@@ -1,0 +1,5 @@
+victim: { approach_dist: 0.5, orientation_dist: 20, orientation_circle: 10, update: 0.5, minimum_dist: 0.5, high_thres: 1.5, low_thres: 0.1, verification_probability: 0.5 }
+qr: { approach_dist: 0.5, orientation_dist: 20, orientation_circle: 10, minimum_dist: 0.4, high_thres: 1, low_thres: 0 }
+hazmat: { approach_dist: 0.5, orientation_circle: 10, orientation_dist: 20, minimum_dist: 0.3, high_thres: 1, low_thres: 0 }
+closest_alert: 0.5
+sensor_range: 2.5 

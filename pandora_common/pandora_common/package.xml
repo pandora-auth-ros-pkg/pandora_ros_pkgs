@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_common</name>
+  <version>0.0.0</version>
+  <description>Containts pandora common packages</description>
+
+  <maintainer email="afourast@gmail.com">afourast</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common</url>
+
+  <author>afourast</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <run_depend>state_manager</run_depend>
+  <run_depend>state_manager_communications</run_depend>
+  <run_depend>watchdog</run_depend>
+  <run_depend>watchdog_communications</run_depend>
+  <run_depend>remote_mutex</run_depend>
+  <run_depend>remote_mutex_communications</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>  
+</package>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_gazebo_worlds</name>
+  <version>0.0.0</version>
+  <description>Contains worlds for simulation using Gazebo.</description>
+
+  <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_gazebo/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_gazebo</url>
+
+  <author>Chris Zalidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>pandora_robots_description</run_depend>
+
+  <export>
+    
+    <gazebo_ros gazebo_media_path="${prefix}" />
+
+  </export>
+</package>

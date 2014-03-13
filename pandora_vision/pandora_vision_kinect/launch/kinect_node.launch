@@ -1,0 +1,3 @@
+<launch>
+  <node name="pandora_kinect_node" type="pandora_kinect_node" pkg="vision" respawn="False" output="screen" />
+</launch>

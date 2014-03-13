@@ -1,0 +1,15 @@
+<launch>
+	
+<group ns="sensors">
+		
+<!--Controllers & sensors-->
+		<node name="xmega" type="uController" pkg="controllers_and_sensors" respawn="true"/>
+
+		<node name="battery_monitor" type="battery_monitor.py" pkg="controllers_and_sensors" />
+		
+		<node name="head_node" type="head_node" pkg="controllers_and_sensors" />
+		
+		<node name="state_indicator" type="state_indicator.py" pkg="controllers_and_sensors" />
+</group>
+
+</launch>

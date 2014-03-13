@@ -1,0 +1,14 @@
+---
+int32[] victimsx
+int32[] victimsy
+int32[] hazmatx
+int32[] hazmaty
+uint8[] pattern
+
+int32[] qrx
+int32[] qry
+
+float64[] qrworldx
+float64[] qrworldy
+string[] qrcontent
+time[] qrtimestamp

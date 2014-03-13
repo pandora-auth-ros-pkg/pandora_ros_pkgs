@@ -1,0 +1,7 @@
+kinect:
+  image_width: 640
+  image_height: 480
+  vfov: 48
+  hfov: 61.14
+  topic_name: /kinect/image
+  camera_frame_id: kinect_link

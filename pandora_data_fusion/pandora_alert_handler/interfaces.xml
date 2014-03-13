@@ -1,0 +1,24 @@
+<package>
+
+  <node>
+    /data_fusion/alert_handler
+    <subscriber>/data_fusion/face_direction_alert</subscriber>
+    <subscriber>/data_fusion/hole_direction_alert</subscriber>
+    <subscriber>/data_fusion/mlx_direction_alert</subscriber>
+    <subscriber>/data_fusion/tpa_direction_alert</subscriber>
+    
+    <subscriber>/data_fusion/selected_victim</subscriber>
+    <subscriber>/data_fusion/tpa_direction_alert</subscriber>
+    <subscriber>/tf</subscriber>
+    
+    <actionClient>/slam/slamMap</actionClient>
+    
+    <actionServer>/data_fusion/get_victims</actionServer>
+    
+    <publisher>/data_fusion/victim_found</publisher>
+    <publisher>/data_fusion/victim_updated</publisher>
+
+  </node>
+  
+</package>
+

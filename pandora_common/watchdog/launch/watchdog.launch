@@ -1,0 +1,4 @@
+<!--Watchdog Monitor -->
+<launch>
+  <node name="watchdog" type="watchdog_monitor" pkg="watchdog" respawn="true" />
+</launch>

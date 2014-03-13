@@ -1,0 +1,7 @@
+tpa: { defaults: { reliability: 0.9, std_deviation: 5, mean_value: 38} }
+mlx: { defaults: { reliability: 0.9, std_deviation: 2, mean_value: 35 } }
+co2: { defaults: { optimal_ppm: 1500, reliability: 0.9 } }
+hole: { defaults: { reliability: 0.9 } }
+face: { defaults: { reliability: 0.8} }
+motion: { defaults: { reliability: 0.8 } }
+stereo_hole: { defaults: { reliability: 0.9 } }

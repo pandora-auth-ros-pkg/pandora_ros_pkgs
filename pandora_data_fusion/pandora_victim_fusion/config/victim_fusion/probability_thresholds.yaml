@@ -1,0 +1,3 @@
+exploration_identification: { tpa: 0.5, mlx: 0.5, hole: 0.5, stereo_hole: 0.5 }
+arm_scan: { mlx: 0.5, face: 0.5 }
+arm_completed: { mlx: 0.5, face: 0.5, co2: 0.5, motion: 0.5 }

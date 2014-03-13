@@ -1,0 +1,53 @@
+<launch>
+    <group ns="pandora_vision_hazmat">
+      
+      <param name="camera_name" value="kinect" />
+    
+      <node name="hazmat_node" type="hazmat_node" pkg="pandora_vision_hazmat" respawn="False" output="screen" />
+      <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+      
+      <!-- **************** /-->
+      <!-- Debug Mode params /-->
+      <!-- **************** /-->
+  
+        <!-- Enable Hazmat Debug /-->
+        <param name="debugHazmat" type="bool" value="True"/>
+  
+      
+      <!-- **************** /-->
+      <!-- Dummy Msg params /-->
+      <!-- **************** /-->
+      
+      
+        <!-- Enable Hazmat Dummy /-->
+        <param name="hazmatDummy" type="bool" value="False"/>	
+      
+        
+        
+      <!-- *********************** /-->
+      <!--  HazmatDetector params  /-->
+      <!-- *********************** /-->
+      
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="colorVariance" type="int" value="30"/>
+        
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="sideLength" type="int" value="50"/>
+  
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="maxAreaThreshold" type="double" value="3300000"/>
+  
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="minAreaThreshold" type="double" value="100"/>
+  
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="votingThreshold" type="double" value="2400"/>
+  
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="MOThreshold" type="double" value="160000"/>				  
+           
+        <!-- Test param for Hazmat Detection  /-->
+        <param name="featureThreshold" type="int" value="10"/>
+  
+    </group>
+</launch>

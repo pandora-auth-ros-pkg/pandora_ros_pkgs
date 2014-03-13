@@ -1,0 +1,11 @@
+<launch>
+  
+  <node name="navigation_visualization" type="navigation_visualization" 
+    pkg="pandora_visualization"/>
+  
+  <node name="data_fusion_object_visualization" type="data_fusion_object_visualization"
+    pkg="pandora_visualization" respawn="true" ns="data_fusion" />
+  
+  <include file="$(find pandora_visualization)/launch/rviz/rviz.launch" />
+  
+</launch>

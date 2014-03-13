@@ -1,0 +1,22 @@
+subscribed_topic_names:
+  holeDirection: /data_fusion/victim_fusion/hole_direction_alert
+  tpaDirection: /data_fusion/victim_fusion/tpa_direction_alert
+  victimVerification: /data_fusion/victim_fusion/victim_verification
+  qr: /vision/qr_alert
+  hazmat: /vision/hazmat_alert
+  currentVictim: /data_fusion/victim_fusion/selected_victim
+  map: /slam/map
+published_topic_names:  
+  victim_found : victim_found
+  victim_update : victim_update
+  victim_verified : victim_verified
+action_server_names:
+  get_victims: get_victims
+  delete_current_victim: delete_current_victim
+  validate_current_hole: validate_current_hole
+service_server_names:
+  get_objects: /data_fusion/get_objects
+  get_markers: /data_fusion/get_markers
+  geotiff: /data_fusion/geotiffSrv
+  flush_queues: /data_fusion/flush_queues
+      

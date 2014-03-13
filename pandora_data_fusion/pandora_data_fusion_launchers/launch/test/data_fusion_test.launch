@@ -1,0 +1,20 @@
+<launch>
+
+  <include file="$(find stdr_launchers)/launch/server_with_map.launch" />
+  
+  <node pkg="tf" type="static_transform_publisher" 
+    name="world2headCamera" args="1 1 1 0 0 0  world headCamera 100" />
+
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_stand_alone.launch" /> 
+
+  <node name="data_fusion_object_visualization" type="data_fusion_object_visualization"
+    pkg="pandora_visualization" respawn="true" ns="data_fusion" />
+  
+  <include file="$(find pandora_visualization)/launch/rviz/rviz_launcher.launch" />
+  
+  <node name="mass_alert_publisher" type="mass_alert_publisher.py"
+    pkg="data_fusion" respawn="true" args="headCamera" />
+    
+  <node name="data_fusion_object_visualization" type="rqt_gui" pkg="rqt_gui" />
+  
+</launch>

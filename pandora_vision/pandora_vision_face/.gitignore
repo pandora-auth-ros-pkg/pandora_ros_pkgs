@@ -1,0 +1,5 @@
+# exclude model file from source repo #
+data/model.xml
+
+# exclude database from source repo #
+att_faces/ 

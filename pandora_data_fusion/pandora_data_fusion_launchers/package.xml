@@ -1,0 +1,16 @@
+<package>
+  <name>pandora_data_fusion_launchers</name>
+  <version>0.0.0</version>
+  <description>data_fusion</description>
+   <maintainer email='afourast@gmail.com'>Afouras Triantafyllos</maintainer> 
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion</url>
+
+  <author>Chris Zalidis</author>
+
+  <export>
+  </export>
+</package>

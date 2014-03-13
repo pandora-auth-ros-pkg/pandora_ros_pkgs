@@ -1,0 +1,34 @@
+<launch>
+  <group ns="pandora_vision_qrcode">
+    
+    <param name="camera_name" value="kinect" />
+    
+    <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" output="screen" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    
+    <!-- **************** /-->
+    <!-- Debug Mode params /-->
+    <!-- **************** /-->
+    
+    <!-- Enable QrCode Debug /-->
+    <param name="debugQrCode" type="bool" value="True"/>
+      
+    <!-- **************** /-->
+    <!-- Dummy Msg params /-->
+    <!-- **************** /-->
+      
+    <!-- Enable QrCode Dummy /-->
+    <param name="qrcodeDummy" type="bool" value="False"/>
+
+    <!-- *********************** /-->
+    <!--  QrCodeDetector params  /-->
+    <!-- *********************** /-->
+        
+    <!-- Test param for QrCode Detection  /-->
+    <param name="qrcodeSharpenBlur" type="int" value="5"/> 
+    
+    <!-- Test param for QrCode Detection  /-->
+    <param name="qrcodeSharpenWeight" type="double" value="0.8"/>
+    
+  </group>
+</launch>

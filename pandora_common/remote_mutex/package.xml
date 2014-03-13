@@ -1,0 +1,24 @@
+<package>
+  <name>remote_mutex</name>
+  <version>0.0.0</version>
+  <description>remote_mutex</description>
+  <maintainer email="afourast@gmail.com">Afouras Triantafyllos</maintainer> 
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/remoteMutex</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Software Architecture Team</author>
+
+ <buildtool_depend>catkin</buildtool_depend>
+
+   <build_depend>roscpp</build_depend> 
+   <build_depend>remote_mutex_communications</build_depend> 
+   
+   <run_depend>roscpp</run_depend> 
+   <build_depend>remote_mutex_communications</build_depend> 
+   
+   
+
+</package>

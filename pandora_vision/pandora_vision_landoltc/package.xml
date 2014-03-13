@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_vision_landoltc</name>
+  <version>0.1.0</version>
+  <description>Containts landoltC detection node.</description>
+
+  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Victor Daropoulos, Despoina Paschalidou</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>roscpp</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_transport</build_depend>
+  <build_depend>vision_communications</build_depend>
+  <build_depend>state_manager</build_depend>
+  <build_depend>state_manager_communications</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  
+  <run_depend>roscpp</run_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>image_transport</run_depend>
+  <run_depend>vision_communications</run_depend>
+  <run_depend>state_manager</run_depend>
+  <run_depend>state_manager_communications</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  
+
+  <export>
+  </export>
+  
+</package>

@@ -1,0 +1,5 @@
+string watchdogName
+uint8 type
+uint8 TYPE_STOP = 0
+uint8 TYPE_START = 1
+duration timeoutDuration

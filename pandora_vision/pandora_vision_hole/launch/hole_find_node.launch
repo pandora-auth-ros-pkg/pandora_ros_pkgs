@@ -1,0 +1,242 @@
+<launch>
+  <group ns="pandora_vision_hole">
+    
+    <param name="camera_name" value="kinect" />
+  
+    <node name="hole_find_node" type="hole_find_node" pkg="pandora_vision_hole" respawn="false" output="screen" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    
+    <!-- **************** /-->
+    <!-- Debug Mode params /-->
+    <!-- **************** /-->
+    
+    <!-- Enable Hole Debug /-->
+    <param name="debugHole" type="bool" value="True"/>
+    
+    <!-- **************** /-->
+    <!-- Dummy Msg params /-->
+    <!-- **************** /-->
+  
+    <!-- Enable Hole Dummy /-->
+    <param name="holeDummy" type="bool" value="False"/>
+    
+
+    <!-- ********************* /-->
+    <!--  HoleDetector params  /-->
+    <!-- ********************* /-->
+  
+    <!-- **************** /-->
+    <!-- Source Filtering /-->
+    <!-- **************** /-->
+    
+    <!-- Mode of operation for Source Filtering  /-->
+    <param name="modeA" type="int" value="0"/> 
+    
+    <!-- Equalize? 0:No 1:Yes  /-->
+    <param name="equalizeA" type="int" value="0"/> 
+    
+    <!-- Smooth Kernel Size. Has to be larger than 4/-->
+    <param name="smoothA" type="int" value="0"/> 
+    
+    <!-- Erode Iterations /-->
+    <param name="erodeA" type="int" value="0"/> 
+    
+    <!-- Dilate Iterations /-->
+    <param name="dilateA" type="int" value="0"/> 
+    
+    <!-- Open Iterations /-->
+    <param name="openA" type="int" value="0"/>
+    
+    <!-- Close Iterations /--> 
+    <param name="closeA" type="int" value="0"/> 
+      
+    <!-- ***************** /-->
+    <!-- Texture Filtering /-->
+    <!-- ***************** /-->
+                
+    <!-- Smooth Kernel Size. Has to be larger than 4/-->
+    <param name="smoothD" type="int" value="11"/> 
+    
+    <!-- Close Iterations /--> 
+    <param name="closeD" type="int" value="3"/> 
+    
+    <!-- Open Iterations /-->
+    <param name="openD" type="int" value="3"/>
+    
+    <!-- Erode Iterations /-->
+    <param name="erodeD" type="int" value="2"/> 
+    
+    <!-- Dilate Iterations /-->
+    <param name="dilateD" type="int" value="5"/> 
+    
+    <!-- Low Threshold  /-->
+    <param name="thresholdLowThresD" type="int" value="130"/> 
+    
+    <!-- High Threshold  /-->
+    <param name="thresholdHighThresD" type="int" value="255"/> 
+      
+    
+    <!-- **************** /-->
+    <!--  Edge Detecting  /-->
+    <!-- **************** /-->
+      
+    <!-- Mode of operation for Edge Detecting  /-->
+    <param name="modeB" type="int" value="0"/> 
+    
+    <!-- ******  /-->
+    <!-- Mode 0  /-->
+    <!-- ******  /-->
+    
+    <!-- Size of Convolution Kernel for Canny. Values : 1,3,5,7  /-->
+    <param name="cannyConvKernelB" type="int" value="3"/> 
+    
+    <!-- Canny low Threshold /-->
+    <param name="cannyLowThresB" type="int" value="20"/> 
+    
+    <!-- Canny high Threshold /-->
+    <param name="cannyHighThresB" type="int" value="40"/> 
+    
+    <!-- Dilate Iterations /-->
+    <param name="dilateB" type="int" value="2"/> 
+    
+    <!-- Size of Convolution Kernel for Canny. Values : 1,3,5,7  /-->
+    <param name="cannyConvKernelB1" type="int" value="3"/> 
+    
+    <!-- Canny low Threshold /-->
+    <param name="cannyLowThresB1" type="int" value="0"/> 
+    
+    <!-- Canny high Threshold /-->
+    <param name="cannyHighThresB1" type="int" value="1"/> 
+      
+    <!-- ******  /-->
+    <!-- Mode 1  /-->
+    <!-- ******  /-->
+    
+    <!-- Gradient Iterations  /-->
+    <param name="gradientB" type="int" value="1"/> 
+    
+    <!-- Equalize? 0:No 1:Yes  /-->
+    <param name="equalizeB" type="int" value="0"/> 
+   
+    <!-- Low Threshold  /-->
+    <param name="thresholdLowThresB" type="int" value="30"/> 
+    
+    <!-- High Threshold  /-->
+    <param name="thresholdHighThresB" type="int" value="255"/> 
+    
+    <!-- Dilate Iterations /-->
+    <param name="dilateB1" type="int" value="2"/> 
+    
+    <!-- Size of Convolution Kernel for Canny. Values : 1,3,5,7  /-->
+    <param name="cannyConvKernelB2" type="int" value="3"/> 
+    
+    <!-- Canny low Threshold /-->
+    <param name="cannyLowThresB2" type="int" value="0"/> 
+    
+    <!-- Canny high Threshold /-->
+    <param name="cannyHighThresB2" type="int" value="0"/> 
+  
+  
+    <!-- **************** /-->
+    <!--   Thresholding   /-->
+    <!-- **************** /-->
+    
+    <!-- Close Iterations /-->
+    <param name="closeC" type="int" value="0"/>
+    
+    <!-- Open Iterations /-->
+    <param name="openC" type="int" value="0"/>
+  
+    <!-- Erode Iterations /-->
+    <param name="erodeC" type="int" value="0"/> 
+    
+    <!-- Dilate Iterations /-->
+    <param name="dilateC" type="int" value="0"/> 
+    
+    <!-- Low Threshold  /-->
+    <param name="thresholdLowThresC" type="int" value="255"/> 
+    
+    <!-- High Threshold  /-->
+    <param name="thresholdHighThresC" type="int" value="255"/> 
+    
+    <!-- ***************** /-->
+    <!-- Contour Filtering /-->
+    <!-- ***************** /-->
+    
+    <!-- Minimum Contour Length /-->
+    <param name="lengthContour" type="int" value="100"/> 
+
+    <!-- Minimum Contour Area /-->
+    <param name="areaContour" type="int" value="2000"/>
+    
+    <!-- Maximum Contour Area /-->
+    <param name="maxAreaContour" type="double" value="90000"/>
+    
+    <!-- Minimum Bounding Rect Height /-->
+    <param name="rectHeightContour" type="int" value="30"/>
+    
+    <!-- Minimum Bounding Rect Width /-->
+    <param name="rectWidthContour" type="int" value="40"/>
+    
+    <!-- Maximum Height to Width Ratio  /-->
+    <param name="heightToWidthContour" type="double" value="3.0"/> 
+    
+    <!-- Maximum Width to Height Ratio  /-->
+    <param name="widthToHeightContour" type="double" value="3.5"/> 
+
+    <!-- Minimum Blob Area to Bounding Rect Area Ratio  /-->
+    <param name="pixelToRectAreaContour" type="double" value="0.50"/> 
+    
+    <!-- Minimum Dark Pixels to Blob Area Ratio  /-->
+    <param name="darkToPixelAreaContour" type="double" value="0.00"/> 
+      
+    <!-- ************** /-->
+    <!-- Blob Filtering /-->
+    <!-- ************** /-->
+    
+    <!-- Minimum Form Factor /-->
+    <param name="minFormFactor" type="double" value="0.50"/> 
+
+    <!-- Minimum Ellipse Factor /-->
+    <param name="ellipseFactorMin" type="double" value="0.6"/> 
+    
+    <!-- Maximum Ellipse Factor /-->
+    <param name="ellipseFactorMax" type="double" value="1.30"/>
+    
+    <!-- Minimum Ellipse Axis Value /-->
+    <param name="minAxisValue" type="int" value="50"/>
+    
+    <!-- Vertical Axis Ratio  /-->
+    <param name="verticalAxisRatio" type="double" value="1.4"/> 
+    
+    <!-- Horizontal Axis Ratio  /-->
+    <param name="horizontalAxisRatio" type="double" value="3.6"/> 
+
+    <!-- Maximum Angle  /-->
+    <param name="thetaHigh" type="double" value="56"/> 
+    
+    <!-- Minimum Angle  /-->
+    <param name="thetaLow" type="double" value="55"/> 
+
+    <!-- ********************* /-->
+    <!-- 	Tracker params	   /-->
+    <!-- ********************* /-->
+
+    <!-- ***************** /-->
+    <!-- CamShift Tracking /-->
+    <!-- ***************** /-->
+
+    <!-- Vmin of HSV  /-->
+    <param name="csVmin" type="int" value="10"/> 
+
+    <!-- Vmax of HSV  /-->
+    <param name="csVmax" type="int" value="72"/> 			
+
+    <!-- Smin of HSV /-->
+    <param name="csSmin" type="int" value="20"/>
+    
+    <!-- Smax of HSV /-->
+    <param name="csSmax" type="int" value="255"/>
+
+  </group>
+</launch>

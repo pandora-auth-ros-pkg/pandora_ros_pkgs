@@ -1,0 +1,5 @@
+string nodeName
+uint8 type
+uint8 TYPE_STARTED = 0
+uint8 TYPE_INITIALIZED = 1
+---

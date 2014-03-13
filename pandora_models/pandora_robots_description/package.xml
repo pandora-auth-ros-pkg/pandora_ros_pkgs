@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_robots_description</name>
+  <version>0.0.0</version>
+  <description>Containts urdf models for pandora robots</description>
+
+  <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_models/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_models</url>
+
+  <author>Chris Zalidis</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  
+  <run_depend>pandora_sensors_description</run_depend>
+  <run_depend>urdf</run_depend>
+  <run_depend>xacro</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+<!--
+  <run_depend>gazebo_ros_control</run_depend>
+-->
+    
+
+  <export>
+  </export>  
+</package>

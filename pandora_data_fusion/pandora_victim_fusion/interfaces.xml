@@ -1,0 +1,18 @@
+<package>
+  
+  <node>
+    /data_fusion/victim_fusion
+    
+    <subscriber>/vision/hazmat_alert</subscriber>
+    <subscriber>/vision/qr_alert</subscriber>
+    <subscriber>/stero/hole_position</subscriber>
+    
+    <publisher>/data_fusion/face_direction_alert</publisher>
+    <publisher>/data_fusion/hole_direction_alert</publisher>
+    <publisher>/data_fusion/mlx_direction_alert</publisher>
+    <publisher>/data_fusion/tpa_direction_alert</publisher>
+    <publisher>/data_fusion/victim_verification</publisher>
+
+  </node>
+
+</package>

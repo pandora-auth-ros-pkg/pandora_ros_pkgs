@@ -1,0 +1,31 @@
+<launch>
+  
+  <arg name="navigation" default="true"/>
+  <arg name="fusion" default="true"/>
+  <arg name="rviz" default="true"/>
+  <arg name="vision" default="false"/>
+  
+  <!-- Slam -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_simulation.launch" />
+  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+  <!-- Navigation -->
+  <group if="$(arg navigation)">
+    <include file="$(find pandora_move_base)/launch/move_base.launch" />
+    <include file="$(find pandora_target_selector)/launch/target_selector.launch" />
+  </group>
+  
+  <!-- Visualization -->
+  <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/visualization.launch" />
+  
+  <!-- Fusion -->
+  <include if="$(arg fusion)" file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+  
+  <!-- Vision -->
+  <group if="$(arg vision)">
+    <include file="$(find pandora_vision_hole)/launch/hole_find_node.launch" />
+    <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
+    <rosparam file="$(find pandora_launchers)/simulation/config/kinect_params.yaml" command="load" />
+  </group>
+
+</launch>
