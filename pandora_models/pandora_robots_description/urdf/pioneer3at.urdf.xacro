@@ -7,12 +7,6 @@
        name="pioneer3at">
 
 <!-- base_link -->
-  <link name="base_footprint"/>
-  <joint name="base_footprint_joint" type="fixed">
-    <origin xyz="0 0 0.177" rpy="0 0 0"/>
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
-  </joint>
   <link name="base_link">
     <inertial>
       <mass value="10.0"/>
@@ -344,7 +338,7 @@
       <rightRearJoint>p3at_back_right_wheel_joint</rightRearJoint>
       <wheelSeparation>0.4</wheelSeparation>
       <wheelDiameter>0.220</wheelDiameter>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <robotBaseFrame>base_link</robotBaseFrame>
       <topicName>cmd_vel</topicName>
       <broadcastTF>0</broadcastTF>
       <torque>5.0</torque>
