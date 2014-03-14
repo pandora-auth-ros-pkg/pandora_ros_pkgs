@@ -1,0 +1,20 @@
+<launch>
+  
+    <param name="interfaceListPackagePath" value="$(find pandora_interface_diagnostics)" />
+     
+    <param name="alertHandlerPackagePath" value="$(find pandora_alert_handler)" />
+    <param name="victimFusionPackagePath" value="$(find pandora_victim_fusion)" />
+    
+    <param name="sensorsPackagePath" value="$(find pandora_sensors)" />
+    
+<!--
+    <param name="slamPackagePath" value="$(find pandora_slam)" />
+    <param name="navigationPackagePath" value="$(find pandora_navigation)" />
+    <param name="visionPackagePath" value="$(find pandora_vision)" />
+-->
+  
+    <node name="interface_diagnostics" 
+      type="interface_diagnostics_node" pkg="pandora_interface_diagnostics"  />
+
+    
+</launch>

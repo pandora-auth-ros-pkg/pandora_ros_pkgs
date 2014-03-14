@@ -1,0 +1,25 @@
+<package>
+  <name>interface_tester</name>
+  <version>0.0.0</version>
+  <description>interface_tester</description>
+  <maintainer email="afourast@gmail.com">sanzoulapi</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_diagnostics/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_diagnostics</url>
+
+  <author>Miltiadis Allamanis</author>
+  <author>Afouras Triantafyllos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+   <build_depend>roscpp</build_depend> 
+   <build_depend>tf</build_depend> 
+   
+   <run_depend>roscpp</run_depend> 
+   <run_depend>tf</run_depend> 
+
+  <export>
+  </export>
+</package>

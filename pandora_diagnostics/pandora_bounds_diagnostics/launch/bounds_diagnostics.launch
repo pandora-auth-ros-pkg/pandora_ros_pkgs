@@ -1,0 +1,4 @@
+<launch>
+    <node name="MsgDiagnListener" 
+      type="boundsCheck" pkg="pandora_bounds_diagnostics"  />
+</launch>

@@ -1,0 +1,22 @@
+<launch>
+  
+<!--
+  <node pkg="pr2_computer_monitor" type="network_detector" name="network_detector" output="screen">
+    <param name="interface_name" value="wlan0"/>
+  </node>
+-->
+
+  <node pkg="pr2_computer_monitor" type="hd_monitor.py" 
+        args="$(optenv HOME /home) --diag-hostname=pandora"  name="hd_monitor" >
+  </node>
+    
+  <node name="cpu_monitor" pkg="pr2_computer_monitor" type="cpu_monitor.py"
+        args="--diag-hostname=pandora" >
+    <param name="check_ipmi_tool" value="false" type="bool" />
+    <param name="enforce_clock_speed" value="false" type="bool" />
+    <param name="num_cores" value="-1" type="int" />
+  </node>
+  
+  <include file="$(find pandora_diagnostics)/launch/aggregator.launch"/>
+
+</launch>

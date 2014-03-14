@@ -1,0 +1,9 @@
+<launch>
+  
+  <include file="$(find pandora_interface_diagnostics)/launch/interface_diagnostics.launch" />
+ 
+  <include file="$(find pandora_bounds_diagnostics)/launch/bounds_diagnostics.launch" />
+  
+  <include file="$(find pandora_diagnostics)/launch/diagnostic_aggregator.launch"/>
+  
+</launch>

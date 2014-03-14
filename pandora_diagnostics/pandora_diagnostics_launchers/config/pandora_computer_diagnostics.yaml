@@ -1,0 +1,36 @@
+analyzers:
+  stateManager:
+    type: GenericAnalyzer
+    path: State Manager
+    startswith: 'stateServer'
+    timeout: 10
+  motors:
+    type: GenericAnalyzer
+    path: Main Motor Control
+    startswith: 'mainMotor'
+    contains: ['Motor Status']
+  computers:
+    type: GenericAnalyzer
+    path: Computers
+    startswith: 'pandora'
+    contains: [
+      'HD Temp',
+      'CPU Usage',
+      'CPU Temprature',
+      'HD Usage']
+    discard_stale: true
+  slam:
+    type: GenericAnalyzer
+    path: Laser
+    startswith: 'slam'
+  tests:
+    type: GenericAnalyzer
+    path: Tests
+    contains: ['System Interfaces',
+    'System Nodes']
+    discard_stale: true
+  arm:
+    type: GenericAnalyzer
+    path: arm
+    contains: ['arm_control_node']
+    discard_stale: false
