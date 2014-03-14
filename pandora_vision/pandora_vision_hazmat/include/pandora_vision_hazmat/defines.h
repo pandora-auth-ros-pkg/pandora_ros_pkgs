@@ -62,7 +62,7 @@
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include "state_client.h"
+#include "state_manager/state_client.h"
 #include "vision_communications/HazmatAlertsVectorMsg.h"
 
 //the maximum number of keypoint NN candidates to check during BBF search

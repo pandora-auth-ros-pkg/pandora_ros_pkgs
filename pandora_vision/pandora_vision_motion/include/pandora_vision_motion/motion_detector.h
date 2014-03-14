@@ -34,43 +34,98 @@
 *
 * Author:  George Aprilis
 *********************************************************************/
-/////////////////////////////////////////////////////////////////
 
 #ifndef MOTIONDETECTOR_H
 #define MOTIONDETECTOR_H
 
+#include "ros/ros.h"
 #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
 
-using namespace std;
-
-class MotionDetector
+namespace pandora_vision 
 {
-public:
-	int			N;					//buffer size
-	int 		diff_threshold;		//threshold between pixel (grayscale) values to be considered "different" between 2 frames
-	double 		motion_high_thres;	//evaluation threshold: higher value means a lot of movement
-	double 		motion_low_thres;	//evaluation threshold: higher value means a little movement - less means no movement at all
+  class MotionDetector
+  {
+    private:
+    //!< Used to avoid wrong results in the first calculations
+    int flagCounter;
+    //!< Last frame stored in buffer		
+    int last;
+    //!< Sum of different pixels between two frames (after thresholding)
+    int count;				
+    //!< N-sized buffer
+    cv::Mat *buf;
+    //!< Temporary copy of frame 			
+    cv::Mat tmp;
+    //!< Image with the difference between 2 frames' pixels' values				
+    cv::Mat dif; 				
 
-private:
-	int 		flagCounter;		//Used to avoid wrong results in the first calculations
-	int 		last;				//Last frame stored in buffer
-	int 		count;				//Sum of different pixels between two frames (after thresholding)
-	//due to empty initial frames in buffer
-	cv::Mat  	*buf; 				//N-sized buffer
-	cv::Mat 	tmp;				//Temporary copy of frame
-	cv::Mat 	dif; 				//Image with the difference between 2 frames' pixels' values
-
-public:
-	MotionDetector();
-	~MotionDetector();
-	int 		detectMotion(cv::Mat frame);	//the main Motion Detector function
-	int 		getCount();
-	void 		resetFlagCounter();	//
-	cv::Mat		getDiffImg();
-};
-
+    public:
+     //!< buffer size
+    int	N;					
+    //!< Threshold between pixel (grayscale) values to be considered "different" between 2 frames
+    int diff_threshold;		
+    //!< Evaluation threshold: higher value means a lot of movement
+    double motion_high_thres;	
+    //!< Evaluation threshold: higher value means a little movement - less means no movement at all
+    double motion_low_thres;	
+    
+    /**
+      @brief Class Constructor
+      Initializes varialbes used in detecting. Here is
+      were desirable threashold values will be determined. 
+    */
+    MotionDetector();
+    
+    /**
+      @brief Class Destructor
+      Deallocates memory used for storing images
+    */
+    virtual ~MotionDetector();
+    
+    /**
+      @brief Using a N-sized buffer compares current given frame
+      with last - (N-1)th frame and calculates an the difference 
+      between the two frames giving value to a variable integer "count" 
+      with the number of different pixels. According to given thresholds,
+      returns:
+                -1				Error in frame input
+                 0				Insignificant Motion
+                 1				Slight Motion
+                 2				Extensive Motion						
+      Function detectMotion() of a specific MotionDetector is run in a loop.	  
+      @param	frame [cv::Mat] The current frame given as input 
+      @return [int] Index of evaluation of Motion in N frames.
+    */
+    int detectMotion(cv::Mat frame);	
+    
+    /**
+      @brief Returns the number of different pixels found
+      in a (thresholded) difference between frames.
+      According to this value, motion is evaluated internally in detectMotion().
+      @return 		integer count 
+    */
+    int getCount();
+    
+    /**
+      @brief Function called in the ROS node, used to reset the flagCounter 
+      value, which causes the algorithm to re-wait until the buffer of frames 
+      is full and results can be trusted again.		   
+      @return 		void 
+    */
+    void resetFlagCounter();	
+    
+    /**
+      @brief Function that returns the last image of the buffer of frames
+      which holds the difference image. Being called
+      in the ROS Node after the agorithm has run,
+      retrieves the result image for debugging.		   
+      @return [int] count 
+    */
+    cv::Mat getDiffImg();
+  };
+}
 #endif

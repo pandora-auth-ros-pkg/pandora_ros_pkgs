@@ -285,7 +285,7 @@ namespace pandora_vision
    * qrcodes in a given frame
    * @return void
    */
-  void QrCodeDetection::qrCallback()
+  void QrCodeDetection::qrCollback()
   {
 
     //!< Create message of QrCode Detector

@@ -54,7 +54,7 @@
 #include "hole_detector.h"
 #include "tracker.h"
 
-#include "state_client.h"
+#include "state_manager/state_client.h"
 
 #include <iostream>
 #include <stdlib.h>

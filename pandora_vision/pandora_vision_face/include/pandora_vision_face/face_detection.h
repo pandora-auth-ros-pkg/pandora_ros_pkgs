@@ -53,7 +53,7 @@
 #include "vision_communications/FaceDirectionMsg.h"
 #include "face_detector.h"
 #include "time_calculator.h"
-#include "state_client.h"
+#include "state_manager/state_client.h"
 
 //!< Horizontal field of view in degrees
 #define HFOV 61.14
