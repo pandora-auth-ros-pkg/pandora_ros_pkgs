@@ -28,7 +28,7 @@
 #include "data_fusion_communications/DatafusionGeotiffSrv.h"
 #include "data_fusion_communications/GetMarkersSrv.h"
 
-#include "state_client.h"
+#include "state_manager/state_client.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
 #include "alert_handler/defines.h"
