@@ -114,7 +114,7 @@ namespace pandora_vision
     for (int i = 0 ; i < nPatterns_ ; i++)
     {
       char temp_name[50];
-      sprintf(temp_name, "/patterns/enter%d.png", i + 1);
+      snprintf(temp_name, sizeof(temp_name), "/patterns/enter%d.png", i + 1);
       std::string name = param_path_ + temp_name;
       
       image = cv::imread(name.c_str(), 1);
@@ -198,7 +198,7 @@ namespace pandora_vision
       char temp_name[50];
       for(int i = 0 ; i < nPatterns_ ; i++)
       {
-        sprintf(temp_name, "/patterns/enter%d.png", i + 1);
+        snprintf(temp_name, sizeof(temp_name), "/patterns/enter%d.png", i + 1);
         std::string name = param_path_ + temp_name;
         image = cv::imread(name.c_str(), 1);
         cvtColor(image, image, CV_BGR2HSV);
@@ -237,7 +237,7 @@ namespace pandora_vision
   {
     // Set parameters
     char temp_name[50];
-    strcpy(temp_name, "/contents");
+    snprintf(temp_name, sizeof(temp_name), "/contents");
     patternIndexPath_ = param_path_ + temp_name;
     
   } 
@@ -374,7 +374,7 @@ namespace pandora_vision
     {
       fgets(imgName, 49, contents);
       imgName[strlen(imgName) - 1] = '\0';
-      sprintf(featName, "/%s.sift", imgName);
+      snprintf(featName, sizeof(featName), "/%s.sift", imgName);
 
       std::string feature_name;
       feature_name = param_path_+featName;
@@ -418,7 +418,7 @@ namespace pandora_vision
       }
       
       int n = sift_features(img, &feat);
-      sprintf(featName, "%s.sift", imgName);
+      snprintf(featName, sizeof(featName), "%s.sift", imgName);
       export_features(featName, feat, n);
 
       // Free memory
@@ -656,7 +656,7 @@ namespace pandora_vision
     // SIFT process of screenshot
     struct kd_node* kd_root;
     
-    if (! img)
+    if (!img)
     {
       ROS_ERROR("Could not load image");
     }
@@ -700,7 +700,8 @@ namespace pandora_vision
           if( H )
           {
             char temp_name[50];
-            sprintf(temp_name, "/patterns/enter%d.png", n + 1);
+            snprintf(temp_name, sizeof(temp_name), 
+              "/patterns/enter%d.png", n + 1);
             std::string name;
             name = param_path_ + temp_name;
           

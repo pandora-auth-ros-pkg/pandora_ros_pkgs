@@ -35,8 +35,8 @@
 * Authors:  Tsakalis Vasilis, Despoina Paschalidou
 *********************************************************************/
 
-#ifndef PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_DEFINES_H_
-#define PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_DEFINES_H_
+#ifndef PANDORA_VISION_HAZMAT_DEFINES_H
+#define PANDORA_VISION_HAZMAT_DEFINES_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -154,4 +154,4 @@
 /** max feature descriptor length */
 #define FEATURE_MAX_D 128
 
-#endif  // PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_DEFINES_H_
+#endif  // PANDORA_VISION_HAZMAT_DEFINES_H

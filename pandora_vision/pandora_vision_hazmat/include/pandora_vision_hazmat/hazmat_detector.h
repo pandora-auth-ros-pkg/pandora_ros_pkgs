@@ -35,8 +35,8 @@
 * Authors:  Tsakalis Vasilis, Despoina Paschalidou
 *********************************************************************/
 
-#ifndef PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H_
-#define PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H_
+#ifndef PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H
+#define PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H
 
 #include "pandora_vision_hazmat/sift.h"
 #include "pandora_vision_hazmat/kdtree.h"
@@ -111,7 +111,7 @@ namespace pandora_vision
       CvPoint2D64f** upperPoints;
       CvPoint2D64f** lowerPoints;
       
-      HazmatEpsilonDetector(std::string package_path); //our constructor
+      explicit HazmatEpsilonDetector(std::string package_path); 
       
       float**maxUV;
       float**minUV;
@@ -254,4 +254,4 @@ namespace pandora_vision
 
 
 
-#endif  // PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H_
+#endif  // PANDORA_VISION_HAZMAT_HAZMAT_DETECTOR_H

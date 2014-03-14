@@ -32,7 +32,6 @@ include_directories(include
 )
 
 add_executable(motion_node 
-    src/motion_node.cpp
     src/motion_detection.cpp
     src/motion_detector.cpp
 )

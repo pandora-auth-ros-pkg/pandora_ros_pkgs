@@ -35,8 +35,8 @@
 * Authors:  Tsakalis Vasilis, Despoina Paschalidou
 *********************************************************************/
  
-#ifndef PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H_
-#define PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H_
+#ifndef PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H
+#define PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H
 
 #include "pandora_vision_hazmat/hazmat_detector.h"
 
@@ -150,6 +150,6 @@ namespace pandora_vision
 
 } // namespace pandora_vision
 
-#endif  // PANDORA_VISION_HAZMAT_INCLUDE_PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H_
+#endif  // PANDORA_VISION_HAZMAT_HAZMAT_DETECTION_H
     
     
