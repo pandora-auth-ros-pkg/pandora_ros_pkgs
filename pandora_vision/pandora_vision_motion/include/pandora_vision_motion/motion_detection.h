@@ -35,8 +35,8 @@
 * Author:  George Aprilis
 *********************************************************************/
  
-#ifndef MOTIONDETECTION_H
-#define  MOTIONDETECTION_H
+#ifndef PANDORA_VISION_MOTION_MOTION_DETECTION_H 
+#define PANDORA_VISION_MOTION_MOTION_DETECTION_H 
 
 #include "ros/ros.h"
 
@@ -50,7 +50,7 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-#include "motion_detector.h"
+#include "pandora_vision_motion/motion_detector.h"
 
 
 #include "state_manager/state_client.h"
@@ -59,9 +59,9 @@
 #include <stdlib.h>
 
 //!< Default frame height
-#define DEFAULT_HEIGHT 480		
+#define DEFAULT_HEIGHT 480
 //!< Default frame width
-#define DEFAULT_WIDTH	640		
+#define DEFAULT_WIDTH 640
 
 namespace pandora_vision
 {
@@ -71,19 +71,19 @@ namespace pandora_vision
 
       //nodeHandle
       ros::NodeHandle _nh;
-      MotionDetector*	_motionDetector;
+      MotionDetector* _motionDetector;
       float ratioX;
       float ratioY;
       
-      float hfov;		//horizontal Field Of View (rad)
-      float vfov;		
-      int frameWidth;		//frame width
-      int frameHeight;	//frame height
+      float hfov; //horizontal Field Of View (rad)
+      float vfov; 
+      int frameWidth; //frame width
+      int frameHeight; //frame height
       
-      cv::Mat	motionFrame;				// frame processed by MotionDetector
+      cv::Mat motionFrame; // frame processed by MotionDetector
     
       
-      ros::Time	motionFrameTimestamp;		// MotionDetector frame timestamp
+      ros::Time motionFrameTimestamp; // MotionDetector frame timestamp
 
       std::string imageTopic;
       std::string cameraName;
@@ -107,9 +107,9 @@ namespace pandora_vision
       //variable used for State Managing
       bool motionNowON;
       
-        /**
-   @brief Publishing debug images
-   @return void
+      /**
+       @brief Publishing debug images
+       @return void
       */
       void publish_debug_images();
     public:
@@ -121,8 +121,8 @@ namespace pandora_vision
             
       /**
         @brief Destructor
-      */			
-      virtual ~MotionDetection();	
+      */
+      virtual ~MotionDetection();
       
        /**
          @brief Get parameters referring to view and frame characteristics from
@@ -165,11 +165,9 @@ namespace pandora_vision
       void completeTransition(void);
       
       //!< Current state of robot
-      int curState;		
+      int curState;
       //!< Previous state of robot
-      int prevState;		
+      int prevState;
   };
-}
-#endif
-		
-		
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_MOTION_MOTION_DETECTION_H

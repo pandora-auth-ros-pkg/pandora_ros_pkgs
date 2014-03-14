@@ -35,8 +35,8 @@
 * Author:  George Aprilis
 *********************************************************************/
 
-#ifndef MOTIONDETECTOR_H
-#define MOTIONDETECTOR_H
+#ifndef PANDORA_VISION_MOTION_MOTION_DETECTOR_H
+#define PANDORA_VISION_MOTION_MOTION_DETECTOR_H
 
 #include "ros/ros.h"
 #include <opencv2/opencv.hpp>
@@ -52,26 +52,26 @@ namespace pandora_vision
     private:
     //!< Used to avoid wrong results in the first calculations
     int flagCounter;
-    //!< Last frame stored in buffer		
+    //!< Last frame stored in buffer
     int last;
     //!< Sum of different pixels between two frames (after thresholding)
-    int count;				
+    int count;
     //!< N-sized buffer
     cv::Mat *buf;
-    //!< Temporary copy of frame 			
+    //!< Temporary copy of frame
     cv::Mat tmp;
-    //!< Image with the difference between 2 frames' pixels' values				
-    cv::Mat dif; 				
+    //!< Image with the difference between 2 frames' pixels' values
+    cv::Mat dif;
 
     public:
      //!< buffer size
-    int	N;					
+    int N;
     //!< Threshold between pixel (grayscale) values to be considered "different" between 2 frames
-    int diff_threshold;		
+    int diff_threshold;
     //!< Evaluation threshold: higher value means a lot of movement
-    double motion_high_thres;	
+    double motion_high_thres;
     //!< Evaluation threshold: higher value means a little movement - less means no movement at all
-    double motion_low_thres;	
+    double motion_low_thres;
     
     /**
       @brief Class Constructor
@@ -92,40 +92,40 @@ namespace pandora_vision
       between the two frames giving value to a variable integer "count" 
       with the number of different pixels. According to given thresholds,
       returns:
-                -1				Error in frame input
-                 0				Insignificant Motion
-                 1				Slight Motion
-                 2				Extensive Motion						
-      Function detectMotion() of a specific MotionDetector is run in a loop.	  
+                -1 Error in frame input
+                 0 Insignificant Motion
+                 1 Slight Motion
+                 2 Extensive Motion 
+      Function detectMotion() of a specific MotionDetector is run in a loop.  
       @param	frame [cv::Mat] The current frame given as input 
       @return [int] Index of evaluation of Motion in N frames.
     */
-    int detectMotion(cv::Mat frame);	
+    int detectMotion(cv::Mat frame);
     
     /**
       @brief Returns the number of different pixels found
       in a (thresholded) difference between frames.
       According to this value, motion is evaluated internally in detectMotion().
-      @return 		integer count 
+      @return integer count 
     */
     int getCount();
     
     /**
       @brief Function called in the ROS node, used to reset the flagCounter 
       value, which causes the algorithm to re-wait until the buffer of frames 
-      is full and results can be trusted again.		   
-      @return 		void 
+      is full and results can be trusted again.
+      @return void 
     */
-    void resetFlagCounter();	
+    void resetFlagCounter();
     
     /**
       @brief Function that returns the last image of the buffer of frames
       which holds the difference image. Being called
       in the ROS Node after the agorithm has run,
-      retrieves the result image for debugging.		   
+      retrieves the result image for debugging.  
       @return [int] count 
     */
     cv::Mat getDiffImg();
   };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_MOTION_MOTION_DETECTOR_H

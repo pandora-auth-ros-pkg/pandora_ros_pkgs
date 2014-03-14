@@ -42,10 +42,10 @@ namespace pandora_vision
   /**
     @brief Constructor
   **/
-  MotionDetection::MotionDetection() :	_nh()
+  MotionDetection::MotionDetection() : _nh()
   {
     //!< Initialize motion detector
-    _motionDetector		=	new MotionDetector();
+    _motionDetector = new MotionDetector();
 
     //!< Get Motion Detector Parameters
     getMotionParams();
@@ -53,27 +53,33 @@ namespace pandora_vision
     //!< Get General Parameters, such as frame width & height , camera id
     getGeneralParams();
 
-    motionFrame = cv::Mat(cv::Size(frameWidth,frameHeight), CV_8UC3);
+    motionFrame = cv::Mat(cv::Size(frameWidth, frameHeight), CV_8UC3);
 
-    //!< Declare publisher and advertise topic where algorithm results are posted
-    _motionPublisher = _nh.advertise<vision_communications::MotionMsg>("motion", 10);
+    //!< Declare publisher and advertise topic where 
+    //!< algorithm results are posted
+    _motionPublisher = 
+      _nh.advertise<vision_communications::MotionMsg>("motion", 10);
 
     //!< Advertise topics for debugging if we are in debug mode
     if (debugMotion)
     {
-      _motionDiffPublisher = image_transport::ImageTransport(_nh).advertise("debug_motionDiff", 1);
-      _motionFrmPublisher = image_transport::ImageTransport(_nh).advertise("debug_motionFrm", 1);
+      _motionDiffPublisher = 
+        image_transport::ImageTransport(_nh).advertise("debug_motionDiff", 1);
+      _motionFrmPublisher =
+        image_transport::ImageTransport(_nh).advertise("debug_motionFrm", 1);
     }
 
     //!< Subscribe to input image's topic
-    _frameSubscriber = image_transport::ImageTransport(_nh).subscribe(imageTopic , 1, &MotionDetection::imageCallback, this );
+    _frameSubscriber = 
+      image_transport::ImageTransport(_nh).subscribe(imageTopic , 1,
+        &MotionDetection::imageCallback, this );
 
     //!< Initialize states - robot starts in STATE_OFF 
     curState = state_manager_communications::robotModeMsg::MODE_OFF;
     prevState = state_manager_communications::robotModeMsg::MODE_OFF;
 
     //!< initialize state Managing Variables
-    motionNowON 	= false;
+    motionNowON = false;
       
     clientInitialize();
       
@@ -326,23 +332,25 @@ namespace pandora_vision
   {
     curState = newState;
     //!< Check if motion algorithm should be running now
-    motionNowON		=	( curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD );
+    motionNowON = ( curState == 
+      state_manager_communications::robotModeMsg::MODE_DF_HOLD );
 
-    //!< Everytime state changes, Motion Detector needs to be reset so that it will
-    //!< discard frames from previous calls in buffer.
+    //!< Everytime state changes, Motion Detector needs to be reset so that 
+    //!< it will discard frames from previous calls in buffer.
     if(motionNowON)
     {
       _motionDetector->resetFlagCounter();
     }
 
     //!< Shutdown if the robot is switched off
-    if (curState == state_manager_communications::robotModeMsg::MODE_TERMINATING)
+    if (curState == 
+      state_manager_communications::robotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;
     }
 
-    prevState=curState;
+    prevState = curState;
 
     transitionComplete(curState); 
   }
@@ -355,4 +363,5 @@ namespace pandora_vision
   {
     ROS_INFO("[motion_node] : Transition Complete");
   }
-}
+}// namespace pandora_vision
+

@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     image_transport
     sensor_msgs
+    roslint
 )
 
 
@@ -22,6 +23,7 @@ catkin_package(
       cv_bridge
       image_transport
       sensor_msgs
+      roslint
     INCLUDE_DIRS
       include
     LIBRARIES 
@@ -41,3 +43,20 @@ add_dependencies(motion_node
     vision_communications_gencpp
     ${catkin_EXPORTED_TARGETS}
 )
+
+#~ To check lint : catkin_make roslint_pandora_vision_motion
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
+    
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
+  RELATIVE ${PROJECT_SOURCE_DIR} 
+            
+  include/motion_detection.h
+  include/motion_detector.h
+  src/motion_detector.cpp
+  src/motion_detection.cpp
+  
+            
+)
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+
