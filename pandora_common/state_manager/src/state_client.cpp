@@ -14,7 +14,7 @@
  */
 
 
-#include "state_client.h"
+#include "state_manager/state_client.h"
 
 StateClient::StateClient (bool doRegister) : _nh() {
 	name = ros::this_node::getName();

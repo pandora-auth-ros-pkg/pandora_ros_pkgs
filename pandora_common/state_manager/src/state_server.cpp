@@ -12,7 +12,7 @@
  * Change History: -
  */
 
-#include "state_server.h"
+#include "state_manager/state_server.h"
 
 StateServer::StateServer() : 
 			_nh(),	
