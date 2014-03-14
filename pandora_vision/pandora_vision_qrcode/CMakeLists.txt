@@ -43,3 +43,19 @@ add_dependencies(qrcode_node
     ${catkin_EXPORTED_TARGETS}
 )
 target_link_libraries(qrcode_node ${catkin_LIBRARIES} zbar)
+
+#~ To check lint : catkin_make roslint_pandora_vision_qrcode
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
+    
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
+  RELATIVE ${PROJECT_SOURCE_DIR} 
+            
+  include/qrCode_detection.h
+  include/qrCode_detector.h
+  src/qrCode_detector.cpp
+  src/qrCode_detection.cpp
+  
+            
+)
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
