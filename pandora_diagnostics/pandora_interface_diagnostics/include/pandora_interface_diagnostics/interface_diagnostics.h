@@ -45,7 +45,7 @@
 #include <stdio.h>
 
 #include <ros/ros.h>
-#include "state_client.h"
+#include "state_manager/state_client.h"
 #include "interface_tester/tf_monitor.h"
 #include "interface_tester/interface_tester.h"
 
