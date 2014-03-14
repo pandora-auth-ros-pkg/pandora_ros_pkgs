@@ -35,8 +35,8 @@
  * Author: Miltiadis-Alexios Papadopoulos
  *********************************************************************/
 
-#ifndef QRCODEDETECTOR_HPP
-#define QRCODEDETECTOR_HPP
+#ifndef PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H 
+#define PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H 
 
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -77,7 +77,7 @@ namespace pandora_vision {
         @param image [zbar::Image&] The image
         @return void
        **/
-      void debug_show(zbar::Image&);
+      void debug_show(const zbar::Image&);
 
 
     public:
@@ -110,5 +110,5 @@ namespace pandora_vision {
         return qrcode_list;
       };
   };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H

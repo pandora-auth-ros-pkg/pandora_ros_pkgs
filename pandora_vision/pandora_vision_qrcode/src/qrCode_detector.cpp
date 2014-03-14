@@ -52,7 +52,7 @@ namespace pandora_vision {
     @param image [zbar::Image&] The image
     @return void
    */
-  void QrCodeDetector::debug_show(zbar::Image& image)
+  void QrCodeDetector::debug_show(const zbar::Image& image)
   {
     cvtColor(gray_frame, debug_frame, CV_GRAY2BGR);
 
@@ -60,7 +60,7 @@ namespace pandora_vision {
     for (zbar::Image::SymbolIterator symbol = image.symbol_begin();
         symbol != image.symbol_end(); ++symbol)
     {
-      for(int i=0; i < symbol->get_location_size(); i++)
+      for(int i = 0; i < symbol->get_location_size(); i++)
       {
         line(debug_frame,
             cv::Point(symbol->get_location_x(i), symbol->get_location_y(i)),
@@ -72,7 +72,7 @@ namespace pandora_vision {
       cv::circle(debug_frame,
           qrcode_list[counter].qrcode_center,
           6,
-          cv::Scalar(0,0,255),
+          cv::Scalar(0, 0, 255),
           CV_FILLED);
 
       counter++;
@@ -122,7 +122,7 @@ namespace pandora_vision {
       detected_code.qrcode_desc = symbol->get_data();
 
       cv::Point detected_center;
-      for(int i=0;i<symbol->get_location_size() ;i++)
+      for(int i = 0; i < symbol->get_location_size(); i++)
       {
         detected_center.x += symbol->get_location_x(i);
         detected_center.y += symbol->get_location_y(i);
@@ -142,4 +142,4 @@ namespace pandora_vision {
 
     image.set_data(NULL, 0);
   }
-}
+}// namespace pandora_vision

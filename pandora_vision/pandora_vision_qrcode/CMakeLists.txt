@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     image_transport
     sensor_msgs
+    roslint
 )
 
 find_package(PkgConfig)
@@ -24,6 +25,7 @@ catkin_package(
       cv_bridge
       image_transport
       sensor_msgs
+      roslint
     INCLUDE_DIRS
       include
     LIBRARIES

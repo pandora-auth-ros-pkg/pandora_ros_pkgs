@@ -35,8 +35,8 @@
  * Author: Miltiadis-Alexios Papadopoulos
  *********************************************************************/
 
-#ifndef QrCodeDetection_H
-#define QrCodeDetection_H
+#ifndef PANDORA_VISION_QRCODE_QRCODE_DETECTION_H
+#define PANDORA_VISION_QRCODE_QRCODE_DETECTION_H
 
 #include <iostream>
 #include <stdlib.h>
@@ -50,7 +50,7 @@
 #include "state_manager/state_client.h"
 #include <std_srvs/Empty.h>
 #include "vision_communications/QRAlertsVectorMsg.h"
-#include "qrCode_detector.h"
+#include "pandora_vision_qrcode/qrCode_detector.h"
 
 //!< Horizontal field of view in degrees
 #define HFOV 61.14  
@@ -94,7 +94,7 @@ namespace pandora_vision {
       cv::Mat qrcodeFrame;
 
       //!< MotionDetector frame timestamp
-      ros::Time	qrcodeFrameTimestamp;
+      ros::Time qrcodeFrameTimestamp;
 
       //!< The topic subscribed to for the front camera
       std::string imageTopic;
@@ -182,5 +182,5 @@ namespace pandora_vision {
       void completeTransition(void);
 
   };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTION_H

@@ -103,6 +103,7 @@ namespace pandora_vision
    */
   void QrCodeDetection::getGeneralParams()
   {
+   
     //!< Get the qrcodeDummy parameter if available;
     if (_nh.hasParam("qrcodeDummy"))
     {
@@ -111,9 +112,8 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : \
-          Parameter qrcodeDummy not found. Using Default");
       qrcodeDummy = false;
+      ROS_DEBUG("qrcodeDummy: %d", qrcodeDummy);
     }
 
     //!< Get the debugQrCode parameter if available;
@@ -124,9 +124,8 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : \
-          Parameter debugQrCode not found. Using Default");
       debugQrCode = true;
+      ROS_DEBUG_STREAM("debugQrCode : " << debugQrCode);
     }
     
     //!< Get the camera to be used by qr node;
@@ -134,9 +133,10 @@ namespace pandora_vision
       _nh.getParam("camera_name", cameraName);
       ROS_DEBUG_STREAM("camera_name : " << cameraName);
     }
-    else {
-      ROS_DEBUG("[QrCode_node] : Parameter frameHeight not found. Using Default");
+    else 
+    {
       cameraName = "camera";
+      ROS_DEBUG_STREAM("camera_name : " << cameraName);
     }
 
     //!< Get the Height parameter if available;
@@ -147,9 +147,8 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : \
-          Parameter frameHeight not found. Using Default");
       frameHeight = DEFAULT_HEIGHT;
+      ROS_DEBUG_STREAM("height : " << frameHeight);
     }
     
     //!< Get the Width parameter if available;
@@ -160,8 +159,8 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : Parameter frameWidth not found. Using Default");
       frameWidth = DEFAULT_WIDTH;
+      ROS_DEBUG_STREAM("width : " << frameWidth);
     }
 
     //!< Get the listener's topic;
@@ -172,8 +171,8 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : Parameter imageTopic not found. Using Default");
       imageTopic = "/camera_head/image_raw";
+      ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
     }
     
     //!< Get the images's frame_id;
@@ -181,9 +180,10 @@ namespace pandora_vision
       _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
       ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
-    else {
-      ROS_DEBUG("[QrCode_node] : Parameter camera_frame_id not found. Using Default");
+    else 
+    {
       cameraFrameId = "/camera";
+      ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
     
     //!< Get the HFOV parameter if available;
@@ -191,9 +191,10 @@ namespace pandora_vision
       _nh.getParam("/" + cameraName + "/hfov", hfov);
       ROS_DEBUG_STREAM("HFOV : " << hfov);
     }
-    else {
-      ROS_DEBUG("[QrCode_node] : Parameter frameWidth not found. Using Default");
+    else 
+    {
       hfov = HFOV;
+      ROS_DEBUG_STREAM("HFOV : " << hfov);
     }
     
     //!< Get the VFOV parameter if available;
@@ -201,9 +202,10 @@ namespace pandora_vision
       _nh.getParam("/" + cameraName + "/vfov", vfov);
       ROS_DEBUG_STREAM("VFOV : " << vfov);
     }
-    else {
-      ROS_DEBUG("[QrCode_node] : Parameter frameWidth not found. Using Default");
+    else 
+    {
       vfov = VFOV;
+      ROS_DEBUG_STREAM("VFOV : " << vfov);
     }
 
   }
@@ -225,8 +227,6 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCodeNode] : \
-          Parameter qrcodeSharpenBlur not found. Using Default");
       _qrcodeDetector.gaussiansharpenblur = 5;
     }
 
@@ -240,8 +240,6 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[QrCode_node] : \
-          Parameter qrcodeSharpenWeight not found. Using Default");
       _qrcodeDetector.gaussiansharpenweight = 0.8;
     }
   }
@@ -257,7 +255,7 @@ namespace pandora_vision
       const sensor_msgs::ImageConstPtr& msg)
   {
     int res = -1;
-
+    
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     qrcodeFrame = in_msg->image.clone();
@@ -265,8 +263,7 @@ namespace pandora_vision
 
     if (qrcodeFrame.empty())
     {
-      ROS_ERROR("[qrcodeNode] : \
-          No more Frames or something went wrong with bag file");
+      ROS_ERROR("[QrCode_node] : No more Frames");
       ros::shutdown();
       return;
     }
@@ -320,15 +317,17 @@ namespace pandora_vision
 
       _qrcodeDetector.detect_qrcode(qrcodeFrame);
       std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
-
-      for(int i=0; i<(int)list_qrcodes.size(); i++)
+   
+      for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
       {
         qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
 
         qrcodeMsg.yaw = ratioX *
-          (list_qrcodes[i].qrcode_center.x - (double)frameWidth / 2);
+          (list_qrcodes[i].qrcode_center.x - 
+            static_cast<double>(frameWidth) / 2);
         qrcodeMsg.pitch = -ratioY *
-          (list_qrcodes[i].qrcode_center.y - (double)frameHeight / 2);
+          (list_qrcodes[i].qrcode_center.y - 
+            static_cast<double>(frameWidth) / 2);
 
         qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
 
@@ -373,7 +372,7 @@ namespace pandora_vision
     curState = newState;
 
     //!< check if QR algorithm should be running now
-    qrcodeNowON	=
+    qrcodeNowON =
       (curState ==
        state_manager_communications::robotModeMsg::MODE_EXPLORATION)
       || (curState ==
@@ -393,7 +392,7 @@ namespace pandora_vision
       return;
     }
 
-    prevState=curState;
+    prevState = curState;
 
     //!< this needs to be called everytime a node finishes transition
     transitionComplete(curState);
@@ -409,5 +408,5 @@ namespace pandora_vision
   {
     ROS_INFO("[QrCodeNode] : Transition Complete");
   }
-}
+}// namespace pandora_vision
 
