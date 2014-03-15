@@ -347,6 +347,17 @@
     </plugin>
   </gazebo>
   
+  <!-- Add 3D pose plugin -->
+  <gazebo>
+    <plugin name="Pandora3dPosePlugin" filename="libpandora_p3d_plugin.so">
+      <robotNamespace></robotNamespace>
+      <bodyName>base_link</bodyName>
+      <frameName>map</frameName>
+      <topicName>perfect_pose</topicName>
+      <broadcastTF>0</broadcastTF>
+    </plugin>
+  </gazebo>
+  
   <!--Insert hokuyo laser-->
   <xacro:include filename="$(find pandora_sensors_description)/urdf/hokuyo_utm_30lx.urdf.xacro" />
   
