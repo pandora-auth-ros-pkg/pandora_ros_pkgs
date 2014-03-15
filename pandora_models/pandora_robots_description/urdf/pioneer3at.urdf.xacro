@@ -9,10 +9,9 @@
 <!-- base_link -->
   <link name="base_link">
     <inertial>
-      <mass value="10.0"/>
-      <origin xyz="0 0 0"/>
-      <inertia ixx="0.3338" ixy="0.0" ixz="0.0"
-         iyy="0.4783" iyz="0.0"
+      <mass value="14.0"/>
+      <inertia ixx="0.3338" ixy="0" ixz="0"
+         iyy="0.4783" iyz="0"
          izz="0.3338"/>
     </inertial>
     <visual name="base_visual">
@@ -41,9 +40,9 @@
     <inertial>
       <mass value="0.1"/>	
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-         iyy="1.0" iyz="0.0"
-        izz="1.0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+         iyy="0.001" iyz="0.0"
+        izz="0.001"/>
     </inertial>
     <visual name="base_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -77,8 +76,8 @@
       <inertial>
         <mass value="0.1"/>	
         <origin xyz="0 0 0"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-           iyy="1.0" iyz="0.0" izz="1.0"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+           iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
     <visual name="base_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -110,8 +109,8 @@
       <inertial>
         <mass value="0.1"/>	
         <origin xyz="0 0 0"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-           iyy="1.0" iyz="0.0" izz="1.0"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+           iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
     <visual name="base_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -183,8 +182,8 @@
       <inertial>
         <mass value="0.1"/>	
         <origin xyz="0 0 0"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-           iyy="1.0" iyz="0.0" izz="1.0"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+           iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
     <visual name="base_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -217,8 +216,8 @@
       <inertial>
         <mass value="0.1"/>	
         <origin xyz="0 0 0"/>
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-           iyy="1.0" iyz="0.0" izz="1.0"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+           iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
     <visual name="base_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -376,7 +375,7 @@
   <xacro:include filename="$(find pandora_sensors_description)/urdf/kinect_camera.urdf.xacro" />
   
   <xacro:kinect_caster parent="base_link">
-    <origin xyz="0.2 0 0.33" rpy="0 0 0"/>
+    <origin xyz="0.2 0 0.33" rpy="0 0.53 0"/>
   </xacro:kinect_caster>
   
   <!--Insert sonars-->

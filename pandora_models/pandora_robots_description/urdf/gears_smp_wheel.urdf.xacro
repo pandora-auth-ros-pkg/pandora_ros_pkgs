@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+      
+<xacro:macro name="wheel_caster" params="suffix_a suffix_b reflect_a reflect_b ">
+  
+    <link
+    name="${suffix_a}_${suffix_b}_tire_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="1.21280538933763" />
+      <inertia
+        ixx="0.00325857540209633"
+        ixy="5.86199184124526E-08"
+        ixz="4.21420928653276E-07"
+        iyy="0.00548118586194348"
+        iyz="-6.40279086420341E-08"
+        izz="0.00325743116853516" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 ${(reflect)*1.57}" />
+      <geometry>
+        <mesh
+          filename="package://pandora_robots_description/meshes/gears_smp/wheel_link.stl" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.753 0.753 0.753 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 ${(reflect)*1.57}" />
+      <geometry>
+        <mesh
+          filename="package://pandora_robots_description/meshes/gears_smp/wheel_link.stl" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint
+    name="${suffix_a}_${suffix_b}_tire_joint"
+    type="continuous">
+    <origin
+      xyz="${reflect_b*0.2} ${reflect_a*0.1281} -0.05"
+      rpy="0 0 0" />
+    <parent
+      link="${suffix_a}_skeleton_link" />
+    <child
+      link="${suffix_a}_${suffix_b}_tire_link" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+
+</xacro:macro>
+    
+</robot>
