@@ -36,8 +36,8 @@
 * 		    Despoina Paschalidou
 *********************************************************************/
 
-#ifndef FACEDETECTOR_H
-#define FACEDETECTOR_H
+#ifndef PANDORA_VISION_FACE_FACE_DETECTOR_H 
+#define PANDORA_VISION_FACE_FACE_DETECTOR_H 
 
 #include <math.h>
 #include <iostream>
@@ -52,7 +52,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
-#include "skin_detector.h"
+#include "pandora_vision_face/skin_detector.h"
 
 namespace pandora_vision
 {
@@ -69,16 +69,16 @@ private:
   //!< probability value
   bool isSkinDetectorEnabled;
 
-  int	_bufferSize;
+  int _bufferSize;
 
   //!< Number of rotation angles
   int angleNum;
 
-  int	now;
+  int now;
 
   cv::Mat skinImg;
   //!< Total probability of face found in a frame
-  float	probability;
+  float probability;
 
   //!< Image buffer used to store frames
   std::vector<cv::Mat> frame_buffer;
@@ -89,7 +89,7 @@ private:
   std::vector<float> probability_buffer;
 
   //!< Cascade classifier for face detection
-  cv::CascadeClassifier	cascade;
+  cv::CascadeClassifier cascade;
 
   //!<Trained model for face detection
   cv::Ptr<cv::FaceRecognizer> model;
@@ -108,7 +108,7 @@ private:
     @return 	integer of the sum of faces found in all rotations
       of the frame.
   */
-  int	findFaces1Frame(cv::Mat frame);
+  int findFaces1Frame(cv::Mat frame);
 
   /**
     @brief Calls detectMultiscale to scan frame for faces and drawFace
@@ -121,14 +121,14 @@ private:
   */
   int detectFace(cv::Mat img);
 
-  void 			createRectangles(cv::Mat tmp);
-  void 			compareWithSkinDetector(float &probability, cv::Mat tmp, int &totalArea);
+  void createRectangles(cv::Mat *tmp);
+  void compareWithSkinDetector(float *probability, cv::Mat tmp, int *totalArea);
 
 public:
 
 
   //debug switch - webNode changes it externally:
-  bool						isDebugMode;
+  bool isDebugMode;
 
   //!< The Constructor
   FaceDetector(std::string cascade_path, std::string model_path,
@@ -147,26 +147,26 @@ public:
   /**
     @brief Creates the continuous table of faces found that contains
     information for each face in every set of 4 values:
-    table[i*4]		=	face #i position x center
-    table[i*4+1]	=	face #i position y center
-    table[i*4+2]	=	face #i rectangle width
-    table[i*4+3]	=	face #i rectangle height
+    table[i*4]=face #i position x center
+    table[i*4+1]=face #i position y center
+    table[i*4+2]=face #i rectangle width
+    table[i*4+3]=face #i rectangle height
     @return int[] table of face positions and sizes
   */
-  int* 	getFacePositionTable();
+  int* getFacePositionTable();
 
   /**
     @brief Returns the size of the table with the positions of the
     faces found
     @return [int] size of table
   */
-  int	getFaceTableSize();
+  int getFaceTableSize();
 
   /**
     @brief Returns the probability of the faces detected in the frame
     @return [float] probability value
   */
-  float	getProbability();
+  float getProbability();
 
   /**
    @brief Rotates input frame according to the given angle
@@ -182,5 +182,5 @@ public:
 
 
 };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_FACE_FACE_DETECTOR_H

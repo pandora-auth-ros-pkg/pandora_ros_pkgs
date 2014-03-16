@@ -35,8 +35,8 @@
 * Author:  Skartados Evangelos
 *********************************************************************/
 
-#ifndef SKINDETECTION_H
-#define  SKINDETECTION_H
+#ifndef PANDORA_VISION_FACE_SKIN_DETECTION_H
+#define PANDORA_VISION_FACE_SKIN_DETECTION_H
 #include <iostream>
 #include <stdlib.h>
 #include "ros/ros.h"
@@ -45,10 +45,10 @@
 #include <sensor_msgs/image_encodings.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/CvBridge.h>
-#include "StateClient.h"
+#include "state_manager/state_client.h"
 #include "vision_communications/victimIdentificationDirectionMsg.h"
-#include "skin_detector.h"
-#include "time_calculator.h"
+#include "pandora_vision_face/skin_detector.h"
+#include "pandora_vision_face/time_calculator.h"
 
 //!< Horizontal field of view in degrees
 #define HFOV 61.14
@@ -57,7 +57,7 @@
 //!< Default frame height
 #define DEFAULT_HEIGHT 480
 //!< Default frame width
-#define DEFAULT_WIDTH	640
+#define DEFAULT_WIDTH 640
 
 namespace pandora_vision
 {
@@ -67,20 +67,20 @@ private:
 
   //nodeHandle
   ros::NodeHandle _nh;
-  SkinDetector*	_skinDetector;
+  SkinDetector* _skinDetector;
   float ratioX;
   float ratioY;
 
-  float hfov;		//horizontal Field Of View (rad)
+  float hfov; //horizontal Field Of View (rad)
   float vfov;
-  int frameWidth;		//frame width
-  int frameHeight;	//frame height
+  int frameWidth; //frame width
+  int frameHeight; //frame height
 
-  cv::Mat	skinFrame;				// frame processed by SkinDetector
-  cv::Mat	extraFrame;				// frame processed by SkinDetector
+  cv::Mat skinFrame; // frame processed by SkinDetector
+  cv::Mat extraFrame; // frame processed by SkinDetector
 
-  ros::Time	skinFrameTimestamp;		// SkinDetector frame timestamp
-  ros::Timer skinTimer;				// Timer for frame callback
+  ros::Time skinFrameTimestamp; // SkinDetector frame timestamp
+  ros::Timer skinTimer; // Timer for frame callback
 
   string imageTopic;
 
@@ -89,7 +89,7 @@ private:
 
   ros::Publisher _victimDirectionPublisher;
 
-  //the subscriber that listens to the frame topic advertised by the central node
+  //the subscriber that listens to the frame topic advertised by the usbCamNode
   image_transport::Subscriber _frameSubscriber;
 
   //debug publishers for SkinDetector
@@ -164,10 +164,10 @@ public:
   */
   void completeTransition(void);
 
-  int curState;		//Current state of robot
-  int prevState;		//Previous state of robot
+  int curState; //Current state of robot
+  int prevState; //Previous state of robot
 };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_FACE_SKIN_DETECTION_H
 
 

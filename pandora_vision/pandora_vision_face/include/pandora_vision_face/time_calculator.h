@@ -35,11 +35,12 @@
 * Author: Skartados Evangelos
 *********************************************************************/
 
-#ifndef TIMECALC_H
-#define TIMECALC_H
+#ifndef PANDORA_VISION_FACE_TIME_CALCULATOR_H 
+#define PANDORA_VISION_FACE_TIME_CALCULATOR_H 
 
 #include <sys/time.h>
-
+#include <stdint.h>
+#include <iostream>
 #define USEC_PER_SEC 1000000L
 
 namespace pandora_vision
@@ -49,14 +50,14 @@ class TimeCalculator
 private:
   struct timeval startTime;
   struct timeval endTime;
-  long timeElapsed (struct timeval &t1, struct timeval &t2);
+  int32_t timeElapsed (const struct timeval &t1, const struct timeval &t2);
 
 public:
   TimeCalculator();
   virtual ~TimeCalculator();
   void startTimer();
-  long endTimer();
+  int32_t endTimer();
 
 };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_FACE_TIME_CALCULATOR_H

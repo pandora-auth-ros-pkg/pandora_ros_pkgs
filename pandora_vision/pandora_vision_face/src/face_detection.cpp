@@ -72,7 +72,7 @@ FaceDetection::FaceDetection() : _nh(), faceNowON(false)
   }
 
   //!< Initialize face detector
-  _faceDetector =	new FaceDetector(cascade_path, model_path, bufferSize,
+  _faceDetector = new FaceDetector(cascade_path, model_path, bufferSize,
                                    skinEnabled, skinHist, wallHist, wall2Hist);
 
   //!< Memory will allocated in the imageCallback
@@ -126,9 +126,8 @@ void FaceDetection::getTimerParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-      Parameter faceDenseTime not found. Using Default");
     faceTime = 0.5;
+    ROS_DEBUG_STREAM("faceTime : " << faceTime);
   }
 
 }
@@ -150,9 +149,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-      Parameter faceDummy not found. Using Default");
     faceDummy = false;
+    ROS_DEBUG("faceDummy: %d", faceDummy);
   }
 
   //!< Get the camera to be used by hole node;
@@ -163,8 +161,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter frameHeight not found. Using Default");
     cameraName = "camera";
+    ROS_DEBUG_STREAM("camera_name : " << cameraName);
   }
 
   //!< Get the Height parameter if available;
@@ -175,8 +173,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter frameHeight not found. Using Default");
     frameHeight = DEFAULT_HEIGHT;
+    ROS_DEBUG_STREAM("height : " << frameHeight);
   }
 
   //!< Get the Width parameter if available;
@@ -187,8 +185,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
     frameWidth = DEFAULT_WIDTH;
+    ROS_DEBUG_STREAM("width : " << frameWidth);
   }
 
   //!< Get the images's topic;
@@ -199,8 +197,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter imageTopic not found. Using Default");
     imageTopic = "/camera_head/image_raw";
+    ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
   }
 
   //!< Get the images's frame_id;
@@ -211,8 +209,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter camera_frame_id not found. Using Default");
     cameraFrameId = "/camera";
+    ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
   }
 
   //!< Get the HFOV parameter if available;
@@ -223,8 +221,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
     hfov = HFOV;
+    ROS_DEBUG_STREAM("HFOV : " << hfov);
   }
 
   //!< Get the VFOV parameter if available;
@@ -235,8 +233,8 @@ void FaceDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
     vfov = VFOV;
+    ROS_DEBUG_STREAM("VFOV : " << vfov);
   }
 
 }
@@ -256,11 +254,10 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter cascadeName not found. Using Default");
     std::string temp = "/data/haarcascade_frontalface_alt_tree.xml";
     cascade_path.assign(packagePath);
     cascade_path.append(temp);
+    ROS_DEBUG_STREAM("cascade_path : " << cascade_path);
   }
 
   //!< Get the model.xml url;
@@ -271,9 +268,8 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-      Parameter model_url not found. Using Default");
     model_url = "https://pandora.ee.auth.gr/vision/model.xml";
+    ROS_DEBUG_STREAM("modelURL : " << model_url);
   }
 
   //!< Get the path of model_path xml file to be loaded
@@ -284,9 +280,8 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter model_path not found. Using Default");
     model_path = packagePath + "/data/model.xml";
+    ROS_DEBUG_STREAM(" model_path : " <<  model_path);
   }
 
 
@@ -297,9 +292,8 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter bufferSize not found. Using Default");
     bufferSize = 5;
+    ROS_DEBUG_STREAM("bufferSize : " << bufferSize);
   }
 
   if (_nh.hasParam("skinEnabled"))
@@ -308,10 +302,9 @@ void FaceDetection::getFaceParams()
     ROS_DEBUG_STREAM("skinEnabled : " << skinEnabled);
   }
   else
-  {
-    ROS_DEBUG("[face_node] : \
-        Parameter skinEnabled not found. Using Default");
+  {    
     skinEnabled = false;
+    ROS_DEBUG_STREAM("skinEnabled : " << skinEnabled);
   }
 
   if (_nh.hasParam("skinHist"))
@@ -321,11 +314,10 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter skinHist not found. Using Default");
     std::string temp = "/data/histogramms/histogramm_skin.jpg";
     skinHist.assign(packagePath);
     skinHist.append(temp);
+    ROS_DEBUG_STREAM("skinHist : " << skinHist);
   }
 
   if (_nh.hasParam("wallHist"))
@@ -335,11 +327,10 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter wallHist not found. Using Default");
     std::string temp = "/data/histogramms/histogramm_wall.jpg";
     wallHist.assign(packagePath);
     wallHist.append(temp);
+    ROS_DEBUG_STREAM("wallHist : " << wallHist);
   }
 
   if (_nh.hasParam("wall2Hist"))
@@ -349,11 +340,10 @@ void FaceDetection::getFaceParams()
   }
   else
   {
-    ROS_DEBUG("[face_node] : \
-        Parameter wall2Hist not found. Using Default");
     std::string temp = "/data/histogramms/histogramm_wall2.jpg";
     wall2Hist.assign(packagePath);
     wall2Hist.append(temp);
+    ROS_DEBUG_STREAM("wall2Hist : " << wall2Hist);
   }
 
 }
@@ -372,8 +362,7 @@ void FaceDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
   if (faceFrame.empty() )
   {
-    ROS_ERROR("[face_node] : \
-      No more Frames or something went wrong with bag file");
+    ROS_ERROR("[face_node] : No more Frames ");
     return;
   }
 }
@@ -399,11 +388,11 @@ void FaceDetection::faceCallback(const ros::TimerEvent&)
 
   if (faceDummy)
   {
-    createDummyFaceMessage(center_x, center_y, faceMessage);
+    createDummyFaceMessage(&center_x, &center_y, &faceMessage);
   }
   else
   {
-    createFaceMessage(faceMessage);
+    createFaceMessage(&faceMessage);
   }
 }
 /**
@@ -413,20 +402,20 @@ void FaceDetection::faceCallback(const ros::TimerEvent&)
  * @param faceMessage
  * @return void
 */
-void FaceDetection::createDummyFaceMessage(float &center_x,
-    float &center_y, vision_communications::FaceDirectionMsg &faceMessage )
+void FaceDetection::createDummyFaceMessage(float *center_x,
+    float *center_y, vision_communications::FaceDirectionMsg *faceMessage )
 {
   for( int i = 0; i < 3; i++)
   {
-    center_x = ratioX * ( 300 - frameWidth / 2 );
-    center_y = -1 * ratioY * ( 200 + frameHeight / 2 );
+    *center_x = ratioX * ( 300 - frameWidth / 2 );
+    *center_y = -1 * ratioY * ( 200 + frameHeight / 2 );
 
-    faceMessage.yaw = center_x;
-    faceMessage.pitch = center_y;
-    faceMessage.header.frame_id = "Face";
-    faceMessage.probability = 1;
-    faceMessage.header.stamp = ros::Time::now();
-    _victimDirectionPublisher.publish(faceMessage);
+    faceMessage->yaw = *center_x;
+    faceMessage->pitch = *center_y;
+    faceMessage->header.frame_id = "Face";
+    faceMessage->probability = 1;
+    faceMessage->header.stamp = ros::Time::now();
+    _victimDirectionPublisher.publish(*faceMessage);
 
   }
 }
@@ -439,7 +428,7 @@ void FaceDetection::createDummyFaceMessage(float &center_x,
  * @return void
 */
 void FaceDetection::createFaceMessage(
-  vision_communications::FaceDirectionMsg &faceMessage)
+  vision_communications::FaceDirectionMsg *faceMessage)
 {
   //!< start the detection process
   int facesNum = _faceDetector->findFaces(faceFrame);
@@ -460,15 +449,15 @@ void FaceDetection::createFaceMessage(
     //!< Send a message for every face found in the frame
     for(int i = 0 ; i < facesNum ; i++)
     {
-      faceMessage.yaw = ratioX * ( facesTable[i * 4] -
-                                   (double)frameWidth / 2 );
-      faceMessage.pitch = -ratioY * ( facesTable[i * 4 + 1] -
-                                      (double)frameHeight / 2 );
-      faceMessage.header.frame_id = cameraFrameId;
-      faceMessage.probability = _faceDetector->getProbability();
-      faceMessage.header.stamp = ros::Time::now();
+      faceMessage->yaw = ratioX * ( facesTable[i * 4] -
+                                   static_cast<double>(frameWidth) / 2 );
+      faceMessage->pitch = -ratioY * ( facesTable[i * 4 + 1] -
+                                    static_cast<double>(frameHeight) / 2 );
+      faceMessage->header.frame_id = cameraFrameId;
+      faceMessage->probability = _faceDetector->getProbability();
+      faceMessage->header.stamp = ros::Time::now();
       ROS_INFO("[face_node]:Face found");
-      _victimDirectionPublisher.publish(faceMessage);
+      _victimDirectionPublisher.publish(*faceMessage);
     }
     delete facesTable;
   }
@@ -486,9 +475,10 @@ void FaceDetection::startTransition(int newState)
   curState = newState;
 
   //!< check if face detection algorithm should be running now
-  faceNowON =	( curState == state_manager_communications::robotModeMsg::MODE_EXPLORATION) ||
-              ( curState == state_manager_communications::robotModeMsg::MODE_ARM_APPROACH ) ||
-              ( curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD );
+  faceNowON = 
+  (curState == state_manager_communications::robotModeMsg::MODE_EXPLORATION) ||
+  (curState == state_manager_communications::robotModeMsg::MODE_ARM_APPROACH) ||
+  (curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD);
 
   //!< shutdown if the robot is switched off
   if (curState == state_manager_communications::robotModeMsg::MODE_TERMINATING)
@@ -511,4 +501,4 @@ void FaceDetection::completeTransition(void)
 {
   ROS_INFO("[Face_node] : Transition Complete");
 }
-}
+}// namespace pandora_vision

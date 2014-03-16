@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     image_transport
     sensor_msgs
+    roslint
 )
 
 
@@ -22,6 +23,7 @@ catkin_package(
       cv_bridge
       image_transport
       sensor_msgs
+      roslint
     INCLUDE_DIRS
       include
     LIBRARIES 
@@ -51,3 +53,26 @@ if(MODEL_ENABLE_TRAIN)
   )
   target_link_libraries(model_train ${catkin_LIBRARIES} )
 endif()
+
+#~ To check lint : catkin_make roslint_pandora_vision_face
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string")
+    
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
+  RELATIVE ${PROJECT_SOURCE_DIR} 
+            
+
+  include/face_detection.h
+  include/face_detector.h
+  include/skin_detection.h
+  include/skin_detector.h
+  include/time_calculator.h
+  src/face_detector.cpp
+  src/face_detection.cpp
+  src/skin_detector.cpp
+  src/skin_detection.cpp
+  src/time_calculator.cpp
+  
+            
+)
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

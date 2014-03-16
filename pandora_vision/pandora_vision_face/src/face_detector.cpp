@@ -126,22 +126,20 @@ int FaceDetector::findFaces(cv::Mat frame)
   tmp = cv::Mat::zeros(frame.size().width, frame.size().height , CV_8UC1);
 
   initFrameProbBuffers(frame);
-  //~ createRectangles(tmp);
+  createRectangles(&tmp);
 
   //!< Clear vector of faces before using it for the current frame
   faces_total.erase (faces_total.begin(), faces_total.begin() +
                      faces_total.size());
 
   int facesNum = detectFace(frame);
-  ROS_INFO_STREAM("Number of faces found " << facesNum);
 
   int totalArea = 0;
-
   if(facesNum)
   {
     totalArea = round( cv::norm(tmp, cv::NORM_L1, cv::noArray()) / 255.);
   }
-
+ 
   if(totalArea == 0)
   {
     //!< if no face was found, probability for this frame is 0
@@ -149,20 +147,20 @@ int FaceDetector::findFaces(cv::Mat frame)
   }
   else
   {
-    probability_buffer[now] = round( cv::norm(tmp, cv::NORM_L1,
-                                     cv::noArray()) / 255.) / (float)totalArea;
+    probability_buffer[now] = round( 
+      cv::norm(tmp, cv::NORM_L1, 
+        cv::noArray()) / 255.) / static_cast<float>(totalArea);
   }
   //!< clear value from last scan
   probability = 0.;
-
   //!< calculate probability
   for(int i = 0 ; i < _bufferSize ; i++)
   {
     probability += (probability_buffer[i]);
   }
   probability = probability / _bufferSize;
-
-  //!< Compare Probability with Skin Output
+  
+  //!< Compaprobabilityre Probability with Skin Output
   if(isSkinDetectorEnabled )
   {
     std::cout << "Skin detector enabled" << std::endl;
@@ -174,7 +172,7 @@ int FaceDetector::findFaces(cv::Mat frame)
     {
       return -2;
     }
-    //compareWithSkinDetector(probability, tmp, totalArea);
+    //~ compareWithSkinDetector(&probability, tmp, &totalArea);
   }
   now = (now + 1) % _bufferSize; //prepare index for next frame
 
@@ -188,7 +186,7 @@ int FaceDetector::findFaces(cv::Mat frame)
   @return Integer of the sum of faces found in all
   rotations of the frame
 */
-void FaceDetector::compareWithSkinDetector(float &probability, cv::Mat tmp, int &totalArea)
+void FaceDetector::compareWithSkinDetector(float *probability, cv::Mat tmp, int *totalArea)
 {
   float skinFactor = 0.;
   float skinFaceRatio = 0.;
@@ -197,15 +195,18 @@ void FaceDetector::compareWithSkinDetector(float &probability, cv::Mat tmp, int 
   //skinImg = skinDetector->getImgContoursForFace();
   skinImg = skinDetector->imgThresholdFiltered;
   skinPixelNum = round( cv::norm(skinImg, cv::NORM_L1, cv::noArray()) / 255.);
-  bitwise_and( frame_buffer[now] , skinImg , tmp); //tmp now stores common skin-face pixels
+  //!< tmp now stores common skin-face pixels
+  bitwise_and( frame_buffer[now] , skinImg , tmp); 
 
   if(totalArea == 0)
   {
-    skinFaceRatio = 0.; // if no face was found, skinFaceRatio for this frame is 0
+    //!< if no face was found, skinFaceRatio for this frame is 0
+    skinFaceRatio = 0.; 
   }
   else
   {
-    skinFaceRatio = round( cv::norm(tmp, cv::NORM_L1, cv::noArray()) / 255.) / (float)totalArea;
+    skinFaceRatio = round( cv::norm(tmp, cv::NORM_L1, 
+    cv::noArray()) / 255.) / static_cast<float>(*totalArea);
   }
 
   if (skinFaceRatio >= 0.01)
@@ -228,8 +229,7 @@ void FaceDetector::compareWithSkinDetector(float &probability, cv::Mat tmp, int 
   {
     skinFactor = 0.;
   }
-
-  probability = 0.7 * probability + 0.3 * skinFactor;
+  *probability = (*probability) * 0.7 + 0.3 * skinFactor;
   std::cout << "skinFaceRatio: " << skinFaceRatio << std::endl;
   std::cout << "skinFaceFactor: " << skinFactor << std::endl;
 
@@ -266,7 +266,7 @@ void FaceDetector::initFrameProbBuffers(cv::Mat frame)
   @param frameIN [cv::Mat] The frame to be scanned for faces
   @return void
 */
-void FaceDetector::createRectangles(cv::Mat tmp)
+void FaceDetector::createRectangles(cv::Mat *tmp)
 {
   cv::Rect faceRect;
   cv::Point start;
@@ -275,8 +275,8 @@ void FaceDetector::createRectangles(cv::Mat tmp)
   {
     faceRect = faces_total.at(i);
     start = cv::Point( faceRect.x , faceRect.y );
-    end = cv::Point( faceRect.x + faceRect.width, faceRect.y + faceRect.height );
-    cv::rectangle(tmp, start, end, cv::Scalar(255, 255, 255, 0), CV_FILLED);
+    end = cv::Point( faceRect.x + faceRect.width, faceRect.y + faceRect.height);
+    cv::rectangle(*tmp, start, end, cv::Scalar(255, 255, 255, 0), CV_FILLED);
   }
 }
 
@@ -431,7 +431,7 @@ cv::Mat FaceDetector::frameRotate(cv::Mat frame, float thAngle)
 
   //!< Calculate rotation matrix
   cv::Mat matRotation = getRotationMatrix2D(
-                          cv::Point( iImageCenterX, iImageCenterY ), (thAngle - 180), 1.1 );
+              cv::Point( iImageCenterX, iImageCenterY ), (thAngle - 180), 1.1 );
 
   cv::Mat rotated_frame;
   cv::warpAffine( frame, rotated_frame, matRotation, rotated_frame.size() );
@@ -439,4 +439,4 @@ cv::Mat FaceDetector::frameRotate(cv::Mat frame, float thAngle)
   return rotated_frame;
 }
 
-}
+}// namespace pandora_vision

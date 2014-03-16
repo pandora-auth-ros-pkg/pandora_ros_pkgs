@@ -36,8 +36,8 @@
 * 		  Despoina Paschalidou
 *********************************************************************/
 
-#ifndef FACEDETECTION_H
-#define FACEDETECTION_H
+#ifndef PANDORA_VISION_FACE_FACE_DETECTION_H 
+#define PANDORA_VISION_FACE_FACE_DETECTION_H 
 
 #include <iostream>
 #include <stdlib.h>
@@ -51,8 +51,8 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "vision_communications/FaceDirectionMsg.h"
-#include "face_detector.h"
-#include "time_calculator.h"
+#include "pandora_vision_face/face_detector.h"
+#include "pandora_vision_face/time_calculator.h"
 #include "state_manager/state_client.h"
 
 //!< Horizontal field of view in degrees
@@ -65,7 +65,7 @@
 #define DEFAULT_HEIGHT 480
 
 //!< default frame width
-#define DEFAULT_WIDTH	 640
+#define DEFAULT_WIDTH 640
 
 namespace pandora_vision
 {
@@ -76,7 +76,7 @@ private:
   //!< The NodeHandle
   ros::NodeHandle _nh;
 
-  FaceDetector*	_faceDetector;
+  FaceDetector* _faceDetector;
 
   float ratioX;
   float ratioY;
@@ -93,7 +93,7 @@ private:
   std::string cameraName;
 
   //!< Frame processed by FaceDetector
-  cv::Mat	faceFrame;
+  cv::Mat faceFrame;
 
   //!<FaceDetector frame timestamp
   ros::Time faceFrameTimestamp;
@@ -179,8 +179,9 @@ public:
   //!< The Destructor
   virtual ~FaceDetection();
 
-  void createFaceMessage(vision_communications::FaceDirectionMsg &faceMessage);
-  void createDummyFaceMessage(float &center_x, float &center_y, vision_communications::FaceDirectionMsg &faceMessage);
+  void createFaceMessage(vision_communications::FaceDirectionMsg *faceMessage);
+  void createDummyFaceMessage(float *center_x, float *center_y, 
+    vision_communications::FaceDirectionMsg *faceMessage);
 
   /**
    * @brief Node's state manager
@@ -196,7 +197,7 @@ public:
   void completeTransition(void);
 
 };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_FACE_FACE_DETECTION_H
 
 

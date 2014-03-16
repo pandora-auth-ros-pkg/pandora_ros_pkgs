@@ -35,8 +35,8 @@
 * Author:  Skartados Evangelos
 *********************************************************************/
 
-#ifndef SKINDETECTOR_H
-#define SKINDETECTOR_H
+#ifndef PANDORA_VISION_FACE_SKIN_DETECTOR_H
+#define PANDORA_VISION_FACE_SKIN_DETECTOR_H
 
 #include <iostream>
 #include <stdlib.h>
@@ -127,18 +127,20 @@ public:
     for skin detection
     @return void
   */
-  void getCalculationParams(int& stepSrc, uchar* &dataSrc , int& channels,
-                            int& stepThreshold, uchar* &dataHistogrammSkin, int& stepHistogrammSkin,
-                            uchar* &dataHistogrammWall, int& stepHistogrammWall, uchar* &dataHistogrammWall2,
-                            int& stepHistogrammWall2, uchar* &dataContours, int& stepContours);
+  void getCalculationParams(int *stepSrc, uchar *dataSrc , int *channels,
+      int *stepThreshold, uchar *dataHistogrammSkin, int *stepHistogrammSkin,
+      uchar *dataHistogrammWall, int *stepHistogrammWall, 
+      uchar *dataHistogrammWall2, int *stepHistogrammWall2, 
+      uchar *dataContours, int *stepContours);
 
   /**
     @brief Function that scans given frame and checks if skin is detected
     @return void
   */
   void scanForSkin(int stepSrc, uchar* dataSrc , int channels,
-                   int stepThreshold, uchar* dataHistogrammSkin, int stepHistogrammSkin,
-                   uchar* dataHistogrammWall, int stepHistogrammWall, uchar* dataHistogrammWall2, int stepHistogrammWall2);
+        int stepThreshold, uchar* dataHistogrammSkin, int stepHistogrammSkin,
+        uchar* dataHistogrammWall, int stepHistogrammWall, 
+        uchar* dataHistogrammWall2, int stepHistogrammWall2);
 
   /**
     @brief Function that calculates probability to have skin
@@ -147,7 +149,7 @@ public:
   */
   void calculatePropability(uchar *dataContours, int stepContours);
 };
-}
-#endif
+}// namespace pandora_vision
+#endif  // PANDORA_VISION_FACE_SKIN_DETECTOR_H
 
 

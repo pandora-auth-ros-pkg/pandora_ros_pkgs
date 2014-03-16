@@ -162,28 +162,29 @@ bool SkinDetector::histogrammsLoaded()
  for skin detection
  @return void
 */
-void SkinDetector::getCalculationParams(int& stepSrc, uchar* &dataSrc , int& channels,
-                                        int& stepThreshold, uchar* &dataHistogrammSkin, int& stepHistogrammSkin,
-                                        uchar* &dataHistogrammWall, int& stepHistogrammWall, uchar* &dataHistogrammWall2,
-                                        int& stepHistogrammWall2, uchar* &dataContours, int& stepContours)
+void SkinDetector::getCalculationParams(int *stepSrc, uchar *dataSrc , 
+  int *channels, int *stepThreshold, uchar *dataHistogrammSkin, 
+  int *stepHistogrammSkin, uchar *dataHistogrammWall, int *stepHistogrammWall, 
+  uchar *dataHistogrammWall2, int *stepHistogrammWall2, uchar *dataContours, 
+  int *stepContours)
 {
-  stepSrc = imgSrc.step;
-  dataSrc = (uchar *)imgSrc.data;
-  channels = imgSrc.channels();
+  *stepSrc = imgSrc.step;
+  dataSrc = reinterpret_cast<uchar *>(imgSrc.data);
+  *channels = imgSrc.channels();
 
-  stepThreshold = imgThreshold.step;
+  *stepThreshold = imgThreshold.step;
 
-  dataHistogrammSkin = (uchar *)imgHistogrammSkin.data;
-  stepHistogrammSkin = imgHistogrammSkin.step;
+  dataHistogrammSkin = reinterpret_cast<uchar *>(imgHistogrammSkin.data);
+  *stepHistogrammSkin = imgHistogrammSkin.step;
 
-  dataHistogrammWall = (uchar *) imgHistogrammWall.data;
-  stepHistogrammWall = imgHistogrammWall.step;
+  dataHistogrammWall = reinterpret_cast<uchar *>(imgHistogrammWall.data);
+  *stepHistogrammWall = imgHistogrammWall.step;
 
-  dataHistogrammWall2 = (uchar *)imgHistogrammWall2.data;
-  stepHistogrammWall2 = imgHistogrammWall2.step;
+  dataHistogrammWall2 = reinterpret_cast<uchar *>(imgHistogrammWall2.data);
+  *stepHistogrammWall2 = imgHistogrammWall2.step;
 
-  dataContours	  = (uchar*)imgContours.data;
-  stepContours	  = imgContours.step;
+  dataContours = reinterpret_cast<uchar *>(imgContours.data);
+  *stepContours = imgContours.step;
 
   imgThreshold = cv::Mat::zeros(imageHeight, imageWidth, CV_8UC1);
   imgThresholdFiltered = cv::Mat::zeros(imageHeight, imageWidth, CV_8UC1);
@@ -197,8 +198,9 @@ void SkinDetector::getCalculationParams(int& stepSrc, uchar* &dataSrc , int& cha
  @return void
 */
 void SkinDetector::scanForSkin(int stepSrc, uchar* dataSrc , int channels,
-                               int stepThreshold, uchar* dataHistogrammSkin, int stepHistogrammSkin, uchar* dataHistogrammWall,
-                               int stepHistogrammWall, uchar* dataHistogrammWall2, int stepHistogrammWall2)
+  int stepThreshold, uchar* dataHistogrammSkin, int stepHistogrammSkin, 
+  uchar* dataHistogrammWall, int stepHistogrammWall, 
+  uchar* dataHistogrammWall2, int stepHistogrammWall2)
 {
   cv::Mat hsv;
   hsv = imgSrc.clone();
@@ -231,7 +233,8 @@ void SkinDetector::calculatePropability(uchar *dataContours, int stepContours)
     {
       std::cout << "IMGCONTOURS CHANGE" << std::endl;
       cv::drawContours( imgContours, Contour, i, CV_RGB(255, 255, 255));
-      contourSize[contourCounter] = int(contourArea( Contour.at(i)));
+      contourSize[contourCounter] = 
+        static_cast<int>((contourArea( Contour.at(i))));
 
       cv::Rect boundingRect = cv::boundingRect( cv::Mat(Contour[i]) );
       double boundingHeight = boundingRect.height;
@@ -241,7 +244,8 @@ void SkinDetector::calculatePropability(uchar *dataContours, int stepContours)
       int startY = boundingRect.y;
       int endY = startY + boundingRect.height;
 
-      contourCenter[contourCounter] = cv::Point( ( startX + boundingWidth / 2 ), ( startY + boundingHeight / 2 ) );
+      contourCenter[contourCounter] = 
+        cv::Point((startX + boundingWidth / 2 ), (startY + boundingHeight / 2));
 
       int positive = 0;
       int negative = 0;
@@ -259,15 +263,18 @@ void SkinDetector::calculatePropability(uchar *dataContours, int stepContours)
           }
         }
       }
-      contourProbability[contourCounter] = (float) positive / (positive + negative);
+      contourProbability[contourCounter] =  
+          static_cast<float> (positive) / (positive + negative);
       contourCounter++;
     }
   }
   for( int i = 0; i < contourCounter; i++ )
   {
-    std::cout << "CountourCenter = " << "( " << contourCenter[i].x << " , " << contourCenter[i].y << " )" << std::endl;
+    std::cout << "CountourCenter = " << "( " << contourCenter[i].x << " , " 
+      << contourCenter[i].y << " )" << std::endl;
     std::cout << "CountourSize = " << contourSize[i] << std::endl;
-    std::cout << "Propability = " << contourProbability[i] << std::endl << std::endl;
+    std::cout << "Propability = " 
+    << contourProbability[i] << std::endl << std::endl;
   }
 }
 
@@ -289,10 +296,10 @@ int SkinDetector::detectSkin(cv::Mat imgInput)
   int stepContours, stepHistogrammWall, stepHistogrammWall2;
   uchar *dataSrc, *dataHistogrammSkin, *dataHistogrammWall, *dataHistogrammWall2, *dataContours;
 
-  getCalculationParams(stepSrc, dataSrc, channels,
-                       stepThreshold, dataHistogrammSkin, stepHistogrammSkin,
-                       dataHistogrammWall, stepHistogrammWall, dataHistogrammWall2,
-                       stepHistogrammWall2, dataContours, stepContours);
+  getCalculationParams(&stepSrc, dataSrc, &channels,
+            &stepThreshold, dataHistogrammSkin, &stepHistogrammSkin,
+            dataHistogrammWall, &stepHistogrammWall, dataHistogrammWall2,
+            &stepHistogrammWall2, dataContours, &stepContours);
 
   scanForSkin(stepSrc, dataSrc, channels,
               stepThreshold, dataHistogrammSkin, stepHistogrammSkin,
@@ -314,4 +321,4 @@ int SkinDetector::detectSkin(cv::Mat imgInput)
   return 0;
 }
 
-}
+}// namespace pandora_vision

@@ -42,10 +42,10 @@ namespace pandora_vision
 /**
  @brief Class Constructor
 */
-SkinDetection::SkinDetection() :	_nh(),
+SkinDetection::SkinDetection() :_nh(),
 {
   //!< Initialize skin detector
-  _skinDetector		=	new SkinDetector();
+  _skinDetector = new SkinDetector();
   //!< Get timer parameters
   getTimerParams();
   //!< Get Skin Detector Paths for images
@@ -56,13 +56,16 @@ SkinDetection::SkinDetection() :	_nh(),
   getGeneralParams();
 
   //!< Declare publisher and advertise topic where algorithm results are posted
-  _victimDirectionPublisher = _nh.advertise<vision_communications::victimIdentificationDirectionMsg>("victimDirection", 10);
+  _victimDirectionPublisher =
+    _nh.advertise<vision_communications::victimIdentificationDirectionMsg>("victimDirection", 10);
 
   //!< Advertise topics for debugging if we are in debug mode
   if (debugSkin)
   {
-    _skinSourcePublisher = image_transport::ImageTransport(_nh).advertise("skinSource", 1);
-    _skinResultPublisher = image_transport::ImageTransport(_nh).advertise("skinResult", 1);
+    _skinSourcePublisher = 
+      image_transport::ImageTransport(_nh).advertise("skinSource", 1);
+    _skinResultPublisher = 
+      image_transport::ImageTransport(_nh).advertise("skinResult", 1);
   }
 
   //!< Subscribe to input image's topic
@@ -78,11 +81,12 @@ SkinDetection::SkinDetection() :	_nh(),
   skinLock = PTHREAD_MUTEX_INITIALIZER;
 
   //!< Initialize state Managing Variables
-  skinNowON 	= false;
+  skinNowON = false;
   //!< Initialize flag used to sync the callbacks
   isSkinFrameUpdated = false;
 
-  skinTimer = _nh.createTimer(ros::Duration(skinTime), &SkinDetection::skinCallback , this);
+  skinTimer = _nh.createTimer(ros::Duration(skinTime),
+    &SkinDetection::skinCallback , this);
   skinTimer.start();
 
   ROS_INFO("[SkinNode] : Created Skin Detection instance");
@@ -346,13 +350,17 @@ void SkinDetection::skinCallback(const ros::TimerEvent&)
     if (debugSkin)
     {
       cv::WImageBuffer3_b skinSource;
-      skinSource.SetIpl( (IplImage*)cvClone( _skinDetector->imgSrc ) );
-      sensor_msgs::ImagePtr msgSkinSource = sensor_msgs::CvBridge::cvToImgMsg(skinSource.Ipl() , "bgr8");
+      skinSource.SetIpl( 
+        reinterpret_cast<IplImage*>(cvClone( _skinDetector->imgSrc ) ));
+      sensor_msgs::ImagePtr msgSkinSource = 
+        sensor_msgs::CvBridge::cvToImgMsg(skinSource.Ipl() , "bgr8");
       _skinSourcePublisher.publish(msgSkinSource);
 
       cv::WImageBuffer3_b skinResult;
-      skinResult.SetIpl( (IplImage*)cvClone( _skinDetector->imgContours ) );
-      sensor_msgs::ImagePtr msgSkinResult = sensor_msgs::CvBridge::cvToImgMsg(skinResult.Ipl() , "mono8");
+      skinResult.SetIpl( 
+        reinterpret_cast<IplImage*>(cvClone( _skinDetector->imgContours )) );
+      sensor_msgs::ImagePtr msgSkinResult = 
+        sensor_msgs::CvBridge::cvToImgMsg(skinResult.Ipl() , "mono8");
       _skinResultPublisher.publish(msgSkinResult);
     }
     _skinDetector->deallocateMemory();
@@ -370,9 +378,9 @@ void SkinDetection::startTransition(int newState)
   curState = newState;
 
   //check if skin algorithm should be running now
-  skinNowON		=	( curState == state_manager_communications::robotModeMsg::MODE_EXPLORATION) ||
-                ( curState == state_manager_communications::robotModeMsg::MODE_ARM_APPROACH ) ||
-                ( curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD );
+  skinNowO = (curState == state_manager_communications::robotModeMsg::MODE_EXPLORATION) ||
+             (curState == state_manager_communications::robotModeMsg::MODE_ARM_APPROACH ) ||
+             (curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD );
 
   //everytime state changes, Skin Detector needs to be reset so that it will
   //discard frames from previous calls in buffer.
@@ -398,6 +406,6 @@ void SkinDetection::completeTransition(void)
 {
   ROS_INFO("[Skin_node] : Transition Complete");
 }
-}
+}//namespace pandora_vision
 
 
