@@ -21,6 +21,8 @@ add_message_files(
   HazmatAlertsVectorMsg.msg
   QRAlertMsg.msg
   QRAlertsVectorMsg.msg
+  DataMatrixAlertMsg.msg
+  DataMatrixAlertsVectorMsg.msg
   )
 
 

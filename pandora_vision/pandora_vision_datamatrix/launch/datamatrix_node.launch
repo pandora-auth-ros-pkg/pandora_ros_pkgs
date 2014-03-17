@@ -1,0 +1,10 @@
+<launch>
+  <group ns="pandora_vision_datamatrix">
+    
+    <param name="camera_name" value="kinect" />
+    
+    <node name="datamatrix_node" type="datamatrix_node" pkg="pandora_vision_datamatrix" respawn="False" output="screen" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    
+  </group>
+</launch>
