@@ -34,46 +34,28 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include "stabilizer/stabilizer_control.h"
+#ifndef STABILIZER_STABILIZER_CONTROL_H
+#define STABILIZER_STABILIZER_CONTROL_H
 
-StabilizerController::StabilizerController(void)
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Quaternion.h>
+#include <std_msgs/Float64.h>
+#include "ros/ros.h"
+#include <tf/tf.h>
+
+class StabilizerController
 {
-  std::string compassTopic;
-  if ( nh.hasParam("compassTopic") )
-  {
-    nh.getParam("compassTopic", compassTopic);
-    ROS_DEBUG("[NavigationController]: Got parameter compassTopic : %s" , compassTopic.c_str());
-  }
-  else
-  {
-    ROS_WARN("[NavigationController] : Parameter compassTopic not found. Using Default");
-    compassTopic = "/sensors/imu";
-  }
-  _compassSubscriber = nh.subscribe(compassTopic, 1, &StabilizerController::serveImuMessage, this);
+  private:
+    ros::NodeHandle nh;
+    ros::Subscriber _compassSubscriber;
 
-  _laser_roll_publisher = nh.advertise<std_msgs::Float64>("/laser_roll_joint_position_controller/command", 5);
-  _laser_pitch_publisher = nh.advertise<std_msgs::Float64>("/laser_pitch_joint_position_controller/command", 5);
-}
+    ros::Publisher _laser_roll_publisher;
+    ros::Publisher _laser_pitch_publisher;
 
-void StabilizerController::serveImuMessage(
-  const sensor_msgs::ImuConstPtr& msg)
-{
-  double compassYaw;
-  double compassPitch;
-  double compassRoll;
-  std_msgs::Float64 str;
+    void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
 
-  tf::Matrix3x3 matrix(
-    tf::Quaternion(
-      msg->orientation.x,
-      msg->orientation.y,
-      msg->orientation.z,
-      msg->orientation.w));
+  public:
+    StabilizerController(void);
+};
 
-  matrix.getRPY(compassRoll, compassPitch, compassYaw);
-
-  str.data = -compassRoll;
-  _laser_roll_publisher.publish(str);
-  str.data = -compassPitch;
-  _laser_pitch_publisher.publish(str);
-}
+#endif  // STABILIZER_STABILIZER_CONTROL_H
