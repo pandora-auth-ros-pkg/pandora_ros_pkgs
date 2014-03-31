@@ -32,7 +32,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  George Aprilis
+* Author:  Despoina Paschalidou
 *********************************************************************/
  
 #ifndef PANDORA_VISION_MOTION_MOTION_DETECTION_H 
@@ -51,8 +51,6 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include "pandora_vision_motion/motion_detector.h"
-
-
 #include "state_manager/state_client.h"
 
 #include <iostream>
@@ -68,50 +66,64 @@ namespace pandora_vision
   class MotionDetection : public StateClient 
   {
     private:
-
-      //nodeHandle
+      /// nodeHandle
       ros::NodeHandle _nh;
-      MotionDetector* _motionDetector;
-      float ratioX;
-      float ratioY;
+      /// Instance of class MotionDetector
+      MotionDetector _motionDetector;
       
-      float hfov; //horizontal Field Of View (rad)
-      float vfov; 
-      int frameWidth; //frame width
-      int frameHeight; //frame height
-      
-      cv::Mat motionFrame; // frame processed by MotionDetector
-    
-      
-      ros::Time motionFrameTimestamp; // MotionDetector frame timestamp
+      /// Frame width
+      int frameWidth; 
+      /// Frame height
+      int frameHeight; 
+      ///Current frame to be processed
+      cv::Mat motionFrame; 
+      /// MotionDetector frame timestamp
+      ros::Time motionFrameTimestamp; 
 
       std::string imageTopic;
       std::string cameraName;
       std::string cameraFrameId;
       
-      //publishers for MotionDetector result messages
+      /// Publishers for MotionDetector result messages
       ros::Publisher _motionPublisher;
       
-      //the subscriber that listens to the frame topic advertised by the central node
-      image_transport::Subscriber _frameSubscriber;
-      
-      //debug publisher for MotionDetector
-      image_transport::Publisher _motionDiffPublisher;
-      image_transport::Publisher _motionFrmPublisher;
-      
-      // variables for changing in dummy msg mode for debugging
-      bool motionDummy;
-      // variables for changing in debug mode. Publish images for debugging
-      bool debugMotion;
-      
-      //variable used for State Managing
+      /// Subscriber that listens to the frame topic advertised by the central node
+      ros::Subscriber _frameSubscriber;
+                
+      /// Variable used for State Managing
       bool motionNowON;
       
-      /**
-       @brief Publishing debug images
-       @return void
+      //!< The dynamic reconfigure (motion's) parameters' server
+      dynamic_reconfigure::Server<pandora_vision_motion::motion_cfgConfig>
+        server;
+      //!< The dynamic reconfigure (depth) parameters' callback
+      dynamic_reconfigure::Server<pandora_vision_motion::motion_cfgConfig>
+        ::CallbackType f;  
+      
+       /**
+        @brief This method uses a MotionDetector instance to detect motion
+        in current frame.
+        @return void
       */
-      void publish_debug_images();
+      void motionCallback();
+
+       /**
+        @brief Function called when new ROS message appears, for front camera
+        @param msg [const sensor_msgs::Image&] The message
+        @return void
+      */
+      void imageCallback(const sensor_msgs::Image& msg);
+      
+      /**
+        @brief The function called when a parameter is changed
+        @param[in] config [const pandora_vision_motion::motion_cfgConfig&]
+        @param[in] level [const uint32_t] The level 
+        @return void
+      **/
+      void parametersCallback(
+        const pandora_vision_motion::motion_cfgConfig& config,
+        const uint32_t& level);
+         
     public:
           
       /**
@@ -122,34 +134,14 @@ namespace pandora_vision
       /**
         @brief Destructor
       */
-      virtual ~MotionDetection();
+      ~MotionDetection();
       
        /**
-         @brief Get parameters referring to view and frame characteristics from
-         launch file
-         @return void
+        @brief Get parameters referring to view and frame characteristics from
+        launch file
+        @return void
       */
       void getGeneralParams();
-      
-      /**
-        @brief Get parameters referring to motion detection algorithm
-        @return void
-      */
-      void getMotionParams();
-      
-      /**
-        @brief This method uses a MotionDetector instance to detect motion
-        in current frame.
-        @return void
-      */
-      void motionCallback();
-
-       /**
-         @brief Function called when new ROS message appears, for front camera
-         @param msg [const sensor_msgs::ImageConstPtr&] The message
-         @return void
-      */
-      void imageCallback(const sensor_msgs::ImageConstPtr& msg);
       
       /**
         @brief Node's state manager

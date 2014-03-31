@@ -56,7 +56,7 @@ namespace pandora_vision
     private:
       
       //nodeHandle
-      ros::NodeHandle nh_;
+      ros::NodeHandle _nh;
       HazmatEpsilonDetector* hazmatDetector_;
       float ratioX_;
       float ratioY_;
@@ -71,21 +71,15 @@ namespace pandora_vision
       ros::Time hazmatFrameTimestamp_; // HazmatDetector frame timestamp
       
       std::string packagePath_;
-      std::string saveImagePath_;
       std::string imageTopic_;
       std::string cameraName;
       std::string cameraFrameId;
-      
-      int hazmatNumber_;
-      
+          
       //publisher
       ros::Publisher hazmatPublisher_;
 
-      image_transport::Subscriber sub_;
-      
-      // variables for changing in dummy msg mode for debugging
-      bool hazmatDummy_;
-      
+      ros::Subscriber sub_;
+            
       //variable used for State Managing
       bool hazmatNowOn_;
       
@@ -93,6 +87,35 @@ namespace pandora_vision
       
       int prevState;  //Previous state of robot
       
+      //!< The dynamic reconfigure (motion's) parameters' server
+      dynamic_reconfigure::Server<pandora_vision_hazmat::hazmat_cfgConfig>
+        server;
+      //!< The dynamic reconfigure (depth) parameters' callback
+      dynamic_reconfigure::Server<pandora_vision_hazmat::hazmat_cfgConfig>
+        ::CallbackType f; 
+      
+      /**
+        @brief Method called only when a new image message is present
+        @return void
+      **/
+      void hazmatCallback(void);
+      
+      /**
+        @brief Callback for a new image
+        @param msg [const sensor_msgs::Image&] The new image
+        @return void
+      **/
+      void imageCallback(const sensor_msgs::Image& msg);
+      
+      /**
+        @brief The function called when a parameter is changed
+        @param[in] config [const pandora_vision_hazmat::hazmat_cfgConfig&]
+        @param[in] level [const uint32_t] The level 
+        @return void
+      **/
+      void parametersCallback(
+        const pandora_vision_hazmat::hazmat_cfgConfig& config,
+        const uint32_t& level);
     public:
           
       /**
@@ -114,25 +137,6 @@ namespace pandora_vision
       void getGeneralParams(void);
       
       /**
-      @brief Reads the hazmat - specific parameters from the launch file
-      @return void
-      **/
-      void getHazmatParams(void);
-
-      /**
-      @brief Method called only when a new image message is present
-      @return void
-      **/
-      void hazmatCallback(void);
-      
-      /**
-      @brief Callback for a new image
-      @param msg [const sensor_msgs::ImageConstPtr&] The new image
-      @return void
-      **/
-      void imageCallback(const sensor_msgs::ImageConstPtr& msg);
-      
-      /**
       @brief Implemented from state manager. Called when a new transition \
       happens
       @param newState [int] The new state of the system
@@ -145,7 +149,6 @@ namespace pandora_vision
       @return void
       **/
       void completeTransition(void);
-
   };
 
 } // namespace pandora_vision

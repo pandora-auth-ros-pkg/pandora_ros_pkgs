@@ -117,7 +117,7 @@ namespace pandora_vision
 
     //!< The subscriber that listens to the frame topic advertised 
     //!< by the central node for the front camera
-    image_transport::Subscriber _frameSubscriber;
+    ros::Subscriber _frameSubscriber;
     
     //!< Variable used for State Managing
     bool datamatrixNowON;
@@ -138,10 +138,10 @@ namespace pandora_vision
           
      /**
       @brief Callback for the RGB Image
-      @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image
+      @param msg [const sensor_msgs::Image& msg] The RGB Image
       @return void
     **/
-    void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+    void imageCallback(const sensor_msgs::Image& msg);
      
     //!< Current state of robot
     int curState;

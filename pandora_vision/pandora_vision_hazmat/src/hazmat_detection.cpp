@@ -43,31 +43,41 @@ namespace pandora_vision
   @brief Default constructor
   @return void
   **/
-  HazmatDetection::HazmatDetection(void) :nh_()
+  HazmatDetection::HazmatDetection(void) :_nh()
   {
-
+    
+    //!< The dynamic reconfigure (depth) parameter's callback
+    server.setCallback(boost::bind(&HazmatDetection::parametersCallback,
+        this, _1, _2));
+         
     // Get General Parameters, such as frame width & height , camera id
     getGeneralParams();
 
     //initialize hazmat detector
     hazmatDetector_ = new HazmatEpsilonDetector(packagePath_);
-  
-    //Get HazmatDetector Parameters
-    getHazmatParams();
     
+     hazmatDetector_->setHazmatParameters(
+      HazmatParameters::colorVariance,
+      static_cast<float>(HazmatParameters::votingThreshold),
+      static_cast<float>(HazmatParameters::minAreaThreshold),
+      static_cast<float>(HazmatParameters::maxAreaThreshold),
+      HazmatParameters::sideLength,
+      HazmatParameters::featureThreshold,
+      static_cast<float>(HazmatParameters::MOThreshold)
+    );
+            
     //Convert field of view from degrees to rads
-
     ratioX_ = hfov_ / frameWidth_;
     ratioY_ = vfov_ / frameHeight_;
 
     hazmatFrame_ = cv::Mat( frameWidth_, frameHeight_, CV_8U );
       
     // Declare publisher and advertise topic where algorithm results are posted
-    hazmatPublisher_ = nh_.advertise
+    hazmatPublisher_ = _nh.advertise
       <vision_communications::HazmatAlertsVectorMsg>("hazmat_alert", 10);
 
     //subscribe to input image's topic
-    sub_ = image_transport::ImageTransport(nh_).subscribe
+    sub_ = _nh.subscribe
       (imageTopic_, 1, &HazmatDetection::imageCallback, this);
 
     //initialize states - robot starts in STATE_OFF 
@@ -99,34 +109,10 @@ namespace pandora_vision
   void HazmatDetection::getGeneralParams(void)
   {
     packagePath_ = ros::package::getPath("pandora_vision_hazmat");
-  
-    if (nh_.hasParam("hazmatDummy"))
-    {
-      nh_.getParam("hazmatDummy_", hazmatDummy_);
-      ROS_DEBUG("hazmatDummy_ : %d", hazmatDummy_);
-    }
-    else 
-    {
-      ROS_DEBUG("[webNode] : Parameter hazmatDummy_ not found. Using Default");
-      hazmatDummy_ = false;
-    }
-  
-    //get the store location of the image
-    if (nh_.hasParam("saveImagePath_"))
-    {
-      nh_.getParam("saveImagePath_", saveImagePath_);
-      ROS_DEBUG_STREAM("path : " << saveImagePath_);
-    }
-    else
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter saveImagePath_ not found. Using Default");
-      saveImagePath_ = "/home/pandora/Desktop/eyeCharts/";
-    }
-  
+      
     //!< Get the camera to be used by qr node;
-    if (nh_.hasParam("camera_name")) {
-      nh_.getParam("camera_name", cameraName);
+    if (_nh.hasParam("camera_name")) {
+      _nh.getParam("camera_name", cameraName);
       ROS_DEBUG_STREAM("camera_name : " << cameraName);
     }
     else {
@@ -135,9 +121,9 @@ namespace pandora_vision
       cameraName = "camera";
     }
     //!< Get the Height parameter if available;
-    if (nh_.hasParam("/" + cameraName + "/image_height"))
+    if (_nh.hasParam("/" + cameraName + "/image_height"))
     {
-    nh_.getParam("/" + cameraName + "/image_height", frameHeight_);
+    _nh.getParam("/" + cameraName + "/image_height", frameHeight_);
       ROS_DEBUG_STREAM("height : " << frameHeight_);
     }
     else
@@ -148,9 +134,9 @@ namespace pandora_vision
     }
 
     //!< Get the Width parameter if available;
-    if (nh_.hasParam("/" + cameraName + "/image_width"))
+    if (_nh.hasParam("/" + cameraName + "/image_width"))
     {
-      nh_.getParam("/" + cameraName + "/image_width", frameWidth_);
+      _nh.getParam("/" + cameraName + "/image_width", frameWidth_);
       ROS_DEBUG_STREAM("width : " << frameWidth_);
     }
     else
@@ -161,9 +147,9 @@ namespace pandora_vision
     }
 
     //!< Get the listener's topic;
-    if (nh_.hasParam("/" + cameraName + "/topic_name"))
+    if (_nh.hasParam("/" + cameraName + "/topic_name"))
     {
-      nh_.getParam("/" + cameraName + "/topic_name", imageTopic_);
+      _nh.getParam("/" + cameraName + "/topic_name", imageTopic_);
     }
     else 
     {
@@ -173,8 +159,8 @@ namespace pandora_vision
     }
 
     //!< Get the images's frame_id;
-    if (nh_.hasParam("/" + cameraName + "/camera_frame_id")) {
-      nh_.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
+    if (_nh.hasParam("/" + cameraName + "/camera_frame_id")) {
+      _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
       ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
     else 
@@ -185,8 +171,8 @@ namespace pandora_vision
     }
     
     //!< Get the HFOV parameter if available;
-    if (nh_.hasParam("/" + cameraName + "/hfov")) {
-      nh_.getParam("/" + cameraName + "/hfov", hfov_);
+    if (_nh.hasParam("/" + cameraName + "/hfov")) {
+      _nh.getParam("/" + cameraName + "/hfov", hfov_);
       ROS_DEBUG_STREAM("HFOV : " << hfov_);
     }
     else {
@@ -196,8 +182,8 @@ namespace pandora_vision
     }
     
     //!< Get the VFOV parameter if available;
-    if (nh_.hasParam("/" + cameraName + "/vfov")) {
-      nh_.getParam("/" + cameraName + "/vfov", vfov_);
+    if (_nh.hasParam("/" + cameraName + "/vfov")) {
+      _nh.getParam("/" + cameraName + "/vfov", vfov_);
       ROS_DEBUG_STREAM("VFOV : " << vfov_);
     }
     else {
@@ -209,145 +195,18 @@ namespace pandora_vision
   }
 
   /**
-  @brief Reads the hazmat - specific parameters from the launch file
-  @return void
-  **/
-  void HazmatDetection::getHazmatParams(void)
-  {
-    // Get the test parameter if available;
-    int colorVariance;
-    if (nh_.hasParam("colorVariance")) 
-    {
-      nh_.getParam("colorVariance", colorVariance);
-    }
-    else 
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter colorVariance not found. Using Default");
-      colorVariance = 10;
-    }
-
-    double votingThreshold;
-    if (nh_.hasParam("votingThreshold")) 
-    {
-      nh_.getParam("votingThreshold", votingThreshold);
-    }
-    else 
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter votingThreshold not found. Using Default");
-      votingThreshold = 39900;
-    }
-
-    //get the minimum area threshold of the hazmat in the image
-    double minAreaThreshold;
-    if (nh_.hasParam("minAreaThreshold")) 
-    {
-      nh_.getParam("minAreaThreshold", minAreaThreshold);
-    }
-    else 
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter minAreaThreshold not found. Using Default");
-      minAreaThreshold = 1000;
-    }
-
-    //get the maximum area threshold of the hazmat in the image
-    double maxAreaThreshold;
-    if (nh_.hasParam("maxAreaThreshold")) 
-    {
-      nh_.getParam("maxAreaThreshold", maxAreaThreshold);
-    }
-    else 
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter maxAreaThreshold not found. Using Default");
-      maxAreaThreshold = 100000;
-    }
-
-    //get the sidelenght parameter of the rectangle in which to test for colour
-    int sideLength;
-    if (nh_.hasParam("sideLength")) 
-    {
-      nh_.getParam("sideLength", sideLength);
-    }
-    else 
-    {
-      ROS_DEBUG("[hazmatNode] : Parameter sideLength not found. Using Default");
-      //sideLength = 200
-      sideLength = 100;
-    }
-
-    //get the minimum number of features threshold
-    int featureThreshold;
-    if (nh_.hasParam("featureThreshold")) 
-    {
-      nh_.getParam("featureThreshold", featureThreshold);
-    }
-    else 
-    {
-      ROS_DEBUG
-        ("[hazmatNode] : Parameter featureThreshold not found. Using Default");
-      featureThreshold = 20;
-    }
-
-    //how many hazmats i have to search for
-    int hazmatNumber_;
-    if (nh_.hasParam("hazmatNumber_")) 
-    {
-      nh_.getParam("hazmatNumber_", hazmatNumber_);
-    }
-    else 
-    {
-      ROS_DEBUG(
-        "[hazmatNode] : Parameter hazmatNumber_ not found. Using Default");
-      hazmatNumber_ = 9;
-    }
-
-    //get the MO threshold
-    double MOThreshold;
-    if (nh_.hasParam("MOThreshold")) 
-    {
-      nh_.getParam("MOThreshold", MOThreshold);
-    }
-    else 
-    {
-      ROS_DEBUG(
-        "[hazmatNode] : Parameter MOThreshold not found. Using Default");
-      MOThreshold = 120000;
-    }
-
-    hazmatDetector_->setHazmatParameters(
-      colorVariance,
-      static_cast<float>(votingThreshold),
-      static_cast<float>(minAreaThreshold),
-      static_cast<float>(maxAreaThreshold),
-      sideLength,
-      featureThreshold,
-      static_cast<float>(MOThreshold)
-    );
-
-  }
-
-  /**
   @brief Callback for a new image
-  @param msg [const sensor_msgs::ImageConstPtr&] The new image
+  @param msg [const sensor_msgs::Image&] The new image
   @return void
   **/
-  void HazmatDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
+  void HazmatDetection::imageCallback(const sensor_msgs::Image& msg)
   {
-    //update image contents
-    //sensor_msgs::CvBridge bridge;
-    //hazmatFrame = bridge.imgMsgToCv(msg, "bgr8");
-    //hazmatFrameTimestamp_ = msg->header.stamp;
     
     cv_bridge::CvImagePtr in_msg;
-    
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    
     cv::Mat temp = in_msg->image.clone();
     hazmatFrame_ = new IplImage(temp);
-    hazmatFrameTimestamp_ = msg->header.stamp;
+    hazmatFrameTimestamp_ = msg.header.stamp;
     
     if ( hazmatFrame_.empty() )
     {               
@@ -377,73 +236,30 @@ namespace pandora_vision
     // Create Msg for hazmat
     vision_communications::HazmatAlertsVectorMsg hazmatVectorMsg;
     vision_communications::HazmatAlertMsg hazmatMsg;
+     
+    std::vector<HazmatEpsilon> a = 
+        hazmatDetector_->DetectHazmatEpsilon(hazmatFrame_);
 
-    if (hazmatDummy_)
+    //if hazmat found
+    if (a.size() > 0)
     {
-      /*
-       * Dummy Hazmat Message
-       */
-      hazmatVectorMsg.header.frame_id = "Hazmat";
-      hazmatVectorMsg.header.stamp = ros::Time::now();
-      for (int i = 0 ; i < 3 ; i++)
+      hazmatVectorMsg.header.frame_id = cameraFrameId;
+      hazmatVectorMsg.header.stamp = hazmatFrameTimestamp_;
+      for (unsigned int i = 0; i < a.size() ; i++)
       {
-        hazmatMsg.yaw = 0;
-        hazmatMsg.pitch = 0;
-        hazmatMsg.patternType = 0;
-
+        hazmatMsg.yaw = ratioX_ * ( a[i].x - frameWidth_ / 2 );
+        hazmatMsg.pitch = - ratioY_ * ( a[i].y - frameHeight_ / 2 );
+        hazmatMsg.patternType = a[i].pattern_num;
         hazmatVectorMsg.hazmatAlerts.push_back(hazmatMsg);
+              
+        ROS_INFO("[hazmatNode] : Hazmat found!");
       }
       if(hazmatVectorMsg.hazmatAlerts.size() > 0)
       {
         hazmatPublisher_.publish(hazmatVectorMsg);
       }
-
-      //dummy delay
-      usleep(1000 * 2000);
     }
-    else
-    {
-      //
-      // Hazmat Message
-      //
-
-      // run hazmat detector
-    
-      std::vector<HazmatEpsilon> a = 
-        hazmatDetector_->DetectHazmatEpsilon(hazmatFrame_);
-
-      //if hazmat found
-      if (a.size() > 0)
-      {
-        hazmatVectorMsg.header.frame_id = cameraFrameId;
-        hazmatVectorMsg.header.stamp = hazmatFrameTimestamp_;
-        for (unsigned int i = 0; i < a.size() ; i++)
-        {
-          //hazmat message information
-          hazmatMsg.yaw = ratioX_ * ( a[i].x - frameWidth_ / 2 );
-          hazmatMsg.pitch = - ratioY_ * ( a[i].y - frameHeight_ / 2 );
-          hazmatMsg.patternType = a[i].pattern_num;
-          //add the message to vector
-          hazmatVectorMsg.hazmatAlerts.push_back(hazmatMsg);
-                
-          ROS_INFO("[hazmatNode] : Hazmat found!");
-          //check if eye chart
-          if (a[i].pattern_num >hazmatNumber_)
-          {
-            std::stringstream ss;
-            //save Image to the desired location
-            ss << saveImagePath_ << hazmatFrameTimestamp_ << ".jpg";
-            imwrite(ss.str().c_str(), hazmatFrame_);
-          }
-        }
-        if(hazmatVectorMsg.hazmatAlerts.size() > 0)
-        {
-          hazmatPublisher_.publish(hazmatVectorMsg);
-        }
-
-      }
-      a.erase(a.begin(), a.end());
-    }
+    a.erase(a.begin(), a.end());
   }
 
   /**
@@ -490,6 +306,27 @@ namespace pandora_vision
   {
     ROS_INFO("[hazmatNode] : Transition Complete");
   }
+  
+  /**
+    @brief The function called when a parameter is changed
+    @param[in] config [const pandora_vision_motion::motion_cfgConfig&]
+    @param[in] level [const uint32_t] The level (?)
+    @return void
+  **/
+  void HazmatDetection::parametersCallback(
+    const pandora_vision_hazmat::hazmat_cfgConfig& config,
+    const uint32_t& level)
+  {
+    HazmatParameters::colorVariance = config.colorVariance;
+    HazmatParameters::sideLength = config.sideLength;
+    HazmatParameters::maxAreaThreshold = config.maxAreaThreshold;
+    HazmatParameters::minAreaThreshold = config.minAreaThreshold;
+    HazmatParameters::votingThreshold = config.votingThreshold;
+    HazmatParameters::MOThreshold = config.MOThreshold;
+    HazmatParameters::featureThreshold = config.featureThreshold;
+    HazmatParameters::numberOfHazmats = config.numberOfHazmats;;
+  }
+  
 } // namespace pandora_vision
 
 

@@ -71,7 +71,7 @@
 #define NN_SQ_DIST_RATIO_THR 0.49
 
 //!< Defines from hazmat_detection
-#define HFOV  61.14           //68 hfov in degrees : giwrgos 61.142
+#define HFOV  61.14           
 #define VFOV  48              //50 vfov in degrees : giwrgos 47.79
 #define DEFAULT_HEIGHT  480   //default frame height
 #define DEFAULT_WIDTH   640   //default frame width

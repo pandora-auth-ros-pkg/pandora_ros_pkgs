@@ -113,7 +113,7 @@ private:
 
   //!< The subscriber that listens to the frame
   //!< topic advertised by the central node
-  image_transport::Subscriber _frameSubscriber;
+  ros::Subscriber _frameSubscriber;
 
   //!< variables for changing in dummy msg mode for debugging
   bool faceDummy;
@@ -166,10 +166,10 @@ private:
 
   /**
    * Function called when new ROS message appears, for front camera
-   * @param msg [const sensor_msgs::ImageConstPtr&] The message
+   * @param msg [const sensor_msgs::Image&] The message
    * @return void
   */
-  void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+  void imageCallback(const sensor_msgs::Image& msg);
 
 public:
 

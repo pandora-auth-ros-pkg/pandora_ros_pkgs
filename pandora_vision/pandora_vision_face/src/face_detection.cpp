@@ -86,7 +86,7 @@ FaceDetection::FaceDetection() : _nh(), faceNowON(false)
 
   //!< Subscribe to input image's topic
   //!< image_transport::ImageTransport it(_nh);
-  _frameSubscriber = image_transport::ImageTransport(_nh).subscribe(
+  _frameSubscriber = _nh.subscribe(
                        imageTopic, 1, &FaceDetection::imageCallback, this);
 
   //!< Initialize states - robot starts in STATE_OFF
@@ -350,15 +350,15 @@ void FaceDetection::getFaceParams()
 
 /**
  * @brief Function called when new ROS message appears, for camera
- * @param msg [const sensor_msgs::ImageConstPtr&] The message
+ * @param msg [const sensor_msgs::Image&] The message
  * @return void
  */
-void FaceDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
+void FaceDetection::imageCallback(const sensor_msgs::Image& msg)
 {
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   faceFrame = in_msg->image.clone();
-  faceFrameTimestamp = msg->header.stamp;
+  faceFrameTimestamp = msg.header.stamp;
 
   if (faceFrame.empty() )
   {

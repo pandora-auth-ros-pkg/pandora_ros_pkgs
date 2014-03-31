@@ -56,8 +56,7 @@ namespace pandora_vision
     ratioY = vfov / frameHeight;
     
     //!< subscribe to input image's topic
-    //!< image_transport::ImageTransport it(_nh);
-    _frameSubscriber = image_transport::ImageTransport(_nh).subscribe(
+    _frameSubscriber = _nh.subscribe(
         imageTopic, 1, &DatamatrixDetection::imageCallback, this);
      
     //!< Declare publisher and advertise topic
@@ -184,17 +183,17 @@ namespace pandora_vision
   
   /**
    * @brief Function called when new ROS message appears from camera
-   * @param msg [const sensor_msgs::ImageConstPtr&] The message
+   * @param msg [const sensor_msgs::Image&] The message
    * @return void
   */
   void DatamatrixDetection::imageCallback(
-      const sensor_msgs::ImageConstPtr& msg)
+      const sensor_msgs::Image& msg)
   {
     
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     datamatrixFrame = in_msg->image.clone();
-    datamatrixFrameTimestamp = msg->header.stamp;
+    datamatrixFrameTimestamp = msg.header.stamp;
 
     if (!datamatrixFrame.data)
     {

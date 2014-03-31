@@ -32,7 +32,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  George Aprilis
+* Author:  Despoina Pascahlidou
 *********************************************************************/
 
 #ifndef PANDORA_VISION_MOTION_MOTION_DETECTOR_H
@@ -40,43 +40,38 @@
 
 #include "ros/ros.h"
 #include <opencv2/opencv.hpp>
-#include <math.h>
-#include <cstdlib>
-#include <cstdio>
 #include <iostream>
+#include <vector>
+#include "pandora_vision_motion/motion_parameters.h"
+
+//~ #define SHOW_DEBUG_IMAGE
 
 namespace pandora_vision 
 {
   class MotionDetector
   {
     private:
-    //!< Used to avoid wrong results in the first calculations
-    int flagCounter;
-    //!< Last frame stored in buffer
-    int last;
-    //!< Sum of different pixels between two frames (after thresholding)
-    int count;
-    //!< N-sized buffer
-    cv::Mat *buf;
-    //!< Temporary copy of frame
-    cv::Mat tmp;
-    //!< Image with the difference between 2 frames' pixels' values
-    cv::Mat dif;
-
+    //!< Current frame to be processed
+    cv::Mat frame;
+    //!< Background image
+    cv::Mat background;
+    //!< Foreground mask
+    cv::Mat foreground;
+    
+    //!< Class instance for Gaussian Mixture-based backgound 
+    //!< and foreground segmentation 
+    cv::BackgroundSubtractorMOG2 bg;
+    
     public:
-     //!< buffer size
-    int N;
-    //!< Threshold between pixel (grayscale) values to be considered "different" between 2 frames
-    int diff_threshold;
-    //!< Evaluation threshold: higher value means a lot of movement
-    double motion_high_thres;
-    //!< Evaluation threshold: higher value means a little movement - less means no movement at all
-    double motion_low_thres;
+    
+    //!< Number of pixels, that differ from current frame and background 
+    int countDiff;
+    //!< Identifier of motion type
+    int typeOfMovement;
     
     /**
       @brief Class Constructor
-      Initializes varialbes used in detecting. Here is
-      were desirable threashold values will be determined. 
+      Initializes all varialbes for thresholding
     */
     MotionDetector();
     
@@ -84,48 +79,41 @@ namespace pandora_vision
       @brief Class Destructor
       Deallocates memory used for storing images
     */
-    virtual ~MotionDetector();
+    ~MotionDetector();
     
     /**
-      @brief Using a N-sized buffer compares current given frame
-      with last - (N-1)th frame and calculates an the difference 
-      between the two frames giving value to a variable integer "count" 
-      with the number of different pixels. According to given thresholds,
-      returns:
-                -1 Error in frame input
-                 0 Insignificant Motion
-                 1 Slight Motion
-                 2 Extensive Motion 
-      Function detectMotion() of a specific MotionDetector is run in a loop.  
-      @param	frame [cv::Mat] The current frame given as input 
-      @return [int] Index of evaluation of Motion in N frames.
+      @brief Function that detects motion, according to substraction
+      between background image and current frame. According to predifined 
+      thresholds motion is detected. According to the type of motion
+      the suitable value is returned.
+      @param _frame [cv::Mat] current frame to be processed 
+      @return [int] Index of evaluation of Motion in current frame.
     */
-    int detectMotion(cv::Mat frame);
+    int detectMotion(cv::Mat _frame);
     
     /**
       @brief Returns the number of different pixels found
-      in a (thresholded) difference between frames.
-      According to this value, motion is evaluated internally in detectMotion().
-      @return integer count 
+      in a (thresholded) difference between background image and current frame.
+      @return [int] countDiff 
     */
     int getCount();
     
     /**
-      @brief Function called in the ROS node, used to reset the flagCounter 
-      value, which causes the algorithm to re-wait until the buffer of frames 
-      is full and results can be trusted again.
-      @return void 
-    */
-    void resetFlagCounter();
+      @brief Function that defines the type of movement 
+      according to the number of pixels, that differ from current
+      frame and background. In case insignificant motion 0 is detected
+      0 is returned. If there is slight motion 1 is returned and last
+      bust not least in case extensive motion is detected 2 is returned
+      @return void
+    */ 
+    void motionIdentification(cv::Mat diff);
     
     /**
-      @brief Function that returns the last image of the buffer of frames
-      which holds the difference image. Being called
-      in the ROS Node after the agorithm has run,
-      retrieves the result image for debugging.  
-      @return [int] count 
-    */
-    cv::Mat getDiffImg();
+      @brief Function used for debug reasons, that shows background
+      foreground and contours of motion trajectories in current frame
+      @return void
+    */ 
+    void debugShow(cv::Mat diff);
   };
 }// namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_DETECTOR_H

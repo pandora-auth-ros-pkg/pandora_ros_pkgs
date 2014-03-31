@@ -12,9 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
     cv_bridge
     image_transport
     sensor_msgs
+    dynamic_reconfigure
     roslint
 )
 
+generate_dynamic_reconfigure_options(
+  cfg/hazmat_cfg.cfg
+)
 
 catkin_package(
     DEPENDS
@@ -26,6 +30,7 @@ catkin_package(
       cv_bridge
       image_transport
       sensor_msgs
+      dynamic_reconfigure
       roslint
     INCLUDE_DIRS
       include
@@ -40,6 +45,7 @@ add_executable(hazmat_node
             src/hazmat_node.cpp
 						src/hazmat_detection.cpp
 						src/hazmat_detector.cpp
+            src/hazmat_parameters.cpp
 						src/utils.cpp 
 						src/sift.cpp 
 						src/kdtree.cpp 
@@ -48,6 +54,7 @@ add_executable(hazmat_node
 						src/imgfeatures.cpp)
 target_link_libraries(hazmat_node ${catkin_LIBRARIES} )
 add_dependencies(hazmat_node 
+    pandora_vision_hazmat_gencfg
     vision_communications_gencpp
     ${catkin_EXPORTED_TARGETS}
 )

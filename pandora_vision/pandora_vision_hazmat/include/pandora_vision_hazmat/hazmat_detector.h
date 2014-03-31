@@ -41,6 +41,7 @@
 #include "pandora_vision_hazmat/sift.h"
 #include "pandora_vision_hazmat/kdtree.h"
 #include "pandora_vision_hazmat/xform.h"
+#include "pandora_vision_hazmat/hazmat_parameters.h"
 
 /**
 @namespace pandora_vision

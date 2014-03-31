@@ -71,8 +71,7 @@ namespace pandora_vision
     }
 
     //!< subscribe to input image's topic
-    //!< image_transport::ImageTransport it(_nh);
-    _frameSubscriber = image_transport::ImageTransport(_nh).subscribe(
+    _frameSubscriber = _nh.subscribe(
         imageTopic, 1, &QrCodeDetection::imageCallback, this);
    
     //!< initialize states - robot starts in STATE_OFF
@@ -248,18 +247,16 @@ namespace pandora_vision
 
   /**
    * @brief Function called when new ROS message appears, for front camera
-   * @param msg [const sensor_msgs::ImageConstPtr&] The message
+   * @param msg [const sensor_msgs::Imager&] The message
    * @return void
    */
   void QrCodeDetection::imageCallback(
-      const sensor_msgs::ImageConstPtr& msg)
+      const sensor_msgs::Image& msg)
   {
-    int res = -1;
-    
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     qrcodeFrame = in_msg->image.clone();
-    qrcodeFrameTimestamp = msg->header.stamp;
+    qrcodeFrameTimestamp = msg.header.stamp;
 
     if (qrcodeFrame.empty())
     {
@@ -331,7 +328,7 @@ namespace pandora_vision
 
         qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
 
-        ROS_INFO("QR found.");
+        ROS_INFO("[QrCode_node]: QR found.");
       }
 
       if (debugQrCode)
