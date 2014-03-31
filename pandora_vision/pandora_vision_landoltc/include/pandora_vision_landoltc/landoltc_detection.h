@@ -34,8 +34,8 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef LANDOLTCDETECTION_H
-#define LANDOLTCDETECTION_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H
 
 #include "ros/ros.h"
 #include <ros/package.h>
@@ -50,7 +50,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "landoltc_detector.h"
+#include "pandora_vision_landoltc/landoltc_detector.h"
 //!< default frame height
 #define DEFAULT_HEIGHT 480
 
@@ -122,5 +122,5 @@ public:
 
 
 };
-}
-#endif
+} // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H

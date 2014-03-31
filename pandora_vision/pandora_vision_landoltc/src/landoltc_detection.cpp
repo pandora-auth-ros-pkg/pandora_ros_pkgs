@@ -86,8 +86,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : \
-        Parameter patternPath not found. Using Default");
+    ROS_DEBUG("[landoltc_node] : Parameter patternPath not found. Using Default");
     std:: string temp = "/bold.jpg";
     patternPath.assign(packagePath);
     patternPath.append(temp);
@@ -101,8 +100,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : \
-        Parameter frameHeight not found. Using Default");
+    ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
     cameraName = "camera";
   }
 
@@ -114,8 +112,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : \
-Parameter frameHeight not found. Using Default");
+    ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
     frameHeight = DEFAULT_HEIGHT;
   }
 
@@ -171,7 +168,6 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   if ( landoltCFrame.empty() )
   {
     ROS_ERROR("[landoltc_node] : No more Frames");
-    ros::shutdown();
     return;
   }
 
@@ -189,7 +185,7 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 void LandoltCDetection::landoltcCallback()
 {
-  _landoltcDetector.begin(landoltCFrame);
+  _landoltcDetector.begin(&landoltCFrame);
 }
 
-}
+} // namespace pandora_vision

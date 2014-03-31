@@ -34,14 +34,17 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef LANDOLTCDETECTOR_H
-#define LANDOLTCDETECTOR_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
 
 #include "ros/ros.h"
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
 #include <stdlib.h>
+
+//~ #define SHOW_DEBUG_IMAGE
+
 namespace pandora_vision
 {
 class LandoltCDetector
@@ -62,6 +65,10 @@ private:
   std::vector<cv::Point> _newCenters;
   //!<Vector containing contour points of reference C
   std::vector<std::vector<cv::Point> > _refContours;
+  //!<Vector containing edge points of C, found using findRotationB function
+  std::vector<cv::Point> _edgePoints;
+  //!<Value representing the number of edges found, again using finRotationB function  
+  int _edges;
   //!<2D Matrix containing "votes" of each pixel, used for finding the centers
   cv::Mat _voting;
   //!<2D Matrix containing landoltsC's, each colored with a unique color
@@ -79,7 +86,7 @@ public:
 
   /**
   @brief Function for the initialization of the reference image
-  @param void
+  @param path [std::string] The path of the reference image
   @return void
   **/
   void initializeReferenceImage(std::string path);
@@ -104,44 +111,71 @@ public:
 
   /**
   @brief Finds LandoltC Contours on RGB Frames
-  @param inImage [cv::Mat&] Input Image
+  @param inImage [const cv::Mat&] Input Image
   @param rows [int] Number of rows of matrix
   @param cols [int] Number of columns of matrix
   @param ref [std::vector<cv::Point>] Vector containing contour points of reference image
   @return void
   **/
-  void findLandoltContours(cv::Mat& inImage, int rows, int cols, std::vector<cv::Point> ref);
+  void findLandoltContours(const cv::Mat& inImage, int rows, int cols, std::vector<cv::Point> ref);
 
   /**
   @brief Mask for separating a LandoltC Contour to its components
-  @param rows [int] Number of rows of matrix
-  @param cols [int] Number of columns of matrix
   @return void
   **/
-  void applyMask(int rows, int cols);
+  void applyMask();
 
   /**
   @brief Thinning algorith using the Zhang-Suen method
-  @param in [cv::Mat&] Matrix containing the frame to thin
+  @param in [cv::Mat*] Matrix containing the frame to thin
   @return void
   **/
-  void thinning(cv::Mat& in);
+  void thinning(cv::Mat* in);
 
   /**
   @brief Thinning iteration call from the thinning function
-  @param in [cv::Mat&] Matrix containing the frame to thin
+  @param in [cv::Mat*] Matrix containing the frame to thin
   @param iter [int] Number of iteration with values 1-2
   @return void
   **/
-  void thinningIter(cv::Mat& in, int iter);
+  void thinningIter(cv::Mat* in, int iter);
 
   /**
   @brief Function called for the initiation of LandoltC search in the frame
-  @param input [cv::Mat&] Matrix containing the frame received from the camera
+  @param input [cv::Mat*] Matrix containing the frame received from the camera
   @return void
   **/
-  void begin(cv::Mat& input);
+  void begin(cv::Mat* input);
+  
+  /**
+  @brief Calculation of rotation based on moments.Precision is good for a
+  distance up to 30cm from the camera
+  @param in [const cv::Mat&] Matrix containing the padded frame
+  @param i [int] Index of C being processed
+  @return void
+  **/
+  void findRotationA(const cv::Mat& in, int i);  
+  
+  /**
+  @brief Calculation of rotation based on thinning.Precision is good for a
+  distance up to 50cm from the camera, gives more accurate results than the first
+  method but it's slower.
+  @param in [const cv::Mat&] Matrix containing the padded frame
+  @param i [int] Index of C being processed
+  @return void
+  **/  
+  void findRotationB(const cv::Mat&in, int i);
+  
+  /**
+  @brief Function for calculating the neighbours of pixels considering
+  8-connectivity
+  @param index [unsigned int] Index of pixel in matrix
+  @param in [cv::Mat&] Input Image
+  @return void
+  **/    
+  void find8Neights(unsigned int index, const cv::Mat& in);
+  
 
 };
-}
-#endif
+} // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
