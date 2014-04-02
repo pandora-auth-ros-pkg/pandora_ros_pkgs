@@ -93,7 +93,7 @@ namespace pandora_vision
       @brief Default Destructor
       @return void
     **/
-    virtual ~DatamatrixDetector();
+    ~DatamatrixDetector();
     
     /**
       @brief Detects datamatrixes and stores them in a vector.

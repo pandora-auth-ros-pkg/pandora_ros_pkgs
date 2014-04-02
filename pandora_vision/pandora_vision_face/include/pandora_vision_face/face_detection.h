@@ -177,7 +177,7 @@ public:
   FaceDetection();
 
   //!< The Destructor
-  virtual ~FaceDetection();
+  ~FaceDetection();
 
   void createFaceMessage(vision_communications::FaceDirectionMsg *faceMessage);
   void createDummyFaceMessage(float *center_x, float *center_y, 

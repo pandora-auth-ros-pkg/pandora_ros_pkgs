@@ -112,7 +112,7 @@ public:
   @brief Default Destructor
   @return void
   **/
-  virtual ~LandoltCDetection();
+  ~LandoltCDetection();
 
   /**
   @brief Get parameters referring to view and frame characteristics

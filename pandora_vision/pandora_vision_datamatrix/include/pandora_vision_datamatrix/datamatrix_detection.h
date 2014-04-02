@@ -161,7 +161,7 @@ namespace pandora_vision
       @brief Default Destructor
       @return void
     **/
-    virtual ~DatamatrixDetection();
+    ~DatamatrixDetection();
    
     /**
       @brief Node's state manager

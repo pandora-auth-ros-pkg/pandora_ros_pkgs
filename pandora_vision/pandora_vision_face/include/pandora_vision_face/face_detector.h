@@ -135,7 +135,7 @@ public:
                int bufferSize, bool skinEnabled, std::string skinHist, std::string wallHist, std::string wall2Hist);
 
   //!< The Destructor
-  virtual ~FaceDetector();
+  ~FaceDetector();
 
   /**
     @brief Searches for faces in current frame.

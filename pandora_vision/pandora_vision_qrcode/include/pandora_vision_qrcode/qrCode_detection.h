@@ -166,7 +166,7 @@ namespace pandora_vision {
       QrCodeDetection();
 
       //!< The Destructor
-      virtual ~QrCodeDetection();
+      ~QrCodeDetection();
 
       /**
        * @brief Node's state manager

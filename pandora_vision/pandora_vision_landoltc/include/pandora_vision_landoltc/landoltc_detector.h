@@ -82,7 +82,7 @@ public:
   LandoltCDetector();
 
   //!< Destructor
-  virtual ~LandoltCDetector();
+  ~LandoltCDetector();
 
   /**
   @brief Function for the initialization of the reference image
