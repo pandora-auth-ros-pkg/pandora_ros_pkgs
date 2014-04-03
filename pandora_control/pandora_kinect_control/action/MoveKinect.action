@@ -1,0 +1,9 @@
+uint32 CENTER = 0
+uint32 MOVE = 1
+
+# Define the goal
+uint32 command
+---
+# Define the result
+---
+# Define a feedback message

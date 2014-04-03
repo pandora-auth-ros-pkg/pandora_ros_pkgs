@@ -34,11 +34,11 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include "stabilizer/stabilizer_control.h"
+#include "pandora_stabilizer_control/pandora_stabilizer_control.h"
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "stabilizer_control_node");
+  ros::init(argc, argv, "pandora_stabilizer_control_node");
   StabilizerController stabilizerController;
   ros::spin();
 }

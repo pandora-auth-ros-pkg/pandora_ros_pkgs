@@ -34,42 +34,47 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include <std_msgs/Float64.h>
-#include "ros/ros.h"
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "kinect_control_node");
+#include "pandora_stabilizer_control/pandora_stabilizer_control.h"
 
-  ros::NodeHandle nh;
-  ros::Publisher kinect_pitch_publisher =
-    nh.advertise<std_msgs::Float64>(
-      "/kinect_pitch_joint_position_controller/command",
-      5);
-  ros::Publisher kinect_yaw_publisher =
-    nh.advertise<std_msgs::Float64>(
-      "/kinect_yaw_joint_position_controller/command",
-      5);
-  std_msgs::Float64 str;
-  while (true)
+StabilizerController::StabilizerController(void)
+{
+  std::string compassTopic;
+  if ( nh.hasParam("compassTopic") )
   {
-    str.data = 0;
-    kinect_pitch_publisher.publish(str);
-    kinect_yaw_publisher.publish(str);
-    sleep(2);
-    str.data = 0.5;
-    kinect_yaw_publisher.publish(str);
-    sleep(2);
-    str.data = 0.5;
-    kinect_pitch_publisher.publish(str);
-    sleep(2);
-    str.data = 0;
-    kinect_yaw_publisher.publish(str);
-    sleep(2);
-    str.data = -0.5;
-    kinect_yaw_publisher.publish(str);
-    sleep(2);
-    str.data = 0;
-    kinect_pitch_publisher.publish(str);
-    sleep(2);
+    nh.getParam("compassTopic", compassTopic);
+    ROS_DEBUG("[stabilizer_control_node]: Got parameter compassTopic : %s" , compassTopic.c_str());
   }
+  else
+  {
+    ROS_WARN("[stabilizer_control_node] : Parameter compassTopic not found. Using Default");
+    compassTopic = "/sensors/imu";
+  }
+  _compassSubscriber = nh.subscribe(compassTopic, 1, &StabilizerController::serveImuMessage, this);
+
+  _laser_roll_publisher = nh.advertise<std_msgs::Float64>("/laser_roll_joint_position_controller/command", 5);
+  _laser_pitch_publisher = nh.advertise<std_msgs::Float64>("/laser_pitch_joint_position_controller/command", 5);
+
+}
+
+void StabilizerController::serveImuMessage(
+  const sensor_msgs::ImuConstPtr& msg)
+{
+  double compassYaw;
+  double compassPitch;
+  double compassRoll;
+  std_msgs::Float64 str;
+
+  tf::Matrix3x3 matrix(
+    tf::Quaternion(
+      msg->orientation.x,
+      msg->orientation.y,
+      msg->orientation.z,
+      msg->orientation.w));
+
+  matrix.getRPY(compassRoll, compassPitch, compassYaw);
+
+  str.data = -compassRoll;
+  _laser_roll_publisher.publish(str);
+  str.data = -compassPitch;
+  _laser_pitch_publisher.publish(str);
 }

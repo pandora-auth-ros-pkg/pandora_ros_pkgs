@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-import roslib; roslib.load_manifest('pandora_control')
+import roslib; roslib.load_manifest('pandora_motor_control')
 import rospy
-import actionlib
 import sys
 import thread
 from time import sleep

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_control</name>
+  <version>0.0.0</version>
+  <description>Containts pandora control packages</description>
+
+  <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_control/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_control</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pandora_laser_control</run_depend>
+  <run_depend>pandora_kinect_control</run_depend>
+  <run_depend>pandora_motor_control</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>  
+</package>

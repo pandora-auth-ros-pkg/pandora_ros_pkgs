@@ -1,0 +1,10 @@
+<launch>
+
+  <node
+    name="pandora_stabilizer_control_node"
+    pkg="pandora_laser_control"
+    type="pandora_stabilizer_control_node" 
+    respawn="false"
+    output="screen"/>
+
+</launch>
