@@ -34,28 +34,11 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#ifndef STABILIZER_STABILIZER_CONTROL_H
-#define STABILIZER_STABILIZER_CONTROL_H
+#include "pandora_stabilizer_control/stabilizer_control.h"
 
-#include <sensor_msgs/Imu.h>
-#include <geometry_msgs/Quaternion.h>
-#include <std_msgs/Float64.h>
-#include "ros/ros.h"
-#include <tf/tf.h>
-
-class StabilizerController
+int main(int argc, char **argv)
 {
-  private:
-    ros::NodeHandle nh;
-    ros::Subscriber _compassSubscriber;
-
-    ros::Publisher _laser_roll_publisher;
-    ros::Publisher _laser_pitch_publisher;
-
-    void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
-
-  public:
-    StabilizerController(void);
-};
-
-#endif  // STABILIZER_STABILIZER_CONTROL_H
+  ros::init(argc, argv, "stabilizer_control_node");
+  pandora_control::StabilizerController stabilizerController;
+  ros::spin();
+}

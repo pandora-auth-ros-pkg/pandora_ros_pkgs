@@ -34,47 +34,60 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include "pandora_stabilizer_control/pandora_stabilizer_control.h"
+#include "pandora_stabilizer_control/stabilizer_control.h"
 
-StabilizerController::StabilizerController(void)
+namespace pandora_control
 {
-  std::string compassTopic;
-  if ( nh.hasParam("compassTopic") )
+  StabilizerController::StabilizerController(void)
   {
-    nh.getParam("compassTopic", compassTopic);
-    ROS_DEBUG("[stabilizer_control_node]: Got parameter compassTopic : %s" , compassTopic.c_str());
+    std::string compassTopic;
+    if ( nodeHandle_.hasParam("compassTopic") )
+    {
+      nodeHandle_.getParam("compassTopic", compassTopic);
+      ROS_DEBUG(
+        "[stabilizer_control_node]: Got parameter compassTopic : %s",
+        compassTopic.c_str());
+    }
+    else
+    {
+      ROS_DEBUG(
+        "[stabilizer_control_node] : Parameter compassTopic not found. Using Default");
+      compassTopic = "/sensors/imu";
+    }
+    compassSubscriber_ = nodeHandle_.subscribe(
+      compassTopic,
+      1,
+      &StabilizerController::serveImuMessage,
+      this);
+
+    laserRollPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
+      "/laser_roll_joint_position_controller/command",
+      5);
+    laserPitchPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
+      "/laser_pitch_joint_position_controller/command",
+      5);
   }
-  else
+
+  void StabilizerController::serveImuMessage(
+    const sensor_msgs::ImuConstPtr& msg)
   {
-    ROS_WARN("[stabilizer_control_node] : Parameter compassTopic not found. Using Default");
-    compassTopic = "/sensors/imu";
+    double compassYaw;
+    double compassPitch;
+    double compassRoll;
+    std_msgs::Float64 str;
+
+    tf::Matrix3x3 matrix(
+      tf::Quaternion(
+        msg->orientation.x,
+        msg->orientation.y,
+        msg->orientation.z,
+        msg->orientation.w));
+
+    matrix.getRPY(compassRoll, compassPitch, compassYaw);
+
+    str.data = -compassRoll;
+    laserRollPublisher_.publish(str);
+    str.data = -compassPitch;
+    laserPitchPublisher_.publish(str);
   }
-  _compassSubscriber = nh.subscribe(compassTopic, 1, &StabilizerController::serveImuMessage, this);
-
-  _laser_roll_publisher = nh.advertise<std_msgs::Float64>("/laser_roll_joint_position_controller/command", 5);
-  _laser_pitch_publisher = nh.advertise<std_msgs::Float64>("/laser_pitch_joint_position_controller/command", 5);
-
-}
-
-void StabilizerController::serveImuMessage(
-  const sensor_msgs::ImuConstPtr& msg)
-{
-  double compassYaw;
-  double compassPitch;
-  double compassRoll;
-  std_msgs::Float64 str;
-
-  tf::Matrix3x3 matrix(
-    tf::Quaternion(
-      msg->orientation.x,
-      msg->orientation.y,
-      msg->orientation.z,
-      msg->orientation.w));
-
-  matrix.getRPY(compassRoll, compassPitch, compassYaw);
-
-  str.data = -compassRoll;
-  _laser_roll_publisher.publish(str);
-  str.data = -compassPitch;
-  _laser_pitch_publisher.publish(str);
-}
+}  // namespace pandora_control

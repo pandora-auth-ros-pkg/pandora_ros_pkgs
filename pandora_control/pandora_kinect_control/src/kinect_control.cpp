@@ -37,7 +37,7 @@
 
 #include <pandora_kinect_control/kinect_control.h>
 
-namespace pandora_kinect_control
+namespace pandora_control
 {
   PandoraMoveKinectActionServer::PandoraMoveKinectActionServer(
     std::string name,
@@ -92,7 +92,7 @@ namespace pandora_kinect_control
 
   void PandoraMoveKinectActionServer::preemptCallback()
   {
-    ROS_INFO("%s: Preempted", actionName_.c_str());
+    ROS_DEBUG("%s: Preempted", actionName_.c_str());
     // set the action state to preempted
     actionServer_.setPreempted();
   }
@@ -113,7 +113,7 @@ namespace pandora_kinect_control
           kinect_yaw_publisher.publish(yawTargetPosition);
           position_ = START;
         }
-        ROS_INFO("%s: Succeeded", actionName_.c_str());
+        ROS_DEBUG("%s: Succeeded", actionName_.c_str());
         // set the action state to succeeded
         actionServer_.setSucceeded();
       }
@@ -161,10 +161,10 @@ namespace pandora_kinect_control
       }
       else
       {
-        ROS_INFO("%s: Aborted, there is no such command", actionName_.c_str());
+        ROS_DEBUG("%s: Aborted, there is no such command", actionName_.c_str());
         // set the action state to aborted
         actionServer_.setAborted();
       }
     }
   }
-}  // namespace pandora_kinect_control
+}  // namespace pandora_control

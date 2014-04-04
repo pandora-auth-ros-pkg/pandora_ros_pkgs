@@ -43,7 +43,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <pandora_kinect_control/MoveKinectAction.h>
 
-namespace pandora_kinect_control
+namespace pandora_control
 {
   enum
   {
@@ -84,5 +84,5 @@ namespace pandora_kinect_control
 
       ~PandoraMoveKinectActionServer(void);
   };
-}  // namespace pandora_kinect_control
+}  // namespace pandora_control
 #endif  // PANDORA_KINECT_CONTROL_KINECT_CONTROL_H

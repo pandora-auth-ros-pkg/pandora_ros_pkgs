@@ -34,11 +34,30 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include "pandora_stabilizer_control/pandora_stabilizer_control.h"
+#ifndef PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
+#define PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
 
-int main(int argc, char **argv)
+#include <sensor_msgs/Imu.h>
+#include <geometry_msgs/Quaternion.h>
+#include <std_msgs/Float64.h>
+#include "ros/ros.h"
+#include <tf/tf.h>
+
+namespace pandora_control
 {
-  ros::init(argc, argv, "pandora_stabilizer_control_node");
-  StabilizerController stabilizerController;
-  ros::spin();
-}
+  class StabilizerController
+  {
+    private:
+      ros::NodeHandle nodeHandle_;
+      ros::Subscriber compassSubscriber_;
+
+      ros::Publisher laserRollPublisher_;
+      ros::Publisher laserPitchPublisher_;
+
+      void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
+
+    public:
+      StabilizerController(void);
+  };
+}  // namespace pandora_control
+#endif  // PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H

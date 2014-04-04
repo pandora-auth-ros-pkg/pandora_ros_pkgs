@@ -29,11 +29,11 @@ include_directories(include
 )
 
 add_executable(
-  pandora_stabilizer_control_node
-  src/pandora_stabilizer_control.cpp
-  src/pandora_stabilizer_control_node.cpp)
+  stabilizer_control_node
+  src/stabilizer_control.cpp
+  src/stabilizer_control_node.cpp)
 target_link_libraries(
-  pandora_stabilizer_control_node 
+  stabilizer_control_node 
   ${catkin_LIBRARIES} )
 
 # To check lint : catkin_make roslint_pandora_control
@@ -42,9 +42,9 @@ set(ROSLINT_CPP_OPTS
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  include/pandora_stabilizer_control/pandora_stabilizer_control.h
-  src/pandora_stabilizer_control_node.cpp
-  src/pandora_stabilizer_control.cpp
+  include/pandora_stabilizer_control/stabilizer_control.h
+  src/stabilizer_control_node.cpp
+  src/stabilizer_control.cpp
 
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

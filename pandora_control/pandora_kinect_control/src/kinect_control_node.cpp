@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "kinect_control_node");
   ros::NodeHandle nodeHandle;
   std::string actionName = "move_kinect_action";
-  pandora_kinect_control::PandoraMoveKinectActionServer
+  pandora_control::PandoraMoveKinectActionServer
     pandoraMoveKinectActionServer(
       actionName,
       nodeHandle);
