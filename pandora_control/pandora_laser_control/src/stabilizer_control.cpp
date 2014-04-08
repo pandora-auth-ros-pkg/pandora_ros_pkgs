@@ -61,10 +61,10 @@ namespace pandora_control
       this);
 
     laserRollPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
-      "/laser_roll_joint_position_controller/command",
+      "/laser_roll_controller/command",
       5);
     laserPitchPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
-      "/laser_pitch_joint_position_controller/command",
+      "/laser_pitch_controller/command",
       5);
   }
 

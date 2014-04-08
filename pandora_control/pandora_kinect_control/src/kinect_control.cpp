@@ -58,12 +58,12 @@ namespace pandora_control
         this));
     kinect_pitch_publisher =
       nodeHandle_.advertise<std_msgs::Float64>(
-        "/kinect_pitch_joint_position_controller/command",
+        "/kinect_pitch_controller/command",
         5);
 
     kinect_yaw_publisher =
       nodeHandle_.advertise<std_msgs::Float64>(
-        "/kinect_yaw_joint_position_controller/command",
+        "/kinect_yaw_controller/command",
         5);
     ros::Duration(0.5).sleep();
     std_msgs::Float64 targetPosition;
