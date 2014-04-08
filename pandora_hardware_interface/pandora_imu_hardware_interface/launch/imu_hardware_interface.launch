@@ -1,0 +1,9 @@
+<launch>
+  <!-- Launch controller manager with pandora hardware interface-->
+  <node
+    name="imu_hardware_interface_node"
+    pkg="pandora_imu_hardware_interface"
+    type="imu_hardware_interface_node"
+    output="screen"
+    ns = "/imu"/>
+</launch>

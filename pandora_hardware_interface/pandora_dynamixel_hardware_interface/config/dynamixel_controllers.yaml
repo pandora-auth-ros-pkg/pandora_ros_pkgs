@@ -1,0 +1,51 @@
+laser_roll_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: laser_roll_joint
+    joint_speed: 1
+    motor:
+        id: 2
+        init: 512
+        min: 0
+        max: 1023
+
+laser_pitch_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: laser_pitch_joint
+    joint_speed: 1
+    motor:
+        id: 1
+        init: 512
+        min: 0
+        max: 1023
+
+kinect_pitch_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: kinect_pitch_joint
+    joint_speed: 1
+    motor:
+        id: 3
+        init: 512
+        min: 0
+        max: 1023
+
+kinect_yaw_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: kinect_yaw_joint
+    joint_speed: 1
+    motor:
+        id: 4
+        init: 512
+        min: 0
+        max: 1023

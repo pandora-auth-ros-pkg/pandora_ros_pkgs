@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>Containts pandora controller packages used to interface eith hardware.</description>
+
+  <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pandora_dynamixel_hardware_interface</run_depend>
+  <run_depend>pandora_imu_hardware_interface</run_depend>
+  <run_depend>pandora_motor_hardware_interface</run_depend>
+  <run_depend>pandora_xmega_hardware_interface</run_depend>
+  <run_depend>controllers_and_sensors_communications</run_depend>
+  <run_depend>pandora_arm_hardware_interface</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>  
+</package>

@@ -1,0 +1,10 @@
+# Goal
+uint8 position
+uint8 positionSet=2
+---
+# Result
+uint8 error
+uint8 OK=0
+uint8 ERROR_COMMUNICATING=1
+---
+# Feedback

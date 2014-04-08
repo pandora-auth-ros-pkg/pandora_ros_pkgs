@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_xmega_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>Containts pandora xmega hardware interface.</description>
+
+  <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface</url>
+  
+  <author>Evangelos Apostolidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
+  <build_depend>controller_manager</build_depend>
+  <build_depend>controller_interface</build_depend>
+  <build_depend>serial</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>pluginlib</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslint</run_depend>
+  <run_depend>controller_manager</run_depend>
+  <run_depend>controller_interface</run_depend>
+  <run_depend>serial</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>pluginlib</run_depend>
+
+  <export>
+    <controller_interface plugin="${prefix}/power_supply_controller.xml"/>
+    <controller_interface plugin="${prefix}/range_sensor_controller.xml"/>
+  </export>
+</package>

@@ -1,0 +1,18 @@
+<launch>
+    <!-- Start joint controllers -->
+    <rosparam
+      file="$(find pandora_dynamixel_hardware_interface)/config/dynamixel_controllers.yaml"
+      command="load"/>
+    <node
+      name="dynamixel_controller_spawner"
+      pkg="dynamixel_controllers"
+      type="controller_spawner.py"
+      output="screen"
+      args="
+        --manager=dxl_manager
+        --port dynamixel_port
+        laser_pitch_controller
+        laser_roll_controller
+        kinect_pitch_controller
+        kinect_yaw_controller"/>
+</launch>

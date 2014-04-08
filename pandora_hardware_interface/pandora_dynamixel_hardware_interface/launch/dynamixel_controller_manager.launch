@@ -1,0 +1,12 @@
+<launch>
+  <node
+    name="dynamixel_manager"
+    pkg="dynamixel_controllers"
+    type="controller_manager.py"
+    required="true"
+    output="screen">
+    <rosparam
+      file="$(find pandora_dynamixel_hardware_interface)/config/dynamixel_controller_manager.yaml"
+      command="load"/>
+    </node>
+</launch>

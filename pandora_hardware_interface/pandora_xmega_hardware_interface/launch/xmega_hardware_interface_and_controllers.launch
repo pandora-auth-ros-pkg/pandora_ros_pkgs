@@ -1,0 +1,13 @@
+<launch>
+  <!-- Launch controller manager with pandora hardware interface-->
+  <include
+    file="$(find pandora_xmega_hardware_interface)/launch/xmega_hardware_interface.launch" />
+
+  <!-- spawn power supply controllers -->
+  <include
+    file="$(find pandora_xmega_hardware_interface)/launch/power_supply_controller.launch" />
+
+  <!-- spawn range sensor controllers -->
+  <include
+    file="$(find pandora_xmega_hardware_interface)/launch/range_sensor_controller.launch" />
+</launch>

@@ -1,0 +1,11 @@
+<library path="lib/librange_sensor_controller">
+  <class
+    name="pandora_xmega/RangeSensorController"
+    type="pandora_hardware_interface::xmega::RangeSensorController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of all available range sensors as
+    sensor_msgs/Range message. 
+  </description>
+  </class>
+</library>

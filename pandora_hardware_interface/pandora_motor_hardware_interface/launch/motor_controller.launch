@@ -1,0 +1,20 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_motor_hardware_interface)/config/motor_hardware_interface.yaml"
+    ns="/motor"/>
+
+  <!-- spawn controller -->
+  <node
+    name="motor_controller_spawner"
+    pkg="controller_manager"
+    type="spawner" output="screen"
+    ns="/motor"
+    args="
+      joint_state_controller
+      movement_left_front_joint_velocity_controller
+      movement_right_front_joint_velocity_controller
+      movement_left_rear_joint_velocity_controller
+      movement_right_rear_joint_velocity_controller" />
+</launch>
