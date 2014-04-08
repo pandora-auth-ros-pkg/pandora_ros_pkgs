@@ -44,6 +44,6 @@ before_script: # Use this to prepare your build for testing e.g. copy database c
 script: # All commands must exit with code 0 on success. Anything else is considered failure.
   - catkin_make -j2
   - source devel/setup.bash
-  - catkin_make roslint
+  - catkin_make roslint -j1
   - catkin_make run_tests
   - catkin_test_results build
