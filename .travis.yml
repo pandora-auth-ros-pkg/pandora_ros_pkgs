@@ -11,7 +11,7 @@ notifications:
   email:
     recipients: # notify committer and commit author only
     on_success: change #[always|never|change] # default: change
-    on_failure: change #[always|never|change] # default: always
+    on_failure: always #[always|never|change] # default: always
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   # Define some config vars
   - export ROS_DISTRO=hydro
@@ -33,7 +33,7 @@ install: # Use this to install any prerequisites or dependencies necessary to ru
   # Download non-debian stuff
   - wstool merge https://raw.github.com/pandora-auth-ros-pkg/install/hydro-devel/travis_ci.rosinstall
   - wstool update
-  # Delete the stdr_simulator.rosinstall version of this repo and use the one of the branch we are testing
+  # Delete the .rosinstall version of this repo and use the one of the branch we are testing
   - rm -rf $REPOSITORY_NAME
   - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace
   - cd ../
