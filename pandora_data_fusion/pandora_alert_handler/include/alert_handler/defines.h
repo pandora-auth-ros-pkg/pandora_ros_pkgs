@@ -1,19 +1,37 @@
 // "Copyright [year] <Copyright Owner>"
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_DEFINES_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_DEFINES_H_
+#ifndef ALERT_HANDLER_DEFINES_H
+#define ALERT_HANDLER_DEFINES_H
 
-//!< The coefficient that needs to be multiplied with pixels to get meters
-#define  OCGD      0.02         
-#define D_PI            3.141592654    //!< PI
-#define MAP_SIZE    4096      //!< Map's size
-#define MAP_HEIGHT    4096      //!< Maps height
+#include <boost/math/constants/constants.hpp>
 
-//!< Global coordinates in the map fro start - X coord
-#define  START_X      MAP_HEIGHT/2  
+#include <geometry_msgs/Pose.h>
+#include <nav_msgs/OccupancyGrid.h>
 
-//!< Global coordinates in the map fro start - Y coord
-#define  START_Y     MAP_HEIGHT/2  
+//!< Set that boost::noncopyable will set private default constructors
+#define BOOST_NO_DEFAULTED_FUNCTIONS
 
+//!< Macro for pi.
+#define PI boost::math::constants::pi<float>()
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_DEFINES_H_
+//!< Macro to convert to map coordinates from meters.
+#define COORDS(X, Y, MAP) ceil((X - MAP->info.origin.position.x)\
+    / MAP->info.resolution) + ceil((Y - MAP->info.origin.position.y)\
+      / MAP->info.resolution) * MAP->info.width
+
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
+
+using geometry_msgs::Pose;
+using geometry_msgs::Point;
+
+typedef nav_msgs::OccupancyGrid Map;
+typedef nav_msgs::OccupancyGridPtr MapPtr;
+typedef nav_msgs::OccupancyGridConstPtr MapConstPtr;
+
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_DEFINES_H

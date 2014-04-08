@@ -37,16 +37,18 @@
 *   Triantafyllos Afouras <afourast@gmail.com>
 *********************************************************************/
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_HANDLER_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_HANDLER_H_
+#ifndef ALERT_HANDLER_VICTIM_HANDLER_H
+#define ALERT_HANDLER_VICTIM_HANDLER_H
 
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/utility.hpp>
 
-#include "ros/ros.h"
-#include "visualization_msgs/MarkerArray.h"
-#include "std_msgs/Empty.h"
+#include <ros/ros.h>
+
+#include <visualization_msgs/MarkerArray.h>
+#include <std_msgs/Empty.h>
 
 #include "data_fusion_communications/ThermalDirectionAlertMsg.h"
 #include "data_fusion_communications/VictimVerificationMsg.h"
@@ -54,17 +56,22 @@
 #include "data_fusion_communications/VictimToFsmMsg.h"
 #include "data_fusion_communications/VictimInfoMsg.h"
 
-#include "alert_handler/object_list.h"
 #include "alert_handler/victim.h"
 #include "alert_handler/victim_clusterer.h"
 #include "alert_handler/victim_list.h"
+#include "alert_handler/defines.h"
+
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
 
 /**
   @class VictimHandler
   @brief Controller that keeps track of victims 
 **/ 
-class VictimHandler {
-
+class VictimHandler : private boost::noncopyable
+{
  public:
  
   /**
@@ -180,9 +187,9 @@ class VictimHandler {
   /**
   @brief Returns all the legit Objects from all the Object lists concatenated 
     into a single vector
-  @return ObjectPtrVector A vector contaiing all the legit Objects
+  @return ObjectConstPtrVector A vector contaiing all the legit Objects
   **/
-  ObjectPtrVector getAllLegitObjects();
+  ObjectConstPtrVectorPtr getAllLegitObjects();
 
   /**
   @brief Publishes a message that a victim was found
@@ -238,8 +245,12 @@ class VictimHandler {
 
   //!< The probability threshold for informing fsm of victim verification 
   float VICTIM_VERIFICATION_PROB;
+
 };
 
-typedef boost::shared_ptr<VictimHandler> VictimHandlerPtr;
+typedef boost::scoped_ptr<VictimHandler> VictimHandlerPtr;
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_HANDLER_H_
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_VICTIM_HANDLER_H

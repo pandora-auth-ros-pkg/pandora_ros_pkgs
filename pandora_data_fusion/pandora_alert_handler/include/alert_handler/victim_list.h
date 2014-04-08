@@ -37,8 +37,8 @@
 *   Triantafyllos Afouras <afourast@gmail.com>
 *********************************************************************/
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_LIST_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_LIST_H_
+#ifndef ALERT_HANDLER_VICTIM_LIST_H
+#define ALERT_HANDLER_VICTIM_LIST_H
 
 #include <list>
 #include <vector>
@@ -52,8 +52,13 @@
 #include "alert_handler/utils.h"
 #include "alert_handler/victim.h"
 
-class VictimList : public ObjectList<Victim> {
-  
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
+
+class VictimList : public ObjectList<Victim>
+{  
  public:
   
   /**
@@ -70,7 +75,7 @@ class VictimList : public ObjectList<Victim> {
   @param victim [VictimPtr] The victim whose existance we need to check
   @return bool True if victim exists, false otherwise
   **/
-  bool contains(const VictimPtr& victim) const;
+  bool contains(const VictimConstPtr& victim) const;
 
   /**
   @brief Checks if a victim is currently tracked or not
@@ -152,7 +157,7 @@ class VictimList : public ObjectList<Victim> {
   @param allObjects [const ObjectPtrVector&] All the legit objects
   @return void
   **/
-  void sanityCheck(const ObjectPtrVector& allObjects);
+  void sanityCheck(const ObjectConstPtrVectorPtr& allObjects);
 
   /**
   @override
@@ -190,7 +195,14 @@ class VictimList : public ObjectList<Victim> {
   float APPROACH_DIST;
   //!< The approach pose distance threshold for informing fsm of change 
   float VICTIM_UPDATE;
+
+ private:
+
+  friend class VictimListTest;
+ 
 };
 
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_LIST_H_
+#endif  // ALERT_HANDLER_VICTIM_LIST_H

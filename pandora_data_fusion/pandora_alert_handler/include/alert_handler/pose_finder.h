@@ -1,58 +1,81 @@
 // "Copyright [year] <Copyright Owner>"
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_POSE_FINDER_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_POSE_FINDER_H_
+#ifndef ALERT_HANDLER_POSE_FINDER_H
+#define ALERT_HANDLER_POSE_FINDER_H
 
 #include <utility> 
-#include <vector> 
+#include <vector>
+#include <boost/utility.hpp>
 
 #include <tf/transform_broadcaster.h>
 
+#include <nav_msgs/OccupancyGrid.h>
+
+#include "alert_handler/defines.h"
+#include "alert_handler/tf_finder.h"
+#include "alert_handler/tf_listener.h"
 #include "alert_handler/objects.h"
 #include "alert_handler/utils.h"
 
-typedef unsigned char** Map;
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
 
-class PoseFinder {
-
+class PoseFinder : private boost::noncopyable
+{
  public:
 
-  PoseFinder(const Map& map,
-      float heightHighThres = 1.2, float heightLowThres = 0,
-      float approachDist = 0.5, int orientationDist = 20,
-      int orientationCircle = 10);
+  PoseFinder(const MapPtr& map, const std::string& mapType,
+    float occupiedCellThres = 0.5,
+    float heightHighThres = 1.2, float heightLowThres = 0,
+    float approachDist = 0.5, float orientationDist = 0.5,
+    float orientationCircle = 0.25);
   Pose findAlertPose(float alertYaw, float alertPitch,
-      tf::Transform tfTransform);
+    tf::Transform tfTransform);
   tf::Transform lookupTransformFromWorld(std_msgs::Header header);
 
-  void updateParams(float heightHighThres, float heightLowThres,
-      float approachDist,
-      int orientationDist, int orientationCircle);
+  void updateParams(float occupiedCellThres,
+    float heightHighThres, float heightLowThres,
+    float approachDist,
+    float orientationDist, float orientationCircle);
 
  private:
 
-  PixelCoords positionOnWall(Point startPoint, float angle);
+  Point positionOnWall(Point startPoint, float angle);
   float calcHeight(float alertPitch, float height, float distFromAlert);
   geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
       Point alertPoint);
-  std::pair<PixelCoords, PixelCoords> findDiameterEndPointsOnWall(
-      std::vector<PixelCoords> points);
+  std::pair<Point, Point> findDiameterEndPointsOnWall(
+      std::vector<Point> points);
 
   void publishVisionTransform(float alertYaw, float alertPitch,
       tf::Transform worldHeadCameraTransform);
-      
+
  private:
 
-  const Map& _map;
-  tf::TransformListener _listener;
-  tf::TransformBroadcaster victimFrameBroadcaster;
+  friend class PoseFinderTest;
 
-  //params
-  int ORIENTATION_CIRCLE;
-  int ORIENTATION_DIST;
+ private:
+
+  const MapPtr& map_;
+
+  TfListenerPtr listener_;
+  // tf::TransformBroadcaster victimFrameBroadcaster;
+
+  //!< params
+  float ORIENTATION_CIRCLE;
+  float ORIENTATION_DIST;
   float APPROACH_DIST;
   float HEIGHT_HIGH_THRES;
   float HEIGHT_LOW_THRES;
+  float OCCUPIED_CELL_THRES;
+
 };
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_POSE_FINDER_H_
+typedef boost::scoped_ptr< PoseFinder > PoseFinderPtr;
+
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_POSE_FINDER_H

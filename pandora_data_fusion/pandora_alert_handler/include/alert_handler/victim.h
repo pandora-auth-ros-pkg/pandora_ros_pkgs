@@ -1,21 +1,27 @@
 // "Copyright [year] <Copyright Owner>"
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_H_
+#ifndef ALERT_HANDLER_VICTIM_H
+#define ALERT_HANDLER_VICTIM_H
 
 #include <vector>
 #include <set>
 
-#include "geometry_msgs/Pose.h"
-#include "visualization_msgs/MarkerArray.h"
+#include <geometry_msgs/Pose.h>
+#include <visualization_msgs/MarkerArray.h>
 
-#include "alert_handler/objects.h"
 #include "data_fusion_communications/DatafusionGeotiffSrv.h"
 
-class Victim : public Object {
+#include "alert_handler/objects.h"
 
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
+
+class Victim : public Object
+{
  public:
-  
+ 
   typedef boost::shared_ptr<Victim> Ptr;
   typedef boost::shared_ptr<Victim const> ConstPtr;
 
@@ -34,11 +40,11 @@ class Victim : public Object {
 
   geometry_msgs::PoseStamped getApproachPoint() const;
   
-  void setObjects(const ObjectPtrVector& objects, float approachDistance);
+  void setObjects(const ObjectConstPtrVector& objects, float approachDistance);
   
   void eraseObjectAt(int index, float approachDistance);
   
-  void sanityCheck(const ObjectPtrVector& allObjects,
+  void sanityCheck(const ObjectConstPtrVectorPtr& allObjects,
             float distThreshold, float approachDistance);
    
   void addSensor(int sensorId);
@@ -49,7 +55,8 @@ class Victim : public Object {
   @brief Getter for member valid_
   @return bool valid_
   **/
-  bool getValid() const {
+  bool getValid() const
+  {
     return valid_;
   }
    
@@ -57,7 +64,8 @@ class Victim : public Object {
   @brief Getter for member visited_
   @return bool visited_
   **/
-  bool getVisited() const {
+  bool getVisited() const
+  {
     return visited_;
   }
    
@@ -65,7 +73,8 @@ class Victim : public Object {
   @brief Getter for member selectedObjectIndex_
   @return bool selectedObjectIndex_
   **/
-  int getSelectedObjectIndex() const {
+  int getSelectedObjectIndex() const
+  {
     return selectedObjectIndex_;
   }
   
@@ -73,7 +82,8 @@ class Victim : public Object {
   @brief Getter for member approachPose_
   @return const geometry_msgs::Pose& approachPose_
   **/
-  const geometry_msgs::Pose& getApproachPose() const {
+  const geometry_msgs::Pose& getApproachPose() const
+  {
     return approachPose_;
   }
   
@@ -81,7 +91,8 @@ class Victim : public Object {
   @brief Getter for member sensorIds_
   @return std::set<int>& sensorIds_
   **/
-  const std::set<int>& getSensorIds() const {
+  const std::set<int>& getSensorIds() const
+  {
     return sensorIds_;
   }
   
@@ -89,7 +100,8 @@ class Victim : public Object {
   @brief Getter for member objects_
   @return std::set<int>& objects_
   **/
-  const ObjectPtrVector& getObjects() const {
+  const ObjectConstPtrVector& getObjects() const
+  {
     return objects_;
   }
    
@@ -98,7 +110,8 @@ class Victim : public Object {
   @param valid [bool] The new valid_ value
   @return void
   **/
-  void setValid(bool valid) {
+  void setValid(bool valid)
+  {
     valid_ = valid;
   }
   
@@ -107,7 +120,8 @@ class Victim : public Object {
   @param visited [bool] The new visited_ value
   @return void
   **/
-  void setVisited(bool visited) {
+  void setVisited(bool visited)
+  {
     visited_ = visited;
   }
     
@@ -145,21 +159,27 @@ class Victim : public Object {
 
   geometry_msgs::Pose approachPose_;    
   
-  //!<Holds the type of sensor that created the alarm
+  //!< Holds the type of sensor that created the alarm
   std::set<int> sensorIds_;   
   
-  ObjectPtrVector objects_;
+  ObjectConstPtrVector objects_;
  
  private:
+
+  friend class VictimTest;
+  friend class VictimClustererTest;
+
+ private:
   
-  static int lastVictimId_;    //!< The last in line victim ID
+  static int lastVictimId_;  //!< The last in line victim ID
   
 };
-
 
 typedef Victim::Ptr VictimPtr;
 typedef Victim::ConstPtr VictimConstPtr;
 typedef std::vector<VictimPtr> VictimPtrVector;
 
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_H_
+#endif  // ALERT_HANDLER_VICTIM_H

@@ -37,33 +37,38 @@
 *   Triantafyllos Afouras <afourast@gmail.com>
 *********************************************************************/
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECTS_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECTS_H_
-
-#include <ros/ros.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/PoseStamped.h>
+#ifndef ALERT_HANDLER_OBJECTS_H
+#define ALERT_HANDLER_OBJECTS_H
 
 #include <set>
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
+#include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
+
 #include "data_fusion_communications/DatafusionGeotiffSrv.h"
+#include "visualization_msgs/MarkerArray.h"
 
 #include "alert_handler/utils.h"
 
-#include "visualization_msgs/MarkerArray.h"
-
-#include <boost/shared_ptr.hpp>
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
 
 /**
-  @class Object
-  @brief Abstract class representing an Object in 3d space
+@class Object
+@brief Abstract class representing an Object in 3d space
 **/ 
-class Object {
+class Object
+{
  public:
+
   typedef boost::shared_ptr<Object> Ptr;
   typedef boost::shared_ptr<Object const> ConstPtr;
 
@@ -104,13 +109,14 @@ class Object {
   @return void
   **/
   virtual void getVisualization(
-    visualization_msgs::MarkerArray* markers) const = 0;
+    visualization_msgs::MarkerArray* markers) const {};
   
   /**
   @brief Getter for member id_
   @return int id
   **/
-  int getId() const {
+  int getId() const
+  {
     return id_;
   }
   
@@ -118,7 +124,8 @@ class Object {
   @brief Getter for member counter_
   @return int counter
   **/
-  int getCounter() const {
+  int getCounter() const
+  {
     return counter_;
   }
   
@@ -126,7 +133,8 @@ class Object {
   @brief Getter for member legit_
   @return bool legit
   **/
-  bool getLegit() const {
+  bool getLegit() const
+  {
     return legit_;
   }
   
@@ -134,7 +142,8 @@ class Object {
   @brief Getter for member type_
   @return std::string type
   **/
-  std::string getType() const {
+  std::string getType() const
+  {
     return type_;
   }
   
@@ -142,7 +151,8 @@ class Object {
   @brief Getter for member legit_
   @return bool legit
   **/
-  float getProbability() const {
+  float getProbability() const
+  {
     return probability_;
   }
   
@@ -150,7 +160,8 @@ class Object {
   @brief Getter for member pose_
   @return geometry_msgs::Pose& The object's pose
   **/
-  const geometry_msgs::Pose& getPose() const {
+  const geometry_msgs::Pose& getPose() const
+  {
     return pose_;
   }
   
@@ -158,7 +169,8 @@ class Object {
   @brief Getter for member frame_id
   @return geometry_msgs::Pose& The object's frame_id
   **/
-  std::string getFrameId() const {
+  std::string getFrameId() const
+  {
     return frame_id_;
   }
   
@@ -167,7 +179,8 @@ class Object {
   @param id [int] The new id value
   @return void
   **/
-  void setId(int id) {
+  void setId(int id)
+  {
     id_ = id;
   }
 
@@ -176,7 +189,8 @@ class Object {
   @param counter [int] The new counter value
   @return void
   **/
-  void setCounter(int counter) {
+  void setCounter(int counter)
+  {
     counter_ = counter;
   }
 
@@ -185,7 +199,8 @@ class Object {
   @param legit [int] The new legit value
   @return void
   **/
-  void setLegit(bool legit) {
+  void setLegit(bool legit)
+  {
     legit_ = legit;
   }
   
@@ -194,7 +209,8 @@ class Object {
   @param type [std::string] The new type value
   @return void
   **/
-  void setType(std::string type) {
+  void setType(std::string type)
+  {
     type_ = type;
   }
   
@@ -203,7 +219,8 @@ class Object {
   @param probability [float] The new probability value
   @return void
   **/
-  void setProbability(float probability) {
+  void setProbability(float probability)
+  {
     probability_ = probability;
   }
   
@@ -212,7 +229,8 @@ class Object {
   @param pose [const geometry_msgs::Pose&] The new pose value
   @return void
   **/
-  void setPose(const geometry_msgs::Pose& pose) {
+  void setPose(const geometry_msgs::Pose& pose)
+  {
     pose_ = pose;
   }
   
@@ -220,11 +238,13 @@ class Object {
   @brief Increments counter by 1
   @return void
   **/
-  void incrementCounter() {
+  void incrementCounter()
+  {
     counter_++;
   }
   
  protected:
+ 
   //!< The object's id
   int id_;
   //!< Counter for counting how many times this object is found
@@ -246,19 +266,23 @@ class Object {
 typedef Object::Ptr ObjectPtr;
 typedef Object::ConstPtr ObjectConstPtr;
 
-typedef std::vector<ObjectPtr> ObjectPtrStdVector;
-typedef boost::shared_ptr<ObjectPtrStdVector> ObjectPtrStdVectorPtr;
-
 typedef std::vector<ObjectPtr> ObjectPtrVector;
+typedef boost::shared_ptr<ObjectPtrVector> ObjectPtrVectorPtr;
 typedef std::vector<ObjectPtrVector> ObjectPtrVectorVector;
+
+typedef std::vector<ObjectConstPtr> ObjectConstPtrVector;
+typedef boost::shared_ptr<ObjectConstPtrVector> ObjectConstPtrVectorPtr;
+typedef std::vector<ObjectConstPtrVector> ObjectConstPtrVectorVector;
 
 /**
   @class Qr
   @brief Concrete class representing a Qr Object. Inherits from Object
 **/ 
-class Qr : public Object {
+class Qr : public Object
+{
  public:
   typedef boost::shared_ptr<Qr> Ptr;
+  typedef boost::shared_ptr<Qr const> ConstPtr;
 
   /**
   @brief Constructor
@@ -278,7 +302,8 @@ class Qr : public Object {
   @brief Getter for member content_
   @return std::string The QR's content
   **/
-  std::string getContent() const {
+  std::string getContent() const
+  {
     return content_;
   }
  
@@ -286,7 +311,8 @@ class Qr : public Object {
   @brief Setter for member content_
   @return void
   **/
-  void setContent(std::string content) {
+  void setContent(std::string content)
+  {
     content_ = content;
   }
  
@@ -298,15 +324,19 @@ class Qr : public Object {
 };
 
 typedef Qr::Ptr QrPtr;
-typedef std::vector<QrPtr> QrPtrStdVector;
+typedef Qr::ConstPtr QrConstPtr;
+typedef std::vector< QrPtr > QrPtrVector;
+typedef boost::shared_ptr< QrPtrVector > QrPtrVectorPtr;
 
 /**
   @class Hazmat
   @brief Concrete class representing a Hazmat Object. Inherits from Object
 **/ 
-class Hazmat : public Object {
+class Hazmat : public Object
+{
  public:
   typedef boost::shared_ptr<Hazmat> Ptr;
+  typedef boost::shared_ptr<Hazmat const> ConstPtr;
 
   /**
   @brief Constructor
@@ -326,7 +356,8 @@ class Hazmat : public Object {
   @brief Getter for member pattern_
   @return int The Hazmat's pattern
   **/
-  int getPattern() const {
+  int getPattern() const
+  {
     return pattern_;
   }
   
@@ -334,7 +365,8 @@ class Hazmat : public Object {
   @brief Setter for member pattern_
   @return void
   **/
-  void setPattern(int pattern) {
+  void setPattern(int pattern)
+  {
     pattern_ = pattern;
   }
   
@@ -344,20 +376,26 @@ class Hazmat : public Object {
 };
 
 typedef Hazmat::Ptr HazmatPtr;
-typedef std::vector<HazmatPtr> HazmatPtrStdVector;
+typedef Hazmat::ConstPtr HazmatConstPtr;
+typedef std::vector< HazmatPtr > HazmatPtrVector;
+typedef boost::shared_ptr< HazmatPtrVector > HazmatPtrVectorPtr;
 
 /**
   @class Hole
   @brief Concrete class representing a Hole Object. Inherits from Object
 **/ 
-class Hole : public Object {
+class Hole : public Object
+{
  public:
   typedef boost::shared_ptr<Hole> Ptr;
+  typedef boost::shared_ptr<Hole const> ConstPtr;
 
   /**
   @brief Constructor
   **/
   Hole();
+
+  virtual bool isSameObject(const ObjectConstPtr& object, float distance) const;
 
   virtual geometry_msgs::PoseStamped getPoseStamped() const;
 
@@ -367,7 +405,8 @@ class Hole : public Object {
   @brief Getter for member holeId_
   @return int The holeId 
   **/
-  unsigned int getHoleId() const {
+  unsigned int getHoleId() const 
+  {
     return holeId_;
   }
   
@@ -375,7 +414,8 @@ class Hole : public Object {
   @brief Setter for member holeId_
   @return void
   **/
-  void setHoleId(int holeId) {
+  void setHoleId(int holeId) 
+  {
     holeId_ = holeId;
   }
 
@@ -385,20 +425,26 @@ class Hole : public Object {
 };
 
 typedef Hole::Ptr HolePtr;
-typedef std::vector<HolePtr> HolePtrStdVector;
+typedef Hole::ConstPtr HoleConstPtr;
+typedef std::vector< HolePtr > HolePtrVector;
+typedef boost::shared_ptr< HolePtrVector > HolePtrVectorPtr;
 
 /**
   @class Tpa
   @brief Concrete class representing a Tpa Object. Inherits from Object
 **/ 
-class Tpa : public Object {
+class Tpa : public Object
+{
  public:
   typedef boost::shared_ptr<Tpa> Ptr;
+  typedef boost::shared_ptr<Tpa const> ConstPtr;
 
   /**
   @brief Constructor
   **/
   Tpa();
+
+  virtual bool isSameObject(const ObjectConstPtr& object, float distance) const;
 
   virtual geometry_msgs::PoseStamped getPoseStamped() const;
 
@@ -406,6 +452,11 @@ class Tpa : public Object {
 };
 
 typedef Tpa::Ptr TpaPtr;
-typedef std::vector<TpaPtr> TpaPtrStdVector;
+typedef Tpa::ConstPtr TpaConstPtr;
+typedef std::vector< TpaPtr > TpaPtrVector;
+typedef boost::shared_ptr< TpaPtrVector > TpaPtrVectorPtr;
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECTS_H_
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_OBJECTS_H

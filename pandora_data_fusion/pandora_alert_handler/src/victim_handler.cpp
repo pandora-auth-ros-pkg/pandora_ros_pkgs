@@ -38,9 +38,11 @@
 *********************************************************************/
 
 #include "alert_handler/victim_handler.h"
-#include <string>
-#include <vector>
-#include <set>
+
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
 
 /**
 @details 
@@ -51,92 +53,106 @@ VictimHandler::VictimHandler(const HoleListConstPtr& holeListPtr,
                              float sameVictimRadius,
                              float approachDist,
                              float victimUpdate) :
-  holePtrListPtr_(holeListPtr) ,
+  holePtrListPtr_(holeListPtr),
   tpaPtrListPtr_(tpaListPtr),
   victimsToGoList_(1, sameVictimRadius, approachDist),
-  victimsVisitedList_(1, sameVictimRadius, approachDist) {
-
-  clusterer_.reset(new VictimClusterer(clusterRadius, approachDist));
+  victimsVisitedList_(1, sameVictimRadius, approachDist)
+{
+  clusterer_.reset( new VictimClusterer(clusterRadius, approachDist) );
 
   std::string param; 
   
-  if (nh_.getParam("published_topic_names/victim_found", param)) {
+  if (nh_.getParam("published_topic_names/victim_found", param))
+  {
   victimFoundPublisher_ =  
     nh_.advertise<data_fusion_communications::VictimFoundMsg>(param, 1);
-  } else {
+  }
+  else
+  {
     ROS_FATAL("victim_found topic name param not found");
     ROS_BREAK();
   }
   
-  if (nh_.getParam("published_topic_names/victim_update", param)) {
+  if (nh_.getParam("published_topic_names/victim_update", param))
+  {
   victimUpdatePublisher_ = nh_.advertise<std_msgs::Empty>(param, 1);
-  } else {
+  }
+  else
+  {
     ROS_FATAL("victim_update topic name param not found");
     ROS_BREAK();
   }
   
-  if (nh_.getParam("published_topic_names/victim_verified", param)) {
-  victimVerifiedPublisher_ =
-    nh_.advertise<data_fusion_communications::VictimToFsmMsg>(param, 1);
-  } else {
+  if (nh_.getParam("published_topic_names/victim_verified", param))
+  {
+    victimVerifiedPublisher_ =
+      nh_.advertise<data_fusion_communications::VictimToFsmMsg>(param, 1);
+  }
+  else
+  {
     ROS_FATAL("victim_verified topic name param not found");
     ROS_BREAK();
   }
-
 }
 
 /**
 @details Clusters the existing Objects into victims and then updates
   the list with the unvisited victims with it
 **/
-void VictimHandler::notify() {
-  
-  ObjectPtrVector allObjects = getAllLegitObjects();  
+void VictimHandler::notify()
+{  
+  ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();  
 
   VictimPtrVector newVictimVector = clusterer_->createVictimList(allObjects);
 
-  for (int ii = 0; ii < newVictimVector.size(); ii++) {
-
+  for (int ii = 0; ii < newVictimVector.size(); ii++)
+  {
     std::vector<int> iteratorList;
 
-    if ( victimsVisitedList_.contains( newVictimVector[ii] ) ) {
+    if ( victimsVisitedList_.contains( newVictimVector[ii] ) )
+    {
       continue;
     }
 
     victimsToGoList_.add(newVictimVector[ii]);
 
-    if ( !victimsToGoList_.isVictimBeingTracked() ) {
+    if ( !victimsToGoList_.isVictimBeingTracked() )
+    {
       publishVictimFoundMsg();
-    } else if (victimsToGoList_.currentVictimUpdated()) {
+    }
+    else if (victimsToGoList_.currentVictimUpdated())
+    {
       publishVictimUpdatedMsg();
     }
-    
   }
-
 }
 
 /**
 @details 
 **/
-ObjectPtrVector VictimHandler::getAllLegitObjects() {
-
-  ObjectPtrVector result;
+ObjectConstPtrVectorPtr VictimHandler::getAllLegitObjects()
+{
+  ObjectConstPtrVectorPtr result(new ObjectConstPtrVector);
 
   ObjectList<Hole>::const_iterator holeIt;
 
   for ( holeIt = holePtrListPtr_->begin();
-        holeIt != holePtrListPtr_->end() ; ++holeIt ) {
-    if ( (*holeIt) -> getLegit()) {
-      result.push_back(ObjectPtr(*holeIt));
+        holeIt != holePtrListPtr_->end() ; ++holeIt )
+  {
+    if ( (*holeIt) -> getLegit())
+    {
+      result->push_back(HoleConstPtr(*holeIt));
     }
   }
 
   ObjectList<Tpa>::const_iterator tpaIt;
 
   for ( tpaIt = tpaPtrListPtr_->begin();
-        tpaIt != tpaPtrListPtr_->end() ; ++tpaIt ) {
-    if ( (*tpaIt) -> getLegit()) {
-      result.push_back(ObjectPtr(*tpaIt));
+        tpaIt != tpaPtrListPtr_->end() ; ++tpaIt )
+  {
+    if ( (*tpaIt) -> getLegit())
+    {
+      result->push_back(TpaConstPtr(*tpaIt));
     }
   }
 
@@ -151,13 +167,14 @@ ObjectPtrVector VictimHandler::getAllLegitObjects() {
   victim contains no more objects after the deletion it is deleted from the
   list itself. The fsm is informed if necessary
 **/
-void VictimHandler::fixVictims() {
-
-  ObjectPtrVector allObjects = getAllLegitObjects();  
+void VictimHandler::fixVictims()
+{
+  ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();  
   
   victimsToGoList_.sanityCheck(allObjects);
   
-  if (victimsToGoList_.currentVictimUpdated()) {
+  if (victimsToGoList_.currentVictimUpdated())
+  {
     publishVictimUpdatedMsg();
   }
 
@@ -169,16 +186,16 @@ void VictimHandler::fixVictims() {
 @details Delegate to victimList
 **/
 void VictimHandler::getVictimsMsg (
-  std::vector< data_fusion_communications::VictimInfoMsg>* victimMsgVector) {
-  
-  victimsToGoList_.getVictimsMsg(victimMsgVector);
-  
+  std::vector< data_fusion_communications::VictimInfoMsg>* victimMsgVector)
+{  
+  victimsToGoList_.getVictimsMsg(victimMsgVector); 
 }
 
 /**
 @details Delegate to victimList
 **/
-void VictimHandler::setCurrentVictimIndex(int index) {
+void VictimHandler::setCurrentVictimIndex(int index)
+{
     // race condition !! If victim is
     // deleted before navigation sends back selected id.
     // Hopefully this will be quite uncommon.
@@ -191,10 +208,12 @@ void VictimHandler::setCurrentVictimIndex(int index) {
 @details Delegate to victimList and add Stamp
 **/
 bool VictimHandler::getCurrentVictimTransform(
-  tf::StampedTransform* stampedTranform) {
+    tf::StampedTransform* stampedTranform)
+{
   tf::Transform trans;
   bool victimTracked = victimsToGoList_.getCurrentVictimTransform(&trans);
-  if (victimTracked) {
+  if (victimTracked)
+  {
     *stampedTranform =  tf::StampedTransform(
         trans, ros::Time::now(), "world", "current_victim" );
     return true;
@@ -207,30 +226,33 @@ bool VictimHandler::getCurrentVictimTransform(
   exceeds threshold
 **/
 void VictimHandler::handleVictimVerification(
-  const data_fusion_communications::VictimVerificationMsg& msg) {
-  
+    const data_fusion_communications::VictimVerificationMsg& msg)
+{
   bool victimTracked = victimsToGoList_.updateCurrentVictimSensorsAndProb(msg);
   
-  if(!victimTracked) {
+  if(!victimTracked)
+  {
     ROS_ERROR("[VICTIM_HANDLER %d] VictimVerificationMsg was"
               "called when no victim is tracked ", __LINE__);
     return;
   }
 
-  if (msg.probability > VICTIM_VERIFICATION_PROB ) {
+  if(msg.probability > VICTIM_VERIFICATION_PROB)
+  {
     publishVictimToFsmMsg(victimsToGoList_.getCurrentVictim());
   }
-  
 }
 
 
 /**
 @details Delegate to victimList
 **/
-void VictimHandler::deleteCurrentVictim() {
+void VictimHandler::deleteCurrentVictim()
+{
   bool victimTracked = victimsToGoList_.deleteCurrentVictim();
 
-  if(!victimTracked) {
+  if(!victimTracked)
+  {
     ROS_ERROR("[VICTIM_HANDLER %d] deleteCurrentVictim was"
               "called when no victim is tracked ", __LINE__);
   }
@@ -239,24 +261,24 @@ void VictimHandler::deleteCurrentVictim() {
 /**
 @details Delegate to victimList
 **/
-void VictimHandler::validateCurrentHole(bool objectValid) {
-
+void VictimHandler::validateCurrentHole(bool objectValid)
+{
   VictimPtr currentVictim = victimsToGoList_.validateCurrentObject(objectValid);
   
-  if(currentVictim) {
+  if(currentVictim)
+  {
     victimsVisitedList_.addUnchanged(currentVictim);
   }
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 /**
 @details 
 **/
 void VictimHandler::fillGeotiff(
-    data_fusion_communications::DatafusionGeotiffSrv::Response* res) {
+    data_fusion_communications::DatafusionGeotiffSrv::Response* res)
+{
   victimsVisitedList_.fillGeotiff(res);
 }
 
@@ -265,17 +287,17 @@ void VictimHandler::fillGeotiff(
 **/
 void VictimHandler::getVisualization(
   visualization_msgs::MarkerArray* victimsVisitedMarkers ,
-  visualization_msgs::MarkerArray* victimsToGoMarkers) {
-
+  visualization_msgs::MarkerArray* victimsToGoMarkers)
+{
   victimsVisitedList_.getVisualization(victimsVisitedMarkers);
   victimsToGoList_.getVisualization(victimsToGoMarkers);
-
 }
 
 /**
 @details 
 **/
-void  VictimHandler::publishVictimFoundMsg() {
+void  VictimHandler::publishVictimFoundMsg()
+{
   ROS_INFO_NAMED("victim_handler",
                  "[VICTIM_HANDLER %d] New victim found ", __LINE__);
   data_fusion_communications::VictimFoundMsg victimMsg;
@@ -286,17 +308,18 @@ void  VictimHandler::publishVictimFoundMsg() {
 /**
 @details 
 **/
-void VictimHandler::publishVictimUpdatedMsg() {
+void VictimHandler::publishVictimUpdatedMsg() 
+{
   std_msgs::Empty msg;
 
   victimUpdatePublisher_.publish(msg);
 }
 
-
 /**
 @details 
 **/
-void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim) {
+void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim)
+{
   data_fusion_communications::VictimToFsmMsg msg;
   msg.header.stamp = ros::Time::now();
   msg.header.frame_id = "/world";
@@ -304,7 +327,8 @@ void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim) {
   msg.y = victim->getPose().position.y;
   msg.probability = victim->getProbability();
   for (std::set<int>::iterator it = victim->getSensorIds().begin();
-       it != victim->getSensorIds().end(); ++it) {
+       it != victim->getSensorIds().end(); ++it)
+  {
     msg.sensors.push_back(sensorIdToString(*it));
   }
   victimVerifiedPublisher_.publish(msg);
@@ -313,17 +337,18 @@ void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim) {
 /**
 @details 
 **/
-std::string VictimHandler::sensorIdToString(int sensorId) {
-
-  switch (sensorId) {
-  case data_fusion_communications::VictimVerificationMsg::FACE:
-    return "Face";
-  case data_fusion_communications::VictimVerificationMsg::MOTION:
-    return "Motion";
-  case data_fusion_communications::VictimVerificationMsg::MLX:
-    return "Mlx";
-  case data_fusion_communications::VictimVerificationMsg::CO2:
-    return "CO2";
+std::string VictimHandler::sensorIdToString(int sensorId)
+{
+  switch (sensorId)
+  {
+    case data_fusion_communications::VictimVerificationMsg::FACE:
+      return "Face";
+    case data_fusion_communications::VictimVerificationMsg::MOTION:
+      return "Motion";
+    case data_fusion_communications::VictimVerificationMsg::MLX:
+      return "Mlx";
+    case data_fusion_communications::VictimVerificationMsg::CO2:
+      return "CO2";
   }
   ROS_ERROR("[VICTIM_HANDLER %d] sensorIdToString was called"
             "with invalid sensor id", __LINE__);
@@ -336,7 +361,8 @@ std::string VictimHandler::sensorIdToString(int sensorId) {
 **/
 void VictimHandler::updateParams(float clusterRadius, float sameVictimRadius,
                                  float approachDist, float victimUpdate,
-                                 float verificationProbability) {
+                                 float verificationProbability)
+{
   VICTIM_VERIFICATION_PROB = verificationProbability;
   clusterer_->updateParams(clusterRadius, approachDist);
   victimsToGoList_.setParams(1, sameVictimRadius, approachDist, victimUpdate);
@@ -345,8 +371,11 @@ void VictimHandler::updateParams(float clusterRadius, float sameVictimRadius,
 /**
 @details 
 **/
-void VictimHandler::flush() {
+void VictimHandler::flush()
+{
   victimsToGoList_.clear();
 }
 
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
 

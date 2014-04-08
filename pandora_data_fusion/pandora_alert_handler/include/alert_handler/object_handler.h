@@ -1,46 +1,55 @@
 // "Copyright [year] <Copyright Owner>"
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECT_HANDLER_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECT_HANDLER_H_
+#ifndef ALERT_HANDLER_OBJECT_HANDLER_H
+#define ALERT_HANDLER_OBJECT_HANDLER_H
 
-#include "alert_handler/object_list.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
+
 #include "data_fusion_communications/QrNotificationMsg.h"
 
-class ObjectHandler {
+#include "alert_handler/object_list.h"
 
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
+
+class ObjectHandler : private boost::noncopyable
+{
  public:
 
   ObjectHandler(HoleListPtr holeListPtr, QrListPtr qrListPtr,
-                HazmatListPtr hazmatListPtr , TpaListPtr tpaListPtr ,
+                HazmatListPtr hazmatListPtr, TpaListPtr tpaListPtr ,
                 float sensorRange = 2.5,
                 float qrClosestAlert = 0.5,
                 float hazmatClosestalert = 0.5);
 
-  void handleHoles(HolePtrStdVector holes, tf::Transform transform);
-  void handleQrs(QrPtrStdVector newQrs,
-    tf::Transform transform, bool eraseHoles);
-  void handleHazmats(HazmatPtrStdVector newHazmats, tf::Transform transform);
-  void handleTpas(TpaPtrStdVector newTpas, tf::Transform transform);
+  void handleHoles(const HolePtrVectorPtr& newHoles, const tf::Transform& transform);
+  void handleQrs(const QrPtrVectorPtr& newQrs, 
+      const tf::Transform& transform, bool eraseHoles);
+  void handleHazmats(const HazmatPtrVectorPtr& newHazmats, const tf::Transform& transform);
+  void handleTpas(const TpaPtrVectorPtr& newTpas, const tf::Transform& transform);
 
-  bool isHoleQr(ObjectPtr hole);
-  bool isHoleHazmat(ObjectPtr hole);
+  bool isHoleQr(const HoleConstPtr& hole);
+  bool isHoleHazmat(const HoleConstPtr& hole);
 
   void updateParams(float sensor_range,
      float qrClosestAlert, float hazmatClosestalert);
 
  private:
 
-  void keepValidHoles(HolePtrStdVector* holesPtr,
-     tf::Transform cameraTransform);
+  void keepValidHoles(const HolePtrVectorPtr& holesPtr,
+     const tf::Transform& cameraTransform);
 
  private:
 
-  ros::Publisher _qrPublisher;
+  ros::Publisher qrPublisher_;
 
-  QrListPtr _qrListPtr;
-  HazmatListPtr _hazmatListPtr;
-  HoleListPtr _holeListPtr;
-  TpaListPtr _tpaListPtr;
+  QrListPtr qrListPtr_;
+  HazmatListPtr hazmatListPtr_;
+  HoleListPtr holeListPtr_;
+  TpaListPtr tpaListPtr_;
 
   float SENSOR_RANGE;
   float QR_CLOSEST_ALERT;
@@ -48,6 +57,9 @@ class ObjectHandler {
 
 };
 
-typedef boost::shared_ptr< ObjectHandler >  ObjectHandlerPtr;
+typedef boost::scoped_ptr< ObjectHandler >  ObjectHandlerPtr;
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_OBJECT_HANDLER_H_
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_OBJECT_HANDLER_H

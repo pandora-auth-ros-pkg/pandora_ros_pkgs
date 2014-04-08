@@ -37,21 +37,28 @@
 *   Triantafyllos Afouras <afourast@gmail.com>
 *********************************************************************/
 
-#ifndef PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_CLUSTERER_H_
-#define PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_CLUSTERER_H_
+#ifndef ALERT_HANDLER_VICTIM_CLUSTERER_H
+#define ALERT_HANDLER_VICTIM_CLUSTERER_H
 
 #include <vector>
+#include <boost/utility.hpp>
 
-#include "ros/ros.h"
+#include <ros/ros.h>
 
 #include "alert_handler/victim.h"
+#include "alert_handler/defines.h"
+
+namespace pandora_data_fusion
+{
+namespace pandora_alert_handler
+{
 
 /**
   @class VictimClusterer
   @brief Controller that keeps track of victims 
 **/ 
-class VictimClusterer {
-
+class VictimClusterer : private boost::noncopyable
+{
  public:
  
   /**
@@ -65,7 +72,7 @@ class VictimClusterer {
     groups of Objects
   @return VictimPtrVector The resulting victim vector 
   **/
-  VictimPtrVector createVictimList(ObjectPtrVector allObjects);
+  VictimPtrVector createVictimList(const ObjectConstPtrVectorPtr& allObjects);
 
   /**
   @brief Updates the victim handler's parameters
@@ -81,16 +88,20 @@ class VictimClusterer {
   @return ObjectPtrVectorVector A vector containing
     the resulting groups as vectors of Objects
   **/
-  ObjectPtrVectorVector groupObjects(ObjectPtrVector allObjects);
+  ObjectConstPtrVectorVector groupObjects(const ObjectConstPtrVectorPtr& allObjects);
 
   /**
   @brief Finds and returns the centroid of a group of Objects
   @param objects [ObjectPtrVector] The group of Objects
   @return geometry_msgs::Point The centroid
   **/
-  geometry_msgs::Point findGroupCenterPoint(ObjectPtrVector objects);
+  geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects);
 
 
+ private:
+
+  friend class VictimClustererTest;
+ 
  private:
   
   //!< The radius used for clustering
@@ -100,6 +111,9 @@ class VictimClusterer {
 
 };
 
-typedef boost::shared_ptr<VictimClusterer> VictimClustererPtr;
+typedef boost::scoped_ptr<VictimClusterer> VictimClustererPtr;
 
-#endif  // PANDORA_ALERT_HANDLER_INCLUDE_ALERT_HANDLER_VICTIM_CLUSTERER_H_
+}  // namespace pandora_alert_handler
+}  // namespace pandora_data_fusion
+
+#endif  // ALERT_HANDLER_VICTIM_CLUSTERER_H
