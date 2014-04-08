@@ -16,13 +16,14 @@
   
   <buildtool_depend>catkin</buildtool_depend>
   
+ <run_depend>pandora_common</run_depend> 
  <run_depend>pandora_visualization</run_depend> 
  <run_depend>pandora_navigation</run_depend> 
  <run_depend>pandora_slam</run_depend> 
  <run_depend>pandora_vision</run_depend> 
  <run_depend>pandora_data_fusion</run_depend> 
  <run_depend>pandora_control</run_depend> 
- <run_depend>pandora_sensors</run_depend> 
+ <run_depend>pandora_hardware_interface</run_depend> 
  <run_depend>pandora_models</run_depend> 
 
 
