@@ -16,7 +16,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   
-  <run_depend>pandora_vision_hole</run_depend>
   <run_depend>pandora_vision_face</run_depend>
   <run_depend>pandora_vision_qrcode</run_depend>
   <run_depend>pandora_vision_landoltc</run_depend>
