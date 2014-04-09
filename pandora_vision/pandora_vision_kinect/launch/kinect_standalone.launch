@@ -1,8 +1,0 @@
-<launch>
-  <include file="$(find openni_launch)/launch/openni.launch" />
-  <node name="pandora_kinect_node" type="pandora_kinect_node" pkg="vision" respawn="False" output="screen" />
-</launch>
-
-<!--
-rosrun image_view image_view image:=/camera/rgb/image_color
--->

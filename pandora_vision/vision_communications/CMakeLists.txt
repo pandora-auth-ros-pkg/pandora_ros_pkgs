@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vision_communications)
-find_package(catkin REQUIRED COMPONENTS 
+find_package(catkin REQUIRED COMPONENTS
   message_generation
   message_runtime
   std_msgs
@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
+  CandidateHoleMsg.msg
+  CandidateHolesVectorMsg.msg
   HoleDirectionMsg.msg
   HolesDirectionsVectorMsg.msg
   FaceDirectionMsg.msg
@@ -25,7 +27,6 @@ add_message_files(
   DataMatrixAlertsVectorMsg.msg
   )
 
-
 generate_messages(
   DEPENDENCIES
     std_msgs
@@ -34,7 +35,7 @@ generate_messages(
   )
 
 catkin_package(
-  CATKIN_DEPENDS 
+  CATKIN_DEPENDS
     message_generation
     message_runtime
     std_msgs

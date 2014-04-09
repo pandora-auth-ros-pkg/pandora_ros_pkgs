@@ -1,0 +1,4 @@
+<launch>
+  <node name="pandora_vision_hole_detector_node" type="pandora_vision_hole_detector_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(HOME)/kinect.bag"/>
+</launch>

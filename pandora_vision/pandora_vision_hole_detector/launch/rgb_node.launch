@@ -1,0 +1,9 @@
+<launch>
+  <group ns="pandora_vision_hole_detector">
+    
+    <param name="camera_name" value="kinect" />
+    
+    <node name="rgb_node" type="rgb_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+    
+  </group>
+</launch>

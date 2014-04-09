@@ -21,7 +21,7 @@
   <run_depend>pandora_vision_qrcode</run_depend>
   <run_depend>pandora_vision_landoltc</run_depend>
   <run_depend>pandora_vision_hazmat</run_depend>
-  <run_depend>pandora_vision_kinect</run_depend>
+  <run_depend>pandora_vision_hole_detector</run_depend>
   <run_depend>pandora_vision_motion</run_depend>
   <run_depend>pandora_vision_launchers</run_depend>
     

@@ -112,7 +112,7 @@ namespace pandora_vision
     std::string cameraName;
     std::string cameraFrameId;
     
-    //!< Publishers for QrCodeDetector result messages
+    //!< Publishers for DatamatrixDetector result messages
     ros::Publisher _datamatrixCodePublisher;
 
     //!< The subscriber that listens to the frame topic advertised 
