@@ -34,8 +34,8 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#ifndef PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-#define PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+#ifndef MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+#define MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
 
 #include "ros/ros.h"
 #include <hardware_interface/joint_command_interface.h>
@@ -74,4 +74,4 @@ namespace motor
   };
 }  // namespace motor
 }  // namespace pandora_hardware_interface
-#endif  // PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+#endif  // MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H

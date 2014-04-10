@@ -45,7 +45,6 @@ namespace motor
   :
     nodeHandle_(nodeHandle),
     motors_("/dev/motors", 9600, 100)
-    
   {
     motors_.init();
     readJointNameFromParamServer();
