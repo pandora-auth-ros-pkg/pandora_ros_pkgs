@@ -238,9 +238,37 @@ add_dependencies(alert_handler_node
   state_manager_communications_gencpp
   ) 
 
-##### Testing ####
+################ RosLint ###################################################
+
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens, -whitespace/braces")
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
+     RELATIVE ${PROJECT_SOURCE_DIR} 
+            include/alert_handler/*.h 
+            src/*.cpp 
+            )
+LIST(REMOVE_ITEM ${PROJECT_NAME}_LINT_SRCS
+      RELATIVE ${PROJECT_SOURCE_DIR}
+            include/alert_handler/alert_handler.h
+            include/alert_handler/tf_listener.h
+            src/alert_handler.cpp
+            src/ros_tf_listener.cpp
+            )
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens, -whitespace/braces, -runtime/references")
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS_WITH_REFS
+     RELATIVE ${PROJECT_SOURCE_DIR} 
+            include/alert_handler/alert_handler.h
+            include/alert_handler/tf_listener.h
+            src/alert_handler.cpp
+            src/ros_tf_listener.cpp
+            )
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS_WITH_REFS})
+
+####### Testing ####
 
 if(CATKIN_ENABLE_TESTING)
-  include(${CMAKE_CURRENT_SOURCE_DIR}/tests.cmake)
+  add_subdirectory(test)
 endif()
 

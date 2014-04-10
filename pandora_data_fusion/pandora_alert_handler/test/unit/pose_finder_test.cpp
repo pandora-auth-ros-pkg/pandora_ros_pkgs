@@ -223,7 +223,7 @@ TEST_F(PoseFinderTest, positionOnWallTest)
   expected.x = 10.48;
   expected.y = 9;
   ROS_INFO_STREAM_NAMED("pose_finder_test", "PositionOnWallTest 1: x = "
-      <<startPoint.x<<" y = "<<startPoint.y<<" angle = "<<angle);
+       << startPoint.x << " y = " << startPoint.y << " angle = " << angle);
   result = positionOnWall(startPoint, angle);
   EXPECT_NEAR( expected.x , result.x , 0.01 );
   EXPECT_NEAR( expected.y , result.y , 0.01 );
@@ -234,7 +234,7 @@ TEST_F(PoseFinderTest, positionOnWallTest)
   expected.x = 5.7495;
   expected.y = 5.7495;
   ROS_INFO_STREAM_NAMED("pose_finder_test", "PositionOnWallTest 2: x = "
-      <<startPoint.x<<" y = "<<startPoint.y<<" angle = "<<angle);
+       << startPoint.x << " y = " << startPoint.y << " angle = " << angle);
   result = positionOnWall(startPoint, angle);
   EXPECT_NEAR( expected.x , result.x , 0.01 );
   EXPECT_NEAR( expected.y , result.y , 0.01 );
@@ -245,7 +245,7 @@ TEST_F(PoseFinderTest, positionOnWallTest)
   expected.x = 2.62;
   expected.y = 3;
   ROS_INFO_STREAM_NAMED("pose_finder_test", "PositionOnWallTest 3: x = "
-      <<startPoint.x<<" y = "<<startPoint.y<<" angle = "<<angle);
+       << startPoint.x << " y = " << startPoint.y << " angle = " << angle);
   result = positionOnWall(startPoint, angle);
   EXPECT_NEAR( expected.x , result.x , 0.01 );
   EXPECT_NEAR( expected.y , result.y , 0.01 );
@@ -261,26 +261,26 @@ TEST_F(PoseFinderTest, calcHeightTest)
   // the corresponding alert height on wall
 
   float h = 0.3;
-  //EXPECT_THROW( calcHeight(1.04720, h, -1) , AlertException );
+  // EXPECT_THROW( calcHeight(1.04720, h, -1) , AlertException );
   EXPECT_NEAR   ( 0.30000 , calcHeight(1.04720, h, 0) , 0.0001 );
   EXPECT_THROW( calcHeight(1.04720, h, 1) , AlertException );
   EXPECT_THROW( calcHeight(1.04720, h, 1.5) , AlertException );
   EXPECT_THROW( calcHeight(1.04720, h, 2) , AlertException );
 
-  //EXPECT_THROW( calcHeight(0.52360, h, -1) , AlertException );
+  // EXPECT_THROW( calcHeight(0.52360, h, -1) , AlertException );
   EXPECT_NEAR   ( 0.30000 , calcHeight(0.52360, h, 0) , 0.0001 );
   EXPECT_NEAR   ( 0.87735 , calcHeight(0.52360, h, 1) , 0.0001 );
   EXPECT_NEAR   ( 1.16603 , calcHeight(0.52360, h, 1.5) , 0.0001 );
   EXPECT_NEAR   ( 1.45470 , calcHeight(0.52360, h, 2) , 0.0001 );
 
-  //EXPECT_THROW( calcHeight(-0.52360, h, -1) , AlertException );
+  // EXPECT_THROW( calcHeight(-0.52360, h, -1) , AlertException );
   EXPECT_NEAR   ( 0.30000 , calcHeight(-0.52360, h, 0) , 0.0001 );
   EXPECT_THROW( calcHeight(-0.52360, h, 1) , AlertException );
   EXPECT_THROW( calcHeight(-0.52360, h, 1.5) , AlertException );
   EXPECT_THROW( calcHeight(-0.52360, h, 2) , AlertException );
 
   h = 0.5;
-  //EXPECT_THROW( calcHeight(-0.26180, h, -1) , AlertException );
+  // EXPECT_THROW( calcHeight(-0.26180, h, -1) , AlertException );
   EXPECT_NEAR   ( 0.500000 , calcHeight(-0.26180, h, 0) , 0.0001 );
   EXPECT_NEAR   ( 0.232051 , calcHeight(-0.26180, h, 1) , 0.0001 );
   EXPECT_NEAR   ( 0.098076 , calcHeight(-0.26180, h, 1.5) , 0.0001 );

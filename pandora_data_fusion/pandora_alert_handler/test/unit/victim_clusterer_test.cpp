@@ -1,3 +1,4 @@
+// "Copyright [2014] <Chamzas Konstantinos>"
 #include "alert_handler/victim_clusterer.h"
 #include "gtest/gtest.h"
 
@@ -12,13 +13,13 @@ class VictimClustererTest : public ::testing::Test {
  
   protected:
 
-  VictimClustererTest(): VictimClustererPtr1(new VictimClusterer(3,3))
+  VictimClustererTest(): VictimClustererPtr1(new VictimClusterer(3, 3))
   {
   }
 /* helper functions*/
  
 // We create manually Tpa1(0, 3.87, 4) Tpa2(1, 0, 2) Hole1(-1, 0, 2) (no rotation)
-  void createVariousObjects1(ObjectConstPtrVector   &ObjConstPtrVect1)
+  void createVariousObjects1(ObjectConstPtrVector*   ObjConstPtrVect1)
   {
     TpaPtr TpaPtr1(new Tpa);
     setPose(0, 3.87, 4,  TpaPtr1);
@@ -26,12 +27,12 @@ class VictimClustererTest : public ::testing::Test {
     setPose(1, 0, 3,  TpaPtr2);
     HolePtr HolePtr1(new Hole);
     setPose(-1, 0, 2, HolePtr1);
-    ObjConstPtrVect1.push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVect1.push_back(TpaConstPtr(TpaPtr2));
-    ObjConstPtrVect1.push_back(HoleConstPtr(HolePtr1));
+    ObjConstPtrVect1->push_back(TpaConstPtr(TpaPtr1));
+    ObjConstPtrVect1->push_back(TpaConstPtr(TpaPtr2));
+    ObjConstPtrVect1->push_back(HoleConstPtr(HolePtr1));
   } 
 // We create manually Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4
-  void createVariousObjects2(ObjectConstPtrVector   &ObjConstPtrVect2)
+  void createVariousObjects2(ObjectConstPtrVector*   ObjConstPtrVect2)
   {
     TpaPtr TpaPtr1(new Tpa);
     setPose(2, 3, 4, TpaPtr1);
@@ -39,9 +40,9 @@ class VictimClustererTest : public ::testing::Test {
     setPose(4, 3, 2, HolePtr1);
     HolePtr HolePtr2(new Hole);
     setPose(0, 4, 2, HolePtr2);
-    ObjConstPtrVect2.push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVect2.push_back(HoleConstPtr(HolePtr1));
-    ObjConstPtrVect2.push_back(HoleConstPtr(HolePtr2));
+    ObjConstPtrVect2->push_back(TpaConstPtr(TpaPtr1));
+    ObjConstPtrVect2->push_back(HoleConstPtr(HolePtr1));
+    ObjConstPtrVect2->push_back(HoleConstPtr(HolePtr2));
   } 
 
   
@@ -73,14 +74,14 @@ class VictimClustererTest : public ::testing::Test {
   }
   
    
-void setPose ( float  x, float  y, float  z, ObjectPtr Object, float yaw=0)
+void setPose ( float  x, float  y, float  z, ObjectPtr Object, float yaw = 0)
   {
-    //z is set zero because this test is written for 2d
+    // z is set zero because this test is written for 2d
     geometry_msgs::Pose pose1;
-    pose1.position.x=x;
-    pose1.position.y=y;
-    pose1.position.z=0;
-    pose1.orientation=tf::createQuaternionMsgFromRollPitchYaw(0,  0,  yaw);
+    pose1.position.x = x;
+    pose1.position.y = y;
+    pose1.position.z = 0;
+    pose1.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,  0,  yaw);
     Object->setPose(pose1);
   }
 
@@ -120,7 +121,7 @@ void setPose ( float  x, float  y, float  z, ObjectPtr Object, float yaw=0)
 VictimClustererSharedPtr  VictimClustererPtr1;
 
 };
-//~ // Checks  if the Construstors behave Correctly 
+// Checks  if the Construstors behave Correctly 
 TEST_F(VictimClustererTest,  Constructor)
 {
   EXPECT_FLOAT_EQ( 3, getclusterRadius(VictimClustererPtr1));
@@ -133,11 +134,11 @@ TEST_F(VictimClustererTest,  Constructor)
 
 TEST_F(VictimClustererTest,  updateParams)
 {
-  VictimClustererPtr1->updateParams(3,1);
+  VictimClustererPtr1->updateParams(3, 1);
   EXPECT_FLOAT_EQ( 3, getclusterRadius(VictimClustererPtr1));
   EXPECT_FLOAT_EQ( 1, getApproachDist(VictimClustererPtr1));
   
-  VictimClustererPtr1->updateParams(-3,-2);
+  VictimClustererPtr1->updateParams(-3, -2);
   EXPECT_FLOAT_EQ( -3, getclusterRadius(VictimClustererPtr1));
   EXPECT_FLOAT_EQ( -2, getApproachDist(VictimClustererPtr1)); 
 } 
@@ -147,21 +148,20 @@ TEST_F(VictimClustererTest,  findGroupCenterPoint)
   ObjectConstPtrVector  ObjConstPtrVect1;
   ObjectConstPtrVector  ObjConstPtrVect2;
   geometry_msgs::Point Point1; 
- // Tpa1(0, 3.87, 4) Tpa2(1, 0, 2) Hole1(-1, 0, 2)
-  createVariousObjects1((ObjConstPtrVect1));
+  // Tpa1(0, 3.87, 4) Tpa2(1, 0, 2) Hole1(-1, 0, 2)
+  createVariousObjects1((&ObjConstPtrVect1));
   Point1 = findGroupCenterPoint(ObjConstPtrVect1, VictimClustererPtr1);
   EXPECT_FLOAT_EQ( 0, Point1.x);
   EXPECT_FLOAT_EQ( 1.29, Point1.y); 
-  //Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
-  
-  createVariousObjects2((ObjConstPtrVect2));
+  // Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
+  createVariousObjects2((&ObjConstPtrVect2));
   Point1 = findGroupCenterPoint(ObjConstPtrVect2, VictimClustererPtr1);
   EXPECT_FLOAT_EQ( 2, Point1.x);
-  EXPECT_NEAR( 3.334, Point1.y,0.001);  
+  EXPECT_NEAR( 3.334, Point1.y, 0.001);  
   
 }
 
-TEST_F(VictimClustererTest, groupObjects)
+TEST_F(VictimClustererTest,  groupObjects)
 {
   ObjectConstPtrVectorPtr ObjectConstPtrVectorPtr1(new ObjectConstPtrVector);
   ObjectConstPtrVectorVector GroupedObjects;
@@ -169,37 +169,37 @@ TEST_F(VictimClustererTest, groupObjects)
   createVariousObjects3(ObjectConstPtrVectorPtr1);
   createVariousObjects4(ObjectConstPtrVectorPtr1);
   
-  VictimClustererPtr1->updateParams( 5,3);
-  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1,VictimClustererPtr1);
-  EXPECT_EQ(2,GroupedObjects.size());
-  EXPECT_EQ(3,GroupedObjects[0].size());
-  EXPECT_EQ(3,GroupedObjects[1].size());
+  VictimClustererPtr1->updateParams( 5, 3);
+  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1, VictimClustererPtr1);
+  EXPECT_EQ(2, GroupedObjects.size());
+  EXPECT_EQ(3, GroupedObjects[0].size());
+  EXPECT_EQ(3, GroupedObjects[1].size());
   
-  VictimClustererPtr1->updateParams( 1.8,3);
-  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1,VictimClustererPtr1);
-  EXPECT_EQ(6,GroupedObjects.size());
-  EXPECT_EQ(1,GroupedObjects[0].size());
-  EXPECT_EQ(1,GroupedObjects[1].size());
+  VictimClustererPtr1->updateParams( 1.8, 3);
+  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1, VictimClustererPtr1);
+  EXPECT_EQ(6, GroupedObjects.size());
+  EXPECT_EQ(1, GroupedObjects[0].size());
+  EXPECT_EQ(1, GroupedObjects[1].size());
   
-  VictimClustererPtr1->updateParams( 3,3);
-  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1,VictimClustererPtr1);
-  EXPECT_EQ(4,GroupedObjects.size());
-  EXPECT_EQ(1,GroupedObjects[0].size());
-  EXPECT_EQ(2,GroupedObjects[1].size());
-  EXPECT_EQ(2,GroupedObjects[2].size());
-  EXPECT_EQ(1,GroupedObjects[3].size());
+  VictimClustererPtr1->updateParams( 3, 3);
+  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1, VictimClustererPtr1);
+  EXPECT_EQ(4, GroupedObjects.size());
+  EXPECT_EQ(1, GroupedObjects[0].size());
+  EXPECT_EQ(2, GroupedObjects[1].size());
+  EXPECT_EQ(2, GroupedObjects[2].size());
+  EXPECT_EQ(1, GroupedObjects[3].size());
   
-  VictimClustererPtr1->updateParams( 3.7,3);
-  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1,VictimClustererPtr1);
-  EXPECT_EQ(3,GroupedObjects.size());
-  EXPECT_EQ(1,GroupedObjects[0].size());
-  EXPECT_EQ(2,GroupedObjects[1].size());
-  EXPECT_EQ(3,GroupedObjects[2].size());
+  VictimClustererPtr1->updateParams( 3.7, 3);
+  GroupedObjects = groupObjects(ObjectConstPtrVectorPtr1, VictimClustererPtr1);
+  EXPECT_EQ(3, GroupedObjects.size());
+  EXPECT_EQ(1, GroupedObjects[0].size());
+  EXPECT_EQ(2, GroupedObjects[1].size());
+  EXPECT_EQ(3, GroupedObjects[2].size());
 } 
 
 
 
-TEST_F(VictimClustererTest, createVictimList)
+TEST_F(VictimClustererTest,  createVictimList)
 {
   ObjectConstPtrVectorPtr ObjectConstPtrVectorPtr1(new ObjectConstPtrVector);
   VictimPtrVector Victims;
@@ -207,32 +207,32 @@ TEST_F(VictimClustererTest, createVictimList)
   createVariousObjects3(ObjectConstPtrVectorPtr1);
   createVariousObjects4(ObjectConstPtrVectorPtr1);
   
-  VictimClustererPtr1->updateParams( 5,3);
+  VictimClustererPtr1->updateParams( 5, 3);
   Victims = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
-  EXPECT_EQ(2,Victims.size());
-  EXPECT_EQ(3,getObjects(Victims[0]).size());
-  EXPECT_EQ(3,getObjects(Victims[1]).size());
+  EXPECT_EQ(2, Victims.size());
+  EXPECT_EQ(3, getObjects(Victims[0]).size());
+  EXPECT_EQ(3, getObjects(Victims[1]).size());
   
-  VictimClustererPtr1->updateParams( 1.8,3);
+  VictimClustererPtr1->updateParams( 1.8, 3);
   Victims    = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
-  EXPECT_EQ(6,Victims.size());
-  EXPECT_EQ(1,getObjects(Victims[0]).size());
-  EXPECT_EQ(1,getObjects(Victims[1]).size());
+  EXPECT_EQ(6, Victims.size());
+  EXPECT_EQ(1, getObjects(Victims[0]).size());
+  EXPECT_EQ(1, getObjects(Victims[1]).size());
   
-  VictimClustererPtr1->updateParams( 3,3);
+  VictimClustererPtr1->updateParams( 3, 3);
   Victims    = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
-  EXPECT_EQ(4,Victims.size());
-  EXPECT_EQ(1,getObjects(Victims[0]).size());
-  EXPECT_EQ(2,getObjects(Victims[1]).size());
-  EXPECT_EQ(2,getObjects(Victims[2]).size());
-  EXPECT_EQ(1,getObjects(Victims[3]).size());
+  EXPECT_EQ(4, Victims.size());
+  EXPECT_EQ(1, getObjects(Victims[0]).size());
+  EXPECT_EQ(2, getObjects(Victims[1]).size());
+  EXPECT_EQ(2, getObjects(Victims[2]).size());
+  EXPECT_EQ(1, getObjects(Victims[3]).size());
   
-  VictimClustererPtr1->updateParams( 3.7,3);
+  VictimClustererPtr1->updateParams( 3.7, 3);
   Victims    = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
-  EXPECT_EQ(3,Victims.size());
-  EXPECT_EQ(1,getObjects(Victims[0]).size());
-  EXPECT_EQ(2,getObjects(Victims[1]).size());
-  EXPECT_EQ(3,getObjects(Victims[2]).size());
+  EXPECT_EQ(3, Victims.size());
+  EXPECT_EQ(1, getObjects(Victims[0]).size());
+  EXPECT_EQ(2, getObjects(Victims[1]).size());
+  EXPECT_EQ(3, getObjects(Victims[2]).size());
 }
 
 }  // namespace pandora_alert_handler

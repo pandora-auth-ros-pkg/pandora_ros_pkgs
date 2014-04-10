@@ -1,3 +1,4 @@
+// "Copyright [2014] <Chamzas Konstantinos>"
 #include "alert_handler/victim.h"
 #include "gtest/gtest.h"
 
@@ -22,14 +23,14 @@ class VictimTest : public ::testing::Test {
   Victim1.reset( new Victim); 
   Victim2.reset( new Victim);
   ObjConstPtrVectPtr3.reset(new ObjectConstPtrVector);
-  //create the Objectvector1 and fill it with various objects 
-  //Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (yaw=0) ApproachDist=5
-  createVariousObjects1(ObjConstPtrVect1);
-  //create the Objectvector2 and fill it with various objects 
-  //Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
-  createVariousObjects2( ObjConstPtrVect2);
-  //create the Objectvector3 and fill it with various objects 
-  //Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
+  // create the Objectvector1 and fill it with various objects 
+  // Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (yaw=0) ApproachDist=5
+  createVariousObjects1(&ObjConstPtrVect1);
+  // create the Objectvector2 and fill it with various objects 
+  // Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
+  createVariousObjects2( &ObjConstPtrVect2);
+  // create the Objectvector3 and fill it with various objects 
+  // Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
   createVariousObjects3(ObjConstPtrVectPtr3);
 
 
@@ -40,10 +41,10 @@ class VictimTest : public ::testing::Test {
     
     clear();
   }
- //* helper functions 
+/* helper functions*/ 
  
 // We create manually Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (no rotation)
-  void createVariousObjects1(ObjectConstPtrVector   &ObjConstPtrVectPtr1)
+  void createVariousObjects1(ObjectConstPtrVector*   ObjConstPtrVectPtr1)
   {
     TpaPtr TpaPtr1(new Tpa);
     setPose(2, 3, 4, TpaPtr1);
@@ -51,12 +52,12 @@ class VictimTest : public ::testing::Test {
     setPose(4, 3, 2, TpaPtr2);
     HolePtr HolePtr1(new Hole);
     setPose(1, 2, 0, HolePtr1);
-    ObjConstPtrVectPtr1.push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVectPtr1.push_back(TpaConstPtr(TpaPtr2));
-    ObjConstPtrVectPtr1.push_back(HoleConstPtr(HolePtr1));
+    ObjConstPtrVectPtr1->push_back(TpaConstPtr(TpaPtr1));
+    ObjConstPtrVectPtr1->push_back(TpaConstPtr(TpaPtr2));
+    ObjConstPtrVectPtr1->push_back(HoleConstPtr(HolePtr1));
   } 
 // We create manually Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4
-  void createVariousObjects2(ObjectConstPtrVector   &ObjConstPtrVectPtr2)
+  void createVariousObjects2(ObjectConstPtrVector*   ObjConstPtrVectPtr2)
   {
     TpaPtr TpaPtr1(new Tpa);
     setPose(2, 3, 4, TpaPtr1);
@@ -64,9 +65,9 @@ class VictimTest : public ::testing::Test {
     setPose(4, 3, 2, HolePtr1, pi/4);
     HolePtr HolePtr2(new Hole);
     setPose(0, 4, 2, HolePtr2);
-    ObjConstPtrVectPtr2.push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVectPtr2.push_back(HoleConstPtr(HolePtr1));
-    ObjConstPtrVectPtr2.push_back(HoleConstPtr(HolePtr2));
+    ObjConstPtrVectPtr2->push_back(TpaConstPtr(TpaPtr1));
+    ObjConstPtrVectPtr2->push_back(HoleConstPtr(HolePtr1));
+    ObjConstPtrVectPtr2->push_back(HoleConstPtr(HolePtr2));
   } 
 
   
@@ -84,19 +85,19 @@ class VictimTest : public ::testing::Test {
     ObjConstPtrVectPtr3->push_back(HoleConstPtr(HolePtr2));
   } 
   
-  void setPose ( float x, float y, float z, ObjectPtr Object, float yaw=0)
+  void setPose ( float x, float y, float z, ObjectPtr Object, float yaw = 0)
   {
-    //z is set zero because this test is written for 2d
+    // z is set zero because this test is written for 2d
     geometry_msgs::Pose pose1;
-    pose1.position.x=x;
-    pose1.position.y=y;
-    pose1.position.z=0;
-    pose1.orientation=tf::createQuaternionMsgFromRollPitchYaw(0, 0, yaw);
+    pose1.position.x = x;
+    pose1.position.y = y;
+    pose1.position.z = 0;
+    pose1.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, yaw);
     Object->setPose(pose1);
   }
   
   /* accesing private functions*/
-   void updatePose(VictimPtr Victim, geometry_msgs::Pose poseVic, float dist)
+  void updatePose(VictimPtr Victim, geometry_msgs::Pose poseVic, float dist)
   {
     Victim->updatePose(poseVic, dist);
   }
@@ -110,7 +111,7 @@ class VictimTest : public ::testing::Test {
   void clear()
   {
     
-    Victim::lastVictimId_=0;
+    Victim::lastVictimId_ = 0;
   }
     
   /* Accesors to private variables*/
@@ -126,7 +127,7 @@ class VictimTest : public ::testing::Test {
   
     return Victim->objects_;
   }
- /* Variables */
+  /* Variables */
  
   VictimPtr Victim1;
   VictimPtr Victim2;
@@ -136,7 +137,7 @@ class VictimTest : public ::testing::Test {
 };
 
 
-//~ // Checks  if the Construstors behave Correctly 
+// Checks  if the Construstors behave Correctly 
 TEST_F(VictimTest, Constructor)
   {
   
@@ -162,7 +163,6 @@ TEST_F(VictimTest, Constructor)
 TEST_F(VictimTest, isSameObject)
   {
   
-  
   EXPECT_EQ(2, *getLastVictimId(Victim1));
   // MUST Be CHECKED ALSO FOR 3d WHEN SLAM BECAMES 3D
   setPose(5, 1, 0, Victim1);
@@ -177,28 +177,28 @@ TEST_F(VictimTest, isSameObject)
   
 TEST_F(VictimTest, updatePose)
 {
-   geometry_msgs::Pose poseVic;
-   poseVic.orientation=tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
-   poseVic.position.x=1;
-   poseVic.position.y=0;
-   poseVic.position.z=0;
-   updatePose(Victim1, poseVic, 5);
-   EXPECT_EQ(1, Victim1->getPose().position.x);
-   EXPECT_EQ(0, Victim1->getPose().position.y);
-   EXPECT_EQ(0, Victim1->getPose().position.z);
-   EXPECT_EQ(6, Victim1->getApproachPose().position.x);
-   EXPECT_EQ(0, Victim1->getApproachPose().position.y);
-   EXPECT_EQ(0, Victim1->getApproachPose().position.z);
-   clear();
+  geometry_msgs::Pose poseVic;
+  poseVic.orientation = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+  poseVic.position.x = 1;
+  poseVic.position.y = 0;
+  poseVic.position.z = 0;
+  updatePose(Victim1, poseVic, 5);
+  EXPECT_EQ(1, Victim1->getPose().position.x);
+  EXPECT_EQ(0, Victim1->getPose().position.y);
+  EXPECT_EQ(0, Victim1->getPose().position.z);
+  EXPECT_EQ(6, Victim1->getApproachPose().position.x);
+  EXPECT_EQ(0, Victim1->getApproachPose().position.y);
+  EXPECT_EQ(0, Victim1->getApproachPose().position.z);
+  clear();
 }
 
 TEST_F(VictimTest, setObjects)
   {
   
   ObjectConstPtrVector  ObjConstPtrVect1;
-  //create the Objectvector and fill it with various objects 
-  //Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (yaw=0) ApproachDist=5
-  createVariousObjects1((ObjConstPtrVect1));
+  // create the Objectvector and fill it with various objects 
+  // Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (yaw=0) ApproachDist=5
+  createVariousObjects1((&ObjConstPtrVect1));
   Victim1->setObjects(ObjConstPtrVect1, 5);
   EXPECT_EQ(3, getObjects(Victim1).size());
   EXPECT_EQ(2, findRepresentativeObject(Victim1));
@@ -212,9 +212,9 @@ TEST_F(VictimTest, setObjects)
   
   
   ObjectConstPtrVector  ObjConstPtrVect2;
-  //create the Objectvector and fill it with various objects 
-  //Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
-  createVariousObjects2((ObjConstPtrVect2));
+  // create the Objectvector and fill it with various objects 
+  // Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
+  createVariousObjects2((&ObjConstPtrVect2));
   Victim2->setObjects(ObjConstPtrVect2, 6);
   EXPECT_EQ(3, ObjConstPtrVect2.size());
   EXPECT_EQ(1, findRepresentativeObject(Victim2));
@@ -230,7 +230,7 @@ TEST_F(VictimTest, setObjects)
 TEST_F(VictimTest, eraseObjectAt)
   {
     
-  //Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0)
+  // Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0)
   Victim1->setObjects(ObjConstPtrVect1, 5);
   // A bigger index should erase the last element
   Victim1->eraseObjectAt(20, 5);
@@ -240,7 +240,7 @@ TEST_F(VictimTest, eraseObjectAt)
   EXPECT_EQ(0, Victim1->getPose().position.z);
   EXPECT_EQ(0, Victim1->getSelectedObjectIndex());
   EXPECT_EQ(2, getObjects(Victim1).size());
-  //the first tpa is erased 
+  // the first tpa is erased 
   Victim1->eraseObjectAt(0, 5);
   EXPECT_EQ(4, Victim1->getPose().position.x);
   EXPECT_EQ(3, Victim1->getPose().position.y);
@@ -253,7 +253,7 @@ TEST_F(VictimTest, eraseObjectAt)
   EXPECT_EQ(0, getObjects(Victim1).size());
   
   
-//Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
+// Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
 
   Victim2->setObjects(ObjConstPtrVect2, 6);
   EXPECT_EQ(1, findRepresentativeObject(Victim2));
@@ -275,12 +275,7 @@ TEST_F(VictimTest, eraseObjectAt)
   
 }
 
-//create the Objectvector1 and fill it with various objects 
-//Tpa1(2, 3, 4) Tpa2(4, 3, 2) Hole1(1, 2, 0) (yaw=0) ApproachDist=5
-//createVariousObjects1((ObjConstPtrVect1));
-//create the Objectvector2 and fill it with various objects 
-//Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4 ApproachDist=6
-//createVariousObjects2((ObjConstPtrVect2));
+
 
 TEST_F(VictimTest, SanityCheck)
 {

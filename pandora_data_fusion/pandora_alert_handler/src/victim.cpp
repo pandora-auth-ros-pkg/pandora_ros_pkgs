@@ -191,8 +191,8 @@ void Victim::eraseObjectAt(int index,
   updateRepresentativeObject(approachDistance);
 }
 
-tf::Transform Victim::getRotatedTransform() const
-{
+
+tf::Transform Victim::getRotatedTransform() const {
   tf::Transform trans = getTransform();
   tfScalar roll, pitch, yaw;
   trans.getBasis().getRPY(roll, pitch, yaw);

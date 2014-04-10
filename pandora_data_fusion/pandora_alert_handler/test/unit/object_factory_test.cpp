@@ -9,7 +9,7 @@ namespace pandora_data_fusion
 namespace pandora_alert_handler
 {
 
-//Defining PI
+// Defining PI
 double pi= M_PI;
 
 class ObjectFactoryTest : public ::testing::Test
@@ -26,7 +26,7 @@ class ObjectFactoryTest : public ::testing::Test
       ros::package::getPath("pandora_alert_handler")
         +"/test/test_maps/map1.yaml");
     ObjectFactoryPtr1.reset(new ObjectFactory(
-      MapPtr1,map_type1, 0.5, 1.2, 0, 0.5, 20, 0.25)); 
+      MapPtr1, map_type1, 0.5, 1.2, 0, 0.5, 20, 0.25)); 
   }
   
   // Creating all the Different Alerts we will use
@@ -40,7 +40,7 @@ class ObjectFactoryTest : public ::testing::Test
   
 /* Helper Functions*/
 
-  //Creating 3 HoleAlerts two on Walls and one very High
+  // Creating 3 HoleAlerts two on Walls and one very High
   void createHoleDirVector()
   {
     HoleDirVect1.header.seq = 1; 
@@ -50,7 +50,7 @@ class ObjectFactoryTest : public ::testing::Test
     HoleDir1.probability = 4;
     HoleDir1.holeId = 1; 
     HoleDirVect1.holesDirections.push_back(HoleDir1); 
-    HoleDir2.yaw = 0;
+    HoleDir2.yaw = -pi/2;
     HoleDir2.pitch = 0; 
     HoleDir2.probability = 4; 
     HoleDir2.holeId = 2;
@@ -62,7 +62,7 @@ class ObjectFactoryTest : public ::testing::Test
     HoleDirVect1.holesDirections.push_back(HoleDir3);
   }
   
-  //Creating 3 QrAlerts two on Walls and one very High
+  // Creating 3 QrAlerts two on Walls and one very High
   void createQrAlertVector()
   {
    
@@ -71,7 +71,7 @@ class ObjectFactoryTest : public ::testing::Test
     QrAlert1.QRcontent = 
       "No one can make you feel inferior without your consent."; 
     QrAlertVect1.qrAlerts.push_back(QrAlert1); 
-    QrAlert2.yaw = 0;
+    QrAlert2.yaw = -pi/2;
     QrAlert2.pitch = 0; 
     QrAlert2.QRcontent =
       "Let him who would enjoy a good future waste none of his present."; 
@@ -83,14 +83,14 @@ class ObjectFactoryTest : public ::testing::Test
     QrAlertVect1.qrAlerts.push_back(QrAlert3);
   }
   
-  //Creating 3 HazmatAlerts two on Walls and one very High
+  // Creating 3 HazmatAlerts two on Walls and one very High
   void createHazmatAlertVector()
   {
     HazmatAlert1.yaw = -pi/4;
     HazmatAlert1.pitch = pi/6; 
     HazmatAlert1.patternType = 1; 
     HazmatAlertVect1.hazmatAlerts.push_back(HazmatAlert1); 
-    HazmatAlert2.yaw = 0;
+    HazmatAlert2.yaw = -pi/2;
     HazmatAlert2.pitch = 0; 
     HazmatAlert2.patternType = 2;
     HazmatAlertVect1.hazmatAlerts.push_back(HazmatAlert2);
@@ -99,7 +99,7 @@ class ObjectFactoryTest : public ::testing::Test
     HazmatAlert3.patternType = 3;
     HazmatAlertVect1.hazmatAlerts.push_back(HazmatAlert3);
   }
-  //Creating 2 TpaAlerts one on Wall and one very High
+  // Creating 2 TpaAlerts one on Wall and one very High
   void createTpaDir()
   {
   TpaDir1.yaw = -pi/4;
@@ -142,23 +142,23 @@ TEST_F(ObjectFactoryTest, makeHoles)
     
     HolePtr HolePtr1 = (*holesVectorPtr)[0];
     EXPECT_EQ(1, HolePtr1->getHoleId()); 
-    EXPECT_NEAR(5.76, HolePtr1->getPose().position.x, 0.01);
-    EXPECT_NEAR(5.76, HolePtr1->getPose().position.y, 0.01);
+    EXPECT_NEAR(5.76, HolePtr1->getPose().position.x, 0.1);
+    EXPECT_NEAR(5.76, HolePtr1->getPose().position.y, 0.1);
     EXPECT_NEAR(0.9205, HolePtr1->getPose().position.z, 0.01);
     EXPECT_NEAR(0, HolePtr1->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, HolePtr1->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, HolePtr1->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, HolePtr1->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, HolePtr1->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, HolePtr1->getPose().orientation.w, 0.1);
     
     HolePtr HolePtr2 = (*holesVectorPtr)[1];
     EXPECT_EQ(2, HolePtr2->getHoleId());
-    EXPECT_NEAR(5.76, HolePtr2->getPose().position.x, 0.01);
-    EXPECT_NEAR(5, HolePtr2->getPose().position.y, 0.01);
+    EXPECT_NEAR(5, HolePtr2->getPose().position.x, 0.1);
+    EXPECT_NEAR(5.76, HolePtr2->getPose().position.y, 0.1);
     EXPECT_NEAR(0.3, HolePtr2->getPose().position.z, 0.01);
     EXPECT_NEAR(0, HolePtr2->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, HolePtr2->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, HolePtr2->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, HolePtr2->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, HolePtr2->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, HolePtr2->getPose().orientation.w, 0.1);
   } 
   
 TEST_F(ObjectFactoryTest, makeQrs)
@@ -170,24 +170,24 @@ TEST_F(ObjectFactoryTest, makeQrs)
     QrPtr QrPtr1 = (*qrsVectorPtr)[0];
     EXPECT_STREQ( "No one can make you feel inferior without your consent."
     , QrPtr1->getContent().c_str()); 
-    EXPECT_NEAR(5.76, QrPtr1->getPose().position.x, 0.01);
-    EXPECT_NEAR(5.76, QrPtr1->getPose().position.y, 0.01);
+    EXPECT_NEAR(5.76, QrPtr1->getPose().position.x, 0.1);
+    EXPECT_NEAR(5.76, QrPtr1->getPose().position.y, 0.1);
     EXPECT_NEAR(0.9205, QrPtr1->getPose().position.z, 0.01);
     EXPECT_NEAR(0, QrPtr1->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, QrPtr1->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, QrPtr1->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, QrPtr1->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, QrPtr1->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, QrPtr1->getPose().orientation.w, 0.1);
     
     QrPtr QrPtr2=(*qrsVectorPtr)[1];
     EXPECT_STREQ("Let him who would enjoy a good future waste none of his present."
     , QrPtr2->getContent().c_str());
-    EXPECT_NEAR(5.76, QrPtr2->getPose().position.x, 0.01);
-    EXPECT_NEAR(5, QrPtr2->getPose().position.y, 0.01);
+    EXPECT_NEAR(5, QrPtr2->getPose().position.x, 0.01);
+    EXPECT_NEAR(5.76, QrPtr2->getPose().position.y, 0.01);
     EXPECT_NEAR(0.3, QrPtr2->getPose().position.z, 0.01);
     EXPECT_NEAR(0, QrPtr2->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, QrPtr2->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, QrPtr2->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, QrPtr2->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, QrPtr2->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, QrPtr2->getPose().orientation.w, 0.1);
   } 
   
 TEST_F(ObjectFactoryTest, makeHazmats)
@@ -198,23 +198,22 @@ TEST_F(ObjectFactoryTest, makeHazmats)
     
     HazmatPtr HazmatPtr1 = (*hazmatsVectorPtr)[0];
     EXPECT_EQ(1, HazmatPtr1->getPattern()); 
-    EXPECT_NEAR(5.76, HazmatPtr1->getPose().position.x, 0.01);
-    EXPECT_NEAR(5.76, HazmatPtr1->getPose().position.y, 0.01);
+    EXPECT_NEAR(5.75, HazmatPtr1->getPose().position.x, 0.01);
+    EXPECT_NEAR(5.75, HazmatPtr1->getPose().position.y, 0.01);
     EXPECT_NEAR(0.9205, HazmatPtr1->getPose().position.z, 0.01);
     EXPECT_NEAR(0, HazmatPtr1->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, HazmatPtr1->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, HazmatPtr1->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, HazmatPtr1->getPose().orientation.w, 0.1);
-    
+    EXPECT_NEAR(-0.70711, HazmatPtr1->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, HazmatPtr1->getPose().orientation.w, 0.1);
     HazmatPtr HazmatPtr2 = (*hazmatsVectorPtr)[1];
     EXPECT_EQ(2, HazmatPtr2->getPattern());
-    EXPECT_NEAR(5.76, HazmatPtr2->getPose().position.x, 0.01);
-    EXPECT_NEAR(5, HazmatPtr2->getPose().position.y, 0.01);
+    EXPECT_NEAR(5, HazmatPtr2->getPose().position.x, 0.01);
+    EXPECT_NEAR(5.76, HazmatPtr2->getPose().position.y, 0.01);
     EXPECT_NEAR(0.3, HazmatPtr2->getPose().position.z, 0.01);
     EXPECT_NEAR(0, HazmatPtr2->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, HazmatPtr2->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, HazmatPtr2->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, HazmatPtr2->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, HazmatPtr2->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711, HazmatPtr2->getPose().orientation.w, 0.1);
   } 
   
   //  A vector is retunred although tpa will always be alone :(
@@ -224,13 +223,13 @@ TEST_F(ObjectFactoryTest, makeHazmats)
     tpasVectorPtr = ObjectFactoryPtr1->makeTpas(TpaDir1);
     EXPECT_EQ(1, tpasVectorPtr->size());
     TpaPtr TpaPtr1 = (*tpasVectorPtr)[0];
-    EXPECT_NEAR(5.76, TpaPtr1->getPose().position.x, 0.01);
-    EXPECT_NEAR(5.76, TpaPtr1->getPose().position.y, 0.01);
+    EXPECT_NEAR(5.75, TpaPtr1->getPose().position.x, 0.01);
+    EXPECT_NEAR(5.75, TpaPtr1->getPose().position.y, 0.01);
     EXPECT_NEAR(0.9205, TpaPtr1->getPose().position.z, 0.01);
     EXPECT_NEAR(0, TpaPtr1->getPose().orientation.x, 0.1);
     EXPECT_NEAR(0, TpaPtr1->getPose().orientation.y, 0.1);
-    EXPECT_NEAR(1, TpaPtr1->getPose().orientation.z, 0.1);
-    EXPECT_NEAR(0, TpaPtr1->getPose().orientation.w, 0.1);
+    EXPECT_NEAR(-0.70711, TpaPtr1->getPose().orientation.z, 0.1);
+    EXPECT_NEAR(+0.70711 , TpaPtr1->getPose().orientation.w, 0.1);
     tpasVectorPtr = ObjectFactoryPtr1->makeTpas(TpaDir2);
   }
   

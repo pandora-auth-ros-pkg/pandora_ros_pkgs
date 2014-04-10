@@ -22,7 +22,7 @@ protected:
   }
 
 // Seting up all the differnet Objects that will be used for our test cases
-//The distance Between the points (0,0,0,) (4,3,2) is 5 
+// The distance Between the points (0,0,0,) (4,3,2) is 5 
   
   virtual void SetUp() 
   {
