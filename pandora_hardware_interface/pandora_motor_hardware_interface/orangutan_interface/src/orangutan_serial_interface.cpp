@@ -34,62 +34,79 @@
 *
 * Author:  Chris Zalidis
 *********************************************************************/
-#ifndef PANDORA_MOTOR_SERIAL_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-#define PANDORA_MOTOR_SERIAL_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-
-#include <stdexcept>
-#include <boost/scoped_ptr.hpp>
-#include <boost/utility.hpp>
-#include <boost/format.hpp>
-
-#include <ros/ros.h>
-#include <serial/serial.h>
+#include "orangutan_interface/orangutan_serial_interface.h"
 
 namespace pandora_hardware_interface {
   
   namespace motor {
-  
-    class MotorSerialInterface : private boost::noncopyable
+    
+    OrangutanSerialInterface::OrangutanSerialInterface(
+      const std::string& device,
+      int speed,
+      int timeout)
+    :
+      serialPtr_(NULL),
+      device_(device),
+      speed_(speed),
+      timeout_(timeout),
+      leftSpeed_(0),
+      rightSpeed_(0)
     {
-     public:
-      MotorSerialInterface(
-          const std::string& device,
-          int speed,
-          int timeout);
-      
-      void init();
-      
-      void read();
-      
-      inline void getSpeeds(int* leftSpeed, int* rightSpeed) const
+    }
+    
+    void OrangutanSerialInterface::init()
+    {
+      if (serialPtr_ == NULL)
       {
-        *leftSpeed = leftSpeed_;
-        *rightSpeed = rightSpeed_;
+        try
+        {
+        serialPtr_.reset(
+          new serial::Serial(
+            device_,
+            speed_,
+            serial::Timeout::simpleTimeout(timeout_)));
+        }
+        catch (serial::IOException& ex)
+        {
+          ROS_FATAL("[motors] Cannot open port!!");
+          ROS_FATAL("%s", ex.what());
+          exit(-1);
+        }
       }
-      
-      inline void setSpeeds(int leftSpeed, int rightSpeed)
+      else
       {
-        write(leftSpeed, rightSpeed);
+        throw std::logic_error("Init called twice!!");
       }
+    }
+    
+    void OrangutanSerialInterface::read()
+    {
+      if (serialPtr_ == NULL)
+        throw std::logic_error("read() called before init()!");
+        
+      // dummy until feedback received from controllers
+    }
+    
+    void OrangutanSerialInterface::write(int leftSpeed, int rightSpeed)
+    {
+      if (serialPtr_ == NULL)
+        throw std::logic_error("write() called before init()!");
       
-     private:
-     
-      void write(int leftSpeed, int rightSpeed);
       
-     private:
+      std::string left = boost::str( boost::format("%+04d") % leftSpeed );
+      std::string right = boost::str( boost::format("%+04d") % rightSpeed );
       
-      int leftSpeed_;
-      int rightSpeed_;
+      std::string command = "$L" + left + "R" + right; // add checksum
       
-      const std::string device_;
-      const int speed_;
-      const int timeout_;
-  
-      boost::scoped_ptr<serial::Serial> serialPtr_;
-    };
-  
-  }  // namespace motor 
-
+      if (serialPtr_->write(command) != command.size()*sizeof(char))
+        throw std::runtime_error("write() failed! Communication problem?");
+        
+      
+      // dummy feedback!
+      leftSpeed_ = leftSpeed;
+      rightSpeed_ = rightSpeed;
+      
+    }
+    
+  }  // namespace motor
 }  // namespace pandora_hardware_interface
-
-#endif  // PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H

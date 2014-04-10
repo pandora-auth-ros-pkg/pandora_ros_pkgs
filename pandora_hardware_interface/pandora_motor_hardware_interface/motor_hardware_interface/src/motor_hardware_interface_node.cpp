@@ -34,40 +34,39 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#ifndef PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-#define PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-
-#include "ros/ros.h"
-#include <hardware_interface/joint_command_interface.h>
-#include <hardware_interface/joint_state_interface.h>
-#include <hardware_interface/robot_hw.h>
-#include <controller_manager/controller_manager.h>
-
-namespace pandora_hardware_interface
-{
-namespace motor
-{
-  class MotorHardwareInterface : public hardware_interface::RobotHW
+#include "motor_hardware_interface/motor_hardware_interface.h"
+  int main(int argc, char **argv)
   {
-    private:
-      ros::NodeHandle nodeHandle_;
+    ros::init(argc, argv, "motor_hardware_interface_node");
+    ros::NodeHandle nodeHandle;
 
-      hardware_interface::JointStateInterface jointStateInterface_;
-      hardware_interface::VelocityJointInterface velocityJointInterface_;
-      double command[4];
-      double position[4];
-      double velocity[4];
-      double effort[4];
+    pandora_hardware_interface::motor::MotorHardwareInterface
+      motorHardwareInterface(
+        nodeHandle);
+    controller_manager::ControllerManager controllerManager(
+      &motorHardwareInterface,
+      nodeHandle);
 
-      std::vector<std::string> getJointNameFromParamServer();
+    ros::Time
+      last,
+      now;
+    now = last = ros::Time::now();
+    ros::Duration period(1.0);
 
-    public:
-      explicit MotorHardwareInterface(
-        ros::NodeHandle nodeHandle);
-      ~MotorHardwareInterface();
-      void read();
-      void write();
-  };
-}  // namespace motor
-}  // namespace pandora_hardware_interface
-#endif  // PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+    ros::AsyncSpinner spinner(2);
+    spinner.start();
+
+    while ( ros::ok() )
+    {
+      now = ros::Time::now();
+      period = now - last;
+      last = now;
+
+      motorHardwareInterface.read();
+      controllerManager.update(now, period);
+      motorHardwareInterface.write();
+      ros::Duration(0.1).sleep();
+    }
+    spinner.stop();
+    return 0;
+  }

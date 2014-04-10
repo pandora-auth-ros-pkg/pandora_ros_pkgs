@@ -34,75 +34,40 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#include "pandora_motor_hardware_interface/motor_hardware_interface.h"
+#ifndef PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+#define PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+
+#include "ros/ros.h"
+#include <hardware_interface/joint_command_interface.h>
+#include <hardware_interface/joint_state_interface.h>
+#include <hardware_interface/robot_hw.h>
+#include <controller_manager/controller_manager.h>
 
 namespace pandora_hardware_interface
 {
 namespace motor
 {
-  MotorHardwareInterface::MotorHardwareInterface(
-    ros::NodeHandle nodeHandle)
-    : nodeHandle_(nodeHandle)
+  class MotorHardwareInterface : public hardware_interface::RobotHW
   {
-    std::vector<std::string> jointNames = getJointNameFromParamServer();
-    // connect and register the joint state interface
-    for (int ii = 0; ii < jointNames.size(); ii++)
-    {
-      hardware_interface::JointStateHandle jointStateHandle(
-        jointNames[ii],
-        &position[ii],
-        &velocity[ii],
-        &effort[ii]);
-      jointStateInterface_.registerHandle(jointStateHandle);
-    }
-    registerInterface(&jointStateInterface_);
+    private:
+      ros::NodeHandle nodeHandle_;
 
-    // connect and register the joint velocity interface
-    for (int ii = 0; ii < jointNames.size(); ii++)
-    {
-      hardware_interface::JointHandle jointVelocityHandle(
-        jointStateInterface_.getHandle(jointNames[ii]),
-        &command[ii]);
-      velocityJointInterface_.registerHandle(jointVelocityHandle);
-    }
-    registerInterface(&velocityJointInterface_);
-  }
+      hardware_interface::JointStateInterface jointStateInterface_;
+      hardware_interface::VelocityJointInterface velocityJointInterface_;
+      double command_[4];
+      double position_[4];
+      double velocity_[4];
+      double effort_[4];
 
-  MotorHardwareInterface::~MotorHardwareInterface()
-  {
-  }
+      std::vector<std::string> getJointNameFromParamServer();
 
-  void MotorHardwareInterface::read()
-  {
-  }
-
-  void MotorHardwareInterface::write()
-  {
-  }
-
-  std::vector<std::string>
-    MotorHardwareInterface::getJointNameFromParamServer()
-  {
-    std::vector<std::string> jointNames;
-    std::string name;
-    nodeHandle_.getParam(
-      "motor_joints/robot_movement_joints/left_front_joint",
-      name);
-    jointNames.push_back(name);
-    nodeHandle_.getParam(
-      "motor_joints/robot_movement_joints/right_front_joint",
-      name);
-    jointNames.push_back(name);
-    nodeHandle_.getParam(
-      "motor_joints/robot_movement_joints/left_rear_joint",
-      name);
-    jointNames.push_back(name);
-    nodeHandle_.getParam(
-      "motor_joints/robot_movement_joints/right_rear_joint",
-      name);
-    jointNames.push_back(name);
-
-    return jointNames;
-  }
+    public:
+      explicit MotorHardwareInterface(
+        ros::NodeHandle nodeHandle);
+      ~MotorHardwareInterface();
+      void read();
+      void write();
+  };
 }  // namespace motor
 }  // namespace pandora_hardware_interface
+#endif  // PANDORA_MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H

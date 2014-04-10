@@ -1,0 +1,11 @@
+<library path="lib/libskid_steer_drive_controller">
+  <class
+    name="pandora_motor/SkidSteerDriveController"
+    type="pandora_hardware_interface::motor::SkidSteerDriveController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller subscribes to a Twist solves the kinematic for
+    SkidSteerDrive and sets the appropriate commands for each joint. 
+  </description>
+  </class>
+</library>

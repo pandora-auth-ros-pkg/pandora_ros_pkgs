@@ -1,8 +1,8 @@
-#include "pandora_motor_hardware_interface/motor_serial_interface.h"
+#include "orangutan_interface/orangutan_serial_interface.h"
 
 int main(int argc, char* argv[])
 {
-  pandora_hardware_interface::motor::MotorSerialInterface motors("/dev/motors", 9600, 100);
+  pandora_hardware_interface::motor::OrangutanSerialInterface motors("/dev/motors", 9600, 100);
   
   if (argc != 3) {
     std::cerr << "Error: I need 2 speeds!!" << std::endl;
