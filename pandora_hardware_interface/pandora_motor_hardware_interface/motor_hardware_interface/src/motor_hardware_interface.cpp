@@ -42,14 +42,22 @@ namespace motor
 {
   MotorHardwareInterface::MotorHardwareInterface(
     ros::NodeHandle nodeHandle)
-    : nodeHandle_(nodeHandle)
+  :
+    nodeHandle_(nodeHandle),
+    motors_("/dev/motors", 9600, 100)
+    
   {
-    std::vector<std::string> jointNames = getJointNameFromParamServer();
+    motors_.init();
+    readJointNameFromParamServer();
+
     // connect and register the joint state interface
-    for (int ii = 0; ii < jointNames.size(); ii++)
+    for (int ii = 0; ii < jointNames_.size(); ii++)
     {
+      position_[ii] = 0;
+      velocity_[ii] = 0;
+      effort_[ii] = 0;
       hardware_interface::JointStateHandle jointStateHandle(
-        jointNames[ii],
+        jointNames_[ii],
         &position_[ii],
         &velocity_[ii],
         &effort_[ii]);
@@ -58,10 +66,10 @@ namespace motor
     registerInterface(&jointStateInterface_);
 
     // connect and register the joint velocity interface
-    for (int ii = 0; ii < jointNames.size(); ii++)
+    for (int ii = 0; ii < jointNames_.size(); ii++)
     {
       hardware_interface::JointHandle jointVelocityHandle(
-        jointStateInterface_.getHandle(jointNames[ii]),
+        jointStateInterface_.getHandle(jointNames_[ii]),
         &command_[ii]);
       velocityJointInterface_.registerHandle(jointVelocityHandle);
     }
@@ -74,35 +82,49 @@ namespace motor
 
   void MotorHardwareInterface::read()
   {
+    int leftSpeed, rightSpeed;
+    motors_.read();
+    motors_.getSpeeds(&leftSpeed, &rightSpeed);
+
+    std::string str1 = "left";
+    std::string str2 = "right";
+
+    for (int ii = 0; ii < jointNames_.size(); ii++)
+    {
+      std::size_t foundLeft = jointNames_[ii].find(str1);
+      std::size_t foundRight = jointNames_[ii].find(str2);
+
+      if (foundLeft != std::string::npos)
+        velocity_[ii] = command_[0];
+      else if (foundRight != std::string::npos)
+        velocity_[ii] = command_[1];
+    }
   }
 
   void MotorHardwareInterface::write()
   {
+    motors_.setSpeeds(command_[0], command_[1]);
   }
 
-  std::vector<std::string>
-    MotorHardwareInterface::getJointNameFromParamServer()
+  void MotorHardwareInterface::readJointNameFromParamServer()
   {
-    std::vector<std::string> jointNames;
     std::string name;
     nodeHandle_.getParam(
       "motor_joints/robot_movement_joints/left_front_joint",
       name);
-    jointNames.push_back(name);
+    jointNames_.push_back(name);
     nodeHandle_.getParam(
       "motor_joints/robot_movement_joints/right_front_joint",
       name);
-    jointNames.push_back(name);
+    jointNames_.push_back(name);
     nodeHandle_.getParam(
       "motor_joints/robot_movement_joints/left_rear_joint",
       name);
-    jointNames.push_back(name);
+    jointNames_.push_back(name);
     nodeHandle_.getParam(
       "motor_joints/robot_movement_joints/right_rear_joint",
       name);
-    jointNames.push_back(name);
-
-    return jointNames;
+    jointNames_.push_back(name);
   }
 }  // namespace motor
 }  // namespace pandora_hardware_interface

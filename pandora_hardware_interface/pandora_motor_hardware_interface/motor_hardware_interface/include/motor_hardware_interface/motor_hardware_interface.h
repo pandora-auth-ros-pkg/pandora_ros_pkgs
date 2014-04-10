@@ -42,6 +42,7 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
+#include "orangutan_interface/orangutan_serial_interface.h"
 
 namespace pandora_hardware_interface
 {
@@ -50,16 +51,19 @@ namespace motor
   class MotorHardwareInterface : public hardware_interface::RobotHW
   {
     private:
+      OrangutanSerialInterface motors_;
+
       ros::NodeHandle nodeHandle_;
 
       hardware_interface::JointStateInterface jointStateInterface_;
       hardware_interface::VelocityJointInterface velocityJointInterface_;
+      std::vector<std::string> jointNames_;
       double command_[4];
       double position_[4];
       double velocity_[4];
       double effort_[4];
 
-      std::vector<std::string> getJointNameFromParamServer();
+      void readJointNameFromParamServer();
 
     public:
       explicit MotorHardwareInterface(

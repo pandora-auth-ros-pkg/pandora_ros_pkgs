@@ -144,25 +144,32 @@ namespace motor
     const double leftVelocity, const double rightVelocity)
   {
     double leftCommand, rightCommand;
+    if (fabs(leftVelocity) > fabs(maxAngularVelocity_))
+    {
+      ROS_DEBUG_STREAM("Limiting left wheel speed, it's to high");
+      leftCommand = copysign(maxAngularVelocity_, leftVelocity);
+    }
+    else
+      leftCommand = leftVelocity;
+
+    if (fabs(rightVelocity) > fabs(maxAngularVelocity_))
+    {
+      ROS_DEBUG_STREAM("Limiting right wheel speed, it's to high");
+      rightCommand = copysign(maxAngularVelocity_, rightVelocity);
+    }
+    else
+      rightCommand = rightVelocity;
+
+    modf( (leftCommand/maxAngularVelocity_) * 255, &leftCommand);
+    modf( (rightCommand/maxAngularVelocity_) * 255, &rightCommand);
+
+    std::string str1 = "left";
+    std::string str2 = "right";
+
     for (int ii = 0; ii < jointHandles_.size(); ii++)
     {
-      if (leftVelocity > maxAngularVelocity_)
-        leftCommand = copysign(maxAngularVelocity_, leftVelocity);
-      else
-        leftCommand = leftVelocity;
-
-      if (rightVelocity > maxAngularVelocity_)
-        rightCommand = copysign(maxAngularVelocity_, rightVelocity);
-      else
-        rightCommand = rightVelocity;
-
-      std::string str1 = "left";
-      std::string str2 = "right";
       std::size_t foundLeft = jointHandles_[ii].getName().find(str1);
       std::size_t foundRight = jointHandles_[ii].getName().find(str2);
-
-      modf( (leftCommand/maxAngularVelocity_) * 255, &leftCommand);
-      modf( (rightCommand/maxAngularVelocity_) * 255, &rightCommand);
 
       // Set motor commands
       if (foundLeft != std::string::npos)
