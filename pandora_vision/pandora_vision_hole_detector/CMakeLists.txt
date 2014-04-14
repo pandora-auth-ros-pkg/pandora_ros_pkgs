@@ -139,7 +139,7 @@ target_link_libraries(hole_fusion_lib
 add_executable(hole_fusion_node
   src/hole_fusion_node/hole_fusion.cpp
   src/hole_fusion_node/hole_fusion_node.cpp
-  src/hole_fusion_node/generic_filters.cpp
+  src/hole_fusion_node/hole_merger.cpp
   src/hole_fusion_node/rgb_filters.cpp
   src/hole_fusion_node/depth_filters.cpp
   src/hole_fusion_node/planes_detection.cpp
@@ -288,13 +288,13 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   ## hole_fusion_node ##
 
   include/hole_fusion_node/depth_filters.h
-  include/hole_fusion_node/generic_filters.h
+  include/hole_fusion_node/hole_merger.h
   include/hole_fusion_node/hole_fusion.h
   include/hole_fusion_node/planes_detection.h
   include/hole_fusion_node/rgb_filters.h
 
   src/hole_fusion_node/depth_filters.cpp
-  src/hole_fusion_node/generic_filters.cpp
+  src/hole_fusion_node/hole_merger.cpp
   src/hole_fusion_node/hole_fusion.cpp
   src/hole_fusion_node/hole_fusion_node.cpp
   src/hole_fusion_node/planes_detection.cpp

@@ -67,7 +67,7 @@ namespace pandora_vision
     {
       case 0:
         {
-          std::vector<std::vector<cv::Point> > blobsOutlineVector;
+          std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
           BlobDetection::brushfireKeypoint(*keyPoints,
@@ -106,7 +106,7 @@ namespace pandora_vision
         }
       case 1:
         {
-          std::vector<std::vector<cv::Point> > blobsOutlineVector;
+          std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
           BlobDetection::raycastKeypoint(keyPoints,
@@ -171,7 +171,7 @@ namespace pandora_vision
     rectangles found
     @param[in] inRectanglesArea [const std::vector<float>&]
     The area of each rectangle
-    @param[in] inContours [const std::vector<std::vector<cv::Point> >&]
+    @param[in] inContours [const std::vector<std::vector<cv::Point2f> >&]
     The outline of each blob found
     @param[out] conveyor [HolesConveyor*] The container of vector of blobs'
     keypoints, outlines and areas
@@ -181,7 +181,7 @@ namespace pandora_vision
     const std::vector<cv::KeyPoint>& inKeyPoints,
     const std::vector<std::vector<cv::Point2f> >& inRectangles,
     const std::vector<float>& inRectanglesArea,
-    const std::vector<std::vector<cv::Point> >& inContours,
+    const std::vector<std::vector<cv::Point2f> >& inContours,
     HolesConveyor* conveyor)
   {
     #ifdef DEBUG_TIME

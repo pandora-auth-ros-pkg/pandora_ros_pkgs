@@ -557,7 +557,7 @@ namespace pandora_vision
             pow((pairs[i].first.x - pairs[i].second.x), 2) +
             pow((pairs[i].first.y - pairs[i].second.y), 2));
 
-        cv::Point bisectorPoint(
+        cv::Point2f bisectorPoint(
             round((pairs[i].first.y + pairs[i].second.y) / 2),
             round((pairs[i].first.x + pairs[i].second.x) / 2));
 
@@ -570,7 +570,7 @@ namespace pandora_vision
         //!< directions. The first non-zero point found will be one of the
         //!< curve that the pair lies on.
         bool foundOutlinePoint = false;
-        cv::Point outlinePoint;
+        cv::Point2f outlinePoint;
         int counter = 0;
         bool inLimitsOne = true;
         bool inLimitsTwo = true;
@@ -604,7 +604,7 @@ namespace pandora_vision
                       bisectorPoint.y + m + counter * cos(bisectorAngle),
                       bisectorPoint.x + n + counter * sin(bisectorAngle)) != 0)
                 {
-                  outlinePoint = cv::Point(
+                  outlinePoint = cv::Point2f(
                       bisectorPoint.x + n + counter * sin(bisectorAngle),
                       bisectorPoint.y + m + counter * cos(bisectorAngle));
 
@@ -625,7 +625,7 @@ namespace pandora_vision
                       bisectorPoint.y + m - counter * cos(bisectorAngle),
                       bisectorPoint.x + n - counter * sin(bisectorAngle)) != 0)
                 {
-                  outlinePoint = cv::Point(
+                  outlinePoint = cv::Point2f(
                       bisectorPoint.x + n - counter * sin(bisectorAngle),
                       bisectorPoint.y + m - counter * cos(bisectorAngle));
                   foundOutlinePoint = true;

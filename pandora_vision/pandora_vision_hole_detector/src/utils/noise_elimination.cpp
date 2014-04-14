@@ -334,12 +334,12 @@ namespace pandora_vision
   /**
     @brief Iteration for the interpolateNoise_brushNear function
     @param[in][out] image [cv::Mat&] The input image
-    @param index [const unsigned int&] Where to start the brushfire algorithm
+    @param index [const int&] Where to start the brushfire algorithm
     (index = y * cols + x)
     @return void
    **/
   void NoiseElimination::brushfireNearStep(cv::Mat* image,
-      const unsigned int& index)
+      const int& index)
   {
     #ifdef DEBUG_TIME
     Timer::start("brushfireNearStep");

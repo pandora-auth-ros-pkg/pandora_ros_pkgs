@@ -34,8 +34,8 @@
  *
  * Authors: Alexandros Filotheou, Manos Tsardoulias
  *********************************************************************/
-#ifndef HOLE_FUSION_NODE_GENERIC_FILTERS_H
-#define HOLE_FUSION_NODE_GENERIC_FILTERS_H
+#ifndef HOLE_FUSION_NODE_HOLE_MERGER_H
+#define HOLE_FUSION_NODE_HOLE_MERGER_H
 
 #include "utils/holes_conveyor.h"
 #include "utils/defines.h"
@@ -49,11 +49,11 @@
 namespace pandora_vision
 {
   /**
-    @class GenericFilters
-    @brief Provides functionalities of hole filters independently of depth
-    or RGB images
+    @class HoleMerger
+    @brief Provides functionalities of merging holes independently of depth
+    or RGB images, or analysis
    **/
-  class GenericFilters
+  class HoleMerger
   {
     public:
 

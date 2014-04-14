@@ -95,8 +95,8 @@ namespace pandora_vision
         The rectangles found
         @param[in] inRectanglesArea [const std::vector<float>&] The area of each
         rectangle
-        @param[in] inContours [const std::vector<std::vector<cv::Point> >&] The
-        outline of each blob found
+        @param[in] inContours [const std::vector<std::vector<cv::Point2f> >&]
+        The outline of each blob found
         @param[out] conveyor [HolesConveyor*] The container of vector of blobs'
         keypoints, outlines and areas
         @return void
@@ -105,7 +105,7 @@ namespace pandora_vision
         const std::vector<cv::KeyPoint>& inKeyPoints,
         const std::vector<std::vector<cv::Point2f> >& inRectangles,
         const std::vector<float>& inRectanglesArea,
-        const std::vector<std::vector<cv::Point> >& inContours,
+        const std::vector<std::vector<cv::Point2f> >& inContours,
         HolesConveyor* conveyor);
   };
 

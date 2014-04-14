@@ -80,7 +80,7 @@ namespace pandora_vision
 
     HolesConveyor rgbHolesConveyor;
     std::vector<cv::Point2f> rectangles;
-    std::vector<cv::Point> outlines;
+    std::vector<cv::Point2f> outlines;
 
     for(int i = 0; i < 1; i++)
     {

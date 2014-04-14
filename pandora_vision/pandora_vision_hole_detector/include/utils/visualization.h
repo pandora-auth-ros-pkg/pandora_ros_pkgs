@@ -61,7 +61,7 @@ namespace pandora_vision
         @param[in] imgs [const std::vector<cv::Mat>&] The images to be shown
         @param[in] titles [const std::vector<std::string>&] The titles for each
         image
-        @param[in] maxSize [const unsigned int&] The maximum size of the window
+        @param[in] maxSize [const int&] The maximum size of the window
         @param[in] ms [const int&] How many seconds the showing lasts
         @return void
        **/
@@ -69,7 +69,7 @@ namespace pandora_vision
         const std::string& title,
         const std::vector<cv::Mat>& imgs,
         const std::vector<std::string>& titles,
-        const unsigned int& maxSize,
+        const int& maxSize,
         const int& ms);
 
       /**
@@ -105,7 +105,7 @@ namespace pandora_vision
         The bounding boxes' vertices
         @param[in] msgs [const std::vector<std::string>] Message to show to each
         keypoint
-        @param[in] outlineVector [const std::vector<std::vector<cv::Point> >&]
+        @param[in] outlineVector [const std::vector<std::vector<cv::Point2f> >&]
         The valid holes' outlines
         @param[in] hz [const floa&t] If positive holds the Hz
         @return [cv::Mat] The drawn image
@@ -117,7 +117,7 @@ namespace pandora_vision
         const std::vector<cv::KeyPoint>& keypoints,
         const std::vector<std::vector<cv::Point2f> >& bounding_boxes,
         const std::vector<std::string>& msgs,
-        const std::vector<std::vector<cv::Point> >& outlineVector,
+        const std::vector<std::vector<cv::Point2f> >& outlineVector,
         const float& hz = -1);
 
       /**

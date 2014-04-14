@@ -107,11 +107,11 @@ namespace pandora_vision
     static int run_checker_depth_area;
     static int run_checker_brushfire_outline_to_rectangle;
     static int run_checker_outline_of_rectangle;
-    static int run_checker_depth_homogenity;
+    static int run_checker_depth_homogeneity;
     static int rectangle_inflation_size;
     static float depth_difference;
 
-    static int run_checker_color_homogenity;
+    static int run_checker_color_homogeneity;
     static int run_checker_luminosity_diff;
     static int run_checker_texture_diff;
     static int run_checker_texture_backproject;
@@ -149,7 +149,7 @@ namespace pandora_vision
     //!< The threshold for texture matching
     static float match_texture_threshold;
 
-    //!< Color homogenity parameters
+    //!< Color homogeneity parameters
     static int num_bins_threshold;
     static int non_zero_points_in_box_blob_histogram;
 

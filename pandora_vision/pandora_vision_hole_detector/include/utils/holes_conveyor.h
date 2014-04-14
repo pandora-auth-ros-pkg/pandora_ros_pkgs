@@ -48,14 +48,14 @@ namespace pandora_vision
     holes' keypoints
     @param rectangles [std::vector< std::vector<cv::Point2f> >] The
     vector of the holes' rotated bounding boxes vertices
-    @param outlines [std::vector<std::vector<cv::Point> >] The
+    @param outlines [std::vector<std::vector<cv::Point2f> >] The
     vector of the holes' outlines
    **/
   struct HolesConveyor
   {
     std::vector<cv::KeyPoint> keyPoints;
     std::vector< std::vector<cv::Point2f> > rectangles;
-    std::vector<std::vector<cv::Point> > outlines;
+    std::vector<std::vector<cv::Point2f> > outlines;
   };
 
 
@@ -173,7 +173,7 @@ namespace pandora_vision
         @brief Appends a dummy HolesConveyor to a HoleConveyor struct
         @param[in] rectangleUpperLeft [const cv::Point2f&] The upper left
         vertex of the bounding rectangle
-        @param[in] outlineUpperLeft [const cv::Point] The upper left
+        @param[in] outlineUpperLeft [const cv::Point2f] The upper left
         vertex of the hole's outline
         @param[in] rx [const int&] The width of the rectangle
         @param[in] ry [const int&] The height of the rectangle
@@ -185,7 +185,7 @@ namespace pandora_vision
        **/
       static void appendDummyConveyor(
         const cv::Point2f& rectangleUpperLeft,
-        const cv::Point& outlineUpperLeft,
+        const cv::Point2f& outlineUpperLeft,
         const int& rx, const int& ry,
         const int& ox, const int& oy,
         HolesConveyor* conveyor);
@@ -197,24 +197,14 @@ namespace pandora_vision
         of the rectangle
         @param[in] x [const int&] The length at x direction
         @param[in] y [const int&] The length at y direction
+        @param[in] intent [const int&] 0 for a rectangle's vertices
+        construction, 1 for a coherent outline construction
         @return std::vector<cv::Point2f> A vector of four vertices
         of type cv::Point2f
        **/
       static std::vector<cv::Point2f> generateRectangle(
-        const cv::Point2f& upperLeft, const int& x, const int& y);
-
-      /**
-        @brief Generates a vector of cv::Point that represents the 4 vertices
-        of a rectangle
-        @param[in] upperLeft [const cv::Point&] The upper left vertex point
-        of the rectangle
-        @param[in] x [const int&] The length at x direction
-        @param[in] y [const int&] The length at y direction
-        @return std::vector<cv::Point> A vector of four vertices
-        of type cv::Point
-       **/
-      static std::vector<cv::Point> generateRectangle(
-        const cv::Point& upperLeft, const int& x, const int& y);
+        const cv::Point2f& upperLeft, const int& x, const int& y,
+        const int& intent);
 
       /**
         @brief Draws the keypoints, rectangles and outlines of holes

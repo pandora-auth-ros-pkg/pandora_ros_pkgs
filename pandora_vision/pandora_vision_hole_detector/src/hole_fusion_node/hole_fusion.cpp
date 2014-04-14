@@ -159,25 +159,26 @@ namespace pandora_vision
       //!< Is the activeId-th candidate hole able to
       //!< {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
       bool isAble = false;
+
       if (operationId == 0)
       {
         //!< Is the activeId-th candidate hole able to assimilate the
         //!< passiveId-th candidate hole?
-        isAble = GenericFilters::isCapableOfAssimilating(activeId,
+        isAble = HoleMerger::isCapableOfAssimilating(activeId,
           *rgbdHolesConveyor, passiveId, *rgbdHolesConveyor);
       }
       if (operationId == 1)
       {
         //!< Is the activeId-th candidate hole able to amalgamate the
         //!< passiveId-th candidate hole?
-        isAble = GenericFilters::isCapableOfAmalgamating(activeId,
+        isAble = HoleMerger::isCapableOfAmalgamating(activeId,
           *rgbdHolesConveyor, passiveId, *rgbdHolesConveyor);
       }
       if (operationId == 2)
       {
         //!< Is the passiveId-th candidate hole able to be connected with the
         //!< activeId-th candidate hole?
-        isAble = GenericFilters::isCapableOfConnecting(activeId,
+        isAble = HoleMerger::isCapableOfConnecting(activeId,
           *rgbdHolesConveyor, passiveId, *rgbdHolesConveyor, pointCloudXYZ_);
       }
 
@@ -195,14 +196,14 @@ namespace pandora_vision
         if (operationId == 0)
         {
           //!< Delete the passiveId-th candidate hole
-          GenericFilters::assimilateOnce(passiveId, &tempHolesConveyor);
+          HoleMerger::assimilateOnce(passiveId, &tempHolesConveyor);
         }
         else if (operationId == 1)
         {
           //!< Delete the passiveId-th candidate hole,
           //!< alter the activeId-th candidate hole so that it has amalgamated
           //!< the passiveId-th candidate hole
-          GenericFilters::amalgamateOnce(activeId, &tempHolesConveyor,
+          HoleMerger::amalgamateOnce(activeId, &tempHolesConveyor,
             passiveId, &tempHolesConveyor);
         }
         else if (operationId == 2)
@@ -210,7 +211,7 @@ namespace pandora_vision
           //!< Delete the passiveId-th candidate hole,
           //!< alter the activeId-th candidate hole so that it has been
           //!< connected with the passiveId -th candidate hole
-          GenericFilters::connectOnce(activeId, &tempHolesConveyor,
+          HoleMerger::connectOnce(activeId, &tempHolesConveyor,
             passiveId, &tempHolesConveyor);
         }
 
@@ -234,8 +235,24 @@ namespace pandora_vision
         filtersOrder[3] = 2;
 
 
+        //!< Create the necessary vectors for each filter used
         std::vector<cv::Mat> imgs;
         std::vector<std::string> msgs;
+        std::vector<std::set<unsigned int> > holesMasksSetVector;
+        std::vector<std::vector<cv::Point2f> > rectanglesVector;
+        std::vector<int> rectanglesIndices;
+        std::vector<std::set<unsigned int> > intermediatePointsSetVector;
+
+        createInflatedRectanglesVector(
+          ithHole,
+          interpolatedDepthImage_,
+          Parameters::rectangle_inflation_size,
+          &rectanglesVector,
+          &rectanglesIndices);
+
+        createHolesMasksSetVector(ithHole, interpolatedDepthImage_,
+          &holesMasksSetVector);
+
 
         std::vector<std::vector<float> >probabilitiesVector(3,
           std::vector<float>(1, 0.0));
@@ -249,7 +266,10 @@ namespace pandora_vision
             interpolatedDepthImage_,
             pointCloudXYZ_,
             ithHole,
-            Parameters::rectangle_inflation_size,
+            holesMasksSetVector,
+            rectanglesVector,
+            rectanglesIndices,
+            intermediatePointsSetVector,
             &probabilitiesVector.at(counter),
             &imgs,
             &msgs);
@@ -450,11 +470,11 @@ namespace pandora_vision
       conveyor->rectangles.push_back(renctangleVertices);
 
       //!< Recreate conveyor.outlines
-      std::vector<cv::Point> outlinePoints;
+      std::vector<cv::Point2f> outlinePoints;
       for (unsigned int o = 0;
         o < candidateHolesVector[i].outlineX.size(); o++)
       {
-        cv::Point outlinePoint;
+        cv::Point2f outlinePoint;
         outlinePoint.x = candidateHolesVector[i].outlineX[o];
         outlinePoint.y = candidateHolesVector[i].outlineY[o];
         outlinePoints.push_back(outlinePoint);
@@ -666,16 +686,16 @@ namespace pandora_vision
       config.run_checker_depth_area;
     Parameters::run_checker_brushfire_outline_to_rectangle =
       config.run_checker_brushfire_outline_to_rectangle;
-    Parameters::run_checker_depth_homogenity =
-      config.run_checker_depth_homogenity;
+    Parameters::run_checker_depth_homogeneity =
+      config.run_checker_depth_homogeneity;
 
     Parameters::rectangle_inflation_size =
       config.rectangle_inflation_size;
     Parameters::depth_difference =
       config.depth_difference;
 
-    Parameters::run_checker_color_homogenity =
-      config.run_checker_color_homogenity;
+    Parameters::run_checker_color_homogeneity =
+      config.run_checker_color_homogeneity;
     Parameters::run_checker_luminosity_diff =
       config.run_checker_luminosity_diff;
     Parameters::run_checker_texture_diff =
@@ -731,7 +751,7 @@ namespace pandora_vision
     Parameters::non_zero_points_in_box_blob_histogram =
       config.non_zero_points_in_box_blob_histogram;
 
-    //!<Color homogenity parameters
+    //!<Color homogeneity parameters
     Parameters::num_bins_threshold =
       config.num_bins_threshold;
 
@@ -829,6 +849,13 @@ namespace pandora_vision
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
       &rgbdHolesConveyor);
 
+
+    //!< Uncomment for testing artificial holes' merging process
+    HolesConveyor dummy;
+    testDummyHolesMerging(&dummy);
+    return;
+
+
     //!< Keep a copy of the initial (not merged) candidate holes for
     //!< debugging and exibition purposes
     HolesConveyor rgbdHolesConveyorBeforeMerge;
@@ -873,6 +900,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_merge_holes)
     {
+      msgs.clear();
       //!< Push back the identifier of each keypoint
       for (int i = 0; i < rgbdHolesConveyor.keyPoints.size(); i++)
       {
@@ -1007,6 +1035,69 @@ namespace pandora_vision
     Timer::start("sift", "processCandidateHoles");
     #endif
 
+
+    //!< A vector of images that each one of them represents the corresponding
+    //!< hole's mask: non-zero value pixels are within a hole's outline points
+    std::vector<cv::Mat> holesMasksImageVector;
+
+    //!< Get the mask images
+    createHolesMasksImageVector(conveyor, interpolatedDepthImage_,
+      &holesMasksImageVector);
+
+
+    //!< A vector of sets that each one of them contains indices of points
+    //!< inside the hole's outline
+    std::vector<std::set<unsigned int> > holesMasksSetVector;
+
+    //!< Get the sets of points inside the hole's outline
+    createHolesMasksSetVector(conveyor, interpolatedDepthImage_,
+      &holesMasksSetVector);
+
+    //!< A vector of vertices of each inflated bounding rectangle.
+    std::vector<std::vector<cv::Point2f> > inflatedRectanglesVector;
+
+    //!< Since inflated rectangle's vertices may go outside the image's bounds,
+    //!< this vector stores the indices of the keypoints whose corresponding
+    //!< inflated rectangle is in totality within the image's bounds
+    std::vector<int> inflatedRectanglesIndices;
+
+
+    //!< Get the inflated rectangles vector and the indices of the original
+    //!< keypoints that correspond to its elements
+    createInflatedRectanglesVector(conveyor,
+      interpolatedDepthImage_,
+      Parameters::rectangle_inflation_size,
+      &inflatedRectanglesVector,
+      &inflatedRectanglesIndices);
+
+
+    //!< A vector of sets that each one of them contains indices of points
+    //!< between the hole's outline and its respective bounding box
+    std::vector<std::set<unsigned int> > intermediatePointsSetVector;
+
+    //!< Get the intermediate points between holes' outlines and their
+    //!< respective inflated bounding box
+    createIntermediateHolesPointsSetVector(conveyor,
+      inflatedRectanglesVector,
+      inflatedRectanglesIndices,
+      interpolatedDepthImage_,
+      &intermediatePointsSetVector);
+
+
+    //!< A vector of images that each one of them contains points
+    //!< between the hole's outline and its respective bounding box
+    std::vector<cv::Mat> intermediatePointsImageVector;
+
+    //!< Get the intermediate points between holes' outlines and their
+    //!< respective inflated bounding box
+    createIntermediateHolesPointsImageVector(conveyor,
+      inflatedRectanglesVector,
+      inflatedRectanglesIndices,
+      interpolatedDepthImage_,
+      Parameters::rectangle_inflation_size,
+      &intermediatePointsImageVector);
+
+
     //!< Initialize the depth probabilities 2D vector. But first we need to know
     //!< how many rows the vector will accomodate
     int depthActiveFilters = 0;
@@ -1027,7 +1118,7 @@ namespace pandora_vision
     {
       depthActiveFilters++;
     }
-    if (Parameters::run_checker_depth_homogenity > 0)
+    if (Parameters::run_checker_depth_homogeneity > 0)
     {
       depthActiveFilters++;
     }
@@ -1040,9 +1131,13 @@ namespace pandora_vision
 
       //!< check holes for debugging purposes
       DepthFilters::checkHoles(
+        conveyor,
         interpolatedDepthImage_,
         pointCloudXYZ_,
-        conveyor,
+        holesMasksSetVector,
+        inflatedRectanglesVector,
+        inflatedRectanglesIndices,
+        intermediatePointsSetVector,
         &depthProbabilitiesVector2D);
 
       #ifdef DEBUG_SHOW
@@ -1069,7 +1164,7 @@ namespace pandora_vision
     //!< how many rows the vector will accomodate
     int rgbActiveFilters = 0;
 
-    if (Parameters::run_checker_color_homogenity > 0)
+    if (Parameters::run_checker_color_homogeneity > 0)
     {
       rgbActiveFilters++;
     }
@@ -1093,11 +1188,16 @@ namespace pandora_vision
         std::vector<float>(conveyor.keyPoints.size(), 0.0));
 
       //!< check holes for debugging purposes
-      RgbFilters::checkHoles(
-        rgbImage_,
-        wallsHistogram_,
-        conveyor,
-        &rgbProbabilitiesVector2D);
+      /*
+       *RgbFilters::checkHoles(
+       *  rgbImage_,
+       *  wallsHistogram_,
+       *  conveyor,
+       *  holesMasksVector,
+       *  inflatedRectanglesVector,
+       *  inflatedRectanglesIndices,
+       *  &rgbProbabilitiesVector2D);
+       */
 
       #ifdef DEBUG_SHOW
       if (conveyor.keyPoints.size() > 0)
@@ -1120,183 +1220,6 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("sift");
-    #endif
-  }
-
-
-
-  /**
-    @brief Runs candidate holes obtained through Depth and RGB analysis
-    through selected filters, from a respective viewpoint (keypoints
-    obtained through Depth analysis are checked against Depth-based
-    filters, etc). Probabilities for each candidate hole and filter
-    are printed in the console, with an order specified by the
-    hole_fusion_cfg of the dynamic reconfigure utility
-    @param[in] depthHolesConveyor [const HolesConveyor&] The conveyor
-    containing candidate holes originated from the depth image's analysis
-    @param[in] rgbHolesConveyor [const HolesConveyor&] The conveyor
-    containing candidate holes originated from the rgb image's analysis
-    @return void
-   **/
-  void HoleFusion::sift(const HolesConveyor& depthHolesConveyor,
-    const HolesConveyor& rgbHolesConveyor)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("siftRespectively", "processCandidateHoles");
-    #endif
-
-    #ifdef DEBUG_SHOW
-    ROS_ERROR("===========================================");
-    ROS_ERROR("#Depth keypoints : %zu", depthHolesConveyor.keyPoints.size());
-    ROS_ERROR("#RGB keypoints   : %zu", rgbHolesConveyor.keyPoints.size());
-    ROS_ERROR("-------------------------------------------");
-    #endif
-
-    //!< Initialize the probabilities 2D vector. But first we need to know
-    //!< how many rows the vector will accomodate
-    int depthActiveFilters = 0;
-
-    if (Parameters::run_checker_depth_diff > 0)
-    {
-      depthActiveFilters++;
-    }
-    if (Parameters::run_checker_outline_of_rectangle > 0)
-    {
-      depthActiveFilters++;
-    }
-    if (Parameters::run_checker_depth_area > 0)
-    {
-      depthActiveFilters++;
-    }
-    if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
-    {
-      depthActiveFilters++;
-    }
-    if (Parameters::run_checker_depth_homogenity > 0)
-    {
-      depthActiveFilters++;
-    }
-
-    std::vector<std::vector<float> > depthProbabilitiesVector2D(
-      depthActiveFilters,
-      std::vector<float>(depthHolesConveyor.keyPoints.size(), 0.0));
-
-    //!< check holes for debugging purposes
-    DepthFilters::checkHoles(
-      interpolatedDepthImage_,
-      pointCloudXYZ_,
-      depthHolesConveyor,
-      &depthProbabilitiesVector2D);
-
-    #ifdef DEBUG_SHOW
-    if (depthHolesConveyor.keyPoints.size() > 0)
-    {
-      ROS_ERROR("Depth : Candidate Holes' probabilities");
-      for (int j = 0; j < depthHolesConveyor.keyPoints.size(); j++)
-      {
-        std::string probsString;
-        for (int i = 0; i < depthActiveFilters; i++)
-        {
-          probsString += TOSTR(depthProbabilitiesVector2D[i][j]) + " | ";
-        }
-
-        ROS_ERROR("P_%d [%f %f]= %s", j, depthHolesConveyor.keyPoints[j].pt.x,
-          depthHolesConveyor.keyPoints[j].pt.y, probsString.c_str());
-        ROS_ERROR("------------------");
-      }
-    }
-    #endif
-
-    //!< Initialize the probabilities 2D vector. But first we need to know
-    //!< how many rows the vector will accomodate
-    int rgbActiveFilters = 0;
-
-    if (Parameters::run_checker_color_homogenity > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::run_checker_luminosity_diff > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::run_checker_texture_diff > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::run_checker_texture_backproject > 0)
-    {
-      rgbActiveFilters++;
-    }
-
-
-    std::vector<std::vector<float> > rgbProbabilitiesVector2D(rgbActiveFilters,
-      std::vector<float>(rgbHolesConveyor.keyPoints.size(), 0.0));
-
-    //!< check holes for debugging purposes
-    RgbFilters::checkHoles(
-      rgbImage_,
-      wallsHistogram_,
-      rgbHolesConveyor,
-      &rgbProbabilitiesVector2D);
-
-    #ifdef DEBUG_SHOW
-    ROS_ERROR("-------------------------------------------");
-    if (rgbHolesConveyor.keyPoints.size() > 0)
-    {
-      ROS_ERROR("RGB: Candidate Holes' probabilities");
-      for (int j = 0; j < rgbHolesConveyor.keyPoints.size(); j++)
-      {
-        std::string probsString;
-        for (int i = 0; i < rgbActiveFilters; i++)
-        {
-          probsString += TOSTR(rgbProbabilitiesVector2D[i][j]) + " | ";
-        }
-
-        ROS_ERROR("P_%d [%f %f] = %s", j, rgbHolesConveyor.keyPoints[j].pt.x,
-          rgbHolesConveyor.keyPoints[j].pt.y, probsString.c_str());
-        ROS_ERROR("------------------");
-      }
-    }
-    #endif
-
-
-    #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
-    {
-      //!< Push back the identities of each keypoint originated from
-      //!< depth analysis
-      std::vector<std::string> depthMsgs;
-      for (int i = 0; i < depthHolesConveyor.keyPoints.size(); i++)
-      {
-        depthMsgs.push_back(TOSTR(i));
-      }
-
-      Visualization::showHoles(
-        "Depth : Final KeyPoints",
-        interpolatedDepthImage_,
-        depthHolesConveyor,
-        1,
-        depthMsgs);
-
-      //!< Push back the identities of each keypoint originated from
-      //!< RGB analysis
-      std::vector<std::string> rgbMsgs;
-      for (int i = 0; i < rgbHolesConveyor.keyPoints.size(); i++)
-      {
-        rgbMsgs.push_back(TOSTR(i));
-      }
-
-      Visualization::showHoles(
-        "RGB: Final KeyPoints",
-        rgbImage_,
-        rgbHolesConveyor,
-        1,
-        rgbMsgs);
-    }
-    #endif
-
-    #ifdef DEBUG_TIME
-    Timer::tick("siftRespectively");
     #endif
   }
 
@@ -1357,48 +1280,507 @@ namespace pandora_vision
 
 
   /**
+    @brief Some hole checkers require the construction of a hole's mask,
+    that is, the pixels inside the hole with a value of
+    value 255 while the background pixels are with 0 value.
+    Construct each mask here, instead of in each checker.
+    @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+    @param[in] image [const cv::Mat&] An image required only for the
+    masks' size
+    @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
+    A vector containing an image (the mask) for each hole
+    @return void
+   **/
+  void HoleFusion::createHolesMasksImageVector(
+    const HolesConveyor& conveyor,
+    const cv::Mat& image,
+    std::vector<cv::Mat>* holesMasksImageVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("createHolesMasksImageVector", "sift");
+    #endif
+
+    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    {
+      //!< The current hole's image mask
+      cv::Mat holeMask = cv::Mat::zeros(image.size(), CV_8UC1);
+
+      //!< A pointer to the hole mask image
+      unsigned char* ptr = holeMask.ptr();
+
+      //!< Draw the outline of the i-th hole onto holeMask
+      for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
+      {
+        holeMask.at<unsigned char>(
+          conveyor.outlines[i][j].y, conveyor.outlines[i][j].x) = 255;
+      }
+
+      //!< The set of points' indices inside the hole's outline
+      std::set<unsigned int> visitedPoints;
+
+      cv::Point2f keypoint(
+        conveyor.keyPoints[i].pt.x, conveyor.keyPoints[i].pt.y);
+
+      //!< Brushfire from the keypoint to the hole's outline
+      //!< to obtain the points inside the hole's outline
+      BlobDetection::brushfirePoint(keypoint, &holeMask, &visitedPoints);
+
+
+      //!< Draw the current hole's mask
+      for (std::set<unsigned int>::iterator it = visitedPoints.begin();
+        it != visitedPoints.end(); it++)
+      {
+        ptr[*it] = 255;
+      }
+
+      holesMasksImageVector->push_back(holeMask);
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("createHolesMasksImageVector");
+    #endif
+  }
+
+
+
+  /**
+    @brief Some hole checkers require access to a hole's inside points,
+    Construct a set of points for each hole, and store all of them in
+    a vector
+    @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+    @param[in] image [const cv::Mat&] An image required to access
+    each hole
+    @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
+    A vector that holds sets of points;
+    each set holds the inside points of each hole
+    @return void
+   **/
+  void HoleFusion::createHolesMasksSetVector(const HolesConveyor& conveyor,
+    const cv::Mat& image,
+    std::vector<std::set<unsigned int> >* holesMasksSetVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("createHolesMasksSetVector", "sift");
+    #endif
+
+    for (int i = 0; i < conveyor.keyPoints.size(); i++)
+    {
+      cv::Mat holeMask = cv::Mat::zeros(image.size(), CV_8UC1);
+
+      //!< Draw the outline of the i-th hole onto holeMask
+      for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
+      {
+        holeMask.at<unsigned char>(
+          conveyor.outlines[i][j].y, conveyor.outlines[i][j].x) = 255;
+      }
+
+      cv::Point2f keypoint(
+        conveyor.keyPoints[i].pt.x, conveyor.keyPoints[i].pt.y);
+
+      std::set<unsigned int> holeSet;
+
+      //!< Brushfire from the keypoint to the hole's outline
+      //!< to obtain the points inside the hole's outline
+      BlobDetection::brushfirePoint(keypoint, &holeMask, &holeSet);
+
+      holesMasksSetVector->push_back(holeSet);
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("createHolesMasksSetVector");
+    #endif
+  }
+
+
+
+  /**
+    @brief Some checkers require the construction of a hole's inflated
+    rectangle in order to validate a hole. Construct each mask here.
+    Each vector element contains the four vertices of the inflated
+    rectangle. A hole's bounding rectangle is inflated by a standard size;
+    inflated rectangles that go beyond the image's bounds are discarded,
+    that is, the output vector contains the indices of the original
+    keypoints whose inflated bounding rectangles is within the image's
+    bounds.
+    @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+    @param[in] image [const cv::Mat&] An image needed only for
+    its size
+    @param[in] inflationSize [const int&] The bounding rectangles
+    inflation size in pixels
+    @param[out] inflatedRectanglesVector
+    [std::vector<std::vector<cv::Point2f> >*] The vector that holds the
+    vertices of the in-image-bounds inflated rectangles
+    @param[out] inflatedRectanglesIndices [std::vector<int>*]
+    The vector that holes the indices of the original holes whose
+    inflated bounding rectangles is within the image's bounds.
+    @param[out] brushfireBeginPoints [std::vector<cv::Point2f>*] A vector
+    used from checker methods that use the brushfire algorithm
+    between a hole's outline and its inflated rectangle
+    @return void
+   **/
+  void HoleFusion::createInflatedRectanglesVector(
+    const HolesConveyor& conveyor,
+    const cv::Mat& image,
+    const int& inflationSize,
+    std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
+    std::vector<int>* inflatedRectanglesIndices)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("createInflatedRectanglesVector", "sift");
+    #endif
+
+    //!< Store the vertices of the inside-of-image-bounds inflated bounding
+    //!< rectangles in the inflatedRectangles vector
+    std::vector<std::vector<cv::Point2f> > inflatedRectangles;
+
+    float key_y;
+    float key_x;
+    float vert_y;
+    float vert_x;
+    double theta;
+    double keypointVertDist;
+
+    for (int i = 0; i < conveyor.rectangles.size(); i++)
+    {
+      std::vector<cv::Point2f> inflatedVertices;
+      int inflatedVerticesWithinImageLimits = 0;
+
+      for (int j = 0; j < 4; j++)
+      {
+        key_y = conveyor.keyPoints[i].pt.y;
+        key_x = conveyor.keyPoints[i].pt.x;
+
+        vert_y = conveyor.rectangles[i][j].y;
+        vert_x = conveyor.rectangles[i][j].x;
+
+        theta = atan2(key_y - vert_y, key_x - vert_x);
+
+        keypointVertDist = sqrt(pow(key_x -vert_x, 2) + pow(key_y -vert_x, 2));
+
+        //!< check if the inflated vertex has gone out of bounds
+        if (vert_x - inflationSize * cos(theta) < image.cols &&
+          vert_x - inflationSize * cos(theta) >= 0 &&
+          vert_y - inflationSize * sin(theta) < image.rows &&
+          vert_y - inflationSize * sin(theta) >= 0)
+        {
+          inflatedVerticesWithinImageLimits++;
+        }
+
+        inflatedVertices.push_back(
+          cv::Point2f(round(vert_x - inflationSize * cos(theta)),
+            round(vert_y - inflationSize * sin(theta))));
+      } //!< end for rectangle's points
+
+      //!< If one or more vertices are out of bounds discard the whole
+      //!< inflated rectangle
+      if (inflatedVerticesWithinImageLimits < 4)
+      {
+        inflatedVertices.clear();
+        continue;
+      }
+      else
+      {
+        inflatedRectanglesIndices->push_back(i);
+        inflatedRectanglesVector->push_back(inflatedVertices);
+      }
+    } //!< end for each hole
+
+    #ifdef DEBUG_TIME
+    Timer::tick("createInflatedRectanglesVector");
+    #endif
+  }
+
+
+
+  /**
+    @brief For each hole, this function finds the points between the hole's
+    outline and the rectangle (inflated or not) that corrensponds to it.
+    These points are then stored in an image.
+    @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+    @param[in] rectanglesVector
+    [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+    the vertices of each rectangle that corresponds to a specific hole
+    inside the coveyor
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
+    @param[in] image [const cv::Mat&] An image needed only for
+    its size
+    @param[in] inflationSize [const int&] The bounding rectangles
+    inflation size in pixels
+    @param[out] intermediatePointsVector [std::vector<cv::Mat>*]
+    A vector that holds the image of the intermediate points for each
+    hole whose identifier exists in the @param rectanglesIndices vector
+    @return void
+   **/
+  void HoleFusion::createIntermediateHolesPointsImageVector(
+    const HolesConveyor& conveyor,
+    const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+    const std::vector<int>& rectanglesIndices,
+    const cv::Mat& image,
+    const int& inflationSize,
+    std::vector<cv::Mat>* intermediatePointsImageVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("createIntermediateHolesPointsImageVector", "sift");
+    #endif
+
+    for (int i = 0; i < rectanglesVector.size(); i++)
+    {
+      //!< The current hole's mask
+      cv::Mat intermediatePointsMask = cv::Mat::zeros(image.size(), CV_8UC1);
+
+      //!< An image whose non-zero value pixels are the ones inside the
+      //!< hole's outline
+      cv::Mat holeOutlineFilled = cv::Mat::zeros(image.size(), CV_8UC1);
+      unsigned char* ptr_h = holeOutlineFilled.ptr();
+
+      //!< An image whose non-zero value pixels are the ones inside the
+      //!< hole's bounding rectangle
+      cv::Mat rectangleOutlineFilled = cv::Mat::zeros(image.size(), CV_8UC1);
+      unsigned char* ptr_r = rectangleOutlineFilled.ptr();
+
+      //!< The brushfire start point is the hole's keypoint
+      cv::Point2f keypoint(
+        conveyor.keyPoints[rectanglesIndices[i]].pt.x,
+        conveyor.keyPoints[rectanglesIndices[i]].pt.y);
+
+
+      //!< Draw the outline of the i-th hole onto holeOutlineFilled
+      for(unsigned int j = 0;
+        j < conveyor.outlines[rectanglesIndices[i]].size(); j++)
+      {
+        holeOutlineFilled.at<uchar>(
+          conveyor.outlines[rectanglesIndices[i]][j].y,
+          conveyor.outlines[rectanglesIndices[i]][j].x) = 255;
+      }
+
+      //!< Fill the inside of the hole
+      std::set<unsigned int> holeOutlineFilledSet;
+      BlobDetection::brushfirePoint(keypoint,
+        &holeOutlineFilled, &holeOutlineFilledSet);
+
+      for(std::set<unsigned int>::iterator it = holeOutlineFilledSet.begin();
+        it != holeOutlineFilledSet.end(); it++)
+      {
+        ptr_h[*it] = 255;
+      }
+
+
+      //!< Draw the bounding rectangle of the i-th hole onto
+      //!< rectangleOutlineFilled
+      for(unsigned int j = 0; j < rectanglesVector[i].size(); j++)
+      {
+        cv::line(rectangleOutlineFilled,
+          rectanglesVector[i][j],
+          rectanglesVector[i][(j + 1) % rectanglesVector[i].size()],
+          cv::Scalar(255, 0, 0), 1, 8 );
+      }
+
+      //!< Fill the inside of the rectangle
+      std::set<unsigned int> rectangleOutlineFilledSet;
+      BlobDetection::brushfirePoint(keypoint,
+        &rectangleOutlineFilled, &rectangleOutlineFilledSet);
+
+      for(std::set<unsigned int>::iterator it
+        = rectangleOutlineFilledSet.begin();
+        it != rectangleOutlineFilledSet.end(); it++)
+      {
+        ptr_r[*it] = 255;
+      }
+
+
+      //!< The current hole's intermediate points mask will be the
+      //!< difference between the filled rectangle image and the
+      //!< filled outline image
+      intermediatePointsMask = rectangleOutlineFilled - holeOutlineFilled;
+
+      intermediatePointsImageVector->push_back(intermediatePointsMask);
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("createIntermediateHolesPointsImageVector");
+    #endif
+  }
+
+
+
+  /**
+    @brief For each hole, this function finds the points between the hole's
+    outline and the rectangle (inflated or not) that corrensponds to it.
+    These points are then stored in a std::set of ints.
+    @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+    @param[in] rectanglesVector
+    [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+    the vertices of each rectangle that corresponds to a specific hole
+    inside the coveyor
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
+    @param[out] intermediatePointsVector [std::vector<std::set<int> >*]
+    A vector that holds the intermediate points' indices for each hole
+    whose identifier exists in the @param rectanglesIndices vector
+    @return void
+   **/
+  void HoleFusion::createIntermediateHolesPointsSetVector(
+    const HolesConveyor& conveyor,
+    const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+    const std::vector<int>& rectanglesIndices,
+    const cv::Mat& image,
+    std::vector<std::set<unsigned int> >* intermediatePointsSetVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("createIntermediateHolesPointsSetVector", "sift");
+    #endif
+
+    for (int i = 0; i < rectanglesVector.size(); i++)
+    {
+      //!< The current hole's mask
+      cv::Mat intermediatePointsMask = cv::Mat::zeros(image.size(), CV_8UC1);
+
+      //!< An image whose non-zero value pixels are the ones inside the
+      //!< hole's outline
+      cv::Mat holeOutlineFilled = cv::Mat::zeros(image.size(), CV_8UC1);
+      unsigned char* ptr_h = holeOutlineFilled.ptr();
+
+      //!< An image whose non-zero value pixels are the ones inside the
+      //!< hole's bounding rectangle
+      cv::Mat rectangleOutlineFilled = cv::Mat::zeros(image.size(), CV_8UC1);
+      unsigned char* ptr_r = rectangleOutlineFilled.ptr();
+
+      //!< The brushfire start point is the hole's keypoint
+      cv::Point2f keypoint(
+        conveyor.keyPoints[rectanglesIndices[i]].pt.x,
+        conveyor.keyPoints[rectanglesIndices[i]].pt.y);
+
+
+      //!< Draw the outline of the i-th hole onto holeOutlineFilled
+      for(unsigned int j = 0;
+        j < conveyor.outlines[rectanglesIndices[i]].size(); j++)
+      {
+        holeOutlineFilled.at<uchar>(
+          conveyor.outlines[rectanglesIndices[i]][j].y,
+          conveyor.outlines[rectanglesIndices[i]][j].x) = 255;
+      }
+
+      //!< Fill the inside of the hole
+      std::set<unsigned int> holeOutlineFilledSet;
+      BlobDetection::brushfirePoint(keypoint,
+        &holeOutlineFilled, &holeOutlineFilledSet);
+
+
+
+      //!< Draw the bounding rectangle of the i-th hole onto
+      //!< rectangleOutlineFilled
+      for(unsigned int j = 0; j < rectanglesVector[i].size(); j++)
+      {
+        cv::line(rectangleOutlineFilled,
+          rectanglesVector[i][j],
+          rectanglesVector[i][(j + 1) % rectanglesVector[i].size()],
+          cv::Scalar(255, 0, 0), 1, 8 );
+      }
+
+      //!< Fill the inside of the rectangle
+      std::set<unsigned int> rectangleOutlineFilledSet;
+      BlobDetection::brushfirePoint(keypoint,
+        &rectangleOutlineFilled, &rectangleOutlineFilledSet);
+
+
+      //!< The final set of points' indices
+      std::set<unsigned int> intermediatePointsSet;
+
+      std::set_difference(rectangleOutlineFilledSet.begin(),
+        rectangleOutlineFilledSet.end(),
+        holeOutlineFilledSet.begin(),
+        holeOutlineFilledSet.end(),
+        std::inserter(intermediatePointsSet, intermediatePointsSet.end()));
+
+      intermediatePointsSetVector->push_back(intermediatePointsSet);
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("createIntermediateHolesPointsSetVector");
+    #endif
+  }
+
+/*
+ *
+ *  void HoleFusion::createCheckerRequiredVectors(
+ *    const HolesConveyor& conveyor,
+ *    const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+ *    const std::vector<int>& rectanglesIndices,
+ *    const cv::Mat& image,
+ *    const int& inflationSize,
+ *    std::vector<cv::Mat>* holesMasksImageVector,
+ *    std::vector<std::set<int> >* holesMasksSetVector,
+ *    std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
+ *    std::vector<int>* inflatedRectanglesIndices,
+ *    std::vector<cv::Mat>* intermediatePointsImageVector,
+ *    std::vector<std::set<int> >* intermediatePointsSetVector)
+ *  {
+ *
+ *  }
+ *
+ */
+
+
+  /**
     @brief Tests the merging operations on artificial holes
     @param[out] dummy [HolesConveyor*] The hole candidates
     @return void
    **/
   void HoleFusion::testDummyHolesMerging(HolesConveyor* dummy)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("testDummyHolesMerging", "processCandidateHoles");
+    #endif
+
     //!< Invalid
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(20, 20), cv::Point(30, 30), 50, 50, 30, 30, dummy);
+      cv::Point2f(20, 20), cv::Point2f(30, 30), 50, 50, 30, 30, dummy);
+
     //!< Invalid
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(80, 80), cv::Point(90, 90), 50, 50, 30, 30, dummy);
+      cv::Point2f(80, 80), cv::Point2f(90, 90), 50, 50, 30, 30, dummy);
 
 
     //!< 0-th assimilator - amalgamator - connector
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(370, 130), cv::Point(372, 132), 80, 80, 76, 76, dummy);
+      cv::Point2f(370.0, 130.0), cv::Point2f(372.0, 132.0), 80, 80, 76, 76,
+      dummy);
 
     //!< 0-th assimilable
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(380, 140), cv::Point(382, 142), 20, 20, 16, 16, dummy);
+      cv::Point2f(380.0, 140.0), cv::Point2f(382.0, 142.0), 20, 20, 16, 16,
+      dummy);
 
     //!< 0-th amalgamatable
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(420, 140), cv::Point(422, 142), 40, 40, 36, 36, dummy);
+      cv::Point2f(420.0, 140.0), cv::Point2f(422.0, 142.0), 40, 40, 36, 36,
+      dummy);
 
     //!< 0-th connectable
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(410, 80), cv::Point(412, 82), 40, 40, 36, 36, dummy);
+      cv::Point2f(510.0, 80.0), cv::Point2f(512.0, 82.0), 40, 40, 36, 36,
+      dummy);
 
 
     //!< 1-st assimilator - amalgamator - connector
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(300, 300), cv::Point(302, 302), 100, 100, 96, 96, dummy);
+      cv::Point2f(300.0, 300.0), cv::Point2f(302.0, 302.0), 100, 100, 96, 96,
+      dummy);
 
     //!< 1-st connectable
     HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(410, 350), cv::Point(412, 352), 50, 50, 46, 46, dummy);
-
+      cv::Point2f(410.0, 350.0), cv::Point2f(412.0, 352.0), 50, 50, 46, 46,
+      dummy);
 
 
     HolesConveyorUtils::shuffle(dummy);
+
+    ROS_ERROR("keypoints before: %d ", HolesConveyorUtils::size(*dummy));
 
     std::vector<std::string> msgs;
     Visualization::showHoles("before", interpolatedDepthImage_, *dummy,
@@ -1409,8 +1791,13 @@ namespace pandora_vision
       applyMergeOperation(dummy, i);
     }
 
+    ROS_ERROR("keypoints after: %d ", HolesConveyorUtils::size(*dummy));
     Visualization::showHoles("after", interpolatedDepthImage_, *dummy,
       1, msgs);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("testDummyHolesMerging");
+    #endif
   }
 
 } // namespace pandora_vision

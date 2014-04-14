@@ -60,14 +60,17 @@ namespace pandora_vision
     public:
 
       /**
-        @brief Checks for valid holes just by depth difference between the c
-        enter of the blob and the edges of the bounding box
+        @brief Checks for valid holes just by the depth difference between
+        the keypoint of the blob and the edges of its bounding box
         @param[in] depthImage [const cv::Mat&] The depth image
         @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in][out] msgs [std::vector<std::string>*] Messages for debug
-        reasons
-        @param[in] inflationSize [const in&t] The number of pixels by which the
-        bounding rectange will be inflated
+        @param[in] rectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&]
+        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+        is used to identify a hole's corresponding rectangle. Used primarily
+        because the rectangles used are inflated rectangles; not all holes
+        possess an inflated rectangle
+        @param[out] msgs [std::vector<std::string>*] Messages for debug reasons
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
         with which the associated candidate hole is associated.
@@ -79,14 +82,19 @@ namespace pandora_vision
       static void checkHolesDepthDiff(
         const cv::Mat& depthImage,
         const HolesConveyor& conveyor,
+        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+        const std::vector<int>& rectanglesIndices,
         std::vector<std::string>* msgs,
-        const int& inflationSize,
         std::vector<float>* probabilitiesVector);
 
       /**
         @brief Checks for valid holes by area / depth comparison
-        @param[in] depthImage [const cv::Mat&] The depth image
         @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] depthImage [const cv::Mat&] The depth image
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points; each point is internal to its
+        respective hole
         @param[in][out] msgs [std::vector<std::string>*] Messages for debug
         reasons
         @param[out] probabilitiesVector [std::vector<float>*] A vector
@@ -98,77 +106,97 @@ namespace pandora_vision
         @return void
        **/
       static void checkHolesDepthArea(
-        const cv::Mat& depthImage,
         const HolesConveyor& conveyor,
+        const cv::Mat& depthImage,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
         std::vector<std::string>* msgs,
         std::vector<float>* probabilitiesVector);
 
       /**
-        @brief Brushfire from a blobs's outline to its bounding box
-        with an inflation size (inflates the rectangle by inflationSize pixels).
-        If the points between the blob's outline and the inflated rectangle
-        lie on one plane, this blob is a hole. Although all
-        planes are considered valid, the @param probabilitiesVector hint
-        to the validity of the candidate hole through this filter
+        @brief If the intermediate points (points between a hole's outline
+        and its bounding rectangle) for each hole lie on one plane,
+        this hole is considered valid. Although plane constitution alone is
+        considered valid, the @param probabilitiesVector hint to the
+        validity of the candidate hole through this filter
         @param[in] inImage [const cv::Mat&] The input depth image
-        @param[in] initialPointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
-        The original point cloud acquired from the depth sensor
-        @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] inflationsize [const int&] Grow the rectangle by
-        inflationsize as to acquire more points to check for plane existence.
+        @param[in] initialPointCloud
+        [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
+        The point cloud acquired from the depth sensor, interpolated
+        @param[in] intermediatePointsSetVector
+        [const std::vector<std::set<unsigned int> >& ] A vector that holds
+        for each hole a set of points;
+        these points are the points between the hole's outline and its
+        bounding rectangle
+        @param[in] rectanglesIndices [const std::vector<int>&] Because
+        each hole's bounding rectangle may be inflated, and thus not all holes
+        possess a bounding rectangle by this process, in this vector is stored
+        the indices of the holes whose inflated bounding box is inside the
+        image's bounds
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
         with which the associated candidate hole is associated.
         While the returned set may be reduced in size, the size of this vector
         is the same throughout and equal to the number of keypoints found and
         published by the rgb node
-        @param[in][out] msgs [std::vector<std::string>*] Messages for debug
-        reasons
+        @param[out] msgs [std::vector<std::string>*] Messages for
+        debug reasons
         @return void
        **/
-      static void checkHolesBrushfireOutlineToRectangle(
+      static void checkHolesOutlineToRectanglePlaneConstitution(
         const cv::Mat& inImage,
         const PointCloudXYZPtr& initialPointCloud,
-        const HolesConveyor& conveyor,
-        const int& inflationSize,
+        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
+        const std::vector<int>& rectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
 
       /**
-        @brief  Given the bounding box of a blob, inflate it.
+        @brief  Given the bounding box of a blob,
         All the points that lie on the (edges of the) rectangle should
         also lie on exactly one plane for the blob to be a hole. Although all
         planes are considered valid, the @param probabilitiesVector hint
         to the validity of the candidate hole through this filter
         @param[in] inImage [const cv::Mat&] The input depth image
-        @param[in] initialPointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
-        The original point cloud,  uninterpolated, undistorted.
-        @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] inflationSize [cosnt int&] grow the rectangle by inflationSize
-        as to acquire more points to check for plane existence.
+        @param[in] initialPointCloud
+        [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
+        The point cloud acquired from the depth sensor, interpolated
+        @param[in] rectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of each rectangle that corresponds to a specific hole
+        inside the coveyor
+        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+        is used to identify a hole's corresponding rectangle. Used primarily
+        because the rectangles used are inflated rectangles; not all holes
+        possess an inflated rectangle
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
         with which the associated candidate hole is associated.
         While the returned set may be reduced in size, the size of this vector
         is the same throughout and equal to the number of keypoints found and
         published by the rgb node
-        @param[in][out] msgs [std::vector<std::string>*] Messages for debug
-        reasons
+        @param[out] msgs [std::vector<std::string>*] Messages for
+        debug reasons
         @return void
        **/
-      static void checkHolesRectangleOutline(
+      static void checkHolesRectangleEdgesPlaneConstitution(
         const cv::Mat& inImage,
         const PointCloudXYZPtr& initialPointCloud,
-        const HolesConveyor& conveyor,
-        const int& inflationSize,
+        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+        const std::vector<int>& rectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
 
       /**
-        @brief Checks the homogenity of the gradient of depth in an area
-        enclosed by @param inOutlines
-        @param[in] interpolatedDepthImage [const cv::Mat&] The input depth image
+        @brief Checks the homogeneity of the gradient of an interpolated
+        depth image in areas denoted by the points inside the
+        holesMasksSetVector vector
         @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] interpolatedDepthImage [const cv::Mat&] The input
+        interpolated depth image
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points; each point is internal to its
+        respective hole
         @param[out] msgs [std::vector<std::string>*] Debug messages
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
@@ -178,9 +206,10 @@ namespace pandora_vision
         published by the rgb node
         @return void
        **/
-      static void checkHolesDepthHomogenity(
-        const cv::Mat& interpolatedDepthImage,
+      static void checkHolesDepthHomogeneity(
         const HolesConveyor& conveyor,
+        const cv::Mat& interpolatedDepthImage,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
         std::vector<std::string>* msgs,
         std::vector<float>* probabilitiesVector);
 
@@ -188,56 +217,93 @@ namespace pandora_vision
         @brief Apply a cascade-like hole checker. Each filter applied is
         attached to an order which relates to the sequence of the overall
         filter execution.
-        @param[in] interpolatedDepthImage [const cv::Mat&] The denoised depth
-        image
-        @param[in] initialPointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr]
-        The undistorted input point cloud
-        @param[in] conveyor [const HolesConveyor&] A struct that
-        contains the final valid holes
+        @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] interpolatedDepthImage [const cv::Mat&] The denoised
+        depth image
+        @param[in] interpolatedPointCloud
+        [const pcl::PointCloud<pcl::PointXYZ>::Ptr]
+        The interpolated input point cloud
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points's indices;
+        each point is internal to its respective hole
+        @param[in] rectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of each rectangle that corresponds to a specific hole
+        inside the coveyor
+        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+        is used to identify a hole's corresponding rectangle. Used primarily
+        because the rectangles used are inflated rectangles; not all holes
+        possess an inflated rectangle
+        @param[in] intermediatePointsSetVector
+        [const std::vector<std::set<unsigned int> >& ] A vector that holds
+        for each hole a set of points;
+        these points are the points between the hole's outline and its
+        bounding rectangle
         @param[out] probabilitiesVector [std::vector<std::vector<float> >*]
         A 2D vector of probabilities hinting to the certainty degree with
         which each candidate hole is associated for every
         active filter executed.
-        While the returned set may be reduced in size,
-        the size of this vector is the same throughout and equal to the number
-        of active filters by the number of keypoints found and
-        published by the rgb node.
+        While the returned set may be reduced in size, the size of this vector
+        is the same throughout and equal to the number of active filters by
+        the number of keypoints found and published by the rgb node.
         @return void
        **/
       static void checkHoles(
-        const cv::Mat& interpolatedDepthImage,
-        const pcl::PointCloud<pcl::PointXYZ>::Ptr& initialPointCloud,
         const HolesConveyor& conveyor,
+        const cv::Mat& interpolatedDepthImage,
+        const pcl::PointCloud<pcl::PointXYZ>::Ptr& interpolatedPointCloud,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
         std::vector<std::vector<float> >* probabilitiesVector);
 
       /**
-        @brief Apply a cascade-like hole checker. Each filter applied
-        is attached to an order which relates to the sequence of the overall
-        filter execution.
-        @param[in] method [const unsigned int&] The filter identifier to execute
+        @brief Apply a cascade-like hole checker. Each filter applied is
+        attached to an order which relates to the sequence of the
+        overall filter execution.
+        @param[in] method [const int&] The filter identifier to execute
         @param[in] img [const cv::Mat&] The input depth image
         @param[in] pointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr&] The
         original point cloud that corresponds to the input depth image
-        @param[in] conveyor [const HolesConveyor&] The structure
-        that holds the final holes' data
-        @param[in] inflationSize [const int&] The amount of pixels by which each
-        bounding box is inflated
+        @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points's indices;
+        each point is internal to its respective hole
+        @param[in] rectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of each rectangle that corresponds to a specific hole
+        inside the coveyor
+        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+        is used to identify a hole's corresponding rectangle. Used primarily
+        because the rectangles used are inflated rectangles; not all holes
+        possess an inflated rectangle
+        @param[in] intermediatePointsSetVector
+        [const std::vector<std::set<unsigned int> >&] A vector that holds
+        for each hole a set of points;
+        these points are the points between the hole's outline and its
+        bounding rectangle
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities hinting to the certainty degree with which each
         candidate hole is associated. While the returned set may be reduced in
         size, the size of this vector is the same throughout and equal to the
         number of keypoints found and published by the rgb node.
-        @param[in][out] imgs [std::vector<cv::Mat>*] A vector of images which
+        @param[out] imgs [std::vector<cv::Mat>*] A vector of images which
         shows the holes that are considered valid by each filter
-        @param[in][out] msgs [std::vector<std::string>*] Debug messages
+        @param[out] msgs [std::vector<std::string>*] Debug messages
         @return void
        **/
       static void applyFilter(
-        const unsigned int& method,
+        const int& method,
         const cv::Mat& img,
         const PointCloudXYZPtr& pointCloud,
         const HolesConveyor& conveyor,
-        const int& inflationSize,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
         std::vector<float>* probabilitiesVector,
         std::vector<cv::Mat>* imgs,
         std::vector<std::string>* msgs);

@@ -78,9 +78,9 @@ namespace pandora_vision
     const sensor_msgs::PointCloud2ConstPtr& pointCloudMessage,
     const int& encoding)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("convertPointCloudMessageToImage");
-#endif
+    #endif
 
     PointCloud pointCloud;
 
@@ -136,9 +136,9 @@ namespace pandora_vision
       }
     }
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("convertPointCloudMessageToImage");
-#endif
+    #endif
 
     return image;
   }
@@ -158,9 +158,9 @@ namespace pandora_vision
     const PointCloudXYZPtr& pointCloudXYZPtr,
     sensor_msgs::PointCloud2* pointCloudMsg)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("convertPointCloudXYZToMessage");
-#endif
+    #endif
 
     PointCloud pointCloud;
 
@@ -171,9 +171,9 @@ namespace pandora_vision
     //!< Pack the point cloud to a ROS message
     pcl_conversions::fromPCL(pointCloud, *pointCloudMsg);
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("convertPointCloudXYZToMessage");
-#endif
+    #endif
   }
 
 
@@ -199,9 +199,9 @@ namespace pandora_vision
     const std::string& encoding,
     const sensor_msgs::Image& msg)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("createCandidateHolesVectorMessage");
-#endif
+    #endif
 
     //!< Fill the vision_communications::CandidateHolesVectorMsg's
     //!< candidateHoles vector
@@ -219,9 +219,9 @@ namespace pandora_vision
     //!< header
     candidateHolesVectorMsg->header = msg.header;
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("createCandidateHolesVectorMessage");
-#endif
+    #endif
   }
 
 
@@ -246,9 +246,9 @@ namespace pandora_vision
     vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
     const sensor_msgs::Image& msg)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("createCandidateHolesVectorMessage");
-#endif
+    #endif
 
     //!< Fill the vision_communications::CandidateHolesVectorMsg's
     //!< candidateHoles vector
@@ -265,9 +265,9 @@ namespace pandora_vision
     //!< header
     candidateHolesVectorMsg->header = msg.header;
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("createCandidateHolesMessage");
-#endif
+    #endif
   }
 
 
@@ -288,9 +288,9 @@ namespace pandora_vision
     const HolesConveyor& conveyor,
     std::vector<vision_communications::CandidateHoleMsg>* candidateHolesVector)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("createCandidateHolesVector");
-#endif
+    #endif
 
     //!< Fill the vision_communications::CandidateHolesVectorMsg's
     //!< candidateHoles vector
@@ -320,9 +320,9 @@ namespace pandora_vision
       candidateHolesVector->push_back(holeMsg);
     }
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("createCandidateHolesVector");
-#endif
+    #endif
   }
 
 
@@ -339,9 +339,9 @@ namespace pandora_vision
     const sensor_msgs::PointCloud2ConstPtr& msg,
     PointCloudXYZPtr* pointCloudXYZ)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("extractPointCloudXYZFromMessage");
-#endif
+    #endif
 
     PointCloud pointCloud;
 
@@ -353,9 +353,9 @@ namespace pandora_vision
     //!< aka PointCloudXYZPtr
     pcl::fromPCLPointCloud2 (pointCloud, *(*pointCloudXYZ));
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("extractPointCloudXYZFromMessage");
-#endif
+    #endif
   }
 
 
@@ -373,9 +373,9 @@ namespace pandora_vision
     cv::Mat* image,
     const std::string& encoding)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("extractImageFromMessage");
-#endif
+    #endif
 
     cv_bridge::CvImagePtr in_msg;
 
@@ -383,9 +383,9 @@ namespace pandora_vision
 
     *image = in_msg->image.clone();
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("extractImageFromMessage");
-#endif
+    #endif
   }
 
 
@@ -403,9 +403,9 @@ namespace pandora_vision
     cv::Mat* image,
     const std::string& encoding)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("extractImageFromMessage");
-#endif
+    #endif
 
     cv_bridge::CvImagePtr in_msg;
 
@@ -413,9 +413,9 @@ namespace pandora_vision
 
     *image = in_msg->image.clone();
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("extractImageFromMessage");
-#endif
+    #endif
   }
 
 
@@ -433,16 +433,16 @@ namespace pandora_vision
     const vision_communications::CandidateHolesVectorMsg& msg,
     cv::Mat* image, const std::string& encoding)
   {
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::start("extractDepthImageFromMessageContainer");
-#endif
+    #endif
 
     sensor_msgs::Image imageMsg = msg.image;
     extractImageFromMessage(imageMsg, image, encoding);
 
-#ifdef DEBUG_TIME
+    #ifdef DEBUG_TIME
     Timer::tick("extractDepthImageFromMessageContainer");
-#endif
+    #endif
   }
 
 } // namespace pandora_vision

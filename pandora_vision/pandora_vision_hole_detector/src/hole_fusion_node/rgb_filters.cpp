@@ -42,22 +42,26 @@ namespace pandora_vision
 
   /**
     @brief Checks for color homogenity in a region where points are
-    constrained inside each @param inOutlines's elements. A candidate hole
-    is considered valid if its H-V histogram has above a certain
-    number of bins occupied.
-    @param[in] inImage [const cv::Mat&] The RGB image in unscaled format
+    constrained inside each hole. A candidate hole is considered valid
+    if its H-V histogram has above a certain number of bins occupied.
     @param[in] conveyor [const HolesConveyor&] The candidate holes
+    @param[in] inImage [const cv::Mat&] The RGB image in unscaled format
+    @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
+    containing the masks needed to produce the histograms of the points
+    inside each hole's outline
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities hinting to the certainty degree which with the
     candidate hole is associated. While the returned set may be reduced in
     size, the size of this vector is the same throughout and equal to the
     number of keypoints found and published by the rgb node
-    @param[in][out] msgs [std::vector<std::string>*] Messages for debug reasons
+    @param[in][out] msgs [std::vector<std::string>*] Messages for
+    debug reasons
     @return void
    **/
   void RgbFilters::checkHolesColorHomogenity(
-    const cv::Mat& inImage,
     const HolesConveyor& conveyor,
+    const cv::Mat& inImage,
+    const std::vector<cv::Mat>& holesMasksImageVector,
     std::vector<float>* probabilitiesVector,
     std::vector<std::string>* msgs)
   {
@@ -81,51 +85,27 @@ namespace pandora_vision
     cv::Mat inImageHSV;
     cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
 
+    //!< Histogram-related parameters
+    int h_bins = 180;
+    int v_bins = 256;
+    int histSize[] = { h_bins, v_bins };
+
+    //!< hue varies from 0 to 179, saturation or value from 0 to 255
+    float h_ranges[] = { 0, 180 };
+    float v_ranges[] = { 0, 256 };
+
+    const float* ranges[] = { h_ranges, v_ranges };
+
+    //!< Use the 0-th and 2-nd channels - H and V
+    int channels[] = { 0, 2 };
+
     for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
     {
-      //!< Create the mask needed for the histogram of the
-      //!< points inside this blobs'outline
-      cv::Mat blobMask = cv::Mat::zeros(inImage.size(), CV_8UC1);
-
-      //!< Draw the points inside the blob
-      for (unsigned int rows = 0; rows < inImage.rows; rows++)
-      {
-        for (unsigned int cols = 0; cols < inImage.cols; cols++)
-        {
-          if (cv::pointPolygonTest(
-              conveyor.outlines[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobMask.at<unsigned char>(rows, cols) = 255;
-          }
-        }
-      }
-      //!< Blob mask is now ready
-
-
-      //!< Histogram-related parameters
-      int h_bins = 180;
-      int v_bins = 256;
-      int histSize[] = { h_bins, v_bins };
-
-      //!< hue varies from 0 to 179, saturation or value from 0 to 255
-      float h_ranges[] = { 0, 180 };
-      float v_ranges[] = { 0, 256 };
-
-      const float* ranges[] = { h_ranges, v_ranges };
-
-      //!< Use the 0-th and 2-nd channels - H and V
-      int channels[] = { 0, 2 };
-
-
       //!< Calculate the blob's histogram
       cv::MatND blobHistogram;
-      cv::calcHist(&inImageHSV, 1, channels, blobMask, blobHistogram,
-        2, histSize, ranges, true, false);
+      cv::calcHist(&inImageHSV, 1, channels, holesMasksImageVector[i],
+        blobHistogram, 2, histSize, ranges, true, false);
 
-      /*
-       *cv::imshow("blobHistogram", blobHistogram);
-       *cv::waitKey(1);
-       */
 
       //!< Break the h_bins X v_bins image into boxes of box_x X box_y
       //!< (vertically by horizontally).
@@ -161,8 +141,9 @@ namespace pandora_vision
         }
       }
 
-      probabilitiesVector->at(i) = static_cast<float> (overallNonZeroBoxes) /
-        (h_bins / box_x * v_bins / box_y);
+      probabilitiesVector->at(i) =
+        static_cast<float> (overallNonZeroBoxes)
+        / (h_bins / box_x * v_bins / box_y);
 
       msgs->push_back(TOSTR(probabilitiesVector->at(i)));
     }
@@ -176,37 +157,42 @@ namespace pandora_vision
 
   /**
     @brief Checks for difference in mean value of luminosity between
-    (1) the pixels in between the blob's bounding box edges and the points
-    outside the blob's outline and
-    (2) the points inside the blob's outline.
-    @param[in] inImage [const cv::Mat&] The RGB image in unscaled format
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inflationSize [cosnt int&] grow the rectangle by
-    inflationSize as to acquire more points to check for plane existence.
+    (1) the pixels in between a hole's bounding box edges and the points
+    outside the hole's outline and
+    (2) the points inside the hole's outline.
+    @param[in] conveyor [const blobHolesConveyor&] The candidate holes
+    @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
+    A vector that holds sets of points's indices;
+    each point is internal to its respective hole
+    @param[in] intermediatePointsSetVector
+    [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
+    hole a set of points' indices; these points are the points between
+    the hole's outline and its bounding rectangle
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities hinting to the certainty degree which with the
     candidate hole is associated. While the returned set may be reduced in
     size, the size of this vector is the same throughout and equal to the
     number of keypoints found and published by the rgb node
-    @param[in][out] msgs [std::vector<std::string>*] Messages for
+    @param[out] msgs [std::vector<std::string>*] Messages for
     debug reasons
     @return void
    **/
   void RgbFilters::checkHolesLuminosityDiff(
-    const cv::Mat& inImage,
     const HolesConveyor& conveyor,
-    const int& inflationSize,
+    const cv::Mat& inImage,
+    const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+    const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
+    const std::vector<int>& rectanglesIndices,
     std::vector<float>* probabilitiesVector,
     std::vector<std::string>* msgs)
   {
     #ifdef DEBUG_TIME
     Timer::start("checkHolesLuminosityDiff", "applyFilter");
     #endif
-
-    //!< Since not all rectangles may make it, store the indices
-    //!< of the original keypoints that correspond to valid inflated rectangles
-    //!< in the validKeyPointsIndices vector
-    std::vector<unsigned int> validKeyPointsIndices;
 
     //!< Scale the inImage in [0, 255] into inImage_ if not already
     cv::Mat inImage_;
@@ -220,110 +206,46 @@ namespace pandora_vision
       inImage.copyTo(inImage_);
     }
 
-    //!< Store the vertices of the inside-of-image-bounds inflated bounding
-    //!< rectangles in the inflatedRectangles vector
-    std::vector<std::vector<cv::Point> > inflatedRectangles;
+    //!< Instead of applying the formula
+    //!< Y = 0.299 * R + 0.587 * G + 0.114 * B to find the luminosity of each
+    //!< pixel, turn inImage into grayscale
+    cv::Mat luminosityImage(inImage.size(), CV_8UC1);
+    cv::cvtColor(inImage, luminosityImage, CV_BGR2GRAY);
 
-    float key_y;
-    float key_x;
-    float vert_y;
-    float vert_x;
-    double theta;
-    double keypointVertDist;
-
-    for (unsigned int i = 0; i < conveyor.rectangles.size(); i++)
-    {
-      std::vector<cv::Point> inflatedVertices;
-      int inflatedVerticesWithinImageLimits = 0;
-
-      for (int j = 0; j < 4; j++)
-      {
-        key_y = conveyor.keyPoints[i].pt.y;
-        key_x = conveyor.keyPoints[i].pt.x;
-
-        vert_y = conveyor.rectangles[i][j].y;
-        vert_x = conveyor.rectangles[i][j].x;
-
-        theta = atan2(key_y - vert_y, key_x - vert_x);
-
-        keypointVertDist = sqrt(pow(key_x -vert_x, 2) + pow(key_y -vert_x, 2));
-
-        //!< check if the inflated vertex has gone out of bounds
-        if (vert_x - inflationSize * cos(theta) < inImage.cols &&
-          vert_x - inflationSize * cos(theta) >= 0 &&
-          vert_y - inflationSize * sin(theta) < inImage.rows &&
-          vert_y - inflationSize * sin(theta) >= 0)
-        {
-          inflatedVerticesWithinImageLimits++;
-        }
-
-        inflatedVertices.push_back(
-          cv::Point(round(vert_x - inflationSize * cos(theta)),
-            round(vert_y - inflationSize * sin(theta))));
-      } //!< end for rectangle's points
-
-      //!< If one or more vertices are out of bounds discard the whole
-      //!< inflated rectangle
-      if (inflatedVerticesWithinImageLimits < 4)
-      {
-        probabilitiesVector->at(i) = 0.0;
-        inflatedVertices.clear();
-        continue;
-      }
-      else
-      {
-        validKeyPointsIndices.push_back(i);
-        inflatedRectangles.push_back(inflatedVertices);
-      }
-    } //!< end for rectangles
-
+    unsigned char* ptr = luminosityImage.ptr();
 
     //!< For each inflated rectangle, calculate the luminosity of
     //!< (1) the points between the blob's outline and the edges of the
     //!< inflated rectangle and
     //!< (2) the points inside the blob's outline
-    for (unsigned int i = 0; i < inflatedRectangles.size(); i++)
+    for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
-      //!< Instead of applying the formula
-      //!< Y = 0.299 * R + 0.587 * G + 0.114 * B to find the luminosity of each
-      //!< pixel, turn inImage_ into grayscale
-      cv::Mat luminosityImage(inImage_.size(), CV_8UC1);
-      cv::cvtColor(inImage_, luminosityImage, CV_BGR2GRAY);
-
-      int boundingBoxLuminosity = 0;
-      int boundingBoxDivisor = 0;
+      //!< The current hole's inside points luminosity sum
       int blobLuminosity = 0;
-      int blobDivisor = 0;
-      for (unsigned int rows = 0; rows < inImage.rows; rows++)
+      for (std::set<unsigned int>::iterator h_it = holesMasksSetVector[i].begin();
+        h_it != holesMasksSetVector[i].end(); h_it++)
       {
-        for (unsigned int cols = 0; cols < inImage.cols; cols++)
-        {
-          //!< Mean outline luminosity test
-          if (cv::pointPolygonTest(
-              conveyor.outlines[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobLuminosity +=
-              (uint8_t)luminosityImage.at<unsigned char>(rows, cols);
-            blobDivisor += 1;
-          }
-          else if (cv::pointPolygonTest(
-              inflatedRectangles[i], cv::Point(cols, rows), false) > 0)
-          {
-            boundingBoxLuminosity +=
-              (uint8_t)luminosityImage.at<unsigned char>(rows, cols);
-            boundingBoxDivisor += 1;
-          }
-        }
+        blobLuminosity += ptr[*h_it];
       }
 
-      //!< Mean luminosity of the points that the inflated rectangle is
-      //!< consisted of, derived from the original bounding box of the blob
-      float meanBoundingBoxLuminosity =
-        static_cast<float> (boundingBoxLuminosity) / boundingBoxDivisor / 255;
+      //!< The current hole's intermediate points luminosity sum
+      int boundingBoxLuminosity = 0;
+      for (std::set<unsigned int>::iterator i_it =
+        intermediatePointsSetVector[i].begin();
+        i_it != intermediatePointsSetVector[i].end(); i_it++)
+      {
+        boundingBoxLuminosity += ptr[*i_it];
+      }
 
-      //!< Mean luminosity of the entire blob
-      float meanBlobLuminosity =
-        static_cast<float> (blobLuminosity) / blobDivisor / 255;
+      //!< Mean luminosity of the inside points of the current hole
+      float meanBlobLuminosity = static_cast<float> (blobLuminosity)
+        / holesMasksSetVector[i].size();
+
+      //!< Mean luminosity of the intermediate points
+      float meanBoundingBoxLuminosity =
+        static_cast<float> (boundingBoxLuminosity)
+        / intermediatePointsSetVector[i].size();
+
 
 
       //!< If the luminosity of the inside of the candidate hole is greater
@@ -331,15 +253,15 @@ namespace pandora_vision
       //!< edges of its bounding box, it surely is not a hole
       if (meanBlobLuminosity > meanBoundingBoxLuminosity)
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) = 0.0;
+        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
       }
       else
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) =
+        probabilitiesVector->at(rectanglesIndices[i]) =
           1 - meanBlobLuminosity / meanBoundingBoxLuminosity;
       }
 
-      msgs->push_back(TOSTR(probabilitiesVector->at(validKeyPointsIndices[i])));
+      msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }
 
     #ifdef DEBUG_TIME
@@ -357,12 +279,19 @@ namespace pandora_vision
     and for major difference between the
     histograms of the bounding box and the points inside the outline of the
     blob.
+    @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The input RGB image in unscaled format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inflationSize [cosnt int&] grow the rectangle by
-    inflationSize as to acquire more points to check for plane existence.
+    @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points inside each hole's outline
+    @param[in] intermediatePointsImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points outside each hole's outline,
+    but inside its bounding rectangle
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities hinting to the certainty degree which with the
     candidate hole is associated. While the returned set may be reduced in
@@ -372,10 +301,12 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesTextureDiff(
+    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const cv::MatND& inHistogram,
-    const HolesConveyor& conveyor,
-    const int& inflationSize,
+    const std::vector<cv::Mat>& holesMasksImageVector,
+    const std::vector<cv::Mat>& intermediatePointsImageVector,
+    const std::vector<int>& rectanglesIndices,
     std::vector<float>* probabilitiesVector,
     std::vector<std::string>* msgs)
   {
@@ -405,130 +336,39 @@ namespace pandora_vision
     cv::Mat inImageHSV;
     cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
 
+    //!< Histogram-related parameters
+    int h_bins = Parameters::number_of_hue_bins;
+    int s_bins = Parameters::number_of_saturation_bins;
+    int histSize[] = { h_bins, s_bins };
 
-    //!< Store the vertices of the inside-of-image-bounds inflated bounding
-    //!< rectangles in the inflatedRectangles vector
-    std::vector<std::vector<cv::Point> > inflatedRectangles;
+    //!< hue varies from 0 to 179, saturation from 0 to 255
+    float h_ranges[] = { 0, 180 };
+    float s_ranges[] = { 0, 256 };
 
-    float key_y;
-    float key_x;
-    float vert_y;
-    float vert_x;
-    double theta;
-    double keypointVertDist;
+    const float* ranges[] = { h_ranges, s_ranges };
 
-    for (unsigned int i = 0; i < conveyor.rectangles.size(); i++)
+    //!< Use the 0-th and 2-nd channels
+    int channels[] = { 0, 2 };
+
+
+    for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
-      std::vector<cv::Point> inflatedVertices;
-      int inflatedVerticesWithinImageLimits = 0;
-
-      for (int j = 0; j < 4; j++)
-      {
-        key_y = conveyor.keyPoints[i].pt.y;
-        key_x = conveyor.keyPoints[i].pt.x;
-
-        vert_y = conveyor.rectangles[i][j].y;
-        vert_x = conveyor.rectangles[i][j].x;
-
-        theta = atan2(key_y - vert_y, key_x - vert_x);
-
-        keypointVertDist = sqrt(pow(key_x -vert_x, 2) + pow(key_y -vert_x, 2));
-
-        //!< check if the inflated vertex has gone out of bounds
-        if (vert_x - inflationSize * cos(theta) < inImage.cols &&
-          vert_x - inflationSize * cos(theta) >= 0 &&
-          vert_y - inflationSize * sin(theta) < inImage.rows &&
-          vert_y - inflationSize * sin(theta) >= 0)
-        {
-          inflatedVerticesWithinImageLimits++;
-        }
-
-        inflatedVertices.push_back(
-          cv::Point(round(vert_x - inflationSize * cos(theta)),
-            round(vert_y - inflationSize * sin(theta))));
-      } //!< end for rectangle's points
-
-      //!< If one or more vertices are out of bounds discard the whole
-      //!< inflated rectangle
-      if (inflatedVerticesWithinImageLimits < 4)
-      {
-        probabilitiesVector->at(i) = 0.0;
-        inflatedVertices.clear();
-        continue;
-      }
-      else
-      {
-        validKeyPointsIndices.push_back(i);
-        inflatedRectangles.push_back(inflatedVertices);
-      }
-    } //!< end for rectangles
-
-
-    //!< For each inflated rectangle, calculate the non-zero masks of
-    //!< (1) the points between the blob's outline and the edges of the
-    //!< inflated rectangle and
-    //!< (2) the points inside the blob's outline
-    for (unsigned int i = 0; i < inflatedRectangles.size(); i++)
-    {
-      //!< Create the masks needed for the histograms of the outline points
-      //!< and the points inside the blobs'outline
-      cv::Mat blobToRectangleMask = cv::Mat::zeros(inImage.size(), CV_8UC1);
-      cv::Mat blobMask = cv::Mat::zeros(inImage.size(), CV_8UC1);
-
-
-      //!< Draw the points inside the blob (blobMask)
-      //!< and the points between the blob the
-      //!< inflated rectangle that corresponds to it (blobToRectangleMask)
-      for (unsigned int rows = 0; rows < inImage.rows; rows++)
-      {
-        for (unsigned int cols = 0; cols < inImage.cols; cols++)
-        {
-          if (cv::pointPolygonTest(
-              conveyor.outlines[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobMask.at<unsigned char>(rows, cols) = 255;
-          }
-          else if(cv::pointPolygonTest(
-              inflatedRectangles[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobToRectangleMask.at<unsigned char>(rows, cols) = 255;
-          }
-        }
-      }
-      //!< Masks are now ready
-
-
-      //!< Histogram-related parameters
-      int h_bins = Parameters::number_of_hue_bins;
-      int s_bins = Parameters::number_of_saturation_bins;
-      int histSize[] = { h_bins, s_bins };
-
-      //!< hue varies from 0 to 179, saturation from 0 to 255
-      float h_ranges[] = { 0, 180 };
-      float s_ranges[] = { 0, 256 };
-
-      const float* ranges[] = { h_ranges, s_ranges };
-
-      //!< Use the 0-th and 2-nd channels
-      int channels[] = { 0, 2 };
-
-
       //!< Produce the histogram for the points in between the blob's outline
       //!< and the inflated rectangle's edges
       cv::MatND blobToRectangleHistogram;
-      cv::calcHist(&inImageHSV, 1, channels, blobToRectangleMask,
+      cv::calcHist(&inImageHSV, 1, channels, intermediatePointsImageVector[i],
         blobToRectangleHistogram, 2, histSize, ranges, true, false);
 
 
       //!< Produce the histogram for the points inside the outline of the blob
       cv::MatND blobHistogram;
-      cv::calcHist(&inImageHSV, 1, channels, blobMask,
+      cv::calcHist(&inImageHSV, 1, channels, holesMasksImageVector[i],
         blobHistogram, 2, histSize, ranges, true, false);
 
 
       //!< Find the correlation between the model histogram and the histogram
       //!< of the inflated rectangle
-      double rectangleToModelCorrelation= cv::compareHist(
+      double rectangleToModelCorrelation = cv::compareHist(
         blobToRectangleHistogram, inHistogram, CV_COMP_CORREL);
 
       //!< Find the correlation between the model histogram and the histogram
@@ -549,15 +389,15 @@ namespace pandora_vision
         Parameters::match_texture_threshold &&
         rectangleToModelCorrelation > blobToModelCorrelation)
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) =
+        probabilitiesVector->at(rectanglesIndices[i]) =
           rectangleToModelCorrelation - blobToModelCorrelation;
       }
       else
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) = 0.0;
+        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
       }
 
-      msgs->push_back(TOSTR(probabilitiesVector->at(validKeyPointsIndices[i])));
+      msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }
 
     #ifdef DEBUG_TIME
@@ -576,12 +416,21 @@ namespace pandora_vision
     and the bounding box's edges to have a high probability
     in the back project image, and for the points inside the candidate
     hole's outline to have a low probability in the back project image
+    @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The input RGB image in unscaled format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inflationSize [cosnt int&] grow the rectangle by
-    inflationSize as to acquire more points to check for plane existence.
+    @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
+    A vector that holds sets of points; each point is internal to its
+    respective hole
+    @param[in] intermediatePointsSetVector
+    [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
+    hole a set of points' indices; these points are the points between
+    the hole's outline and its bounding rectangle
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities hinting to the certainty degree which with the
     candidate hole is associated. While the returned set may be reduced in
@@ -591,21 +440,18 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesTextureBackProject(
+    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const cv::MatND& inHistogram,
-    const HolesConveyor& conveyor,
-    const int& inflationSize,
+    const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+    const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
+    const std::vector<int>& rectanglesIndices,
     std::vector<float>* probabilitiesVector,
     std::vector<std::string>* msgs)
   {
     #ifdef DEBUG_TIME
     Timer::start("checkHolesTextureBackProject", "applyFilter");
     #endif
-
-    //!< Since not all rectangles may make it, store the indices
-    //!< of the original keypoints that correspond to valid inflated rectangles
-    //!< in the validKeyPointsIndices vector
-    std::vector<unsigned int> validKeyPointsIndices;
 
     //!< Scale the inImage in [0, 255] into inImage_ if not already
     cv::Mat inImage_;
@@ -642,107 +488,42 @@ namespace pandora_vision
       ranges, 1, true);
 
     #ifdef DEBUG_SHOW
-      //Visualization::show("backProject", backProject, 1);
+    //Visualization::show("backProject", backProject, 1);
     #endif
 
-    //!< Store the vertices of the inside-of-image-bounds inflated bounding
-    //!< rectangles in the inflatedRectangles vector
-    std::vector<std::vector<cv::Point> > inflatedRectangles;
-
-    float key_y;
-    float key_x;
-    float vert_y;
-    float vert_x;
-    double theta;
-    double keypointVertDist;
-
-    for (unsigned int i = 0; i < conveyor.rectangles.size(); i++)
-    {
-      std::vector<cv::Point> inflatedVertices;
-      int inflatedVerticesWithinImageLimits = 0;
-
-      for (int j = 0; j < 4; j++)
-      {
-        key_y = conveyor.keyPoints[i].pt.y;
-        key_x = conveyor.keyPoints[i].pt.x;
-
-        vert_y = conveyor.rectangles[i][j].y;
-        vert_x = conveyor.rectangles[i][j].x;
-
-        theta = atan2(key_y - vert_y, key_x - vert_x);
-
-        keypointVertDist = sqrt(pow(key_x -vert_x, 2) + pow(key_y -vert_x, 2));
-
-        //!< check if the inflated vertex has gone out of bounds
-        if (vert_x - inflationSize * cos(theta) < inImage.cols &&
-          vert_x - inflationSize * cos(theta) >= 0 &&
-          vert_y - inflationSize * sin(theta) < inImage.rows &&
-          vert_y - inflationSize * sin(theta) >= 0)
-        {
-          inflatedVerticesWithinImageLimits++;
-        }
-
-        inflatedVertices.push_back(
-          cv::Point(round(vert_x - inflationSize * cos(theta)),
-            round(vert_y - inflationSize * sin(theta))));
-      } //!< end for rectangle's points
-
-      //!< If one or more vertices are out of bounds discard the whole
-      //!< inflated rectangle
-      if (inflatedVerticesWithinImageLimits < 4)
-      {
-        probabilitiesVector->at(i) = 0.0;
-        inflatedVertices.clear();
-        continue;
-      }
-      else
-      {
-        validKeyPointsIndices.push_back(i);
-        inflatedRectangles.push_back(inflatedVertices);
-      }
-    } //!< end for rectangles
-
+    unsigned char* ptr = backProject.ptr();
 
     //!< For each inflated rectangle, calculate the probabilities of
     //!< (1) the points between the blob's outline and the edges of the
     //!< inflated rectangle and
     //!< (2) the points inside the blob's outline
     //!< based on the backProjection cv::MatND
-    for (unsigned int i = 0; i < inflatedRectangles.size(); i++)
+    for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
-      float blobToRectangleSum  = 0;
-      int blobToRectanglePoints  = 0;
       float blobSum = 0;
-      int blobPoints = 0;
-      for (unsigned int rows = 0; rows < inImage.rows; rows++)
+      for (std::set<unsigned int>::iterator h_it = holesMasksSetVector[i].begin();
+        h_it != holesMasksSetVector[i].end(); h_it++)
       {
-        for (unsigned int cols = 0; cols < inImage.cols; cols++)
-        {
-          if (cv::pointPolygonTest(
-              conveyor.outlines[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobSum +=
-              (uint8_t)backProject.at<unsigned char>(rows, cols);
-            blobPoints++;
-          }
-          else if (cv::pointPolygonTest(
-              inflatedRectangles[i], cv::Point(cols, rows), false) > 0)
-          {
-            blobToRectangleSum +=
-              (uint8_t)backProject.at<unsigned char>(rows, cols);
-            blobToRectanglePoints++;
-          }
-        }
+        blobSum += ptr[*h_it];
+      }
+
+      float blobToRectangleSum = 0;
+      for (std::set<unsigned int>::iterator i_it =
+        intermediatePointsSetVector[i].begin();
+        i_it != intermediatePointsSetVector[i].end(); i_it++)
+      {
+        blobToRectangleSum += ptr[*i_it];
       }
 
       //!< The average probability of the points consisting the inflated
       //!< rectangle matching the inHistogram
       float rectangleMatchProbability =
-        blobToRectangleSum / blobToRectanglePoints / 255;
+        blobToRectangleSum / holesMasksSetVector[i].size() / 255;
 
       //!< The average probability of the points inside the blob's outline
       //!< matching the inHistogram
-      float blobMatchProbability = blobSum / blobPoints / 255;
+      float blobMatchProbability =
+        blobSum / intermediatePointsSetVector[i].size() / 255;
 
       //!< This blob is considered valid, with a non zero validity probability,
       //!< if the points consisting the inflated rectangle have a greater
@@ -751,15 +532,15 @@ namespace pandora_vision
       //!< inside the blob's outline
       if (rectangleMatchProbability > blobMatchProbability)
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) =
+        probabilitiesVector->at(rectanglesIndices[i]) =
           rectangleMatchProbability - blobMatchProbability;
       }
       else
       {
-        probabilitiesVector->at(validKeyPointsIndices[i]) = 0.0;
+        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
       }
 
-      msgs->push_back(TOSTR(probabilitiesVector->at(validKeyPointsIndices[i])));
+      msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }
 
     #ifdef DEBUG_TIME
@@ -773,9 +554,27 @@ namespace pandora_vision
     @brief Apply a cascade-like hole checker. Each filter applied is
     attached to an order which relates to the sequence of the overall
     filter execution.
-    @param[in] rgbImage [const cv::Mat&] The input rgb image
     @param[in] conveyor [const HolesConveyor&] A struct that
     contains the final valid holes
+    @param[in] rgbImage [const cv::Mat&] The input rgb image
+    @param[in] inHistogram [const cv::MatND&]
+    The model histogram's H and S component
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
+    @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points inside each hole's outline
+    @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
+    A vector that holds sets of points's indices;
+    each point is internal to its respective hole
+    @param[in] intermediatePointsImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points outside each hole's outline,
+    but inside its bounding rectangle
+    @param[in] intermediatePointsSetVector
+    [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
+    hole a set of points' indices; these points are the points between
+    the hole's outline and its bounding rectangle
     @param[out] probabilitiesVector [std::vector<std::vector<float> >*]
     A 2D vector of probabilities hinting to the certainty degree with
     which each candidate hole is associated for every
@@ -787,9 +586,14 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHoles(
+    const HolesConveyor& conveyor,
     const cv::Mat& rgbImage,
     const cv::MatND& inHistogram,
-    const HolesConveyor& conveyor,
+    const std::vector<int>& rectanglesIndices,
+    const std::vector<cv::Mat>& holesMasksImageVector,
+    const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+    const std::vector<cv::Mat>& intermediatePointsImageVector,
+    const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
     std::vector<std::vector<float> >* probabilitiesVector)
   {
     #ifdef DEBUG_TIME
@@ -801,9 +605,9 @@ namespace pandora_vision
 
     std::map<int, int> filtersOrder;
 
-    if (Parameters::run_checker_color_homogenity > 0)
+    if (Parameters::run_checker_color_homogeneity > 0)
     {
-      filtersOrder[Parameters::run_checker_color_homogenity ] = 1;
+      filtersOrder[Parameters::run_checker_color_homogeneity ] = 1;
     }
     if (Parameters::run_checker_luminosity_diff> 0)
     {
@@ -829,8 +633,12 @@ namespace pandora_vision
         o_it->second,
         rgbImage,
         conveyor,
-        Parameters::rectangle_inflation_size,
         inHistogram,
+        rectanglesIndices,
+        holesMasksImageVector,
+        holesMasksSetVector,
+        intermediatePointsImageVector,
+        intermediatePointsSetVector,
         &probabilitiesVector->at(counter),
         &imgs,
         &msgs);
@@ -855,12 +663,28 @@ namespace pandora_vision
   /**
     @brief Apply a cascade-like hole checker. Each filter applied is attached
     to an order which relates to the sequence of the overall filter execution.
-    @param[in] method [const unsigned int&] The filter identifier to execute
+    @param[in] method [const int&] The filter identifier to execute
     @param[in] img [const cv::Mat&] The input rgb image
     @param[in] conveyor [const HolesConveyor&] The structure that
     holds the final holes' data
-    @param[in] inflationSize [const int&] The amount of pixels by which each
-    bounding box is inflated
+    @param[in] inHistogram [const cv::MatND&]
+    The model histogram's H and S component
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
+    @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points inside each hole's outline
+    @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
+    A vector that holds sets of points's indices;
+    each point is internal to its respective hole
+    @param[in] intermediatePointsImageVector [const std::vector<cv::Mat>&]
+    A vector containing masks of the points outside each hole's outline,
+    but inside its bounding rectangle
+    @param[in] intermediatePointsSetVector
+    [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
+    hole a set of points' indices; these points are the points between
+    the hole's outline and its bounding rectangle
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities hinting to the certainty degree with which each
     candidate hole is associated. While the returned set may be reduced in
@@ -872,11 +696,15 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::applyFilter(
-    const unsigned int& method,
+    const int& method,
     const cv::Mat& img,
     const HolesConveyor& conveyor,
-    const int& inflationSize,
     const cv::MatND& inHistogram,
+    const std::vector<int>& rectanglesIndices,
+    const std::vector<cv::Mat>& holesMasksImageVector,
+    const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+    const std::vector<cv::Mat>& intermediatePointsImageVector,
+    const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
     std::vector<float>* probabilitiesVector,
     std::vector<cv::Mat>* imgs,
     std::vector<std::string>* msgs)
@@ -899,10 +727,12 @@ namespace pandora_vision
       case 1 :
         {
           checkHolesColorHomogenity(
-            img,
             conveyor,
+            img,
+            holesMasksImageVector,
             probabilitiesVector,
             &msgs_);
+
           windowMsg = "Filter: Color homogenity";
           break;
         }
@@ -912,11 +742,14 @@ namespace pandora_vision
       case 2 :
         {
           checkHolesLuminosityDiff(
-            img,
             conveyor,
-            inflationSize,
+            img,
+            holesMasksSetVector,
+            intermediatePointsSetVector,
+            rectanglesIndices,
             probabilitiesVector,
             &msgs_);
+
           windowMsg = "Filter: Luminosity difference";
           break;
         }
@@ -924,12 +757,15 @@ namespace pandora_vision
       case 3 :
         {
           checkHolesTextureDiff(
+            conveyor,
             img,
             inHistogram,
-            conveyor,
-            inflationSize,
+            holesMasksImageVector,
+            intermediatePointsImageVector,
+            rectanglesIndices,
             probabilitiesVector,
             &msgs_);
+
           windowMsg = "Filter: Texture difference";
           break;
         }
@@ -937,12 +773,15 @@ namespace pandora_vision
       case 4 :
         {
           checkHolesTextureBackProject(
+            conveyor,
             img,
             inHistogram,
-            conveyor,
-            inflationSize,
+            holesMasksSetVector,
+            intermediatePointsSetVector,
+            rectanglesIndices,
             probabilitiesVector,
             &msgs_);
+
           windowMsg = "Filter: Texture back project";
           break;
         }

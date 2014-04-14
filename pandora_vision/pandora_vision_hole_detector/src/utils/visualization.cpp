@@ -45,7 +45,7 @@ namespace pandora_vision
     @param[in] imgs [const std::vector<cv::Mat>&] The images to be shown
     @param[in] titles [const std::vector<std::string>&] The titles for each
     image
-    @param[in] maxSize [const unsigned int&] The maximum size of the window
+    @param[in] maxSize [const int&] The maximum size of the window
     @param[in] ms [const int&] How many seconds the showing lasts
     @return void
    **/
@@ -53,7 +53,7 @@ namespace pandora_vision
     const std::string& title,
     const std::vector<cv::Mat>& imgs,
     const std::vector<std::string>& titles,
-    const unsigned int& maxSize,
+    const int& maxSize,
     const int& ms)
   {
     if(imgs.size() == 0)
@@ -110,16 +110,16 @@ namespace pandora_vision
     for(unsigned int i = 1 ; i <= rows - 1 ; i++)
     {
       cv::line(big,
-        cv::Point(0 , i * imgs[0].rows - 1),
-        cv::Point(cols * imgs[0].cols - 1, i * imgs[0].rows - 1),
+        cv::Point2f(0 , i * imgs[0].rows - 1),
+        cv::Point2f(cols * imgs[0].cols - 1, i * imgs[0].rows - 1),
         CV_RGB(255, 255, 255), 2, 8);
     }
 
     for(unsigned int i = 1 ; i <= cols - 1 ; i++)
     {
       cv::line(big,
-        cv::Point(i * imgs[0].cols - 1 , 0),
-        cv::Point(i * imgs[0].cols - 1, rows * imgs[0].rows),
+        cv::Point2f(i * imgs[0].cols - 1 , 0),
+        cv::Point2f(i * imgs[0].cols - 1, rows * imgs[0].rows),
         CV_RGB(255, 255, 255), 2, 8);
     }
 
@@ -202,7 +202,7 @@ namespace pandora_vision
     The bounding boxes' vertices
     @param[in] msgs [const std::vector<std::string>&] Message to show to
     each keypoint
-    @param[in] outlineVector [const std::vector<std::vector<cv::Point> >&] The
+    @param[in] outlineVector [const std::vector<std::vector<cv::Point2f> >&] The
     valid holes' outlines
     @param[in] hz [const float&] If positive holds the Hz
     @return void
@@ -214,7 +214,7 @@ namespace pandora_vision
     const std::vector<cv::KeyPoint>& keypoints,
     const std::vector<std::vector<cv::Point2f> >& bounding_boxes,
     const std::vector<std::string>& msgs,
-    const std::vector<std::vector<cv::Point> >& outlineVector,
+    const std::vector<std::vector<cv::Point2f> >& outlineVector,
     const float& hz)
   {
     cv::Mat img;

@@ -99,11 +99,11 @@ namespace pandora_vision
   int Parameters::run_checker_depth_area = 3;
   int Parameters::run_checker_brushfire_outline_to_rectangle = 4;
   int Parameters::run_checker_outline_of_rectangle = 2;
-  int Parameters::run_checker_depth_homogenity = 5;
+  int Parameters::run_checker_depth_homogeneity = 5;
   int Parameters::rectangle_inflation_size = 20;
   float Parameters::depth_difference = 0.4;
 
-  int Parameters::run_checker_color_homogenity = 1;
+  int Parameters::run_checker_color_homogeneity = 1;
   int Parameters::run_checker_luminosity_diff = 2;
   int Parameters::run_checker_texture_diff = 3;
   int Parameters::run_checker_texture_backproject = 4;
@@ -142,7 +142,7 @@ namespace pandora_vision
   //!< The threshold for texture matching
   float Parameters::match_texture_threshold = 0.5;
 
-  //!<Color homogenity parameters
+  //!<Color homogeneity parameters
   int Parameters::num_bins_threshold = 10;
   int Parameters::non_zero_points_in_box_blob_histogram = 0;
 

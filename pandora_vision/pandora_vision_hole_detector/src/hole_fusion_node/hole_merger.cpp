@@ -35,7 +35,7 @@
  * Authors: Alexandros Filotheou, Manos Tsardoulias
  *********************************************************************/
 
-#include "hole_fusion_node/generic_filters.h"
+#include "hole_fusion_node/hole_merger.h"
 
 namespace pandora_vision
 {
@@ -48,7 +48,7 @@ namespace pandora_vision
     The candidate holes conveyor originated from the rgb node
     @return void
    **/
-  void GenericFilters::assimilateBilaterally(
+  void HoleMerger::assimilateBilaterally(
     HolesConveyor* depthHolesConveyor,
     HolesConveyor* rgbHolesConveyor)
   {
@@ -80,7 +80,7 @@ namespace pandora_vision
     by the assimilator
     @return void
    **/
-  void GenericFilters::assimilateUnilaterally(
+  void HoleMerger::assimilateUnilaterally(
     const HolesConveyor& assimilator,
     HolesConveyor* assimilable)
   {
@@ -118,7 +118,7 @@ namespace pandora_vision
     @return [bool] True if all of the outline points of the assimilable
     hole are inside the outline of the assimilator
    **/
-  bool GenericFilters::isCapableOfAssimilating(
+  bool HoleMerger::isCapableOfAssimilating(
     const int& assimilatorId,
     const HolesConveyor& assimilator,
     const int& assimilableId,
@@ -130,14 +130,12 @@ namespace pandora_vision
 
     //!< Are all the outline points of assimilable inside the
     //!< assimilator's outline?
-    bool allAssimilableOutlinePointsInAssimilator = true;
     for (int av = 0; av < assimilable.outlines[assimilableId].size(); av++)
     {
       if (cv::pointPolygonTest(assimilator.outlines[assimilatorId],
           assimilable.outlines[assimilableId][av], false) < 0)
       {
-        allAssimilableOutlinePointsInAssimilator = false;
-        break;
+        return false;
       }
     }
 
@@ -145,7 +143,7 @@ namespace pandora_vision
     Timer::tick("isCapableOfAssimilating");
     #endif
 
-    return allAssimilableOutlinePointsInAssimilator;
+    return true;
   }
 
 
@@ -162,7 +160,7 @@ namespace pandora_vision
     will be deleted
     @return void
    **/
-  void GenericFilters::assimilateOnce(const int& keyPointId,
+  void HoleMerger::assimilateOnce(const int& keyPointId,
     HolesConveyor* assimilable)
   {
     #ifdef DEBUG_TIME
@@ -210,7 +208,7 @@ namespace pandora_vision
     by criterion of distance
     @return void
    **/
-  void GenericFilters::connectUnilaterally(HolesConveyor* connector,
+  void HoleMerger::connectUnilaterally(HolesConveyor* connector,
     HolesConveyor* connectable, const PointCloudXYZPtr& pointCloudXYZ)
   {
     //!< Validate the connectable's holes against the connector's ones
@@ -255,7 +253,7 @@ namespace pandora_vision
     @return [bool] True if the connectable is capable of being connected
     with the connector
    **/
-  bool GenericFilters::isCapableOfConnecting(const int& connectorId,
+  bool HoleMerger::isCapableOfConnecting(const int& connectorId,
     const HolesConveyor& connector,
     const int& connectableId,
     const HolesConveyor& connectable,
@@ -265,22 +263,21 @@ namespace pandora_vision
     Timer::start("isCapableOfConnecting", "applyMergeOperation");
     #endif
 
-    //!< Are all the connectable's outline points outside
-    //!< the connector's bounding box?
-    int numconnectableOutlinePointsInconnector = 0;
+    for (int av = 0; av < connectable.outlines[connectableId].size(); av++)
+    {
+      if (cv::pointPolygonTest(connector.outlines[connectorId],
+          connectable.outlines[connectableId][av], false) >= 0)
+      {
+        return false;
+      }
+    }
+
 
     //!< The real min distance (in meters) between two points of the
     //!< connector's and connectable's outlines
     double minOutlinesDistance = 10000.0;
-
     for (int av = 0; av < connectable.outlines[connectableId].size(); av++)
     {
-      if (cv::pointPolygonTest(connector.outlines[connectorId],
-          connectable.outlines[connectableId][av], false) > 0)
-      {
-        numconnectableOutlinePointsInconnector++;
-      }
-
       //!< The connectable's current outline point x,y,z coordinates
       //!< measured by the depth sensor
       float connectableOutlinePointX = pointCloudXYZ->points[
@@ -337,8 +334,7 @@ namespace pandora_vision
     //!< outlines is greater than a distance thrshold,
     //!< this connectable is not a candidate to be connected with
     //!< the connector
-    if (numconnectableOutlinePointsInconnector != 0 ||
-      minOutlinesDistance > Parameters::connect_holes_min_distance)
+    if (minOutlinesDistance > Parameters::connect_holes_min_distance)
     {
       return false;
     }
@@ -414,7 +410,7 @@ namespace pandora_vision
     will be deleted
     @return void
    **/
-  void GenericFilters::connectOnce(const int& connectorId,
+  void HoleMerger::connectOnce(const int& connectorId,
     HolesConveyor* connector,
     const int& connectableId,
     HolesConveyor* connectable)
@@ -458,14 +454,18 @@ namespace pandora_vision
     connector->rectangles.at(connectorId) = substituteVerticesVector;
 
 
-    //!< The overall candidate hole's keypoint
-    connector->keyPoints[connectorId].pt.x =
-      (connector->keyPoints[connectorId].pt.x
-       + connectable->keyPoints[connectableId].pt.x) / 2;
+    //!< Set the overall candidate hole's keypoint to the center of the
+    //!< newly created bounding rectangle
+    float x = 0;
+    float y = 0;
+    for (int k = 0; k < 4; k++)
+    {
+      x += connector->rectangles[connectorId][k].x;
+      y += connector->rectangles[connectorId][k].y;
+    }
 
-    connector->keyPoints[connectorId].pt.y = (
-      connector->keyPoints[connectorId].pt.y
-      + connectable->keyPoints[connectableId].pt.y) / 2;
+    connector->keyPoints[connectorId].pt.x = x / 4;
+    connector->keyPoints[connectorId].pt.y = y / 4;
 
 
     //!< The connectable has now been merged with the connector,
@@ -514,7 +514,7 @@ namespace pandora_vision
     The candidate holes conveyor originated from the rgb node
     @return void
    **/
-  void GenericFilters::amalgamateBilaterally(
+  void HoleMerger::amalgamateBilaterally(
     HolesConveyor* depthHolesConveyor,
     HolesConveyor* rgbHolesConveyor)
   {
@@ -551,7 +551,7 @@ namespace pandora_vision
     will be assimilated by candidate holes of @paramamalgamator
     @return void
    **/
-  void GenericFilters::amalgamateUnilaterally(
+  void HoleMerger::amalgamateUnilaterally(
     HolesConveyor* amalgamator,
     HolesConveyor* amalgamatable)
   {
@@ -592,7 +592,7 @@ namespace pandora_vision
     @return [bool] True if the amalgamator is capable of amalgamating
     the amalgamatable
    **/
-  bool GenericFilters::isCapableOfAmalgamating(
+  bool HoleMerger::isCapableOfAmalgamating(
     const int& amalgamatorId,
     const HolesConveyor& amalgamator,
     const int& amalgamatableId,
@@ -604,15 +604,16 @@ namespace pandora_vision
 
     //!< Are all the assimilable's outline points inside
     //!< the assimilator's bounding box? If not all but some, continue
-    int numAmalgamatableOutlinePointsInAmalgamator= 0;
+    int numAmalgamatableOutlinePointsInAmalgamator = 0;
     for (int av = 0; av < amalgamatable.outlines[amalgamatableId].size(); av++)
     {
       if (cv::pointPolygonTest(amalgamator.outlines[amalgamatorId],
-          amalgamatable.outlines[amalgamatableId][av], false) > 0)
+          amalgamatable.outlines[amalgamatableId][av], false) >= 0)
       {
         numAmalgamatableOutlinePointsInAmalgamator++;
       }
     }
+
 
     //!< If zero or all of amalgamatable's outline points
     //!< are inside the amalgamator's outline, this amalgamatable is
@@ -698,7 +699,7 @@ namespace pandora_vision
     will be deleted
     @return void
    **/
-  void GenericFilters::amalgamateOnce(const int& amalgamatorId,
+  void HoleMerger::amalgamateOnce(const int& amalgamatorId,
     HolesConveyor* amalgamator,
     const int& amalgamatableId,
     HolesConveyor* amalgamatable)
@@ -710,8 +711,8 @@ namespace pandora_vision
     //!< Viewing the two outlines as sets,
     //!< the final outline should not have the intersection
     //!< of the two sets.
-    std::vector<cv::Point> amalgamatorOutline;
-    std::vector<cv::Point> amalgamatableOutline;
+    std::vector<cv::Point2f> amalgamatorOutline;
+    std::vector<cv::Point2f> amalgamatableOutline;
 
     //!< Add all the amalgamatable's outline points that are not located
     //!< inside the amalgamator's outline, to the amalgamatableOutline
@@ -719,7 +720,7 @@ namespace pandora_vision
     for (int o = 0; o < amalgamatable->outlines[amalgamatableId].size(); o++)
     {
       if (pointPolygonTest(amalgamator->outlines[amalgamatorId],
-          amalgamatable->outlines[amalgamatableId][o], false) <= 0)
+          amalgamatable->outlines[amalgamatableId][o], false) < 0)
       {
         amalgamatableOutline.push_back(
           amalgamatable->outlines[amalgamatableId][o]);
@@ -732,7 +733,7 @@ namespace pandora_vision
     for (int o = 0; o < amalgamator->outlines[amalgamatorId].size(); o++)
     {
       if (pointPolygonTest(amalgamatable->outlines[amalgamatableId],
-          amalgamator->outlines[amalgamatorId][o], false) <= 0)
+          amalgamator->outlines[amalgamatorId][o], false) < 0)
       {
         amalgamatorOutline.push_back(amalgamator->outlines[amalgamatorId][o]);
       }
@@ -772,14 +773,19 @@ namespace pandora_vision
     amalgamator->rectangles.at(amalgamatorId) = substituteVerticesVector;
 
 
-    //!< The overall candidate hole's keypoint
-    amalgamator->keyPoints[amalgamatorId].pt.x =
-      (amalgamator->keyPoints[amalgamatorId].pt.x +
-       amalgamatable->keyPoints[amalgamatableId].pt.x) / 2;
+    //!< Set the overall candidate hole's keypoint to the center of the
+    //!< newly created bounding rectangle
+    float x = 0;
+    float y = 0;
+    for (int k = 0; k < 4; k++)
+    {
+      x += amalgamator->rectangles[amalgamatorId][k].x;
+      y += amalgamator->rectangles[amalgamatorId][k].y;
+    }
 
-    amalgamator->keyPoints[amalgamatorId].pt.y =
-      (amalgamator->keyPoints[amalgamatorId].pt.y +
-       amalgamatable->keyPoints[amalgamatableId].pt.y) / 2;
+    amalgamator->keyPoints[amalgamatorId].pt.x = x / 4;
+    amalgamator->keyPoints[amalgamatorId].pt.y = y / 4;
+
 
     //!< The amalgamatable has now been merged with the amalgamator,
     //!< so delete it. So long, amalgamatable

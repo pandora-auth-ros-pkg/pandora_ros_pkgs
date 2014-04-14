@@ -57,7 +57,7 @@ namespace pandora_vision
       /**
         @brief Finds rotated bounding boxes from blob outlines
         @param inImage [const cv::Mat&] The input image
-        @param blobsOutlineVector [std::vector<std::vector<cv::Point> >&]
+        @param blobsOutlineVector [std::vector<std::vector<cv::Point2f> >&]
         The outline points of the blobs
         @param blobsArea [const std::vector<float>&] The blobs' area
         @param outImage [cv::Mat*] The output image
@@ -67,7 +67,7 @@ namespace pandora_vision
        **/
       static void findRotatedBoundingBoxesFromOutline(
         const cv::Mat& inImage,
-        const std::vector<std::vector<cv::Point> >& blobsOutlineVector,
+        const std::vector<std::vector<cv::Point2f> >& blobsOutlineVector,
         const std::vector<float>& blobsArea,
         cv::Mat* outImage,
         std::vector< std::vector<cv::Point2f> >* outRectangles);

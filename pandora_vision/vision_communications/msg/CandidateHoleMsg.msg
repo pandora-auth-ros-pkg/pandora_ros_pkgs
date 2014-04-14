@@ -13,7 +13,7 @@ float32[] verticesX
 float32[] verticesY
 
 # blob's outline points X coordinate
-int32[] outlineX
+float32[] outlineX
 
 # blob's outline points X coordinate
-int32[] outlineY
+float32[] outlineY

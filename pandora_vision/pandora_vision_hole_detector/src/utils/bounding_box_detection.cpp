@@ -44,7 +44,7 @@ namespace pandora_vision
     must be larger than Parameters::bounding_box_min_area_threshold.
     The blob and its bounding rectangle must be inside the image's limits.
     @param[in] inImage [const cv::Mat&] The input image
-    @param[in] blobsOutlineVector [const std::vector<std::vector<cv::Point> >&]
+    @param[in] blobsOutlineVector [const std::vector<std::vector<cv::Point2f> >&]
     The outline points of the blobs
     @param[in] blobsArea [const std::vector<float>&] The blobs' area
     @param[out] outImage [cv::Mat*] The output image
@@ -54,7 +54,7 @@ namespace pandora_vision
    **/
   void BoundingBoxDetection::findRotatedBoundingBoxesFromOutline(
     const cv::Mat& inImage,
-    const std::vector<std::vector<cv::Point> >& blobsOutlineVector,
+    const std::vector<std::vector<cv::Point2f> >& blobsOutlineVector,
     const std::vector<float>& blobsArea,
     cv::Mat* outImage,
     std::vector<std::vector<cv::Point2f> >* outRectangles)
