@@ -96,7 +96,7 @@ private:
 
   /**
     @brief Initializes frame and probability buffer
-    @param image [cv::Mat] The current frame
+    @param frame [cv::Mat] The current frame
     @return void
   */
   void initFrameProbBuffers(cv::Mat frame);
@@ -104,8 +104,8 @@ private:
   /**
     @brief Rotates the given frame in 5 main angles and
       searches for faces in each rotated frame.
-    @param frameIN [cv::Mat] The frame to be scanned for faces
-    @return 	integer of the sum of faces found in all rotations
+    @param frame [cv::Mat] The frame to be scanned for faces
+    @return integer of the sum of faces found in all rotations
       of the frame.
   */
   int findFaces1Frame(cv::Mat frame);
@@ -114,14 +114,27 @@ private:
     @brief Calls detectMultiscale to scan frame for faces and drawFace
       to create rectangles around the faces found in each frame
     @param frame [cv::Mat] the frame to be scaned.
-    @param cascade [cv::CascadeClassifier] the classifier used for
-      detection
-    @param	angle [float] the rotation angle
     @return [int] the number of faces found in each frame
   */
-  int detectFace(cv::Mat img);
-
+  int detectFace(cv::Mat frame);
+  
+  /**
+  @brief Crate rectangles to current frame according to the positions
+    of faces found in previous frames
+  @param tmp [cv::Mat] The frame to be scanned for faces
+  @return void
+ */
   void createRectangles(cv::Mat *tmp);
+  
+  /**
+  @brief Set probability accordint to skinDetector instance
+  @param probability [float*] Probability for each one of detected faces in 
+  current frame
+  @param totalArea [int*]
+  @param tmp [cv::Mat] The frame to be scanned for faces
+  @return Integer of the sum of faces found in all
+  rotations of the frame
+ */
   void compareWithSkinDetector(float *probability, cv::Mat tmp, int *totalArea);
 
 public:
@@ -130,27 +143,23 @@ public:
   //debug switch - webNode changes it externally:
   bool isDebugMode;
 
-  //!< The Constructor
+  //! The Constructor
   FaceDetector(std::string cascade_path, std::string model_path,
                int bufferSize, bool skinEnabled, std::string skinHist, std::string wallHist, std::string wall2Hist);
 
-  //!< The Destructor
+  //! The Destructor
   ~FaceDetector();
 
   /**
     @brief Searches for faces in current frame.
-    @param image [cv::Mat] The  current frame
+    @param frame [cv::Mat] The current frame
     @return number [int] of faces found in current frame
   **/
-  int findFaces(cv::Mat img);
+  int findFaces(cv::Mat frame);
 
   /**
     @brief Creates the continuous table of faces found that contains
-    information for each face in every set of 4 values:
-    table[i*4]=face #i position x center
-    table[i*4+1]=face #i position y center
-    table[i*4+2]=face #i rectangle width
-    table[i*4+3]=face #i rectangle height
+    information for each face in every set of 4 values.
     @return int[] table of face positions and sizes
   */
   int* getFacePositionTable();
@@ -174,11 +183,9 @@ public:
    @param thAngle [int] angle in degrees (angle>=0)
      any angle more than 360 degrees is reduced to a primary circle
      angle.
-   @param	rotMatData pointer to the data of the rotation
-     matrix values produces for this rotation (this function feels the values)
    @return the frame rotated
   */
-  cv::Mat frameRotate( cv::Mat frame, float angle);
+  cv::Mat frameRotate( cv::Mat frame, float thAngle);
 
 
 };

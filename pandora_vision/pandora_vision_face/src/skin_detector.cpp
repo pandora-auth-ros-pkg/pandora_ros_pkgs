@@ -47,9 +47,9 @@ namespace pandora_vision
  initial image and the width axis the Cb channel.
  Each pixel represents the normalized number of times the corresponding
  (Cr,Cb) component appears on the initial images.
- @param skinHist  string The name of the skin histogramm image.
-  		  wallHist  string The name of the wall histogramm image.
-  		  wall2Hist string The name of the second type of wall histogramm image.
+  @param skinHist  string The name of the skin histogramm image.
+  @param wallHist  string The name of the wall histogramm image.
+  @param wall2Hist string The name of the second type of wall histogramm image.
 */
 SkinDetector::SkinDetector( std::string skinHist, std::string wallHist, std::string wall2Hist )
 {

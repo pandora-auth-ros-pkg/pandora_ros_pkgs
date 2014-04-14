@@ -103,18 +103,6 @@ namespace pandora_vision
   void QrCodeDetection::getGeneralParams()
   {
    
-    //!< Get the qrcodeDummy parameter if available;
-    if (_nh.hasParam("qrcodeDummy"))
-    {
-      _nh.getParam("qrcodeDummy", qrcodeDummy);
-      ROS_DEBUG("qrcodeDummy: %d", qrcodeDummy);
-    }
-    else
-    {
-      qrcodeDummy = false;
-      ROS_DEBUG("qrcodeDummy: %d", qrcodeDummy);
-    }
-
     //!< Get the debugQrCode parameter if available;
     if (_nh.hasParam("debugQrCode"))
     {
@@ -284,57 +272,35 @@ namespace pandora_vision
 
     //!< Create message of QrCode Detector
     vision_communications::QRAlertsVectorMsg qrcodeVectorMsg;
-
     vision_communications::QRAlertMsg qrcodeMsg;
+ 
+    //!< Qrcode message 
+    //!< do detection and examine result cases
+    qrcodeVectorMsg.header.frame_id = cameraFrameId;
+    qrcodeVectorMsg.header.stamp = ros::Time::now();
 
-    if (qrcodeDummy)
+    _qrcodeDetector.detect_qrcode(qrcodeFrame);
+    std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
+ 
+    for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
     {
-      //!< Motion Dummy Message
-      qrcodeVectorMsg.header.frame_id = "QrCode";
-      qrcodeVectorMsg.header.stamp = ros::Time::now();
+      qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
 
-      qrcodeMsg.QRcontent = "It's peanut butter jelly time!";
-      qrcodeMsg.yaw = 0;
-      qrcodeMsg.pitch = 0;
+      qrcodeMsg.yaw = ratioX *
+        (list_qrcodes[i].qrcode_center.x - 
+          static_cast<double>(frameWidth) / 2);
+      qrcodeMsg.pitch = -ratioY *
+        (list_qrcodes[i].qrcode_center.y - 
+          static_cast<double>(frameWidth) / 2);
 
       qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
 
-      //!< dummy delay
-      usleep(1000 * 60);
+      ROS_INFO("[QrCode_node]: QR found.");
     }
-    else
+
+    if (debugQrCode)
     {
-      /*
-       * QrCode Message
-       */
-
-      //!< do detection and examine result cases
-      qrcodeVectorMsg.header.frame_id = cameraFrameId;
-      qrcodeVectorMsg.header.stamp = ros::Time::now();
-
-      _qrcodeDetector.detect_qrcode(qrcodeFrame);
-      std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
-   
-      for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
-      {
-        qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
-
-        qrcodeMsg.yaw = ratioX *
-          (list_qrcodes[i].qrcode_center.x - 
-            static_cast<double>(frameWidth) / 2);
-        qrcodeMsg.pitch = -ratioY *
-          (list_qrcodes[i].qrcode_center.y - 
-            static_cast<double>(frameWidth) / 2);
-
-        qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
-
-        ROS_INFO("[QrCode_node]: QR found.");
-      }
-
-      if (debugQrCode)
-      {
-        publish_debug_images();
-      }
+      publish_debug_images();
     }
 
     if(qrcodeVectorMsg.qrAlerts.size() > 0)
