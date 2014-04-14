@@ -46,7 +46,7 @@
 int main(int argc, char** argv)
 {
   ros::init(argc,argv,"QrCode_node");
-  pandora_vision::QrCodeDetection QrCodeDetection;
+  pandora_vision::QrCodeDetection QrCodeDetection("qrcode");
   ros::spin();
   return 0;
 }

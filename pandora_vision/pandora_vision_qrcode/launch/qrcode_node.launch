@@ -1,34 +1,12 @@
 <launch>
-  <group ns="pandora_vision_qrcode">
     
-    <param name="camera_name" value="kinect" />
-    
-    <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" output="screen" />
+  <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" output="screen" />
     <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
     
-    <!-- **************** /-->
-    <!-- Debug Mode params /-->
-    <!-- **************** /-->
+  <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_topics.yaml" 
+        command="load" ns="qrcode"/>
     
-    <!-- Enable QrCode Debug /-->
-    <param name="debugQrCode" type="bool" value="True"/>
-      
-    <!-- **************** /-->
-    <!-- Dummy Msg params /-->
-    <!-- **************** /-->
-      
-    <!-- Enable QrCode Dummy /-->
-    <param name="qrcodeDummy" type="bool" value="False"/>
-
-    <!-- *********************** /-->
-    <!--  QrCodeDetector params  /-->
-    <!-- *********************** /-->
-        
-    <!-- Test param for QrCode Detection  /-->
-    <param name="qrcodeSharpenBlur" type="int" value="5"/> 
+  <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_params.yaml" 
+        command="load" ns="qrcode"/>
     
-    <!-- Test param for QrCode Detection  /-->
-    <param name="qrcodeSharpenWeight" type="double" value="0.8"/>
-    
-  </group>
 </launch>

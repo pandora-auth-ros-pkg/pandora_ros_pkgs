@@ -158,12 +158,13 @@ namespace pandora_vision {
 
       //!< Previous state of robot
       int prevState;
-
+      
+      std::string param;
 
     public:
 
       //!< The Constructor
-      QrCodeDetection();
+      explicit QrCodeDetection(const std::string& ns);
 
       //!< The Destructor
       ~QrCodeDetection();

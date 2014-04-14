@@ -370,10 +370,10 @@ float FaceDetector::getProbability()
 /**
   @brief Calls detectMultiscale to scan frame for faces and drawFace
     to create rectangles around the faces found in each frame
-  @param frame [cv::Mat] the frame to be scaned.
+  @param img [cv::Mat] the frame to be scaned.
   @return [int] the number of faces found in each frame
 */
-int FaceDetector::detectFace(cv::Mat frame)
+int FaceDetector::detectFace(cv::Mat img)
 {
   cv::Mat original(img.size().width, img.size().height, CV_8UC1);
   original = img.clone();
