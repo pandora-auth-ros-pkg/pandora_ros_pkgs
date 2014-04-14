@@ -317,15 +317,12 @@ namespace pandora_vision
     {
       for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
       {
-        cv::line(img,
-          cvPoint(conveyor.outlines[i][j].x - 1, conveyor.outlines[i][j].y - 1),
-          cvPoint(conveyor.outlines[i][j].x + 1, conveyor.outlines[i][j].y + 1),
-          cv::Scalar(0, 255, 0), 1, 8 , CV_AA);
-
-        cv::line(img,
-          cvPoint(conveyor.outlines[i][j].x - 1, conveyor.outlines[i][j].y + 1),
-          cvPoint(conveyor.outlines[i][j].x + 1, conveyor.outlines[i][j].y - 1),
-          cv::Scalar(0, 255, 0), 1, 8);
+        img.at<unsigned char>(conveyor.outlines[i][j].y,
+          3 * conveyor.outlines[i][j].x + 2) = 0;
+        img.at<unsigned char>(conveyor.outlines[i][j].y,
+          3 * conveyor.outlines[i][j].x + 1) = 255;
+        img.at<unsigned char>(conveyor.outlines[i][j].y,
+          3 * conveyor.outlines[i][j].x + 0) = 0;
       }
     }
 

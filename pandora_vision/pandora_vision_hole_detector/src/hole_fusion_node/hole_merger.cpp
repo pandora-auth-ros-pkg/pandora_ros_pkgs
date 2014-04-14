@@ -384,7 +384,7 @@ namespace pandora_vision
 
     //!< If the connectable's area is smaller than the connector's,
     //!< this connectable is capable of being connected with the connector
-    return (connectableBoxArea < connectorBoxArea);
+    return (connectableBoxArea <= connectorBoxArea);
   }
 
 
@@ -673,7 +673,7 @@ namespace pandora_vision
 
     //!< If the amalgatamable's area is smaller than the assimilator's,
     //!< this amalgamator is capable of amalgamating the amalgamatable
-    return (amalgamatableBoxArea < amalgamatorBoxArea);
+    return (amalgamatableBoxArea <= amalgamatorBoxArea);
   }
 
 
@@ -708,7 +708,7 @@ namespace pandora_vision
     Timer::start("amalgamateOnce", "applyMergeOperation");
     #endif
 
-    //!< Viewing the two outlines as sets,
+    //!< Viewing visually the two outlines as sets,
     //!< the final outline should not have the intersection
     //!< of the two sets.
     std::vector<cv::Point2f> amalgamatorOutline;

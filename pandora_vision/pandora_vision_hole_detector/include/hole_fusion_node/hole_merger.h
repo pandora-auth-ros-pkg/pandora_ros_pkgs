@@ -287,4 +287,4 @@ namespace pandora_vision
 
 } // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_GENERIC_FILTERS_H
+#endif  // HOLE_FUSION_NODE_HOLE_MERGER_H
