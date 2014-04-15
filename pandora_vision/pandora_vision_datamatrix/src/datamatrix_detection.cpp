@@ -210,6 +210,7 @@ namespace pandora_vision
   /**
    * @brief This method uses a DatamatrixDetector instance to detect 
    * all present datamatrixes in a given frame
+   * @param frame_id [std::string] The frame id
    * @return void
   */
   void DatamatrixDetection::datamatrixCallback()

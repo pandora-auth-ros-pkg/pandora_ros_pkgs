@@ -153,5 +153,6 @@ namespace pandora_vision
 
   //!< Holes connection - merger
   float Parameters::connect_holes_min_distance = 0.1;
+  float Parameters::connect_holes_max_distance = 0.2;
 
 } // namespace pandora_vision

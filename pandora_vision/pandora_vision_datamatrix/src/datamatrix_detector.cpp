@@ -73,7 +73,7 @@ namespace pandora_vision
   
   /**
     @brief Detects datamatrixes and stores them in a vector. 
-    @param image [cv::Mat] The image in which the QRs are detected
+    @param frame [cv::Mat] The image in which the QRs are detected
     @return void
    */
   void DatamatrixDetector::detect_datamatrix(cv::Mat image)
@@ -116,7 +116,7 @@ namespace pandora_vision
   
   /**
     @brief Function that finds the position of datamatrixe's center
-    @param image [cv::Mat] The image in which the QRs are detected
+    @param frame [cv::Mat] The image in which the QRs are detected
     @return void
    */
   void DatamatrixDetector::locate_datamatrix(cv::Mat image)
@@ -155,10 +155,8 @@ namespace pandora_vision
   
   /**
     @brief Function that creates view for debugging purposes.
-    @param image [cv::Mat] The image in which the datamatrixes are detected
-    @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners 
-    of datamatrix image, according to which i draw lines for debug reasons
-    @return debug_frcame [cv::Mat], frame with rotated rectangle
+    @param frame [cv::Mat] The image in which the datamatrixes are detected
+    @return debyg_frcame [cv::Mat], frame with rotated rectangle
     and center of it
   */
   void DatamatrixDetector::debug_show(cv::Mat image, std::vector<cv::Point2f> datamatrixVector)

@@ -160,6 +160,7 @@ namespace pandora_vision
 
     //!< Holes connection - merger
     static float connect_holes_min_distance;
+    static float connect_holes_max_distance;
   };
 
 } // namespace pandora_vision

@@ -254,6 +254,49 @@ namespace pandora_vision
       void testDummyHolesMerging(HolesConveyor* dummy);
 
       /**
+        @brief Each Depth and RGB filter requires the construction of a set
+        of vectors which uses to determine the validity of each hole.
+        The total number of vectors is finite; every filter uses vectors from
+        this pool of vectors. This method centrally constructs the necessary
+        vectors in runtime, depending on which filters are commanded to run
+        @param[in] conveyor [const HolesConeveyor&] The candidate holes
+        from which each element of the vector will be constructed
+        @param[in] image [const cv::Mat&] An image needed for its size
+        @param[in] inflationSize [const int&] The bounding rectangles
+        inflation size
+        @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
+        A vector containing an image (the mask) for each hole
+        @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
+        A vector that holds sets of points's indices; each set holds the
+        indices of the points inside the outline of each hole
+        @param[out] inflatedRectanglesVector
+        [std::vector<std::vector<cv::Point2f> >*] The vector that holds the
+        vertices of the in-image-bounds inflated rectangles
+        @param[out] inflatedRectanglesIndices [std::vector<int>*]
+        The vector that holds the indices of the original holes whose
+        inflated bounding rectangles is within the image's bounds.
+        @param[out] intermediatePointsImageVector [std::vector<cv::Mat>*]
+        A vector that holds the image of the intermediate points between
+        a hole's outline and its bounding box, for each hole whose identifier
+        exists in the @param inflatedRectanglesIndices vector
+        @param[out] intermediatePointsSetVector [std::vector<std::set<int> >*]
+        A vector that holds the intermediate points' indices between a hole's
+        outline and its bounding box, for each hole whose identifier
+        exists in the @param inflatedRectanglesIndices vector
+        @return void
+       **/
+      void createCheckerRequiredVectors(
+        const HolesConveyor& conveyor,
+        const cv::Mat& image,
+        const int& inflationSize,
+        std::vector<cv::Mat>* holesMasksImageVector,
+        std::vector<std::set<unsigned int> >* holesMasksSetVector,
+        std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
+        std::vector<int>* inflatedRectanglesIndices,
+        std::vector<cv::Mat>* intermediatePointsImageVector,
+        std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
+
+      /**
         @brief Some hole checkers require the construction of a hole's mask,
         that is, the pixels inside the hole with a value of
         value 255 while the background pixels are with 0 value.

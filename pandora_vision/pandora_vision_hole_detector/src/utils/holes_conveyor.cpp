@@ -70,6 +70,41 @@ namespace pandora_vision
 
 
   /**
+    @brief Appends a dummy HolesConveyor to a HoleConveyor struct
+    @param[in] rectangleUpperLeft [const cv::Point2f&] The upper left
+    vertex of the bounding rectangle
+    @param[in] outlineUpperLeft [const cv::Point2f] The upper left
+    vertex of the hole's outline
+    @param[in] rx [const int&] The width of the rectangle
+    @param[in] ry [const int&] The height of the rectangle
+    @param[in] ox [const int&] The width of the outline rectangle
+    @param[in] ry [const int&] The height of the outline rectangle
+    @param[in][out] conveyor [HolesConveyor*] The conveyor to which the
+    dummy HolesConveyor will be appended
+    @return void
+   **/
+  void HolesConveyorUtils::appendDummyConveyor(
+    const cv::Point2f& rectangleUpperLeft,
+    const cv::Point2f& outlineUpperLeft,
+    const int& rx, const int& ry,
+    const int& ox, const int& oy,
+    HolesConveyor* conveyor)
+  {
+    conveyor->rectangles.push_back(
+      generateRectangle(rectangleUpperLeft, rx, ry, 0));
+
+    conveyor->outlines.push_back(
+      generateRectangle(outlineUpperLeft, ox, oy, 1));
+
+    cv::KeyPoint k(outlineUpperLeft.x + ox / 2,
+      outlineUpperLeft.y + oy / 2, 1);
+
+    conveyor->keyPoints.push_back(k);
+  }
+
+
+
+  /**
     @brief Hollows a HolesConveyor struct, deleting every entry in it
     @param[in][out] conveyor [HolesConveyor*] The conveyor struct that will
     be cleared
@@ -126,6 +161,67 @@ namespace pandora_vision
 
     //!< Append the src to the dst
     append(src, dst);
+  }
+
+
+
+  /**
+    @brief Generates a vector of cv::Point2f that represents the 4 vertices
+    of a rectangle
+    @param[in] upperLeft [const cv::Point2f&] The upper left vertex point
+    of the rectangle
+    @param[in] x [const int&] The length at x direction
+    @param[in] y [const int&] The length at y direction
+    @param[in] intent [const int&] 0 for a rectangle's vertices
+    construction, 1 for a coherent outline construction
+    @return std::vector<cv::Point2f> A vector of four vertices
+    of type cv::Point2f
+   **/
+  std::vector<cv::Point2f> HolesConveyorUtils::generateRectangle(
+    const cv::Point2f& upperLeft, const int& x, const int& y,
+    const int& intent)
+  {
+    std::vector<cv::Point2f> rectangleVertices;
+
+    cv::Point2f vertex_1(upperLeft.x, upperLeft.y);
+    rectangleVertices.push_back(vertex_1);
+
+    cv::Point2f vertex_2(upperLeft.x, upperLeft.y + y);
+    rectangleVertices.push_back(vertex_2);
+
+    cv::Point2f vertex_3(upperLeft.x + x, upperLeft.y + y);
+    rectangleVertices.push_back(vertex_3);
+
+    cv::Point2f vertex_4(upperLeft.x + x, upperLeft.y);
+    rectangleVertices.push_back(vertex_4);
+
+    //!< Outline construction
+    if (intent == 1)
+    {
+      rectangleVertices.clear();
+
+      cv::Point2f a[] = {vertex_1, vertex_2, vertex_3, vertex_4};
+
+      cv::Mat canvas = cv::Mat::zeros(480, 640, CV_8UC1);
+
+      for(unsigned int j = 0; j < 4; j++)
+      {
+        cv::line(canvas, a[j], a[(j + 1) % 4], cv::Scalar(255, 0, 0), 1, 8);
+      }
+
+      for (int i = 0; i < 480; i++)
+      {
+        for (int j = 0; j < 640; j++)
+        {
+          if (canvas.at<unsigned char>(i, j) != 0)
+          {
+            rectangleVertices.push_back(cv::Point2f(j, i));
+          }
+        }
+      }
+      return rectangleVertices;
+    }
+    return rectangleVertices;
   }
 
 
@@ -216,6 +312,55 @@ namespace pandora_vision
       }
       dst->rectangles.push_back(tempRectangle);
     }
+  }
+
+
+
+  /**
+    @brief Prints a hole's data in the console in a form such that
+    they can be easily translated to code, in order for the hole to be
+    cloned and debugged
+    @param[in] conveyor [const HolesConveyor&] The conveyor from which
+    the hole will be printed
+    @param[in] id [const int&] The identifier of the hole inside the
+    conveyor
+    @param[in] prefix [const std::string&] The prefix used to name the
+    outline and rectangle vectors
+    @return void
+   **/
+  void HolesConveyorUtils::migrateToArtificialSetting(
+    const HolesConveyor& conveyor,
+    const int& id,
+    const std::string& prefix)
+  {
+    ROS_ERROR("cv::KeyPoint %s_k(%f, %f, 1);",
+      prefix.c_str(),
+      conveyor.keyPoints[id].pt.x,
+      conveyor.keyPoints[id].pt.y);
+
+    ROS_ERROR("dummy.keyPoints.push_back(%s_k);", prefix.c_str());
+
+    ROS_ERROR("std::vector<std::vector<cv::Point2f> > %s_outlines;",
+      prefix.c_str());
+    for (int i = 0; i < conveyor.outlines[id].size(); i++)
+    {
+      ROS_ERROR("%s_outlines.push_back(cv::Point2f(%f, %f));",
+        prefix.c_str(),
+        conveyor.outlines[id][i].x,
+        conveyor.outlines[id][i].y);
+    }
+    ROS_ERROR("dummy.outlines.push_back(%s_outlines);", prefix.c_str());
+
+    ROS_ERROR("std::vector<std::vector<cv::Point2f> > %s_rectangles;",
+      prefix.c_str());
+    for (int i = 0; i < conveyor.rectangles[id].size(); i++)
+    {
+      ROS_ERROR("%s_outlines.push_back(cv::Point2f(%f, %f));",
+        prefix.c_str(),
+        conveyor.rectangles[id][i].x,
+        conveyor.rectangles[id][i].y);
+    }
+    ROS_ERROR("dummy.rectangles.push_back(%s_outlines);", prefix.c_str());
   }
 
 
@@ -410,144 +555,6 @@ namespace pandora_vision
   int HolesConveyorUtils::size(const HolesConveyor& conveyor)
   {
     return conveyor.keyPoints.size();
-  }
-
-
-
-  /**
-    @brief Appends a dummy HolesConveyor to a HoleConveyor struct
-    @param[in] rectangleUpperLeft [const cv::Point2f&] The upper left
-    vertex of the bounding rectangle
-    @param[in] outlineUpperLeft [const cv::Point2f] The upper left
-    vertex of the hole's outline
-    @param[in] rx [const int&] The width of the rectangle
-    @param[in] ry [const int&] The height of the rectangle
-    @param[in] ox [const int&] The width of the outline rectangle
-    @param[in] ry [const int&] The height of the outline rectangle
-    @param[in][out] conveyor [HolesConveyor*] The conveyor to which the
-    dummy HolesConveyor will be appended
-    @return void
-   **/
-  void HolesConveyorUtils::appendDummyConveyor(
-    const cv::Point2f& rectangleUpperLeft,
-    const cv::Point2f& outlineUpperLeft,
-    const int& rx, const int& ry,
-    const int& ox, const int& oy,
-    HolesConveyor* conveyor)
-  {
-    conveyor->rectangles.push_back(
-      generateRectangle(rectangleUpperLeft, rx, ry, 0));
-
-    conveyor->outlines.push_back(
-      generateRectangle(outlineUpperLeft, ox, oy, 1));
-
-    cv::KeyPoint k(outlineUpperLeft.x + ox / 2,
-      outlineUpperLeft.y + oy / 2, 1);
-
-    conveyor->keyPoints.push_back(k);
-  }
-
-
-
- /**
-    @brief Generates a vector of cv::Point2f that represents the 4 vertices
-    of a rectangle
-    @param[in] upperLeft [const cv::Point2f&] The upper left vertex point
-    of the rectangle
-    @param[in] x [const int&] The length at x direction
-    @param[in] y [const int&] The length at y direction
-    @param[in] intent [const int&] 0 for a rectangle's vertices
-    construction, 1 for a coherent outline construction
-    @return std::vector<cv::Point2f> A vector of four vertices
-    of type cv::Point2f
-   **/
-  std::vector<cv::Point2f> HolesConveyorUtils::generateRectangle(
-    const cv::Point2f& upperLeft, const int& x, const int& y,
-    const int& intent)
-  {
-    std::vector<cv::Point2f> rectangleVertices;
-
-    cv::Point2f vertex_1(upperLeft.x, upperLeft.y);
-    rectangleVertices.push_back(vertex_1);
-
-    cv::Point2f vertex_2(upperLeft.x, upperLeft.y + y);
-    rectangleVertices.push_back(vertex_2);
-
-    cv::Point2f vertex_3(upperLeft.x + x, upperLeft.y + y);
-    rectangleVertices.push_back(vertex_3);
-
-    cv::Point2f vertex_4(upperLeft.x + x, upperLeft.y);
-    rectangleVertices.push_back(vertex_4);
-
-    //!< Outline construction
-    if (intent == 1)
-    {
-      rectangleVertices.clear();
-
-      cv::Point2f a[] = {vertex_1, vertex_2, vertex_3, vertex_4};
-
-      cv::Mat canvas = cv::Mat::zeros(480, 640, CV_8UC1);
-
-      for(unsigned int j = 0; j < 4; j++)
-      {
-        cv::line(canvas, a[j], a[(j + 1) % 4], cv::Scalar(255, 0, 0), 1, 8);
-      }
-
-      for (int i = 0; i < 480; i++)
-      {
-        for (int j = 0; j < 640; j++)
-        {
-          if (canvas.at<unsigned char>(i, j) != 0)
-          {
-            rectangleVertices.push_back(cv::Point2f(j, i));
-          }
-        }
-      }
-      return rectangleVertices;
-    }
-    return rectangleVertices;
-  }
-
-
-
-  /**
-    @brief Draws the keypoints, rectangles and outlines of holes
-    @param[in] coneyor [const HolesConveyor&] The conveyor whose holes
-    will be drawn on @param img
-    @param[in][out] img [cv::Mat*] The image drawn
-    @return void
-   **/
-  void HolesConveyorUtils::draw(const HolesConveyor& conveyor,
-    cv::Mat* img)
-  {
-    cv::drawKeypoints(*img, conveyor.keyPoints, *img, CV_RGB(0, 255, 0),
-      cv::DrawMatchesFlags::DEFAULT);
-
-    for(unsigned int i = 0; i < conveyor.outlines.size(); i++)
-    {
-      for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
-      {
-        cv::line(*img,
-          cvPoint(conveyor.outlines[i][j].x - 1, conveyor.outlines[i][j].y - 1),
-          cvPoint(conveyor.outlines[i][j].x + 1, conveyor.outlines[i][j].y + 1),
-          cv::Scalar(0, 255, 0), 1, 8 , CV_AA);
-
-        cv::line(*img,
-          cvPoint(conveyor.outlines[i][j].x - 1, conveyor.outlines[i][j].y + 1),
-          cvPoint(conveyor.outlines[i][j].x + 1, conveyor.outlines[i][j].y - 1),
-          cv::Scalar(0, 255, 0), 1, 8);
-      }
-    }
-
-    for (int i = 0; i < conveyor.rectangles.size(); i++)
-    {
-      for(int j = 0; j < 4; j++)
-      {
-        cv::line(*img, conveyor.rectangles[i][j],
-          conveyor.rectangles[i][(j + 1) % 4], CV_RGB(255, 0, 0), 1, 8);
-      }
-    }
-
   }
 
 } // namespace pandora_vision

@@ -40,6 +40,88 @@
 namespace pandora_vision
 {
   /**
+    @brief Implements the brushfire algorithm for one blob keypoint in order to
+    find its blob outline points
+    @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
+    @param[in] edgesImage [cv::Mat*] The input image
+    @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
+    The output vector containing the blob's outline
+    @param[out] blobArea [float*] The area of the blob
+    @return void
+   **/
+  void BlobDetection::brushfireKeypoint(
+    const cv::KeyPoint& inKeyPoint,
+    cv::Mat* edgesImage,
+    std::vector<cv::Point2f>* blobOutlineVector,
+    float* blobArea)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("brushfireKeypoint", "validateBlobs");
+    #endif
+
+    unsigned char* ptr = edgesImage->ptr();
+
+    std::set<unsigned int> current, next, visited;
+
+    current.insert(
+      static_cast<int>(round(inKeyPoint.pt.y) * edgesImage->cols)
+      + static_cast<int>(round(inKeyPoint.pt.x)));
+
+    visited.insert(
+      static_cast<int>(round(inKeyPoint.pt.y) * edgesImage->cols)
+      + static_cast<int>(round(inKeyPoint.pt.x)));
+
+    while (current.size() != 0)
+    {
+      for (std::set<unsigned int>::iterator it = current.begin() ;
+        it != current.end() ; it++)
+      {
+        //!< sweep the neighbors of the current point
+        for (int m = -1; m < 2; m++)
+        {
+          for (int n = -1; n < 2; n++)
+          {
+            int x = static_cast<int>(*it) % edgesImage->cols + m;
+            int y = static_cast<int>(*it) / edgesImage->cols + n;
+            int ind = y * edgesImage->cols + x;
+
+            if (x < 0 ||
+              y < 0 ||
+              x > edgesImage->cols - 1 ||
+              y > edgesImage->rows - 1)
+            {
+              continue;
+            }
+
+            char v = ptr[ind];
+            if ((v == 0) && visited.find(ind) == visited.end())
+            {
+              next.insert(ind);
+            }
+
+            if (v != 0)
+            {
+              blobOutlineVector->push_back(cv::Point2f(x, y));
+            }
+
+            visited.insert(ind);
+          }
+        }
+      }
+      current.swap(next);
+      next.clear();
+    }
+
+    *blobArea = static_cast<float>(visited.size());
+
+    #ifdef DEBUG_TIME
+    Timer::tick("brushfireKeypoint");
+    #endif
+  }
+
+
+
+  /**
     @brief Implements the brushfire algorithm for all blob keypoints in order to
     find a blob limits
     @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints

@@ -53,6 +53,21 @@ namespace pandora_vision
   class BlobDetection
   {
     public:
+      /**
+        @brief Implements the brushfire algorithm for one blob keypoint in
+        order to find its blob outline points
+        @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
+        @param[in] edgesImage [cv::Mat*] The input image
+        @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
+        The output vector containing the blob's outline
+        @param[out] blobArea [float*] The area of the blob
+        @return void
+       **/
+      static void brushfireKeypoint(
+        const cv::KeyPoint& inKeyPoint,
+        cv::Mat* edgesImage,
+        std::vector<cv::Point2f>* blobOutlineVector,
+        float* blobArea);
 
       /**
         @brief Implements the brushfire algorithm for all blob keypoints in
@@ -77,7 +92,7 @@ namespace pandora_vision
         @param[in] inPoint [const cv::Point2f&] The input point
         @param[in] inImage [cv::Mat*] The input image
         @param[out] visited [std::set<unsigned int>&] The points between
-        two areas of non-zero value pixels.
+        areas of non-zero value pixels.
         @return void
        **/
       static void brushfirePoint(const cv::Point2f& inPoint,
