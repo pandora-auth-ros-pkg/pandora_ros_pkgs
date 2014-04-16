@@ -1,0 +1,4 @@
+published_topic_names:  
+  debug_qrcode : debug_image
+  qr_alert : /vision/qr_alert
+      

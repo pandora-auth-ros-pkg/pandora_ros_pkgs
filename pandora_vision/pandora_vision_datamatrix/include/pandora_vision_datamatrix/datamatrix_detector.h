@@ -97,22 +97,24 @@ namespace pandora_vision
     
     /**
       @brief Detects datamatrixes and stores them in a vector.
-      @param frame [cv::Mat] The image in which the datamatrixes are detected
+      @param image [cv::Mat] The image in which the datamatrixes are detected
       @return void
     **/
     void detect_datamatrix(cv::Mat image);
     
     /**
     @brief Function that finds the position of datamatrixe's center
-    @param frame [cv::Mat] The image in which the datamatrixes are detected
+    @param image [cv::Mat] The image in which the datamatrixes are detected
     @return void
     */
     void locate_datamatrix(cv::Mat image);
     
     /**
     @brief Function that creates view for debugging purposes.
-    @param frame [cv::Mat] The image in which the datamatrixes are detected
-    @return debug_frame [cv::Mat], frame with rotated rectangle
+    @param image [cv::Mat] The image in which the datamatrixes are detected
+    @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners 
+    of datamatrix image, according to which i draw lines for debug reasons
+    @return debug_frcame [cv::Mat], frame with rotated rectangle
     and center of it
     */
     void debug_show(cv::Mat image, std::vector<cv::Point2f> datamatrixVector);

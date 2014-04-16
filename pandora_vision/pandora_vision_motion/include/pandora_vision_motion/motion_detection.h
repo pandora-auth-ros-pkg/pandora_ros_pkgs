@@ -129,7 +129,7 @@ namespace pandora_vision
       /**
         @brief Constructor
       **/
-      MotionDetection();
+      MotionDetection(const std::string& ns);
             
       /**
         @brief Destructor
@@ -160,6 +160,8 @@ namespace pandora_vision
       int curState;
       //!< Previous state of robot
       int prevState;
+      
+      std::string param;
   };
 }// namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_DETECTION_H

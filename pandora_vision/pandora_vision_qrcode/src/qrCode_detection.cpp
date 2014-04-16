@@ -42,7 +42,7 @@ namespace pandora_vision
   /**
     @brief Constructor
    **/
-  QrCodeDetection::QrCodeDetection() : _nh(), qrcodeNowON(false)
+  QrCodeDetection::QrCodeDetection(const std::string& ns) : _nh(ns), qrcodeNowON(false)
   {
     //!< Get Motion Detector Parameters
     getQrCodeParams();
@@ -56,19 +56,6 @@ namespace pandora_vision
 
     ratioX = hfov / frameWidth;
     ratioY = vfov / frameHeight;
-
-    //!< Declare publisher and advertise topic
-    //!< where algorithm results are posted
-    _qrcodePublisher =
-      _nh.advertise<vision_communications::QRAlertsVectorMsg>("/vision/qr_alert", 10, true);
-
-    //!< Advertise topics for debugging if we are in debug mode
-    if (debugQrCode)
-    {
-      _qrcodeDetector.set_debug(true);
-      _qrcodeDebugPublisher =
-        image_transport::ImageTransport(_nh).advertise("debug_qrcode", 1);
-    }
 
     //!< subscribe to input image's topic
     _frameSubscriber = _nh.subscribe(
@@ -84,7 +71,6 @@ namespace pandora_vision
   }
 
 
-
   /**
     @brief Destructor
    */
@@ -94,7 +80,6 @@ namespace pandora_vision
   }
 
 
-
   /**
    * @brief Get parameters referring to view and frame characteristics from
    * launch file
@@ -102,46 +87,61 @@ namespace pandora_vision
    */
   void QrCodeDetection::getGeneralParams()
   {
-   
-    //!< Get the qrcodeDummy parameter if available;
-    if (_nh.hasParam("qrcodeDummy"))
+    //! Publishers
+    
+    //! Declare publisher and advertise topic
+    //! where algorithm results are posted
+    if (_nh.getParam("published_topic_names/qr_alert", param))
     {
-      _nh.getParam("qrcodeDummy", qrcodeDummy);
-      ROS_DEBUG("qrcodeDummy: %d", qrcodeDummy);
+      _qrcodePublisher = 
+        _nh.advertise<vision_communications::QRAlertsVectorMsg>(param, 10, true);
     }
     else
     {
-      qrcodeDummy = false;
-      ROS_DEBUG("qrcodeDummy: %d", qrcodeDummy);
+      ROS_FATAL("Qr alert topic name param not found");
+      ROS_BREAK();
     }
-
+  
+    
     //!< Get the debugQrCode parameter if available;
-    if (_nh.hasParam("debugQrCode"))
+    if (_nh.getParam("debugQrCode", debugQrCode))
     {
-      _nh.getParam("debugQrCode", debugQrCode);
       ROS_DEBUG_STREAM("debugQrCode : " << debugQrCode);
     }
     else
     {
-      debugQrCode = true;
+      debugQrCode = false;
       ROS_DEBUG_STREAM("debugQrCode : " << debugQrCode);
     }
     
+    if(debugQrCode)
+    {    
+      //! Advertise topics for debugging if we are in debug mode
+      if (_nh.getParam("published_topic_names/debug_qrcode", param))
+      {
+        _qrcodeDebugPublisher =
+          image_transport::ImageTransport(_nh).advertise(param, 1);
+      }
+      else
+      {
+        ROS_WARN(" Cannot find qrcode debug show topic");
+      }    
+    }         
+  
+    
     //!< Get the camera to be used by qr node;
-    if (_nh.hasParam("camera_name")) {
-      _nh.getParam("camera_name", cameraName);
+    if (_nh.getParam("camera_name", cameraName)) {
       ROS_DEBUG_STREAM("camera_name : " << cameraName);
     }
     else 
     {
-      cameraName = "camera";
-      ROS_DEBUG_STREAM("camera_name : " << cameraName);
+      ROS_FATAL("Camera name not found");
+      ROS_BREAK(); 
     }
 
     //!< Get the Height parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/image_height"))
+    if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
     {
-      _nh.getParam("/" + cameraName + "/image_height", frameHeight);
       ROS_DEBUG_STREAM("height : " << frameHeight);
     }
     else
@@ -163,31 +163,30 @@ namespace pandora_vision
     }
 
     //!< Get the listener's topic;
-    if (_nh.hasParam("/" + cameraName + "/topic_name"))
+    if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
     {
-      _nh.getParam("/" + cameraName + "/topic_name", imageTopic);
       ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
     }
     else
     {
-      imageTopic = "/camera_head/image_raw";
-      ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
+     ROS_FATAL("Camera name not found");
+     ROS_BREAK(); 
     }
     
     //!< Get the images's frame_id;
-    if (_nh.hasParam("/" + cameraName + "/camera_frame_id")) {
-      _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
+    if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId)) 
+    {
       ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
     else 
     {
-      cameraFrameId = "/camera";
-      ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
+      ROS_FATAL("Camera name not found");
+      ROS_BREAK(); 
     }
     
     //!< Get the HFOV parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/hfov")) {
-      _nh.getParam("/" + cameraName + "/hfov", hfov);
+    if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
+    {
       ROS_DEBUG_STREAM("HFOV : " << hfov);
     }
     else 
@@ -197,8 +196,8 @@ namespace pandora_vision
     }
     
     //!< Get the VFOV parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/vfov")) {
-      _nh.getParam("/" + cameraName + "/vfov", vfov);
+    if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
+    {
       ROS_DEBUG_STREAM("VFOV : " << vfov);
     }
     else 
@@ -284,57 +283,35 @@ namespace pandora_vision
 
     //!< Create message of QrCode Detector
     vision_communications::QRAlertsVectorMsg qrcodeVectorMsg;
-
     vision_communications::QRAlertMsg qrcodeMsg;
+ 
+    //!< Qrcode message 
+    //!< do detection and examine result cases
+    qrcodeVectorMsg.header.frame_id = cameraFrameId;
+    qrcodeVectorMsg.header.stamp = ros::Time::now();
 
-    if (qrcodeDummy)
+    _qrcodeDetector.detect_qrcode(qrcodeFrame);
+    std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
+ 
+    for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
     {
-      //!< Motion Dummy Message
-      qrcodeVectorMsg.header.frame_id = "QrCode";
-      qrcodeVectorMsg.header.stamp = ros::Time::now();
+      qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
 
-      qrcodeMsg.QRcontent = "It's peanut butter jelly time!";
-      qrcodeMsg.yaw = 0;
-      qrcodeMsg.pitch = 0;
+      qrcodeMsg.yaw = ratioX *
+        (list_qrcodes[i].qrcode_center.x - 
+          static_cast<double>(frameWidth) / 2);
+      qrcodeMsg.pitch = -ratioY *
+        (list_qrcodes[i].qrcode_center.y - 
+          static_cast<double>(frameWidth) / 2);
 
       qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
 
-      //!< dummy delay
-      usleep(1000 * 60);
+      ROS_INFO("[QrCode_node]: QR found.");
     }
-    else
+
+    if (debugQrCode)
     {
-      /*
-       * QrCode Message
-       */
-
-      //!< do detection and examine result cases
-      qrcodeVectorMsg.header.frame_id = cameraFrameId;
-      qrcodeVectorMsg.header.stamp = ros::Time::now();
-
-      _qrcodeDetector.detect_qrcode(qrcodeFrame);
-      std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
-   
-      for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
-      {
-        qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
-
-        qrcodeMsg.yaw = ratioX *
-          (list_qrcodes[i].qrcode_center.x - 
-            static_cast<double>(frameWidth) / 2);
-        qrcodeMsg.pitch = -ratioY *
-          (list_qrcodes[i].qrcode_center.y - 
-            static_cast<double>(frameWidth) / 2);
-
-        qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
-
-        ROS_INFO("[QrCode_node]: QR found.");
-      }
-
-      if (debugQrCode)
-      {
-        publish_debug_images();
-      }
+      publish_debug_images();
     }
 
     if(qrcodeVectorMsg.qrAlerts.size() > 0)

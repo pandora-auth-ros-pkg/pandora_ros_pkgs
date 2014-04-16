@@ -46,7 +46,7 @@
 int main(int argc, char** argv)
 {
   ros::init(argc,argv,"motion_node");
-  pandora_vision::MotionDetection motion_detector;
+  pandora_vision::MotionDetection motion_detector("motion");
   ros::spin();
   return 0;
 }
