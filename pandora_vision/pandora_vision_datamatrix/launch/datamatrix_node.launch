@@ -1,13 +1,10 @@
 <launch>
+  <group ns="pandora_vision_datamatrix">
     
-  <node name="datamatrix_node" type="datamatrix_node" pkg="pandora_vision_datamatrix" 
-    respawn="False" output="screen" />
-  <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
-  
-  <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_topics.yaml" 
-    command="load" ns="datamatrixcode"/>
+    <param name="camera_name" value="kinect" />
     
-  <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_params.yaml" 
-    command="load" ns="datamatrixcode"/>
-        
+    <node name="datamatrix_node" type="datamatrix_node" pkg="pandora_vision_datamatrix" respawn="False" output="screen" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    
+  </group>
 </launch>

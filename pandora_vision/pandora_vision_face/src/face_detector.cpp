@@ -51,6 +51,8 @@ namespace pandora_vision
  @param bufferSize [int] number of frames in the frame buffer
  @param skinEnabled [bool] enables the verification
          of face algorithm using the Skin detector
+ @param mn parameter used in cvHaarDetect function
+ @param minFaceDim parameter used in cvHaarDetect function
  @param skinHist Histogram - parameter to be passed in the Skin Detector
  @param wallHist Histogram - parameter to be passed in the Skin Detector
  @param wall2Hist Histogram - parameter to be passed in the Skin Detector
@@ -93,7 +95,7 @@ FaceDetector::FaceDetector(std::string cascade_path, std::string model_path,
 */
 FaceDetector::~FaceDetector()
 {
-  //! Erase frame and probability buffers
+  //!< Erase frame and probability buffers
   if (!frame_buffer.empty())
   {
     frame_buffer.erase (frame_buffer.begin(), frame_buffer.begin() +
@@ -113,7 +115,7 @@ FaceDetector::~FaceDetector()
 /**
   @brief Detects number of faces found in current frame.
   The image buffer contributs to probability.
-  @param frame [cv::Mat] The frame to be scanned for faces
+  @param frameIN [cv::Mat] The frame to be scanned for faces
   @return Integer of the sum of faces found in all
   rotations of the frame
 */
@@ -126,7 +128,7 @@ int FaceDetector::findFaces(cv::Mat frame)
   initFrameProbBuffers(frame);
   createRectangles(&tmp);
 
-  //! Clear vector of faces before using it for the current frame
+  //!< Clear vector of faces before using it for the current frame
   faces_total.erase (faces_total.begin(), faces_total.begin() +
                      faces_total.size());
 
@@ -140,7 +142,7 @@ int FaceDetector::findFaces(cv::Mat frame)
  
   if(totalArea == 0)
   {
-    //! if no face was found, probability for this frame is 0
+    //!< if no face was found, probability for this frame is 0
     probability_buffer[now] = 0.;
   }
   else
@@ -149,23 +151,23 @@ int FaceDetector::findFaces(cv::Mat frame)
       cv::norm(tmp, cv::NORM_L1, 
         cv::noArray()) / 255.) / static_cast<float>(totalArea);
   }
-  //!< Clear value from last scan
+  //!< clear value from last scan
   probability = 0.;
-  //! And calculate probability
+  //!< calculate probability
   for(int i = 0 ; i < _bufferSize ; i++)
   {
     probability += (probability_buffer[i]);
   }
   probability = probability / _bufferSize;
   
-  //! Compare probability with Skin Output
+  //!< Compaprobabilityre Probability with Skin Output
   if(isSkinDetectorEnabled )
   {
     std::cout << "Skin detector enabled" << std::endl;
     skinDetector->init();
 
-    //! When there is a problem with detectSkin() it returns 1
-    //! in this case findFaces() returns -2
+    //!< When there is a problem with detectSkin() it returns 1
+    //!< in this case findFaces() returns -2
     if ( skinDetector->detectSkin( frame ) )
     {
       return -2;
@@ -180,10 +182,7 @@ int FaceDetector::findFaces(cv::Mat frame)
 
 /**
   @brief Set probability accordint to skinDetector instance
-  @param probability [float*] Probability for each one of detected faces in 
-  current frame
-  @param totalArea [int*]
-  @param tmp [cv::Mat] The frame to be scanned for faces
+  @param frameIN [cv::Mat] The frame to be scanned for faces
   @return Integer of the sum of faces found in all
   rotations of the frame
 */
@@ -196,12 +195,12 @@ void FaceDetector::compareWithSkinDetector(float *probability, cv::Mat tmp, int 
   //skinImg = skinDetector->getImgContoursForFace();
   skinImg = skinDetector->imgThresholdFiltered;
   skinPixelNum = round( cv::norm(skinImg, cv::NORM_L1, cv::noArray()) / 255.);
-  //! tmp now stores common skin-face pixels
+  //!< tmp now stores common skin-face pixels
   bitwise_and( frame_buffer[now] , skinImg , tmp); 
 
   if(totalArea == 0)
   {
-    //! If no face was found, skinFaceRatio for this frame is 0
+    //!< if no face was found, skinFaceRatio for this frame is 0
     skinFaceRatio = 0.; 
   }
   else
@@ -239,7 +238,7 @@ void FaceDetector::compareWithSkinDetector(float *probability, cv::Mat tmp, int 
 
 /**
   @brief Initializes frame and probability buffer
-  @param frame [cv::Mat] The current frame
+  @param image [cv::Mat] The current frame
   @return void
 */
 void FaceDetector::initFrameProbBuffers(cv::Mat frame)
@@ -264,7 +263,7 @@ void FaceDetector::initFrameProbBuffers(cv::Mat frame)
 /**
   @brief Crate rectangles to current frame according to the positions
     of faces found in previous frames
-  @param tmp [cv::Mat] The frame to be scanned for faces
+  @param frameIN [cv::Mat] The frame to be scanned for faces
   @return void
 */
 void FaceDetector::createRectangles(cv::Mat *tmp)
@@ -284,8 +283,8 @@ void FaceDetector::createRectangles(cv::Mat *tmp)
 /**
   @brief Rotates the given frame in 5 main angles and
     searches for faces in each rotated frame.
-  @param frame [cv::Mat] The frame to be scanned for faces
-  @return integer of the sum of faces found in all rotations
+  @param frameIN [cv::Mat] The frame to be scanned for faces
+  @return 	integer of the sum of faces found in all rotations
   of the frame.
 */
 int FaceDetector::findFaces1Frame(cv::Mat frame)
@@ -315,34 +314,38 @@ int FaceDetector::findFaces1Frame(cv::Mat frame)
     facesNum_total += facesNum;
   }
 
-  //! Number of Faces is the sum of all faces found in each rotated frame
+  //!< Number of Faces is the sum of all faces found in
+  //!< each rotated frame
   return facesNum_total;
 }
 
 /**
   @brief Creates the continuous table of faces found that contains
   information for each face in every set of 4 values:
+  table[i*4]		=	face #i position x center
+  table[i*4+1]	=	face #i position y center
+  table[i*4+2]	=	face #i rectangle width
+  table[i*4+3]	=	face #i rectangle height
   @return int[] table of face positions and sizes
 */
 int* FaceDetector::getFacePositionTable()
 {
-  //!
   cv::Rect faceRect;
   int* table = new int[ 4 * faces_total.size() ];
   for(int ii = 0; ii < faces_total.size(); ii++)
   {
     faceRect = faces_total.at(ii);
 
-    //! Face center_x
+    //!< Face center_x
     table[ii * 4]   = round( faceRect.x + faceRect.width * 0.5 );
 
-    //! Face center_y
+    //!< Face center_y
     table[ii * 4 + 1] = round( faceRect.y + faceRect.height * 0.5 );
 
-    //! Face width (rectangle width)
+    //!< Face width
     table[ii * 4 + 2] = faceRect.width;
 
-    //! Face height (rectangle height)
+    //!< Face height
     table[ii * 4 + 3] = faceRect.height;
   }
   return table;
@@ -370,7 +373,10 @@ float FaceDetector::getProbability()
 /**
   @brief Calls detectMultiscale to scan frame for faces and drawFace
     to create rectangles around the faces found in each frame
-  @param img [cv::Mat] the frame to be scaned.
+  @param frame [cv::Mat] the frame to be scaned.
+  @param cascade [cv::CascadeClassifier] the classifier used for
+    detection
+  @param	angle [float] the rotation angle
   @return [int] the number of faces found in each frame
 */
 int FaceDetector::detectFace(cv::Mat img)
@@ -386,11 +392,11 @@ int FaceDetector::detectFace(cv::Mat img)
 
   if(!cascade.empty())
   {
-    //! Find the faces in the frame:
+    //!< Find the faces in the frame:
     cascade.detectMultiScale(gray, thrfaces);
     for(int i = 0; i < thrfaces.size(); i++)
     {
-      //! Process face by face:
+      //!< Process face by face:
       cv::Rect face_i = thrfaces[i];
       cv::Mat face = gray(face_i);
       cv::Mat face_resized;
@@ -398,7 +404,7 @@ int FaceDetector::detectFace(cv::Mat img)
       int prediction = model->predict(face_resized);
       ROS_INFO_STREAM("Prediction " << prediction);
       rectangle(original, face_i, CV_RGB(0, 255, 0), 1);
-      //! Add every element created for each frame, to the total amount of faces
+      //!< Add every element created for each frame, to the total amount of faces
       faces_total.push_back (thrfaces.at(i));
     }
   }
@@ -414,6 +420,8 @@ int FaceDetector::detectFace(cv::Mat img)
   @param thAngle [int] angle in degrees (angle>=0)
     any angle more than 360 degrees is reduced to a primary circle
     angle.
+  @param	rotMatData pointer to the data of the rotation
+    matrix values produces for this rotation (this function feels the values)
   @return the frame rotated
 */
 cv::Mat FaceDetector::frameRotate(cv::Mat frame, float thAngle)
@@ -421,7 +429,7 @@ cv::Mat FaceDetector::frameRotate(cv::Mat frame, float thAngle)
   float iImageCenterY = frame.rows / 2;
   float iImageCenterX = frame.cols / 2;
 
-  //! Calculate rotation matrix
+  //!< Calculate rotation matrix
   cv::Mat matRotation = getRotationMatrix2D(
               cv::Point( iImageCenterX, iImageCenterY ), (thAngle - 180), 1.1 );
 

@@ -88,11 +88,11 @@ int sift_features( IplImage* img, struct feature** feat )
    detected features are stored in the array pointed to by \a feat.
 
    @param img the image in which to detect features
-   @param feat a pointer to an array in which to store detected features
+   @param fea a pointer to an array in which to store detected features
    @param intvls the number of intervals sampled per octave of scale space
    @param sigma the amount of Gaussian smoothing applied to each image level
      before building the scale space representation for an octave
-   @param contr_thr a threshold on the value of the scale space function
+   @param cont_thr a threshold on the value of the scale space function
      \f$\left|D(\hat{x})\right|\f$, where \f$\hat{x}\f$ is a vector specifying
      feature location and scale, used to reject unstable features;  assumes
      pixel values in the range [0, 1]

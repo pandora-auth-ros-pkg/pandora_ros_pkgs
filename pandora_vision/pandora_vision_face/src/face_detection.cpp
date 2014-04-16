@@ -370,8 +370,6 @@ void FaceDetection::imageCallback(const sensor_msgs::Image& msg)
 /**
  * @brief This method uses a FaceDetector instance to detect all
  * present faces in a given frame
- * @param [ros::TimerEvent] Each time the timer ticks the
- * face detection process begins
  * @return void
 */
 void FaceDetection::faceCallback(const ros::TimerEvent&)
@@ -424,6 +422,8 @@ void FaceDetection::createDummyFaceMessage(float *center_x,
 
 /**
  * @brief This method creates the message to be published
+ * @param center_x
+ * @param center_y
  * @param faceMessage
  * @return void
 */

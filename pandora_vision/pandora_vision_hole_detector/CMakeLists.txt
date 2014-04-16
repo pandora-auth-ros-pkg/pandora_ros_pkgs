@@ -85,7 +85,7 @@ set_target_properties(depth_node
 )
 
 add_dependencies(depth_node
-  vision_gencfg
+  ${PROJECT_NAME}_gencfg
   vision_communications_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
@@ -111,7 +111,7 @@ target_link_libraries(synchronizer_node
 )
 
 add_dependencies(synchronizer_node
-  vision_gencfg
+  ${PROJECT_NAME}_gencfg
   vision_communications_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
@@ -151,7 +151,7 @@ target_link_libraries(hole_fusion_node
 )
 
 add_dependencies(hole_fusion_node
-  vision_gencfg
+  ${PROJECT_NAME}_gencfg
   vision_communications_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
@@ -211,31 +211,12 @@ target_link_libraries(rgb_node
 )
 
 add_dependencies(rgb_node
-  vision_gencfg
+  ${PROJECT_NAME}_gencfg
   vision_communications_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
 
-#~ To check lint : catkin_make roslint_pandora_vision_hole_detector
-set(ROSLINT_CPP_OPTS
-  "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
 
-FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
-  RELATIVE ${PROJECT_SOURCE_DIR}
-
-  include/rgb_node/hole_detection.h
-  include/rgb_node/hole_detector.h
-  include/rgb_node/edge_detection.h
-  include/rgb_node/texture_filter.h
-  include/rgb_node/blob_extraction.h
-  include/rgb_node/rgb_constants.h
-  src/rgb_node/hole_detection.cpp
-  src/rgb_node/hole_detector.cpp
-  src/rgb_node/edge_detection.cpp
-  src/rgb_node/texture_filter.cpp
-  src/rgb_node/blob_extraction.cpp
-  src/rgb_node/rgb_constants.cpp
-  )
 
 ################################# ROSLINT ######################################
 # Execute via lint : catkin_make roslint_{PACKAGE_NAME}
@@ -307,6 +288,17 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
 
   src/synchronizer_node/rgb_depth_synchronizer.cpp
   src/synchronizer_node/rgb_depth_synchronizer_node.cpp
+
+  ## rgb_node ##
+
+  include/rgb_node/hole_detection.h
+  include/rgb_node/hole_detector.h
+  include/rgb_node/texture_filter.h
+
+  src/rgb_node/hole_detection.cpp
+  src/rgb_node/hole_detector.cpp
+  src/rgb_node/texture_filter.cpp
+  src/rgb_node/hole_node.cpp
   )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

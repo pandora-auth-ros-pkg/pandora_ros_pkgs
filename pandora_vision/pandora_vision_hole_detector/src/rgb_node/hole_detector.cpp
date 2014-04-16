@@ -97,7 +97,7 @@ namespace pandora_vision
 
     cv::Mat after_blur;
     holeFrame.copyTo(after_blur);
-    cv::blur(holeFrame, after_blur, cv::Size(7,7));
+    cv::blur(holeFrame, after_blur, cv::Size(7, 7));
 
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);

@@ -42,7 +42,7 @@ namespace pandora_vision
   /**
    *@brief Constructor
   **/
-  DatamatrixDetection::DatamatrixDetection(const std::string& ns) : _nh(ns), datamatrixNowON(false)
+  DatamatrixDetection::DatamatrixDetection() : _nh(), datamatrixNowON(false)
   {
     
     //!< Get General Parameters, such as frame width & height , camera id
@@ -58,7 +58,12 @@ namespace pandora_vision
     //!< subscribe to input image's topic
     _frameSubscriber = _nh.subscribe(
         imageTopic, 1, &DatamatrixDetection::imageCallback, this);
- 
+     
+    //!< Declare publisher and advertise topic
+    //!< where algorithm results are posted
+    _datamatrixCodePublisher =
+      _nh.advertise<vision_communications::DataMatrixAlertsVectorMsg>("datamatrix_alert", 10, true);
+      
     //!< initialize states - robot starts in STATE_OFF
     curState = state_manager_communications::robotModeMsg::MODE_OFF;
     prevState = state_manager_communications::robotModeMsg::MODE_OFF;
@@ -70,6 +75,7 @@ namespace pandora_vision
   }
   
   
+  
   /**
     @brief Destructor
    */
@@ -77,6 +83,7 @@ namespace pandora_vision
   {
     ROS_INFO("[Datamatrix_node] : Destroying datamatrix Detection instance");
   }
+  
   
   
   /**
@@ -89,34 +96,22 @@ namespace pandora_vision
     
     packagePath = ros::package::getPath("pandora_vision_datamatrix");
     
-    //! Publishers
-    
-    //! Declare publisher and advertise topic
-    //! where algorithm results are posted
-    if (_nh.getParam("published_topic_names/datamatrix_alert", param))
+    //!< Get the camera to be used by hole node;
+    if (_nh.hasParam("camera_name"))
     {
-      _datamatrixCodePublisher =
-        _nh.advertise<vision_communications::DataMatrixAlertsVectorMsg>(param, 10, true);
+      _nh.getParam("camera_name", cameraName);
+      ROS_DEBUG_STREAM("camera_name : " << cameraName);
     }
     else
     {
-      ROS_FATAL("Datamatrix alert topic name param not found");
-      ROS_BREAK();
+      ROS_DEBUG("[face_node] : Parameter frameHeight not found. Using Default");
+      cameraName = "camera";
     }
-    
-    //!< Get the camera to be used by qr node;
-    if (_nh.getParam("camera_name", cameraName)) {
-      ROS_DEBUG_STREAM("camera_name : " << cameraName);
-    }
-    else 
-    {
-      ROS_FATAL("Camera name not found");
-      ROS_BREAK(); 
-    }
-    
+
     //!< Get the Height parameter if available;
-    if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
+    if (_nh.hasParam("/" + cameraName + "/image_height"))
     {
+      _nh.getParam("/" + cameraName + "/image_height", frameHeight);
       ROS_DEBUG_STREAM("height : " << frameHeight);
     }
     else
@@ -126,8 +121,9 @@ namespace pandora_vision
     }
 
     //!< Get the Width parameter if available;
-    if (_nh.getParam("/" + cameraName + "/image_width", frameWidth))
+    if (_nh.hasParam("/" + cameraName + "/image_width"))
     {
+      _nh.getParam("/" + cameraName + "/image_width", frameWidth);
       ROS_DEBUG_STREAM("width : " << frameWidth);
     }
     else
@@ -137,30 +133,33 @@ namespace pandora_vision
     }
 
     //!< Get the images's topic;
-    if ( _nh.getParam("/" + cameraName + "/topic_name", imageTopic))
+    if (_nh.hasParam("/" + cameraName + "/topic_name"))
     {
+      _nh.getParam("/" + cameraName + "/topic_name", imageTopic);
       ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
     }
     else
     {
-     ROS_FATAL("Camera name not found");
-     ROS_BREAK();
+      ROS_DEBUG("[face_node] : Parameter imageTopic not found. Using Default");
+      imageTopic = "/camera_head/image_raw";
     }
 
     //!< Get the images's frame_id;
-    if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId))
+    if (_nh.hasParam("/" + cameraName + "/camera_frame_id"))
     {
+      _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
       ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
     else
     {
-      ROS_FATAL("Camera name not found");
-      ROS_BREAK();
+      ROS_DEBUG("[face_node] : Parameter camera_frame_id not found. Using Default");
+      cameraFrameId = "/camera";
     }
 
     //!< Get the HFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/hfov", hfov))
+    if (_nh.hasParam("/" + cameraName + "/hfov"))
     {
+      _nh.getParam("/" + cameraName + "/hfov", hfov);
       ROS_DEBUG_STREAM("HFOV : " << hfov);
     }
     else
@@ -170,8 +169,9 @@ namespace pandora_vision
     }
 
     //!< Get the VFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/vfov", vfov))
+    if (_nh.hasParam("/" + cameraName + "/vfov"))
     {
+      _nh.getParam("/" + cameraName + "/vfov", vfov);
       ROS_DEBUG_STREAM("VFOV : " << vfov);
     }
     else
@@ -210,6 +210,7 @@ namespace pandora_vision
   /**
    * @brief This method uses a DatamatrixDetector instance to detect 
    * all present datamatrixes in a given frame
+   * @param frame_id [std::string] The frame id
    * @return void
   */
   void DatamatrixDetection::datamatrixCallback()

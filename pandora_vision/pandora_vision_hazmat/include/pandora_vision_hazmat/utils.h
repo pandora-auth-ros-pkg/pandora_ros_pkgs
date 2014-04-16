@@ -154,6 +154,7 @@ extern char* prepend_path( const char* path, const char* file );
   Displays progress in the console with a spinning pinwheel.  Every time this
   function is called, the state of the pinwheel is incremented.  The pinwheel
   has four states that loop indefinitely: '|', '/', '-', '\'.
+
   @param done if 0, this function simply increments the state of the pinwheel;
    otherwise it prints "done"
 */

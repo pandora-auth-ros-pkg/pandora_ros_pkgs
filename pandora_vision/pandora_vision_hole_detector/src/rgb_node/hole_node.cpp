@@ -45,7 +45,7 @@
  **/
 int main(int argc, char** argv)
 {
-  ros::init(argc,argv,"rgb_node");
+  ros::init(argc, argv, "rgb_node");
   pandora_vision::HoleDetection hole_finder;
   ros::spin();
   return 0;
