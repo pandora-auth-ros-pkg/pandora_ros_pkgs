@@ -127,7 +127,6 @@ namespace pandora_vision
         ROS_WARN(" Cannot find qrcode debug show topic");
       }    
     }         
-  
     
     //!< Get the camera to be used by qr node;
     if (_nh.getParam("camera_name", cameraName)) {

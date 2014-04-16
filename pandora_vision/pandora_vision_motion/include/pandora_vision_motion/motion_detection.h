@@ -129,7 +129,7 @@ namespace pandora_vision
       /**
         @brief Constructor
       **/
-      MotionDetection(const std::string& ns);
+      explicit MotionDetection(const std::string& ns);
             
       /**
         @brief Destructor
