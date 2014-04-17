@@ -122,7 +122,7 @@ namespace pandora_vision
       @brief Default constructor
       @return void
       **/
-      HazmatDetection(void);
+      explicit HazmatDetection(const std::string& ns);
             
       /**
       @brief Default destructor
@@ -149,6 +149,8 @@ namespace pandora_vision
       @return void
       **/
       void completeTransition(void);
+      
+      std::string param;
   };
 
 } // namespace pandora_vision

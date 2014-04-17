@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "hazmat_node");
 
   pandora_vision::HazmatDetection* hazmatDetection = 
-    new pandora_vision::HazmatDetection();
+    new pandora_vision::HazmatDetection("hazmat");
 
   ros::spin();
   return 0;

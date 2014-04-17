@@ -155,7 +155,7 @@ namespace pandora_vision
       @brief Default Constructor
       @return void
     **/
-    DatamatrixDetection();
+    explicit DatamatrixDetection(const std::string& ns);
 
     /**
       @brief Default Destructor
@@ -175,6 +175,8 @@ namespace pandora_vision
       @return void
     */
       void completeTransition(void);
+      
+      std::string param;
 
   };
 }// namespace pandora_vision

@@ -41,7 +41,7 @@ namespace pandora_vision
   /**
     @brief Constructor
   **/
-  MotionDetection::MotionDetection() : _nh()
+  MotionDetection::MotionDetection(const std::string& ns) : _nh(ns)
   {
   
     //!< Get General Parameters, such as frame width & height , camera id
@@ -53,11 +53,6 @@ namespace pandora_vision
     server.setCallback(boost::bind(&MotionDetection::parametersCallback,
         this, _1, _2));
         
-    //!< Declare publisher and advertise topic where 
-    //!< algorithm results are posted
-    _motionPublisher = 
-      _nh.advertise<vision_communications::MotionMsg>("motion", 10);
-
     //!< Subscribe to input image's topic
     _frameSubscriber = _nh.subscribe(imageTopic , 1,
         &MotionDetection::imageCallback, this );
@@ -87,23 +82,35 @@ namespace pandora_vision
    @return void
   */
   void MotionDetection::getGeneralParams()
-  {    
-    //!< Get the camera to be used by hole node;
-    if (_nh.hasParam("camera_name")) 
+  { 
+    //! Publishers
+    //! Declare publisher and advertise topic
+    //! where algorithm results are posted
+    if (_nh.getParam("published_topic_names/motion_alert", param))
     {
-      _nh.getParam("camera_name", cameraName);
-      ROS_DEBUG_STREAM("camera_name : " << cameraName);
+    _motionPublisher = 
+      _nh.advertise<vision_communications::MotionMsg>(param, 10);
     }
     else
     {
-      ROS_DEBUG("[motion_node] : Parameter frameHeight not found. Using Default");
-      cameraName = "camera";
+      ROS_FATAL("Motion alert topic name param not found");
+      ROS_BREAK();
+    }
+       
+    //!< Get the camera to be used by qr node;
+    if (_nh.getParam("camera_name", cameraName)) 
+    {
+      ROS_DEBUG_STREAM("camera_name : " << cameraName);
+    }
+    else 
+    {
+      ROS_FATAL("Camera name not found");
+      ROS_BREAK(); 
     }
 
-    //!< Get the Height parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/image_height")) 
+    //! Get the Height parameter if available;
+    if (_nh.getParam("/" + cameraName + "/image_height", frameHeight)) 
     {
-      _nh.getParam("/" + cameraName + "/image_height", frameHeight);
       ROS_DEBUG_STREAM("height : " << frameHeight);
     }
     else 
@@ -112,10 +119,9 @@ namespace pandora_vision
       frameHeight = DEFAULT_HEIGHT;
     }
     
-    //!< Get the Width parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/image_width")) 
+    //! Get the Width parameter if available;
+    if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth)) 
     {
-      _nh.getParam("/" + cameraName + "/image_width", frameWidth);
       ROS_DEBUG_STREAM("width : " << frameWidth);
     }
     else 
@@ -124,28 +130,26 @@ namespace pandora_vision
       frameWidth = DEFAULT_WIDTH;
     }
     
-    //!< Get the images's topic;
-    if (_nh.hasParam("/" + cameraName + "/topic_name")) 
+    //! Get the images's topic;
+    if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic)) 
     {
-      _nh.getParam("/" + cameraName + "/topic_name", imageTopic);
       ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
     }
     else 
     {
-      ROS_DEBUG("[motion_node] : Parameter imageTopic not found. Using Default");
-      imageTopic = "/camera_head/image_raw";
+      ROS_FATAL("Camera name not found");
+      ROS_BREAK();
     }
 
-    //!< Get the images's frame_id;
-    if (_nh.hasParam("/" + cameraName + "/camera_frame_id")) 
+    //! Get the images's frame_id;
+    if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId)) 
     {
-      _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
       ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
     }
     else 
     {
-      ROS_DEBUG("[motion_node] : Parameter camera_frame_id not found. Using Default");
-      cameraFrameId = "/camera";
+     ROS_FATAL("Camera name not found");
+     ROS_BREAK();
     }
   }
 

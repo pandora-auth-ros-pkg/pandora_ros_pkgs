@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
   ros::init(argc, argv, "datamatrix_node");
 
-  pandora_vision::DatamatrixDetection datamatrix_finder;
+  pandora_vision::DatamatrixDetection datamatrix_finder("datamatrixcode");
   
   ros::spin();
   return 0;

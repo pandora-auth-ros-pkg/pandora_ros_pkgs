@@ -1,10 +1,13 @@
 <launch>
-    <group ns="pandora_vision_motion">
+          
+    <node name="motion_node" type="motion_node" pkg="pandora_vision_motion" 
+      respawn="False" output="screen" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    
+    <rosparam file="$(find pandora_vision_motion)/cfg/motion_topics.yaml" 
+      command="load" ns="motion"/>
       
-      <param name="camera_name" value="kinect" />
-      
-      <node name="motion_node" type="motion_node" pkg="pandora_vision_motion" respawn="False" output="screen" />
-      <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
-   
-    </group>
+    <rosparam file="$(find pandora_vision_motion)/cfg/motion_params.yaml" 
+      command="load" ns="motion"/>
+        
 </launch>

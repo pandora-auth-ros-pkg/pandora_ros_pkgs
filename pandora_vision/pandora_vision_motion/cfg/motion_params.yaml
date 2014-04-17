@@ -1,0 +1,8 @@
+camera_name: kinect
+history: 10
+varThreshold: 16
+bShadowDetection: true
+nmixtures: 3
+diff_threshold: 45
+motion_high_thres: 7500
+motion_low_thres: 200
