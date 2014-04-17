@@ -298,6 +298,29 @@ namespace pandora_vision
 
       /**
         @brief Some hole checkers require the construction of a hole's mask,
+        that is, the pixels inside the hole; either in cv::Mat form or in
+        a set form which contains points' indices.
+        Construct each form here; this method makes it possible to brushfire
+        once for every hole, instead of twice, if the image and set vectors
+        are needed
+        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+        @param[in] image [const cv::Mat&] An image required only for the
+        masks' size
+        @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
+        A vector containing an image (the mask) for each hole
+        @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
+        A vector that holds sets of points;
+        each set holds the inside points of each hole
+        @return void
+       **/
+      static void createHolesMasksVectors(
+        const HolesConveyor& conveyor,
+        const cv::Mat& image,
+        std::vector<cv::Mat>* holesMasksImageVector,
+        std::vector<std::set<unsigned int> >* holesMasksSetVector);
+
+      /**
+        @brief Some hole checkers require the construction of a hole's mask,
         that is, the pixels inside the hole with a value of
         value 255 while the background pixels are with 0 value.
         Construct each mask here, instead of in each checker.
@@ -358,6 +381,42 @@ namespace pandora_vision
         std::vector<int>* inflatedRectanglesIndices);
 
       /**
+        @brief Some hole checkers require the construction of a hole's mask
+        for the points between a hole's outline and its inflated bounding
+        rectangle, either in cv::Mat form or in a set form which contains
+        points' indices.
+        Construct each form here; this method makes it possible to brushfire
+        once for every hole, instead of twice, if the image and set vectors
+        are needed
+        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
+        @param[in] rectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of each rectangle that corresponds to a specific hole
+        inside the coveyor
+        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+        is used to identify a hole's corresponding rectangle. Used primarily
+        because the rectangles used are inflated rectangles; not all holes
+        possess an inflated rectangle
+        @param[in] image [const cv::Mat&] An image needed only for
+        its size
+        A vector that holds the image of the intermediate points between
+        a hole's outline and its bounding box, for each hole whose identifier
+        exists in the @param inflatedRectanglesIndices vector
+        @param[out] intermediatePointsSetVector [std::vector<std::set<int> >*]
+        A vector that holds the intermediate points' indices between a hole's
+        outline and its bounding box, for each hole whose identifier
+        exists in the @param inflatedRectanglesIndices vector
+        @return void
+       **/
+      static void createIntermediateHolesPointsVectors(
+        const HolesConveyor& conveyor,
+        const cv::Mat& image,
+        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
+        const std::vector<int>& rectanglesIndices,
+        std::vector<cv::Mat>* intermediatePointsImageVector,
+        std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
+
+      /**
         @brief For each hole, this function finds the points between the hole's
         outline and the rectangle (inflated or not) that corrensponds to it.
         These points are then stored in an image
@@ -372,8 +431,6 @@ namespace pandora_vision
         possess an inflated rectangle
         @param[in] image [const cv::Mat&] An image needed only for
         its size
-        @param[in] inflationSize [const int&] The bounding rectangles
-        inflation size in pixels
         @param[out] intermediatePointsVector [std::vector<cv::Mat>*]
         A vector that holds the image of the intermediate points for each
         hole whose identifier exists in the @param rectanglesIndices vector
@@ -381,10 +438,9 @@ namespace pandora_vision
        **/
       void createIntermediateHolesPointsImageVector(
         const HolesConveyor& conveyor,
+        const cv::Mat& image,
         const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
         const std::vector<int>& rectanglesIndices,
-        const cv::Mat& image,
-        const int& inflationSize,
         std::vector<cv::Mat>* intermediatePointsImageVector);
 
       /**
@@ -408,9 +464,9 @@ namespace pandora_vision
        **/
       void createIntermediateHolesPointsSetVector(
         const HolesConveyor& conveyor,
+        const cv::Mat& image,
         const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
         const std::vector<int>& inflatedRectanglesIndices,
-        const cv::Mat& image,
         std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
 
 
@@ -425,6 +481,7 @@ namespace pandora_vision
         @brief The HoleFusion deconstructor
        **/
       ~HoleFusion(void);
+
   };
 
 } // namespace pandora_vision
