@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 #ifndef UTILS_DEFINES_H
 #define UTILS_DEFINES_H

@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef HOLE_FUSION_NODE_DEPTH_FILTERS_H
@@ -65,7 +65,9 @@ namespace pandora_vision
         @param[in] depthImage [const cv::Mat&] The depth image
         @param[in] conveyor [const HolesConveyor&] The candidate holes
         @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&]
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of each rectangle that corresponds to a specific hole
+        inside the coveyor
         @param[in] rectanglesIndices [const std::vector<int>&] A vector that
         is used to identify a hole's corresponding rectangle. Used primarily
         because the rectangles used are inflated rectangles; not all holes
@@ -95,7 +97,7 @@ namespace pandora_vision
         [const std::vector<std::set<unsigned int> >&]
         A vector that holds sets of points; each point is internal to its
         respective hole
-        @param[in][out] msgs [std::vector<std::string>*] Messages for debug
+        @param[out] msgs [std::vector<std::string>*] Messages for debug
         reasons
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
@@ -151,8 +153,7 @@ namespace pandora_vision
         std::vector<std::string>* msgs);
 
       /**
-        @brief  Given the bounding box of a blob,
-        All the points that lie on the (edges of the) rectangle should
+        @brief All the points that lie on the (edges of the) rectangle should
         also lie on exactly one plane for the blob to be a hole. Although all
         planes are considered valid, the @param probabilitiesVector hint
         to the validity of the candidate hole through this filter

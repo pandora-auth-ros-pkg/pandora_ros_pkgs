@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef UTILS_PARAMETERS_H
@@ -49,11 +49,11 @@ namespace pandora_vision
 {
   struct Parameters
   {
-    //!< Kanny parameters
-    static int kanny_ratio;
-    static int kanny_kernel_size;
-    static int kanny_low_threshold;
-    static int kanny_blur_noise_kernel_size;
+    //!< canny parameters
+    static int canny_ratio;
+    static int canny_kernel_size;
+    static int canny_low_threshold;
+    static int canny_blur_noise_kernel_size;
 
     static float contrast_enhance_alpha;
     static float contrast_enhance_beta;

@@ -1,39 +1,39 @@
 /*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Authors: Alexandros Filotheou, Manos Tsardoulias
-*********************************************************************/
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
+ *********************************************************************/
 
 #include "utils/edge_detection.h"
 
@@ -54,18 +54,18 @@ namespace pandora_vision
     inImage.copyTo(*outImage);
     cv::Mat detected_edges;
     cv::Mat dst;
-    int ratio = Parameters::kanny_ratio;
-    int kernel_size = Parameters::kanny_kernel_size;
-    int lowThreshold = Parameters::kanny_low_threshold;
+    int ratio = Parameters::canny_ratio;
+    int kernel_size = Parameters::canny_kernel_size;
+    int lowThreshold = Parameters::canny_low_threshold;
 
     //!< Reduce noise with a kernel 3x3
     cv::blur(*outImage, detected_edges, cv::Size(
-          Parameters::kanny_blur_noise_kernel_size,
-          Parameters::kanny_blur_noise_kernel_size));
+        Parameters::canny_blur_noise_kernel_size,
+        Parameters::canny_blur_noise_kernel_size));
 
     //!< Canny detector
     cv::Canny(detected_edges, detected_edges, lowThreshold,
-        lowThreshold * ratio, kernel_size);
+      lowThreshold * ratio, kernel_size);
 
     //!< Using Canny's output as a mask, we display our result
     dst = cv::Scalar::all(0);
@@ -202,7 +202,7 @@ namespace pandora_vision
 
 
   /**
-    @brief Applies contamination to the edges image. It keeps only the edges\
+    @brief Applies contamination to the edges image. It keeps only the edges
     that are not iteratively neighbors to the image's limits
     @param[in][out] inImage [cv::Mat*] Input image in CV_8UC1 format
     @return void
@@ -261,7 +261,7 @@ namespace pandora_vision
     while(current.size() != 0)  //!< Iterative contamination
     {
       for(std::set<unsigned int>::iterator i = current.begin() ;
-          i != current.end() ; i++)
+        i != current.end() ; i++)
       {
         int x = *i / cols;
         int y = *i % cols;
@@ -336,7 +336,7 @@ namespace pandora_vision
     @return void
    **/
   void EdgeDetection::anisotropicDiffusion (const cv::Mat& inImage,
-      cv::Mat* outImage, const int& iterations, const int& method)
+    cv::Mat* outImage, const int& iterations, const int& method)
   {
     #ifdef DEBUG_TIME
     Timer::start("anisotropicDiffusion");
@@ -434,7 +434,7 @@ namespace pandora_vision
         }
       }
       *outImage += lamda * (cN.mul(deltaNorth) + cS.mul(deltaSouth)
-          + cE.mul(deltaEast) + cW.mul(deltaWest));
+        + cE.mul(deltaEast) + cW.mul(deltaWest));
     }
     #ifdef DEBUG_TIME
     Timer::tick("anisotropicDiffusion");
@@ -480,11 +480,11 @@ namespace pandora_vision
       (visualizableDenoisedImage, &denoisedDepthImageEdges);
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
-        Parameters::threshold_lower_value, 255, 3);
+      Parameters::threshold_lower_value, 255, 3);
 
     //!< make all non zero pixels have a value of 255
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
-        0, 255, 0);
+      0, 255, 0);
 
     denoisedDepthImageEdges.copyTo(*edges);
 
@@ -509,8 +509,8 @@ namespace pandora_vision
     @return void
    **/
   void EdgeDetection::connectPairs(cv::Mat* inImage,
-      const std::vector<std::pair<GraphNode, GraphNode> >& pairs,
-      const int& method)
+    const std::vector<std::pair<GraphNode, GraphNode> >& pairs,
+    const int& method)
   {
 
     #ifdef DEBUG_SHOW
@@ -536,10 +536,10 @@ namespace pandora_vision
       for (unsigned int i = 0; i < pairs.size(); i++)
       {
         cv::line(
-            *inImage,
-            cv::Point(pairs[i].first.y, pairs[i].first.x),
-            cv::Point(pairs[i].second.y, pairs[i].second.x),
-            cv::Scalar(255, 255, 255), 1, 8);
+          *inImage,
+          cv::Point(pairs[i].first.y, pairs[i].first.x),
+          cv::Point(pairs[i].second.y, pairs[i].second.x),
+          cv::Scalar(255, 255, 255), 1, 8);
       }
     }
     else if (method == 1)
@@ -547,23 +547,23 @@ namespace pandora_vision
 
       cv::Mat inImageDrawnOnce;
       cv::Mat addedArcs =  cv::Mat(inImage->rows, inImage->cols, CV_8UC1,
-          cv::Scalar::all(0));
+        cv::Scalar::all(0));
 
       for (unsigned int i = 0; i < pairs.size(); i++)
       {
         inImage->copyTo(inImageDrawnOnce);
 
         float pairsDistance = sqrt(
-            pow((pairs[i].first.x - pairs[i].second.x), 2) +
-            pow((pairs[i].first.y - pairs[i].second.y), 2));
+          pow((pairs[i].first.x - pairs[i].second.x), 2) +
+          pow((pairs[i].first.y - pairs[i].second.y), 2));
 
         cv::Point2f bisectorPoint(
-            round((pairs[i].first.y + pairs[i].second.y) / 2),
-            round((pairs[i].first.x + pairs[i].second.x) / 2));
+          round((pairs[i].first.y + pairs[i].second.y) / 2),
+          round((pairs[i].first.x + pairs[i].second.x) / 2));
 
         float bisectorAngle = atan2(
-            pairs[i].second.x - pairs[i].first.x,
-            pairs[i].first.y - pairs[i].second.y);
+          pairs[i].second.x - pairs[i].first.x,
+          pairs[i].first.y - pairs[i].second.y);
 
         //!< Given the line that is perpendicular to the line that connects
         //!< the pair points, move on it one point at a time, in opposite
@@ -601,12 +601,12 @@ namespace pandora_vision
               for (int n = -1; n < 2; n++)
               {
                 if (inImage->at<uchar>(
-                      bisectorPoint.y + m + counter * cos(bisectorAngle),
-                      bisectorPoint.x + n + counter * sin(bisectorAngle)) != 0)
+                    bisectorPoint.y + m + counter * cos(bisectorAngle),
+                    bisectorPoint.x + n + counter * sin(bisectorAngle)) != 0)
                 {
                   outlinePoint = cv::Point2f(
-                      bisectorPoint.x + n + counter * sin(bisectorAngle),
-                      bisectorPoint.y + m + counter * cos(bisectorAngle));
+                    bisectorPoint.x + n + counter * sin(bisectorAngle),
+                    bisectorPoint.y + m + counter * cos(bisectorAngle));
 
                   foundOutlinePoint = true;
                 }
@@ -622,12 +622,12 @@ namespace pandora_vision
               for (int n = -1; n < 2; n++)
               {
                 if (inImage->at<uchar>(
-                      bisectorPoint.y + m - counter * cos(bisectorAngle),
-                      bisectorPoint.x + n - counter * sin(bisectorAngle)) != 0)
+                    bisectorPoint.y + m - counter * cos(bisectorAngle),
+                    bisectorPoint.x + n - counter * sin(bisectorAngle)) != 0)
                 {
                   outlinePoint = cv::Point2f(
-                      bisectorPoint.x + n - counter * sin(bisectorAngle),
-                      bisectorPoint.y + m - counter * cos(bisectorAngle));
+                    bisectorPoint.x + n - counter * sin(bisectorAngle),
+                    bisectorPoint.y + m - counter * cos(bisectorAngle));
                   foundOutlinePoint = true;
                 }
               }
@@ -638,14 +638,14 @@ namespace pandora_vision
         if (foundOutlinePoint)
         {
           float outlineBisectorPointDist = sqrt(
-              pow(bisectorPoint.x - outlinePoint.x, 2) +
-              pow(bisectorPoint.y - outlinePoint.y, 2));
+            pow(bisectorPoint.x - outlinePoint.x, 2) +
+            pow(bisectorPoint.y - outlinePoint.y, 2));
 
 
           //!< If the curve is close to a straight line,
           //!< do not connect pair[i].first and pair[i].second
           if (pairsDistance >=
-              Parameters::AB_to_MO_ratio * outlineBisectorPointDist)
+            Parameters::AB_to_MO_ratio * outlineBisectorPointDist)
           {
             continue;
           }
@@ -656,12 +656,12 @@ namespace pandora_vision
             outlineBisectorPointDist / 2 : pairsDistance / 4;
 
           float pairFirstToOutlinePointAngle = atan2(
-              outlinePoint.y - pairs[i].first.x,
-              outlinePoint.x - pairs[i].first.y);
+            outlinePoint.y - pairs[i].first.x,
+            outlinePoint.x - pairs[i].first.y);
 
           float pairSecondToOutlinePointAngle = atan2(
-              outlinePoint.y - pairs[i].second.x,
-              outlinePoint.x - pairs[i].second.y);
+            outlinePoint.y - pairs[i].second.x,
+            outlinePoint.x - pairs[i].second.y);
 
           // map the angles to the standard polar system
           if (pairFirstToOutlinePointAngle > 0)
@@ -688,12 +688,12 @@ namespace pandora_vision
 
           float pairsAngle;
           float defaultAngle = atan2(
-              pairs[i].first.x - pairs[i].second.x,
-              pairs[i].first.y - pairs[i].second.y);
+            pairs[i].first.x - pairs[i].second.x,
+            pairs[i].first.y - pairs[i].second.y);
 
           //!< Both pair points are above the X axis
           if (pairFirstToOutlinePointAngle > 0 &&
-              pairSecondToOutlinePointAngle > 0)
+            pairSecondToOutlinePointAngle > 0)
           {
             if (pairFirstToOutlinePointAngle < pairSecondToOutlinePointAngle)
             {
@@ -707,7 +707,7 @@ namespace pandora_vision
 
           //!< Both pair points are below the X axis
           if (pairFirstToOutlinePointAngle < 0 &&
-              pairSecondToOutlinePointAngle < 0)
+            pairSecondToOutlinePointAngle < 0)
           {
             if (pairFirstToOutlinePointAngle > pairSecondToOutlinePointAngle)
             {
@@ -721,10 +721,10 @@ namespace pandora_vision
 
           //!< Pair point 2 is above the X axis while pair point 1 below it
           if (pairFirstToOutlinePointAngle < 0 &&
-              pairSecondToOutlinePointAngle > 0)
+            pairSecondToOutlinePointAngle > 0)
           {
             if (-pairFirstToOutlinePointAngle
-                + pairSecondToOutlinePointAngle < 3.1415926535897)
+              + pairSecondToOutlinePointAngle < 3.1415926535897)
             {
               pairsAngle = defaultAngle + 3.1415926535897;
             }
@@ -736,10 +736,10 @@ namespace pandora_vision
 
           //!< Pair point 1 is above the X axis while pair point 2 below it
           if (pairFirstToOutlinePointAngle > 0 &&
-              pairSecondToOutlinePointAngle < 0)
+            pairSecondToOutlinePointAngle < 0)
           {
             if (pairFirstToOutlinePointAngle
-                - pairSecondToOutlinePointAngle < 3.1415926535897)
+              - pairSecondToOutlinePointAngle < 3.1415926535897)
             {
               pairsAngle = defaultAngle;
             }
@@ -752,20 +752,20 @@ namespace pandora_vision
           //!< size arg 1: length of the major axis. always pairsDistance / 2
           //!< size arg 2: length of the minor axis.
           cv::ellipse(
-              inImageDrawnOnce,
-              bisectorPoint,
-              cv::Size(majorAxis, minorAxis),
-              pairsAngle * 180 / 3.1415926535897,
-              0,
-              180,
-              cv::Scalar(255, 255, 255));
+            inImageDrawnOnce,
+            bisectorPoint,
+            cv::Size(majorAxis, minorAxis),
+            pairsAngle * 180 / 3.1415926535897,
+            0,
+            180,
+            cv::Scalar(255, 255, 255));
 
           for (unsigned int rows = 0; rows < inImage->rows; rows++)
           {
             for (unsigned int cols = 0; cols < inImage->cols; cols++)
             {
               if (inImageDrawnOnce.at<unsigned char>(rows, cols) != 0 &&
-                  inImage->at<unsigned char>(rows, cols) == 0)
+                inImage->at<unsigned char>(rows, cols) == 0)
               {
                 addedArcs.at<uchar>(rows, cols) = 255;
               }
@@ -813,7 +813,7 @@ namespace pandora_vision
     #endif
 
     inImage.convertTo(*outImage, -1, Parameters::contrast_enhance_alpha,
-        Parameters::contrast_enhance_beta);
+      Parameters::contrast_enhance_beta);
 
     #ifdef DEBUG_TIME
     Timer::tick("enhanceContrast");
@@ -884,7 +884,7 @@ namespace pandora_vision
       thinnedImg.copyTo(tmp);
       imgs.push_back(tmp);
     }
-    #endif
+  #endif
 
     //!< Perform edge contamination
     EdgeDetection::applyEdgeContamination(&thinnedImg);
@@ -892,9 +892,11 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("Sector #1");
     #endif
+
     #ifdef DEBUG_TIME
     Timer::start("Sector #2", "denoiseEdges");
     #endif
+
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
     {
@@ -938,6 +940,7 @@ namespace pandora_vision
       imgs.push_back(tmp);
     }
     #endif
+
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
     {
@@ -949,9 +952,11 @@ namespace pandora_vision
       imgs.push_back(tmp);
     }
     #endif
+
     #ifdef DEBUG_TIME
     Timer::tick("Sector #2");
     #endif
+
     #ifdef DEBUG_TIME
     Timer::start("Sector #3");
     #endif
@@ -991,7 +996,7 @@ namespace pandora_vision
     for(unsigned int i = 0 ; i < lines.size() ; i++)
     {
       for(std::set<unsigned int>::iterator it = lines[i].begin() ;
-          it != lines[i].end() ; it++)
+        it != lines[i].end() ; it++)
       {
         thinnedImg.data[*it] = 255;
       }
@@ -1003,9 +1008,11 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("Sector #3");
     #endif
+
     #ifdef DEBUG_TIME
     Timer::start("Sector #4");
     #endif
+
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
     {
@@ -1040,6 +1047,7 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("Sector #4");
     #endif
+
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
     {
@@ -1053,9 +1061,10 @@ namespace pandora_vision
     if(Parameters::debug_show_denoise_edges) // Debug
     {
       Visualization::multipleShow("denoiseEdges function", imgs, msgs,
-          Parameters::debug_show_denoise_edges_size, 1);
+        Parameters::debug_show_denoise_edges_size, 1);
     }
     #endif
+
     #ifdef DEBUG_TIME
     Timer::tick("denoiseEdges");
     #endif
@@ -1074,7 +1083,7 @@ namespace pandora_vision
     end points
    **/
   std::pair<GraphNode, GraphNode> EdgeDetection::findNeighs(
-      cv::Mat* img, const int& x_, const int& y_, std::set<unsigned int>* ret)
+    cv::Mat* img, const int& x_, const int& y_, std::set<unsigned int>* ret)
   {
     #ifdef DEBUG_TIME
     Timer::start("findNeighs", "denoiseEdges");
@@ -1105,8 +1114,8 @@ namespace pandora_vision
         img->at<unsigned char>(x, y) = 0;
         unsigned int counter = 0;
         if(img->at<unsigned char>(x - 1, y - 1) != 0 &&
-            currs.find((x-1) * img->cols + y - 1) == currs.end() &&
-            ret->find((x-1) * img->cols + y - 1) == ret->end())
+          currs.find((x-1) * img->cols + y - 1) == currs.end() &&
+          ret->find((x-1) * img->cols + y - 1) == ret->end())
         {
           next.push_back((x-1) * img->cols + y - 1);
           originNext.push_back(originCurr[i]);
@@ -1115,8 +1124,8 @@ namespace pandora_vision
           counter++;
         }
         if(img->at<unsigned char>(x - 1, y) != 0 &&
-            currs.find((x-1) * img->cols + y) == currs.end() &&
-            ret->find((x-1) * img->cols + y) == ret->end())
+          currs.find((x-1) * img->cols + y) == currs.end() &&
+          ret->find((x-1) * img->cols + y) == ret->end())
         {
           next.push_back((x-1) * img->cols + y);
           originNext.push_back(originCurr[i]);
@@ -1125,8 +1134,8 @@ namespace pandora_vision
           counter++;
         }
         if(img->at<unsigned char>(x - 1, y + 1) != 0 &&
-            currs.find((x-1) * img->cols + y + 1) == currs.end() &&
-            ret->find((x-1) * img->cols + y + 1) == ret->end())
+          currs.find((x-1) * img->cols + y + 1) == currs.end() &&
+          ret->find((x-1) * img->cols + y + 1) == ret->end())
         {
           next.push_back((x-1) * img->cols + y + 1);
           originNext.push_back(originCurr[i]);
@@ -1136,8 +1145,8 @@ namespace pandora_vision
         }
 
         if(img->at<unsigned char>(x, y - 1) != 0 &&
-            currs.find((x) * img->cols + y - 1) == currs.end() &&
-            ret->find((x) * img->cols + y - 1) == ret->end())
+          currs.find((x) * img->cols + y - 1) == currs.end() &&
+          ret->find((x) * img->cols + y - 1) == ret->end())
         {
           next.push_back((x) * img->cols + y - 1);
           originNext.push_back(originCurr[i]);
@@ -1146,8 +1155,8 @@ namespace pandora_vision
           counter++;
         }
         if(img->at<unsigned char>(x, y + 1) != 0 &&
-            currs.find((x) * img->cols + y + 1) == currs.end() &&
-            ret->find((x) * img->cols + y + 1) == ret->end())
+          currs.find((x) * img->cols + y + 1) == currs.end() &&
+          ret->find((x) * img->cols + y + 1) == ret->end())
         {
           next.push_back((x) * img->cols + y + 1);
           originNext.push_back(originCurr[i]);
@@ -1157,8 +1166,8 @@ namespace pandora_vision
         }
 
         if(img->at<unsigned char>(x + 1, y - 1) != 0 &&
-            currs.find((x+1) * img->cols + y - 1) == currs.end() &&
-            ret->find((x+1) * img->cols + y - 1) == ret->end())
+          currs.find((x+1) * img->cols + y - 1) == currs.end() &&
+          ret->find((x+1) * img->cols + y - 1) == ret->end())
         {
           next.push_back((x+1) * img->cols + y - 1);
           originNext.push_back(originCurr[i]);
@@ -1167,8 +1176,8 @@ namespace pandora_vision
           counter++;
         }
         if(img->at<unsigned char>(x + 1, y) != 0 &&
-            currs.find((x+1) * img->cols + y) == currs.end() &&
-            ret->find((x+1) * img->cols + y) == ret->end())
+          currs.find((x+1) * img->cols + y) == currs.end() &&
+          ret->find((x+1) * img->cols + y) == ret->end())
         {
           next.push_back((x+1) * img->cols + y);
           originNext.push_back(originCurr[i]);
@@ -1177,8 +1186,8 @@ namespace pandora_vision
           counter++;
         }
         if(img->at<unsigned char>(x + 1, y + 1) != 0 &&
-            currs.find((x+1) * img->cols + y + 1) == currs.end() &&
-            ret->find((x+1) * img->cols + y + 1) == ret->end())
+          currs.find((x+1) * img->cols + y + 1) == currs.end() &&
+          ret->find((x+1) * img->cols + y + 1) == ret->end())
         {
           next.push_back((x+1) * img->cols + y + 1);
           originNext.push_back(originCurr[i]);
@@ -1459,7 +1468,7 @@ namespace pandora_vision
 
     //!< The floodfill's edges - region borders
     cv::Mat bordersImage = cv::Mat(inImage->rows, inImage->cols, CV_8UC1,
-        cv::Scalar::all(0));
+      cv::Scalar::all(0));
 
     for (int kernelId = 0; kernelId < 8; kernelId++)
     {
@@ -1468,10 +1477,10 @@ namespace pandora_vision
         for (unsigned int cols = 1; cols < inImage->cols - 1; cols++)
         {
           if (finalFloodFill.at<unsigned char>(rows, cols) != 0 &&
-              bordersImage.at<unsigned char>(rows, cols) == 0)
+            bordersImage.at<unsigned char>(rows, cols) == 0)
           {
             if (Morphology::kernelCheck(kernels[kernelId], finalFloodFill,
-                  cv::Point(cols, rows)))
+                cv::Point(cols, rows)))
             {
               bordersImage.at<unsigned char>(rows, cols) = 255;
             }
@@ -1485,6 +1494,7 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("getShapesClearBorder");
     #endif
+
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_get_shapes_clear_border) // Debug
     {
@@ -1498,7 +1508,7 @@ namespace pandora_vision
     if(Parameters::debug_show_get_shapes_clear_border) // Debug
     {
       Visualization::multipleShow("getShapesClearBorder function", imgs, msgs,
-          1200, 1);
+        1200, 1);
     }
     #endif
   }

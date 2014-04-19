@@ -1,39 +1,39 @@
 /*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Authors: Alexandros Filotheou, Manos Tsardoulias
-*********************************************************************/
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
+ *********************************************************************/
 
 #include "utils/blob_detection.h"
 
@@ -41,7 +41,7 @@ namespace pandora_vision
 {
   /**
     @brief Implements the brushfire algorithm for one blob keypoint in order to
-    find its blob outline points
+    find its outline points
     @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
     @param[in] edgesImage [cv::Mat*] The input image
     @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
@@ -123,7 +123,7 @@ namespace pandora_vision
 
   /**
     @brief Implements the brushfire algorithm for all blob keypoints in order to
-    find a blob limits
+    find blobs' outlines
     @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
     @param[in] edgesImage [cv::Mat*] The input image
     @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]
@@ -242,7 +242,7 @@ namespace pandora_vision
     while (current.size() != 0)
     {
       for (std::set<unsigned int>::iterator it = current.begin() ;
-          it != current.end() ; it++)
+        it != current.end() ; it++)
       {
         //!< sweep the neighbors of the current point
         for (int m = -1; m < 2; m++)
@@ -263,7 +263,7 @@ namespace pandora_vision
               int ind = y * inImage->cols + x;
 
               if (x < 0 || y < 0 ||
-                  x > inImage->cols - 1 || y > inImage->rows - 1)
+                x > inImage->cols - 1 || y > inImage->rows - 1)
               {
                 continue;
               }
@@ -297,7 +297,7 @@ namespace pandora_vision
     @return void
    **/
   void BlobDetection::detectBlobs(const cv::Mat& inImage,
-      std::vector<cv::KeyPoint>* keyPointsOut)
+    std::vector<cv::KeyPoint>* keyPointsOut)
   {
     #ifdef DEBUG_TIME
     Timer::start("detectBlobs", "findHoles");
@@ -335,9 +335,9 @@ namespace pandora_vision
     {
       //!< if the keypoint is out of image limits, discard it
       if (keyPoints[keypointId].pt.x < inImage.cols &&
-          keyPoints[keypointId].pt.x >= 0 &&
-          keyPoints[keypointId].pt.y < inImage.rows &&
-          keyPoints[keypointId].pt.y >= 0)
+        keyPoints[keypointId].pt.x >= 0 &&
+        keyPoints[keypointId].pt.y < inImage.rows &&
+        keyPoints[keypointId].pt.y >= 0)
       {
         keyPointsOut->push_back(keyPoints[keypointId]);
       }
@@ -354,7 +354,7 @@ namespace pandora_vision
     @brief Implements a raycast algorithm for all blob keypoints in order
     to find blob's outlines. The output is a vector containing a coherent
     vector of points.
-    @param[in][out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
+    @param[in out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
     @param[in] edgesImage [cv::Mat*] The input image
     @param[in] partitions [const int&] The number of directions
     towards which the outline of the blob will be sought,
@@ -366,11 +366,11 @@ namespace pandora_vision
     @return void
    **/
   void BlobDetection::raycastKeypoint(
-      std::vector<cv::KeyPoint>* inKeyPoints,
-      cv::Mat* edgesImage,
-      const int& partitions,
-      std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
-      std::vector<float>* blobsArea)
+    std::vector<cv::KeyPoint>* inKeyPoints,
+    cv::Mat* edgesImage,
+    const int& partitions,
+    std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
+    std::vector<float>* blobsArea)
   {
     #ifdef DEBUG_TIME
     Timer::start("raycastKeypoint", "validateBlobs");
@@ -582,7 +582,7 @@ namespace pandora_vision
           while (current.size() != 0)
           {
             for (std::set<unsigned int>::iterator it = current.begin() ;
-                it != current.end() ; it++)
+              it != current.end() ; it++)
             {
               //!< sweep the neighbors of the current point
               for (int m = -1; m < 2; m++)
@@ -594,7 +594,7 @@ namespace pandora_vision
                   int y = static_cast<int>(*it) / inImage->cols + n;
 
                   if (x < 0 || y < 0 ||
-                      x > inImage->cols - 1 || y > inImage->rows - 1)
+                    x > inImage->cols - 1 || y > inImage->rows - 1)
                   {
                     continue;
                   }
@@ -632,4 +632,5 @@ namespace pandora_vision
     Timer::tick("getClosedCurves");
     #endif
   }
+
 } // namespace pandora_vision

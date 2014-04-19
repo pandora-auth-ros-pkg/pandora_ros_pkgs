@@ -1,39 +1,39 @@
 /*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Authors: Alexandros Filotheou, Manos Tsardoulias
-*********************************************************************/
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
+ *********************************************************************/
 
 #include "depth_node/depth.h"
 
@@ -43,27 +43,19 @@ namespace pandora_vision
     @brief Default constructor. Initiates communications, loads parameters.
     @return void
    **/
-  PandoraKinect::PandoraKinect(void)
+  Depth::Depth(void)
   {
     #ifdef DEBUG_TIME
-    Timer::start("PandoraKinect");
+    Timer::start("Depth");
     #endif
 
     ros::Duration(0.5).sleep();
 
-/*
- *    //!< Subscribe to the point cloud published by the
- *    //!< rgb_depth_synchronizer node
- *    inputCloudSubscriber_ = nodeHandle_.subscribe(
- *      "/synchronized/camera/depth/points", 1,
- *      &PandoraKinect::inputCloudCallback, this);
- *
- */
     //!< Subscribe to the point cloud published by the
     //!< rgb_depth_synchronizer node
     depthImageSubscriber_ = nodeHandle_.subscribe(
       "/synchronized/camera/depth/image_raw", 1,
-      &PandoraKinect::inputDepthImageCallback, this);
+      &Depth::inputDepthImageCallback, this);
 
     //!< Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
@@ -71,13 +63,13 @@ namespace pandora_vision
       "/synchronized/camera/depth/candidate_holes", 1000);
 
     //!< The dynamic reconfigure (depth) parameter's callback
-    server.setCallback(boost::bind(&PandoraKinect::parametersCallback,
+    server.setCallback(boost::bind(&Depth::parametersCallback,
         this, _1, _2));
 
     ROS_INFO("Depth node initiated");
 
     #ifdef DEBUG_TIME
-    Timer::tick("PandoraKinect");
+    Timer::tick("Depth");
     #endif
   }
 
@@ -87,7 +79,7 @@ namespace pandora_vision
     @brief Default destructor
     @return void
    **/
-  PandoraKinect::~PandoraKinect(void)
+  Depth::~Depth(void)
   {
     ROS_INFO("Depth node terminated");
   }
@@ -99,7 +91,7 @@ namespace pandora_vision
     @param msg [const sensor_msgs::Image&] The depth image message
     @return void
    **/
-  void PandoraKinect::inputDepthImageCallback(
+  void Depth::inputDepthImageCallback(
     const sensor_msgs::Image& msg)
   {
     #ifdef DEBUG_TIME
@@ -147,7 +139,7 @@ namespace pandora_vision
     @param[in] level [const uint32_t] The level (?)
     @return void
    **/
-  void PandoraKinect::parametersCallback(
+  void Depth::parametersCallback(
     const pandora_vision_hole_detector::depth_cfgConfig& config,
     const uint32_t& level)
   {
@@ -155,12 +147,12 @@ namespace pandora_vision
     ROS_INFO("Parameters callback called");
     #endif
 
-    //!< Kanny parameters
-    Parameters::kanny_ratio = config.kanny_ratio;
-    Parameters::kanny_kernel_size = config.kanny_kernel_size;
-    Parameters::kanny_low_threshold = config.kanny_low_threshold;
-    Parameters::kanny_blur_noise_kernel_size =
-      config.kanny_blur_noise_kernel_size;
+    //!< canny parameters
+    Parameters::canny_ratio = config.canny_ratio;
+    Parameters::canny_kernel_size = config.canny_kernel_size;
+    Parameters::canny_low_threshold = config.canny_low_threshold;
+    Parameters::canny_blur_noise_kernel_size =
+      config.canny_blur_noise_kernel_size;
 
     Parameters::contrast_enhance_alpha = config.contrast_enhance_alpha;
     Parameters::contrast_enhance_beta = config.contrast_enhance_beta;

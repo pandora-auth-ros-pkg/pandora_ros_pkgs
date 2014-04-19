@@ -225,12 +225,12 @@ namespace pandora_vision
     ROS_INFO("Parameters callback called");
     #endif
 
-    //!< Kanny parameters
-    Parameters::kanny_ratio = config.kanny_ratio;
-    Parameters::kanny_kernel_size = config.kanny_kernel_size;
-    Parameters::kanny_low_threshold = config.kanny_low_threshold;
-    Parameters::kanny_blur_noise_kernel_size =
-      config.kanny_blur_noise_kernel_size;
+    //!< canny parameters
+    Parameters::canny_ratio = config.canny_ratio;
+    Parameters::canny_kernel_size = config.canny_kernel_size;
+    Parameters::canny_low_threshold = config.canny_low_threshold;
+    Parameters::canny_blur_noise_kernel_size =
+      config.canny_blur_noise_kernel_size;
 
     Parameters::contrast_enhance_beta = config.contrast_enhance_beta;
     Parameters::contrast_enhance_alpha = config.contrast_enhance_alpha;

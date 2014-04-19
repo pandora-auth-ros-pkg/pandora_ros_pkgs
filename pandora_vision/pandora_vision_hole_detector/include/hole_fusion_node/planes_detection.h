@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef HOLE_FUSION_NODE_PLANES_DETECTION_H
@@ -48,11 +48,20 @@ namespace pandora_vision
 {
   /**
     @class PlanesDetection
-    @brief Provides methods for plane extraction
+    @brief Provides methods for plane detection and extraction
    **/
   class PlanesDetection
   {
     public:
+
+      /**
+        @brief Applies a voxel grid filtering
+        (http://pointclouds.org/documentation/tutorials/voxel_grid.php)
+        @param[in] cloudIn [const PointCloudXYZPtr&] The point cloud to filter
+        @return PointCloudXYZPtr A pointer to the filtered cloud
+       **/
+      static PointCloudXYZPtr applyVoxelGridFilter
+        (const PointCloudXYZPtr& cloudIn);
 
       /**
         @brief Identify the planes in a point cloud and return the number of
@@ -133,14 +142,6 @@ namespace pandora_vision
          std::vector<pcl::ModelCoefficients>* coefficientsVectorOut,
          std::vector<pcl::PointIndices::Ptr>* inliersVectorOut);
 
-      /**
-        @brief Applies a voxel grid filtering
-        (http://pointclouds.org/documentation/tutorials/voxel_grid.php)
-        @param[in] cloudIn [const PointCloudXYZPtr&] The point cloud to filter
-        @return PointCloudXYZPtr A pointer to the filtered cloud
-       **/
-      static PointCloudXYZPtr applyVoxelGridFilter
-        (const PointCloudXYZPtr& cloudIn);
   };
 
 } // namespace pandora_vision

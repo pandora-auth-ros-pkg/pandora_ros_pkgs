@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef DEPTH_NODE_DEPTH_H
@@ -50,7 +50,7 @@
  **/
 namespace pandora_vision
 {
-  class PandoraKinect
+  class Depth
   {
     private:
       //!< The ROS node handle
@@ -69,7 +69,6 @@ namespace pandora_vision
       //!< The dynamic reconfigure (depth) parameters' callback
       dynamic_reconfigure::Server<pandora_vision_hole_detector::depth_cfgConfig>
         ::CallbackType f;
-
 
       /**
         @brief Callback for the depth image
@@ -95,13 +94,13 @@ namespace pandora_vision
         @brief Default constructor. Initiates communications, loads parameters.
         @return void
        **/
-      PandoraKinect(void);
+      Depth(void);
 
       /**
         @brief Default destructor
         @return void
        **/
-      ~PandoraKinect(void);
+      ~Depth(void);
 
   };
 

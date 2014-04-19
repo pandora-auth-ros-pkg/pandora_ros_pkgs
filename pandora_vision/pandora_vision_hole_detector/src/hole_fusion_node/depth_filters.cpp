@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #include "hole_fusion_node/depth_filters.h"
@@ -45,8 +45,13 @@ namespace pandora_vision
     @param[in] depthImage [const cv::Mat&] The depth image
     @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] rectanglesVector
-    [const std::vector<std::vector<cv::Point2f> >&]
-    @param[in] rectanglesIndices [const std::vector<int>&]
+    [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+    the vertices of each rectangle that corresponds to a specific hole
+    inside the coveyor
+    @param[in] rectanglesIndices [const std::vector<int>&] A vector that
+    is used to identify a hole's corresponding rectangle. Used primarily
+    because the rectangles used are inflated rectangles; not all holes
+    possess an inflated rectangle
     @param[out] msgs [std::vector<std::string>*] Messages for debug reasons
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities, each position of which hints to the certainty degree
@@ -111,7 +116,8 @@ namespace pandora_vision
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
     A vector that holds sets of points; each point is internal to its
     respective hole
-    @param[in][out] msgs [std::vector<std::string>*] Messages for debug reasons
+    @param[out] msgs [std::vector<std::string>*] Messages for debug
+    reasons
     @param[out] probabilitiesVector [std::vector<float>*] A vector
     of probabilities, each position of which hints to the certainty degree
     with which the associated candidate hole is associated.
@@ -186,8 +192,9 @@ namespace pandora_vision
     The point cloud acquired from the depth sensor, interpolated
     @param[in] intermediatePointsSetVector
     [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
-    hole a set of points; these points are the points between the hole's
-    outline and its bounding rectangle
+    hole a set of points;
+    these points are the points between the hole's outline and its
+    bounding rectangle
     @param[in] rectanglesIndices [const std::vector<int>&] Because
     each hole's bounding rectangle may be inflated, and thus not all holes
     possess a bounding rectangle by this process, in this vector is stored
@@ -199,7 +206,7 @@ namespace pandora_vision
     While the returned set may be reduced in size, the size of this vector
     is the same throughout and equal to the number of keypoints found and
     published by the rgb node
-    @param[in][out] msgs [std::vector<std::string>*] Messages for
+    @param[out] msgs [std::vector<std::string>*] Messages for
     debug reasons
     @return void
    **/
@@ -282,8 +289,7 @@ namespace pandora_vision
 
 
   /**
-    @brief  Given the bounding box of a blob,
-    All the points that lie on the (edges of the) rectangle should
+    @brief All the points that lie on the (edges of the) rectangle should
     also lie on exactly one plane for the blob to be a hole. Although all
     planes are considered valid, the @param probabilitiesVector hint
     to the validity of the candidate hole through this filter
@@ -305,7 +311,7 @@ namespace pandora_vision
     While the returned set may be reduced in size, the size of this vector
     is the same throughout and equal to the number of keypoints found and
     published by the rgb node
-    @param[in][out] msgs [std::vector<std::string>*] Messages for
+    @param[out] msgs [std::vector<std::string>*] Messages for
     debug reasons
     @return void
    **/
@@ -440,7 +446,7 @@ namespace pandora_vision
     std::vector<float>* probabilitiesVector)
   {
     #ifdef DEBUG_TIME
-    Timer::start("checkHolesDepthHomogenity", "applyFilter");
+    Timer::start("checkHolesDepthHomogeneity", "applyFilter");
     #endif
 
     //!< Facilitate the edge detection by converting the 32FC1 image
@@ -489,7 +495,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_TIME
-    Timer::tick("checkHolesDepthHomogenity");
+    Timer::tick("checkHolesDepthHomogeneity");
     #endif
   }
 
@@ -505,7 +511,8 @@ namespace pandora_vision
     @param[in] interpolatedPointCloud
     [const pcl::PointCloud<pcl::PointXYZ>::Ptr]
     The interpolated input point cloud
-    @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
+    @param[in] holesMasksSetVector
+    [const std::vector<std::set<unsigned int> >&]
     A vector that holds sets of points's indices;
     each point is internal to its respective hole
     @param[in] rectanglesVector
@@ -517,9 +524,10 @@ namespace pandora_vision
     because the rectangles used are inflated rectangles; not all holes
     possess an inflated rectangle
     @param[in] intermediatePointsSetVector
-    [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
-    hole a set of points; these points are the points between the hole's
-    outline and its bounding rectangle
+    [const std::vector<std::set<unsigned int> >& ] A vector that holds
+    for each hole a set of points;
+    these points are the points between the hole's outline and its
+    bounding rectangle
     @param[out] probabilitiesVector [std::vector<std::vector<float> >*]
     A 2D vector of probabilities hinting to the certainty degree with
     which each candidate hole is associated for every
@@ -776,4 +784,3 @@ namespace pandora_vision
   }
 
 } // namespace pandora_vision
-

@@ -32,18 +32,18 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #include "utils/parameters.h"
 
 namespace pandora_vision
 {
-  //!< Kanny parameters
-  int Parameters::kanny_ratio = 3;
-  int Parameters::kanny_kernel_size = 3;
-  int Parameters::kanny_low_threshold = 50;
-  int Parameters::kanny_blur_noise_kernel_size = 3;
+  //!< canny parameters
+  int Parameters::canny_ratio = 3;
+  int Parameters::canny_kernel_size = 3;
+  int Parameters::canny_low_threshold = 50;
+  int Parameters::canny_blur_noise_kernel_size = 3;
 
   float Parameters::contrast_enhance_alpha = 2;
   float Parameters::contrast_enhance_beta = 2;

@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 #ifndef HOLE_FUSION_NODE_RGB_FILTERS_H
 #define HOLE_FUSION_NODE_RGB_FILTERS_H
@@ -62,7 +62,7 @@ namespace pandora_vision
         if its H-V histogram has above a certain number of bins occupied.
         @param[in] conveyor [const HolesConveyor&] The candidate holes
         @param[in] inImage [const cv::Mat&] The RGB image in unscaled format
-        @param[in] holesMasksVector [const std::vector<cv::Mat>&] A vector
+        @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
         containing the masks needed to produce the histograms of the points
         inside each hole's outline
         @param[out] probabilitiesVector [std::vector<float>*] A vector
@@ -74,7 +74,7 @@ namespace pandora_vision
         debug reasons
         @return void
        **/
-      static void checkHolesColorHomogenity(
+      static void checkHolesColorHomogeneity(
         const HolesConveyor& conveyor,
         const cv::Mat& inImage,
         const std::vector<cv::Mat>& holesMasksVector,

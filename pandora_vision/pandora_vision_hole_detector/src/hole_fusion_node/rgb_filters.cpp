@@ -32,14 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #include "hole_fusion_node/rgb_filters.h"
 
 namespace pandora_vision
 {
-
   /**
     @brief Checks for color homogenity in a region where points are
     constrained inside each hole. A candidate hole is considered valid
@@ -58,7 +57,7 @@ namespace pandora_vision
     debug reasons
     @return void
    **/
-  void RgbFilters::checkHolesColorHomogenity(
+  void RgbFilters::checkHolesColorHomogeneity(
     const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const std::vector<cv::Mat>& holesMasksImageVector,
@@ -66,7 +65,7 @@ namespace pandora_vision
     std::vector<std::string>* msgs)
   {
     #ifdef DEBUG_TIME
-    Timer::start("checkHolesColorHomogenity", "applyFilter");
+    Timer::start("checkHolesColorHomogeneity", "applyFilter");
     #endif
 
     //!< Scale the inImage in [0, 255] into inImage_ if not already
@@ -149,7 +148,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_TIME
-    Timer::tick("checkHolesColorHomogenity");
+    Timer::tick("checkHolesColorHomogeneity");
     #endif
   }
 
@@ -280,7 +279,8 @@ namespace pandora_vision
     histograms of the bounding box and the points inside the outline of the
     blob.
     @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inImage [const cv::Mat&] The input RGB image in unscaled format
+    @param[in] inImage [const cv::Mat&] The input RGB image in unscaled
+    format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
@@ -726,14 +726,14 @@ namespace pandora_vision
       //!< Filter #1 (Color homogenity inside blob)-----------------------------
       case 1 :
         {
-          checkHolesColorHomogenity(
+          checkHolesColorHomogeneity(
             conveyor,
             img,
             holesMasksImageVector,
             probabilitiesVector,
             &msgs_);
 
-          windowMsg = "Filter: Color homogenity";
+          windowMsg = "Filter: Color homogeneity";
           break;
         }
         //!< Filter #2 (Luminosity difference)----------------------------------

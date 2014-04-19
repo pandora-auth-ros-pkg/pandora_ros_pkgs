@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef UTILS_BLOB_DETECTION_H
@@ -55,7 +55,7 @@ namespace pandora_vision
     public:
       /**
         @brief Implements the brushfire algorithm for one blob keypoint in
-        order to find its blob outline points
+        order to find its outline points
         @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
         @param[in] edgesImage [cv::Mat*] The input image
         @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
@@ -71,7 +71,7 @@ namespace pandora_vision
 
       /**
         @brief Implements the brushfire algorithm for all blob keypoints in
-        order to find a blob limits
+        order to find blobs' outlines
         @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
         @param[in] edgesImage [cv::Mat*] The input image
         @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]
@@ -113,7 +113,7 @@ namespace pandora_vision
         @brief Implements a raycast algorithm for all blob keypoints in order
         to find blob's outlines. The output is a vector containing a coherent
         vector of points.
-        @param[in][out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
+        @param[in out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
         @param[in] edgesImage [cv::Mat*] The input image
         @param[in] partitions [const int&] The number of directions
         towards which the outline of the blob will be sought,

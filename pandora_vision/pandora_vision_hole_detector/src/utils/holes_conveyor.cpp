@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #include "utils/holes_conveyor.h"
@@ -172,7 +172,7 @@ namespace pandora_vision
     of the rectangle
     @param[in] x [const int&] The length at x direction
     @param[in] y [const int&] The length at y direction
-    @param[in] intent [const int&] 0 for a rectangle's vertices
+    @param[in] intent [const int&] 0 for vertices'
     construction, 1 for a coherent outline construction
     @return std::vector<cv::Point2f> A vector of four vertices
     of type cv::Point2f

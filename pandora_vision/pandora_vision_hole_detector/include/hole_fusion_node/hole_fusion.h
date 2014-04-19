@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
 #ifndef HOLE_FUSION_NODE_HOLE_FUSION_H
@@ -49,6 +49,7 @@
 #include "utils/parameters.h"
 #include "utils/visualization.h"
 #include "hole_fusion_node/depth_filters.h"
+#include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/rgb_filters.h"
 #include "hole_fusion_node/hole_merger.h"
 
@@ -112,15 +113,19 @@ namespace pandora_vision
         hole_fusion_cfgConfig>:: CallbackType f;
 
       /**
-        @brief The function called when a parameter is changed
-        @param[in] config
-        [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
-        @param[in] level [const uint32_t] The level (?)
+        @brief Applies a merging operation of @param operationId, until
+        every candidate hole, even as it changes through the various merges that
+        happen, has been merged with every candidate hole that can be merged
+        with it.
+        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+        candidate holes conveyor
+        @param[in] operationId [const int&] The identifier of the merging
+        process. Values: 0 for assimilation, 1 for amalgamation and
+        2 for connecting
         @return void
        **/
-      void parametersCallback(
-        const pandora_vision_hole_detector::hole_fusion_cfgConfig& config,
-        const uint32_t& level);
+      void applyMergeOperation(HolesConveyor* rgbdHolesConveyor,
+        const int& operationId);
 
       /**
         @brief Callback for the candidate holes via the depth node
@@ -133,27 +138,6 @@ namespace pandora_vision
       void depthCandidateHolesCallback(
         const vision_communications::CandidateHolesVectorMsg&
         depthCandidateHolesVector);
-
-      /**
-        @brief Callback for the candidate holes via the rgb node
-        @param[in] depthCandidateHolesVector
-        [const vision_communications::CandidateHolesVectorMsg&]
-        The message containing the necessary information to filter hole
-        candidates acquired through the rgb node
-        @return void
-       **/
-      void rgbCandidateHolesCallback(
-        const vision_communications::CandidateHolesVectorMsg&
-        rgbCandidateHolesVector);
-
-      /**
-        @brief Callback for the point cloud that the synchronizer node
-        publishes
-        @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The message
-        containing the point cloud
-        @return void
-       **/
-      void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
 
       /**
         @brief Recreates the HolesConveyor struct for the
@@ -173,12 +157,78 @@ namespace pandora_vision
 
       /**
         @brief Computes a cv::MatND histogram from images loaded in directory
-        ${pandora_vision_hole_detector}/src/wall_pictures and stores it in
+        ${pandora_vision_hole_detector}/src/walls and stores it in
         a private member variable so as to be used in texture comparing
         @parameters void
         @return void
        **/
       void getWallsHistogram();
+
+      /**
+        @brief The function called when a parameter is changed
+        @param[in] config
+        [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
+        @param[in] level [const uint32_t] The level (?)
+        @return void
+       **/
+      void parametersCallback(
+        const pandora_vision_hole_detector::hole_fusion_cfgConfig& config,
+        const uint32_t& level);
+
+      /**
+        @brief Callback for the point cloud that the synchronizer node
+        publishes
+        @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The message
+        containing the point cloud
+        @return void
+       **/
+      void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
+
+      /**
+        @brief Implements a strategy to combine
+        information from both sources in order to accurately find valid holes
+        @return void
+       **/
+      void processCandidateHoles();
+
+      /**
+        @brief Callback for the candidate holes via the rgb node
+        @param[in] depthCandidateHolesVector
+        [const vision_communications::CandidateHolesVectorMsg&]
+        The message containing the necessary information to filter hole
+        candidates acquired through the rgb node
+        @return void
+       **/
+      void rgbCandidateHolesCallback(
+        const vision_communications::CandidateHolesVectorMsg&
+        rgbCandidateHolesVector);
+
+      /**
+        @brief Sets the depth values of a point cloud according to the
+        values of a depth image
+        @param[in] inImage [const cv::Mat&] The depth image in CV_32FC1 format
+        @param[out] pointCloudXYZPtr [PointCloudXYZPtr*] The point cloud
+        @return void
+       **/
+      void setDepthValuesInPointCloud(const cv::Mat& inImage,
+        PointCloudXYZPtr* pointCloudXYZPtr);
+
+      /**
+        @brief Runs candidate holes through selected filters.
+        Probabilities for each candidate hole and filter
+        are printed in the console, with an order specified by the
+        hole_fusion_cfg of the dynamic reconfigure utility
+        @param[in] conveyor [const HolesConveyor&] The conveyor
+        containing candidate holes
+        @return void
+       **/
+      void sift(const HolesConveyor& conveyor);
+
+      /**
+        @brief Requests from the synchronizer to process a new point cloud
+        @return void
+       **/
+      void unlockSynchronizer();
 
       /**
         @brief Unpacks the the HolesConveyor struct for the
@@ -198,276 +248,11 @@ namespace pandora_vision
         HolesConveyor* conveyor, cv::Mat* image, const std::string& encoding);
 
       /**
-        @brief Implements a strategy to combine
-        information from both sources in order to accurately find valid holes
-        @return void
-       **/
-      void processCandidateHoles();
-
-      /**
-        @brief Runs candidate holes through selected filters.
-        Probabilities for each candidate hole and filter
-        are printed in the console, with an order specified by the
-        hole_fusion_cfg of the dynamic reconfigure utility
-        @param[in] conveyor [const HolesConveyor&] The conveyor
-        containing candidate holes
-        @return void
-       **/
-      void sift(const HolesConveyor& conveyor);
-
-      /**
-        @brief Applies a merging operation of @param operationId, until
-        every candidate hole, even as it changes through the various merges that
-        happen, has been merged with every candidate hole that can be merged
-        with it.
-        @param[in][out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
-        candidate holes conveyor
-        @param[in] operationId [const int&] The identifier of the merging
-        process. Values: 0 for assimilation, 1 for amalgamation and
-        2 for connecting
-        @return void
-       **/
-      void applyMergeOperation(HolesConveyor* rgbdHolesConveyor,
-        const int& operationId);
-
-      /**
-        @brief Requests from the synchronizer to process a new point cloud
-        @return void
-       **/
-      void unlockSynchronizer();
-
-      /**
-        @brief Sets the depth values of a point cloud according to the
-        values of a depth image
-        @param[in] inImage [const cv::Mat&] The depth image in CV_32FC1 format
-        @param[out] pointCloudXYZPtr [PointCloudXYZPtr*] The point cloud
-        @return void
-       **/
-      void setDepthValuesInPointCloud(const cv::Mat& inImage,
-        PointCloudXYZPtr* pointCloudXYZPtr);
-
-      /**
         @brief Tests the merging operations on artificial holes
         @param[out] dummy [HolesConveyor*] The hole candidates
         @return void
        **/
       void testDummyHolesMerging(HolesConveyor* dummy);
-
-      /**
-        @brief Each Depth and RGB filter requires the construction of a set
-        of vectors which uses to determine the validity of each hole.
-        The total number of vectors is finite; every filter uses vectors from
-        this pool of vectors. This method centrally constructs the necessary
-        vectors in runtime, depending on which filters are commanded to run
-        @param[in] conveyor [const HolesConeveyor&] The candidate holes
-        from which each element of the vector will be constructed
-        @param[in] image [const cv::Mat&] An image needed for its size
-        @param[in] inflationSize [const int&] The bounding rectangles
-        inflation size
-        @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
-        A vector containing an image (the mask) for each hole
-        @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
-        A vector that holds sets of points's indices; each set holds the
-        indices of the points inside the outline of each hole
-        @param[out] inflatedRectanglesVector
-        [std::vector<std::vector<cv::Point2f> >*] The vector that holds the
-        vertices of the in-image-bounds inflated rectangles
-        @param[out] inflatedRectanglesIndices [std::vector<int>*]
-        The vector that holds the indices of the original holes whose
-        inflated bounding rectangles is within the image's bounds.
-        @param[out] intermediatePointsImageVector [std::vector<cv::Mat>*]
-        A vector that holds the image of the intermediate points between
-        a hole's outline and its bounding box, for each hole whose identifier
-        exists in the @param inflatedRectanglesIndices vector
-        @param[out] intermediatePointsSetVector [std::vector<std::set<int> >*]
-        A vector that holds the intermediate points' indices between a hole's
-        outline and its bounding box, for each hole whose identifier
-        exists in the @param inflatedRectanglesIndices vector
-        @return void
-       **/
-      void createCheckerRequiredVectors(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        const int& inflationSize,
-        std::vector<cv::Mat>* holesMasksImageVector,
-        std::vector<std::set<unsigned int> >* holesMasksSetVector,
-        std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
-        std::vector<int>* inflatedRectanglesIndices,
-        std::vector<cv::Mat>* intermediatePointsImageVector,
-        std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
-
-      /**
-        @brief Some hole checkers require the construction of a hole's mask,
-        that is, the pixels inside the hole; either in cv::Mat form or in
-        a set form which contains points' indices.
-        Construct each form here; this method makes it possible to brushfire
-        once for every hole, instead of twice, if the image and set vectors
-        are needed
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] image [const cv::Mat&] An image required only for the
-        masks' size
-        @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
-        A vector containing an image (the mask) for each hole
-        @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
-        A vector that holds sets of points;
-        each set holds the inside points of each hole
-        @return void
-       **/
-      static void createHolesMasksVectors(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        std::vector<cv::Mat>* holesMasksImageVector,
-        std::vector<std::set<unsigned int> >* holesMasksSetVector);
-
-      /**
-        @brief Some hole checkers require the construction of a hole's mask,
-        that is, the pixels inside the hole with a value of
-        value 255 while the background pixels are with 0 value.
-        Construct each mask here, instead of in each checker.
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] image [const cv::Mat&] An image required only for the
-        masks' size
-        @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
-        A vector containing an image (the mask) for each hole
-        @return void
-       **/
-      void createHolesMasksImageVector(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        std::vector<cv::Mat>* holesMasksImageVector);
-
-      /**
-        @brief Some hole checkers require access to a hole's inside points,
-        Construct a set of points for each hole, and store all of them in
-        a vector
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] image [const cv::Mat&] An image required to access
-        each hole
-        @param[out] holesMasksSetVector [std::vector<unsigned int>*] A vector
-        that holds sets of points; each set holds the inside points of each hole
-        @return void
-       **/
-      void createHolesMasksSetVector(const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        std::vector<std::set<unsigned int> >* holesMasksSetVector);
-
-      /**
-        @brief Some checkers require the construction of a hole's inflated
-        rectangle in order to validate a hole. Construct each mask here.
-        Each vector element contains the four vertices of the inflated
-        rectangle. A hole's bounding rectangle is inflated by a standard size;
-        inflated rectangles that go beyond the image's bounds are discarded,
-        that is, the output vector contains the indices of the original
-        keypoints whose inflated bounding rectangles is within the image's
-        bounds.
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] image [const cv::Mat&] An image needed only for
-        its size
-        @param[in] inflationSize [const int&] The bounding rectangles
-        inflation size in pixels
-        @param[out] inflatedRectanglesVector
-        [std::vector<std::vector<cv::Point2f> >*] The vector that holds the
-        vertices of the in-image-bounds inflated rectangles
-        @param[out] inflatedRectanglesIndices [std::vector<int>*]
-        The vector that holes the indices of the original holes whose
-        inflated bounding rectangles is within the image's bounds.
-        @return void
-       **/
-      void createInflatedRectanglesVector(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        const int& inflationSize,
-        std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
-        std::vector<int>* inflatedRectanglesIndices);
-
-      /**
-        @brief Some hole checkers require the construction of a hole's mask
-        for the points between a hole's outline and its inflated bounding
-        rectangle, either in cv::Mat form or in a set form which contains
-        points' indices.
-        Construct each form here; this method makes it possible to brushfire
-        once for every hole, instead of twice, if the image and set vectors
-        are needed
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
-        @param[in] image [const cv::Mat&] An image needed only for
-        its size
-        A vector that holds the image of the intermediate points between
-        a hole's outline and its bounding box, for each hole whose identifier
-        exists in the @param inflatedRectanglesIndices vector
-        @param[out] intermediatePointsSetVector [std::vector<std::set<int> >*]
-        A vector that holds the intermediate points' indices between a hole's
-        outline and its bounding box, for each hole whose identifier
-        exists in the @param inflatedRectanglesIndices vector
-        @return void
-       **/
-      static void createIntermediateHolesPointsVectors(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
-        std::vector<cv::Mat>* intermediatePointsImageVector,
-        std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
-
-      /**
-        @brief For each hole, this function finds the points between the hole's
-        outline and the rectangle (inflated or not) that corrensponds to it.
-        These points are then stored in an image
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
-        @param[in] image [const cv::Mat&] An image needed only for
-        its size
-        @param[out] intermediatePointsVector [std::vector<cv::Mat>*]
-        A vector that holds the image of the intermediate points for each
-        hole whose identifier exists in the @param rectanglesIndices vector
-        @return void
-       **/
-      void createIntermediateHolesPointsImageVector(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
-        std::vector<cv::Mat>* intermediatePointsImageVector);
-
-      /**
-        @brief For each hole, this function finds the points between the hole's
-        outline and the rectangle (inflated or not) that corrensponds to it.
-        These points are then stored in a std::set of ints.
-        @param[in] conveyor [const HolesConveyor&] The conveyor of holes
-        @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
-        @param[out] intermediatePointsSetVector
-        [std::vector<std::set<unsigned int> >*]
-        A vector that holds the intermediate points' indices for each hole
-        whose identifier exists in the @param rectanglesIndices vector
-        @return void
-       **/
-      void createIntermediateHolesPointsSetVector(
-        const HolesConveyor& conveyor,
-        const cv::Mat& image,
-        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
-        const std::vector<int>& inflatedRectanglesIndices,
-        std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
 
 
     public:

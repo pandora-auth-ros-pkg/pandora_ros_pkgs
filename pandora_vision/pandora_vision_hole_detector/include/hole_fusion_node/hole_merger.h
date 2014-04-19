@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Filotheou, Manos Tsardoulias
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 #ifndef HOLE_FUSION_NODE_HOLE_MERGER_H
 #define HOLE_FUSION_NODE_HOLE_MERGER_H
@@ -81,8 +81,9 @@ namespace pandora_vision
         is capable of amalgamating another hole assigned the role of
         the amalgamatable. The amalgamator is capable of amalgamating the
         amalgamatable if and only if the amalgatamable's outline
-        points intersect with the amalgamator's outline, and the area of the
-        amalgamator is larger than the area of the amalgamatable
+        points intersect with the amalgamator's outline, but not in their
+        entirety, and the area of the amalgamator is larger than the area
+        of the amalgamatable
         @param[in] amalgamatorHoleMaskSet [const std::set<unsigned int>&]
         A set that includes the indices of points inside the amalgamator's
         outline
@@ -98,18 +99,16 @@ namespace pandora_vision
 
       /**
         @brief Intended to use after the check of the
-        isCapableOfAmalgamating function, this function carries the burden
-        of having to delete a hole entry from its HolesConveyor amalgamatable
-        struct, thus being its executor,
-        and modifying the HolesConveyor conveyor[amalgamatorId] entry so that it
-        it has absorbed the amalgamatable hole in terms of keypoint location,
-        outline unification and bounding rectangle inclusion of the
-        amalgamatable's outline
+        isCapableOfAmalgamating function, this function modifies the
+        HolesConveyor conveyor[amalgamatorId] entry so that it
+        has absorbed the amalgamatable hole (conveyor[amalgamatableId])
+        in terms of keypoint location, outline unification and bounding
+        rectangle inclusion of the amalgamatable's outline
         @param[in out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
         will be modified
-        @param[in] amalgamatorId [const int&] The identifier of the hole inside
-        the HolesConveyor amalgamator struct
+        @param[in] amalgamatorId [const int&] The identifier of the
+        hole inside the HolesConveyor amalgamator struct
         @param[in out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
         A set that includes the indices of points inside the amalgamator's
         outline
@@ -120,12 +119,11 @@ namespace pandora_vision
         @return void
        **/
       static void amalgamateOnce(
-        HolesConveyor* amalgamator,
+        HolesConveyor* conveyor,
         const int& amalgamatorId,
         std::set<unsigned int>* amalgamatorHoleMaskSet,
         const std::set<unsigned int>& amalgamatableHoleMaskSet,
         const cv::Mat& image);
-
 
       /**
         @brief Indicates whether a hole assigned the role of the connectable
@@ -164,13 +162,10 @@ namespace pandora_vision
 
       /**
         @brief Intended to use after the check of the
-        isCapableOfConnecting function, this function carries the burden
-        of having to delete a hole entry from its HolesConveyor connectable
-        struct, thus being its executor,
-        and modifying the HolesConveyor connector struct entry so that it
-        it has absorbed the connectable hole in terms of keypoint location,
-        outline unification and bounding rectangle inclusion of the
-        connectable's outline
+        isCapableOfConnecting function, this method modifies the HolesConveyor
+        connector struct entry so that it it has absorbed the connectable hole
+        in terms of keypoint location, outline unification and bounding
+        rectangle inclusion of the connectable's outline
         @param[in out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
         will be modified
