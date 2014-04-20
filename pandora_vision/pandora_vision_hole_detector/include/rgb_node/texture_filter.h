@@ -45,6 +45,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "utils/histogram_calculation.h"
 #include "utils/holes_conveyor.h"
 #include "utils/morphological_operators.h"
 
@@ -82,20 +83,6 @@ namespace pandora_vision
       @return void
       */
     void getGeneralParams();
-
-    /**
-      @brief Function for calculating histogramms for texture recognition
-      @return void
-      */
-    void calculateTexture();
-
-    /**
-      @brief Function for calculating HS histogramm
-      @param walls [vector<cv::Mat>] vector of images corresponding to walls
-      @return void
-      */
-    void calculateHistogramm(std::vector<cv::Mat> walls);
-
 
     /**
       @brief Function for calculating applying backprojection in input image

@@ -478,9 +478,7 @@ namespace pandora_vision
     @param[in] connectorHoleMaskSet [const std::set<unsigned int>&]
     A set that includes the indices of points inside the connector's
     outline
-    @param[in] connectableHoleMaskSet [const std::set<unsigned int>&]
-    A set that includes the indices of points inside the connectable's
-    outline
+    @param[in] image [const cv::Mat&] An image required only for its size
     @return void
    **/
   void HoleMerger::connectOnce(
@@ -488,25 +486,83 @@ namespace pandora_vision
     const int& connectorId,
     const int& connectableId,
     std::set<unsigned int>* connectorHoleMaskSet,
-    const std::set<unsigned int>& connectableHoleMaskSet)
+    const cv::Mat& image)
   {
     #ifdef DEBUG_TIME
     Timer::start("connectOnce", "applyMergeOperation");
     #endif
 
-    for (std::set<unsigned int>::iterator it = connectableHoleMaskSet.begin();
-      it != connectableHoleMaskSet.end(); it++)
+    //!< The connection rationale is as follows:
+    //!< Since the two holes are not overlapping each other,
+    //!< some sort of connection regime has to be established.
+    //!< The idea is that the points that consist the outline of each hole
+    //!< are connected via a cv::line so that the overall connector's outline
+    //!< is the overall shape's outline
+
+
+    //!< The image on which the hole's outline connection will be drawn
+    cv::Mat canvas = cv::Mat::zeros(image.size(), CV_8UC1);
+    unsigned char* ptr = canvas.ptr();
+
+    for (int i = 0; i < conveyor->outlines[connectorId].size(); i++)
     {
-      //!< In the meanwhile, construct the amalgamator's new hole set
-      connectorHoleMaskSet->insert(*it);
+      for (int j = 0; j < conveyor->outlines[connectableId].size(); j++)
+      {
+        cv::line(canvas,
+          conveyor->outlines[connectorId][i],
+          conveyor->outlines[connectableId][j],
+          cv::Scalar(255, 0, 0), 1, 8);
+      }
     }
 
-    //!< The connector's outline will be the sum of the outline points
-    //!< of the two conveyors
-    conveyor->outlines[connectorId].insert(
-      conveyor->outlines[connectorId].end(),
-      conveyor->outlines[connectableId].begin(),
-      conveyor->outlines[connectableId].end());
+    cv::imshow("canvas", canvas);
+    cv::waitKey(1);
+
+    //!< Construct the connector's new hole mask
+    //!< First, clear the former one
+    connectorHoleMaskSet->erase(
+      connectorHoleMaskSet->begin(),
+      connectorHoleMaskSet->end());
+
+    for (int rows = 0; rows < canvas.rows; rows++)
+    {
+      for (int cols = 0; cols < canvas.cols; cols++)
+      {
+        unsigned int ind = cols + rows * image.cols;
+        if (ptr[ind] != 0)
+        {
+          connectorHoleMaskSet->insert(ptr[ind]);
+        }
+      }
+    }
+
+    //!< Invert canvas
+    for (int rows = 0; rows < image.rows; rows++)
+    {
+      for (int cols = 0; cols < image.cols; cols++)
+      {
+        unsigned int ind = cols + rows * image.cols;
+        if (ptr[ind] == 0)
+        {
+          ptr[ind] = 255;
+        }
+        else
+        {
+          ptr[ind] = 0;
+        }
+      }
+    }
+
+    //!< Locate the outline of the combined hole
+    std::vector<cv::Point2f> newConnectorOutline;
+    float area;
+    BlobDetection::brushfireKeypoint(
+      conveyor->keyPoints[connectorId],
+      &canvas,
+      &newConnectorOutline,
+      &area);
+
+    conveyor->outlines[connectorId] = newConnectorOutline;
 
 
     //!< The connectable's new least area rotated bounding box will be the
@@ -536,18 +592,15 @@ namespace pandora_vision
     conveyor->rectangles.at(connectorId) = substituteVerticesVector;
 
 
-    //!< Set the overall candidate hole's keypoint to the center of the
-    //!< newly created bounding rectangle
-    float x = 0;
-    float y = 0;
-    for (int k = 0; k < 4; k++)
-    {
-      x += conveyor->rectangles[connectorId][k].x;
-      y += conveyor->rectangles[connectorId][k].y;
-    }
+    //!< Set the overall candidate hole's keypoint to the mean of the keypoints
+    //!< of the connector and the connectable
+    conveyor->keyPoints[connectorId].pt.x =
+      (conveyor->keyPoints[connectorId].pt.x
+       + conveyor->keyPoints[connectableId].pt.x) / 2;
 
-    conveyor->keyPoints[connectorId].pt.x = x / 4;
-    conveyor->keyPoints[connectorId].pt.y = y / 4;
+    conveyor->keyPoints[connectorId].pt.y =
+      (conveyor->keyPoints[connectorId].pt.y
+       + conveyor->keyPoints[connectableId].pt.y) / 2;
 
     #ifdef DEBUG_TIME
     Timer::tick("connectOnce");

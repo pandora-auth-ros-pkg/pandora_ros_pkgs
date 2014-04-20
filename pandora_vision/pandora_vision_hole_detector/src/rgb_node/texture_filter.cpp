@@ -34,6 +34,7 @@
  *
  * Author: Despoina Paschalidou
  *********************************************************************/
+
 #include "rgb_node/texture_filter.h"
 
 namespace pandora_vision
@@ -48,7 +49,7 @@ namespace pandora_vision
     pathToWalls = packagePath + "/walls/";
 
     //! Calculate histogramm according to a given set of images
-    calculateTexture();
+    HistogramCalculation::getHistogram(1, &histogramm);
 
     ROS_INFO("[rgb_node]: Textrure detector instance created");
   }
@@ -104,70 +105,6 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("getGeneralParams");
-    #endif
-  }
-
-
-
-  /**
-    @brief Function for calculating histogramms for texture recognition
-    @return void
-   **/
-  void TextureDetector::calculateTexture()
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("calculateTexture", "TextureDetector");
-    #endif
-
-    std::vector<cv::Mat> walls;
-    for(int i = 0; i < 6; i++)
-    {
-      std::ostringstream out;
-      out<< pathToWalls << i << ".png";
-      walls.push_back(cv::imread(out.str()));
-    }
-
-    calculateHistogramm(walls);
-
-    #ifdef DEBUG_TIME
-    Timer::tick("calculateTexture");
-    #endif
-  }
-
-
-
-  /**
-    @brief Function for calculating HS histogramm
-    @param walls [vector<cv::Mat>] vector of images corresponding to walls
-    @return void
-   **/
-  void TextureDetector::calculateHistogramm(std::vector<cv::Mat> walls)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("calculateHistogramm", "calculateTexture");
-    #endif
-
-    cv::Mat* hsv = new cv::Mat[14];
-    for(int i = 0; i < 6; i++)
-      cvtColor(walls[i], hsv[i], CV_BGR2HSV);
-
-    /// Quantize the hue to 30 levels
-    /// and the saturation to 32 levels
-    int hbins = 30, sbins = 32;
-    int histSize[] = {hbins, sbins};
-    /// hue varies from 0 to 179, see cvtColor
-    float hranges[] = { 0, 180 };
-    ///saturation varies from 0 (black-gray-white) to
-    /// 255 (pure spectrum color)
-    float sranges[] = { 0, 256 };
-    const float* ranges[] = { hranges, sranges };
-    /// We compute the histogram from the 0-th and 1-st channels
-    int channels[] = {0, 1};
-    cv::calcHist(hsv, 6, channels, cv::Mat(), histogramm, 2,
-      histSize, ranges, true, false );
-
-    #ifdef DEBUG_TIME
-    Timer::tick("calculateHistogramm");
     #endif
   }
 

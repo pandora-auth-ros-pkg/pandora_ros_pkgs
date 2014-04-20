@@ -176,9 +176,7 @@ namespace pandora_vision
         @param[in] connectorHoleMaskSet [const std::set<unsigned int>&]
         A set that includes the indices of points inside the connector's
         outline
-        @param[in] connectableHoleMaskSet [const std::set<unsigned int>&]
-        A set that includes the indices of points inside the connectable's
-        outline
+        @param[in] image [const cv::Mat&] An image required only for its size
         @return void
        **/
       static void connectOnce(
@@ -186,7 +184,7 @@ namespace pandora_vision
         const int& connectorId,
         const int& connectableId,
         std::set<unsigned int>* connectorHoleMaskSet,
-        const std::set<unsigned int>& connectableHoleMaskSet);
+        const cv::Mat& image);
 
   };
 

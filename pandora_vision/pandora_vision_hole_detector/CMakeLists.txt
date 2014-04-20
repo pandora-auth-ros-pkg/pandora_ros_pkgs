@@ -119,16 +119,17 @@ add_dependencies(synchronizer_node
 
 ############################## HoleFusionNode ##################################
 add_library(hole_fusion_lib
-  src/utils/message_conversions.cpp
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
-  src/utils/parameters.cpp
   src/utils/edge_detection.cpp
+  src/utils/histogram_calculation.cpp
   src/utils/hole_filters.cpp
+  src/utils/holes_conveyor.cpp
+  src/utils/message_conversions.cpp
   src/utils/morphological_operators.cpp
   src/utils/noise_elimination.cpp
+  src/utils/parameters.cpp
   src/utils/timer.cpp
-  src/utils/holes_conveyor.cpp
   src/utils/visualization.cpp
 )
 
@@ -183,13 +184,14 @@ add_dependencies(rgb_dummy_node
 
 ################################ RgbNode ######################################
 add_library(rgb_node_lib
-  src/utils/hole_filters.cpp
-  src/utils/holes_conveyor.cpp
-  src/utils/noise_elimination.cpp
-  src/utils/edge_detection.cpp
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
+  src/utils/edge_detection.cpp
+  src/utils/histogram_calculation.cpp
+  src/utils/hole_filters.cpp
+  src/utils/holes_conveyor.cpp
   src/utils/message_conversions.cpp
+  src/utils/noise_elimination.cpp
   src/utils/morphological_operators.cpp
   src/utils/visualization.cpp
   src/utils/parameters.cpp
@@ -245,6 +247,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/utils/defines.h
   include/utils/parameters.h
   include/utils/edge_detection.h
+  include/utils/histogram_calculation.h
   include/utils/hole_filters.h
   include/utils/holes_conveyor.h
   include/utils/morphological_operators.h
@@ -258,6 +261,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/utils/defines.h
   src/utils/parameters.cpp
   src/utils/edge_detection.cpp
+  src/utils/histogram_calculation.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
   src/utils/morphological_operators.cpp

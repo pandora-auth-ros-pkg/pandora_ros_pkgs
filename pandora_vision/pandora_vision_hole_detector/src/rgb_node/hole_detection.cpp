@@ -286,6 +286,11 @@ namespace pandora_vision
     //!< Method to scale the CV_32FC1 image to CV_8UC1
     Parameters::scale_method = config.scale_method;
 
+    //!< Parameters needed for histogram calculation
+    Parameters::number_of_hue_bins = config.number_of_hue_bins;
+    Parameters::number_of_saturation_bins = config.number_of_saturation_bins;
+    Parameters::number_of_value_bins = config.number_of_value_bins;
+
 
     //!< Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;

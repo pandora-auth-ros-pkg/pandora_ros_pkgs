@@ -51,7 +51,7 @@ namespace pandora_vision
     ros::Duration(0.5).sleep();
 
     //!< Calculate the histogram cv::MatND needed for texture comparing
-    getWallsHistogram();
+    HistogramCalculation::getHistogram(2, &wallsHistogram_);
 
     //!< Initialize the numNodesReady variable
     numNodesReady_ = 0;
@@ -241,7 +241,7 @@ namespace pandora_vision
           HoleMerger::connectOnce(&tempHolesConveyor,
             activeId, passiveId,
             &tempHolesMasksSetVector[activeId],
-            tempHolesMasksSetVector[passiveId]);
+            interpolatedDepthImage_);
 
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
@@ -537,98 +537,6 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("fromCandidateHoleMsgToConveyor");
-    #endif
-  }
-
-
-
-  /**
-    @brief Computes a cv::MatND histogram from images loaded in directory
-    ${pandora_vision_hole_detector}/src/walls and stores it in
-    a private member variable so as to be used in texture comparing
-    @parameters void
-    @return void
-   **/
-  void HoleFusion::getWallsHistogram()
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("getWallsHistogram", "HoleFusion");
-    #endif
-
-    //!< The path to the package where the wall pictures directory lies in
-    std::string packagePath =
-      ros::package::getPath("pandora_vision_hole_detector");
-
-    //!< The actual wall pictures directory
-    std::string wallPicturesPath = packagePath + "/walls/";
-
-    int fileLength;
-
-    //!< The number of wall picture files inside the wallPicturesPath directory
-    int numPictures = 0;
-
-    struct dirent* result = NULL;
-
-    int nameMax = pathconf(wallPicturesPath.c_str(), _PC_NAME_MAX);
-    int len = offsetof(struct dirent, d_name) + nameMax + 1;
-    struct dirent *theDir = static_cast<struct dirent*>(malloc(len));
-
-    DIR *directory;
-
-    directory = opendir(wallPicturesPath.c_str());
-    if (theDir != NULL)
-    {
-      while ((readdir_r(directory, theDir, &result)) == 0 && result!= NULL)
-      {
-        fileLength = strlen(theDir->d_name);
-        if (strcmp (".png", &(theDir->d_name[fileLength - 4])) == 0)
-        {
-          numPictures++;
-        }
-      }
-      closedir (directory);
-    }
-
-    //!< Read the pictures inside the wallPicturesPath, convert them to HSV
-    //!< and calculate their histogram
-    cv::Mat* wallImagesHSV = new cv::Mat[numPictures];
-    for(int i = 0; i < numPictures; i++)
-    {
-      char temp_name[250];
-
-      std::string temp = wallPicturesPath +"%d.png";
-
-      sprintf(temp_name, temp.c_str(), i);
-
-      cv::cvtColor(
-        Visualization::scaleImageForVisualization(cv::imread(temp_name),
-          Parameters::scale_method),
-        wallImagesHSV[i], cv::COLOR_BGR2HSV);
-    }
-
-    //!< Histogram-related parameters
-    int h_bins = Parameters::number_of_hue_bins;
-    int s_bins = Parameters::number_of_saturation_bins;
-    int histSize[] = { h_bins, s_bins };
-
-    //!< hue varies from 0 to 179, saturation from 0 to 255
-    float h_ranges[] = { 0, 180 };
-    float s_ranges[] = { 0, 256 };
-
-    const float* ranges[] = { h_ranges, s_ranges };
-
-    //!< Use the 0-th and 1-st channels
-    int channels[] = { 0, 2 };
-
-    //!< Calculate the histogram for the walls and store it in the class's
-    //!< private member wallsHistogram_
-    cv::calcHist(wallImagesHSV, numPictures, channels, cv::Mat(),
-      wallsHistogram_, 2, histSize, ranges, true, false);
-
-    delete[] wallImagesHSV;
-
-    #ifdef DEBUG_TIME
-    Timer::tick("getWallsHistogram");
     #endif
   }
 

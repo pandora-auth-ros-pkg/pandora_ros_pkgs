@@ -43,9 +43,10 @@
 #include <std_msgs/Empty.h>
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "vision_communications/CandidateHoleMsg.h"
+#include "utils/defines.h"
+#include "utils/histogram_calculation.h"
 #include "utils/message_conversions.h"
 #include "utils/noise_elimination.h"
-#include "utils/defines.h"
 #include "utils/parameters.h"
 #include "utils/visualization.h"
 #include "hole_fusion_node/depth_filters.h"
@@ -154,15 +155,6 @@ namespace pandora_vision
         const std::vector<vision_communications::CandidateHoleMsg>&
         candidateHolesVector,
         HolesConveyor* conveyor);
-
-      /**
-        @brief Computes a cv::MatND histogram from images loaded in directory
-        ${pandora_vision_hole_detector}/src/walls and stores it in
-        a private member variable so as to be used in texture comparing
-        @parameters void
-        @return void
-       **/
-      void getWallsHistogram();
 
       /**
         @brief The function called when a parameter is changed
