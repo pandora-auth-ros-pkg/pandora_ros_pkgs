@@ -90,16 +90,17 @@ namespace pandora_vision
         conveyor.keyPoints[rectanglesIndices[i]].pt.y,
         conveyor.keyPoints[rectanglesIndices[i]].pt.x) - mean;
 
-      if(value > 0 && value < Parameters::depth_difference)
-      {
-        probabilitiesVector->at(rectanglesIndices[i]) = 1.0;
-      }
-      else
-      {
-        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
-      }
+      //!< The gaussian mean
+      float m = Parameters::holes_gaussian_mean;
 
-      msgs->push_back(TOSTR(value));
+      //!< The gaussian standard deviation
+      float s = Parameters::holes_gaussian_stddev;
+
+      //!< The gaussian probability of this hole being valid
+      probabilitiesVector->at(rectanglesIndices[i]) =
+        exp(-pow((value -m) / s, 2) / 2);
+
+      msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }
 
     #ifdef DEBUG_TIME

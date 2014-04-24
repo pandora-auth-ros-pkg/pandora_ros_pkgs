@@ -50,6 +50,9 @@ namespace pandora_vision
     @param[in] image [const cv::Mat&] An image needed for its size
     @param[in] inflationSize [const int&] The bounding rectangles
     inflation size
+    @param[in] interpolationMethod [const int&] The interpolation method
+    of the depth image. If its value is other than zero, the depth filters
+    cannot be applied.
     @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
     A vector containing an image (the mask) for each hole
     @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
@@ -75,6 +78,7 @@ namespace pandora_vision
     const HolesConveyor& conveyor,
     const cv::Mat& image,
     const int& inflationSize,
+    const int& interpolationMethod,
     std::vector<cv::Mat>* holesMasksImageVector,
     std::vector<std::set<unsigned int> >* holesMasksSetVector,
     std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
@@ -138,44 +142,48 @@ namespace pandora_vision
       enable_inflatedRectanglesVectorAndIndices = true;
     }
 
-    //!< The depth diff filter requires only the contruction of the vectors that
-    //!< have to do with the inflation of holes' rectangles
-    if (Parameters::run_checker_depth_diff > 0)
+    //!< If the conditions permit for the depth filters to be run,
+    //!< create their resources
+    if (interpolationMethod == 0)
     {
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
+      //!< The depth diff filter requires only the contruction of the vectors
+      //!< that have to do with the inflation of holes' rectangles
+      if (Parameters::run_checker_depth_diff > 0)
+      {
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
 
-    //!< The depth/area filter requires only the construction of sets that
-    //!< hold the indices of points inside holes' outlines
-    if (Parameters::run_checker_depth_area > 0)
-    {
-      enable_holesMasksSetVector = true;
-    }
+      //!< The depth/area filter requires only the construction of sets that
+      //!< hold the indices of points inside holes' outlines
+      if (Parameters::run_checker_depth_area > 0)
+      {
+        enable_holesMasksSetVector = true;
+      }
 
-    //!< The intermediate points plane constitution filter requires exactly
-    //!< the construction of vectors pertaining to holes' inflation and
-    //!< and a vector of sets of indices of points between holes' outline and
-    //!< their respective (inflated) bounding rectangle
-    if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
-    {
-      enable_intermediatePointsSetVector = true;
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
+      //!< The intermediate points plane constitution filter requires exactly
+      //!< the construction of vectors pertaining to holes' inflation and
+      //!< and a vector of sets of indices of points between holes' outline and
+      //!< their respective (inflated) bounding rectangle
+      if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
+      {
+        enable_intermediatePointsSetVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
 
-    //!< The outline of rectangle plane constitution filter requires
-    //!< the construction of vectors pertaining to holes' inflation
-    if (Parameters::run_checker_outline_of_rectangle > 0)
-    {
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
+      //!< The outline of rectangle plane constitution filter requires
+      //!< the construction of vectors pertaining to holes' inflation
+      if (Parameters::run_checker_outline_of_rectangle > 0)
+      {
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
 
-    //!< The depth homogeneity filter requires the construction of sets of
-    //!< points' indices; these points are the ones inside holes' outlines
-    if (Parameters::run_checker_depth_homogeneity > 0)
-    {
-      enable_holesMasksSetVector = true;
+      //!< The depth homogeneity filter requires the construction of sets of
+      //!< points' indices; these points are the ones inside holes' outlines
+      if (Parameters::run_checker_depth_homogeneity > 0)
+      {
+        enable_holesMasksSetVector = true;
+      }
     }
-
 
     //!< Create the necessary resources
 

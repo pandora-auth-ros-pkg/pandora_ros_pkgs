@@ -40,6 +40,606 @@
 namespace pandora_vision
 {
   /**
+    @brief Applies a merging operation of @param operationId, until
+    every candidate hole, even as it changes through the various merges that
+    happen, has been merged with every candidate hole that can be merged
+    with it.
+    @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+    candidate holes conveyor
+    @param[in] image [const cv::Mat&] An image used for filters' resources
+    creation and size usage
+    @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+    cloud used in the connection operation; it is used to obtain real world
+    distances between holes
+    @param[in] operationId [const int&] The identifier of the merging
+    process. Values: 0 for assimilation, 1 for amalgamation and
+    2 for connecting
+    @return void
+   **/
+  void HoleMerger::applyMergeOperation(
+    HolesConveyor* rgbdHolesConveyor,
+    const cv::Mat& image,
+    const PointCloudXYZPtr& pointCloud,
+    const int& operationId)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("applyMergeOperation", "processCandidateHoles");
+    #endif
+
+    //!< If there are no candidate holes,
+    //!< or there is only one candidate hole,
+    //!< there is no meaning to this operation
+    if (rgbdHolesConveyor->keyPoints.size() < 2)
+    {
+      return;
+    }
+
+
+    //!< The holesMaskSetVector vector is used in the merging processes
+    std::vector<std::set<unsigned int> > holesMasksSetVector;
+    FiltersResources::createHolesMasksSetVector(
+      *rgbdHolesConveyor,
+      image,
+      &holesMasksSetVector);
+
+
+    //!< A vector that indicates when a specific hole has finished
+    //!< examining all the other holes in the conveyor for merging.
+    //!< Initialized at 0 for all conveyor entries, the specific hole
+    //!< that corresponds to a vector's entry is given a 1 when it has
+    //!< finished examining all other holes.
+    std::vector<int> finishVector(rgbdHolesConveyor->keyPoints.size(), 0);
+
+    //!< The index of the candidate hole that will
+    //!< {assimilate, amalgamate, connect} the passiveId-th candidate hole.
+    //!< The activeId always has a value of 0 due to the implementation's
+    //!< rationale: The candidate hole that examines each hole in the
+    //!< rgbdHolesConveyor is always the first one. When it has finished,
+    //!< it goes back into the rgbdHolesConveyor, at the last position
+    const int activeId = 0;
+
+    //!< The index of the candidate hole that will be
+    //!< {assimilated, amalgamated, connected} by / with
+    //!< the activeId-th candidate hole
+    int passiveId = 1;
+
+    bool isFuseComplete = false;
+    while(!isFuseComplete)
+    {
+      //!< Is the activeId-th candidate hole able to
+      //!< {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
+      bool isAble = false;
+
+      if (operationId == 0)
+      {
+        //!< Is the activeId-th candidate hole able to assimilate the
+        //!< passiveId-th candidate hole?
+        isAble = HoleMerger::isCapableOfAssimilating(
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId]);
+      }
+      if (operationId == 1)
+      {
+        //!< Is the activeId-th candidate hole able to amalgamate the
+        //!< passiveId-th candidate hole?
+        isAble = HoleMerger::isCapableOfAmalgamating(
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId]);
+      }
+      if (operationId == 2)
+      {
+        //!< Is the passiveId-th candidate hole able to be connected with the
+        //!< activeId-th candidate hole?
+        isAble = HoleMerger::isCapableOfConnecting(*rgbdHolesConveyor,
+          activeId,
+          passiveId,
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId],
+          pointCloud);
+      }
+
+
+      if (isAble)
+      {
+        //!< Copy the original holes conveyor to a temp one.
+        //!< The temp one will be tested through the hole filters
+        //!< On success, temp will replace rgbdHolesConveyor,
+        //!< on failure, rgbdHolesConveyor will remain unchanged
+        HolesConveyor tempHolesConveyor;
+        HolesConveyorUtils::copyTo(*rgbdHolesConveyor, &tempHolesConveyor);
+
+        //!< Copy the original holes masks set to a temp one.
+        //!< If the temp conveyor is tested successfully through the hole
+        //!< filters, temp will replace the original.
+        //!< On failure, the original will remain unchanged
+        std::vector<std::set<unsigned int> > tempHolesMasksSetVector;
+        tempHolesMasksSetVector = holesMasksSetVector;
+
+        if (operationId == 0)
+        {
+          //!< Delete the passiveId-th candidate hole
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+        else if (operationId == 1)
+        {
+          //!< Delete the passiveId-th candidate hole,
+          //!< alter the activeId-th candidate hole so that it has amalgamated
+          //!< the passiveId-th candidate hole
+          HoleMerger::amalgamateOnce(&tempHolesConveyor,
+            activeId,
+            &tempHolesMasksSetVector[activeId],
+            tempHolesMasksSetVector[passiveId],
+            image);
+
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+        else if (operationId == 2)
+        {
+          //!< Delete the passiveId-th candidate hole,
+          //!< alter the activeId-th candidate hole so that it has been
+          //!< connected with the passiveId -th candidate hole
+          HoleMerger::connectOnce(&tempHolesConveyor,
+            activeId, passiveId,
+            &tempHolesMasksSetVector[activeId],
+            image);
+
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+
+        //!< Since the {assimilator, amalgamator, connector} is able,
+        //!< delete the assimilable's entries in the vectors needed
+        //!< for filtering and merging
+        tempHolesMasksSetVector.erase(
+          tempHolesMasksSetVector.begin() + passiveId);
+
+
+        //!< Declaration of probabilities is made here because of the
+        //!< ommision of checkers running during the assimilation operation
+        float da = 0.0;
+        float dd = 0.0;
+
+        //!< Because of the nature of the assimilation operation,
+        //!< that is, the assimilator does not change in shape or otherwise,
+        //!< there is no need to check the validity of the outcome of the
+        //!< assimilation operation. Either way, the assimilatable will be
+        //!< absorbed by the assimilator.
+        if (operationId != 0)
+        {
+          //!< Obtain the activeId-th candidate hole in order for it
+          //!< to be checked against the selected filters
+          HolesConveyor ithHole =
+            HolesConveyorUtils::getHole(tempHolesConveyor, activeId);
+
+
+          //!< TODO make more flexible
+          //!< Determines the selected filters execution
+          std::map<int, int> filtersOrder;
+
+          //!< Depth diff runs first
+          filtersOrder[1] = 1;
+
+          //!< Depth / Area runs second
+          filtersOrder[2] = 3;
+
+          //!< Create the necessary vectors for each hole checker and
+          //!< merger used
+          std::vector<cv::Mat> imgs;
+          std::vector<std::string> msgs;
+          std::vector<std::vector<cv::Point2f> > rectanglesVector;
+          std::vector<int> rectanglesIndices;
+          std::vector<std::set<unsigned int> > intermediatePointsSetVector;
+
+          //!< The inflated rectangles vector is used in the
+          //!< checkHolesDepthDiff and checkHolesRectangleEdgesPlaneConstitution
+          //!< checkers
+          FiltersResources::createInflatedRectanglesVector(
+            ithHole,
+            image,
+            Parameters::rectangle_inflation_size,
+            &rectanglesVector,
+            &rectanglesIndices);
+
+          //!< The 2D vector with rows = 2 and cols = 1.
+          //!< The value of the element in row 0 and col 0 is the probability
+          //!< that the ithHole has, passing through the depth diff checker,
+          //!< while the value of the element in row 1 and col 0 is the
+          //!< probability that the ithHole has, passing through the
+          //!< depth / area filter.
+          std::vector<std::vector<float> >probabilitiesVector(2,
+            std::vector<float>(1, 0.0));
+
+          int counter = 0;
+          for (std::map<int, int>::iterator o_it = filtersOrder.begin();
+            o_it != filtersOrder.end(); ++o_it)
+          {
+            DepthFilters::applyFilter(
+              o_it->second,
+              image,
+              pointCloud,
+              ithHole,
+              tempHolesMasksSetVector,
+              rectanglesVector,
+              rectanglesIndices,
+              intermediatePointsSetVector,
+              &probabilitiesVector.at(counter),
+              &imgs,
+              &msgs);
+
+            counter++;
+          } //!< o_it iterator ends
+
+          dd = probabilitiesVector[0][0];
+          da = probabilitiesVector[1][0];
+        }
+
+        //!< Probabilities threshold for merge acceptance.
+        //!< In the assimilation operation, the temp conveyor unconditionally
+        //!< replaces the original conveyor
+        if ((dd > Parameters::checker_depth_diff_threshold
+          && da > Parameters::checker_depth_area_threshold)
+          || (operationId == 0))
+        {
+          //!< Since the tempHolesConveyor's ithHole has been positively tested,
+          //!< the tempHolesConveyor is now the new rgbdHolesConveyor
+          HolesConveyorUtils::replace(tempHolesConveyor, rgbdHolesConveyor);
+
+
+          //!< ..and the new holesMasksSetVector is the positively tested
+          //!< temp one
+          holesMasksSetVector = tempHolesMasksSetVector;
+
+
+          //!< Delete the passiveId-th entry of the finishVector since the
+          //!< passiveId-th hole has been absorbed by the activeId-th hole
+          finishVector.erase(finishVector.begin() + passiveId);
+
+
+          //!< Because of the merge happening, the activeId-th
+          //!< candidate hole must re-examine all the other holes
+          passiveId = 1;
+        }
+        else //!< rgbdHolesConveyor remains unchanged
+        {
+          //!< passiveId-th hole not merged. let's see about the next one
+          passiveId++;
+        }
+      }
+      else //!< isAble == false
+      {
+        //!< passiveId-th hole not merged. let's see about the next one
+        passiveId++;
+      }
+
+      //!< If the passiveId-th hole was the last one to be checked for merge,
+      //!< the one doing the merge is rendered obsolete, so go to the next one
+      //!< by moving the current activeId-th candidate hole to the back
+      //!< of the rgbdHolesConveyor. This way the new activeId-th candidate
+      //!< hole still has a value of 0, but now points to the candidate hole
+      //!< next to the one that was moved back
+      if (passiveId >= rgbdHolesConveyor->keyPoints.size())
+      {
+        //!< No meaning moving to the back of the rgbdHolesConveyor if
+        //!< there is only one candidate hole
+        if (rgbdHolesConveyor->keyPoints.size() > 1)
+        {
+          //!< activeId-th hole candidate finished examining the rest of the
+          //!< hole candidates. move it to the back of the rgbdHolesConveyor
+          HolesConveyorUtils::append(
+            HolesConveyorUtils::getHole(*rgbdHolesConveyor, activeId),
+            rgbdHolesConveyor);
+
+          //!< Remove the activeId-th candidate hole from its former position
+          HolesConveyorUtils::removeHole(rgbdHolesConveyor, activeId);
+
+
+          //!< Remove the activeId-th set from its position and append it
+          holesMasksSetVector.push_back(holesMasksSetVector[activeId]);
+          holesMasksSetVector.erase(holesMasksSetVector.begin() + activeId);
+
+
+          //!< Since the candidate hole was appended at the end of the
+          //!< rgbdHolesConveyor, the finish vector needs to be shifted
+          //!< once to the left because the value 1 is always set at the end
+          //!< of the finishVector vector. See below.
+          std::rotate(finishVector.begin(), finishVector.begin() + 1,
+            finishVector.end());
+
+          //!< Return the passive's candidate hole identifier to the
+          //!< next of the active's candidate hole identifier, which is 0
+          passiveId = 1;
+        }
+
+        //!< Since the ith candidate hole was appended at the end of the
+        //!< rgbdHolesConveyor, the position to which it corresponds in the
+        //!< finishVector is at the end of the vector.
+        //!< Place the value of 1 in the last position, indicating that the
+        //!< previously activeId-th candidate hole has finished examining all
+        //!< other candidate holes for merging
+        std::vector<int>::iterator finishVectorIterator =
+          finishVector.end() - 1;
+
+        *finishVectorIterator = 1;
+
+        //!< Count how many aces there are in the finishVector
+        //!< If they amount to the size of the vector, that means that
+        //!< each hole has finished examining the others, and the current
+        //!< operation is complete
+        int numAces = 0;
+        for (int i = 0; i < finishVector.size(); i++)
+        {
+          numAces += finishVector[i];
+        }
+
+        if (numAces == finishVector.size())
+        {
+          isFuseComplete = true;
+        }
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("applyMergeOperation");
+    #endif
+  }
+
+
+
+  /**
+    @brief Applies a merging operation of @param operationId, until
+    every candidate hole, even as it changes through the various merges that
+    happen, has been merged with every candidate hole that can be merged
+    with it. In contrast to the applyMergeOperation method, this method
+    does not consult hole checkers to validate the newly merged holes.
+    (Used when depth analysis is unattainable)
+    @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+    candidate holes conveyor
+    @param[in] image [const cv::Mat&] An image used for filters' resources
+    creation and size usage
+    @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+    cloud used in the connection operation; it is used to obtain real world
+    distances between holes
+    @param[in] operationId [const int&] The identifier of the merging
+    process. Values: 0 for assimilation, 1 for amalgamation and
+    2 for connecting
+    @return void
+   **/
+  void HoleMerger::applyMergeOperationWithoutValidation(
+    HolesConveyor* rgbdHolesConveyor,
+    const cv::Mat& image,
+    const PointCloudXYZPtr& pointCloud,
+    const int& operationId)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("applyMergeOperation", "processCandidateHoles");
+    #endif
+
+    //!< If there are no candidate holes,
+    //!< or there is only one candidate hole,
+    //!< there is no meaning to this operation
+    if (rgbdHolesConveyor->keyPoints.size() < 2)
+    {
+      return;
+    }
+
+
+    //!< The holesMaskSetVector vector is used in the merging processes
+    std::vector<std::set<unsigned int> > holesMasksSetVector;
+    FiltersResources::createHolesMasksSetVector(
+      *rgbdHolesConveyor,
+      image,
+      &holesMasksSetVector);
+
+
+    //!< A vector that indicates when a specific hole has finished
+    //!< examining all the other holes in the conveyor for merging.
+    //!< Initialized at 0 for all conveyor entries, the specific hole
+    //!< that corresponds to a vector's entry is given a 1 when it has
+    //!< finished examining all other holes.
+    std::vector<int> finishVector(rgbdHolesConveyor->keyPoints.size(), 0);
+
+    //!< The index of the candidate hole that will
+    //!< {assimilate, amalgamate, connect} the passiveId-th candidate hole.
+    //!< The activeId always has a value of 0 due to the implementation's
+    //!< rationale: The candidate hole that examines each hole in the
+    //!< rgbdHolesConveyor is always the first one. When it has finished,
+    //!< it goes back into the rgbdHolesConveyor, at the last position
+    const int activeId = 0;
+
+    //!< The index of the candidate hole that will be
+    //!< {assimilated, amalgamated, connected} by / with
+    //!< the activeId-th candidate hole
+    int passiveId = 1;
+
+    bool isFuseComplete = false;
+    while(!isFuseComplete)
+    {
+      //!< Is the activeId-th candidate hole able to
+      //!< {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
+      bool isAble = false;
+
+      if (operationId == 0)
+      {
+        //!< Is the activeId-th candidate hole able to assimilate the
+        //!< passiveId-th candidate hole?
+        isAble = HoleMerger::isCapableOfAssimilating(
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId]);
+      }
+      if (operationId == 1)
+      {
+        //!< Is the activeId-th candidate hole able to amalgamate the
+        //!< passiveId-th candidate hole?
+        isAble = HoleMerger::isCapableOfAmalgamating(
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId]);
+      }
+      if (operationId == 2)
+      {
+        //!< Is the passiveId-th candidate hole able to be connected with the
+        //!< activeId-th candidate hole?
+        isAble = HoleMerger::isCapableOfConnecting(*rgbdHolesConveyor,
+          activeId,
+          passiveId,
+          holesMasksSetVector[activeId],
+          holesMasksSetVector[passiveId],
+          pointCloud);
+      }
+
+
+      if (isAble)
+      {
+        //!< Copy the original holes conveyor to a temp one.
+        //!< The temp one will be tested through the hole filters
+        //!< On success, temp will replace rgbdHolesConveyor,
+        //!< on failure, rgbdHolesConveyor will remain unchanged
+        HolesConveyor tempHolesConveyor;
+        HolesConveyorUtils::copyTo(*rgbdHolesConveyor, &tempHolesConveyor);
+
+        //!< Copy the original holes masks set to a temp one.
+        //!< If the temp conveyor is tested successfully through the hole
+        //!< filters, temp will replace the original.
+        //!< On failure, the original will remain unchanged
+        std::vector<std::set<unsigned int> > tempHolesMasksSetVector;
+        tempHolesMasksSetVector = holesMasksSetVector;
+
+        if (operationId == 0)
+        {
+          //!< Delete the passiveId-th candidate hole
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+        else if (operationId == 1)
+        {
+          //!< Delete the passiveId-th candidate hole,
+          //!< alter the activeId-th candidate hole so that it has amalgamated
+          //!< the passiveId-th candidate hole
+          HoleMerger::amalgamateOnce(&tempHolesConveyor,
+            activeId,
+            &tempHolesMasksSetVector[activeId],
+            tempHolesMasksSetVector[passiveId],
+            image);
+
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+        else if (operationId == 2)
+        {
+          //!< Delete the passiveId-th candidate hole,
+          //!< alter the activeId-th candidate hole so that it has been
+          //!< connected with the passiveId -th candidate hole
+          HoleMerger::connectOnce(&tempHolesConveyor,
+            activeId, passiveId,
+            &tempHolesMasksSetVector[activeId],
+            image);
+
+          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
+        }
+
+        //!< Since the {assimilator, amalgamator, connector} is able,
+        //!< delete the assimilable's entries in the vectors needed
+        //!< for filtering and merging
+        tempHolesMasksSetVector.erase(
+          tempHolesMasksSetVector.begin() + passiveId);
+
+
+        //!< Since the merge has been uncondionally happened,
+        //!< the tempHolesConveyor is now the new rgbdHolesConveyor
+        HolesConveyorUtils::replace(tempHolesConveyor, rgbdHolesConveyor);
+
+
+        //!< ..and the new holesMasksSetVector is the positively tested
+        //!< temp one
+        holesMasksSetVector = tempHolesMasksSetVector;
+
+
+        //!< Delete the passiveId-th entry of the finishVector since the
+        //!< passiveId-th hole has been absorbed by the activeId-th hole
+        finishVector.erase(finishVector.begin() + passiveId);
+
+
+        //!< Because of the merge happening, the activeId-th
+        //!< candidate hole must re-examine all the other holes
+        passiveId = 1;
+      }
+      else //!< isAble == false
+      {
+        //!< passiveId-th hole not merged. let's see about the next one
+        passiveId++;
+      }
+
+      //!< If the passiveId-th hole was the last one to be checked for merge,
+      //!< the one doing the merge is rendered obsolete, so go to the next one
+      //!< by moving the current activeId-th candidate hole to the back
+      //!< of the rgbdHolesConveyor. This way the new activeId-th candidate
+      //!< hole still has a value of 0, but now points to the candidate hole
+      //!< next to the one that was moved back
+      if (passiveId >= rgbdHolesConveyor->keyPoints.size())
+      {
+        //!< No meaning moving to the back of the rgbdHolesConveyor if
+        //!< there is only one candidate hole
+        if (rgbdHolesConveyor->keyPoints.size() > 1)
+        {
+          //!< activeId-th hole candidate finished examining the rest of the
+          //!< hole candidates. move it to the back of the rgbdHolesConveyor
+          HolesConveyorUtils::append(
+            HolesConveyorUtils::getHole(*rgbdHolesConveyor, activeId),
+            rgbdHolesConveyor);
+
+          //!< Remove the activeId-th candidate hole from its former position
+          HolesConveyorUtils::removeHole(rgbdHolesConveyor, activeId);
+
+
+          //!< Remove the activeId-th set from its position and append it
+          holesMasksSetVector.push_back(holesMasksSetVector[activeId]);
+          holesMasksSetVector.erase(holesMasksSetVector.begin() + activeId);
+
+
+          //!< Since the candidate hole was appended at the end of the
+          //!< rgbdHolesConveyor, the finish vector needs to be shifted
+          //!< once to the left because the value 1 is always set at the end
+          //!< of the finishVector vector. See below.
+          std::rotate(finishVector.begin(), finishVector.begin() + 1,
+            finishVector.end());
+
+          //!< Return the passive's candidate hole identifier to the
+          //!< next of the active's candidate hole identifier, which is 0
+          passiveId = 1;
+        }
+
+        //!< Since the ith candidate hole was appended at the end of the
+        //!< rgbdHolesConveyor, the position to which it corresponds in the
+        //!< finishVector is at the end of the vector.
+        //!< Place the value of 1 in the last position, indicating that the
+        //!< previously activeId-th candidate hole has finished examining all
+        //!< other candidate holes for merging
+        std::vector<int>::iterator finishVectorIterator =
+          finishVector.end() - 1;
+
+        *finishVectorIterator = 1;
+
+        //!< Count how many aces there are in the finishVector
+        //!< If they amount to the size of the vector, that means that
+        //!< each hole has finished examining the others, and the current
+        //!< operation is complete
+        int numAces = 0;
+        for (int i = 0; i < finishVector.size(); i++)
+        {
+          numAces += finishVector[i];
+        }
+
+        if (numAces == finishVector.size())
+        {
+          isFuseComplete = true;
+        }
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("applyMergeOperation");
+    #endif
+  }
+
+
+
+  /**
     @brief Indicates whether a hole assigned the role of the assimilator
     is capable of assimilating another hole assigned the role of
     the assimilable. It checks whether the assimilable's outline
@@ -514,9 +1114,6 @@ namespace pandora_vision
           cv::Scalar(255, 0, 0), 1, 8);
       }
     }
-
-    cv::imshow("canvas", canvas);
-    cv::waitKey(1);
 
     //!< Construct the connector's new hole mask
     //!< First, clear the former one

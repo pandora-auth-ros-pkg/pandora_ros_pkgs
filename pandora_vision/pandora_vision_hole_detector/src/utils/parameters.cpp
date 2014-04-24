@@ -94,19 +94,38 @@ namespace pandora_vision
   //!< 2 for brushfire far
   int Parameters::interpolation_method = 0;
 
-  //!< Hole checkers
+  //!< Hole checkers and their thresholds`
   int Parameters::run_checker_depth_diff = 1;
+  float Parameters::checker_depth_diff_threshold = 0.4;
+
   int Parameters::run_checker_depth_area = 3;
+  float Parameters::checker_depth_area_threshold = 0.4;
+
   int Parameters::run_checker_brushfire_outline_to_rectangle = 4;
+  float Parameters::checker_brushfire_outline_to_rectangle_threshold = 0.4;
+
   int Parameters::run_checker_outline_of_rectangle = 2;
+  float Parameters::checker_outline_of_rectangle_threshold = 0.75;
+
   int Parameters::run_checker_depth_homogeneity = 5;
+  float Parameters::checker_depth_homogeneity_threshold = 0.2;
+
   int Parameters::rectangle_inflation_size = 20;
-  float Parameters::depth_difference = 0.4;
+  float Parameters::holes_gaussian_mean = 0.3;
+  float Parameters::holes_gaussian_stddev = 0.3;
+
 
   int Parameters::run_checker_color_homogeneity = 1;
+  float Parameters::checker_color_homogeneity_threshold = 0.4;
+
   int Parameters::run_checker_luminosity_diff = 2;
+  float Parameters::checker_luminosity_diff_threshold = 0.4;
+
   int Parameters::run_checker_texture_diff = 3;
+  float Parameters::checker_texture_diff_threshold = 0.4;
+
   int Parameters::run_checker_texture_backproject = 4;
+  float Parameters::checker_texture_backproject_threshold = 0.4;
 
   //!< Plane detection
   int Parameters::segmentation_method = 0;

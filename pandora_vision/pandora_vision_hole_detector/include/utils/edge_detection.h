@@ -106,7 +106,7 @@ namespace pandora_vision
       /**
         @brief Applies contamination to the edges image. It keeps only the edges
         that are not iteratively neighbors to the image's limits
-        @param[in][out] inImage [cv::Mat*] Input image in CV_8UC1 format
+        @param[in out] inImage [cv::Mat*] Input image in CV_8UC1 format
         @return void
        **/
       static void applyEdgeContamination (cv::Mat* inImage);
@@ -145,7 +145,7 @@ namespace pandora_vision
       /**
         @brief Connects each point of a number of pair of points  with a line or
         an elliptic arc
-        @param[in][out] inImage [cv::Mat*] The image whose selected points will
+        @param[in out] inImage [cv::Mat*] The image whose selected points will
         be connected and line or the elliptic arc drawn on
         @param[in] pairs [const std::vector<std::pair<GraphNode,GraphNode> >&]
         The vector of pair points
@@ -168,7 +168,7 @@ namespace pandora_vision
       /**
         @brief Takes an input image in unsigned char format and tries to isolate
         hole-like shapes so as to facilitate the blob detection process
-        @param[in][out] img [cv::Mat*] The input image in unsigned char format
+        @param[in out] img [cv::Mat*] The input image in unsigned char format
         @return void
        **/
       static void denoiseEdges(cv::Mat* img);
@@ -192,7 +192,7 @@ namespace pandora_vision
         this function fills closed regions, at first, and then extracts the
         outline of each region. Used when there is a closed region with garbage
         pixels with a value of 255 within it.
-        @param[in][out] inImage [cv::Mat*] The input image
+        @param[in out] inImage [cv::Mat*] The input image
         @return void
        **/
       static void getShapesClearBorder (cv::Mat* inImage);

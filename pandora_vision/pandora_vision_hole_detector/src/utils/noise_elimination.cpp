@@ -100,7 +100,7 @@ namespace pandora_vision
 
   /**
     @brief Iteration for the interpolateNoise_brushNear function
-    @param[in][out] image [cv::Mat&] The input image
+    @param[in out] image [cv::Mat&] The input image
     @param index [const int&] Where to start the brushfire algorithm
     (index = y * cols + x)
     @return void
@@ -265,7 +265,7 @@ namespace pandora_vision
 
   /**
     @brief Interpolates the noise of an image at its borders.
-    @param[in][out] inImage [cv::Mat*] The image whose noise will be
+    @param[in out] inImage [cv::Mat*] The image whose noise will be
     interpolated at the edges.
     @return void
    **/
@@ -318,7 +318,7 @@ namespace pandora_vision
     @param[in] inImage [const cv::Mat &] The input depth image
     @param[in] row [const int&] The row index of the pixel of interest
     @param[in] col [const int&] The column index of the pixel of interest
-    @param[in][out] endFlag [bool*] True indicates that there are pixels
+    @param[in out] endFlag [bool*] True indicates that there are pixels
     left with zero value
     @return void
    **/
@@ -425,7 +425,7 @@ namespace pandora_vision
 
   /**
     @brief Iteration for the interpolateNoise function
-    @param[in][out] inImage [cv::Mat*] The input image
+    @param[in out] inImage [cv::Mat*] The input image
     @return flag [bool]. if flag == true there exist pixels
     that their value needs to be interpolated
    **/

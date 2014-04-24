@@ -70,7 +70,7 @@ namespace pandora_vision
         candidate hole is associated. While the returned set may be reduced in
         size, the size of this vector is the same throughout and equal to the
         number of keypoints found and published by the rgb node
-        @param[in][out] msgs [std::vector<std::string>*] Messages for
+        @param[in out] msgs [std::vector<std::string>*] Messages for
         debug reasons
         @return void
        **/
@@ -145,7 +145,7 @@ namespace pandora_vision
         candidate hole is associated. While the returned set may be reduced in
         size, the size of this vector is the same throughout and equal to the
         number of keypoints found and published by the rgb node
-        @param[in][out] msgs [std::vector<std::string>*] Messages for
+        @param[in out] msgs [std::vector<std::string>*] Messages for
         debug reasons
         @return void
        **/
@@ -191,7 +191,7 @@ namespace pandora_vision
         candidate hole is associated. While the returned set may be reduced in
         size, the size of this vector is the same throughout and equal to the
         number of keypoints found and published by the rgb node
-        @param[in][out] msgs [std::vector<std::string>*] Messages for
+        @param[in out] msgs [std::vector<std::string>*] Messages for
         debug reasons
         @return void
        **/
@@ -286,9 +286,9 @@ namespace pandora_vision
         candidate hole is associated. While the returned set may be reduced in
         size, the size of this vector is the same throughout and equal to the
         number of keypoints found and published by the rgb node.
-        @param[in][out] imgs [std::vector<cv::Mat>*] A vector of images which
+        @param[in out] imgs [std::vector<cv::Mat>*] A vector of images which
         shows the holes that are considered valid by each filter
-        @param[in][out] msgs [std::vector<std::string>*] Debug messages
+        @param[in out] msgs [std::vector<std::string>*] Debug messages
         @return void
        **/
       static void applyFilter(

@@ -60,6 +60,9 @@ namespace pandora_vision
         @param[in] image [const cv::Mat&] An image needed for its size
         @param[in] inflationSize [const int&] The bounding rectangles
         inflation size
+        @param[in] interpolationMethod [const int&] The interpolation method
+        of the depth image. If its value is other than zero, the depth filters
+        cannot be applied.
         @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
         A vector containing an image (the mask) for each hole
         @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
@@ -85,6 +88,7 @@ namespace pandora_vision
         const HolesConveyor& conveyor,
         const cv::Mat& image,
         const int& inflationSize,
+        const int& interpolationMethod,
         std::vector<cv::Mat>* holesMasksImageVector,
         std::vector<std::set<unsigned int> >* holesMasksSetVector,
         std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,

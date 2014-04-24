@@ -102,19 +102,37 @@ namespace pandora_vision
     //!< 2 for brushfire far
     static int interpolation_method;
 
-    //!< Hole checkers
+    //!< Hole checkers and their thresholds`
     static int run_checker_depth_diff;
+    static float checker_depth_diff_threshold;
+
     static int run_checker_depth_area;
+    static float checker_depth_area_threshold;
+
     static int run_checker_brushfire_outline_to_rectangle;
+    static float checker_brushfire_outline_to_rectangle_threshold;
+
     static int run_checker_outline_of_rectangle;
+    static float checker_outline_of_rectangle_threshold;
+
     static int run_checker_depth_homogeneity;
+    static float checker_depth_homogeneity_threshold;
+
     static int rectangle_inflation_size;
-    static float depth_difference;
+    static float holes_gaussian_mean;
+    static float holes_gaussian_stddev;
 
     static int run_checker_color_homogeneity;
+    static float checker_color_homogeneity_threshold;
+
     static int run_checker_luminosity_diff;
+    static float checker_luminosity_diff_threshold;
+
     static int run_checker_texture_diff;
+    static float checker_texture_diff_threshold;
+
     static int run_checker_texture_backproject;
+    static float checker_texture_backproject_threshold;
 
     //!< Plane detection
     static int segmentation_method;

@@ -37,9 +37,11 @@
 #ifndef HOLE_FUSION_NODE_HOLE_MERGER_H
 #define HOLE_FUSION_NODE_HOLE_MERGER_H
 
+#include "hole_fusion_node/filters_resources.h"
+#include "hole_fusion_node/depth_filters.h"
 #include "utils/blob_detection.h"
-#include "utils/holes_conveyor.h"
 #include "utils/defines.h"
+#include "utils/holes_conveyor.h"
 #include "utils/parameters.h"
 #include <math.h>
 
@@ -57,6 +59,54 @@ namespace pandora_vision
   class HoleMerger
   {
     public:
+
+      /**
+        @brief Applies a merging operation of @param operationId, until
+        every candidate hole, even as it changes through the various merges that
+        happen, has been merged with every candidate hole that can be merged
+        with it.
+        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+        candidate holes conveyor
+        @param[in] image [const cv::Mat&] An image used for filters' resources
+        creation and size usage
+        @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+        cloud used in the connection operation; it is used to obtain real world
+        distances between holes
+        @param[in] operationId [const int&] The identifier of the merging
+        process. Values: 0 for assimilation, 1 for amalgamation and
+        2 for connecting
+        @return void
+       **/
+      static void applyMergeOperation(
+        HolesConveyor* rgbdHolesConveyor,
+        const cv::Mat& image,
+        const PointCloudXYZPtr& pointCloud,
+        const int& operationId);
+
+      /**
+        @brief Applies a merging operation of @param operationId, until
+        every candidate hole, even as it changes through the various merges that
+        happen, has been merged with every candidate hole that can be merged
+        with it. In contrast to the applyMergeOperation method, this method
+        does not consult hole checkers to validate the newly merged holes.
+        (Used when depth analysis is unattainable)
+        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+        candidate holes conveyor
+        @param[in] image [const cv::Mat&] An image used for filters' resources
+        creation and size usage
+        @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+        cloud used in the connection operation; it is used to obtain real world
+        distances between holes
+        @param[in] operationId [const int&] The identifier of the merging
+        process. Values: 0 for assimilation, 1 for amalgamation and
+        2 for connecting
+        @return void
+       **/
+      static void applyMergeOperationWithoutValidation(
+        HolesConveyor* rgbdHolesConveyor,
+        const cv::Mat& image,
+        const PointCloudXYZPtr& pointCloud,
+        const int& operationId);
 
       /**
         @brief Indicates whether a hole assigned the role of the assimilator

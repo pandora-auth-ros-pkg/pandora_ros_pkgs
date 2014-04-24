@@ -268,15 +268,17 @@ namespace pandora_vision
 
       if (inliers->indices.size () == 0)
       {
-        std::cerr
-          << "Could not estimate a planar model for the given dataset."
-          << std::endl;
+        #ifdef DEBUG_SHOW
+        ROS_ERROR("Could not estimate a planar model for the given dataset.");
+        #endif
+
         break;
       }
 
       //!< Extract the inliers
       extract.setInputCloud (cloudIn);
       extract.setIndices (inliers);
+
       //!< Remove the plane found from cloudIn and place it in
       //!< loud_p. cloudIn goes unaffected.
       extract.setNegative (false);
@@ -410,8 +412,10 @@ namespace pandora_vision
 
         if (inliers->indices.size () == 0)
         {
-          std::cerr << "Could not estimate a planar model for the given dataset."
-            << std::endl;
+          #ifdef DEBUG_SHOW
+          ROS_ERROR("Could not estimate a planar model for the given dataset.");
+          #endif
+
           break;
         }
 

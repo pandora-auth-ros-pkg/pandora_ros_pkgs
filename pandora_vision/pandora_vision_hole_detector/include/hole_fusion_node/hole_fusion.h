@@ -113,20 +113,6 @@ namespace pandora_vision
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
         hole_fusion_cfgConfig>:: CallbackType f;
 
-      /**
-        @brief Applies a merging operation of @param operationId, until
-        every candidate hole, even as it changes through the various merges that
-        happen, has been merged with every candidate hole that can be merged
-        with it.
-        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
-        candidate holes conveyor
-        @param[in] operationId [const int&] The identifier of the merging
-        process. Values: 0 for assimilation, 1 for amalgamation and
-        2 for connecting
-        @return void
-       **/
-      void applyMergeOperation(HolesConveyor* rgbdHolesConveyor,
-        const int& operationId);
 
       /**
         @brief Callback for the candidate holes via the depth node
@@ -155,6 +141,24 @@ namespace pandora_vision
         const std::vector<vision_communications::CandidateHoleMsg>&
         candidateHolesVector,
         HolesConveyor* conveyor);
+
+      /**
+        @brief With an input a conveyor of holes, this method, depending on
+        the depth image's interpolation method, has holes assimilating,
+        amalgamating or being connected with holes that can be assimilated,
+        amalgamated or connected with or by them. The interpolation method is
+        a basic criterion for the mode of merging holes because the two
+        filters that verify the validity of each merger are depth-based ones.
+        If there is no valid depth image on which to run these filters, it is
+        sure that the depth sensor is closer to the scene it is witnessing
+        than 0.5-0.6m. In this way of operation, the merging of holes does not
+        consider employing validator filters and simply merges holes that can
+        be merged with each other (assimilated, amalgamated, or connected).
+        @param[in out] conveyor [HolesConveyor*] The conveyor of holes to be
+        merged with one another, where applicable.
+        @return void
+       **/
+      void mergeHoles(HolesConveyor* conveyor);
 
       /**
         @brief The function called when a parameter is changed
@@ -214,7 +218,7 @@ namespace pandora_vision
         containing candidate holes
         @return void
        **/
-      void sift(const HolesConveyor& conveyor);
+      void siftHoles(const HolesConveyor& conveyor);
 
       /**
         @brief Requests from the synchronizer to process a new point cloud
