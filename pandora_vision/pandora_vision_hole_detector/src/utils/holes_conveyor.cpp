@@ -79,7 +79,7 @@ namespace pandora_vision
     @param[in] ry [const int&] The height of the rectangle
     @param[in] ox [const int&] The width of the outline rectangle
     @param[in] ry [const int&] The height of the outline rectangle
-    @param[in out] conveyor [HolesConveyor*] The conveyor to which the
+    @param[in,out] conveyor [HolesConveyor*] The conveyor to which the
     dummy HolesConveyor will be appended
     @return void
    **/
@@ -106,7 +106,7 @@ namespace pandora_vision
 
   /**
     @brief Hollows a HolesConveyor struct, deleting every entry in it
-    @param[in out] conveyor [HolesConveyor*] The conveyor struct that will
+    @param[in,out] conveyor [HolesConveyor*] The conveyor struct that will
     be cleared
     @return void
    **/
@@ -430,7 +430,7 @@ namespace pandora_vision
 
   /**
     @brief Deletes a hole from HolesConveyor struct,
-    @param[in out] conveyor [HolesConveyor*] The conveyor struct from which
+    @param[in,out] conveyor [HolesConveyor*] The conveyor struct from which
     the hole will be removed
     @param[in] id [const int&] The index of the hole in the conveyor
     @return void
@@ -516,7 +516,7 @@ namespace pandora_vision
 
   /**
     @brief Shuffles the contents of a HolesConveyor
-    @param[in out] src [HolesConveyor*] The conveyor
+    @param[in,out] src [HolesConveyor*] The conveyor
     @return void
    **/
   void HolesConveyorUtils::shuffle(HolesConveyor* src)

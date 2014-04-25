@@ -65,7 +65,7 @@ namespace pandora_vision
         every candidate hole, even as it changes through the various merges that
         happen, has been merged with every candidate hole that can be merged
         with it.
-        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+        @param[in,out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
         candidate holes conveyor
         @param[in] image [const cv::Mat&] An image used for filters' resources
         creation and size usage
@@ -90,7 +90,7 @@ namespace pandora_vision
         with it. In contrast to the applyMergeOperation method, this method
         does not consult hole checkers to validate the newly merged holes.
         (Used when depth analysis is unattainable)
-        @param[in out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
+        @param[in,out] rgbdHolesConveyor [HolesConveyor*] The unified rgb-d
         candidate holes conveyor
         @param[in] image [const cv::Mat&] An image used for filters' resources
         creation and size usage
@@ -154,12 +154,12 @@ namespace pandora_vision
         has absorbed the amalgamatable hole (conveyor[amalgamatableId])
         in terms of keypoint location, outline unification and bounding
         rectangle inclusion of the amalgamatable's outline
-        @param[in out] conveyor [HolesConveyor*] The holes conveyor
+        @param[in,out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
         will be modified
         @param[in] amalgamatorId [const int&] The identifier of the
         hole inside the HolesConveyor amalgamator struct
-        @param[in out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
+        @param[in,out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
         A set that includes the indices of points inside the amalgamator's
         outline
         @param[in] amalgamatableHoleMaskSet [const std::set<unsigned int>&]
@@ -216,7 +216,7 @@ namespace pandora_vision
         connector struct entry so that it it has absorbed the connectable hole
         in terms of keypoint location, outline unification and bounding
         rectangle inclusion of the connectable's outline
-        @param[in out] conveyor [HolesConveyor*] The holes conveyor
+        @param[in,out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
         will be modified
         @param[in] connectorId [const int&] The identifier of the hole inside

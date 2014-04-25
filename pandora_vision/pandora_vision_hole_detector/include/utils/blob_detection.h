@@ -113,7 +113,7 @@ namespace pandora_vision
         @brief Implements a raycast algorithm for all blob keypoints in order
         to find blob's outlines. The output is a vector containing a coherent
         vector of points.
-        @param[in out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
+        @param[in,out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
         @param[in] edgesImage [cv::Mat*] The input image
         @param[in] partitions [const int&] The number of directions
         towards which the outline of the blob will be sought,

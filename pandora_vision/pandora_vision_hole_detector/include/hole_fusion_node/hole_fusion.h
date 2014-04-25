@@ -154,7 +154,7 @@ namespace pandora_vision
         than 0.5-0.6m. In this way of operation, the merging of holes does not
         consider employing validator filters and simply merges holes that can
         be merged with each other (assimilated, amalgamated, or connected).
-        @param[in out] conveyor [HolesConveyor*] The conveyor of holes to be
+        @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
         merged with one another, where applicable.
         @return void
        **/
