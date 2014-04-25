@@ -398,6 +398,10 @@ namespace pandora_vision
       {
         bool outlineFound = false;
         int counter = 0;
+        //!< A ray can hit up to 5 outline points, but only one must be chosen.
+        //!< Store these points as potential outline points.
+        //!< We will select only the first found
+        std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
 
         while(!outlineFound && !deleteThisKeypoint)
         {
@@ -439,11 +443,21 @@ namespace pandora_vision
               if (v != 0)
               {
                 outlineFound = true;
-                keypointOutline.push_back(cv::Point2f(x, y));
+                singleRayPotentialOutlinePoints.push_back(cv::Point2f(x, y));
               }
             }
           }
         } //!< End {while outline not found} loop
+
+        if (outlineFound)
+        {
+          //!< From the, at most 5, outline points found,
+          //!< regard only one of them as an outline point, so that, in total,
+          //!< their number equals the number of partitions
+          //!< (Needed to approximate fairly accurately the blob's area)
+          keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
+        }
+
 
         //!< If this keypoint is to be deleted, break from the angles loop
         //!< in order to delete the keypoint and move on to the next one
@@ -465,6 +479,41 @@ namespace pandora_vision
         inKeyPoints->erase(inKeyPoints->begin() + keypointId);
         continue;
       }
+
+
+      //!< Calculate each blob's approximate area by heron's formula
+      //!< https://en.wikipedia.org/wiki/Heron's_formula
+      float area = 0.0;
+      for (unsigned int t = 0; t < keypointOutline.size(); t++)
+      {
+        //!< calculate the area of each triangle found
+        //!< O is the keypoint and A, B two successive outline points
+        float lengthOA = sqrt(
+          pow((*inKeyPoints)[keypointId].pt.x - keypointOutline[t].x, 2)
+          + pow((*inKeyPoints)[keypointId].pt.y - keypointOutline[t].y, 2));
+
+        float lengthOB = sqrt(
+          pow((*inKeyPoints)[keypointId].pt.x
+            - keypointOutline[(t + 1) % partitions].x, 2)
+          + pow((*inKeyPoints)[keypointId].pt.y
+            - keypointOutline[(t + 1) % partitions].y, 2));
+
+        float lengthAB = sqrt(
+          pow(keypointOutline[t].x
+            - keypointOutline[(t + 1) % partitions].x, 2)
+          + pow(keypointOutline[t].y
+            - keypointOutline[(t + 1) % partitions].y, 2));
+
+        float semiperimeter = (lengthOA + lengthOB + lengthAB) / 2;
+
+        area += sqrt(semiperimeter
+          * (semiperimeter - lengthOA)
+          * (semiperimeter - lengthOB)
+          * (semiperimeter - lengthAB));
+      }
+
+      blobsArea->push_back(area);
+
 
       //!< Instead of keeping the sparce points that are the product of
       //!< the raycast algorithm, connect them linearly in order to
@@ -496,38 +545,7 @@ namespace pandora_vision
         }
       }
 
-
       blobsOutlineVector->push_back(keypointOutline);
-
-      //!< Calculate each blob's approximate area by heron's formula
-      //!< https://en.wikipedia.org/wiki/Heron's_formula
-      float area = 0.0;
-      for (unsigned int t = 0; t < partitions; t++)
-      {
-        //!< calculate the area of each triangle found
-        //!< O is the keypoint and A, B any two successive outline points
-        float lengthOA = sqrt(
-          pow((*inKeyPoints)[keypointId].pt.x - keypointOutline[t].x, 2)
-          + pow((*inKeyPoints)[keypointId].pt.y - keypointOutline[t].y, 2));
-        float lengthOB = sqrt(
-          pow((*inKeyPoints)[keypointId].pt.x
-            - keypointOutline[(t + 1) % partitions].x, 2)
-          + pow((*inKeyPoints)[keypointId].pt.y
-            - keypointOutline[(t + 1) % partitions].y, 2));
-        float lengthAB = sqrt(
-          pow(keypointOutline[t].x
-            - keypointOutline[(t + 1) % partitions].x, 2)
-          + pow(keypointOutline[t].y
-            - keypointOutline[(t + 1) % partitions].y, 2));
-        float perimeter = lengthOA + lengthOB + lengthAB;
-
-        area += sqrt(perimeter
-          * (perimeter - lengthOA)
-          * (perimeter - lengthOB)
-          * (perimeter - lengthAB));
-      }
-
-      blobsArea->push_back(area);
     }
 
     //!< Because the keypoints vector is traversed backwards,

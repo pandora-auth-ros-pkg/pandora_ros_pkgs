@@ -70,7 +70,7 @@ http://www.asciiflow.com/#Draw5547639148542835085/1967816621
  **/
 int main(int argc, char** argv) {
   srand (time(NULL));
-  ros::init(argc, argv, "DepthNode");
+  ros::init(argc, argv, "depth_node");
   pandora_vision::Depth depth;
   ros::spin();
   return 0;

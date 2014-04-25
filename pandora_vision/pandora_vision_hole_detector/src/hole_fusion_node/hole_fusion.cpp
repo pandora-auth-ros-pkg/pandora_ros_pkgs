@@ -937,7 +937,7 @@ namespace pandora_vision
         }
         #endif
 
-        //!< Fill the probabilitiesVector2D with the rgb one
+        //!< Fill the probabilitiesVector2D with the depth one
         for (int i = 0; i < depthProbabilitiesVector2D.size(); i++)
         {
           std::vector<float> row;

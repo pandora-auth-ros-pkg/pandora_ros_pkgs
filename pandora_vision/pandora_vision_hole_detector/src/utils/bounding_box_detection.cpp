@@ -67,7 +67,7 @@ namespace pandora_vision
     std::vector<cv::RotatedRect> minRect;
     for(unsigned int i = 0; i < blobsOutlineVector.size(); i++)
     {
-      if(blobsArea[i] >= Parameters::bounding_box_min_area_threshold)
+      if(blobsArea[i] >= Parameters::blob_min_area)
       {
         minRect.push_back(minAreaRect(cv::Mat(blobsOutlineVector[i])));
       }
