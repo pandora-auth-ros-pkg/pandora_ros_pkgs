@@ -50,17 +50,18 @@ include_directories(include
 
 ########################### DepthNode ############################
 add_library(depth_node_lib
-  src/utils/message_conversions.cpp
-  src/utils/hole_filters.cpp
-  src/utils/holes_conveyor.cpp
-  src/utils/noise_elimination.cpp
-  src/utils/edge_detection.cpp
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
+  src/utils/edge_detection.cpp
+  src/utils/hole_filters.cpp
+  src/utils/holes_conveyor.cpp
+  src/utils/message_conversions.cpp
   src/utils/morphological_operators.cpp
-  src/utils/visualization.cpp
-  src/utils/timer.cpp
+  src/utils/noise_elimination.cpp
   src/utils/parameters.cpp
+  src/utils/timer.cpp
+  src/utils/visualization.cpp
+  src/utils/wavelets.cpp
   )
 target_link_libraries(depth_node_lib
   ${catkin_LIBRARIES}
@@ -196,6 +197,7 @@ add_library(rgb_node_lib
   src/utils/visualization.cpp
   src/utils/parameters.cpp
   src/utils/timer.cpp
+  src/utils/wavelets.cpp
 )
 
 target_link_libraries(rgb_node_lib
@@ -245,30 +247,32 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/utils/blob_detection.h
   include/utils/bounding_box_detection.h
   include/utils/defines.h
-  include/utils/parameters.h
   include/utils/edge_detection.h
   include/utils/histogram_calculation.h
   include/utils/hole_filters.h
   include/utils/holes_conveyor.h
+  include/utils/message_conversions.h
   include/utils/morphological_operators.h
   include/utils/noise_elimination.h
+  include/utils/parameters.h
   #include/utils/timer.h
   include/utils/visualization.h
-  include/utils/message_conversions.h
+  include/utils/wavelets.h
 
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
   src/utils/defines.h
-  src/utils/parameters.cpp
   src/utils/edge_detection.cpp
   src/utils/histogram_calculation.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
+  src/utils/message_conversions.cpp
   src/utils/morphological_operators.cpp
   src/utils/noise_elimination.cpp
+  src/utils/parameters.cpp
   #src/utils/timer.cpp
   src/utils/visualization.cpp
-  src/utils/message_conversions.cpp
+  src/utils/wavelets.cpp
 
 
   ## hole_fusion_node ##

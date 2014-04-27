@@ -351,6 +351,128 @@ namespace pandora_vision
 
 
   /**
+    @brief Implements a raycast algorithm for a blob keypoint in order
+    to find its outline points. The output is a vector of coherent points.
+    @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
+    @param[in] edgesImage [cv::Mat*] The input image
+    @param[in] partitions [const int&] The number of directions
+    towards which the outline of the blob will be sought,
+    or the number of partitions in which the blob will be divided by
+    the rays. Same deal.
+    @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
+    The output vector containing the blobs' (rough approximate) outline
+    @return void
+   **/
+  void BlobDetection::raycastKeypoint(
+    const cv::KeyPoint& inKeyPoint,
+    cv::Mat* edgesImage,
+    const int& partitions,
+    std::vector<cv::Point2f>* blobOutlineVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("raycastKeypoint");
+    #endif
+
+    unsigned char* ptr = edgesImage->ptr();
+
+    //!< A vector storing the non-zero pixels surrounding the keypoint
+    std::vector<cv::Point2f> keypointOutline;
+
+    float theta = 0;
+    float thetaIncrement = 2 * 3.1415926535897 / partitions;
+
+    for (unsigned int angleId = 0; angleId < partitions; angleId++)
+    {
+      bool outlineFound = false;
+      int counter = 0;
+
+      //!< A ray can hit up to 5 outline points, but only one must be chosen.
+      //!< Store these points as potential outline points.
+      //!< We will select only the first found
+      std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
+
+      while(!outlineFound)
+      {
+        counter++;
+
+        //!< If the 8 pixels surrounding the ray's pixel, including the center
+        //!< pixel, are found to be all outside the image's borders,
+        //!< something has gone horribly wrong. The keypoint is not surrounded
+        //!< entirely by non-zero pixels. The best choice is to delete it.
+        int numPixelsOutsideImageBorders = 0;
+
+        for (int m = -1; m < 2; m++)
+        {
+          for (int n = -1; n < 2; n++)
+          {
+            int x = inKeyPoint.pt.x + m + counter * cos(theta);
+            int y = inKeyPoint.pt.y + n + counter * sin(theta);
+
+            int ind = y * edgesImage->cols + x;
+            char v = ptr[ind];
+
+            if (v != 0)
+            {
+              outlineFound = true;
+              singleRayPotentialOutlinePoints.push_back(cv::Point2f(x, y));
+            }
+          }
+        }
+      } //!< End {while outline not found} loop
+
+      if (outlineFound)
+      {
+        //!< From the, at most 5, outline points found,
+        //!< regard only one of them as an outline point, so that, in total,
+        //!< their number equals the number of partitions
+        //!< (Needed to approximate fairly accurately the blob's area)
+        keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
+      }
+
+      theta += thetaIncrement;
+    }
+
+
+    //!< Instead of keeping the sparce points that are the product of
+    //!< the raycast algorithm, connect them linearly in order to
+    //!< have a coherent set of points as the hole's outline
+    cv::Mat canvas = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
+
+    //!< Draw the connected outline of the i-th hole onto canvas
+    for(unsigned int j = 0; j < keypointOutline.size(); j++)
+    {
+      cv::line(canvas, keypointOutline[j],
+        keypointOutline[(j + 1) % keypointOutline.size()],
+        cv::Scalar(255, 0, 0), 1, 8 );
+    }
+
+    //!< Clear the outline vector. It will be filled with the points
+    //!< drawn on the canvas image
+    keypointOutline.clear();
+
+    //!< Every non-zero point is a point drawn; it is a point that
+    //!< belongs to the outline of the hole
+    for (unsigned int rows = 0; rows < canvas.rows; rows++)
+    {
+      for (unsigned int cols = 0; cols < canvas.cols; cols++)
+      {
+        if (canvas.at<unsigned char>(rows, cols) != 0)
+        {
+          keypointOutline.push_back(cv::Point2f(cols, rows));
+        }
+      }
+    }
+
+    *blobOutlineVector = keypointOutline;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("raycastKeypoint");
+    #endif
+  }
+
+
+
+  /**
     @brief Implements a raycast algorithm for all blob keypoints in order
     to find blob's outlines. The output is a vector containing a coherent
     vector of points.
@@ -398,6 +520,7 @@ namespace pandora_vision
       {
         bool outlineFound = false;
         int counter = 0;
+
         //!< A ray can hit up to 5 outline points, but only one must be chosen.
         //!< Store these points as potential outline points.
         //!< We will select only the first found

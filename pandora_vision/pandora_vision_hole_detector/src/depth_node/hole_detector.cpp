@@ -48,14 +48,11 @@ namespace pandora_vision
 
   /**
     @brief Finds the holes provided a depth image in CV_32FC1 format
-    @param[in] depthImage [const cv::Mat&] The depth image in CV_32FC1
-    format
-    @param[out] interpolatedDepthImage [cv::Mat*] The denoised
+    @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
     depth image in CV_32FC1 format
     @return HolesConveyor The struct that contains the holes
    **/
-  HolesConveyor HoleDetector::findHoles(const cv::Mat& depthImage,
-    cv::Mat* interpolatedDepthImage)
+  HolesConveyor HoleDetector::findHoles(const cv::Mat& interpolatedDepthImage)
   {
     #ifdef DEBUG_TIME
     Timer::start("findHoles", "inputDepthImageCallback");
@@ -67,32 +64,17 @@ namespace pandora_vision
     if(Parameters::debug_show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : Initial Depth";
-      msgs.push_back(msg);
-      cv::Mat tmp = Visualization::scaleImageForVisualization(depthImage, 0);
-      imgs.push_back(tmp);
-    }
-    #endif
-
-    //!< Perform noise elimination (black pixels removed)
-    NoiseElimination::performNoiseElimination(depthImage,
-      interpolatedDepthImage);
-
-    #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
-    {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Interpolated depth image";
       msgs.push_back(msg);
       cv::Mat tmp = Visualization::scaleImageForVisualization(
-        *interpolatedDepthImage, 0);
+        interpolatedDepthImage, 0);
       imgs.push_back(tmp);
     }
     #endif
 
     //!< Edge computation
     cv::Mat denoisedDepthImageEdges;
-    EdgeDetection::computeEdges(*interpolatedDepthImage,
+    EdgeDetection::computeEdges(interpolatedDepthImage,
       &denoisedDepthImageEdges);
 
     #ifdef DEBUG_SHOW
@@ -152,7 +134,7 @@ namespace pandora_vision
       imgs.push_back(
         Visualization::showHoles(
           msg,
-          *interpolatedDepthImage,
+          interpolatedDepthImage,
           -1,
           conveyor.keyPoints,
           conveyor.rectangles,
@@ -172,7 +154,7 @@ namespace pandora_vision
       imgs.push_back(
         Visualization::showKeypoints(
           msg,
-          *interpolatedDepthImage,
+          interpolatedDepthImage,
           -1,
           conveyor.keyPoints)
         );

@@ -41,6 +41,7 @@
 #include "depth_node/hole_detector.h"
 #include "utils/parameters.h"
 #include "utils/message_conversions.h"
+#include "utils/wavelets.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
 
 

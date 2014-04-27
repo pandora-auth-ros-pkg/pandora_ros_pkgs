@@ -102,20 +102,42 @@ namespace pandora_vision
     ROS_INFO("Depth node callback");
     #endif
 
+    //!< Obtain the depth image
     cv::Mat depthImage;
     MessageConversions::extractImageFromMessage(msg, &depthImage,
       sensor_msgs::image_encodings::TYPE_32FC1);
 
-    //!< Finds possible holes
+    //!< Perform noise elimination on the depth image
     cv::Mat interpolatedDepthImage;
-    HolesConveyor holes = HoleDetector::findHoles(depthImage,
+    NoiseElimination::performNoiseElimination(depthImage,
       &interpolatedDepthImage);
+
+    //!< Regardless of the image representation method, the depth node
+    //!< will publish the interpolated depth image of original size
+    //!< to the Hole Fusion node
+    cv::Mat interpolatedDepthImageSent;
+    interpolatedDepthImage.copyTo(interpolatedDepthImageSent);
+
+    //!< A value of 1 means that the depth image is subtituted by its
+    //!< low-low, wavelet analysis driven, part
+    if (Parameters::depth_image_representation_method == 1)
+    {
+      double min;
+      double max;
+      cv::minMaxIdx(depthImage, &min, &max);
+
+      Wavelets::getLowLow(interpolatedDepthImage, min, max,
+        &interpolatedDepthImage);
+    }
+
+    //!< Finds possible holes
+    HolesConveyor holes = HoleDetector::findHoles(interpolatedDepthImage);
 
     //!< Create the candidate holes message
     vision_communications::CandidateHolesVectorMsg depthCandidateHolesMsg;
 
     MessageConversions::createCandidateHolesVectorMessage(holes,
-      interpolatedDepthImage,
+      interpolatedDepthImageSent,
       &depthCandidateHolesMsg,
       sensor_msgs::image_encodings::TYPE_32FC1,
       msg);
@@ -146,6 +168,13 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     ROS_INFO("Parameters callback called");
     #endif
+
+    //!< Depth image representation method.
+    //!< 0 if the depth image used is the one obtained from the depth sensor,
+    //!< unadulterated
+    //!< 1 through wavelet representation
+    Parameters::depth_image_representation_method =
+      config.depth_image_representation_method;
 
     //!< canny parameters
     Parameters::canny_ratio = config.canny_ratio;

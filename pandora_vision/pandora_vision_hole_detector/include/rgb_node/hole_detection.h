@@ -40,17 +40,16 @@
 
 #include <iostream>
 #include <stdlib.h>
-
 #include "ros/ros.h"
 #include <ros/package.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <image_transport/image_transport.h>
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "state_manager/state_client.h"
 #include "utils/parameters.h"
 #include "utils/message_conversions.h"
+#include "utils/wavelets.h"
 #include "rgb_node/hole_detector.h"
 
 namespace pandora_vision

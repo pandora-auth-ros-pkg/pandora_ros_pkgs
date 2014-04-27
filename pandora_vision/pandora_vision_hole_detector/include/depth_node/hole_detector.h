@@ -64,14 +64,12 @@ namespace pandora_vision
 
       /**
         @brief Finds the holes provided a depth image in CV_32FC1 format
-        @param[in] depthImage [const cv::Mat&] The depth image in CV_32FC1
-        format
-        @param[out] interpolatedDepthImage [cv::Mat*] The denoised
+        @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
         depth image in CV_32FC1 format
         @return HolesConveyor The struct that contains the holes
        **/
-      static HolesConveyor findHoles(const cv::Mat& depthImage,
-        cv::Mat* interpolatedDepthImage);
+      static HolesConveyor findHoles(const cv::Mat& interpolatedDepthImage);
+
   };
 
 } // namespace pandora_vision

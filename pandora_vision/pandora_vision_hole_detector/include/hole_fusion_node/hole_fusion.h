@@ -113,7 +113,6 @@ namespace pandora_vision
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
         hole_fusion_cfgConfig>:: CallbackType f;
 
-
       /**
         @brief Callback for the candidate holes via the depth node
         @param[in] depthCandidateHolesVector
@@ -135,12 +134,20 @@ namespace pandora_vision
         The input candidate holes
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
+        @param[in] inImage [const cv::Mat&] An image used for its size.
+        It is needed if the wavelet method is used in the keypoints' extraction,
+        in order to obtain the coherent shape of holes' outline points
+        @param[in] imageRepresentationMethod [const int&] 1 if the image
+        representation method used to obtain the keypoints was the wavelet
+        method, 0 if the image used was the original one
         @return void
        **/
-      void fromCandidateHoleMsgToConveyor(
+      static void fromCandidateHoleMsgToConveyor(
         const std::vector<vision_communications::CandidateHoleMsg>&
         candidateHolesVector,
-        HolesConveyor* conveyor);
+        HolesConveyor* conveyor,
+        const cv::Mat& inImage,
+        const int& imageRepresentationMethod);
 
       /**
         @brief With an input a conveyor of holes, this method, depending on
@@ -228,20 +235,27 @@ namespace pandora_vision
 
       /**
         @brief Unpacks the the HolesConveyor struct for the
-        candidate holes and the image
+        candidate holes, the interpolated depth image and the point cloud
         from the vision_communications::CandidateHolesVectorMsg message
         @param[in] holesMsg
         [vision_communications::CandidateHolesVectorMsg&] The input
-        candidate holes message
+        candidate holes message obtained through the depth node
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
-        @param[out] image [cv::Mat*] The output image
-        @param[in] encoding [const std::string&] The image's encoding
+        @param[out] pointCloudXYZ [PointCloudXYZPtr*] The output point cloud
+        @param[out] interpolatedDepthImage [cv::Mat*] The output interpolated
+        depth image
+        @param[in] imageRepresentationMethod [const int&] 1 if the image
+        representation method used to obtain the keypoints was the wavelet
+        method, 0 if the image used was the original one
         @return void
        **/
-      void unpackMessage(
+      static void unpackMessage(
         const vision_communications::CandidateHolesVectorMsg& holesMsg,
-        HolesConveyor* conveyor, cv::Mat* image, const std::string& encoding);
+        HolesConveyor* conveyor,
+        cv::Mat* image,
+        const std::string& encoding,
+        const int& imageRepresentationMethod);
 
       /**
         @brief Tests the merging operations on artificial holes
