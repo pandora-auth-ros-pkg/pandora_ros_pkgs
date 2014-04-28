@@ -15,62 +15,79 @@ class VictimClustererTest : public ::testing::Test {
 
   VictimClustererTest(): VictimClustererPtr1(new VictimClusterer(3, 3))
   {
+      }
+  
+  
+  virtual void SetUp()
+  {
+    
+    filterModelPtr.reset( new FilterModel );
+    Victim::setHoleModel(filterModelPtr);
+    Victim::setTpaModel(filterModelPtr);
+    
   }
+   
 /* helper functions*/
  
 // We create manually Tpa1(0, 3.87, 4) Tpa2(1, 0, 2) Hole1(-1, 0, 2) (no rotation)
   void createVariousObjects1(ObjectConstPtrVector*   ObjConstPtrVect1)
   {
-    TpaPtr TpaPtr1(new Tpa);
-    setPose(0, 3.87, 4,  TpaPtr1);
-    TpaPtr TpaPtr2(new Tpa);
-    setPose(1, 0, 3,  TpaPtr2);
-    HolePtr HolePtr1(new Hole);
-    setPose(-1, 0, 2, HolePtr1);
-    ObjConstPtrVect1->push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVect1->push_back(TpaConstPtr(TpaPtr2));
-    ObjConstPtrVect1->push_back(HoleConstPtr(HolePtr1));
+    TpaPtr tpaPtr1(new Tpa);
+    setPose(0, 3.87, 4,  tpaPtr1);
+    TpaPtr tpaPtr2(new Tpa);
+    setPose(1, 0, 3,  tpaPtr2);
+    HolePtr holePtr1(new Hole);
+    setPose(-1, 0, 2, holePtr1);
+    ObjConstPtrVect1->push_back(TpaConstPtr(tpaPtr1));
+    ObjConstPtrVect1->push_back(TpaConstPtr(tpaPtr2));
+    ObjConstPtrVect1->push_back(HoleConstPtr(holePtr1));
   } 
 // We create manually Tpa1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) Yaw=pi/4
   void createVariousObjects2(ObjectConstPtrVector*   ObjConstPtrVect2)
   {
-    TpaPtr TpaPtr1(new Tpa);
-    setPose(2, 3, 4, TpaPtr1);
-    HolePtr HolePtr1(new Hole);
-    setPose(4, 3, 2, HolePtr1);
-    HolePtr HolePtr2(new Hole);
-    setPose(0, 4, 2, HolePtr2);
-    ObjConstPtrVect2->push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVect2->push_back(HoleConstPtr(HolePtr1));
-    ObjConstPtrVect2->push_back(HoleConstPtr(HolePtr2));
+    TpaPtr tpaPtr1(new Tpa);
+    setPose(2, 3, 4, tpaPtr1);
+    tpaPtr1->update(tpaPtr1, filterModelPtr);
+    tpaPtr1->update(tpaPtr1, filterModelPtr);
+    HolePtr holePtr1(new Hole);
+    setPose(4, 3, 2, holePtr1);
+    HolePtr holePtr2(new Hole);
+    setPose(0, 4, 2, holePtr2);
+    ObjConstPtrVect2->push_back(TpaConstPtr(tpaPtr1));
+    ObjConstPtrVect2->push_back(HoleConstPtr(holePtr1));
+    ObjConstPtrVect2->push_back(HoleConstPtr(holePtr2));
   } 
 
   
 //  We create manually Tpa1(0, 3.87, 4) Tpa2(1, 0, 2) Hole1(-1, 0, 2)
   void createVariousObjects3(ObjectConstPtrVectorPtr   ObjConstPtrVectPtr1)
   {
-    TpaPtr TpaPtr1(new Tpa);
-    setPose(0, 3.87, 4,  TpaPtr1);
-    TpaPtr TpaPtr2(new Tpa);
-    setPose(1, 0, 3,  TpaPtr2);
-    HolePtr HolePtr1(new Hole);
-    setPose(-1, 0, 2, HolePtr1);
-    ObjConstPtrVectPtr1->push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVectPtr1->push_back(TpaConstPtr(TpaPtr2));
-    ObjConstPtrVectPtr1->push_back(HoleConstPtr(HolePtr1));
+    TpaPtr tpaPtr1(new Tpa);
+    setPose(0, 3.87, 4,  tpaPtr1);
+    TpaPtr tpaPtr2(new Tpa);
+    setPose(1, 0, 3,  tpaPtr2);
+    tpaPtr2->update(tpaPtr2, filterModelPtr);
+    tpaPtr2->update(tpaPtr2, filterModelPtr);
+    HolePtr holePtr1(new Hole);
+    setPose(-1, 0, 2, holePtr1);
+    ObjConstPtrVectPtr1->push_back(TpaConstPtr(tpaPtr1));
+    ObjConstPtrVectPtr1->push_back(TpaConstPtr(tpaPtr2));
+    ObjConstPtrVectPtr1->push_back(HoleConstPtr(holePtr1));
   }
   
   void createVariousObjects4(ObjectConstPtrVectorPtr   ObjConstPtrVectPtr2)
   {
-    TpaPtr TpaPtr1(new Tpa);
-    setPose(10, 3, 0, TpaPtr1);
-    HolePtr HolePtr1(new Hole);
-    setPose(11, 5, 2, HolePtr1, pi/4);
-    HolePtr HolePtr2(new Hole);
-    setPose(14, 3, 3, HolePtr2);
-    ObjConstPtrVectPtr2->push_back(TpaConstPtr(TpaPtr1));
-    ObjConstPtrVectPtr2->push_back(HoleConstPtr(HolePtr1));
-    ObjConstPtrVectPtr2->push_back(HoleConstPtr(HolePtr2));
+    TpaPtr tpaPtr1(new Tpa);
+    setPose(10, 3, 0, tpaPtr1);
+    HolePtr holePtr1(new Hole);
+    setPose(11, 5, 2, holePtr1, pi/4);
+    holePtr1->update(holePtr1, filterModelPtr);
+    holePtr1->update(holePtr1, filterModelPtr);
+    HolePtr holePtr2(new Hole);
+    setPose(14, 3, 3, holePtr2);
+    ObjConstPtrVectPtr2->push_back(TpaConstPtr(tpaPtr1));
+    ObjConstPtrVectPtr2->push_back(HoleConstPtr(holePtr1));
+    ObjConstPtrVectPtr2->push_back(HoleConstPtr(holePtr2));
   }
   
    
@@ -83,6 +100,7 @@ void setPose ( float  x, float  y, float  z, ObjectPtr Object, float yaw = 0)
     pose1.position.z = 0;
     pose1.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,  0,  yaw);
     Object->setPose(pose1);
+    Object->initializeObjectFilter(0.5, 0.5, 0.5); 
   }
 
   
@@ -119,6 +137,7 @@ void setPose ( float  x, float  y, float  z, ObjectPtr Object, float yaw = 0)
 /* variables */
 
 VictimClustererSharedPtr  VictimClustererPtr1;
+FilterModelPtr filterModelPtr;
 
 };
 // Checks  if the Construstors behave Correctly 
@@ -210,8 +229,8 @@ TEST_F(VictimClustererTest,  createVictimList)
   VictimClustererPtr1->updateParams( 5, 3);
   Victims = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
   EXPECT_EQ(2, Victims.size());
-  EXPECT_EQ(3, getObjects(Victims[0]).size());
-  EXPECT_EQ(3, getObjects(Victims[1]).size());
+  EXPECT_EQ(2, getObjects(Victims[0]).size());
+  EXPECT_EQ(2, getObjects(Victims[1]).size());
   
   VictimClustererPtr1->updateParams( 1.8, 3);
   Victims    = VictimClustererPtr1->createVictimList(ObjectConstPtrVectorPtr1);
@@ -232,7 +251,7 @@ TEST_F(VictimClustererTest,  createVictimList)
   EXPECT_EQ(3, Victims.size());
   EXPECT_EQ(1, getObjects(Victims[0]).size());
   EXPECT_EQ(2, getObjects(Victims[1]).size());
-  EXPECT_EQ(3, getObjects(Victims[2]).size());
+  EXPECT_EQ(2, getObjects(Victims[2]).size());
 }
 
 }  // namespace pandora_alert_handler

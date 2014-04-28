@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation
 					actionlib_msgs 
 					geometry_msgs
 					visualization_msgs
+                                        std_srvs
 					)
 
 # include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
@@ -77,7 +78,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 ## Generate added messages and services with any dependencies listed here
 
 generate_messages(
-	DEPENDENCIES std_msgs actionlib_msgs geometry_msgs visualization_msgs
+	DEPENDENCIES std_msgs actionlib_msgs geometry_msgs visualization_msgs std_srvs
 )
 # TODO: fill in what other packages will need to use this package
 ## LIBRARIES: libraries you create in this project that dependent projects also need

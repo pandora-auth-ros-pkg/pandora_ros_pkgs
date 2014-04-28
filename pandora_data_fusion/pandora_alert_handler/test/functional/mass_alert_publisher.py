@@ -6,6 +6,7 @@ import sys
 from  vision_communications.msg import  HoleDirectionMsg, HolesDirectionsVectorMsg
 from  vision_communications.msg import  HazmatAlertMsg, HazmatAlertsVectorMsg
 from  vision_communications.msg import  QRAlertsVectorMsg, QRAlertMsg
+from  data_fusion_communications.msg import ThermalDirectionAlertMsg 
 
 from dynamic_reconfigure.server import Server
 
@@ -28,31 +29,30 @@ class MassPublisher:
         self.qr_msg.qrAlerts.append(QRAlertMsg())
         self.qr_msg.header.frame_id = frame_id
         
-        self.hole_1_msg = HolesDirectionsVectorMsg()
-        #~ self.hole_1_msg.holesDirections.append(HoleDirectionMsg())
-        #~ self.hole_1_msg.holesDirections.append(HoleDirectionMsg())
-        self.hole_1_msg.header.frame_id = frame_id
-        
-        #~ self.hole_2_msg = HolesDirectionsVectorMsg()
-        #~ self.hole_2_msg.holesDirections.append(HoleDirectionMsg())
-        #~ self.hole_2_msg.header.frame_id = 'headCamera'
-        
+        self.hole_msg = HolesDirectionsVectorMsg()
+        self.hole_msg.header.frame_id = frame_id
+       
+        self.tpa_msg = ThermalDirectionAlertMsg()
+        self.tpa_msg.header.frame_id = frame_id
+
         self.hazmat_pub = rospy.Publisher('/vision/hazmat_alert', HazmatAlertsVectorMsg)
         self.qr_pub = rospy.Publisher('/vision/qr_alert', QRAlertsVectorMsg)
         self.hole_pub = rospy.Publisher('/data_fusion/victim_fusion/hole_direction_alert', HolesDirectionsVectorMsg)
+        self.tpa_pub = rospy.Publisher('/data_fusion/victim_fusion/tpa_direction_alert', ThermalDirectionAlertMsg)
         self.dyn_reconf_srv = Server(MassAlertPublisherConfig, self.dyn_reconf_callback)
 
         self.qr_post = False
         self.hazmat_post = False
         self.hole_1_post = False
         self.hole_2_post = False
+        self.tpa_post = False
                 
         self.publish_stuff()
     
 
 
     def dyn_reconf_callback(self, config, level):
-        rospy.loginfo("""Reconfiugre Request: {hole_1_yaw}, {hole_1_pitch}""".format(**config))
+        rospy.loginfo("""Reconfigure Request: {hole_1_yaw}, {hole_1_pitch}""".format(**config))
 
         self.hazmat_msg.hazmatAlerts[0]=HazmatAlertMsg(yaw=config.hazmat_yaw,
             pitch=config.hazmat_pitch,patternType=config.hazmat_pattern)
@@ -61,21 +61,25 @@ class MassPublisher:
             QRcontent=config.qr_content)
         
         
-        self.hole_1_msg.holesDirections = []
+        self.hole_msg.holesDirections = []
         
         if config.hole_1_post:
-            self.hole_1_msg.holesDirections.append(HoleDirectionMsg(yaw=config.hole_1_yaw,
+            self.hole_msg.holesDirections.append(HoleDirectionMsg(yaw=config.hole_1_yaw,
                 pitch=config.hole_1_pitch,probability=1,holeId=config.hole_1_id))
             
         if config.hole_2_post:
-            self.hole_1_msg.holesDirections.append(HoleDirectionMsg(yaw=config.hole_2_yaw,
+            self.hole_msg.holesDirections.append(HoleDirectionMsg(yaw=config.hole_2_yaw,
                 pitch=config.hole_2_pitch,probability=1,holeId=config.hole_2_id))
         
+        self.tpa_msg.yaw = config.tpa_yaw
+        self.tpa_msg.pitch = config.tpa_pitch
+        self.tpa_msg.probability = config.tpa_probability
         
         self.qr_post =  config.qr_post
         self.hazmat_post =  config.hazmat_post
         self.hole_1_post =  config.hole_1_post
         self.hole_2_post = config.hole_2_post
+        self.tpa_post = config.tpa_post
                       
         return config
     
@@ -90,7 +94,10 @@ class MassPublisher:
                 self.qr_pub.publish(self.qr_msg)
                 
             if self.hole_1_post or self.hole_2_post:
-                self.hole_pub.publish(self.hole_1_msg)
+                self.hole_pub.publish(self.hole_msg)
+
+            if self.tpa_post:
+                self.tpa_pub.publish(self.tpa_msg)
             
             rospy.sleep(0.5)
 

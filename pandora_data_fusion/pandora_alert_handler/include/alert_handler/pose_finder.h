@@ -26,11 +26,7 @@ class PoseFinder : private boost::noncopyable
 {
  public:
 
-  PoseFinder(const MapPtr& map, const std::string& mapType,
-    float occupiedCellThres = 0.5,
-    float heightHighThres = 1.2, float heightLowThres = 0,
-    float approachDist = 0.5, float orientationDist = 0.5,
-    float orientationCircle = 0.25);
+  PoseFinder(const MapPtr& map, const std::string& mapType);
   Pose findAlertPose(float alertYaw, float alertPitch,
     tf::Transform tfTransform);
   tf::Transform lookupTransformFromWorld(std_msgs::Header header);

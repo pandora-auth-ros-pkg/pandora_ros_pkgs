@@ -11,10 +11,10 @@ RosTfListener::RosTfListener()
 {
   tf::StampedTransform tfTransform;
 
-  waitForTransform("/world", "/map",
+  waitForTransform("/map", "/map",
           ros::Time(0), ros::Duration(1));
 
-  lookupTransform("/world", "/map", 
+  lookupTransform("/map", "/map", 
           ros::Time(0), tfTransform);
 }
 

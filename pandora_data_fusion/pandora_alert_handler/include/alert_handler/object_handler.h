@@ -6,6 +6,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
+#include <std_msgs/Int32.h>
+
 #include "data_fusion_communications/QrNotificationMsg.h"
 
 #include "alert_handler/object_list.h"
@@ -20,10 +22,7 @@ class ObjectHandler : private boost::noncopyable
  public:
 
   ObjectHandler(HoleListPtr holeListPtr, QrListPtr qrListPtr,
-                HazmatListPtr hazmatListPtr, TpaListPtr tpaListPtr ,
-                float sensorRange = 2.5,
-                float qrClosestAlert = 0.5,
-                float hazmatClosestalert = 0.5);
+                HazmatListPtr hazmatListPtr, TpaListPtr tpaListPtr);
 
   void handleHoles(const HolePtrVectorPtr& newHoles, const tf::Transform& transform);
   void handleQrs(const QrPtrVectorPtr& newQrs, 
@@ -31,11 +30,7 @@ class ObjectHandler : private boost::noncopyable
   void handleHazmats(const HazmatPtrVectorPtr& newHazmats, const tf::Transform& transform);
   void handleTpas(const TpaPtrVectorPtr& newTpas, const tf::Transform& transform);
 
-  bool isHoleQr(const HoleConstPtr& hole);
-  bool isHoleHazmat(const HoleConstPtr& hole);
-
-  void updateParams(float sensor_range,
-     float qrClosestAlert, float hazmatClosestalert);
+  void updateParams(float sensor_range);
 
  private:
 
@@ -45,15 +40,16 @@ class ObjectHandler : private boost::noncopyable
  private:
 
   ros::Publisher qrPublisher_;
+  ros::Publisher scorePublisher_;
 
   QrListPtr qrListPtr_;
   HazmatListPtr hazmatListPtr_;
   HoleListPtr holeListPtr_;
   TpaListPtr tpaListPtr_;
 
+  int roboCupScore_;
+  
   float SENSOR_RANGE;
-  float QR_CLOSEST_ALERT;
-  float HAZMAT_CLOSEST_ALERT;
 
 };
 

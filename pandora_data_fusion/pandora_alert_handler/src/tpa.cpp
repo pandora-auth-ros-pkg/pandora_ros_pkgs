@@ -12,9 +12,9 @@ Tpa::Tpa()
   type_ = "tpa";
 }
 
-geometry_msgs::PoseStamped Tpa::getPoseStamped() const
+PoseStamped Tpa::getPoseStamped() const
 {
-  geometry_msgs::PoseStamped objPose = Object::getPoseStamped();
+  PoseStamped objPose = Object::getPoseStamped();
   objPose.header.frame_id = "tpa_" + boost::to_string(id_);
   return objPose;
 }

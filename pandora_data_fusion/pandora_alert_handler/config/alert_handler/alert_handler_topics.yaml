@@ -5,12 +5,14 @@ subscribed_topic_names:
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
   currentVictim: /data_fusion/victim_fusion/selected_victim
-  map: /map
+  map: /slam/map
 published_topic_names:  
   victim_found : victim_found
   victim_update : victim_update
   victim_verified : victim_verified
+  valid_victims_counter : valid_victims_counter
   qr_notification : qr_notification
+  robocup_score : robocup_score
 action_server_names:
   get_victims: get_victims
   delete_current_victim: delete_current_victim

@@ -54,56 +54,56 @@ namespace pandora_alert_handler
 {
 
 /**
-  @class VictimClusterer
-  @brief Controller that keeps track of victims 
-**/ 
+ * @class VictimClusterer
+ * @brief Controller that keeps track of victims 
+ */ 
 class VictimClusterer : private boost::noncopyable
 {
  public:
  
   /**
-  @brief Constructor
-  **/
-  VictimClusterer(float clusterRadius, float approachDist);
+   * @brief Constructor
+   */
+  VictimClusterer(float clusterRadius = 0.2, float approachDist = 0.5);
 
   /**
-  @brief Creates a new victim vector from groups of Objects
-  @param groupedObjects [ObjectPtrVectorVector] The vector containing the
-    groups of Objects
-  @return VictimPtrVector The resulting victim vector 
-  **/
-  VictimPtrVector createVictimList(const ObjectConstPtrVectorPtr& allObjects);
+   * @brief Creates a new victim vector from groups of Objects
+   * @param groupedObjects [ObjectPtrVectorVector] The vector containing the
+   * groups of Objects
+   * @return VictimPtrVector The resulting victim vector 
+   */
+  VictimPtrVector createVictimList(
+      const ObjectConstPtrVectorPtr& allObjects);
 
   /**
-  @brief Updates the victim handler's parameters
-  @param clusterRadius [float] The new cluster radius
-  @return void
-  **/
+   * @brief Updates the victim handler's parameters
+   * @param clusterRadius [float] The new cluster radius
+   * @return void
+   */
   void updateParams(float clusterRadius, float approachDist);
 
  private:
 
   /**
-  @brief Clusters the existing Objects into victims
-  @return ObjectPtrVectorVector A vector containing
-    the resulting groups as vectors of Objects
-  **/
+   * @brief Clusters the existing Objects into victims
+   * @return ObjectPtrVectorVector A vector containing
+   * the resulting groups as vectors of Objects
+   */
   ObjectConstPtrVectorVector groupObjects(const ObjectConstPtrVectorPtr& allObjects);
 
   /**
-  @brief Finds and returns the centroid of a group of Objects
-  @param objects [ObjectPtrVector] The group of Objects
-  @return geometry_msgs::Point The centroid
-  **/
+   * @brief Finds and returns the centroid of a group of Objects
+   * @param objects [ObjectPtrVector] The group of Objects
+   * @return geometry_msgs::Point The centroid
+   */
   geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects);
-
 
  private:
 
   friend class VictimClustererTest;
  
  private:
-  
+
   //!< The radius used for clustering
   float CLUSTER_RADIUS;
   //!< The distance of the approach pose from the wall

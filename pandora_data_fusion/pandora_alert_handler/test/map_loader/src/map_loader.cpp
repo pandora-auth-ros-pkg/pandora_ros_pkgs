@@ -24,10 +24,10 @@
 namespace map_loader {
     
   /**
-  @brief Loads a map from an image file
-  @param fname [const std::string&] The file name
-  @return nav_msgs::OccupancyGrid
-  **/
+   * @brief Loads a map from an image file
+   * @param fname [const std::string&] The file name
+   * @return nav_msgs::OccupancyGrid
+   */
   nav_msgs::OccupancyGrid loadMap(const std::string& fname) {
       
     nav_msgs::GetMap::Response map_resp_;
@@ -85,7 +85,6 @@ namespace map_loader {
     }
     try { 
       doc["image"] >> mapfname; 
-      // TODO: make this path-handling more robust
       if(mapfname.size() == 0)
       {
       ROS_ERROR("The image tag cannot be an empty string.");
@@ -103,8 +102,8 @@ namespace map_loader {
       exit(-1);
     }
     
-    map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),
-      res,negate,occ_th,free_th, origin);
+    map_server::loadMapFromFile(&map_resp_, mapfname.c_str(), 
+      res, negate, occ_th, free_th, origin);
       
     map_resp_.map.info.map_load_time = ros::Time::now();
     map_resp_.map.header.frame_id = frame_id;
@@ -113,4 +112,4 @@ namespace map_loader {
     return map_resp_.map;    
   } 
   
-} // end of namespace map_loader
+}  // namespace map_loader

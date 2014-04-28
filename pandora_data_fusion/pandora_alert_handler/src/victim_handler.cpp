@@ -45,27 +45,26 @@ namespace pandora_alert_handler
 {
 
 /**
-@details 
-**/
+ * @details 
+ */
 VictimHandler::VictimHandler(const HoleListConstPtr& holeListPtr,
-                             const TpaListConstPtr& tpaListPtr,
-                             float clusterRadius,
-                             float sameVictimRadius,
-                             float approachDist,
-                             float victimUpdate) :
+                             const TpaListConstPtr& tpaListPtr) :
   holePtrListPtr_(holeListPtr),
-  tpaPtrListPtr_(tpaListPtr),
-  victimsToGoList_(1, sameVictimRadius, approachDist),
-  victimsVisitedList_(1, sameVictimRadius, approachDist)
+  tpaPtrListPtr_(tpaListPtr)
 {
-  clusterer_.reset( new VictimClusterer(clusterRadius, approachDist) );
+  Victim::setHoleModel(holePtrListPtr_->getFilterModel());
+  Victim::setTpaModel(tpaPtrListPtr_->getFilterModel());
+
+  clusterer_.reset( new VictimClusterer(0.2, 0.5) );
+
+  validVictimsCounter_ = 0;
 
   std::string param; 
   
   if (nh_.getParam("published_topic_names/victim_found", param))
   {
-  victimFoundPublisher_ =  
-    nh_.advertise<data_fusion_communications::VictimFoundMsg>(param, 1);
+    victimFoundPublisher_ =  
+      nh_.advertise<data_fusion_communications::VictimFoundMsg>(param, 1);
   }
   else
   {
@@ -75,7 +74,7 @@ VictimHandler::VictimHandler(const HoleListConstPtr& holeListPtr,
   
   if (nh_.getParam("published_topic_names/victim_update", param))
   {
-  victimUpdatePublisher_ = nh_.advertise<std_msgs::Empty>(param, 1);
+    victimUpdatePublisher_ = nh_.advertise<std_msgs::Empty>(param, 1);
   }
   else
   {
@@ -93,12 +92,23 @@ VictimHandler::VictimHandler(const HoleListConstPtr& holeListPtr,
     ROS_FATAL("victim_verified topic name param not found");
     ROS_BREAK();
   }
+
+  if (nh_.getParam("published_topic_names/valid_victims_counter", param))
+  {
+    validVictimsPublisher_ =  
+      nh_.advertise<std_msgs::Int32>(param, 1);
+  }
+  else
+  {
+    ROS_FATAL("valid_victims_counter topic name param not found");
+    ROS_BREAK();
+  }
 }
 
 /**
-@details Clusters the existing Objects into victims and then updates
-  the list with the unvisited victims with it
-**/
+ * @details Clusters the existing Objects into victims and then updates
+ * the list with the unvisited victims with it.
+ */
 void VictimHandler::notify()
 {  
   ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();  
@@ -107,8 +117,6 @@ void VictimHandler::notify()
 
   for (int ii = 0; ii < newVictimVector.size(); ii++)
   {
-    std::vector<int> iteratorList;
-
     if ( victimsVisitedList_.contains( newVictimVector[ii] ) )
     {
       continue;
@@ -128,8 +136,10 @@ void VictimHandler::notify()
 }
 
 /**
-@details 
-**/
+ * @details Collects from hole and tpa list, all these objects
+ * that are thought to be legitimate and are to be grouped to 
+ * Victim objects.
+ */
 ObjectConstPtrVectorPtr VictimHandler::getAllLegitObjects()
 {
   ObjectConstPtrVectorPtr result(new ObjectConstPtrVector);
@@ -159,32 +169,9 @@ ObjectConstPtrVectorPtr VictimHandler::getAllLegitObjects()
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 /**
-@details Iterates the unvistied victims list and checks if any holes that 
-  are contained in every victim still exist. If not they are deleted. If the
-  victim contains no more objects after the deletion it is deleted from the
-  list itself. The fsm is informed if necessary
-**/
-void VictimHandler::fixVictims()
-{
-  ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();  
-  
-  victimsToGoList_.sanityCheck(allObjects);
-  
-  if (victimsToGoList_.currentVictimUpdated())
-  {
-    publishVictimUpdatedMsg();
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-/**
-@details Delegate to victimList
-**/
+ * @details Delegate to victimList
+ */
 void VictimHandler::getVictimsMsg (
   std::vector< data_fusion_communications::VictimInfoMsg>* victimMsgVector)
 {  
@@ -192,8 +179,8 @@ void VictimHandler::getVictimsMsg (
 }
 
 /**
-@details Delegate to victimList
-**/
+ * @details Delegate to victimList
+ */
 void VictimHandler::setCurrentVictimIndex(int index)
 {
     // race condition !! If victim is
@@ -205,8 +192,8 @@ void VictimHandler::setCurrentVictimIndex(int index)
 }
 
 /**
-@details Delegate to victimList and add Stamp
-**/
+ * @details Delegate to victimList and add Stamp
+ */
 bool VictimHandler::getCurrentVictimTransform(
     tf::StampedTransform* stampedTranform)
 {
@@ -222,9 +209,9 @@ bool VictimHandler::getCurrentVictimTransform(
 }
 
 /**
-@details Delegate to victimList and publish verification msg if porbability
-  exceeds threshold
-**/
+ * @details Delegate to victimList and publish verification msg if probability
+ * exceeds threshold
+ */
 void VictimHandler::handleVictimVerification(
     const data_fusion_communications::VictimVerificationMsg& msg)
 {
@@ -245,8 +232,8 @@ void VictimHandler::handleVictimVerification(
 
 
 /**
-@details Delegate to victimList
-**/
+ * @details Delegate to victimList
+ */
 void VictimHandler::deleteCurrentVictim()
 {
   bool victimTracked = victimsToGoList_.deleteCurrentVictim();
@@ -259,23 +246,41 @@ void VictimHandler::deleteCurrentVictim()
 }
 
 /**
-@details Delegate to victimList
-**/
+ * @details Delegate to victimList
+ */
 void VictimHandler::validateCurrentHole(bool objectValid)
 {
   VictimPtr currentVictim = victimsToGoList_.validateCurrentObject(objectValid);
   
-  if(currentVictim)
+  if(currentVictim.get())
   {
+    if(currentVictim->getValid())
+    {
+      std_msgs::Int32 updateValidVictims;
+      updateValidVictims.data = ++validVictimsCounter_;
+      validVictimsPublisher_.publish(updateValidVictims);
+    }
     victimsVisitedList_.addUnchanged(currentVictim);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void VictimHandler::getVictimsPosesStamped(PoseStampedVector* victimsToGo, 
+    PoseStampedVector* victimsVisited, PoseStampedVector* approachPoses)
+{
+  victimsToGoList_.getObjectsPosesStamped(victimsToGo);
+  victimsVisitedList_.getObjectsPosesStamped(victimsVisited);
+  for(VictimList::const_iterator it = victimsToGoList_.begin();
+      it != victimsToGoList_.end(); ++it)
+  {
+    approachPoses->push_back((*it)->getApproachPoseStamped());
+  }
+}
+
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::fillGeotiff(
     data_fusion_communications::DatafusionGeotiffSrv::Response* res)
 {
@@ -283,19 +288,19 @@ void VictimHandler::fillGeotiff(
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::getVisualization(
-  visualization_msgs::MarkerArray* victimsVisitedMarkers ,
-  visualization_msgs::MarkerArray* victimsToGoMarkers)
+    visualization_msgs::MarkerArray* victimsVisitedMarkers,
+    visualization_msgs::MarkerArray* victimsToGoMarkers)
 {
   victimsVisitedList_.getVisualization(victimsVisitedMarkers);
   victimsToGoList_.getVisualization(victimsToGoMarkers);
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 void  VictimHandler::publishVictimFoundMsg()
 {
   ROS_INFO_NAMED("victim_handler",
@@ -306,8 +311,8 @@ void  VictimHandler::publishVictimFoundMsg()
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::publishVictimUpdatedMsg() 
 {
   std_msgs::Empty msg;
@@ -316,8 +321,8 @@ void VictimHandler::publishVictimUpdatedMsg()
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim)
 {
   data_fusion_communications::VictimToFsmMsg msg;
@@ -335,8 +340,8 @@ void VictimHandler::publishVictimToFsmMsg(const VictimPtr& victim)
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 std::string VictimHandler::sensorIdToString(int sensorId)
 {
   switch (sensorId)
@@ -353,24 +358,26 @@ std::string VictimHandler::sensorIdToString(int sensorId)
   ROS_ERROR("[VICTIM_HANDLER %d] sensorIdToString was called"
             "with invalid sensor id", __LINE__);
   ROS_BREAK();
+  return "";
 }
 
 
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::updateParams(float clusterRadius, float sameVictimRadius,
                                  float approachDist, float victimUpdate,
                                  float verificationProbability)
 {
   VICTIM_VERIFICATION_PROB = verificationProbability;
   clusterer_->updateParams(clusterRadius, approachDist);
-  victimsToGoList_.setParams(1, sameVictimRadius, approachDist, victimUpdate);
+  victimsToGoList_.setParams(sameVictimRadius, approachDist, victimUpdate);
+  victimsVisitedList_.setParams(sameVictimRadius, approachDist, victimUpdate);
 }
 
 /**
-@details 
-**/
+ * @details 
+ */
 void VictimHandler::flush()
 {
   victimsToGoList_.clear();

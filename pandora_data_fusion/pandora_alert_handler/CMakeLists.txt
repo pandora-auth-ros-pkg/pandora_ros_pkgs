@@ -11,8 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
           dynamic_reconfigure
           roslint
           data_fusion_communications 
-          vision_communications 
+          vision_communications
           )
+
+find_package(PkgConfig)
+pkg_check_modules(BFL REQUIRED orocos-bfl)
 
 generate_dynamic_reconfigure_options(
   config/alert_handler/alert_handler_dynamic.cfg
@@ -20,14 +23,16 @@ generate_dynamic_reconfigure_options(
   )
 
 catkin_package(
-    DEPENDS 
-    CATKIN-DEPENDS 
+    DEPENDS
+      orocos-bfl
+    CATKIN_DEPENDS 
     INCLUDE_DIRS 
     LIBRARIES 
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${BFL_INCLUDE_DIRS})
 
+link_directories(${BFL_LIBRARY_DIRS})
           
 ##################### utils ############################################
 
@@ -40,6 +45,18 @@ add_dependencies(utils
   data_fusion_communications_gencpp
   )
 
+##################### filter_model ############################################
+
+add_library(filter_model
+        src/filter_model.cpp)
+target_link_libraries(filter_model 
+          ${catkin_LIBRARIES}
+          ${BFL_LIBRARIES}
+          )
+add_dependencies(filter_model 
+  data_fusion_communications_gencpp
+  )
+
 ###################### objects #########################################
 
 add_library(objects 
@@ -47,6 +64,7 @@ add_library(objects
 target_link_libraries(objects
           ${catkin_LIBRARIES}
           utils
+          filter_model
           )
 add_dependencies(objects 
   data_fusion_communications_gencpp
@@ -109,6 +127,7 @@ add_library(victim_list
 target_link_libraries(victim_list
           ${catkin_LIBRARIES}
           utils
+          filter_model
           victim
           )
 add_dependencies(victim_list 
@@ -224,6 +243,7 @@ target_link_libraries(alert_handler_node
           victim_clusterer
           victim_list
           utils
+          filter_model
           objects
           hazmat
           hole
@@ -265,6 +285,14 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS_WITH_REFS
             src/ros_tf_listener.cpp
             )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS_WITH_REFS})
+set(ROSLINT_CPP_OPTS 
+    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens,-whitespace/braces")
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST 
+    RELATIVE ${PROJECT_SOURCE_DIR} 
+    test/*
+    )
+roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
+#roslint_add_test()
 
 ####### Testing ####
 

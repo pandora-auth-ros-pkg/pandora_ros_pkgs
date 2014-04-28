@@ -1,5 +1,8 @@
 #!usr/bin/env python
+import os
+from collections import deque
 
+import roslib; roslib.load_manifest('pandora_alert_handler')
 import rospy
 
 from vision_communications.msg import HoleDirectionMsg
@@ -22,7 +25,7 @@ class AlertDeliveryBoy:
 
         self.frame_id = 'headCamera'
 
-        self.orderWaitingList = []
+        self.orderWaitingList = deque([])
         
         self.hazmat_msg = HazmatAlertsVectorMsg()
         self.hazmat_msg.header.frame_id = self.frame_id
@@ -61,9 +64,6 @@ class AlertDeliveryBoy:
                                             probability = orderProbability,
                                             holeId = orderId))
         self.hole_pub.publish(self.hole_msg)
-        for i in range(2): 
-	    self.hole_pub.publish(self.hole_msg)
-	    rospy.sleep(1)
 
     def deliverHazmatOrder(self, orderYaw, 
                           orderPitch, orderPattern):
@@ -74,9 +74,6 @@ class AlertDeliveryBoy:
                                             pitch = orderPitch,
                                             patternType = orderPattern))
         self.hazmat_pub.publish(self.hazmat_msg)
-        for i in range(2): 
-	    self.hazmat_pub.publish(self.hazmat_msg)
-	    rospy.sleep(1)
 
     def deliverQrOrder(self, orderYaw, 
                       orderPitch, orderContent):
@@ -87,9 +84,6 @@ class AlertDeliveryBoy:
                                               pitch = orderPitch,
                                               QRcontent = orderContent))
         self.qr_pub.publish(self.qr_msg)
-        for i in range(2): 
-	    self.qr_pub.publish(self.qr_msg)
-	    rospy.sleep(1)
 
     def deliverTpaOrder(self, orderYaw, orderPitch, orderProbability):
 
@@ -98,13 +92,12 @@ class AlertDeliveryBoy:
         self.tpa_msg.pitch = orderPitch
         self.tpa_msg.probability = orderProbability
         self.tpa_pub.publish(self.tpa_msg)
-        for i in range(2): 
-	    self.tpa_pub.publish(self.tpa_msg)
-	    rospy.sleep(1)
 
     def deliverNextOrder(self):
         
-        nextOrder = self.orderWaitingList.pop()
+        if len(self.orderWaitingList) == 0:
+            raise BadBossOrderFile("No orders left.")
+        nextOrder = self.orderWaitingList.popleft()
         if nextOrder[1] == 'qr':
             self.qr_pub.publish(nextOrder[0])
         elif nextOrder[1] == 'hazmat':
@@ -116,13 +109,15 @@ class AlertDeliveryBoy:
 
     def clearOrderList(self):
 
-        self.orderWaitingList = []
+        self.orderWaitingList = deque([])
 
     def getOrderListFromBoss(self, boss):
-        
-        with open(boss, 'r') as bossList:
+       
+        __dir__ = os.path.dirname(os.path.abspath(__file__))
+        filepath = os.path.join(__dir__, boss)
+        with open(filepath, 'r') as bossList:
             for order in bossList:
-                a = order[:-2].split()
+                a = order.split()
                 if a[0] == 'qr:':
                     if len(a) != 4:
                         raise BadBossOrderFile("Not right argument numbers.")

@@ -7,15 +7,9 @@ namespace pandora_data_fusion
 namespace pandora_alert_handler
 {
 
-PoseFinder::PoseFinder(const MapPtr& map, const std::string& mapType, 
-    float occupiedCellThres, 
-    float heightHighThres, float heightLowThres,
-    float approachDist, float orientationDist,
-    float orientationCircle) : map_(map)
+PoseFinder::PoseFinder(const MapPtr& map, const std::string& mapType) 
+  : map_(map)
 {
-  updateParams(occupiedCellThres, heightHighThres, heightLowThres, approachDist,
-                            orientationDist, orientationCircle);
-  
   listener_.reset( TfFinder::newTfListener(mapType) );
 }
 
@@ -227,10 +221,10 @@ tf::Transform PoseFinder::lookupTransformFromWorld(std_msgs::Header header)
 {
   tf::StampedTransform tfTransform;
 
-  listener_->waitForTransform("/world", header.frame_id,
+  listener_->waitForTransform("/map", header.frame_id,
       header.stamp, ros::Duration(1));
 
-  listener_->lookupTransform( "/world", header.frame_id, 
+  listener_->lookupTransform( "/map", header.frame_id, 
       header.stamp, tfTransform);
 
   return tfTransform;

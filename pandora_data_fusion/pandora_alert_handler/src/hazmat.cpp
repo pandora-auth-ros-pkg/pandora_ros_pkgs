@@ -12,9 +12,9 @@ Hazmat::Hazmat()
   type_ = "hazmat";
 }
 
-geometry_msgs::PoseStamped Hazmat::getPoseStamped() const
+PoseStamped Hazmat::getPoseStamped() const
 {
-  geometry_msgs::PoseStamped objPose = Object::getPoseStamped();
+  PoseStamped objPose = Object::getPoseStamped();
   objPose.header.frame_id = "hazmat_" + boost::to_string(id_) + "_" +
                             boost::to_string(pattern_);
   return objPose;
@@ -24,16 +24,12 @@ bool Hazmat::isSameObject(const ObjectConstPtr& object, float distance) const
 {
   bool cond = false;
   
-  if(object->getType().compare(std::string("tpa")))
+  if (!object->getType().compare(type_))
   {
-    cond = Object::isSameObject(object, distance);
-    if (!object->getType().compare(type_))
-    {
-      cond = cond &&
-        pattern_ == boost::dynamic_pointer_cast<const Hazmat>(
-            object)->getPattern();
-    } 
-  }
+    cond = Object::isSameObject(object, distance) 
+      && pattern_ == boost::dynamic_pointer_cast<const Hazmat>(object)
+      ->getPattern();
+  } 
 
   return cond;
 }

@@ -276,8 +276,6 @@ void AlertHandler::qrAlertCallback(
   objectHandler_->handleQrs(qrsVectorPtr, objectFactory_->getTransform(),
     eraseHolesQrs);
 
-  victimHandler_->fixVictims();
-
 }
 
 void AlertHandler::tpaDirectionAlertCallback(
@@ -365,19 +363,30 @@ void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
 }
 
 void AlertHandler::dynamicReconfigCallback(
-    const alert_handler::AlertHandlerConfig& config, uint32_t level)
+    const ::pandora_alert_handler::AlertHandlerConfig& config, uint32_t level)
 {
   objectFactory_->dynamicReconfigForward( config.occupiedCellThres,
     config.highThres, config.lowThres, config.approachDist,
     config.orientationCircle, config.orientationDist); 
 
-  holes_->setParams(config.holeCounterThreshold, config.holeMinimumDist);
-  qrs_->setParams(config.qrCounterThreshold, config.qrMinimumDist);
-  hazmats_->setParams(config.hazmatCounterThreshold, config.hazmatMinimumDist);
+  holes_->setParams(-1, config.holeMinimumDist,
+      config.holeXVarThres, config.holeYVarThres, config.holeZVarThres,
+      config.holePriorXSD, config.holePriorYSD, config.holePriorZSD,
+      config.holeSystemNoiseSD, config.holeMeasNoiseSD);
+  qrs_->setParams(config.qrScore, config.qrMinimumDist,
+      config.qrXVarThres, config.qrYVarThres, config.qrZVarThres,
+      config.qrPriorXSD, config.qrPriorYSD, config.qrPriorZSD,
+      config.qrSystemNoiseSD, config.qrMeasNoiseSD);
+  hazmats_->setParams(config.hazmatScore, config.hazmatMinimumDist,
+      config.hazmatXVarThres, config.hazmatYVarThres, config.hazmatZVarThres,
+      config.hazmatPriorXSD, config.hazmatPriorYSD, config.hazmatPriorZSD,
+      config.hazmatSystemNoiseSD, config.hazmatMeasNoiseSD);
+  tpas_->setParams(config.tpaScore, config.tpaMinimumDist,
+      config.tpaXVarThres, config.tpaYVarThres, config.tpaZVarThres,
+      config.tpaPriorXSD, config.tpaPriorYSD, config.tpaPriorZSD,
+      config.tpaSystemNoiseSD, config.tpaMeasNoiseSD);
 
-  objectHandler_->updateParams(config.sensorRange,
-                               config.qrClosestAlert,
-                               config.hazmatClosestAlert );
+  objectHandler_->updateParams(config.sensorRange);
 
   victimHandler_->updateParams(
     config.clusterRadius , config.sameVictimRadius,
@@ -395,8 +404,8 @@ bool AlertHandler::getObjectsServiceCb(
   hazmats_->getObjectsPosesStamped(&rs.hazmats);
   tpas_->getObjectsPosesStamped(&rs.tpas);
 
-  // victimHandler_->getVictimsPosesStamped(&rs.victimsToGo, &rs.victimsVisited
-                                         // , &rs.approachPoints);
+  victimHandler_->getVictimsPosesStamped(&rs.victimsToGo, &rs.victimsVisited, 
+      &rs.approachPoints);
 
   return true;
 }
@@ -448,10 +457,13 @@ bool AlertHandler::flushQueues(
     std_srvs::Empty::Request& rq,
       std_srvs::Empty::Response &rs)
 {
+  ROS_INFO_NAMED("ALERT_HANDLER_FLUSH_SERVICE", "Flushing lists!");
   holes_->clear();
   qrs_->clear();
   hazmats_->clear();
+  tpas_->clear();
   victimHandler_->flush();
+  return true;
 }
 
 void AlertHandler::startTransition(int newState)

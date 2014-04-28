@@ -44,21 +44,13 @@ namespace pandora_data_fusion
 namespace pandora_alert_handler
 {
 
-VictimList::VictimList(int counterThreshold, float distanceThreshold, 
-      float approachDistance, float victimUpdate) :
-  ObjectList<Victim>(counterThreshold, distanceThreshold)
+VictimList::VictimList()
 {
-    currentVictimIt_ = objects_.end();
-    victimsRequestedAndGiven_ = false;
-    currentVictimDied_ = false;
-    APPROACH_DIST = approachDistance;
-    VICTIM_UPDATE = victimUpdate;
+  currentVictimIt_ = objects_.end();
+  victimsRequestedAndGiven_ = false;
+  currentVictimDied_ = false;
 }
 
-/**
-@details Also returns a vector containing the indices of the victims in the
-  vector that match the given one
-**/
 bool VictimList::contains(const VictimConstPtr& victim) const
 {
   for (const_iterator it = this->begin(); it != this->end(); ++it)
@@ -72,12 +64,12 @@ bool VictimList::contains(const VictimConstPtr& victim) const
 }
 
 /**
-@details A victim from given the indices of the unvisited list is selected 
-  (this will be the current if we track one). Its info is updated by 
-    copying the given victim object's one and the rest are deleted from the 
-      unvisited list. The fsm is informed if necessary     
-**/
-void VictimList::updateObject(const VictimPtr& victim, 
+ * @details A victimToUpdate from victim list is selected (this will be the 
+ * current if we are tracking one). Its info is updated by copying the given 
+ * victim's objects and the rest victims that are thought to be the same are 
+ * deleted from victim list. The fsm is informed if necessary.
+ */
+void VictimList::updateObjects(const VictimConstPtr& victim, 
     const IteratorList& iteratorList)
 {                                   
   ROS_ASSERT(iteratorList.size() > 0);
@@ -111,27 +103,30 @@ void VictimList::updateObject(const VictimPtr& victim,
 }
 
 /**
-@details 
-**/
-void VictimList::setParams(int counterThreshold, float distanceThreshold, 
+ * @details Sets various thresholds and params for VictimList
+ */
+void VictimList::setParams(float distanceThreshold, 
     float approachDistance, float victimUpdate)
 {    
-  ObjectList<Victim>::setParams(counterThreshold, distanceThreshold);
+  ObjectList<Victim>::setParams(0, distanceThreshold);
   APPROACH_DIST = approachDistance;
   VICTIM_UPDATE = victimUpdate;  
 }
 
 /**
-@details 
-**/
+ * @details It is set that if we do not currently track a victim,
+ * the iterator is the one pointing at the end of the victim list
+ * (where there is no victim - yet)
+ */
 bool VictimList::isVictimBeingTracked() const
 {
   return currentVictimIt_ != objects_.end();
 }
 
 /**
-@details 
-**/
+ * @details Assuming that a victim is being tracked,
+ * this method returns that victim.
+ */
 const VictimPtr& VictimList::getCurrentVictim() const
 {
   ROS_ASSERT(currentVictimIt_ != objects_.end());
@@ -139,10 +134,10 @@ const VictimPtr& VictimList::getCurrentVictim() const
 }
 
 /**
-@details Keeps track of the victims indices in the sequence they are 
-  returned so that when setCurrentVictimIndex is called, we can still find
-  the correct index
-**/
+ * @details Keeps track of the victims' indices in the sequence they are 
+ * returned so that when setCurrentVictimIndex is called, we can still find
+ * the correct index by its victimId_.
+ */
 void VictimList::getVictimsMsg(
     std::vector< data_fusion_communications::VictimInfoMsg>* victimMsgVector)
 {
@@ -171,11 +166,10 @@ void VictimList::getVictimsMsg(
 }
 
 /**
-@details This method should always be called after getVictimsMsg() so if that
-  is not the case the assertion should fire.
-  Victim id = -1 means that no victim was chosen so
-  if a victim is tracked it is unset. This behavior may very possibly change 
-**/
+ * @details This method should always be called after getVictimsMsg() so if 
+ * that is not the case the assertion should fire. Also, index = -1 means 
+ * that no victim was chosen from victimMsgVector.
+ */
 bool VictimList::setCurrentVictim(int index)
 {
   ROS_ASSERT(victimsRequestedAndGiven_);
@@ -203,21 +197,22 @@ bool VictimList::setCurrentVictim(int index)
 }
 
 /**
-@details 
-**/
+ * @details If there is a victim being tracked returns its transform
+ * with reversed yaw. Else, returns false.
+ */
 bool VictimList::getCurrentVictimTransform(tf::Transform* Transform) const
 {
   if (currentVictimIt_ == objects_.end())
   {
     return false;
   }
-  *Transform =  (*currentVictimIt_)->getRotatedTransform();
+  *Transform = (*currentVictimIt_)->getRotatedTransform();
   return true;
 }
 
 /**
-@details 
-**/
+ * @details Sets victim's info according to the message from Victim Fusion.
+ */
 bool VictimList::updateCurrentVictimSensorsAndProb(
     const data_fusion_communications::VictimVerificationMsg& msg)
 {    
@@ -237,20 +232,24 @@ bool VictimList::updateCurrentVictimSensorsAndProb(
 }
 
 /**
-@details 
-**/
+ * @details Assuming that a victim is being tracked, that victim is erased
+ * from victim list. Next currentVictim iterator points to the end of the
+ * list.
+ */
 bool VictimList::deleteCurrentVictim()
 {
   ROS_ASSERT(currentVictimIt_ != objects_.end());
   objects_.erase(currentVictimIt_);
   currentVictimIt_ = objects_.end();
+  return true;
 }
 
 /**
-@details If the objcect is valid then the current victim is erased from the
- list and returned. If it is not valid, it is erased from the victim's objects.
- If after this erasal the victim is empty, then it is erased and returned
-**/
+ * @details If the object is valid then the current victim is erased from the
+ * list and returned. If it is not valid, it is erased from the victim's 
+ * objects. If after this erasal the victim is empty, then it is erased and 
+ * returned.
+ */
 VictimPtr VictimList::validateCurrentObject(bool objectValid)
 {
   ROS_ASSERT(currentVictimIt_ != objects_.end());
@@ -263,27 +262,29 @@ VictimPtr VictimList::validateCurrentObject(bool objectValid)
     currentVictim->setValid(true);
     currentVictim->setVisited(true);
     objects_.erase(currentVictimIt_);
+    currentVictimIt_ = objects_.end();
   }
   else
   {
     (*currentVictimIt_)->eraseObjectAt(
-      currentVictim->getSelectedObjectIndex(), APPROACH_DIST);
-    if (currentVictim->getObjects().empty())
+      (*currentVictimIt_)->getSelectedObjectIndex(), APPROACH_DIST);
+    if ((*currentVictimIt_)->getObjects().empty() || 
+        (*currentVictimIt_)->getObjects().at(0)->getType() == "tpa") //  to be removed
     {
       currentVictim = *currentVictimIt_;
       currentVictim->setValid(false);
       currentVictim->setVisited(true);
       objects_.erase(currentVictimIt_);
+      currentVictimIt_ = objects_.end();
     } 
   }
-  currentVictimIt_ = objects_.end();
   
   return currentVictim;
 }
 
 /**
-@details 
-**/
+ * @details ~Add As You Are~ - Nirvana
+ */
 void VictimList::addUnchanged(const VictimPtr& victim)
 {
   objects_.push_back(victim);
@@ -296,8 +297,10 @@ void VictimList::clear()
 }
 
 /**
-@details 
-**/
+ * @details Has the victim being tracked changed state?
+ * If it has died or its approach point has changed much,
+ * it is necessary to inform.
+ */
 bool VictimList::currentVictimUpdated()
 {
   if (currentVictimIt_ == objects_.end())
@@ -317,33 +320,7 @@ bool VictimList::currentVictimUpdated()
   {
     return true;
   }
-}
-
-/**
-@details If a victim is erased during sanity check, we should inform it,
-  that's why currentVictimDied_ the is used. See currentVictimUpdated()
-**/
-void VictimList::sanityCheck(const ObjectConstPtrVectorPtr& allObjects)
-{  
-  iterator it = objects_.begin();
-    
-  while (it != objects_.end())
-  {
-    (*it)->sanityCheck(allObjects, DIST_THRESHOLD, APPROACH_DIST);
-    if((*it)->getObjects().empty())
-    {
-      if (it == currentVictimIt_)
-      {
-        currentVictimIt_ =  objects_.end();
-        currentVictimDied_ = true;
-      }
-      objects_.erase(it++);
-    }
-    else
-    {
-      ++it;
-    }
-  }
+  return false;
 }
 
 }  // namespace pandora_alert_handler

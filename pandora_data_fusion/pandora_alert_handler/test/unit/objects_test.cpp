@@ -65,7 +65,6 @@ protected:
 
 TEST_F(ObjectsTest, Construstors)
   {
-  EXPECT_EQ(0, Object1.getCounter());
   EXPECT_FALSE(Object1.getLegit());
   EXPECT_STREQ("qr", Qr1.getType().c_str());    
   EXPECT_STREQ("hazmat", Hazmat1.getType().c_str());

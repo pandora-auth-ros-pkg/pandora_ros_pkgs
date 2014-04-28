@@ -7,15 +7,9 @@ namespace pandora_data_fusion
 namespace pandora_alert_handler
 {
 
-ObjectFactory::ObjectFactory(const MapPtr& map, const std::string& mapType,
-      float occupiedCellThres,
-      float heightHighThres, float heightLowThres,
-      float approachDist, float orientationDist,
-      float orientationCircle)
+ObjectFactory::ObjectFactory(const MapPtr& map, const std::string& mapType)
 {
-  poseFinder_.reset( new PoseFinder(map, mapType, occupiedCellThres, 
-           heightHighThres, heightLowThres, approachDist, 
-           orientationDist, orientationCircle) );
+  poseFinder_.reset( new PoseFinder(map, mapType) );
 }
 
 HolePtrVectorPtr ObjectFactory::makeHoles(
@@ -140,16 +134,16 @@ void ObjectFactory::setUpObject(const TpaPtr& tpaPtr,
 void ObjectFactory::setUpObject(const HazmatPtr& hazmatPtr, 
     const vision_communications::HazmatAlertMsg& msg)
 {
-  hazmatPtr->setPose( poseFinder_->findAlertPose(msg.yaw,
-                                                  msg.pitch, currentTransform_) );
+  hazmatPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
+        msg.pitch, currentTransform_) );
   hazmatPtr->setPattern( msg.patternType );
 }
 
 void ObjectFactory::setUpObject(const QrPtr& qrPtr, 
     const vision_communications::QRAlertMsg& msg)
 {
-  qrPtr->setPose( poseFinder_->findAlertPose(msg.yaw,
-                                                  msg.pitch, currentTransform_) );
+  qrPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
+        msg.pitch, currentTransform_) );
   qrPtr->setContent( msg.QRcontent );
 }
 

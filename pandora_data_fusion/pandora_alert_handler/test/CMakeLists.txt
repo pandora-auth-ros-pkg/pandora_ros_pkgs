@@ -95,16 +95,7 @@ ${catkin_LIBRARIES}
    ) 
 
 ########## Functional Tests #########
-
+ 
+add_rostest(functional/alert_handler_static_test.launch)
 add_rostest(functional/alert_handler_test.launch)
-
-########### RosLint ###################################################
-
-set(ROSLINT_CPP_OPTS 
-    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens, -whitespace/braces")
-FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
-     RELATIVE ${PROJECT_SOURCE_DIR} 
-            unit/*.cpp
-            )
-roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 

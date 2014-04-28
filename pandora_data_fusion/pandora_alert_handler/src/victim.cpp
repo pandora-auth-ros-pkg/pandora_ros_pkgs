@@ -13,23 +13,25 @@ Victim::Victim()
   id_ = lastVictimId_;
   valid_ = false;
   visited_ = false;
+  holeDeleted_ = false;
+  tpaDeleted_ = false;
   selectedObjectIndex_ = -1;
 }
 
 int Victim::lastVictimId_ = 0;
+FilterModelPtr Victim::holeModelPtr_ = FilterModelPtr();
+FilterModelPtr Victim::tpaModelPtr_ = FilterModelPtr();
 
 bool Victim::isSameObject(const ObjectConstPtr& object, float distance) const
 {  
   ROS_ASSERT(object->getType().compare(type_) == 0);
   
-  return 
-    Utils::distanceBetweenPoints2D(pose_.position, object->getPose().position)
-      < distance; 
+  return Object::isSameObject(object, distance);
 }
 
-geometry_msgs::PoseStamped Victim::getPoseStamped() const
+PoseStamped Victim::getPoseStamped() const
 {
-  geometry_msgs::PoseStamped victimPose;
+  PoseStamped victimPose;
 
   victimPose.pose = pose_;
   if (!visited_)
@@ -53,9 +55,9 @@ geometry_msgs::PoseStamped Victim::getPoseStamped() const
   return victimPose;
 }
 
-geometry_msgs::PoseStamped Victim::getApproachPoint() const
+PoseStamped Victim::getApproachPoseStamped() const
 {
-  geometry_msgs::PoseStamped approachPoseStamped;
+  PoseStamped approachPoseStamped;
   approachPoseStamped.pose = approachPose_;
   approachPoseStamped.header.frame_id = 
     "app_pose_" + boost::to_string(id_);
@@ -131,16 +133,92 @@ void Victim::fillGeotiff(
   }
 }
 
-void Victim::setObjects(const ObjectConstPtrVector& objects, 
+/**
+ * @details Representative Object should be the one in the cluster 
+ * with the most confidence (least standard deviation) with its conviction pdf 
+ * updated by the rest objects in victim. Between the hole and the tpa 
+ * candidate, hole will be prefered.
+ */
+void Victim::setObjects(const ObjectConstPtrVector& objects,
     float approachDistance) 
 {
-  objects_ = objects;
+  ROS_DEBUG_STREAM("Setting up victim with "<<objects.size()<<" objects.");
+  objects_.clear();
+
+  if(!holeDeleted_)
+  {
+    ObjectConstPtrVector::const_iterator holeIt = objects.end();
+    float minHoleVariance = 1;
+
+    for ( ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        it != objects.end(); it++)
+    {
+      if (!(*it)->getType().compare(std::string("hole")) && 
+          (*it)->getVarianceX() < minHoleVariance)
+      {
+        minHoleVariance = (*it)->getVarianceX();
+        holeIt = it;
+      }
+    }
+
+    ObjectPtr representativeHole( new Hole );
+
+    if (holeIt != objects.end())
+      *representativeHole = *(*holeIt);
+
+    for ( ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        it != objects.end(); it++)
+    {
+      if (!(*it)->getType().compare(std::string("hole")) && it != holeIt)
+      {
+        representativeHole->update((*it), holeModelPtr_);
+      }
+    }
+  
+    if (holeIt != objects.end())
+      objects_.push_back(representativeHole);
+  }
+
+  if(!tpaDeleted_)
+  {
+    ObjectConstPtrVector::const_iterator tpaIt = objects.end();
+    float minTpaVariance = 1;
+
+    for ( ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        it != objects.end(); it++)
+    {
+      if (!(*it)->getType().compare(std::string("tpa")) && 
+          (*it)->getVarianceX() < minTpaVariance)
+      {
+        minTpaVariance = (*it)->getVarianceX();
+        tpaIt = it;
+      }
+    }
+
+    ObjectPtr representativeTpa( new Tpa );
+
+    if (tpaIt != objects.end())
+      *representativeTpa = *(*tpaIt);
+
+    for ( ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        it != objects.end(); it++)
+    {
+      if (!(*it)->getType().compare(std::string("tpa")) && it != tpaIt)
+      {
+        representativeTpa->update((*it), tpaModelPtr_);
+      }
+    }
+  
+    if (tpaIt != objects.end())
+      objects_.push_back(representativeTpa);
+  }
+
   updateRepresentativeObject(approachDistance);
 }
   
 /**
-@details Should always be called after any change on the objects_
-**/
+ * @details Should always be called after any change on the objects_.
+ */
 void Victim::updateRepresentativeObject(float approachDistance)
 {  
   selectedObjectIndex_ = findRepresentativeObject();
@@ -152,8 +230,12 @@ void Victim::updateRepresentativeObject(float approachDistance)
 }
 
 /**
-@details 
-**/
+ * @details As for now, hole objects are prefered over tpa objects,
+ * because it is more likely to verify a victim though vision means
+ * rather than thermal sensors. In a future implementation of the robot
+ * where the thermal sensor would be more informative and trustworthy this
+ * method would have been changed.
+ */
 int Victim::findRepresentativeObject() const
 {
   if (objects_.size() == 0)
@@ -161,9 +243,9 @@ int Victim::findRepresentativeObject() const
     return -1;
   }
 
-  for ( int ii = 0 ; ii < objects_.size() ; ii++)
+  for ( int ii = 0 ; ii < objects_.size() ; ++ii)
   {
-    if (objects_[ii]->getType() == "hole")
+    if (!objects_[ii]->getType().compare(std::string("hole")))
     {
       return ii;
     }
@@ -172,7 +254,7 @@ int Victim::findRepresentativeObject() const
   return 0;
 }
 
-void Victim::updatePose(const geometry_msgs::Pose& newPose,
+void Victim::updatePose(const Pose& newPose,
     float approachDistance) 
 {
   setPose(newPose);
@@ -184,15 +266,29 @@ void Victim::addSensor(int sensorId)
   sensorIds_.insert(sensorId);
 } 
 
+/**
+ * @details Erasing an object will get the appropriate objectDeleted_
+ * flag set to true, so that this victim will be ignorant to that type of
+ * objects.
+ */
 void Victim::eraseObjectAt(int index,
     float approachDistance)
 {
+  if(objects_[index]->getType() == "hole")
+  {
+    holeDeleted_ = true;
+  }
+  else if(objects_[index]->getType() == "tpa")
+  {
+    tpaDeleted_ = true;
+  }
   objects_.erase(objects_.begin() + index);
   updateRepresentativeObject(approachDistance);
 }
 
 
-tf::Transform Victim::getRotatedTransform() const {
+tf::Transform Victim::getRotatedTransform() const
+{
   tf::Transform trans = getTransform();
   tfScalar roll, pitch, yaw;
   trans.getBasis().getRPY(roll, pitch, yaw);
@@ -202,9 +298,12 @@ tf::Transform Victim::getRotatedTransform() const {
 }
 
 /**
-@details 
-**/
-geometry_msgs::Pose Victim::calculateApproachPose(float approachDistance) 
+ * @details Basically returns an approach point that is some length in front of
+ * the position of the victim in the direction of its orientation. Also sets
+ * its orientation to be the yaw-reversed of the victim's (as it's if we look
+ * to the victim).
+ */
+Pose Victim::calculateApproachPose(float approachDistance) 
     const
 {
   tf::Transform transformation = getTransform();
@@ -234,34 +333,6 @@ tf::Transform Victim::getTransform() const
       pose_.orientation.z, pose_.orientation.w );
   tf::Vector3 vec(pose_.position.x, pose_.position.y, pose_.position.z);
   return tf::Transform(tfQuaternion, vec);
-}
-
-/**
-@details 
-**/
-void Victim::sanityCheck(
-    const ObjectConstPtrVectorPtr& allObjects,
-      float distThreshold, float approachDistance)
-{
-  bool objectStillExists = true;
-  for ( ObjectConstPtrVector::iterator it = objects_.begin() ;
-      it != objects_.end() ; it++)
-  {
-    objectStillExists = false;
-    for ( int jj = 0 ; jj < allObjects->size() ; jj++)
-    {
-      if ((*it)->isSameObject(allObjects->at(jj), distThreshold))
-      {
-        objectStillExists = true;
-        break;
-      }
-    }
-    if (!objectStillExists)
-    {
-      it = --objects_.erase(it);
-      updateRepresentativeObject(approachDistance);
-    }
-  }
 }
 
 }  // namespace pandora_alert_handler

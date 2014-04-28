@@ -13,9 +13,9 @@ Qr::Qr()
   timeFound_ = ros::Time::now();
 }
 
-geometry_msgs::PoseStamped Qr::getPoseStamped() const
+PoseStamped Qr::getPoseStamped() const
 {
-  geometry_msgs::PoseStamped objPose = Object::getPoseStamped();
+  PoseStamped objPose = Object::getPoseStamped();
   objPose.header.frame_id = "qr_" + boost::to_string(id_) + "_" + content_;
   return objPose;
 }
@@ -24,15 +24,11 @@ bool Qr::isSameObject(const ObjectConstPtr& object, float distance) const
 {
   bool cond = false;
 
-  if(object->getType().compare(std::string("tpa")))
+  if (!object->getType().compare(type_))
   {
-    cond = Object::isSameObject(object, distance);
-    if (!object->getType().compare(type_))
-    {
-      cond = cond &&
-        !content_.compare(
-          boost::dynamic_pointer_cast<const Qr>(object)->getContent());
-    }
+    cond = Object::isSameObject(object, distance)
+      && !content_.compare(
+      boost::dynamic_pointer_cast<const Qr>(object)->getContent());
   }
 
   return cond;

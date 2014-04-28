@@ -19,8 +19,8 @@
    * Chris Zalidis, zalidis@gmail.com 
 ******************************************************************************/
 
-#ifndef MAP_LOADER_H
-#define MAP_LOADER_H
+#ifndef MAP_LOADER_MAP_LOADER_H
+#define MAP_LOADER_MAP_LOADER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,8 +35,8 @@
 
 
 #ifdef HAVE_NEW_YAMLCPP
-//! The >> operator disappeared in yaml-cpp 0.5, so this function is
-//! added to provide support for code written under the yaml-cpp 0.3 API.
+//!< The >> operator disappeared in yaml-cpp 0.5, so this function is
+//!< added to provide support for code written under the yaml-cpp 0.3 API.
 template<typename T>
 void operator >> (const YAML::Node& node, T& i)
 {
@@ -46,18 +46,18 @@ void operator >> (const YAML::Node& node, T& i)
 
 
 /**
-@namespace map_loader
-@brief The namespace for STDR map loader
-**/ 
+ * @namespace map_loader
+ * @brief The namespace for STDR map loader
+ */ 
 namespace map_loader {
     
   /**
-  @brief Loads a map from an image file
-  @param fname [const std::string&] The file name
-  @return nav_msgs::OccupancyGrid
-  **/
+   * @brief Loads a map from an image file
+   * @param fname [const std::string&] The file name
+   * @return nav_msgs::OccupancyGrid
+   */
   nav_msgs::OccupancyGrid loadMap(const std::string& fname); 
 
-} // end of namespace map_loader
+}  // namespace map_loader
 
-#endif
+#endif  // MAP_LOADER_MAP_LOADER_H

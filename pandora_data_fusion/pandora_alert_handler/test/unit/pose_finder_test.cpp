@@ -13,9 +13,9 @@ namespace pandora_alert_handler
 {
 
 /**
-@class PoseFinderTest
-@brief Basic Test Fixture for testing PoseFinder
-**/
+ * @class PoseFinderTest
+ * @brief Basic Test Fixture for testing PoseFinder
+ */
 class PoseFinderTest : public ::testing::Test 
 {
  protected:
@@ -108,8 +108,8 @@ class PoseFinderTest : public ::testing::Test
 
   /* Methods */
   /**
-  @brief Constructor
-  **/
+   * @brief Constructor
+   */
   PoseFinderTest() 
   {
     ros::Time::init();
@@ -121,12 +121,12 @@ class PoseFinderTest : public ::testing::Test
   }
 
   /**
-  @brief Function to SetUp the Test Fixture
-  @return void
-  **/
+   * @brief Function to SetUp the Test Fixture
+   * @return void
+   */
   virtual void
     SetUp() 
-    {      
+    {
       defaultRotation_.setValue(tfScalar(1), tfScalar(0), tfScalar(0),
                                     tfScalar(0), tfScalar(1), tfScalar(0),
                                     tfScalar(0), tfScalar(0), tfScalar(1));
@@ -134,7 +134,8 @@ class PoseFinderTest : public ::testing::Test
       defaultTransform_.setBasis(defaultRotation_);
       defaultTransform_.setOrigin(defaultTranslation_);
 
-      poseFinder_.reset( new PoseFinder(map_, "TEST") );    
+      poseFinder_.reset( new PoseFinder(map_, "TEST") );
+      poseFinder_->updateParams(0.5, 1.2, 0, 0.5, 0.5, 0.25);
   }
 
   /* Variables */

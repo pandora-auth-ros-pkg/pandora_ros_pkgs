@@ -45,19 +45,23 @@ namespace pandora_alert_handler
 {
 
 VictimClusterer::VictimClusterer(float clusterRadius, float approachDist)
-{  
+{
   CLUSTER_RADIUS = clusterRadius;
   APPROACH_DIST = approachDist; 
 }
 
 /**
-@details 
-**/
+ * @details In order to create Victim objects, two things are being used.
+ * First, a simple centroid clusterer groups all given objects into vectors
+ * of objects. Next, a Victim object is created by each vector of grouped
+ * objects by finding their representative object and setting it in Victim's
+ * characteristic objects.
+ */
 VictimPtrVector VictimClusterer::createVictimList(
-  const ObjectConstPtrVectorPtr& allObjects)
+    const ObjectConstPtrVectorPtr& allObjects)
 {  
   ObjectConstPtrVectorVector groupedObjects = groupObjects(allObjects);
-    
+ 
   VictimPtrVector newVictimVector;
 
   for (int ii = 0; ii < groupedObjects.size(); ++ii)
@@ -73,8 +77,10 @@ VictimPtrVector VictimClusterer::createVictimList(
 }
 
 /**
-@details 
-**/
+ * @details Very simple clusterer that uses a centroid and a euclidean distance
+ * metric with threshold to decide whether an object should be added
+ * to the group or not.
+ */
 ObjectConstPtrVectorVector 
   VictimClusterer::groupObjects(const ObjectConstPtrVectorPtr& allObjects)
 {
@@ -92,7 +98,7 @@ ObjectConstPtrVectorVector
         findGroupCenterPoint(groupedObjects[ii]);
 
       double distance =
-        Utils::distanceBetweenPoints2D(currentObj->
+        Utils::distanceBetweenPoints3D(currentObj->
                                        getPose().position, groupCenterPoint);
 
       if (distance < CLUSTER_RADIUS)
@@ -116,8 +122,9 @@ ObjectConstPtrVectorVector
 }
 
 /**
-@details 
-**/
+ * @details Given a group of objects which contain 3D position coordinates,
+ * this function returns the centroid of the group.
+ */
 geometry_msgs::Point VictimClusterer::findGroupCenterPoint(
   const ObjectConstPtrVector& objects)
 {
@@ -128,17 +135,20 @@ geometry_msgs::Point VictimClusterer::findGroupCenterPoint(
   {
     centerPoint.x += (*it)->getPose().position.x;
     centerPoint.y += (*it)->getPose().position.y;
+    centerPoint.z += (*it)->getPose().position.z;
   }
 
   centerPoint.x /= objects.size();
   centerPoint.y /= objects.size();
+  centerPoint.z /= objects.size();
 
   return centerPoint;
 }
 
 /**
-@details 
-**/
+ * @details Updates the parameters tha are used in clustering (distance
+ * threshold) and in finding approach point.
+ */
 void VictimClusterer::updateParams(float clusterRadius, float approachDist)
 {
   CLUSTER_RADIUS = clusterRadius;

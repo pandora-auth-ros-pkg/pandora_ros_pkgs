@@ -10,6 +10,7 @@
 #include "visualization_msgs/MarkerArray.h"
 
 #include "alert_handler/objects.h"
+#include "alert_handler/filter_model.h"
 // #include "alert_handler/const_iterator_const_ref.h"
 #include "alert_handler/utils.h"
 
@@ -22,7 +23,8 @@ template <class ObjectType>
 class ObjectList
 {
  public:
- 
+
+  //!< Type definitions
   typedef boost::shared_ptr< ObjectType > Ptr;
   typedef boost::shared_ptr< ObjectType const > ConstPtr;
   typedef std::list< Ptr > List;
@@ -35,45 +37,54 @@ class ObjectList
 
  public:
 
-  ObjectList(int counterThreshold = 1, float distanceThreshold = 0.5);
+  ObjectList(); 
 
   const_iterator begin() const;
   const_iterator end() const;
   int size() const;
-  bool isObjectPoseInList(const ObjectConstPtr& object, float closestAlert) const;
+  bool isObjectPoseInList(const ObjectConstPtr& object,
+      float closestAlert) const;
 
-  bool add(const Ptr& object);
+  int add(const Ptr& object);
   void pop_back();
   void clear();
 
   void removeInRangeOfObject(const ObjectConstPtr& object, float range);
 
-  void getObjectsPosesStamped(
-    std::vector<geometry_msgs::PoseStamped>* poses) const;
+  void getObjectsPosesStamped(PoseStampedVector* poses) const;
 
   void fillGeotiff(
     data_fusion_communications::DatafusionGeotiffSrv::Response* res) const;
 
   void getVisualization(visualization_msgs::MarkerArray* markers) const;
 
-  void setParams(int counterThreshold, float distanceThreshold);
+  void setParams(int objectScore, float distanceThreshold, float x_var_thres = 0.0009, 
+      float y_var_thres = 0.0009, float z_var_thres = 0.0009,
+      float prior_x_sd = 0.05, float prior_y_sd = 0.05, float prior_z_sd = 0.05,
+      float system_noise_sd = 0.003, float measurement_noise_sd = 0.05);
+
+  FilterModelPtr getFilterModel() const;
 
  protected:
 
   bool isAnExistingObject(
     const ConstPtr& object, IteratorList* iteratorListPtr);
 
-  void updateObject(
-    const Ptr& object,
-      const IteratorList& iteratorList);
+  virtual void updateObjects(const ConstPtr& object,
+    const IteratorList& iteratorList);
+
+  void checkLegit(const Ptr& object);
 
   void removeElementAt(iterator it);
 
  protected:
 
   List objects_;
+
+  FilterModelPtr filterModelPtr_;
+
+  //!< params
   float DIST_THRESHOLD;
-  int COUNTER_THRES;
 
  private:
 
@@ -82,6 +93,17 @@ class ObjectList
  private:
 
   int id_;
+
+  //!< params
+  int OBJECT_SCORE;
+
+  float X_VAR_THRES;
+  float Y_VAR_THRES;
+  float Z_VAR_THRES;
+
+  float PRIOR_X_SD;
+  float PRIOR_Y_SD;
+  float PRIOR_Z_SD;
 
 };
 
@@ -98,12 +120,10 @@ typedef boost::shared_ptr< const ObjectList<Hazmat> > HazmatListConstPtr;
 typedef boost::shared_ptr< const ObjectList<Tpa> >  TpaListConstPtr;
 
 template <class ObjectType>
-ObjectList<ObjectType>::ObjectList(int counterThreshold,
-    float distanceThreshold)
+ObjectList<ObjectType>::ObjectList() 
 {
+  filterModelPtr_.reset( new FilterModel );
   id_ = 0;
-  COUNTER_THRES = counterThreshold;
-  DIST_THRESHOLD = distanceThreshold;
 }
 
 template <class ObjectType>
@@ -121,20 +141,21 @@ typename ObjectList<ObjectType>::const_iterator
 }
 
 template <class ObjectType>
-bool ObjectList<ObjectType>::add(const Ptr& object)
+int ObjectList<ObjectType>::add(const Ptr& object)
 {
   IteratorList iteratorList;
 
   if (isAnExistingObject(object, &iteratorList))
   {
-    updateObject(object, iteratorList);
-    return false;
+    updateObjects(object, iteratorList);
+    return 0;
   }
 
+  object->initializeObjectFilter(PRIOR_X_SD, PRIOR_Y_SD, PRIOR_Z_SD);
+  
   object->setId(id_++);
-  object->incrementCounter();
   objects_.push_back(object);
-  return true;
+  return OBJECT_SCORE;
 }
 
 template <class ObjectType>
@@ -145,11 +166,22 @@ void ObjectList<ObjectType>::removeElementAt(
 }
 
 template <class ObjectType>
-void ObjectList<ObjectType>::setParams(int counterThreshold,
-    float distanceThreshold)
+void ObjectList<ObjectType>::setParams(int objectScore, 
+    float distanceThreshold, float x_var_thres, 
+    float y_var_thres, float z_var_thres,
+    float prior_x_sd, float prior_y_sd, float prior_z_sd,
+    float system_noise_sd, float measurement_noise_sd)
 {
-  COUNTER_THRES = counterThreshold;
+  OBJECT_SCORE = objectScore;
   DIST_THRESHOLD = distanceThreshold;
+  X_VAR_THRES = x_var_thres;
+  Y_VAR_THRES = y_var_thres;
+  Z_VAR_THRES = z_var_thres;
+  PRIOR_X_SD = prior_x_sd;
+  PRIOR_Y_SD = prior_y_sd;
+  PRIOR_Z_SD = prior_z_sd;
+  filterModelPtr_->setParams(system_noise_sd, measurement_noise_sd);
+  filterModelPtr_->initializeFilterModel();
 }
 
 template <class ObjectType>
@@ -168,6 +200,13 @@ template <class ObjectType>
 void ObjectList<ObjectType>::clear()
 {
   objects_.clear();
+  id_ = 0;
+}
+
+template <class ObjectType>
+FilterModelPtr ObjectList<ObjectType>::getFilterModel() const
+{
+  return filterModelPtr_;
 }
 
 template <class ObjectType>
@@ -215,7 +254,7 @@ void ObjectList<ObjectType>::removeInRangeOfObject(
 
 template <class ObjectType>
 void ObjectList<ObjectType>::getObjectsPosesStamped(
-    std::vector<geometry_msgs::PoseStamped>* poses) const
+    PoseStampedVector* poses) const
 {
   for (const_iterator it = this->begin(); it != this->end(); ++it)
   {
@@ -263,37 +302,27 @@ bool ObjectList<ObjectType>::isAnExistingObject(
 }
 
 template <class ObjectType>
-void ObjectList<ObjectType>::updateObject(
-    const Ptr& object,
-      const IteratorList& iteratorList)
+void ObjectList<ObjectType>::updateObjects(const ConstPtr& object,
+    const IteratorList& iteratorList)
 {
-  int totalCounter = 0;
-  int maxCounter = (*iteratorList.front())->getCounter();
-  int maxId = (*iteratorList.front())->getId();
-
-  for ( typename IteratorList::const_iterator it = iteratorList.begin();
-         it != iteratorList.end() ; ++it)
+  for ( typename IteratorList::const_iterator it = iteratorList.begin(); 
+      it != iteratorList.end(); ++it)
   {
-    // find total counter value, set new object's id as the id of the
-    // object with the highest counter as of now.
-    totalCounter += (*(*it))->getCounter();
-    if ((*(*it))->getCounter() > maxCounter)
-    {
-      maxCounter = (*(*it))->getCounter();
-      maxId = (*(*it))->getId();
-    }
-    removeElementAt(*it);
+    (*(*it))->update(object, filterModelPtr_);
+    checkLegit((*(*it)));
   }
+}
 
-  object->setId(maxId);
-  object->setCounter(++totalCounter);
-
-  if (object->getCounter() > COUNTER_THRES)
+template <class ObjectType>
+void ObjectList<ObjectType>::checkLegit(const Ptr& object)
+{
+  bool objectIsLegit = object->getVarianceX() < X_VAR_THRES && 
+                       object->getVarianceY() < Y_VAR_THRES &&
+                       object->getVarianceZ() < Z_VAR_THRES;
+  if (objectIsLegit)
   {
     object->setLegit(true);
   }
-
-  objects_.push_back(object);
 }
 
 }  // namespace pandora_alert_handler
