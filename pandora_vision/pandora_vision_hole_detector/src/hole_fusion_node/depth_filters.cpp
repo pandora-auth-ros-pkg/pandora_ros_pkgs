@@ -140,27 +140,50 @@ namespace pandora_vision
 
     for(unsigned int i = 0 ; i < conveyor.keyPoints.size() ; i++)
     {
-      float mean = 0;
-      float area = holesMasksSetVector[i].size();
+      //!< The mean depth value of the points inside the i-th hole
+      float mean = 0.0;
 
-      for(unsigned int j = 0; j < conveyor.rectangles[i].size(); j++)
+      for (std::set<unsigned int>::iterator it = holesMasksSetVector[i].begin();
+        it != holesMasksSetVector[i].end(); it++)
       {
-        int x = conveyor.rectangles[i][j].x;
-        int y = conveyor.rectangles[i][j].y;
+         int x = static_cast<int>(*it) % depthImage.cols;
+         int y = static_cast<int>(*it) / depthImage.cols;
 
         mean += depthImage.at<float>(y, x);
       }
 
-      mean /= conveyor.rectangles[i].size();
+      //!< The number of points inside the i-th hole, or else, its area
+      float area = holesMasksSetVector[i].size();
 
-      //!< Cubic fitting  --- Small hole
-      //!< Normal : -18480  * x^3+87260.3 * x^2-136846 * x+74094
-      float vlow = -18480.0 * pow(mean, 3) + 87260.3 * pow(mean, 2) -
-        136846 * mean + 68500.0 - area;
-      //!< Exponential fitting --- Small hole
-      //!< Normal : -23279.4  * x^3+112218 * x^2-182162 * x+105500
-      float vhigh = -23279.4 * pow(mean, 3) + 112218.0 * pow(mean, 2) -
-        182162.0 * mean + 112500 - area;
+      mean /= area;
+
+/*
+ *
+ *      //!< Rectangle vertices depth fitting
+ *      //!< Cubic fitting  --- Small hole
+ *      //!< Normal : -18480 * x^3
+ *      //!< + 87260.3 * x^2
+ *      //!< - 136846 * x
+ *      //!< + 74094
+ *      float vlow = -18480.0 * pow(mean, 3) + 87260.3 * pow(mean, 2) -
+ *        136846 * mean + 68500.0 - area;
+ *
+ *      //!< Exponential fitting --- Small hole
+ *      //!< Normal :
+ *      //!< -23279.4 * x^3
+ *      //!< + 112218 * x^2
+ *      //!< - 182162 * x
+ *      //!< + 105500
+ *      float vhigh = -23279.4 * pow(mean, 3) + 112218.0 * pow(mean, 2) -
+ *        182162.0 * mean + 112500 - area;
+ *
+ */
+
+      float vlow = 1.1453568203869413 * pow(10, 5)
+        * exp(- 2.2824590272661807 * mean) - area - 7000;
+
+      float vhigh = 5.7028988154428989 * pow(10, 4)
+        * exp(- 2.2113680011649128 * mean) - area + 7000;
 
       if(vlow < 0 && vhigh > 0)
       {

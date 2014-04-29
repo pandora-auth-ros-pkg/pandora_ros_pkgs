@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Despoina Paschalidou
+ * Author: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
 #ifndef RGB_NODE_HOLE_DETECTOR_H
@@ -41,36 +41,37 @@
 #define SHOW_DEBUG_IMAGE
 
 #include "utils/hole_filters.h"
-#include "rgb_node/texture_filter.h"
+#include "utils/histogram.h"
 
 namespace pandora_vision
 {
   class HoleDetector
   {
-    //! Instance of class TextureDetector, that applies texture in current
-    //! frame in order to isolate pixels of the image, where we have walls
-    TextureDetector _textureDetector;
+    private:
+
+      //!< Calculated histogramm according to given images
+      cv::MatND histogram_;
 
 
     public:
 
-    /**
-      @brief Class constructor
-      */
-    HoleDetector();
+      /**
+        @brief Class constructor
+       **/
+      HoleDetector();
 
-    /**
-      @brief Class destructor
-      */
-    virtual ~HoleDetector();
+      /**
+        @brief Class destructor
+       **/
+      ~HoleDetector();
 
-    /**
-      @brief Function that locates the position of potentional holes
-      in current frame.
-      @param holeFrame [cv::Mat] current frame to be processed
-      @return void
-      */
-    HolesConveyor findHoles(cv::Mat holeFrame);
+      /**
+        @brief Function that locates the position of potentional holes
+        in the current frame.
+        @param holeFrame [const cv::Mat&] current frame to be processed
+        @return void
+       **/
+      HolesConveyor findHoles(const cv::Mat& holeFrame);
 
   };
 

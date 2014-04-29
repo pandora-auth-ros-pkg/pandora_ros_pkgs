@@ -44,7 +44,7 @@
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "vision_communications/CandidateHoleMsg.h"
 #include "utils/defines.h"
-#include "utils/histogram_calculation.h"
+#include "utils/histogram.h"
 #include "utils/message_conversions.h"
 #include "utils/noise_elimination.h"
 #include "utils/parameters.h"

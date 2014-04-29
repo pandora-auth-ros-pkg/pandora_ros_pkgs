@@ -58,11 +58,6 @@ namespace pandora_vision
     public:
 
       /**
-        @brief The HoleDetector constructor
-       **/
-      HoleDetector(void);
-
-      /**
         @brief Finds the holes provided a depth image in CV_32FC1 format
         @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
         depth image in CV_32FC1 format

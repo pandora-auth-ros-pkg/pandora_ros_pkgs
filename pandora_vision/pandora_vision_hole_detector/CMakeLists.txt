@@ -123,7 +123,7 @@ add_library(hole_fusion_lib
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
   src/utils/edge_detection.cpp
-  src/utils/histogram_calculation.cpp
+  src/utils/histogram.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
   src/utils/message_conversions.cpp
@@ -188,7 +188,7 @@ add_library(rgb_node_lib
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
   src/utils/edge_detection.cpp
-  src/utils/histogram_calculation.cpp
+  src/utils/histogram.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
   src/utils/message_conversions.cpp
@@ -204,10 +204,9 @@ target_link_libraries(rgb_node_lib
   ${catkin_LIBRARIES} )
 
 add_executable(rgb_node
-  src/rgb_node/hole_node.cpp
-  src/rgb_node/hole_detection.cpp
+  src/rgb_node/rgb_node.cpp
+  src/rgb_node/rgb.cpp
   src/rgb_node/hole_detector.cpp
-  src/rgb_node/texture_filter.cpp
 )
 
 target_link_libraries(rgb_node
@@ -248,7 +247,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/utils/bounding_box_detection.h
   include/utils/defines.h
   include/utils/edge_detection.h
-  include/utils/histogram_calculation.h
+  include/utils/histogram.h
   include/utils/hole_filters.h
   include/utils/holes_conveyor.h
   include/utils/message_conversions.h
@@ -263,7 +262,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/utils/bounding_box_detection.cpp
   src/utils/defines.h
   src/utils/edge_detection.cpp
-  src/utils/histogram_calculation.cpp
+  src/utils/histogram.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
   src/utils/message_conversions.cpp
@@ -302,14 +301,12 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
 
   ## rgb_node ##
 
-  include/rgb_node/hole_detection.h
+  include/rgb_node/rgb.h
   include/rgb_node/hole_detector.h
-  include/rgb_node/texture_filter.h
 
-  src/rgb_node/hole_detection.cpp
+  src/rgb_node/rgb.cpp
   src/rgb_node/hole_detector.cpp
-  src/rgb_node/texture_filter.cpp
-  src/rgb_node/hole_node.cpp
+  src/rgb_node/rgb_node.cpp
   )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

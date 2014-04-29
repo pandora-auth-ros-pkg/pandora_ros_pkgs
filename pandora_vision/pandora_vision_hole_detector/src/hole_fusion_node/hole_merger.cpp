@@ -275,8 +275,8 @@ namespace pandora_vision
         //!< Probabilities threshold for merge acceptance.
         //!< In the assimilation operation, the temp conveyor unconditionally
         //!< replaces the original conveyor
-        if ((dd > Parameters::checker_depth_diff_threshold
-          && da > Parameters::checker_depth_area_threshold)
+        if ((dd >= Parameters::checker_depth_diff_threshold
+          && da >= Parameters::checker_depth_area_threshold)
           || (operationId == 0))
         {
           //!< Since the tempHolesConveyor's ithHole has been positively tested,

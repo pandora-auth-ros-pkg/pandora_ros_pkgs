@@ -48,6 +48,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class Wavelets
+    @brief Provides methods for representing images via wavelet transformations
+   **/
   class Wavelets
   {
     public:
@@ -86,11 +90,11 @@ namespace pandora_vision
         cv::Mat* outImage);
 
       /**
-        @brief Returns a RGB CV_8UC1 image containing the low-low part of the
-        input RGB image, which is also in CV_8UC1 format
-        @param[in] inImage [const cv::Mat&] The input image in CV_8UC1 format
+        @brief Returns a RGB CV_8UC3 image containing the low-low part of the
+        input RGB image, which is also in CV_8UC3 format
+        @param[in] inImage [const cv::Mat&] The input image in CV_8UC3 format
         @param[out] outImage [cv::Mat*] The low-low part of the inImage in
-        CV_8UC1 format
+        CV_8UC3 format
         @return void
        **/
       static void getLowLow(const cv::Mat& inImage, cv::Mat* outImage);

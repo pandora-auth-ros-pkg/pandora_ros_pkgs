@@ -51,7 +51,7 @@ namespace pandora_vision
     ros::Duration(0.5).sleep();
 
     //!< Calculate the histogram cv::MatND needed for texture comparing
-    HistogramCalculation::getHistogram(2, &wallsHistogram_);
+    Histogram::getHistogram(2, &wallsHistogram_);
 
     //!< Initialize the numNodesReady variable
     numNodesReady_ = 0;
@@ -945,7 +945,7 @@ namespace pandora_vision
             probsString += TOSTR(rgbProbabilitiesVector2D[i][j]) + " | ";
           }
 
-          ROS_ERROR("P_%d [%f %f] = %s", j, conveyor.keyPoints[j].pt.x,
+          ROS_ERROR("P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
             conveyor.keyPoints[j].pt.y, probsString.c_str());
         }
       }
@@ -1021,7 +1021,7 @@ namespace pandora_vision
               probsString += TOSTR(depthProbabilitiesVector2D[i][j]) + " | ";
             }
 
-            ROS_ERROR("P_%d [%f %f]= %s", j, conveyor.keyPoints[j].pt.x,
+            ROS_ERROR("P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
               conveyor.keyPoints[j].pt.y, probsString.c_str());
           }
         }

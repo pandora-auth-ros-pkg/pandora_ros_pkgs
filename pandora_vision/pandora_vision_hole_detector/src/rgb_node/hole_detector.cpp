@@ -32,17 +32,21 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Despoina Paschalidou
+ * Author: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
+
 #include "rgb_node/hole_detector.h"
 
 namespace pandora_vision
 {
   /**
     @brief Class constructor
-    */
+   **/
   HoleDetector::HoleDetector()
   {
+    //! Calculate histogram according to a given set of images
+    Histogram::getHistogram(2, &histogram_);
+
     ROS_INFO("[rgb_node]: HoleDetector instance created");
   }
 
@@ -50,7 +54,7 @@ namespace pandora_vision
 
   /**
     @brief Class destructor
-    */
+   **/
   HoleDetector::~HoleDetector()
   {
     ROS_INFO("[rgb_node]: HoleDetector instance destroyed");
@@ -60,20 +64,15 @@ namespace pandora_vision
 
   /**
     @brief Function that locates the position of potentional holes
-    in current frame.
-    @param holeFrame [cv::Mat] current frame to be processed
+    in the current frame.
+    @param holeFrame [const cv::Mat&] current frame to be processed
     @return void
     */
-  HolesConveyor HoleDetector::findHoles(cv::Mat holeFrame)
+  HolesConveyor HoleDetector::findHoles(const cv::Mat& holeFrame)
   {
     #ifdef DEBUG_TIME
     Timer::start("findHoles", "inputRgbImageCallback");
     #endif
-
-    //! Find pixels in current frame where there is the same texture
-    //! according to the given histogramm and calculate
-    std::vector<cv::KeyPoint> detectedkeyPoints;
-    cv::Mat temp, backprojectedFrame;
 
     #ifdef SHOW_DEBUG_IMAGE
     std::string msg;
@@ -90,25 +89,24 @@ namespace pandora_vision
     imgs.push_back(before_blur);
     #endif
 
-    backprojectedFrame = cv::Mat::zeros(holeFrame.size().height,
-      holeFrame.size().width, CV_8UC1);
+    //! Backprojection of current frame
+    cv::Mat backprojectedFrame = cv::Mat::zeros(holeFrame.size(), CV_8UC1);
 
-    holeFrame.copyTo(temp);
+    //!< Get the backprojected image of the frame, based on the precalculated
+    //!< histogram_ histogram
+    Histogram::getBackprojection(holeFrame, histogram_, &backprojectedFrame);
 
-    cv::Mat after_blur;
-    holeFrame.copyTo(after_blur);
-    cv::blur(holeFrame, after_blur, cv::Size(7, 7));
+    //Visualization::show("backproject", *backprojectedFrame, 1);
 
-    #ifdef SHOW_DEBUG_IMAGE
-    msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-    msg += " : After blur";
-    msgs.push_back(msg);
-    imgs.push_back(after_blur);
-    #endif
+    // apply thresholds in backprojected image
+    cv::threshold(backprojectedFrame, backprojectedFrame, 200, 255, 0);
+    //Visualization::show("bp thresholded", backprojectedFrame, 1);
 
-    //! backprojection of current frame
-    _textureDetector.applyTexture(&holeFrame, &backprojectedFrame);
+    //cv::cvtColor(holeFrame, holeFrame, CV_BGR2GRAY);
+    //cv::bitwise_and(holeFrame, backprojectedFrame, backprojectedFrame);
+    //cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
 
+    Morphology::dilation(&backprojectedFrame, 3, false);
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
     msg += " : After texture";
@@ -116,9 +114,13 @@ namespace pandora_vision
     imgs.push_back(backprojectedFrame);
     #endif
 
+    cv::Mat temp;
+    holeFrame.copyTo(temp);
+
     //! Apply in current frame Canny edge detection algorithm
     EdgeDetection::applySobel(backprojectedFrame, &temp);
 
+    //!< Denoise the edges image
     EdgeDetection::denoiseEdges(&temp);
 
 
@@ -129,6 +131,9 @@ namespace pandora_vision
     imgs.push_back(temp);
     #endif
 
+    //! Find pixels in current frame where there is the same texture
+    //! according to the given histogram and calculate
+    std::vector<cv::KeyPoint> detectedkeyPoints;
     BlobDetection::detectBlobs(temp, &detectedkeyPoints);
 
 
@@ -159,7 +164,7 @@ namespace pandora_vision
     #endif
 
     #ifdef SHOW_DEBUG_IMAGE
-    //Visualization::multipleShow("RGB node",imgs,msgs,800,1);
+    //Visualization::multipleShow("RGB node", imgs, msgs, 800, 1);
     #endif
 
     #ifdef DEBUG_TIME
