@@ -157,35 +157,20 @@ namespace pandora_vision
 
       mean /= area;
 
-/*
- *
- *      //!< Rectangle vertices depth fitting
- *      //!< Cubic fitting  --- Small hole
- *      //!< Normal : -18480 * x^3
- *      //!< + 87260.3 * x^2
- *      //!< - 136846 * x
- *      //!< + 74094
- *      float vlow = -18480.0 * pow(mean, 3) + 87260.3 * pow(mean, 2) -
- *        136846 * mean + 68500.0 - area;
- *
- *      //!< Exponential fitting --- Small hole
- *      //!< Normal :
- *      //!< -23279.4 * x^3
- *      //!< + 112218 * x^2
- *      //!< - 182162 * x
- *      //!< + 105500
- *      float vhigh = -23279.4 * pow(mean, 3) + 112218.0 * pow(mean, 2) -
- *        182162.0 * mean + 112500 - area;
- *
- */
+      //!< area = f(mean) for one circular hole
+      float singleHoleDepthArea = 5.7028988154428989 * pow(10, 4)
+        * exp(- 2.2113680011649128 * mean);
 
-      float vlow = 1.1453568203869413 * pow(10, 5)
-        * exp(- 2.2824590272661807 * mean) - area - 7000;
+      //!< Upper-most curve, plus an increase in height
+      //!< At most, one complete hole contains three circular ones
+      float high = 3 * singleHoleDepthArea - area + 7000;
 
-      float vhigh = 5.7028988154428989 * pow(10, 4)
-        * exp(- 2.2113680011649128 * mean) - area + 7000;
+      //!< Lower-most curve minus a reduction in height
+      //!< At least, one complete hole is one circular hole
+      float low = singleHoleDepthArea - area - 7000;
 
-      if(vlow < 0 && vhigh > 0)
+
+      if(low < 0 && high > 0)
       {
         probabilitiesVector->at(i) = 1.0;
       }
@@ -194,7 +179,7 @@ namespace pandora_vision
         probabilitiesVector->at(i) = 0.0;
       }
 
-      msgs->push_back(TOSTR(vlow) + std::string(",") + TOSTR(vhigh));
+      msgs->push_back(TOSTR(low) + std::string(" / ") + TOSTR(high));
     }
 
     #ifdef DEBUG_TIME

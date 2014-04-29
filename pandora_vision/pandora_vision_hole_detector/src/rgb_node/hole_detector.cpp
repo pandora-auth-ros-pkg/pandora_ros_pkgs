@@ -96,7 +96,7 @@ namespace pandora_vision
     //!< histogram_ histogram
     Histogram::getBackprojection(holeFrame, histogram_, &backprojectedFrame);
 
-    //Visualization::show("backproject", *backprojectedFrame, 1);
+    //Visualization::show("backproject", backprojectedFrame, 1);
 
     // apply thresholds in backprojected image
     cv::threshold(backprojectedFrame, backprojectedFrame, 200, 255, 0);

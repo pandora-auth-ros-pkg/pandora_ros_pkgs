@@ -79,8 +79,14 @@ namespace pandora_vision
       //!< behaviour
       ros::Subscriber holeFusionSubscriber_;
 
-      //!< Records the time for each synchronizer evocation
-      double evocationTime_;
+      //!< Records the time for each synchronizer invocation
+      double invocationTime_;
+
+      //!< Mean invocation interval of time
+      double meanProcessingTime_;
+
+      //!< Amount of synchronizer's invocations
+      int ticks_;
 
       /**
         @brief The synchronized callback for the point cloud

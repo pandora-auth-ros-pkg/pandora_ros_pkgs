@@ -43,6 +43,7 @@ namespace pandora_vision
     @brief The constructor
    **/
   RgbDepthSynchronizer::RgbDepthSynchronizer(void)
+    : invocationTime_(0.0), meanProcessingTime_(0.0), ticks_(0)
   {
     #ifdef DEBUG_TIME
     Timer::start("RgbDepthSynchronizer");
@@ -111,14 +112,29 @@ namespace pandora_vision
 
       #ifdef DEBUG_TIME
       ROS_ERROR("================================================");
-      ROS_ERROR("Previous synchronizer evocation before %fs",
-        ros::Time::now().toSec() - evocationTime_);
+
+      double t = ros::Time::now().toSec() - invocationTime_;
+
+      ROS_ERROR("Previous synchronizer invocation before %fs", t);
+
+      //!< Increment the number of this node's invocations
+      ticks_++;
+
+      if (ticks_ > 1)
+      {
+        meanProcessingTime_ += t;
+      }
+
+      ROS_ERROR("Mean processing time :                  %fs",
+        (meanProcessingTime_ / (ticks_ - 1)));
+
       ROS_ERROR("================================================");
+
+      invocationTime_ = ros::Time::now().toSec();
 
       Timer::start("synchronizedCallback", "", true);
       #endif
 
-      evocationTime_ = ros::Time::now().toSec();
 
       //!< Lock the rgb_depth_synchronizer node; aka prevent the execution
       //!< of this if-block without the explicit request of the hole_fusion node
