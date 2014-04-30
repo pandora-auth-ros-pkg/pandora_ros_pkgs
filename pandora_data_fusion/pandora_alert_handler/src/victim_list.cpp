@@ -269,7 +269,7 @@ VictimPtr VictimList::validateCurrentObject(bool objectValid)
     (*currentVictimIt_)->eraseObjectAt(
       (*currentVictimIt_)->getSelectedObjectIndex(), APPROACH_DIST);
     if ((*currentVictimIt_)->getObjects().empty() || 
-        (*currentVictimIt_)->getObjects().at(0)->getType() == "tpa") //  to be removed
+        (*currentVictimIt_)->getObjects().at(0)->getType() == "tpa")  // to be removed
     {
       currentVictim = *currentVictimIt_;
       currentVictim->setValid(false);

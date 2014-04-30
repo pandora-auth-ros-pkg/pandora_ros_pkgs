@@ -142,7 +142,7 @@ void Victim::fillGeotiff(
 void Victim::setObjects(const ObjectConstPtrVector& objects,
     float approachDistance) 
 {
-  ROS_DEBUG_STREAM("Setting up victim with "<<objects.size()<<" objects.");
+  ROS_DEBUG_STREAM("Setting up victim with " << objects.size() << " objects.");
   objects_.clear();
 
   if(!holeDeleted_)

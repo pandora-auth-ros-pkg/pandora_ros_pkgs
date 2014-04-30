@@ -14,74 +14,16 @@ import rostest
 import rospy
 
 import alert_delivery
+from test_base import distance
+from test_base import direction
+import test_base
 
 from data_fusion_communications.srv import GetObjectsSrv
 from data_fusion_communications.srv import GetObjectsSrvResponse
 from std_srvs.srv import Empty
 from geometry_msgs.msg import Point
 
-def distance(a, b):
-
-    return float(math.sqrt( (a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2 ))
-
-def direction(a, b):
-        
-    dire = Point()
-    norm = distance(a, b)
-    dire.x = (b.x - a.x)/norm
-    dire.y = (b.y - a.y)/norm
-    dire.z = (b.z - a.z)/norm
-    return dire
-
-class AlertHandlerStaticTest(unittest.TestCase):
-     
-    deliveryBoy = alert_delivery.AlertDeliveryBoy()
-
-    @classmethod
-    def connect(cls):
-
-        cls.get_objects = rospy.ServiceProxy('/data_fusion/get_objects', GetObjectsSrv, True)
-        rospy.wait_for_service('/data_fusion/get_objects')
-        cls.flush_lists = rospy.ServiceProxy('/data_fusion/flush_queues', Empty, True)
-        rospy.wait_for_service('/data_fusion/flush_queues')
-        cls.deliveryBoy.deliverHazmatOrder(0, 0, 1)
-        rospy.sleep(0.05)
-        cls.flush_lists()
-        
-    @classmethod
-    def disconnect(cls):
-
-        cls.get_objects.close()
-        cls.flush_lists.close()
-
-    def setUp(self):
-
-        i = 0
-        while(True):
-            try:
-                self.flush_lists()
-                break
-            except rospy.ServiceException as exc:
-                if (i > 3):
-                    raise rospy.ServiceException()
-                rospy.logdebug("!< flush_lists service failed >! reconnecting and retrying...")
-                i += 1
-                self.connect()
-        self.deliveryBoy.clearOrderList()
-      
-    def fillInfo(self, outs):
-
-        i = 0
-        while(True):
-            try:
-                outs.append(self.get_objects())
-                break
-            except rospy.ServiceException as exc:
-                if (i > 3):
-                    raise rospy.ServiceException()
-                rospy.logdebug("!< get_objects service failed >! reconnecting and retrying...")
-                i += 1
-                self.connect()
+class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_works(self):
 
@@ -488,7 +430,7 @@ class AlertHandlerStaticTest(unittest.TestCase):
           out[1].victimsToGo[0].pose.position), 0)
         # Filtering makes object resistant to gaussian noise!
         self.assertLess(distance(out[0].holes[0].pose.position,
-          out[1].victimsToGo[0].pose.position), 0.03)
+          out[1].victimsToGo[0].pose.position), 0.04)
 
 
 if __name__ == '__main__':
