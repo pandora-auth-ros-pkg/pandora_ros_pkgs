@@ -107,6 +107,13 @@ namespace pandora_vision
     MessageConversions::extractImageFromMessage(msg, &depthImage,
       sensor_msgs::image_encodings::TYPE_32FC1);
 
+    #ifdef DEBUG_SHOW
+    if (Parameters::show_depth_image)
+    {
+      Visualization::showScaled("Depth image", depthImage, 1);
+    }
+    #endif
+
     //!< Perform noise elimination on the depth image
     cv::Mat interpolatedDepthImage;
     NoiseElimination::performNoiseElimination(depthImage,
@@ -168,6 +175,10 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     ROS_INFO("Parameters callback called");
     #endif
+
+    //!< Show the depth image that arrives in the depth node
+    Parameters::show_depth_image =
+     config.show_depth_image;
 
     //!< Depth image representation method.
     //!< 0 if the depth image used is the one obtained from the depth sensor,

@@ -39,6 +39,16 @@
 
 namespace pandora_vision
 {
+  //!< Show the depth image that arrives in the depth node
+  bool Parameters::show_depth_image = false;
+
+  //!< Show the rgb image that arrives in the rgb node
+  bool Parameters::show_rgb_image = false;
+
+  //!< Show the holes that each of the depth and RGB nodes transmit to the
+  //!< hole fusion node, on top of their respective origin images
+  bool Parameters::show_respective_holes = false;
+
   //!< Depth and RGB images' representation method.
   //!< 0 if image used is used as obtained from the image sensor
   //!< 1 through wavelet analysis
@@ -175,6 +185,7 @@ namespace pandora_vision
   int Parameters::number_of_hue_bins = 30;
   int Parameters::number_of_saturation_bins = 32;
   int Parameters::number_of_value_bins = 32;
+  int Parameters::secondary_channel = 2;
 
   //!< Holes connection - merger
   float Parameters::connect_holes_min_distance = 0.1;

@@ -45,7 +45,7 @@
 
 namespace pandora_vision
 {
-  class Rgb
+  class RgbDummy
   {
     private:
 
@@ -71,10 +71,10 @@ namespace pandora_vision
     public:
 
       //!< Constructor
-      Rgb(void);
+      RgbDummy(void);
 
       //!< Destructor
-      ~Rgb(void);
+      ~RgbDummy(void);
   };
 
 } // namespace pandora_vision

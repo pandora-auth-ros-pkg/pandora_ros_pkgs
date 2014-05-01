@@ -47,11 +47,14 @@ namespace pandora_vision
     based on which the @param backprojection is produced
     @param[out] backprojection [cv::Mat*] Backprojection of the current
     frame
+    @param[in] secondaryChannel [const int&] Which channel to use, aside the
+    hue one. 1 for the Saturation channel, 2 for the Value channel
     @return void
    **/
   void Histogram::getBackprojection(const cv::Mat& inImage,
     const cv::MatND& modelHistogram,
-    cv::Mat* backprojection)
+    cv::Mat* backprojection,
+    const int& secondaryChannel)
   {
     #ifdef DEBUG_TIME
     Timer::start("applyBackprojection");
@@ -69,11 +72,18 @@ namespace pandora_vision
 
     const float* ranges[] = { hranges, sec_ranges};
 
-    //!< Use the 0-th (Hue) and 2-nd (Value) channels
-    int channels[] = {0, 2};
+    if (secondaryChannel == 1 || secondaryChannel == 2)
+    {
+      //!< Use the 0-th (Hue) and secondaryChannel channels
+      int channels[] = {0, secondaryChannel};
 
     cv::calcBackProject(&hsv, 1, channels, modelHistogram,
       *backprojection, ranges, 1, true);
+    }
+    else
+    {
+      return;
+    }
 
     #ifdef DEBUG_TIME
     Timer::tick("applyBackprojection");
@@ -85,14 +95,14 @@ namespace pandora_vision
   /**
     @brief Computes a cv::MatND histogram from images loaded in directory
     ${pandora_vision_hole_detector}/src/walls
+    @param[out] The calculated histogram
     @param[in] secondaryChannel [const int&] Which channel to use, aside the
     hue one. 1 for the Saturation channel, 2 for the Value channel
-    @param[out] The calculated histogram
     @return void
    **/
   void Histogram::getHistogram (
-    const int& secondaryChannel,
-    cv::MatND* histogram)
+    cv::MatND* histogram,
+    const int& secondaryChannel)
   {
     #ifdef DEBUG_TIME
     Timer::start("getHistogram", "", true);
@@ -149,11 +159,10 @@ namespace pandora_vision
         wallImagesHSV[i], cv::COLOR_BGR2HSV);
     }
 
-    //!< Histogram-related parameters
-    int h_bins = Parameters::number_of_hue_bins;
-
     int* histSize = new int[2];
-    histSize[0] = h_bins;
+
+    //!< The first value will always be with regard to Hue
+    histSize[0] = Parameters::number_of_hue_bins;
 
     if (secondaryChannel == 1)
     {
@@ -163,6 +172,10 @@ namespace pandora_vision
     if (secondaryChannel == 2)
     {
       histSize[1] = Parameters::number_of_value_bins;
+    }
+    else
+    {
+      return;
     }
 
     //!< hue varies from 0 to 179, saturation and value from 0 to 255

@@ -40,7 +40,7 @@
 namespace pandora_vision
 {
   //!< Constructor
-  Rgb::Rgb(void)
+  RgbDummy::RgbDummy(void)
   {
     ros::Duration(0.5).sleep();
 
@@ -48,7 +48,7 @@ namespace pandora_vision
     //!< rgb_depth_synchronizer node
     rgbImageSubscriber_= nodeHandle_.subscribe(
       "/synchronized/camera/rgb/image_raw", 1,
-      &Rgb::rgbImageCallback, this);
+      &RgbDummy::rgbImageCallback, this);
 
 
     //!< Advertise the candidate holes found by the depth node
@@ -61,7 +61,7 @@ namespace pandora_vision
 
 
   //!< Destructor
-  Rgb::~Rgb(void)
+  RgbDummy::~RgbDummy(void)
   {
     ROS_INFO("RGB dummy node terminated");
   }
@@ -72,7 +72,7 @@ namespace pandora_vision
     @param[in] rgbImage [const sensor_msgs::Image&] The RGB image
     @return void
    **/
-  void Rgb::rgbImageCallback(const sensor_msgs::Image& inImage)
+  void RgbDummy::rgbImageCallback(const sensor_msgs::Image& inImage)
   {
     #ifdef DEBUG_SHOW
     ROS_INFO("RGB node callback");

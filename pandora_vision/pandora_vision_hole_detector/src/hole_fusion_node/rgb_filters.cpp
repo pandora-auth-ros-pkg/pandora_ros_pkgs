@@ -81,7 +81,7 @@ namespace pandora_vision
     }
 
     //!< inImage_ transformed from BGR format to HSV
-    cv::Mat inImageHSV;
+    cv::Mat inImageHSV = cv::Mat::zeros(inImage_.size(), CV_8UC3);
     cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
 
     //!< Histogram-related parameters
@@ -142,7 +142,8 @@ namespace pandora_vision
 
       probabilitiesVector->at(i) =
         static_cast<float> (overallNonZeroBoxes)
-        / (h_bins / box_x * v_bins / box_y);
+        / ((static_cast<float>(h_bins) / box_x)
+        * (static_cast<float>(v_bins) / box_y));
 
       msgs->push_back(TOSTR(probabilitiesVector->at(i)));
     }
@@ -376,8 +377,8 @@ namespace pandora_vision
       double blobToModelCorrelation = cv::compareHist(
         blobHistogram, inHistogram, CV_COMP_CORREL);
 
-      //ROS_ERROR("R2M: %f", static_cast<float> (rectangleToModelCorrelation));
-      //ROS_ERROR("B2M: %f", static_cast<float> (blobToModelCorrelation));
+      ROS_ERROR("R2M: %f", static_cast<float> (rectangleToModelCorrelation));
+      ROS_ERROR("B2M: %f", static_cast<float> (blobToModelCorrelation));
 
       //!< This blob is considered valid if there is a correlation between
       //!< blobToRectangleHistogram and the model histogram
@@ -465,27 +466,10 @@ namespace pandora_vision
       inImage.copyTo(inImage_);
     }
 
-    //!< inImage transformed from BGR format to HSV
-    cv::Mat inImageHSV;
-    cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
-
-    //!< Histogram-related parameters
-    //!< hue varies from 0 to 179, saturation from 0 to 255
-    float h_ranges[] = { 0, 180 };
-    float v_ranges[] = { 0, 256 };
-
-    const float* ranges[] = { h_ranges, v_ranges };
-
-    //!< Use the 0-th and 1-st channels
-    int channels[] = { 0, 2 };
-
-    //!< Calulate the inImageHSV's back project.
-    //!< We will use it to find a mean probability for inHistogram's occurence
-    //!< in the points consiting the inflated rectangle (below) and the points
-    //!< inside the outline
+    //!< Obtain the backprojection of the inImage_, according to the inHistogram
     cv::MatND backProject;
-    cv::calcBackProject(&inImageHSV, 1, channels, inHistogram, backProject,
-      ranges, 1, true);
+    Histogram::getBackprojection(inImage_, inHistogram,
+      &backProject, Parameters::secondary_channel);
 
     #ifdef DEBUG_SHOW
     //Visualization::show("backProject", backProject, 1);
@@ -607,17 +591,17 @@ namespace pandora_vision
 
     if (Parameters::run_checker_color_homogeneity > 0)
     {
-      filtersOrder[Parameters::run_checker_color_homogeneity ] = 1;
+      filtersOrder[Parameters::run_checker_color_homogeneity] = 1;
     }
-    if (Parameters::run_checker_luminosity_diff> 0)
+    if (Parameters::run_checker_luminosity_diff > 0)
     {
-      filtersOrder[Parameters::run_checker_luminosity_diff ] = 2;
+      filtersOrder[Parameters::run_checker_luminosity_diff] = 2;
     }
-    if (Parameters::run_checker_texture_diff> 0)
+    if (Parameters::run_checker_texture_diff > 0)
     {
       filtersOrder[Parameters::run_checker_texture_diff] = 3;
     }
-    if (Parameters::run_checker_texture_backproject> 0)
+    if (Parameters::run_checker_texture_backproject > 0)
     {
       filtersOrder[Parameters::run_checker_texture_backproject] = 4;
     }

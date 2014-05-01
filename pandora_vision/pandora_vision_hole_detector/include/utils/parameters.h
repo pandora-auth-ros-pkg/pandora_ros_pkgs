@@ -49,6 +49,16 @@ namespace pandora_vision
 {
   struct Parameters
   {
+    //!< Show the depth image that arrives in the depth node
+    static bool show_depth_image;
+
+    //!< Show the rgb image that arrives in the rgb node
+    static bool show_rgb_image;
+
+    //!< Show the holes that each of the depth and RGB nodes transmit to the
+    //!< hole fusion node, on top of their respective origin images
+    static bool show_respective_holes;
+
     //!< Depth and RGB images' representation method.
     //!< 0 if image used is used as obtained from the image sensor
     //!< 1 through wavelet analysis
@@ -181,6 +191,8 @@ namespace pandora_vision
     static int number_of_hue_bins;
     static int number_of_saturation_bins;
     static int number_of_value_bins;
+    static int secondary_channel;
+
 
     //!< Holes connection - merger
     static float connect_holes_min_distance;

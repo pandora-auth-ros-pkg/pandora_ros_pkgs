@@ -51,7 +51,7 @@ namespace pandora_vision
     ros::Duration(0.5).sleep();
 
     //!< Calculate the histogram cv::MatND needed for texture comparing
-    Histogram::getHistogram(2, &wallsHistogram_);
+    Histogram::getHistogram(&wallsHistogram_, Parameters::secondary_channel);
 
     //!< Initialize the numNodesReady variable
     numNodesReady_ = 0;
@@ -423,6 +423,11 @@ namespace pandora_vision
     ROS_INFO("Parameters callback called");
     #endif
 
+    //!< Show the holes that each of the depth and RGB nodes transmit to the
+    //!< hole fusion node, on top of their respective origin images
+    Parameters::show_respective_holes =
+      config.show_respective_holes;
+
     //!< Depth image representation method.
     //!< 0 if the depth image used is the one obtained from the depth sensor,
     //!< unadulterated
@@ -633,6 +638,8 @@ namespace pandora_vision
       config.number_of_saturation_bins;
     Parameters::number_of_value_bins =
       config.number_of_value_bins;
+    Parameters::secondary_channel =
+      config.secondary_channel;
 
     //!< Holes connection - merger
     Parameters::connect_holes_min_distance =
@@ -716,6 +723,44 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::start("processCandidateHoles", "", true);
     #endif
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::show_respective_holes)
+    {
+      std::vector<std::string> msgs;
+
+      //!< Holes originated from analysis on the depth image,
+      //!< on top of the depth image
+      cv::Mat depthHolesImage =
+        Visualization::showHoles("Holes originated from Depth analysis",
+          interpolatedDepthImage_,
+          depthHolesConveyor_,
+          -1,
+          msgs);
+
+      //!< Holes originated from analysis on the RGB image,
+      //!< on top of the RGB image
+      cv::Mat rgbHolesImage =
+        Visualization::showHoles("Holes originated from RGB analysis",
+          rgbImage_,
+          rgbHolesConveyor_,
+          -1,
+          msgs);
+
+      //!< The two images
+      std::vector<cv::Mat> imgs;
+      imgs.push_back(depthHolesImage);
+      imgs.push_back(rgbHolesImage);
+
+      //!< The titles of the images
+      std::vector<std::string> titles;
+      titles.push_back("Holes originated from Depth analysis");
+      titles.push_back("Holes originated from RGB analysis");
+
+      Visualization::multipleShow("Respective keypoints", imgs, titles, 1280, 1);
+    }
+    #endif
+
 
     //!< Merge the conveyors from the RGB and Depth sources
     HolesConveyor rgbdHolesConveyor;

@@ -100,6 +100,13 @@ namespace pandora_vision
       return;
     }
 
+    #ifdef DEBUG_SHOW
+    if (Parameters::show_rgb_image)
+    {
+      Visualization::show("RGB image", _holeFrame, 1);
+    }
+    #endif
+
     //!< Regardless of the image representation method, the RGB node
     //!< will publish the RGB image of original size to the Hole Fusion node
     cv::Mat holeFrameSent;
@@ -147,6 +154,10 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     ROS_INFO("Parameters callback called");
     #endif
+
+    //!< Show the rgb image that arrives in the rgb node
+    Parameters::show_rgb_image =
+     config.show_rgb_image;
 
     //!< RGB image representation method.
     //!< 0 if the depth image used is the one obtained from the depth sensor,
@@ -220,6 +231,7 @@ namespace pandora_vision
     Parameters::number_of_hue_bins = config.number_of_hue_bins;
     Parameters::number_of_saturation_bins = config.number_of_saturation_bins;
     Parameters::number_of_value_bins = config.number_of_value_bins;
+    Parameters::secondary_channel = config.secondary_channel;
 
 
     //!< Debug

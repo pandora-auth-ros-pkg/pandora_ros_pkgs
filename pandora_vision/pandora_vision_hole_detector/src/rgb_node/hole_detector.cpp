@@ -45,7 +45,7 @@ namespace pandora_vision
   HoleDetector::HoleDetector()
   {
     //! Calculate histogram according to a given set of images
-    Histogram::getHistogram(2, &histogram_);
+    Histogram::getHistogram(&histogram_, Parameters::secondary_channel);
 
     ROS_INFO("[rgb_node]: HoleDetector instance created");
   }
@@ -94,19 +94,30 @@ namespace pandora_vision
 
     //!< Get the backprojected image of the frame, based on the precalculated
     //!< histogram_ histogram
-    Histogram::getBackprojection(holeFrame, histogram_, &backprojectedFrame);
+    Histogram::getBackprojection(holeFrame, histogram_,
+      &backprojectedFrame, Parameters::secondary_channel);
 
     //Visualization::show("backproject", backprojectedFrame, 1);
-
+/*
+ *
+ *    cv::Mat holeFrameGray;
+ *    cv::cvtColor(holeFrame, holeFrameGray, CV_BGR2GRAY);
+ *    cv::bitwise_and(holeFrameGray, backprojectedFrame, backprojectedFrame);
+ *    Visualization::show("and", backprojectedFrame, 1);
+ *
+ */
     // apply thresholds in backprojected image
-    cv::threshold(backprojectedFrame, backprojectedFrame, 200, 255, 0);
+    cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
     //Visualization::show("bp thresholded", backprojectedFrame, 1);
 
-    //cv::cvtColor(holeFrame, holeFrame, CV_BGR2GRAY);
-    //cv::bitwise_and(holeFrame, backprojectedFrame, backprojectedFrame);
-    //cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
+    //!< The backprojected image is usually scattered with individual
+    //!< non-zero points rather than whole areas.
+    //!< Apply dilation so that the non-zero points expand in size and
+    //!< occupy the area of the matchin texture
+    Morphology::dilation(&backprojectedFrame, 2, false);
 
-    Morphology::dilation(&backprojectedFrame, 3, false);
+    //Visualization::show("dilated", backprojectedFrame, 1);
+
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
     msg += " : After texture";

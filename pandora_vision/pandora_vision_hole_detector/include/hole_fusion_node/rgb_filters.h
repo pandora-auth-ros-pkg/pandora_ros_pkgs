@@ -38,6 +38,7 @@
 #define HOLE_FUSION_NODE_RGB_FILTERS_H
 
 #include <math.h>
+#include "utils/histogram.h"
 #include "utils/holes_conveyor.h"
 #include "utils/parameters.h"
 #include "utils/visualization.h"
