@@ -84,18 +84,18 @@ namespace pandora_vision
 
     PointCloud pointCloud;
 
-    //!< convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
-    //!< to pcl::PCLPointCloud2
+    // convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
+    // to pcl::PCLPointCloud2
     pcl_conversions::toPCL(*pointCloudMessage, pointCloud);
 
-    //!< prepare the output image
+    // prepare the output image
     cv::Mat image(pointCloud.height, pointCloud.width,
       encoding);
 
     if (encoding == CV_32FC1)
     {
-      //!< convert the point cloud from
-      //!< pcl::PCLPointCloud2 to pcl::PointCloudXYZ
+      // convert the point cloud from
+      // pcl::PCLPointCloud2 to pcl::PointCloudXYZ
       PointCloudXYZPtr pointCloudXYZ (new PointCloudXYZ);
       pcl::fromPCLPointCloud2 (pointCloud, *pointCloudXYZ);
 
@@ -106,7 +106,7 @@ namespace pandora_vision
           image.at<float>(row, col) =
             pointCloudXYZ->points[col + pointCloudXYZ->width * row].z;
 
-          //!< if element is nan make it a zero
+          // if element is nan make it a zero
           if (image.at<float>(row, col) !=
             image.at<float>(row, col))
           {
@@ -117,8 +117,8 @@ namespace pandora_vision
     }
     else if (encoding == CV_8UC3)
     {
-      //!< convert the point cloud from
-      //!< pcl::PCLPointCloud2 to pcl::PointCloudXYZRGB
+      // convert the point cloud from
+      // pcl::PCLPointCloud2 to pcl::PointCloudXYZRGB
       PointCloudXYZRGBPtr pointCloudXYZRGB (new PointCloudXYZRGB);
       pcl::fromPCLPointCloud2 (pointCloud, *pointCloudXYZRGB);
 
@@ -164,11 +164,11 @@ namespace pandora_vision
 
     PointCloud pointCloud;
 
-    //!< Convert the pcl::PointCloud<pcl::PointXYZ>::Ptr aka PointCloudXYZPtr
-    //!< to pcl::PCLPointCloud2
+    // Convert the pcl::PointCloud<pcl::PointXYZ>::Ptr aka PointCloudXYZPtr
+    // to pcl::PCLPointCloud2
     pcl::toPCLPointCloud2(*pointCloudXYZPtr, pointCloud);
 
-    //!< Pack the point cloud to a ROS message
+    // Pack the point cloud to a ROS message
     pcl_conversions::fromPCL(pointCloud, *pointCloudMsg);
 
     #ifdef DEBUG_TIME
@@ -203,20 +203,20 @@ namespace pandora_vision
     Timer::start("createCandidateHolesVectorMessage");
     #endif
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< candidateHoles vector
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // candidateHoles vector
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
     createCandidateHolesVector(conveyor, &candidateHolesVector);
 
     candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< image
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // image
     candidateHolesVectorMsg->image =
       convertImageToMessage(image, encoding, msg);
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< header
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // header
     candidateHolesVectorMsg->header = msg.header;
 
     #ifdef DEBUG_TIME
@@ -250,19 +250,19 @@ namespace pandora_vision
     Timer::start("createCandidateHolesVectorMessage");
     #endif
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< candidateHoles vector
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // candidateHoles vector
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
     createCandidateHolesVector(conveyor, &candidateHolesVector);
 
     candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< image
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // image
     candidateHolesVectorMsg->image = image;
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< header
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // header
     candidateHolesVectorMsg->header = msg.header;
 
     #ifdef DEBUG_TIME
@@ -292,31 +292,31 @@ namespace pandora_vision
     Timer::start("createCandidateHolesVector");
     #endif
 
-    //!< Fill the vision_communications::CandidateHolesVectorMsg's
-    //!< candidateHoles vector
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // candidateHoles vector
     for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
     {
       vision_communications::CandidateHoleMsg holeMsg;
 
-      //!< Push back the keypoint
+      // Push back the keypoint
       holeMsg.keypointX = conveyor.keyPoints[i].pt.x;
       holeMsg.keypointY = conveyor.keyPoints[i].pt.y;
 
-      //!< Push back the bounding rectangle's vertices
+      // Push back the bounding rectangle's vertices
       for (int v = 0; v < conveyor.rectangles[i].size(); v++)
       {
         holeMsg.verticesX.push_back(conveyor.rectangles[i][v].x);
         holeMsg.verticesY.push_back(conveyor.rectangles[i][v].y);
       }
 
-      //!< Push back the blob's outline points
+      // Push back the blob's outline points
       for (int o = 0; o < conveyor.outlines[i].size(); o++)
       {
         holeMsg.outlineX.push_back(conveyor.outlines[i][o].x);
         holeMsg.outlineY.push_back(conveyor.outlines[i][o].y);
       }
 
-      //!< Push back one hole to the holes vector message
+      // Push back one hole to the holes vector message
       candidateHolesVector->push_back(holeMsg);
     }
 
@@ -345,12 +345,12 @@ namespace pandora_vision
 
     PointCloud pointCloud;
 
-    //!< convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
-    //!< to pcl::PCLPointCloud2
+    // convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
+    // to pcl::PCLPointCloud2
     pcl_conversions::toPCL(*msg, pointCloud);
 
-    //!< Convert the pcl::PCLPointCloud2 to pcl::PointCloud<pcl::PointXYZ>::Ptr
-    //!< aka PointCloudXYZPtr
+    // Convert the pcl::PCLPointCloud2 to pcl::PointCloud<pcl::PointXYZ>::Ptr
+    // aka PointCloudXYZPtr
     pcl::fromPCLPointCloud2 (pointCloud, *(*pointCloudXYZ));
 
     #ifdef DEBUG_TIME

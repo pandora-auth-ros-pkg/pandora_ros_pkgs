@@ -78,7 +78,6 @@ namespace pandora_vision
        **/
       static void applyCanny (const cv::Mat& inImage, cv::Mat* outImage);
 
-
       /**
         @brief Applies the Scharr edge transform
         @param[in] inImage [const cv::Mat&] Input image in CV_8UC1 format
@@ -196,6 +195,7 @@ namespace pandora_vision
         @return void
        **/
       static void getShapesClearBorder (cv::Mat* inImage);
+
   };
 
 } // namespace pandora_vision

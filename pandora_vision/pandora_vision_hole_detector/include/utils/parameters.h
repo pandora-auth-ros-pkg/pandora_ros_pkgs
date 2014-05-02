@@ -49,23 +49,23 @@ namespace pandora_vision
 {
   struct Parameters
   {
-    //!< Show the depth image that arrives in the depth node
+    // Show the depth image that arrives in the depth node
     static bool show_depth_image;
 
-    //!< Show the rgb image that arrives in the rgb node
+    // Show the rgb image that arrives in the rgb node
     static bool show_rgb_image;
 
-    //!< Show the holes that each of the depth and RGB nodes transmit to the
-    //!< hole fusion node, on top of their respective origin images
+    // Show the holes that each of the depth and RGB nodes transmit to the
+    // hole fusion node, on top of their respective origin images
     static bool show_respective_holes;
 
-    //!< Depth and RGB images' representation method.
-    //!< 0 if image used is used as obtained from the image sensor
-    //!< 1 through wavelet analysis
+    // Depth and RGB images' representation method.
+    // 0 if image used is used as obtained from the image sensor
+    // 1 through wavelet analysis
     static int depth_image_representation_method;
     static int rgb_image_representation_method;
 
-    //!< canny parameters
+    // canny parameters
     static int canny_ratio;
     static int canny_kernel_size;
     static int canny_low_threshold;
@@ -74,10 +74,10 @@ namespace pandora_vision
     static float contrast_enhance_alpha;
     static float contrast_enhance_beta;
 
-    //!< Threshold parameters
+    // Threshold parameters
     static int threshold_lower_value;
 
-    //!< Blob detection parameters
+    // Blob detection parameters
     static int blob_min_threshold;
     static int blob_max_threshold;
     static int blob_threshold_step;
@@ -91,34 +91,34 @@ namespace pandora_vision
     static bool blob_filter_by_color;
     static bool blob_filter_by_circularity;
 
-    //!< Bounding boxes parameters
+    // Bounding boxes parameters
     static int bounding_box_min_area_threshold;
 
-    //!< The bounding box detection method
-    //!< 0 for detecting by means of brushfire starting
-    //!< from the keypoint of the blob
-    //!< 1 for detecting by means of contours around the edges of the blob
+    // The bounding box detection method
+    // 0 for detecting by means of brushfire starting
+    // from the keypoint of the blob
+    // 1 for detecting by means of contours around the edges of the blob
     static int bounding_box_detection_method;
 
-    //!< When using raycast instead of brushfire to find the (approximate here)
-    //!< outline of blobs, raycast_keypoint_partitions dictates the number of
-    //!< rays, or equivalently, the number of partitions in which the blob is
-    //!< partitioned in search of the blob's borders
+    // When using raycast instead of brushfire to find the (approximate here)
+    // outline of blobs, raycast_keypoint_partitions dictates the number of
+    // rays, or equivalently, the number of partitions in which the blob is
+    // partitioned in search of the blob's borders
     static int raycast_keypoint_partitions;
 
     //<! Loose ends connection parameters
     static int AB_to_MO_ratio;
     static int minimum_curve_points;
 
-    ////!< Interpolation parameters
+    //// Interpolation parameters
 
-    //!< The interpolation method for noise removal
-    //!< 0 for averaging the pixel's neighbor values
-    //!< 1 for brushfire near
-    //!< 2 for brushfire far
+    // The interpolation method for noise removal
+    // 0 for averaging the pixel's neighbor values
+    // 1 for brushfire near
+    // 2 for brushfire far
     static int interpolation_method;
 
-    //!< Hole checkers and their thresholds`
+    // Hole checkers and their thresholds`
     static int run_checker_depth_diff;
     static float checker_depth_diff_threshold;
 
@@ -150,16 +150,16 @@ namespace pandora_vision
     static int run_checker_texture_backproject;
     static float checker_texture_backproject_threshold;
 
-    //!< Plane detection
+    // Plane detection
     static int segmentation_method;
     static int max_iterations;
     static double num_points_to_exclude;
     static double point_to_plane_distance_threshold;
 
-    //!< Method to scale the CV_32FC1 image to CV_8UC1
+    // Method to scale the CV_32FC1 image to CV_8UC1
     static int scale_method;
 
-    //!< Debug
+    // Debug
     static bool debug_show_find_holes;
     static int debug_show_find_holes_size;
 
@@ -179,22 +179,22 @@ namespace pandora_vision
     static bool debug_show_merge_holes;
     static int debug_show_merge_holes_size;
 
-    //!< Texture parameters
-    //!< The threshold for texture matching
+    // Texture parameters
+    // The threshold for texture matching
     static float match_texture_threshold;
 
-    //!< Color homogeneity parameters
+    // Color homogeneity parameters
     static int num_bins_threshold;
     static int non_zero_points_in_box_blob_histogram;
 
-    //!< Histogram parameters
+    // Histogram parameters
     static int number_of_hue_bins;
     static int number_of_saturation_bins;
     static int number_of_value_bins;
     static int secondary_channel;
 
 
-    //!< Holes connection - merger
+    // Holes connection - merger
     static float connect_holes_min_distance;
     static float connect_holes_max_distance;
   };

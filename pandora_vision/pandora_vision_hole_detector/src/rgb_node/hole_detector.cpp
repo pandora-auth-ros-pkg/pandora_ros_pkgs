@@ -92,8 +92,8 @@ namespace pandora_vision
     //! Backprojection of current frame
     cv::Mat backprojectedFrame = cv::Mat::zeros(holeFrame.size(), CV_8UC1);
 
-    //!< Get the backprojected image of the frame, based on the precalculated
-    //!< histogram_ histogram
+    // Get the backprojected image of the frame, based on the precalculated
+    // histogram_ histogram
     Histogram::getBackprojection(holeFrame, histogram_,
       &backprojectedFrame, Parameters::secondary_channel);
 
@@ -110,10 +110,10 @@ namespace pandora_vision
     cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
     //Visualization::show("bp thresholded", backprojectedFrame, 1);
 
-    //!< The backprojected image is usually scattered with individual
-    //!< non-zero points rather than whole areas.
-    //!< Apply dilation so that the non-zero points expand in size and
-    //!< occupy the area of the matchin texture
+    // The backprojected image is usually scattered with individual
+    // non-zero points rather than whole areas.
+    // Apply dilation so that the non-zero points expand in size and
+    // occupy the area of the matchin texture
     Morphology::dilation(&backprojectedFrame, 2, false);
 
     //Visualization::show("dilated", backprojectedFrame, 1);
@@ -131,7 +131,7 @@ namespace pandora_vision
     //! Apply in current frame Canny edge detection algorithm
     EdgeDetection::applySobel(backprojectedFrame, &temp);
 
-    //!< Denoise the edges image
+    // Denoise the edges image
     EdgeDetection::denoiseEdges(&temp);
 
 
@@ -148,7 +148,7 @@ namespace pandora_vision
     BlobDetection::detectBlobs(temp, &detectedkeyPoints);
 
 
-    //!< The final vectors of keypoints, rectangles and blobs' outlines.
+    // The final vectors of keypoints, rectangles and blobs' outlines.
     struct HolesConveyor conveyor;
 
     HoleFilters::validateBlobs(

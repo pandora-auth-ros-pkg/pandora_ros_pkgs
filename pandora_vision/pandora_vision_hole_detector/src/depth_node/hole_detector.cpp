@@ -65,7 +65,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Edge computation
+    // Edge computation
     cv::Mat denoisedDepthImageEdges;
     EdgeDetection::computeEdges(interpolatedDepthImage,
       &denoisedDepthImageEdges);
@@ -82,8 +82,8 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Find blobs in the edges image. Each blob is represented as
-    //!< a keypoint which is the center of the blob found
+    // Find blobs in the edges image. Each blob is represented as
+    // a keypoint which is the center of the blob found
     std::vector<cv::KeyPoint> keyPoints;
     BlobDetection::detectBlobs(denoisedDepthImageEdges, &keyPoints);
 
@@ -100,7 +100,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< The final vectors of keypoints, rectangles and blobs' outlines.
+    // The final vectors of keypoints, rectangles and blobs' outlines.
     struct HolesConveyor conveyor;
 
     /**

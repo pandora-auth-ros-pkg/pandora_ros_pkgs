@@ -109,6 +109,7 @@ namespace pandora_vision
 
       static cv::Mat getHighHigh(const cv::Mat& in,
         const std::vector<float>& kernel);
+
   };
 
 } // namespace pandora_vision

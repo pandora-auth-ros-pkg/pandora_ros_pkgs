@@ -76,7 +76,7 @@ namespace pandora_vision
       for (std::set<unsigned int>::iterator it = current.begin() ;
         it != current.end() ; it++)
       {
-        //!< sweep the neighbors of the current point
+        // sweep the neighbors of the current point
         for (int m = -1; m < 2; m++)
         {
           for (int n = -1; n < 2; n++)
@@ -164,7 +164,7 @@ namespace pandora_vision
         for (std::set<unsigned int>::iterator it = current.begin() ;
           it != current.end() ; it++)
         {
-          //!< sweep the neighbors of the current point
+          // sweep the neighbors of the current point
           for (int m = -1; m < 2; m++)
           {
             for (int n = -1; n < 2; n++)
@@ -244,17 +244,17 @@ namespace pandora_vision
       for (std::set<unsigned int>::iterator it = current.begin() ;
         it != current.end() ; it++)
       {
-        //!< sweep the neighbors of the current point
+        // sweep the neighbors of the current point
         for (int m = -1; m < 2; m++)
         {
           for (int n = -1; n < 2; n++)
           {
-            //!< This check is needed because it is possible to access
-            //!< a point diagonal to the current one
-            //!< that goes out of the border's of interest bounds
-            //!< (value == 0) while it shouldn't.
-            //!< This happens when there are "cracks" to the border of a
-            //!< 1-pixel border
+            // This check is needed because it is possible to access
+            // a point diagonal to the current one
+            // that goes out of the border's of interest bounds
+            // (value == 0) while it shouldn't.
+            // This happens when there are "cracks" to the border of a
+            // 1-pixel border
             if (abs(m) + abs(n) < 2)
             {
               int x = static_cast<int>(*it) % inImage->cols + m;
@@ -328,12 +328,12 @@ namespace pandora_vision
 
     std::vector<cv::KeyPoint> keyPoints;
 
-    //!< detect blobs. store their center point
+    // detect blobs. store their center point
     blobDetector.detect(inImage, keyPoints);
 
     for (int keypointId = 0; keypointId < keyPoints.size(); keypointId++)
     {
-      //!< if the keypoint is out of image limits, discard it
+      // if the keypoint is out of image limits, discard it
       if (keyPoints[keypointId].pt.x < inImage.cols &&
         keyPoints[keypointId].pt.x >= 0 &&
         keyPoints[keypointId].pt.y < inImage.rows &&
@@ -375,7 +375,7 @@ namespace pandora_vision
 
     unsigned char* ptr = edgesImage->ptr();
 
-    //!< A vector storing the non-zero pixels surrounding the keypoint
+    // A vector storing the non-zero pixels surrounding the keypoint
     std::vector<cv::Point2f> keypointOutline;
 
     float theta = 0;
@@ -386,19 +386,19 @@ namespace pandora_vision
       bool outlineFound = false;
       int counter = 0;
 
-      //!< A ray can hit up to 5 outline points, but only one must be chosen.
-      //!< Store these points as potential outline points.
-      //!< We will select only the first found
+      // A ray can hit up to 5 outline points, but only one must be chosen.
+      // Store these points as potential outline points.
+      // We will select only the first found
       std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
 
       while(!outlineFound)
       {
         counter++;
 
-        //!< If the 8 pixels surrounding the ray's pixel, including the center
-        //!< pixel, are found to be all outside the image's borders,
-        //!< something has gone horribly wrong. The keypoint is not surrounded
-        //!< entirely by non-zero pixels. The best choice is to delete it.
+        // If the 8 pixels surrounding the ray's pixel, including the center
+        // pixel, are found to be all outside the image's borders,
+        // something has gone horribly wrong. The keypoint is not surrounded
+        // entirely by non-zero pixels. The best choice is to delete it.
         int numPixelsOutsideImageBorders = 0;
 
         for (int m = -1; m < 2; m++)
@@ -418,14 +418,14 @@ namespace pandora_vision
             }
           }
         }
-      } //!< End {while outline not found} loop
+      } // End {while outline not found} loop
 
       if (outlineFound)
       {
-        //!< From the, at most 5, outline points found,
-        //!< regard only one of them as an outline point, so that, in total,
-        //!< their number equals the number of partitions
-        //!< (Needed to approximate fairly accurately the blob's area)
+        // From the, at most 5, outline points found,
+        // regard only one of them as an outline point, so that, in total,
+        // their number equals the number of partitions
+        // (Needed to approximate fairly accurately the blob's area)
         keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
       }
 
@@ -433,12 +433,12 @@ namespace pandora_vision
     }
 
 
-    //!< Instead of keeping the sparce points that are the product of
-    //!< the raycast algorithm, connect them linearly in order to
-    //!< have a coherent set of points as the hole's outline
+    // Instead of keeping the sparce points that are the product of
+    // the raycast algorithm, connect them linearly in order to
+    // have a coherent set of points as the hole's outline
     cv::Mat canvas = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
 
-    //!< Draw the connected outline of the i-th hole onto canvas
+    // Draw the connected outline of the i-th hole onto canvas
     for(unsigned int j = 0; j < keypointOutline.size(); j++)
     {
       cv::line(canvas, keypointOutline[j],
@@ -446,12 +446,12 @@ namespace pandora_vision
         cv::Scalar(255, 0, 0), 1, 8 );
     }
 
-    //!< Clear the outline vector. It will be filled with the points
-    //!< drawn on the canvas image
+    // Clear the outline vector. It will be filled with the points
+    // drawn on the canvas image
     keypointOutline.clear();
 
-    //!< Every non-zero point is a point drawn; it is a point that
-    //!< belongs to the outline of the hole
+    // Every non-zero point is a point drawn; it is a point that
+    // belongs to the outline of the hole
     for (unsigned int rows = 0; rows < canvas.rows; rows++)
     {
       for (unsigned int cols = 0; cols < canvas.cols; cols++)
@@ -501,16 +501,16 @@ namespace pandora_vision
 
     unsigned char* ptr = edgesImage->ptr();
 
-    //!< Traverse the inKeyPoints vector backwards because a keypoint
-    //!< might be deleted due to it not being entirely surrounded by
-    //!< non-zero pixels
+    // Traverse the inKeyPoints vector backwards because a keypoint
+    // might be deleted due to it not being entirely surrounded by
+    // non-zero pixels
     for (int keypointId = inKeyPoints->size() - 1; keypointId >= 0;
       keypointId--)
     {
-      //!< A priori, this keypoint is not to be deleted
+      // A priori, this keypoint is not to be deleted
       bool deleteThisKeypoint = false;
 
-      //!< A vector storing the non-zero pixels surrounding the keypoint
+      // A vector storing the non-zero pixels surrounding the keypoint
       std::vector<cv::Point2f> keypointOutline;
 
       float theta = 0;
@@ -521,19 +521,19 @@ namespace pandora_vision
         bool outlineFound = false;
         int counter = 0;
 
-        //!< A ray can hit up to 5 outline points, but only one must be chosen.
-        //!< Store these points as potential outline points.
-        //!< We will select only the first found
+        // A ray can hit up to 5 outline points, but only one must be chosen.
+        // Store these points as potential outline points.
+        // We will select only the first found
         std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
 
         while(!outlineFound && !deleteThisKeypoint)
         {
           counter++;
 
-          //!< If the 8 pixels surrounding the ray's pixel, including the center
-          //!< pixel, are found to be all outside the image's borders,
-          //!< something has gone horribly wrong. The keypoint is not surrounded
-          //!< entirely by non-zero pixels. The best choice is to delete it.
+          // If the 8 pixels surrounding the ray's pixel, including the center
+          // pixel, are found to be all outside the image's borders,
+          // something has gone horribly wrong. The keypoint is not surrounded
+          // entirely by non-zero pixels. The best choice is to delete it.
           int numPixelsOutsideImageBorders = 0;
 
           for (int m = -1; m < 2; m++)
@@ -545,7 +545,7 @@ namespace pandora_vision
               int y = (*inKeyPoints)[keypointId].pt.y
                 + n + counter * sin(theta);
 
-              //!< If the ray point is not within image borders
+              // If the ray point is not within image borders
               if (x < 0 || y < 0 ||
                 x > edgesImage->cols - 1 ||
                 y > edgesImage->rows - 1)
@@ -570,20 +570,20 @@ namespace pandora_vision
               }
             }
           }
-        } //!< End {while outline not found} loop
+        } // End {while outline not found} loop
 
         if (outlineFound)
         {
-          //!< From the, at most 5, outline points found,
-          //!< regard only one of them as an outline point, so that, in total,
-          //!< their number equals the number of partitions
-          //!< (Needed to approximate fairly accurately the blob's area)
+          // From the, at most 5, outline points found,
+          // regard only one of them as an outline point, so that, in total,
+          // their number equals the number of partitions
+          // (Needed to approximate fairly accurately the blob's area)
           keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
         }
 
 
-        //!< If this keypoint is to be deleted, break from the angles loop
-        //!< in order to delete the keypoint and move on to the next one
+        // If this keypoint is to be deleted, break from the angles loop
+        // in order to delete the keypoint and move on to the next one
         if (deleteThisKeypoint)
         {
           break;
@@ -604,13 +604,13 @@ namespace pandora_vision
       }
 
 
-      //!< Calculate each blob's approximate area by heron's formula
-      //!< https://en.wikipedia.org/wiki/Heron's_formula
+      // Calculate each blob's approximate area by heron's formula
+      // https://en.wikipedia.org/wiki/Heron's_formula
       float area = 0.0;
       for (unsigned int t = 0; t < keypointOutline.size(); t++)
       {
-        //!< calculate the area of each triangle found
-        //!< O is the keypoint and A, B two successive outline points
+        // calculate the area of each triangle found
+        // O is the keypoint and A, B two successive outline points
         float lengthOA = sqrt(
           pow((*inKeyPoints)[keypointId].pt.x - keypointOutline[t].x, 2)
           + pow((*inKeyPoints)[keypointId].pt.y - keypointOutline[t].y, 2));
@@ -638,12 +638,12 @@ namespace pandora_vision
       blobsArea->push_back(area);
 
 
-      //!< Instead of keeping the sparce points that are the product of
-      //!< the raycast algorithm, connect them linearly in order to
-      //!< have a coherent set of points as the hole's outline
+      // Instead of keeping the sparce points that are the product of
+      // the raycast algorithm, connect them linearly in order to
+      // have a coherent set of points as the hole's outline
       cv::Mat canvas = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
 
-      //!< Draw the connected outline of the i-th hole onto canvas
+      // Draw the connected outline of the i-th hole onto canvas
       for(unsigned int j = 0; j < keypointOutline.size(); j++)
       {
         cv::line(canvas, keypointOutline[j],
@@ -651,12 +651,12 @@ namespace pandora_vision
           cv::Scalar(255, 0, 0), 1, 8 );
       }
 
-      //!< Clear the outline vector. It will be filled with the points
-      //!< drawn on the canvas image
+      // Clear the outline vector. It will be filled with the points
+      // drawn on the canvas image
       keypointOutline.clear();
 
-      //!< Every non-zero point is a point drawn; it is a point that
-      //!< belongs to the outline of the hole
+      // Every non-zero point is a point drawn; it is a point that
+      // belongs to the outline of the hole
       for (unsigned int rows = 0; rows < canvas.rows; rows++)
       {
         for (unsigned int cols = 0; cols < canvas.cols; cols++)
@@ -671,10 +671,10 @@ namespace pandora_vision
       blobsOutlineVector->push_back(keypointOutline);
     }
 
-    //!< Because the keypoints vector is traversed backwards,
-    //!< but the elements are pushed back into keypointOutline and blobsArea,
-    //!< we must reverse them in order for them to be accurately corresponded
-    //!< to one another
+    // Because the keypoints vector is traversed backwards,
+    // but the elements are pushed back into keypointOutline and blobsArea,
+    // we must reverse them in order for them to be accurately corresponded
+    // to one another
     std::reverse(blobsOutlineVector->begin(), blobsOutlineVector->end());
     std::reverse(blobsArea->begin(), blobsArea->end());
 
@@ -713,7 +713,7 @@ namespace pandora_vision
         int ind = rows * inImage->cols + cols;
         char v = ptr[ind];
 
-        //!< Found a new curve?
+        // Found a new curve?
         if (v != 0 && checked.find(ind) == checked.end())
         {
           current.insert(ind);
@@ -725,7 +725,7 @@ namespace pandora_vision
             for (std::set<unsigned int>::iterator it = current.begin() ;
               it != current.end() ; it++)
             {
-              //!< sweep the neighbors of the current point
+              // sweep the neighbors of the current point
               for (int m = -1; m < 2; m++)
               {
                 for (int n = -1; n < 2; n++)

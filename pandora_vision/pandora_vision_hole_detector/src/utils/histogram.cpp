@@ -60,21 +60,21 @@ namespace pandora_vision
     Timer::start("applyBackprojection");
     #endif
 
-    //!< Convert the inImage image from RGB to HSV
+    // Convert the inImage image from RGB to HSV
     cv::Mat hsv;
     cvtColor(inImage, hsv, CV_BGR2HSV);
 
-    //!< hue varies from 0 to 180
+    // hue varies from 0 to 180
     float hranges[] = { 0, 180 };
 
-    //!< saturation or value varies from 0 to 256
+    // saturation or value varies from 0 to 256
     float sec_ranges[] = { 0, 256 };
 
     const float* ranges[] = { hranges, sec_ranges};
 
     if (secondaryChannel == 1 || secondaryChannel == 2)
     {
-      //!< Use the 0-th (Hue) and secondaryChannel channels
+      // Use the 0-th (Hue) and secondaryChannel channels
       int channels[] = {0, secondaryChannel};
 
     cv::calcBackProject(&hsv, 1, channels, modelHistogram,
@@ -108,16 +108,16 @@ namespace pandora_vision
     Timer::start("getHistogram", "", true);
     #endif
 
-    //!< The path to the package where the wall pictures directory lies in
+    // The path to the package where the wall pictures directory lies in
     std::string packagePath =
       ros::package::getPath("pandora_vision_hole_detector");
 
-    //!< The actual wall pictures directory
+    // The actual wall pictures directory
     std::string wallPicturesPath = packagePath + "/walls/";
 
     int fileLength;
 
-    //!< The number of wall picture files inside the wallPicturesPath directory
+    // The number of wall picture files inside the wallPicturesPath directory
     int numPictures = 0;
 
     struct dirent* result = NULL;
@@ -142,8 +142,8 @@ namespace pandora_vision
       closedir (directory);
     }
 
-    //!< Read the pictures inside the wallPicturesPath, convert them to HSV
-    //!< and calculate their histogram
+    // Read the pictures inside the wallPicturesPath, convert them to HSV
+    // and calculate their histogram
     cv::Mat* wallImagesHSV = new cv::Mat[numPictures];
     for(int i = 0; i < numPictures; i++)
     {
@@ -161,7 +161,7 @@ namespace pandora_vision
 
     int* histSize = new int[2];
 
-    //!< The first value will always be with regard to Hue
+    // The first value will always be with regard to Hue
     histSize[0] = Parameters::number_of_hue_bins;
 
     if (secondaryChannel == 1)
@@ -178,16 +178,16 @@ namespace pandora_vision
       return;
     }
 
-    //!< hue varies from 0 to 179, saturation and value from 0 to 255
+    // hue varies from 0 to 179, saturation and value from 0 to 255
     float h_ranges[] = { 0, 180 };
     float sec_ranges[] = { 0, 256 };
 
     const float* ranges[] = { h_ranges, sec_ranges };
 
-    //!< Use the 0-th and secondaryChannel-st channels
+    // Use the 0-th and secondaryChannel-st channels
     int channels[] = { 0, secondaryChannel };
 
-    //!< Calculate the histogram for the walls
+    // Calculate the histogram for the walls
     cv::calcHist(wallImagesHSV, numPictures, channels, cv::Mat(),
       *histogram, 2, histSize, ranges, true, false);
 

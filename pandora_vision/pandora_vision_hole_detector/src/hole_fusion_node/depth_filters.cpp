@@ -90,13 +90,13 @@ namespace pandora_vision
         conveyor.keyPoints[rectanglesIndices[i]].pt.y,
         conveyor.keyPoints[rectanglesIndices[i]].pt.x) - mean;
 
-      //!< The gaussian mean
+      // The gaussian mean
       float m = Parameters::holes_gaussian_mean;
 
-      //!< The gaussian standard deviation
+      // The gaussian standard deviation
       float s = Parameters::holes_gaussian_stddev;
 
-      //!< The gaussian probability of this hole being valid
+      // The gaussian probability of this hole being valid
       probabilitiesVector->at(rectanglesIndices[i]) =
         exp(-pow((value -m) / s, 2) / 2);
 
@@ -140,7 +140,7 @@ namespace pandora_vision
 
     for(unsigned int i = 0 ; i < conveyor.keyPoints.size() ; i++)
     {
-      //!< The mean depth value of the points inside the i-th hole
+      // The mean depth value of the points inside the i-th hole
       float mean = 0.0;
 
       for (std::set<unsigned int>::iterator it = holesMasksSetVector[i].begin();
@@ -152,21 +152,21 @@ namespace pandora_vision
         mean += depthImage.at<float>(y, x);
       }
 
-      //!< The number of points inside the i-th hole, or else, its area
+      // The number of points inside the i-th hole, or else, its area
       float area = holesMasksSetVector[i].size();
 
       mean /= area;
 
-      //!< area = f(mean) for one circular hole
+      // area = f(mean) for one circular hole
       float singleHoleDepthArea = 5.7028988154428989 * pow(10, 4)
         * exp(- 2.2113680011649128 * mean);
 
-      //!< Upper-most curve, plus an increase in height
-      //!< At most, one complete hole contains three circular ones
+      // Upper-most curve, plus an increase in height
+      // At most, one complete hole contains three circular ones
       float high = 3 * singleHoleDepthArea - area + 7000;
 
-      //!< Lower-most curve minus a reduction in height
-      //!< At least, one complete hole is one circular hole
+      // Lower-most curve minus a reduction in height
+      // At least, one complete hole is one circular hole
       float low = singleHoleDepthArea - area - 7000;
 
 
@@ -234,8 +234,8 @@ namespace pandora_vision
 
     for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
-      //!< From each set of intermediate points, construct the point cloud
-      //!< that will be checked for plane constitution
+      // From each set of intermediate points, construct the point cloud
+      // that will be checked for plane constitution
       PointCloudXYZPtr intermediatePointsPointCloud (new PointCloudXYZ);
 
       intermediatePointsPointCloud->width = intermediatePointsSetVector[i].size();
@@ -266,15 +266,15 @@ namespace pandora_vision
         pointCloudPointsIndex++;
       }
 
-      //!< Check if the intermediatePointsPointCloud's points are on a plane
+      // Check if the intermediatePointsPointCloud's points are on a plane
       std::vector<pcl::PointIndices::Ptr> inliersVector;
       int numPlanes = PlanesDetection::locatePlanes(
         intermediatePointsPointCloud, false, &inliersVector);
 
-      //!< The probability (in all probability) of the current hole lying on
-      //!< one plane will be the ratio of the number of intermediate points
-      //!< that lie on one plane over all the intermediate points
-      //!< (max points on one plane) / (all intermediate points)
+      // The probability (in all probability) of the current hole lying on
+      // one plane will be the ratio of the number of intermediate points
+      // that lie on one plane over all the intermediate points
+      // (max points on one plane) / (all intermediate points)
       int maxPoints = 0;
       for (unsigned int iv = 0; iv < inliersVector.size(); iv++)
       {
@@ -337,19 +337,19 @@ namespace pandora_vision
     #endif
 
 
-    //!< For each inflated rectangle, store in visitedPoints
-    //!< the points that constitute the rectangle.
-    //!< We will test if these points all lie on one plane.
+    // For each inflated rectangle, store in visitedPoints
+    // the points that constitute the rectangle.
+    // We will test if these points all lie on one plane.
     for (unsigned int i = 0; i < rectanglesVector.size(); i++)
     {
-      //!< The canvas image will hold the rectangles.
+      // The canvas image will hold the rectangles.
       cv::Mat canvas = cv::Mat::zeros(inImage.size(), CV_8UC1);
       cv::RNG rng(12345);
       cv::Scalar color = cv::Scalar(
         rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 
 
-      //!< Draw the rectangle that corresponds to it
+      // Draw the rectangle that corresponds to it
       for(int j = 0; j < 4; j++)
       {
         cv::line(canvas, rectanglesVector[i][j],
@@ -368,8 +368,8 @@ namespace pandora_vision
         }
       }
 
-      //!< From each set of points lying on the edges of the rectangle,
-      //!< construct the point cloud that will be checked for plane constitution
+      // From each set of points lying on the edges of the rectangle,
+      // construct the point cloud that will be checked for plane constitution
       PointCloudXYZPtr edgePointsPointCloud (new PointCloudXYZ);
 
       edgePointsPointCloud->width = visitedPoints.size();
@@ -398,14 +398,14 @@ namespace pandora_vision
         pointCloudPointsIndex++;
       }
 
-      //!< Check if the edgePointsPointCloud points are on a plane
+      // Check if the edgePointsPointCloud points are on a plane
       std::vector<pcl::PointIndices::Ptr> inliersVector;
       int numPlanes = PlanesDetection::locatePlanes(edgePointsPointCloud,
         false, &inliersVector);
 
-      //!< The probability (in all probability) of an inflated rectangle
-      //!< residing on one plane will be the ratio of
-      //!< (max points on one plane) / (all inflated rectangle points)
+      // The probability (in all probability) of an inflated rectangle
+      // residing on one plane will be the ratio of
+      // (max points on one plane) / (all inflated rectangle points)
       int maxPoints = 0;
       for (unsigned int iv = 0; iv < inliersVector.size(); iv++)
       {
@@ -458,22 +458,22 @@ namespace pandora_vision
     Timer::start("checkHolesDepthHomogeneity", "applyFilter");
     #endif
 
-    //!< Facilitate the edge detection by converting the 32FC1 image
-    //!< values to a range of 0-255
+    // Facilitate the edge detection by converting the 32FC1 image
+    // values to a range of 0-255
     cv::Mat visualizableDenoisedImage;
     visualizableDenoisedImage = Visualization::scaleImageForVisualization
       (interpolatedDepthImage, Parameters::scale_method);
 
-    //!< from now onwards every image is in the range of 0-255
+    // from now onwards every image is in the range of 0-255
     cv::Mat interpolatedDepthImageEdges;
     EdgeDetection::applySobel(visualizableDenoisedImage,
       &interpolatedDepthImageEdges);
 
-    //!< Threshold the interpolatedDepthImageEdges image
+    // Threshold the interpolatedDepthImageEdges image
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
       Parameters::threshold_lower_value, 255, 3);
 
-    //!< make all non zero pixels have a value of 255
+    // make all non zero pixels have a value of 255
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
       0, 255, 0);
 
@@ -604,7 +604,7 @@ namespace pandora_vision
         &msgs);
 
       counter++;
-    } //!< o_it iterator ends
+    } // o_it iterator ends
 
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_check_holes) // Debug
@@ -675,13 +675,13 @@ namespace pandora_vision
     std::vector<std::string> finalMsgs;
     std::vector<std::string> msgs_;
 
-    //!< Initialize structures
+    // Initialize structures
     finalMsgs.clear();
     msgs_.clear();
 
     switch(method)
     {
-      //!< Filter #1 (through difference of depth)------------------------------
+      // Filter #1 (through difference of depth)------------------------------
       case 1 :
         {
           checkHolesDepthDiff(
@@ -695,10 +695,10 @@ namespace pandora_vision
           windowMsg = "Filter: Depth difference";
           break;
         }
-        //!< Filter #2----------------------------------------------------------
-        //!< Inflate the bounding boxes by an inflation size.
-        //!< For a blob to be at least a potential hole, all the points that
-        //!< constitute the inflated rectangle should lie on exactly one plane.
+        // Filter #2----------------------------------------------------------
+        // Inflate the bounding boxes by an inflation size.
+        // For a blob to be at least a potential hole, all the points that
+        // constitute the inflated rectangle should lie on exactly one plane.
       case 2 :
         {
           checkHolesRectangleEdgesPlaneConstitution(
@@ -712,7 +712,7 @@ namespace pandora_vision
           windowMsg = "Filter: Outline of rectangle on plane";
           break;
         }
-        //!< Filter #3 (depth & area comparison)--------------------------------
+        // Filter #3 (depth & area comparison)--------------------------------
       case 3 :
         {
           checkHolesDepthArea(
@@ -725,11 +725,11 @@ namespace pandora_vision
           windowMsg = "Filter: Area / Depth";
           break;
         }
-        //!< Filter #4----------------------------------------------------------
-        //!< Brushfire from blob outline to blob bounding box
-        //!< with an inflation size (inflates the rectangle by x pixels).
-        //!< If the points between the blob's outline and the inflated rectangle
-        //!< lie on one plane, this blob is a hole.
+        // Filter #4----------------------------------------------------------
+        // Brushfire from blob outline to blob bounding box
+        // with an inflation size (inflates the rectangle by x pixels).
+        // If the points between the blob's outline and the inflated rectangle
+        // lie on one plane, this blob is a hole.
       case 4 :
         {
           checkHolesOutlineToRectanglePlaneConstitution(
@@ -743,9 +743,9 @@ namespace pandora_vision
           windowMsg = "Filter: Points around blob to plane";
           break;
         }
-        //!< Filter #5 (Depth homogenity)---------------------------------------
-        //!< All holes are considered valid except for those that are edgeless
-        //!< inside the area denoted by the conveyor->outlines points
+        // Filter #5 (Depth homogenity)---------------------------------------
+        // All holes are considered valid except for those that are edgeless
+        // inside the area denoted by the conveyor->outlines points
       case 5 :
         {
           checkHolesDepthHomogeneity(

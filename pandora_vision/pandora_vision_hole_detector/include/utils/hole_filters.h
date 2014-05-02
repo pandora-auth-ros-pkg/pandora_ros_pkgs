@@ -107,6 +107,7 @@ namespace pandora_vision
         const std::vector<float>& inRectanglesArea,
         const std::vector<std::vector<cv::Point2f> >& inContours,
         HolesConveyor* conveyor);
+
   };
 
 } // namespace pandora_vision

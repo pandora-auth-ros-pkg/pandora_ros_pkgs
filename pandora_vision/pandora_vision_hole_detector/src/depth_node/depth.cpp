@@ -51,18 +51,18 @@ namespace pandora_vision
 
     ros::Duration(0.5).sleep();
 
-    //!< Subscribe to the point cloud published by the
-    //!< rgb_depth_synchronizer node
+    // Subscribe to the point cloud published by the
+    // rgb_depth_synchronizer node
     depthImageSubscriber_ = nodeHandle_.subscribe(
       "/synchronized/camera/depth/image_raw", 1,
       &Depth::inputDepthImageCallback, this);
 
-    //!< Advertise the candidate holes found by the depth node
+    // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::CandidateHolesVectorMsg>(
       "/synchronized/camera/depth/candidate_holes", 1000);
 
-    //!< The dynamic reconfigure (depth) parameter's callback
+    // The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&Depth::parametersCallback,
         this, _1, _2));
 
@@ -102,7 +102,7 @@ namespace pandora_vision
     ROS_INFO("Depth node callback");
     #endif
 
-    //!< Obtain the depth image
+    // Obtain the depth image
     cv::Mat depthImage;
     MessageConversions::extractImageFromMessage(msg, &depthImage,
       sensor_msgs::image_encodings::TYPE_32FC1);
@@ -114,19 +114,19 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Perform noise elimination on the depth image
+    // Perform noise elimination on the depth image
     cv::Mat interpolatedDepthImage;
     NoiseElimination::performNoiseElimination(depthImage,
       &interpolatedDepthImage);
 
-    //!< Regardless of the image representation method, the depth node
-    //!< will publish the interpolated depth image of original size
-    //!< to the Hole Fusion node
+    // Regardless of the image representation method, the depth node
+    // will publish the interpolated depth image of original size
+    // to the Hole Fusion node
     cv::Mat interpolatedDepthImageSent;
     interpolatedDepthImage.copyTo(interpolatedDepthImageSent);
 
-    //!< A value of 1 means that the depth image is subtituted by its
-    //!< low-low, wavelet analysis driven, part
+    // A value of 1 means that the depth image is subtituted by its
+    // low-low, wavelet analysis driven, part
     if (Parameters::depth_image_representation_method == 1)
     {
       double min;
@@ -137,10 +137,10 @@ namespace pandora_vision
         &interpolatedDepthImage);
     }
 
-    //!< Finds possible holes
+    // Finds possible holes
     HolesConveyor holes = HoleDetector::findHoles(interpolatedDepthImage);
 
-    //!< Create the candidate holes message
+    // Create the candidate holes message
     vision_communications::CandidateHolesVectorMsg depthCandidateHolesMsg;
 
     MessageConversions::createCandidateHolesVectorMessage(holes,
@@ -149,7 +149,7 @@ namespace pandora_vision
       sensor_msgs::image_encodings::TYPE_32FC1,
       msg);
 
-    //!< Publish the candidate holes message
+    // Publish the candidate holes message
     candidateHolesPublisher_.publish(depthCandidateHolesMsg);
 
     #ifdef DEBUG_TIME
@@ -176,18 +176,18 @@ namespace pandora_vision
     ROS_INFO("Parameters callback called");
     #endif
 
-    //!< Show the depth image that arrives in the depth node
+    // Show the depth image that arrives in the depth node
     Parameters::show_depth_image =
      config.show_depth_image;
 
-    //!< Depth image representation method.
-    //!< 0 if the depth image used is the one obtained from the depth sensor,
-    //!< unadulterated
-    //!< 1 through wavelet representation
+    // Depth image representation method.
+    // 0 if the depth image used is the one obtained from the depth sensor,
+    // unadulterated
+    // 1 through wavelet representation
     Parameters::depth_image_representation_method =
       config.depth_image_representation_method;
 
-    //!< canny parameters
+    // canny parameters
     Parameters::canny_ratio = config.canny_ratio;
     Parameters::canny_kernel_size = config.canny_kernel_size;
     Parameters::canny_low_threshold = config.canny_low_threshold;
@@ -197,10 +197,10 @@ namespace pandora_vision
     Parameters::contrast_enhance_alpha = config.contrast_enhance_alpha;
     Parameters::contrast_enhance_beta = config.contrast_enhance_beta;
 
-    //!< Threshold parameters
+    // Threshold parameters
     Parameters::threshold_lower_value = config.threshold_lower_value;
 
-    //!< Blob detection parameters
+    // Blob detection parameters
     Parameters::blob_min_threshold = config.blob_min_threshold;
     Parameters::blob_max_threshold = config.blob_max_threshold;
     Parameters::blob_threshold_step = config.blob_threshold_step;
@@ -215,21 +215,21 @@ namespace pandora_vision
     Parameters::blob_filter_by_circularity =
       config.blob_filter_by_circularity;
 
-    //!< Bounding boxes parameters
+    // Bounding boxes parameters
     Parameters::bounding_box_min_area_threshold =
       config.bounding_box_min_area_threshold;
 
-    //!< The bounding box detection method
-    //!< 0 for detecting by means of brushfire starting
-    //!< from the keypoint of the blob
-    //!< 1 for detecting by means of contours around the edges of the blob
+    // The bounding box detection method
+    // 0 for detecting by means of brushfire starting
+    // from the keypoint of the blob
+    // 1 for detecting by means of contours around the edges of the blob
     Parameters::bounding_box_detection_method =
       config.bounding_box_detection_method;
 
-    //!< When using raycast instead of brushfire to find the (approximate here)
-    //!< outline of blobs, raycast_keypoint_partitions dictates the number of
-    //!< rays, or equivalently, the number of partitions in which the blob is
-    //!< partitioned in search of the blob's borders
+    // When using raycast instead of brushfire to find the (approximate here)
+    // outline of blobs, raycast_keypoint_partitions dictates the number of
+    // rays, or equivalently, the number of partitions in which the blob is
+    // partitioned in search of the blob's borders
     Parameters::raycast_keypoint_partitions =
       config.raycast_keypoint_partitions;
 
@@ -237,16 +237,16 @@ namespace pandora_vision
     Parameters::AB_to_MO_ratio = config.AB_to_MO_ratio;
     Parameters::minimum_curve_points = config.minimum_curve_points;
 
-    //!< The interpolation method for noise removal
-    //!< 0 for averaging the pixel's neighbor values
-    //!< 1 for brushfire near
-    //!< 2 for brushfire far
+    // The interpolation method for noise removal
+    // 0 for averaging the pixel's neighbor values
+    // 1 for brushfire near
+    // 2 for brushfire far
     Parameters::interpolation_method = config.interpolation_method;
 
-    //!< Method to scale the CV_32FC1 image to CV_8UC1
+    // Method to scale the CV_32FC1 image to CV_8UC1
     Parameters::scale_method = config.scale_method;
 
-    //!< Debug
+    // Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;
     Parameters::debug_show_find_holes_size =
       config.debug_show_find_holes_size;

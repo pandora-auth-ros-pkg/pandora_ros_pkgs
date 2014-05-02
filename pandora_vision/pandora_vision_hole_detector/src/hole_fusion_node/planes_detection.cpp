@@ -228,23 +228,23 @@ namespace pandora_vision
     pcl::ModelCoefficients coefficients;
     pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
 
-    //!< Create the segmentation object
+    // Create the segmentation object
     pcl::SACSegmentation<pcl::PointXYZ> seg;
 
-    //!< Optional
+    // Optional
     seg.setOptimizeCoefficients (true);
 
-    //!< Mandatory
+    // Mandatory
     seg.setModelType (pcl::SACMODEL_PLANE);
     seg.setMethodType (pcl::SAC_RANSAC);
     seg.setMaxIterations (Parameters::max_iterations);
 
-    //!< Maybe a value needs to be set dynamically here, depending on
-    //!< the distance of the kinect to the plane.
+    // Maybe a value needs to be set dynamically here, depending on
+    // the distance of the kinect to the plane.
     seg.setDistanceThreshold(
       Parameters::point_to_plane_distance_threshold);
 
-    //!< Create the filtering object
+    // Create the filtering object
     pcl::ExtractIndices<pcl::PointXYZ> extract;
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_f
@@ -257,12 +257,12 @@ namespace pandora_vision
     int i = 0;
     int nr_points = static_cast<int> (cloudIn->points.size());
 
-    //!< While 100 x num_points_to_exclude % of the original
-    //!< cloud is still there
+    // While 100 x num_points_to_exclude % of the original
+    // cloud is still there
     while (cloudIn->points.size () >
       Parameters::num_points_to_exclude * nr_points)
     {
-      //!< Segment the largest planar component from the remaining cloud
+      // Segment the largest planar component from the remaining cloud
       seg.setInputCloud (cloudIn);
       seg.segment (*inliers, coefficients);
 
@@ -275,12 +275,12 @@ namespace pandora_vision
         break;
       }
 
-      //!< Extract the inliers
+      // Extract the inliers
       extract.setInputCloud (cloudIn);
       extract.setIndices (inliers);
 
-      //!< Remove the plane found from cloudIn and place it in
-      //!< loud_p. cloudIn goes unaffected.
+      // Remove the plane found from cloudIn and place it in
+      // loud_p. cloudIn goes unaffected.
       extract.setNegative (false);
 
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_p
@@ -298,17 +298,17 @@ namespace pandora_vision
       coefficientsVector.push_back(coefficients);
       inliersVector.push_back(inliers);
 
-      //!< Create the filtering object. Remove the plane \
-      //!< found from cloudIn.
-      //!< cloud_f = cloudIn - cloud_p. cloudIn goes unaffected.
+      // Create the filtering object. Remove the plane \
+      // found from cloudIn.
+      // cloud_f = cloudIn - cloud_p. cloudIn goes unaffected.
       extract.setNegative (true);
       extract.filter (*cloud_f);
       *cloudIn = *cloud_f;
 
       i++;
 
-      //!< If the number of planes found so far exceeds the number one,
-      //!< return. We are only interested in holes that lie on one plane.
+      // If the number of planes found so far exceeds the number one,
+      // return. We are only interested in holes that lie on one plane.
       if (i > 1)
       {
         return;
@@ -357,7 +357,7 @@ namespace pandora_vision
 
       pcl::ModelCoefficients coefficients;
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
-      //!< Create the segmentation object
+      // Create the segmentation object
       pcl::SACSegmentationFromNormals<pcl::PointXYZ, pcl::Normal> seg;
       pcl::search::KdTree<pcl::PointXYZ>::Ptr tree
         (new pcl::search::KdTree<pcl::PointXYZ>);
@@ -365,21 +365,21 @@ namespace pandora_vision
       pcl::PointCloud<pcl::Normal>::Ptr cloud_normals
         (new pcl::PointCloud<pcl::Normal>);
 
-      //!< Optional
+      // Optional
       seg.setOptimizeCoefficients (true);
 
-      //!< Mandatory
+      // Mandatory
       seg.setModelType (pcl::SACMODEL_NORMAL_PLANE);
       seg.setNormalDistanceWeight(0.01);
       seg.setMethodType (pcl::SAC_RANSAC);
       seg.setMaxIterations (Parameters::max_iterations);
 
-      //!< Maybe a value needs to be set dynamically here,
-      //!< depending on the distance of the kinect to the plane.
+      // Maybe a value needs to be set dynamically here,
+      // depending on the distance of the kinect to the plane.
       seg.setDistanceThreshold(
         Parameters::point_to_plane_distance_threshold);
 
-      //!< Create the filtering object
+      // Create the filtering object
       pcl::ExtractIndices<pcl::PointXYZ> extract;
       pcl::ExtractIndices<pcl::Normal> extract_normals;
 
@@ -390,7 +390,7 @@ namespace pandora_vision
       std::vector<pcl::ModelCoefficients> coefficientsVector;
       std::vector<pcl::PointIndices::Ptr> inliersVector;
 
-      //!< Estimate point normals
+      // Estimate point normals
       ne.setSearchMethod(tree);
       ne.setInputCloud (cloudIn);
       ne.setKSearch (50);
@@ -399,13 +399,13 @@ namespace pandora_vision
       int i = 0;
       int nr_points = static_cast<int> (cloudIn->points.size());
 
-      //!< While 100 x num_points_to_exclude % of the original
-      //!< cloud is still there
+      // While 100 x num_points_to_exclude % of the original
+      // cloud is still there
       while (cloudIn->points.size () >
         Parameters::num_points_to_exclude * nr_points)
       {
-        //!< Segment the largest planar component from the
-        //!< remaining cloud
+        // Segment the largest planar component from the
+        // remaining cloud
         seg.setInputCloud (cloudIn);
         seg.setInputNormals(cloud_normals);
         seg.segment (*inliers, coefficients);
@@ -419,12 +419,12 @@ namespace pandora_vision
           break;
         }
 
-        //!< Extract the inliers
+        // Extract the inliers
         extract.setInputCloud (cloudIn);
         extract.setIndices (inliers);
 
-        //!< Remove the plane found from cloudIn and place it in cloud_p.
-        //!< cloudIn goes unaffected.
+        // Remove the plane found from cloudIn and place it in cloud_p.
+        // cloudIn goes unaffected.
         extract.setNegative (false);
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_p
@@ -450,7 +450,7 @@ namespace pandora_vision
         extract.filter (*cloud_f);
         *cloudIn = *cloud_f;
 
-        //!< Create the filtering object
+        // Create the filtering object
         extract_normals.setNegative (true);
         extract_normals.setInputCloud (cloud_normals);
         extract_normals.setIndices (inliers);
@@ -458,8 +458,8 @@ namespace pandora_vision
 
         i++;
 
-        //!< If the number of planes found so far exceeds the number one,
-        //!< return. We are only interested in holes that lie on one plane.
+        // If the number of planes found so far exceeds the number one,
+        // return. We are only interested in holes that lie on one plane.
         if (i > 1)
         {
           return;

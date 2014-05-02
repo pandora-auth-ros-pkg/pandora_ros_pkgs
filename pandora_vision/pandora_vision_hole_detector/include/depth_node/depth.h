@@ -54,20 +54,20 @@ namespace pandora_vision
   class Depth
   {
     private:
-      //!< The ROS node handle
+      // The ROS node handle
       ros::NodeHandle nodeHandle_;
 
-      //!< Subscriber of Kinect point cloud
+      // Subscriber of Kinect point cloud
       ros::Subscriber depthImageSubscriber_;
 
-      //!< ROS publisher for the candidate holes
+      // ROS publisher for the candidate holes
       ros::Publisher candidateHolesPublisher_;
 
-      //!< The dynamic reconfigure (depth) parameters' server
+      // The dynamic reconfigure (depth) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::depth_cfgConfig>
         server;
 
-      //!< The dynamic reconfigure (depth) parameters' callback
+      // The dynamic reconfigure (depth) parameters' callback
       dynamic_reconfigure::Server<pandora_vision_hole_detector::depth_cfgConfig>
         ::CallbackType f;
 

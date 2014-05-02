@@ -64,52 +64,52 @@ namespace pandora_vision
   {
     private:
 
-      //!< The ROS node handle
+      // The ROS node handle
       ros::NodeHandle nodeHandle_;
 
-      //!< The ROS publisher that will be used for unlocking the
-      //!< synchronizer_node
+      // The ROS publisher that will be used for unlocking the
+      // synchronizer_node
       ros::Publisher unlockPublisher_;
 
-      //!< The ROS subscriber for acquisition of candidate holes originated
-      //!< from the depth node
+      // The ROS subscriber for acquisition of candidate holes originated
+      // from the depth node
       ros::Subscriber depthCandidateHolesSubscriber_;
 
-      //!< The ROS subscriber for acquisition of candidate holes originated
-      //!< from the rgb node
+      // The ROS subscriber for acquisition of candidate holes originated
+      // from the rgb node
       ros::Subscriber rgbCandidateHolesSubscriber_;
 
-      //!< The ROS subscriber for acquisition of the point cloud originated
-      //!< from th e synchronizer node
+      // The ROS subscriber for acquisition of the point cloud originated
+      // from th e synchronizer node
       ros::Subscriber pointCloudSubscriber_;
 
-      //!< Indicates how many of the depth_node and rgb_node nodes have
-      //!< received hole candidates and are ready to send them for processing
+      // Indicates how many of the depth_node and rgb_node nodes have
+      // received hole candidates and are ready to send them for processing
       int numNodesReady_;
 
-      //!< The rgb received by the RGB node
+      // The rgb received by the RGB node
       cv::Mat rgbImage_;
 
-      //!< The point cloud received by the depth node
+      // The point cloud received by the depth node
       PointCloudXYZPtr pointCloudXYZ_;
 
-      //!< The interpolated depth image received by the depth node
+      // The interpolated depth image received by the depth node
       cv::Mat interpolatedDepthImage_;
 
-      //!< The conveyor of hole candidates received by the depth node
+      // The conveyor of hole candidates received by the depth node
       HolesConveyor depthHolesConveyor_;
 
-      //!< The conveyor of hole candidates received by the rgb node
+      // The conveyor of hole candidates received by the rgb node
       HolesConveyor rgbHolesConveyor_;
 
-      //!< A histogramm for the texture of walls
+      // A histogramm for the texture of walls
       cv::MatND wallsHistogram_;
 
-      //!< The dynamic reconfigure (hole fusion's) parameters' server
+      // The dynamic reconfigure (hole fusion's) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
         hole_fusion_cfgConfig> server;
 
-      //!< The dynamic reconfigure (hole fusion's) parameters' callback
+      // The dynamic reconfigure (hole fusion's) parameters' callback
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
         hole_fusion_cfgConfig>:: CallbackType f;
 

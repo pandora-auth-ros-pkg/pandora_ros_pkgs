@@ -58,16 +58,16 @@ namespace pandora_vision
     int kernel_size = Parameters::canny_kernel_size;
     int lowThreshold = Parameters::canny_low_threshold;
 
-    //!< Reduce noise with a kernel 3x3
+    // Reduce noise with a kernel 3x3
     cv::blur(*outImage, detected_edges, cv::Size(
         Parameters::canny_blur_noise_kernel_size,
         Parameters::canny_blur_noise_kernel_size));
 
-    //!< Canny detector
+    // Canny detector
     cv::Canny(detected_edges, detected_edges, lowThreshold,
       lowThreshold * ratio, kernel_size);
 
-    //!< Using Canny's output as a mask, we display our result
+    // Using Canny's output as a mask, we display our result
     dst = cv::Scalar::all(0);
 
     outImage->copyTo(dst, detected_edges);
@@ -92,23 +92,23 @@ namespace pandora_vision
     Timer::start("applyScharr", "computeEdges");
     #endif
 
-    //!< appropriate values for scale, delta and ddepth
+    // appropriate values for scale, delta and ddepth
     int scale = 1;
-    int delta = 0; //!< the value for the non-edges
+    int delta = 0; // the value for the non-edges
     int ddepth = CV_16S;
 
     cv::Mat edges;
     inImage.copyTo(edges);
 
-    //!< Generate grad_x and grad_y
+    // Generate grad_x and grad_y
     cv::Mat grad_x, grad_y;
     cv::Mat abs_grad_x, abs_grad_y;
 
-    //!< Gradient X
+    // Gradient X
     cv::Scharr(edges, grad_x, ddepth, 1, 0, scale, delta, cv::BORDER_DEFAULT);
     cv::convertScaleAbs(grad_x, abs_grad_x);
 
-    //!< Gradient Y
+    // Gradient Y
     cv::Scharr(edges, grad_y, ddepth, 0, 1, scale, delta, cv::BORDER_DEFAULT);
     cv::convertScaleAbs(grad_y, abs_grad_y);
 
@@ -137,23 +137,23 @@ namespace pandora_vision
     Timer::start("applySobel", "computeEdges");
     #endif
 
-    //!< appropriate values for scale, delta and ddepth
+    // appropriate values for scale, delta and ddepth
     int scale = 1;
-    int delta = 0; //!< the value for the non-edges
+    int delta = 0; // the value for the non-edges
     int ddepth = CV_16S;
 
     cv::Mat edges;
     inImage.copyTo(edges);
 
-    //!< Generate grad_x and grad_y
+    // Generate grad_x and grad_y
     cv::Mat grad_x, grad_y;
     cv::Mat abs_grad_x, abs_grad_y;
 
-    //!< Gradient X
+    // Gradient X
     cv::Sobel(edges, grad_x, ddepth, 1, 0, 3, scale, delta, cv::BORDER_DEFAULT);
     cv::convertScaleAbs(grad_x, abs_grad_x);
 
-    //!< Gradient Y
+    // Gradient Y
     cv::Sobel(edges, grad_y, ddepth, 0, 1, 3, scale, delta, cv::BORDER_DEFAULT);
     cv::convertScaleAbs(grad_y, abs_grad_y);
 
@@ -182,9 +182,9 @@ namespace pandora_vision
     Timer::start("applyLaplacian", "computeEdges");
     #endif
 
-    //!< appropriate values for scale, delta and ddepth
+    // appropriate values for scale, delta and ddepth
     int scale = 1;
-    int delta = 0; //!< the value for the non-edges
+    int delta = 0; // the value for the non-edges
     int ddepth = CV_16S;
 
     cv::Mat edges;
@@ -217,19 +217,19 @@ namespace pandora_vision
     int cols = inImage->cols;
     std::set<unsigned int> current, next, visited;
 
-    for(unsigned int i = 0 ; i < rows ; i++)  //!< Border blacken
+    for(unsigned int i = 0 ; i < rows ; i++)  // Border blacken
     {
       inImage->data[i * inImage->cols] = 0;
       inImage->data[i * inImage->cols + cols - 1] = 0;
     }
 
-    for(unsigned int j = 0 ; j < cols ; j++)  //!< Border blacken
+    for(unsigned int j = 0 ; j < cols ; j++)  // Border blacken
     {
       inImage->data[j] = 0;
       inImage->data[(rows - 1) * inImage->cols + j] = 0;
     }
 
-    for(unsigned int i = 1 ; i < rows - 1 ; i++)  //!< Find outer white borders
+    for(unsigned int i = 1 ; i < rows - 1 ; i++)  // Find outer white borders
     {
       if(inImage->data[i * inImage->cols + 1] > 0)
       {
@@ -243,7 +243,7 @@ namespace pandora_vision
       }
     }
 
-    for(unsigned int j = 1 ; j < cols - 1 ; j++)  //!< Find outer white borders
+    for(unsigned int j = 1 ; j < cols - 1 ; j++)  // Find outer white borders
     {
       if(inImage->data[1 * inImage->cols + j] > 0)
       {
@@ -258,7 +258,7 @@ namespace pandora_vision
       }
     }
 
-    while(current.size() != 0)  //!< Iterative contamination
+    while(current.size() != 0)  // Iterative contamination
     {
       for(std::set<unsigned int>::iterator i = current.begin() ;
         i != current.end() ; i++)
@@ -470,19 +470,19 @@ namespace pandora_vision
 
     inImage.copyTo(tempImg);
 
-    //!< Facilitate the edge detection by converting the 32FC1 image \
+    // Facilitate the edge detection by converting the 32FC1 image \
     values to a range of 0-255
       visualizableDenoisedImage = Visualization::scaleImageForVisualization
       (tempImg, Parameters::scale_method);
 
-    //!< from now onwards every image is in the range of 0-255
+    // from now onwards every image is in the range of 0-255
     EdgeDetection::applySobel
       (visualizableDenoisedImage, &denoisedDepthImageEdges);
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
       Parameters::threshold_lower_value, 255, 3);
 
-    //!< make all non zero pixels have a value of 255
+    // make all non zero pixels have a value of 255
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
       0, 255, 0);
 
@@ -565,10 +565,10 @@ namespace pandora_vision
           pairs[i].second.x - pairs[i].first.x,
           pairs[i].first.y - pairs[i].second.y);
 
-        //!< Given the line that is perpendicular to the line that connects
-        //!< the pair points, move on it one point at a time, in opposite
-        //!< directions. The first non-zero point found will be one of the
-        //!< curve that the pair lies on.
+        // Given the line that is perpendicular to the line that connects
+        // the pair points, move on it one point at a time, in opposite
+        // directions. The first non-zero point found will be one of the
+        // curve that the pair lies on.
         bool foundOutlinePoint = false;
         cv::Point2f outlinePoint;
         int counter = 0;
@@ -642,8 +642,8 @@ namespace pandora_vision
             pow(bisectorPoint.y - outlinePoint.y, 2));
 
 
-          //!< If the curve is close to a straight line,
-          //!< do not connect pair[i].first and pair[i].second
+          // If the curve is close to a straight line,
+          // do not connect pair[i].first and pair[i].second
           if (pairsDistance >=
             Parameters::AB_to_MO_ratio * outlineBisectorPointDist)
           {
@@ -691,7 +691,7 @@ namespace pandora_vision
             pairs[i].first.x - pairs[i].second.x,
             pairs[i].first.y - pairs[i].second.y);
 
-          //!< Both pair points are above the X axis
+          // Both pair points are above the X axis
           if (pairFirstToOutlinePointAngle > 0 &&
             pairSecondToOutlinePointAngle > 0)
           {
@@ -705,7 +705,7 @@ namespace pandora_vision
             }
           }
 
-          //!< Both pair points are below the X axis
+          // Both pair points are below the X axis
           if (pairFirstToOutlinePointAngle < 0 &&
             pairSecondToOutlinePointAngle < 0)
           {
@@ -719,7 +719,7 @@ namespace pandora_vision
             }
           }
 
-          //!< Pair point 2 is above the X axis while pair point 1 below it
+          // Pair point 2 is above the X axis while pair point 1 below it
           if (pairFirstToOutlinePointAngle < 0 &&
             pairSecondToOutlinePointAngle > 0)
           {
@@ -734,7 +734,7 @@ namespace pandora_vision
             }
           }
 
-          //!< Pair point 1 is above the X axis while pair point 2 below it
+          // Pair point 1 is above the X axis while pair point 2 below it
           if (pairFirstToOutlinePointAngle > 0 &&
             pairSecondToOutlinePointAngle < 0)
           {
@@ -749,8 +749,8 @@ namespace pandora_vision
             }
           }
 
-          //!< size arg 1: length of the major axis. always pairsDistance / 2
-          //!< size arg 2: length of the minor axis.
+          // size arg 1: length of the major axis. always pairsDistance / 2
+          // size arg 2: length of the minor axis.
           cv::ellipse(
             inImageDrawnOnce,
             bisectorPoint,
@@ -855,7 +855,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Perform dilation
+    // Perform dilation
     Morphology::dilation(&temp, 2);
 
     #ifdef DEBUG_SHOW
@@ -870,7 +870,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Perform thinning
+    // Perform thinning
     cv::Mat thinnedImg;
     Morphology::thinning(temp, &thinnedImg, 100);
 
@@ -886,7 +886,7 @@ namespace pandora_vision
     }
   #endif
 
-    //!< Perform edge contamination
+    // Perform edge contamination
     EdgeDetection::applyEdgeContamination(&thinnedImg);
 
     #ifdef DEBUG_TIME
@@ -909,7 +909,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Eliminate closed shapes
+    // Eliminate closed shapes
     for(unsigned int i = 0 ; i < img->rows ; i++)
     {
       thinnedImg.at<unsigned char>(i, 0) = 0;
@@ -1002,7 +1002,7 @@ namespace pandora_vision
       }
     }
 
-    //!< Connect pairs
+    // Connect pairs
     connectPairs(&thinnedImg, farPts, 1);
 
     #ifdef DEBUG_TIME
@@ -1025,7 +1025,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Re-enable the closed shapes
+    // Re-enable the closed shapes
     thinnedImg = thinnedImg + closedLines;
 
     #ifdef DEBUG_SHOW
@@ -1040,7 +1040,7 @@ namespace pandora_vision
     }
     #endif
 
-    //!< Extract only the outer border of closed shapes
+    // Extract only the outer border of closed shapes
     thinnedImg.copyTo(*img);
     EdgeDetection::getShapesClearBorder(img);
 
@@ -1196,7 +1196,7 @@ namespace pandora_vision
           counter++;
         }
 
-        if(counter == 0)  //!< This is edge
+        if(counter == 0)  // This is edge
         {
           GraphNode* temp = new GraphNode(x, y);
           nodes.push_back(temp);
@@ -1209,7 +1209,7 @@ namespace pandora_vision
           originCurr[i]->dists.push_back(temp->dist);
           temp->dists.push_back(temp->dist);
         }
-        else if(counter >= 2) //!< This is joint
+        else if(counter >= 2) // This is joint
         {
           GraphNode* temp = new GraphNode(x, y);
           nodes.push_back(temp);
@@ -1237,13 +1237,13 @@ namespace pandora_vision
     }
 
     std::pair<GraphNode, GraphNode> edgePoints;
-    //!< If it is small avoid the fuzz
+    // If it is small avoid the fuzz
     if(ret->size() < Parameters::minimum_curve_points)
     {
       return edgePoints;
     }
 
-    //!< Find larger dist between nodes
+    // Find larger dist between nodes
     int maxDist = 0;
 
     for(unsigned int i = 0 ; i < nodes.size(); i++)
@@ -1330,7 +1330,7 @@ namespace pandora_vision
     Timer::start("getShapesClearBorder", "denoiseEdges");
     #endif
 
-    //!< Kernel for obtaining boundary pixels
+    // Kernel for obtaining boundary pixels
     static const char kernels[8][3][3] = {
       { {0, 2, 2},
         {2, 1, 2},
@@ -1365,7 +1365,7 @@ namespace pandora_vision
         {2, 2, 2} }
     };
 
-    //!< Invert the image to facilitate floodfill's operation
+    // Invert the image to facilitate floodfill's operation
     for (unsigned int rows = 0; rows < inImage->rows; rows++)
     {
       for (unsigned int cols = 0; cols < inImage->cols; cols++)
@@ -1382,28 +1382,28 @@ namespace pandora_vision
     }
 
 
-    //!< A vector that holds floodfill images needed for the final output
+    // A vector that holds floodfill images needed for the final output
     std::vector<cv::Mat> floodfillsVector;
 
-    //!< First floodfill operation
+    // First floodfill operation
     cv::floodFill(*inImage, cv::Point(0, 0), 0);
 
-    //!< Push the first floodfill operation's result
-    //!< back into the floodfillsVector
+    // Push the first floodfill operation's result
+    // back into the floodfillsVector
     cv::Mat firstFloodFill;
     inImage->copyTo(firstFloodFill);
     floodfillsVector.push_back(firstFloodFill);
 
 
-    //!< Termination flag
+    // Termination flag
     bool isFloodFillFinished = false;
 
-    //!< The total number of images needed to obtain a clear result
+    // The total number of images needed to obtain a clear result
     int numImages = 0;
 
     while(!isFloodFillFinished)
     {
-      //!< Invert the image to facilitate floodfill's operation
+      // Invert the image to facilitate floodfill's operation
       for (unsigned int rows = 0; rows < inImage->rows; rows++)
       {
         for (unsigned int cols = 0; cols < inImage->cols; cols++)
@@ -1419,20 +1419,20 @@ namespace pandora_vision
         }
       }
 
-      //!< Second floodfill operation
+      // Second floodfill operation
       cv::floodFill(*inImage, cv::Point(0, 0), 0);
 
 
-      //!< The prunedFloodFill image will act as termination check
-      //!< If it is filled with zeros, that means that there are no
-      //!< closed shapes in the floodfill's image.
-      //!< If not, we need to iterate the floodfill procedure
+      // The prunedFloodFill image will act as termination check
+      // If it is filled with zeros, that means that there are no
+      // closed shapes in the floodfill's image.
+      // If not, we need to iterate the floodfill procedure
       cv::Mat prunedFloodFill;
       inImage->copyTo(prunedFloodFill);
       Morphology::pruningStrictIterative(&prunedFloodFill, 1000);
 
-      //!< Check the prunedFloodFill image for the numerosity of zeros
-      //!< If there are non-zero pixels, reiterate
+      // Check the prunedFloodFill image for the numerosity of zeros
+      // If there are non-zero pixels, reiterate
       cv::Mat pruneDiff;
       cv::compare(prunedFloodFill, cv::Mat::zeros(inImage->size(), CV_8UC1),
         pruneDiff, cv::CMP_NE);
@@ -1441,8 +1441,8 @@ namespace pandora_vision
       {
         numImages++;
 
-        //!< Push the second floodfill operation's result
-        //!< back into the floodfillsVector
+        // Push the second floodfill operation's result
+        // back into the floodfillsVector
         cv::Mat nFloodFill;
         inImage->copyTo(nFloodFill);
         floodfillsVector.push_back(nFloodFill);
@@ -1453,7 +1453,7 @@ namespace pandora_vision
       }
     }
 
-    //!< The final floodfill-ed image
+    // The final floodfill-ed image
     cv::Mat finalFloodFill = floodfillsVector[0];
     bool sign = false;
     for (int i = 2; i < floodfillsVector.size(); i += 2)
@@ -1463,10 +1463,10 @@ namespace pandora_vision
       sign = (sign == false);
     }
 
-    //!< Dilate once to get rid of pesky borders
+    // Dilate once to get rid of pesky borders
     Morphology::dilation(&finalFloodFill, 1);
 
-    //!< The floodfill's edges - region borders
+    // The floodfill's edges - region borders
     cv::Mat bordersImage = cv::Mat(inImage->rows, inImage->cols, CV_8UC1,
       cv::Scalar::all(0));
 

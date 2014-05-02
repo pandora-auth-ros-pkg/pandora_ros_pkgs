@@ -75,7 +75,7 @@ namespace pandora_vision
 
     cv::Mat big(rows * imgs[0].rows, cols * imgs[0].cols, CV_8UC3);
 
-    //!< Draw images
+    // Draw images
     for(unsigned int im = 0 ; im < imgs.size() ; im++)
     {
       unsigned int startRow, startCol;
@@ -123,7 +123,7 @@ namespace pandora_vision
         CV_RGB(255, 255, 255), 2, 8);
     }
 
-    //!< Final resize
+    // Final resize
     cv::Mat resized(finalRows, finalCols, CV_8UC3);
     cv::resize(big, resized, cv::Size(finalCols, finalRows));
     show(title, resized, ms);

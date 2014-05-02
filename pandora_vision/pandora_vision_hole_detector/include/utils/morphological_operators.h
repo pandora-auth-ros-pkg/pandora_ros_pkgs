@@ -53,6 +53,7 @@ namespace pandora_vision
   class Morphology
   {
     public:
+
       /**
         @brief Performs steps of closing
         @param img [cv::Mat*] The input image in CV_8UC1 format

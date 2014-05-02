@@ -56,7 +56,7 @@ namespace pandora_vision
     inImage.copyTo(*outImage);
     bool finished = false;
 
-    //!< Assign the image borders a non zero value
+    // Assign the image borders a non zero value
     for(unsigned int i = 0 ; i < outImage->rows ; i++)
     {
       outImage->at<float>(i, 0) = 1;
@@ -77,7 +77,7 @@ namespace pandora_vision
       {
         for(unsigned int j = 1 ; j< outImage->cols - 1 ; j++)
         {
-          if(outImage->at<float>(i, j) == 0.0)  //!< Found black
+          if(outImage->at<float>(i, j) == 0.0)  // Found black
           {
             brushfireNearStep(outImage, i * outImage->cols + j);
             finished = false;
@@ -244,7 +244,7 @@ namespace pandora_vision
     bper = static_cast<float>(blacks) / (image.rows * image.cols);
 
     Parameters::interpolation_method = 15;
-    if(bper > 0.7)  //!< Choose close
+    if(bper > 0.7)  // Choose close
     {
       Parameters::interpolation_method = 2;
     }
@@ -275,8 +275,8 @@ namespace pandora_vision
     Timer::start("interpolateImageBorders");
     #endif
 
-    //!< interpolate the pixels at the edges of the inImage
-    //!< interpolate the rows
+    // interpolate the pixels at the edges of the inImage
+    // interpolate the rows
     for (unsigned int i = 1; i < inImage->cols - 1; ++i)
     {
       inImage->at<float>(0, i) = inImage->at<float>(1, i);
@@ -284,7 +284,7 @@ namespace pandora_vision
         inImage->at<float>(inImage->rows - 2, i);
     }
 
-    //!< interpolate the columns
+    // interpolate the columns
     for (unsigned int i = 1; i < inImage->rows - 1; ++i)
     {
       inImage->at<float>(i, 0) = inImage->at<float>(i, 1);
@@ -292,7 +292,7 @@ namespace pandora_vision
         inImage->at<float>(i, inImage->cols - 2);
     }
 
-    //!< interpolate the corners
+    // interpolate the corners
     /// top left
     inImage->at<float>(0, 0) = inImage->at<float>(1, 1);
     /// top right
@@ -412,8 +412,8 @@ namespace pandora_vision
     #endif
 
     inImage.copyTo(*outImage);
-    //!< in the end, only pixels adjacent to the edge of the
-    //!< image are left black
+    // in the end, only pixels adjacent to the edge of the
+    // image are left black
     while (interpolationIteration(outImage)){}
 
     #ifdef DEBUG_TIME
@@ -473,17 +473,17 @@ namespace pandora_vision
 
     switch(Parameters::interpolation_method)
     {
-      case 0: //!< Thinning-like interpolation
+      case 0: // Thinning-like interpolation
         {
           interpolation(inImage, outImage);
           break;
         }
-      case 1: //!< Produce the near brushfire image
+      case 1: // Produce the near brushfire image
         {
           brushfireNear(inImage, outImage);
           break;
         }
-      case 2: //!< Produce the white noise image
+      case 2: // Produce the white noise image
         {
           transformNoiseToWhite(inImage, outImage);
           break;

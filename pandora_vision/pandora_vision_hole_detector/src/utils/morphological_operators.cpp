@@ -96,9 +96,9 @@ namespace pandora_vision
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           p = i * img->cols + j;
-          if(img->data[i * img->cols + j] == 0) //!< That's foreground
+          if(img->data[i * img->cols + j] == 0) // That's foreground
           {
-            //!< Check for all adjacent
+            // Check for all adjacent
             if(img->data[p + img->cols + 1] != 0)
             {
               helper.data[p] = 255;
@@ -178,9 +178,9 @@ namespace pandora_vision
       {
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
-          if(img->at<unsigned char>(i, j) != 0) //!< That's foreground
+          if(img->at<unsigned char>(i, j) != 0) // That's foreground
           {
-            //!< Check for all adjacent
+            // Check for all adjacent
             if(img->at<unsigned char>(i + 1, j + 1) == 0)
             {
               helper.at<unsigned char>(i, j) = 0;
@@ -538,7 +538,7 @@ namespace pandora_vision
       {
         if(img->at<unsigned char>(rows, cols) != 0)
         {
-          //!< Check for initial stuff
+          // Check for initial stuff
           for(unsigned int i = 0 ; i < nOfKernels ; i++)
           {
             if(kernelCheck(kernels[i], *img, cv::Point(cols, rows)))
@@ -728,8 +728,8 @@ namespace pandora_vision
 
     inImage.copyTo(*outImage);
 
-    //!< if the image is saturated by the thickenning operator,
-    //!< cease its operation
+    // if the image is saturated by the thickenning operator,
+    // cease its operation
     bool isRunning;
     for (unsigned int s = 0; s < steps; s++)
     {
@@ -821,8 +821,8 @@ namespace pandora_vision
 
     inImage.copyTo(*outImage);
 
-    //!< if the image is saturated by the thinning operator,
-    //!< cease its operation
+    // if the image is saturated by the thinning operator,
+    // cease its operation
     bool isRunning;
     static unsigned int limit = 0;
     static unsigned int *pts =

@@ -80,7 +80,6 @@ namespace pandora_vision
         const bool& applyVoxelFilter,
         std::vector<pcl::PointIndices::Ptr>* inliersVector);
 
-
       /**
         @brief Identify the planes in a point cloud and return a vector
         cointaining pointers to them.

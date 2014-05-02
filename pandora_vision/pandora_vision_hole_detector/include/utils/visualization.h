@@ -166,6 +166,7 @@ namespace pandora_vision
         const std::string& windowTitle,
         const cv::Mat& inImage,
         const int& ms);
+
   };
 
 } // namespace pandora_vision

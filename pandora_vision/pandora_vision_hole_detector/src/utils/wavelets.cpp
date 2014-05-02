@@ -294,11 +294,11 @@ namespace pandora_vision
       }
     }
 
-    //!< LowLow contains the inImage's low low frequencies, in CV_32FC1 format
-    //!< What we will return will be this image scaled to the actual proportions
-    //!< of values of the inImage (also in CV_32FC1 format).
-    //!< After obtaining the low-low, reverse the scale operation, in an
-    //!< attempt to approximate the initial depth image's values
+    // LowLow contains the inImage's low low frequencies, in CV_32FC1 format
+    // What we will return will be this image scaled to the actual proportions
+    // of values of the inImage (also in CV_32FC1 format).
+    // After obtaining the low-low, reverse the scale operation, in an
+    // attempt to approximate the initial depth image's values
     *outImage = wave->getLowLow(doubled, H0) * (max - min);
   }
 
@@ -339,14 +339,14 @@ namespace pandora_vision
         }
       }
 
-      //!< LowLow contains the inImage's low low frequencies, in CV_32FC1 format
-      //!< What we will return will be this image scaled to the actual
-      //!< proportions of values of the inImage (also in CV_32FC1 format).
+      // LowLow contains the inImage's low low frequencies, in CV_32FC1 format
+      // What we will return will be this image scaled to the actual
+      // proportions of values of the inImage (also in CV_32FC1 format).
       lowLow[i] = wave->getLowLow(doubled, H0);
     }
 
-    //!< The outImage. out has to be assigned to *outImage but cannot be done
-    //!< in the following loops immediately
+    // The outImage. out has to be assigned to *outImage but cannot be done
+    // in the following loops immediately
     cv::Mat out = cv::Mat::zeros(lowLow[0].size(), CV_8UC3);
 
     for (int i = 0; i < 3; i++)

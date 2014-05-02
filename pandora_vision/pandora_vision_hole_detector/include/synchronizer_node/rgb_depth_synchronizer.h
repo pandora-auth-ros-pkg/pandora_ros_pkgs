@@ -57,35 +57,35 @@ namespace pandora_vision
   {
     private:
 
-      //!< The ROS node handle
+      // The ROS node handle
       ros::NodeHandle nodeHandle_;
 
-      //!< The subscriber to the point cloud topic
+      // The subscriber to the point cloud topic
       ros::Subscriber pointCloudSubscriber_;
 
-      //!< The publishers which will advertise the
-      //!< synchronized point cloud, depth and rgb images extracted from the
-      //!< point cloud;
+      // The publishers which will advertise the
+      // synchronized point cloud, depth and rgb images extracted from the
+      // point cloud;
       ros::Publisher synchronizedPointCloudPublisher_;
       ros::Publisher synchronizedDepthImagePublisher_;
       ros::Publisher synchronizedRGBImagePublisher_;
 
-      //!< A boolean indicating whether the node is publishing through the
-      //!< above two publishers
+      // A boolean indicating whether the node is publishing through the
+      // above two publishers
       bool isLocked_;
 
-      //!< The subscriber to the topic where the hole_fusion node publishes
-      //!< lock/unlock messages concerning the rgb_depth_synchronizer's
-      //!< behaviour
+      // The subscriber to the topic where the hole_fusion node publishes
+      // lock/unlock messages concerning the rgb_depth_synchronizer's
+      // behaviour
       ros::Subscriber holeFusionSubscriber_;
 
-      //!< Records the time for each synchronizer invocation
+      // Records the time for each synchronizer invocation
       double invocationTime_;
 
-      //!< Mean invocation interval of time
+      // Mean invocation interval of time
       double meanProcessingTime_;
 
-      //!< Amount of synchronizer's invocations
+      // Amount of synchronizer's invocations
       int ticks_;
 
       /**

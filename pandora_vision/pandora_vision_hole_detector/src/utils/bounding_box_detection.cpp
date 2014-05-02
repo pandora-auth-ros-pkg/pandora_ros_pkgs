@@ -63,7 +63,7 @@ namespace pandora_vision
     Timer::start("findRotatedBoundingBoxesFromOutline", "validateBlobs");
     #endif
 
-    //!< Find the rotated rectangles for each blob based on its outline
+    // Find the rotated rectangles for each blob based on its outline
     std::vector<cv::RotatedRect> minRect;
     for(unsigned int i = 0; i < blobsOutlineVector.size(); i++)
     {
@@ -73,7 +73,7 @@ namespace pandora_vision
       }
     }
 
-    //!< Draw polygonal contour + bonding rects
+    // Draw polygonal contour + bonding rects
     cv::RNG rng(12345);
     cv::Mat drawing = cv::Mat::zeros(inImage.size(), CV_8UC1);
 
@@ -102,7 +102,7 @@ namespace pandora_vision
         continue;
       }
 
-      //!< same as rect_points array, but vector
+      // same as rect_points array, but vector
       std::vector<cv::Point2f> rect_points_vector;
 
       for(int j = 0; j < 4; j++)
@@ -113,7 +113,7 @@ namespace pandora_vision
         rect_points_vector.push_back(rect_points[j]);
       }
 
-      //!< push back the 4 vertices of rectangle i
+      // push back the 4 vertices of rectangle i
       outRectangles->push_back(rect_points_vector);
     }
 

@@ -49,7 +49,7 @@ namespace pandora_vision
   {
     private:
 
-      //!< Calculated histogramm according to given images
+      // Calculated histogramm according to given images
       cv::MatND histogram_;
 
 

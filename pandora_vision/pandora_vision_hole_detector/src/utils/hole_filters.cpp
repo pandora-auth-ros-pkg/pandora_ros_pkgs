@@ -75,16 +75,16 @@ namespace pandora_vision
             &blobsOutlineVector,
             &blobsArea);
 
-          //!< For each outline found, find the rotated rectangle
-          //!< with the least area that encloses it.
+          // For each outline found, find the rotated rectangle
+          // with the least area that encloses it.
           cv::Mat inputDenoisedDepthImageEdges;
           denoisedDepthImageEdges->copyTo(inputDenoisedDepthImageEdges);
 
           cv::Mat rectanglesImage;
           std::vector< std::vector<cv::Point2f> > rectangles;
 
-          //!< Given the outline of the blob, find the least area
-          //!< rotated bounding box that encloses it
+          // Given the outline of the blob, find the least area
+          // rotated bounding box that encloses it
           BoundingBoxDetection::findRotatedBoundingBoxesFromOutline(
             inputDenoisedDepthImageEdges,
             blobsOutlineVector,
@@ -92,9 +92,9 @@ namespace pandora_vision
             &rectanglesImage,
             &rectangles);
 
-          //!< Correlate each keypoint with each rectangle found.
-          //!< Keep in mind that for a blob to be a potential hole, its area
-          //!< must be greater than Parameters::bounding_box_min_area_threshold
+          // Correlate each keypoint with each rectangle found.
+          // Keep in mind that for a blob to be a potential hole, its area
+          // must be greater than Parameters::bounding_box_min_area_threshold
           validateKeypointsToRectangles(
             *keyPoints,
             rectangles,
@@ -115,16 +115,16 @@ namespace pandora_vision
             &blobsOutlineVector,
             &blobsArea);
 
-          //!< For each outline found, find the rotated rectangle
-          //!< with the least area that encloses it.
+          // For each outline found, find the rotated rectangle
+          // with the least area that encloses it.
           cv::Mat inputDenoisedDepthImageEdges;
           denoisedDepthImageEdges->copyTo(inputDenoisedDepthImageEdges);
 
           cv::Mat rectanglesImage;
           std::vector< std::vector<cv::Point2f> > rectangles;
 
-          //!< Given the outline of the blob, find the least area
-          //!< rotated bounding box that encloses it
+          // Given the outline of the blob, find the least area
+          // rotated bounding box that encloses it
           BoundingBoxDetection::findRotatedBoundingBoxesFromOutline(
             inputDenoisedDepthImageEdges,
             blobsOutlineVector,
@@ -132,9 +132,9 @@ namespace pandora_vision
             &rectanglesImage,
             &rectangles);
 
-          //!< Correlate each keypoint with each rectangle found.
-          //!< Keep in mind that for a blob to be a potential hole, its area
-          //!< must be greater than Parameters::bounding_box_min_area_threshold
+          // Correlate each keypoint with each rectangle found.
+          // Keep in mind that for a blob to be a potential hole, its area
+          // must be greater than Parameters::bounding_box_min_area_threshold
           validateKeypointsToRectangles(
             *keyPoints,
             rectangles,
@@ -192,7 +192,7 @@ namespace pandora_vision
     {
       std::vector<int> keypointResidesInRectIds;
 
-      //!< Test to see where (in which rectangle(s)) the keypoint resides.
+      // Test to see where (in which rectangle(s)) the keypoint resides.
       for (unsigned int rectId = 0; rectId < inRectangles.size(); rectId++)
       {
         if (cv::pointPolygonTest(

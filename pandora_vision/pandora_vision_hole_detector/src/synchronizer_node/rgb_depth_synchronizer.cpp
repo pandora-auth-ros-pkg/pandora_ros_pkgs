@@ -51,26 +51,26 @@ namespace pandora_vision
 
     isLocked_ = true;
 
-    //!< Subscribe to the RGB point cloud topic
+    // Subscribe to the RGB point cloud topic
     pointCloudSubscriber_ = nodeHandle_.subscribe(
       "/camera/depth_registered/points", 1,
       &RgbDepthSynchronizer::synchronizedCallback, this);
 
-    //!< Subscribe to the hole_fusion lock/unlock topic
+    // Subscribe to the hole_fusion lock/unlock topic
     holeFusionSubscriber_ = nodeHandle_.subscribe(
       "/vision/hole_fusion/unlock_rgb_depth_synchronizer", 1,
       &RgbDepthSynchronizer::holeFusionCallback, this);
 
 
-    //!< Advertise the synchronized point cloud
+    // Advertise the synchronized point cloud
     synchronizedPointCloudPublisher_ = nodeHandle_.advertise
       <sensor_msgs::PointCloud2>("/synchronized/camera/depth/points", 1000);
 
-    //!< Advertise the synchronized depth image
+    // Advertise the synchronized depth image
     synchronizedDepthImagePublisher_ = nodeHandle_.advertise
       <sensor_msgs::Image>("/synchronized/camera/depth/image_raw", 1000);
 
-    //!< Advertise the synchronized rgb image
+    // Advertise the synchronized rgb image
     synchronizedRGBImagePublisher_ = nodeHandle_.advertise
       <sensor_msgs::Image>("/synchronized/camera/rgb/image_raw", 1000);
 
@@ -117,7 +117,7 @@ namespace pandora_vision
 
       ROS_ERROR("Previous synchronizer invocation before %fs", t);
 
-      //!< Increment the number of this node's invocations
+      // Increment the number of this node's invocations
       ticks_++;
 
       if (ticks_ > 1)
@@ -136,42 +136,42 @@ namespace pandora_vision
       #endif
 
 
-      //!< Lock the rgb_depth_synchronizer node; aka prevent the execution
-      //!< of this if-block without the explicit request of the hole_fusion node
+      // Lock the rgb_depth_synchronizer node; aka prevent the execution
+      // of this if-block without the explicit request of the hole_fusion node
       isLocked_ = true;
 
-      //!< Extract the RGB image from the point cloud
+      // Extract the RGB image from the point cloud
       cv::Mat rgbImage = MessageConversions::convertPointCloudMessageToImage(
         pointCloudMessage, CV_8UC3);
 
-      //!< Convert the rgbImage to a ROS message
+      // Convert the rgbImage to a ROS message
       cv_bridge::CvImagePtr rgbImageMessagePtr(new cv_bridge::CvImage());
 
       rgbImageMessagePtr->header = pointCloudMessage->header;
       rgbImageMessagePtr->encoding = sensor_msgs::image_encodings::BGR8;
       rgbImageMessagePtr->image = rgbImage;
 
-      //!< Publish the synchronized rgb image
+      // Publish the synchronized rgb image
       synchronizedRGBImagePublisher_.publish(rgbImageMessagePtr->toImageMsg());
 
 
-      //!< Extract the depth image from the point cloud
+      // Extract the depth image from the point cloud
       cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
         pointCloudMessage, CV_32FC1);
 
-      //!< Convert the depthImage to a ROS message
+      // Convert the depthImage to a ROS message
       cv_bridge::CvImagePtr depthImageMessagePtr(new cv_bridge::CvImage());
 
       depthImageMessagePtr->header = pointCloudMessage->header;
       depthImageMessagePtr->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
       depthImageMessagePtr->image = depthImage;
 
-      //!< Publish the synchronized depth image
+      // Publish the synchronized depth image
       synchronizedDepthImagePublisher_.publish(
         depthImageMessagePtr->toImageMsg());
 
 
-      //!< Publish the synchronized point cloud
+      // Publish the synchronized point cloud
       synchronizedPointCloudPublisher_.publish(pointCloudMessage);
 
       #ifdef DEBUG_TIME

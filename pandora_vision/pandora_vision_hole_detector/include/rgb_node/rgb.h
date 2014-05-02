@@ -52,39 +52,39 @@ namespace pandora_vision
   {
     private:
 
-      //!< The NodeHandle
+      // The NodeHandle
       ros::NodeHandle _nh;
 
-      //!< Frame processed by FaceDetector
+      // Frame processed by FaceDetector
       cv::Mat _holeFrame;
 
-      //!<FaceDetector frame timestamp
+      //FaceDetector frame timestamp
       ros::Time _holeFrameTimestamp;
 
-      //!< The ROS subscriber for acquisition of the RGB image through the
+      // The ROS subscriber for acquisition of the RGB image through the
       //depth sensor
       ros::Subscriber _frameSubscriber;
 
-      //!< The ROS publisher ofcandidate holes
+      // The ROS publisher ofcandidate holes
       ros::Publisher rgbCandidateHolesPublisher_;
 
-      //!< Current state of robot
+      // Current state of robot
       int curState;
-      //!< Previous state of robot
+      // Previous state of robot
       int prevState;
 
-      //!< Variable used for State Managing
+      // Variable used for State Managing
       bool holeNowON;
 
-      //!< Class HoleDetector instance that finds and locates tha position
-      //!< potentional holes in current frame
+      // Class HoleDetector instance that finds and locates tha position
+      // potentional holes in current frame
       HoleDetector _holeDetector;
 
-      //!< The dynamic reconfigure (RGB) parameters' server
+      // The dynamic reconfigure (RGB) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::rgb_cfgConfig>
         server;
 
-      //!< The dynamic reconfigure (RGB) parameters' callback
+      // The dynamic reconfigure (RGB) parameters' callback
       dynamic_reconfigure::Server<pandora_vision_hole_detector::rgb_cfgConfig>::
         CallbackType f;
 
@@ -108,10 +108,10 @@ namespace pandora_vision
 
     public:
 
-      //!< The constructor
+      // The constructor
       Rgb();
 
-      //!< The destructor
+      // The destructor
       ~Rgb();
   };
 
