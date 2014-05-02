@@ -274,9 +274,10 @@ namespace pandora_vision
         A two dimensional vector containing the probabilities of
         validity of each candidate hole. Each row of it pertains to a specific
         filter applied, each column to a particular hole
-        @return [std::vector<int>] The indices of the valid holes
+        @return [std::map<int, float>] The indices of the valid holes and their
+        respective validity probabilities
        **/
-      std::vector<int> validateHoles(
+      std::map<int, float> validateHoles(
         const std::vector<std::vector<float> >& probabilitiesVector2D);
 
       /**

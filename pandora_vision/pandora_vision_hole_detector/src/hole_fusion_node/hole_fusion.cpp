@@ -1008,9 +1008,60 @@ namespace pandora_vision
     probabilitiesVector2D = checkHoles(rgbdHolesConveyor);
 
     // Which candidate holes are actually holes?
-    // The probabilities obtained above need to be processed
-    std::vector<int> validHolesIndices;
-    validHolesIndices = validateHoles(probabilitiesVector2D);
+    // The probabilities obtained above need to be evaluated
+    std::map<int, float> validHolesMap;
+    validHolesMap = validateHoles(probabilitiesVector2D);
+
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_find_holes)
+    {
+      // The holes conveyor containing only the valid holes
+      HolesConveyor validHolesConveyor;
+
+      // Contains the validity probability for each hole considered valid
+      std::vector<std::string> msgs;
+
+      for (std::map<int, float>::iterator it = validHolesMap.begin();
+        it != validHolesMap.end(); it++)
+      {
+        HolesConveyorUtils::append(
+          HolesConveyorUtils::getHole(rgbdHolesConveyor, it->first),
+          &validHolesConveyor);
+
+        msgs.push_back(TOSTR(it->second));
+      }
+
+
+      // Valid holes on top of the interpolated depth image
+      cv::Mat depthValidHolesImage =
+        Visualization::showHoles("Valid Holes",
+          interpolatedDepthImage_,
+          validHolesConveyor,
+          -1,
+          msgs);
+
+      // Valid holes on top of the RGB image
+      cv::Mat rgbValidHolesImage =
+        Visualization::showHoles("ValidHoles",
+          rgbImage_,
+          validHolesConveyor,
+          -1,
+          msgs);
+
+      // The two images
+      std::vector<cv::Mat> imgs;
+      imgs.push_back(depthValidHolesImage);
+      imgs.push_back(rgbValidHolesImage);
+
+      // The titles of the images
+      std::vector<std::string> titles;
+      titles.push_back("Valid Holes");
+      titles.push_back("Valid Holes");
+
+      Visualization::multipleShow("Valid Holes", imgs, titles, 1280, 1);
+    }
+    #endif
 
     #ifdef DEBUG_TIME
     Timer::tick("processCandidateHoles");
@@ -1187,17 +1238,19 @@ namespace pandora_vision
     A two dimensional vector containing the probabilities of
     validity of each candidate hole. Each row of it pertains to a specific
     filter applied, each column to a particular hole
-    @return [std::vector<int>] The indices of the valid holes
+    @return [std::map<int, float>] The indices of the valid holes and their
+    respective validity probabilities
    **/
-  std::vector<int> HoleFusion::validateHoles(
+  std::map<int, float> HoleFusion::validateHoles(
     const std::vector<std::vector<float> >& probabilitiesVector2D)
   {
     #ifdef DEBUG_TIME
     Timer::start("validateHoles", "processCandidateHoles");
     #endif
 
-    // The vector of holes' indices that are valid and will be returned
-    std::vector<int> valid;
+    // The map of holes' indices that are valid and
+    // their respective validity probability that will be returned
+    std::map<int, float> valid;
 
     for (int i = 0; i < probabilitiesVector2D[0].size(); i++)
     {
@@ -1256,8 +1309,8 @@ namespace pandora_vision
       // Priotity{texture_diff} = 1
       if (Parameters::run_checker_texture_diff > 0)
       {
-        sum += pow(2, exponent) *
-          probabilitiesVector2D[Parameters::run_checker_texture_diff - 1][i];
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::run_checker_texture_diff - 1][i];
 
         exponent++;
       }
@@ -1265,8 +1318,8 @@ namespace pandora_vision
       // Priotity{texture_backproject} = 2
       if (Parameters::run_checker_texture_backproject > 0)
       {
-        sum += pow(2, exponent) *
-          probabilitiesVector2D[Parameters::run_checker_texture_backproject - 1][i];
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::run_checker_texture_backproject - 1][i];
 
         exponent++;
       }
@@ -1274,8 +1327,8 @@ namespace pandora_vision
       // Priotity{color_homogeneity} = 3
       if (Parameters::run_checker_color_homogeneity > 0)
       {
-        sum += pow(2, exponent) *
-          probabilitiesVector2D[Parameters::run_checker_color_homogeneity - 1][i];
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::run_checker_color_homogeneity - 1][i];
 
         exponent++;
       }
@@ -1283,8 +1336,8 @@ namespace pandora_vision
       // Priotity{luminosity_diff} = 4
       if (Parameters::run_checker_luminosity_diff > 0)
       {
-        sum += pow(2, exponent) *
-          probabilitiesVector2D[Parameters::run_checker_luminosity_diff - 1][i];
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::run_checker_luminosity_diff - 1][i];
 
         exponent++;
       }
@@ -1294,8 +1347,7 @@ namespace pandora_vision
       {
         if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
         {
-          sum += pow(2, exponent) *
-            probabilitiesVector2D[rgbActiveFilters
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
             + Parameters::run_checker_brushfire_outline_to_rectangle - 1][i];
 
           exponent++;
@@ -1307,8 +1359,7 @@ namespace pandora_vision
       {
         if (Parameters::run_checker_outline_of_rectangle > 0)
         {
-          sum += pow(2, exponent) *
-            probabilitiesVector2D[rgbActiveFilters
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
             + Parameters::run_checker_outline_of_rectangle - 1][i];
 
           exponent++;
@@ -1320,8 +1371,7 @@ namespace pandora_vision
       {
         if (Parameters::run_checker_depth_diff > 0)
         {
-          sum += pow(2, exponent) *
-            probabilitiesVector2D[rgbActiveFilters
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
             + Parameters::run_checker_depth_diff - 1][i];
 
           exponent++;
@@ -1333,8 +1383,7 @@ namespace pandora_vision
       {
         if (Parameters::run_checker_depth_area > 0)
         {
-          sum += pow(2, exponent) *
-            probabilitiesVector2D[rgbActiveFilters
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
             + Parameters::run_checker_depth_area - 1][i];
 
           exponent++;
@@ -1343,10 +1392,22 @@ namespace pandora_vision
 
       sum /= (pow(2, exponent) - 1);
 
-      float threshold = 0.8;
+      ROS_ERROR("sum : %f", sum);
+
+      // The validity acceptance threshold
+      float threshold = 0.0;
+      if (Parameters::interpolation_method == 0)
+      {
+        threshold = 0.8;
+      }
+      else
+      {
+        threshold = 0.6;
+      }
+
       if (sum > threshold)
       {
-        valid.push_back(i);
+        valid[i] = sum;
       }
     }
 
