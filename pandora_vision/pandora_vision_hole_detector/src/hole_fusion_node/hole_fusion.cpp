@@ -870,6 +870,17 @@ namespace pandora_vision
       config.connect_holes_min_distance;
     Parameters::connect_holes_max_distance =
       config.connect_holes_max_distance;
+
+
+    // Holes validity thresholds
+    // Normal : when depth analysis is applicable
+    Parameters::holes_validity_threshold_normal =
+      config.holes_validity_threshold_normal;
+
+    // Urgent : when depth analysis is not applicable, we can only rely
+    // on RGB analysis
+    Parameters::holes_validity_threshold_urgent =
+      config.holes_validity_threshold_urgent;
   }
 
 
@@ -1392,17 +1403,15 @@ namespace pandora_vision
 
       sum /= (pow(2, exponent) - 1);
 
-      ROS_ERROR("sum : %f", sum);
-
       // The validity acceptance threshold
       float threshold = 0.0;
       if (Parameters::interpolation_method == 0)
       {
-        threshold = 0.8;
+        threshold = Parameters::holes_validity_threshold_normal;
       }
       else
       {
-        threshold = 0.6;
+        threshold = Parameters::holes_validity_threshold_urgent;
       }
 
       if (sum > threshold)

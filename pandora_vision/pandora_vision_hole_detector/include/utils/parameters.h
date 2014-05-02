@@ -197,6 +197,16 @@ namespace pandora_vision
     // Holes connection - merger
     static float connect_holes_min_distance;
     static float connect_holes_max_distance;
+
+
+    // Holes validity thresholds
+    // Normal : when depth analysis is applicable
+    static float holes_validity_threshold_normal;
+
+    // Urgent : when depth analysis is not applicable, we can only rely
+    // on RGB analysis
+    static float holes_validity_threshold_urgent;
+
   };
 
 } // namespace pandora_vision

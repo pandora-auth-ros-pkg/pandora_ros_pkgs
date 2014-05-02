@@ -191,4 +191,13 @@ namespace pandora_vision
   float Parameters::connect_holes_min_distance = 0.1;
   float Parameters::connect_holes_max_distance = 0.2;
 
+
+  // Holes validity thresholds
+  // Normal : when depth analysis is applicable
+  float Parameters::holes_validity_threshold_normal = 0.84;
+
+  // Urgent : when depth analysis is not applicable, we can only rely
+  // on RGB analysis
+  float Parameters::holes_validity_threshold_urgent = 0.6;
+
 } // namespace pandora_vision
