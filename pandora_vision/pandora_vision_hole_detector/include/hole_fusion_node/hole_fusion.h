@@ -114,6 +114,20 @@ namespace pandora_vision
         hole_fusion_cfgConfig>:: CallbackType f;
 
       /**
+        @brief Runs candidate holes through selected filters.
+        Probabilities for each candidate hole and filter
+        are printed in the console, with an order specified by the
+        hole_fusion_cfg of the dynamic reconfigure utility
+        @param[in] conveyor [const HolesConveyor&] The conveyor
+        containing candidate holes
+        @return A two dimensional vector containing the probabilities of
+        validity of each candidate hole. Each row of it pertains to a specific
+        filter applied, each column to a particular hole
+       **/
+      std::vector<std::vector<float> > checkHoles(
+        const HolesConveyor& conveyor);
+
+      /**
         @brief Callback for the candidate holes via the depth node
         @param[in] depthCandidateHolesVector
         [const vision_communications::CandidateHolesVectorMsg&]
@@ -217,17 +231,6 @@ namespace pandora_vision
         PointCloudXYZPtr* pointCloudXYZPtr);
 
       /**
-        @brief Runs candidate holes through selected filters.
-        Probabilities for each candidate hole and filter
-        are printed in the console, with an order specified by the
-        hole_fusion_cfg of the dynamic reconfigure utility
-        @param[in] conveyor [const HolesConveyor&] The conveyor
-        containing candidate holes
-        @return void
-       **/
-      void siftHoles(const HolesConveyor& conveyor);
-
-      /**
         @brief Requests from the synchronizer to process a new point cloud
         @return void
        **/
@@ -256,6 +259,25 @@ namespace pandora_vision
         cv::Mat* image,
         const std::string& encoding,
         const int& imageRepresentationMethod);
+
+      /**
+        @brief Validates candidate holes, meaning that having a two dimensional
+        array that is the product of a series of validity ascertainers that
+        in their turn produce a probability hinting to the confidence level
+        that a particular candidate hole is indeed a hole, this method fuses
+        all the probabilities produced by various hole checkers and responds
+        affirmatively to the question of the purpose of this package:
+        which of the things that the image sensor of the pandora ugv
+        locates as potential holes are indeed holes.
+        @param[in] probabilitiesVector2D
+        [const std::vector<std::vector<float> >&]
+        A two dimensional vector containing the probabilities of
+        validity of each candidate hole. Each row of it pertains to a specific
+        filter applied, each column to a particular hole
+        @return [std::vector<int>] The indices of the valid holes
+       **/
+      std::vector<int> validateHoles(
+        const std::vector<std::vector<float> >& probabilitiesVector2D);
 
       /**
         @brief Tests the merging operations on artificial holes

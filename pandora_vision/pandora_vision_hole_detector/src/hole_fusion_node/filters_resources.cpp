@@ -87,7 +87,7 @@ namespace pandora_vision
     std::vector<std::set<unsigned int> >* intermediatePointsSetVector)
   {
     #ifdef DEBUG_TIME
-    Timer::start("createCheckerRequiredVectors", "sift");
+    Timer::start("createCheckerRequiredVectors", "checkHoles");
     #endif
 
     bool enable_holesMasksImageVector = false;

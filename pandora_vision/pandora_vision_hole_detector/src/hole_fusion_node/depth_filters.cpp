@@ -576,8 +576,7 @@ namespace pandora_vision
     }
     if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
     {
-      filtersOrder[Parameters::
-        run_checker_brushfire_outline_to_rectangle] = 4;
+      filtersOrder[Parameters::run_checker_brushfire_outline_to_rectangle] = 4;
     }
     if (Parameters::run_checker_depth_homogeneity > 0)
     {
