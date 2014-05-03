@@ -81,6 +81,7 @@ namespace pandora_vision
       {
         int x = rectanglesVector[i][j].x;
         int y = rectanglesVector[i][j].y;
+
         mean += depthImage.at<float>(y, x);
       }
 
@@ -98,7 +99,7 @@ namespace pandora_vision
 
       // The gaussian probability of this hole being valid
       probabilitiesVector->at(rectanglesIndices[i]) =
-        exp(-pow((value -m) / s, 2) / 2);
+        exp(-pow((value - m) / s, 2) / 2);
 
       msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }

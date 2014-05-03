@@ -357,8 +357,7 @@ namespace pandora_vision
     unpackMessage(depthCandidateHolesVector,
       &depthHolesConveyor_,
       &interpolatedDepthImage_,
-      sensor_msgs::image_encodings::TYPE_32FC1,
-      Parameters::depth_image_representation_method);
+      sensor_msgs::image_encodings::TYPE_32FC1);
 
     numNodesReady_++;
 
@@ -395,24 +394,20 @@ namespace pandora_vision
     @param[in] inImage [const cv::Mat&] An image used for its size.
     It is needed if the wavelet method is used in the keypoints' extraction,
     in order to obtain the coherent shape of holes' outline points
-    @param[in] imageRepresentationMethod [const int&] 1 if the image
-    representation method used to obtain the keypoints was the wavelet
-    method, 0 if the image used was the original one
     @return void
    **/
   void HoleFusion::fromCandidateHoleMsgToConveyor(
     const std::vector<vision_communications::CandidateHoleMsg>&
     candidateHolesVector,
     HolesConveyor* conveyor,
-    const cv::Mat& inImage,
-    const int& imageRepresentationMethod)
+    const cv::Mat& inImage)
   {
     #ifdef DEBUG_TIME
     Timer::start("fromCandidateHoleMsgToConveyor");
     #endif
 
     // Normal mode
-    if (imageRepresentationMethod == 0)
+    if (Parameters::image_representation_method == 0)
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
@@ -448,7 +443,7 @@ namespace pandora_vision
       }
     }
     // Wavelet mode
-    else if (imageRepresentationMethod == 1)
+    else if (Parameters::image_representation_method == 1)
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
@@ -498,7 +493,7 @@ namespace pandora_vision
         }
 
         // The easiest and most efficient way to obtain the same result as
-        // if *_image_representation_method was 0 is to apply the raycast
+        // if image_representation_method was 0 is to apply the raycast
         // algorithm
         std::vector<cv::Point2f> outline;
         BlobDetection::raycastKeypoint(holeKeypoint,
@@ -651,19 +646,12 @@ namespace pandora_vision
     Parameters::show_respective_holes =
       config.show_respective_holes;
 
-    // Depth image representation method.
-    // 0 if the depth image used is the one obtained from the depth sensor,
+    // Depth and RGB image representation method.
+    // 0 if the image used is the one obtained from the sensor,
     // unadulterated
     // 1 through wavelet representation
-    Parameters::depth_image_representation_method =
-      config.depth_image_representation_method;
-
-    // RGB image representation method.
-    // 0 if the depth image used is the one obtained from the depth sensor,
-    // unadulterated
-    // 1 through wavelet representation
-    Parameters::rgb_image_representation_method =
-      config.rgb_image_representation_method;
+    Parameters::image_representation_method =
+      config.image_representation_method;
 
     // canny parameters
     Parameters::canny_ratio =
@@ -691,10 +679,19 @@ namespace pandora_vision
       config.blob_max_threshold;
     Parameters::blob_threshold_step =
       config.blob_threshold_step;
-    Parameters::blob_min_area =
-      config.blob_min_area;
-    Parameters::blob_max_area =
-      config.blob_max_area;
+
+    //!< In wavelet mode, the image shrinks by a factor of 4
+    if (config.image_representation_method == 0)
+    {
+      Parameters::blob_min_area = config.blob_min_area;
+      Parameters::blob_max_area = config.blob_max_area;
+    }
+    else if (config.image_representation_method == 1)
+    {
+      Parameters::blob_min_area = static_cast<int>(config.blob_min_area / 4);
+      Parameters::blob_max_area = static_cast<int>(config.blob_max_area / 4);
+    }
+
     Parameters::blob_min_convexity =
       config.blob_min_convexity;
     Parameters::blob_max_convexity =
@@ -709,10 +706,6 @@ namespace pandora_vision
       config.blob_filter_by_color;
     Parameters::blob_filter_by_circularity =
       config.blob_filter_by_circularity;
-
-    // Bounding boxes parameters
-    Parameters::bounding_box_min_area_threshold =
-      config.bounding_box_min_area_threshold;
 
     // The bounding box detection zzmethod
     // 0 for detecting by means of brushfire starting
@@ -1110,8 +1103,7 @@ namespace pandora_vision
     unpackMessage(rgbCandidateHolesVector,
       &rgbHolesConveyor_,
       &rgbImage_,
-      sensor_msgs::image_encodings::TYPE_8UC3,
-      Parameters::rgb_image_representation_method);
+      sensor_msgs::image_encodings::TYPE_8UC3);
 
     numNodesReady_++;
 
@@ -1200,17 +1192,13 @@ namespace pandora_vision
     @param[out] pointCloudXYZ [PointCloudXYZPtr*] The output point cloud
     @param[out] interpolatedDepthImage [cv::Mat*] The output interpolated
     depth image
-    @param[in] imageRepresentationMethod [const int&] 1 if the image
-    representation method used to obtain the keypoints was the wavelet
-    method, 0 if the image used was the original one
     @return void
    **/
   void HoleFusion::unpackMessage(
     const vision_communications::CandidateHolesVectorMsg& holesMsg,
     HolesConveyor* conveyor,
     cv::Mat* image,
-    const std::string& encoding,
-    const int& imageRepresentationMethod)
+    const std::string& encoding)
   {
     #ifdef DEBUG_TIME
     Timer::start("unpackMessage");
@@ -1226,8 +1214,7 @@ namespace pandora_vision
     fromCandidateHoleMsgToConveyor(
       holesMsg.candidateHoles,
       conveyor,
-      *image,
-      imageRepresentationMethod);
+      *image);
 
     #ifdef DEBUG_TIME
     Timer::tick("unpackMessage");
@@ -1300,7 +1287,7 @@ namespace pandora_vision
       // Commence setting of priorities given to hole checkers.
       // Each priority given is not fixed, but there is an apparent hierarchy
       // witnessed here.
-      // In order to valid a valid conclusion an analytical method had to be
+      // In order to reach a valid conclusion, an analytical method had to be
       // used, which is one analogous to the one presented in {insert link}
 
       // The depth homogeneity is considered the least confident measure of

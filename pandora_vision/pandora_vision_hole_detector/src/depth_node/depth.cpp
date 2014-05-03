@@ -127,7 +127,7 @@ namespace pandora_vision
 
     // A value of 1 means that the depth image is subtituted by its
     // low-low, wavelet analysis driven, part
-    if (Parameters::depth_image_representation_method == 1)
+    if (Parameters::image_representation_method == 1)
     {
       double min;
       double max;
@@ -184,8 +184,8 @@ namespace pandora_vision
     // 0 if the depth image used is the one obtained from the depth sensor,
     // unadulterated
     // 1 through wavelet representation
-    Parameters::depth_image_representation_method =
-      config.depth_image_representation_method;
+    Parameters::image_representation_method =
+      config.image_representation_method;
 
     // canny parameters
     Parameters::canny_ratio = config.canny_ratio;
@@ -204,8 +204,19 @@ namespace pandora_vision
     Parameters::blob_min_threshold = config.blob_min_threshold;
     Parameters::blob_max_threshold = config.blob_max_threshold;
     Parameters::blob_threshold_step = config.blob_threshold_step;
-    Parameters::blob_min_area = config.blob_min_area;
-    Parameters::blob_max_area = config.blob_max_area;
+
+    //!< In wavelet mode, the image shrinks by a factor of 4
+    if (config.image_representation_method == 0)
+    {
+      Parameters::blob_min_area = config.blob_min_area;
+      Parameters::blob_max_area = config.blob_max_area;
+    }
+    else if (config.image_representation_method == 1)
+    {
+      Parameters::blob_min_area = static_cast<int>(config.blob_min_area / 4);
+      Parameters::blob_max_area = static_cast<int>(config.blob_max_area / 4);
+    }
+
     Parameters::blob_min_convexity = config.blob_min_convexity;
     Parameters::blob_max_convexity = config.blob_max_convexity;
     Parameters::blob_min_inertia_ratio = config.blob_min_inertia_ratio;
@@ -216,8 +227,6 @@ namespace pandora_vision
       config.blob_filter_by_circularity;
 
     // Bounding boxes parameters
-    Parameters::bounding_box_min_area_threshold =
-      config.bounding_box_min_area_threshold;
 
     // The bounding box detection method
     // 0 for detecting by means of brushfire starting

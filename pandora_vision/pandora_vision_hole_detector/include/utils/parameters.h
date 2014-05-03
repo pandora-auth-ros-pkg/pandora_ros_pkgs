@@ -62,8 +62,7 @@ namespace pandora_vision
     // Depth and RGB images' representation method.
     // 0 if image used is used as obtained from the image sensor
     // 1 through wavelet analysis
-    static int depth_image_representation_method;
-    static int rgb_image_representation_method;
+    static int image_representation_method;
 
     // canny parameters
     static int canny_ratio;
@@ -92,7 +91,6 @@ namespace pandora_vision
     static bool blob_filter_by_circularity;
 
     // Bounding boxes parameters
-    static int bounding_box_min_area_threshold;
 
     // The bounding box detection method
     // 0 for detecting by means of brushfire starting
