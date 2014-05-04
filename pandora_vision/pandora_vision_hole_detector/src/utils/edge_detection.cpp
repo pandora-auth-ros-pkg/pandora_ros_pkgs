@@ -190,8 +190,7 @@ namespace pandora_vision
     cv::Mat edges;
     inImage.copyTo(edges);
 
-    cv::Laplacian(edges, *outImage, ddepth, 1, scale, delta,
-      cv::BORDER_DEFAULT);
+    cv::Laplacian(edges, *outImage, ddepth, 1, scale, delta, cv::BORDER_DEFAULT);
     convertScaleAbs(*outImage, *outImage);
 
     #ifdef DEBUG_TIME
@@ -502,13 +501,12 @@ namespace pandora_vision
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
       Parameters::threshold_lower_value, 255, 3);
 
-    // make all non zero pixels have a value of 255
-    cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
-      0, 255, 0);
+    // Make all non zero pixels have a value of 255
+    cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges, 0, 255, 0);
 
+    // Denoise the edges found
     denoisedDepthImageEdges.copyTo(*edges);
-
-    EdgeDetection::denoiseEdges(edges);
+    denoiseEdges(edges);
 
     #ifdef DEBUG_TIME
     Timer::tick("computeEdges");
@@ -857,7 +855,6 @@ namespace pandora_vision
     Timer::start("Sector #1", "denoiseEdges");
     #endif
 
-
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
@@ -1072,7 +1069,7 @@ namespace pandora_vision
 
     // Extract only the outer border of closed shapes
     thinnedImg.copyTo(*img);
-    getShapesClearBorder(img);
+    getShapesClearBorderSimple(img);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #4");
@@ -1541,6 +1538,145 @@ namespace pandora_vision
     {
       Visualization::multipleShow("getShapesClearBorder function", imgs, msgs,
         1200, 1);
+    }
+    #endif
+  }
+
+
+
+  /**
+    @brief With an binary input image (quantized in 0 and 255 levels),
+    this function fills closed regions, at first, and then extracts the
+    outermost outline of each region.
+    Used when there is a closed region with garbage pixels with
+    a value of 255 within it.
+    Caution: Only the outermost outline of shapes is computed. If there are
+    closed shapes inside of other closed shapes, only the latter's outline
+    will be computed, as opposed to the getShapesClearBorder function
+    @param[in,out] inImage [cv::Mat*] The input image
+    @return void
+   **/
+  void EdgeDetection::getShapesClearBorderSimple (cv::Mat* inImage)
+  {
+    #ifdef DEBUG_SHOW
+    std::vector<cv::Mat> imgs;
+    std::vector<std::string> msgs;
+    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    {
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Before clear blorders";
+      msgs.push_back(msg);
+      cv::Mat tmp;
+      inImage->copyTo(tmp);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    #ifdef DEBUG_TIME
+    Timer::start("getShapesClearBorderSimple", "denoiseEdges");
+    #endif
+
+    cv::Mat floodFilledImage;
+    inImage->copyTo(floodFilledImage);
+
+    // Flood the original image from (0, 0) with a value of 255
+    cv::floodFill(floodFilledImage, cv::Point(0, 0), 255);
+
+    // The pixels affected by the above floodfill operation are
+    // backgroung pixels. The ones that remain unaffected are interior to the
+    // shapes whose outline we wish to identify.
+    // Store these pixels in the tempImage image
+    cv::Mat tempImage = cv::Mat::zeros(inImage->size(), CV_8UC1);
+
+    for (int rows = 0; rows < inImage->rows; rows++)
+    {
+      for (int cols = 0; cols < inImage->cols; cols++)
+      {
+        if (floodFilledImage.at<unsigned char>(rows, cols) ==
+          inImage->at<unsigned char>(rows, cols))
+        {
+          tempImage.at<unsigned char>(rows, cols) = 255;
+        }
+      }
+    }
+
+
+    static const char kernels[8][3][3] = {
+      { {0, 2, 2},
+        {2, 1, 2},
+        {2, 2, 2} },
+
+      { {2, 0, 2},
+        {2, 1, 2},
+        {2, 2, 2} },
+
+      { {2, 2, 0},
+        {2, 1, 2},
+        {2, 2, 2} },
+
+      { {2, 2, 2},
+        {2, 1, 0},
+        {2, 2, 2} },
+
+      { {2, 2, 2},
+        {2, 1, 2},
+        {2, 2, 0} },
+
+      { {2, 2, 2},
+        {2, 1, 2},
+        {2, 0, 2} },
+
+      { {2, 2, 2},
+        {2, 1, 2},
+        {0, 2, 2} },
+
+      { {2, 2, 2},
+        {0, 1, 2},
+        {2, 2, 2} }
+    };
+
+    // The image whose non-zero pixels indicate the outlines of shapes
+    cv::Mat bordersImage = cv::Mat(inImage->rows, inImage->cols, CV_8UC1,
+        cv::Scalar::all(0));
+
+    for (int kernelId = 0; kernelId < 8; kernelId++)
+    {
+      for (unsigned int rows = 1; rows < inImage->rows - 1; rows++)
+      {
+        for (unsigned int cols = 1; cols < inImage->cols - 1; cols++)
+        {
+          if (tempImage.at<unsigned char>(rows, cols) != 0)
+          {
+            if (Morphology::kernelCheck(kernels[kernelId], tempImage,
+                  cv::Point(cols, rows)))
+            {
+              bordersImage.at<unsigned char>(rows, cols) = 255;
+            }
+          }
+        }
+      }
+    }
+
+    bordersImage.copyTo(*inImage);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("getShapesClearBorderSimple");
+    #endif
+
+    #ifdef DEBUG_SHOW
+    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    {
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : After clear borders";
+      msgs.push_back(msg);
+      cv::Mat tmp;
+      inImage->copyTo(tmp);
+      imgs.push_back(tmp);
+    }
+    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    {
+      Visualization::multipleShow("getShapesClearBorderSimple function",
+        imgs, msgs, 1200, 1);
     }
     #endif
   }
