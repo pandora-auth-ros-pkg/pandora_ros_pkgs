@@ -475,9 +475,29 @@ namespace pandora_vision
       visualizableDenoisedImage = Visualization::scaleImageForVisualization
       (tempImg, Parameters::scale_method);
 
+
     // from now onwards every image is in the range of 0-255
-    EdgeDetection::applySobel
-      (visualizableDenoisedImage, &denoisedDepthImageEdges);
+    if (Parameters::edge_detection_method == 0)
+    {
+      EdgeDetection::applyCanny(
+        visualizableDenoisedImage, &denoisedDepthImageEdges);
+    }
+    else if (Parameters::edge_detection_method == 1)
+    {
+      EdgeDetection::applyScharr(
+        visualizableDenoisedImage, &denoisedDepthImageEdges);
+    }
+    else if (Parameters::edge_detection_method == 2)
+    {
+      EdgeDetection::applySobel(
+        visualizableDenoisedImage, &denoisedDepthImageEdges);
+    }
+    else if (Parameters::edge_detection_method == 3)
+    {
+      EdgeDetection::applyLaplacian(
+        visualizableDenoisedImage, &denoisedDepthImageEdges);
+    }
+
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
       Parameters::threshold_lower_value, 255, 3);
@@ -586,6 +606,7 @@ namespace pandora_vision
           {
             inLimitsOne = false;
           }
+
           if (bisectorPoint.y - counter * cos(bisectorAngle) > inImage->rows - 1
             || bisectorPoint.y - counter * cos(bisectorAngle) < 0 ||
             bisectorPoint.x - counter * sin(bisectorAngle) > inImage->cols - 1
@@ -612,7 +633,6 @@ namespace pandora_vision
                 }
               }
             }
-
           }
 
           if (inLimitsTwo)
@@ -837,54 +857,64 @@ namespace pandora_vision
     Timer::start("Sector #1", "denoiseEdges");
     #endif
 
-    cv::Mat temp;
-    img->copyTo(temp);
 
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-
-    if(Parameters::debug_show_denoise_edges) // Debug
-    {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : Initial Edges";
-      msgs.push_back(msg);
-      cv::Mat tmp;
-      temp.copyTo(tmp);
-      imgs.push_back(tmp);
-    }
     #endif
 
-    // Perform dilation
-    Morphology::dilation(&temp, 2);
+/*
+ *   cv::Mat temp;
+ *   img->copyTo(temp);
+ *
+ *
+ *    #ifdef DEBUG_SHOW
+ *    if(Parameters::debug_show_denoise_edges) // Debug
+ *    {
+ *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+ *      msg += " : Initial Edges";
+ *      msgs.push_back(msg);
+ *      cv::Mat tmp;
+ *      temp.copyTo(tmp);
+ *      imgs.push_back(tmp);
+ *    }
+ *    #endif
+ *
+ *    // Perform dilation
+ *    Morphology::dilation(&temp, 2);
+ *
+ *    #ifdef DEBUG_SHOW
+ *    if(Parameters::debug_show_denoise_edges) // Debug
+ *    {
+ *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+ *      msg += " : After 2 steps of dilation";
+ *      msgs.push_back(msg);
+ *      cv::Mat tmp;
+ *      temp.copyTo(tmp);
+ *      imgs.push_back(tmp);
+ *    }
+ *    #endif
+ *
+ *    // Perform thinning
+ *    cv::Mat thinnedImg;
+ *    Morphology::thinning(temp, &thinnedImg, 100);
+ *
+ *    #ifdef DEBUG_SHOW
+ *    if(Parameters::debug_show_denoise_edges) // Debug
+ *    {
+ *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+ *      msg += " : After thinning";
+ *      msgs.push_back(msg);
+ *      cv::Mat tmp;
+ *      thinnedImg.copyTo(tmp);
+ *      imgs.push_back(tmp);
+ *    }
+ *  #endif
+ *
+ */
 
-    #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
-    {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : After 2 steps of dilation";
-      msgs.push_back(msg);
-      cv::Mat tmp;
-      temp.copyTo(tmp);
-      imgs.push_back(tmp);
-    }
-    #endif
-
-    // Perform thinning
     cv::Mat thinnedImg;
-    Morphology::thinning(temp, &thinnedImg, 100);
-
-    #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
-    {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : After thinning";
-      msgs.push_back(msg);
-      cv::Mat tmp;
-      thinnedImg.copyTo(tmp);
-      imgs.push_back(tmp);
-    }
-  #endif
+    img->copyTo(thinnedImg);
 
     // Perform edge contamination
     EdgeDetection::applyEdgeContamination(&thinnedImg);
@@ -1042,7 +1072,7 @@ namespace pandora_vision
 
     // Extract only the outer border of closed shapes
     thinnedImg.copyTo(*img);
-    EdgeDetection::getShapesClearBorder(img);
+    getShapesClearBorder(img);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #4");
@@ -1052,7 +1082,7 @@ namespace pandora_vision
     if(Parameters::debug_show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : After pruning and dilation";
+      msg += " : After clear borders";
       msgs.push_back(msg);
       cv::Mat tmp;
       img->copyTo(tmp);
@@ -1463,8 +1493,10 @@ namespace pandora_vision
       sign = (sign == false);
     }
 
-    // Dilate once to get rid of pesky borders
-    Morphology::dilation(&finalFloodFill, 1);
+    // Dilate twice:
+    // once to (a) get rid of pesky borders
+    // and once (b) for the blob's outline to approximate the original's outline
+    Morphology::dilation(&finalFloodFill, 2);
 
     // The floodfill's edges - region borders
     cv::Mat bordersImage = cv::Mat(inImage->rows, inImage->cols, CV_8UC1,

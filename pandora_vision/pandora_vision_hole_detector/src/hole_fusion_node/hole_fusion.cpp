@@ -641,6 +641,10 @@ namespace pandora_vision
     ROS_INFO("Parameters callback called");
     #endif
 
+    // The product of this package: valid holes
+    Parameters::show_final_holes =
+     config.show_final_holes;
+
     // Show the holes that each of the depth and RGB nodes transmit to the
     // hole fusion node, on top of their respective origin images
     Parameters::show_respective_holes =
@@ -1018,7 +1022,7 @@ namespace pandora_vision
 
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_find_holes)
+    if (Parameters::show_final_holes)
     {
       // The holes conveyor containing only the valid holes
       HolesConveyor validHolesConveyor;

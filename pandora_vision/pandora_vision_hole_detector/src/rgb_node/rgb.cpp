@@ -166,6 +166,10 @@ namespace pandora_vision
     Parameters::image_representation_method =
       config.image_representation_method;
 
+    // Edge detection parameters
+    Parameters::edge_detection_method =
+      config.edge_detection_method;
+
     // canny parameters
     Parameters::canny_ratio = config.canny_ratio;
     Parameters::canny_kernel_size = config.canny_kernel_size;

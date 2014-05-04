@@ -49,10 +49,16 @@ namespace pandora_vision
   // hole fusion node, on top of their respective origin images
   bool Parameters::show_respective_holes = false;
 
+  // The product of this package: valid holes
+  bool Parameters::show_final_holes = false;
+
   // Depth and RGB images' representation method.
   // 0 if image used is used as obtained from the image sensor
   // 1 through wavelet analysis
   int Parameters::image_representation_method = 0;
+
+  // Edge detection parameters
+  int Parameters::edge_detection_method = 2;
 
   // canny parameters
   int Parameters::canny_ratio = 3;

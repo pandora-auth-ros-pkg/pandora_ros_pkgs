@@ -128,8 +128,23 @@ namespace pandora_vision
     cv::Mat temp;
     holeFrame.copyTo(temp);
 
-    //! Apply in current frame Canny edge detection algorithm
-    EdgeDetection::applySobel(backprojectedFrame, &temp);
+    // Detect edges on the backprojection
+    if (Parameters::edge_detection_method == 0)
+    {
+      EdgeDetection::applyCanny(backprojectedFrame, &temp);
+    }
+    else if (Parameters::edge_detection_method == 1)
+    {
+      EdgeDetection::applyScharr(backprojectedFrame, &temp);
+    }
+    else if (Parameters::edge_detection_method == 2)
+    {
+      EdgeDetection::applySobel(backprojectedFrame, &temp);
+    }
+    else if (Parameters::edge_detection_method == 3)
+    {
+      EdgeDetection::applyLaplacian(backprojectedFrame, &temp);
+    }
 
     // Denoise the edges image
     EdgeDetection::denoiseEdges(&temp);
