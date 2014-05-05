@@ -61,6 +61,12 @@ namespace pandora_vision
     unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>
       ("/vision/hole_fusion/unlock_rgb_depth_synchronizer", 1000, true);
 
+    // Advertise the topic that the yaw and pitch of the keypoints of the final,
+    // valid holes will be published to
+    validHolesPublisher_ = nodeHandle_.advertise
+      <vision_communications::HolesDirectionsVectorMsg>
+      ("/vision/holes_direction", 1000, true);
+
     // Subscribe to the topic where the depth node publishes
     // candidate holes
     depthCandidateHolesSubscriber_= nodeHandle_.subscribe(

@@ -43,6 +43,8 @@
 #include <std_msgs/Empty.h>
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "vision_communications/CandidateHoleMsg.h"
+#include "vision_communications/HolesDirectionsVectorMsg.h"
+#include "vision_communications/HoleDirectionMsg.h"
 #include "utils/defines.h"
 #include "utils/histogram.h"
 #include "utils/message_conversions.h"
@@ -70,6 +72,10 @@ namespace pandora_vision
       // The ROS publisher that will be used for unlocking the
       // synchronizer_node
       ros::Publisher unlockPublisher_;
+
+      // The ROS publisher that will be used to publish the final valid holes
+      // produced by this package
+      ros::Publisher validHolesPublisher_;
 
       // The ROS subscriber for acquisition of candidate holes originated
       // from the depth node
