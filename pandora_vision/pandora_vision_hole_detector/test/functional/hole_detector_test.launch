@@ -1,0 +1,23 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/> 
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!--<node name="synchronizer_node" type="synchronizer_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />-->
+  <!--<node name="depth_node"        type="depth_node"        pkg="pandora_vision_hole_detector" respawn="False" output="screen" />-->
+  <!--<node name="rgb_node"          type="rgb_node"    pkg="pandora_vision_hole_detector" respawn="False" output="screen" />-->
+  <!--<node name="hole_fusion_node"  type="hole_fusion_node"  pkg="pandora_vision_hole_detector" respawn="False" output="screen" />-->
+
+  <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_dry.launch" />
+
+  <node pkg="rosbag" type="play" name="player" output="screen"
+    args="--clock $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag" /> 
+  
+  <node name="state_changer" type="state_changer" pkg="state_manager" args="2" />
+
+  <param name="test/subscribed_topic_names/holeDirection" type="str" value="/vision/hole_direction_alert" />
+  <test test-name="HoleDetectorTest" pkg="pandora_vision_hole_detector"
+    type="hole_detector_test" />
+
+</launch>

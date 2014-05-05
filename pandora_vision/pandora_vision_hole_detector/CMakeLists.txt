@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_hole_detector)
 
-set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -310,3 +310,8 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+
+if(CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()
+
