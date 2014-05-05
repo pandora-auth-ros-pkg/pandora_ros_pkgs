@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+<!-- Import Descriptions ################################################## -->
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/kinect_camera.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/hokuyo_utm_30lx.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/sonar_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/thermal_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/co2_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/microphone_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- Kinect ############################################################### -->
+
+  <xacro:macro name="kinect_sensor" >
+    <!-- ================================================================== -->
+    <xacro:kinect_caster parent="${base_link_name}_link" >
+
+      <origin xyz="0.156 0.0 0.526"
+              rpy="${zero}" />
+
+    </xacro:kinect_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Hokuyo Laser ######################################################### -->
+
+  <xacro:macro name="hokuyo_laser_sensor" >
+    <!-- ================================================================== -->
+    <xacro:hokuyo_caster parent="${base_link_name}_link" >
+
+      <origin xyz="0.2 0.0 0.15"
+              rpy="${zero}" />
+
+    </xacro:hokuyo_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Sonars ############################################################### -->
+
+  <xacro:macro name="sonar_sensor"
+               params="prefix_y reflect_y" >
+    <!-- ================================================================== -->
+    <xacro:sonar_caster name="${prefix_y}_rear"
+                        parent="${base_link_name}_link" >
+
+      <origin xyz="-0.2 ${ reflect_y * ( 0.15 ) } 0.13"
+              rpy="0.0 0.0 ${PI}" />
+
+    </xacro:sonar_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Thermal ############################################################## -->
+
+  <xacro:macro name="thermal_sensor" >
+    <!-- ================================================================== -->
+    <xacro:thermal_caster parent="${base_link_name}_link" >
+
+      <origin xyz="0.2 -0.05 0.23"
+              rpy="${zero}" />
+
+    </xacro:thermal_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- CO2 ################################################################## -->
+
+  <xacro:macro name="co2_sensor" >
+    <!-- ================================================================== -->
+    <xacro:co2_caster parent="${base_link_name}_link" >
+
+      <origin xyz="0.2 0.0 0.36"
+              rpy="${zero}" />
+
+    </xacro:co2_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Microphone ########################################################### -->
+
+  <xacro:macro name="microphone_sensor" >
+    <!-- ================================================================== -->
+    <xacro:microphone_caster parent="${base_link_name}_link" >
+
+      <origin xyz="0.2 0.0 0.38"
+              rpy="${zero}" />
+
+    </xacro:microphone_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- ###################################################################### -->
+
+</robot>

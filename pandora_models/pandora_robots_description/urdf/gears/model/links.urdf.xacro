@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+<!-- Base ################################################################# -->
+
+  <xacro:macro name="base_link" >
+    <!-- ================================================================== -->
+    <link name="${base_link_name}_link" >
+
+      <inertial>
+        <xacro:base_link_inertial_origin />
+        <xacro:base_link_mass />
+        <xacro:base_link_inertia />
+      </inertial>
+
+      <visual>
+        <xacro:base_link_visual_origin />
+        <xacro:base_link_visual_mesh />
+        <material name="base" />
+      </visual>
+
+      <collision>
+        <xacro:base_link_collision_origin />
+        <xacro:base_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Side ################################################################# -->
+
+  <xacro:macro name="side_link"
+               params="prefix_y reflect_y" >
+    <!-- ================================================================== -->
+    <link name="${prefix_y}_${side_link_name}_link" >
+
+      <inertial>
+        <xacro:side_link_inertial_origin reflect_y="${reflect_y}" />
+        <xacro:side_link_mass />
+        <xacro:side_link_inertia reflect_y="${reflect_y}" />
+      </inertial>
+
+      <visual>
+        <xacro:side_link_visual_origin reflect_y="${reflect_y}" />
+        <xacro:side_link_visual_mesh />
+        <material name="side" />
+      </visual>
+
+      <collision>
+        <xacro:side_link_collision_origin reflect_y="${reflect_y}" />
+        <xacro:side_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Wheel ################################################################ -->
+
+  <xacro:macro name="wheel_link"
+               params="prefix_y prefix_x reflect_y reflect_x" >
+    <!-- ================================================================== -->
+    <link name="${prefix_y}_${prefix_x}_${wheel_link_name}_link" >
+
+      <inertial>
+        <xacro:wheel_link_inertial_origin reflect_y="${reflect_y}" />
+        <xacro:wheel_link_mass />
+        <xacro:wheel_link_inertia reflect_y="${reflect_y}" />
+      </inertial>
+
+      <visual>
+        <xacro:wheel_link_visual_origin reflect_y="${reflect_y}" />
+        <xacro:wheel_link_visual_mesh />
+        <material name="wheel" />
+      </visual>
+
+      <collision>
+        <xacro:wheel_link_collision_origin reflect_y="${reflect_y}" />
+        <xacro:wheel_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- ###################################################################### -->
+
+</robot>

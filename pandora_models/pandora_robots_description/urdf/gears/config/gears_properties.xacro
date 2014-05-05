@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+<!-- Import Properties #################################################### -->
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/constants.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/defaults.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/link_offsets.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/joint_offsets.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/masses.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/inertia_tensors.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/meshes.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/materials.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/properties/names.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+</robot>

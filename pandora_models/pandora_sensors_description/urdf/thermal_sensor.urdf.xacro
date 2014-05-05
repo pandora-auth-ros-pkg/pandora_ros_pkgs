@@ -1,55 +1,84 @@
 <?xml version="1.0" ?>
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
-<xacro:macro name="thermal_caster" params="parent *origin">
-    <link name="thermal_link">
+  <xacro:macro name="thermal_caster"
+               params="parent *origin" >
+
+    <link name="thermal_link" >
+
       <inertial>
-        <origin xyz="0 0 0.186" rpy="0 0 0"/>
-        <mass value="0.1"/>	
-        <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
-             iyy="0.0001" iyz="0.0" izz="0.0001"/>
+        <origin xyz="0 0 0.186"
+                rpy="0 0 0" />
+        <mass value="0.1" />
+        <inertia ixx="1.0"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="1.0"
+                 iyz="0.0"
+                 izz="1.0" />
       </inertial>
-      <visual name="visual">
+
+      <visual name="visual" >
         <geometry>
-         <mesh filename="package://pandora_sensors_description/meshes/thermal_sensor/thermal_small.dae"/>
+          <mesh filename="package://pandora_sensors_description/meshes/thermal_sensor/thermal_small.dae" />
         </geometry>
       </visual>
-      <collision name="collision">
+
+      <collision name="collision" >
         <geometry>
-          <box size="0.01 0.01 0.01"/>
+          <box size="0.01 0.01 0.01" />
         </geometry>
       </collision>
+
     </link>
-    
-    <gazebo reference="thermal_link">
-    <sensor name="thermal" type="camera">
+
+    <gazebo reference="thermal_link" >
+      <sensor name="thermal"
+              type="camera" >
+
         <camera>
-          <horizontal_fov>0.5</horizontal_fov>
+
+          <horizontal_fov>0.8</horizontal_fov>
+
           <image>
-            <width>8</width>
-            <height>8</height>
+            <width>640</width>
+            <height>480</height>
           </image>
+
           <clip>
-            <near>0.1</near>
-            <far>2</far>
+            <near>0.05</near>
+            <far>1.5</far>
           </clip>
+
         </camera>
+
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>false</visualize>
-        <plugin name="thermal2ros" filename="libpandora_thermal_plugin.so">
-        <frameName>thermal_link</frameName>
-        <topicName>sensors/thermal</topicName>
-      </plugin>
+
+        <plugin name="thermal2ros"
+                filename="libpandora_thermal_plugin.so" >
+
+          <frameName>thermal_link</frameName>
+          <topicName>sensors/thermal</topicName>
+
+        </plugin>
+
       </sensor>
-  </gazebo>
 
-  <joint name="thermal_joint" type="fixed">
-    <xacro:insert_block name="origin" />
-      <parent link="${parent}"/>
-    <child link="thermal_link"/>
-  </joint>
-</xacro:macro>
+    </gazebo>
+
+    <joint name="thermal_joint"
+           type="fixed" >
+
+      <parent link="${parent}" />
+      <child link="thermal_link" />
+
+      <xacro:insert_block name="origin" />
+
+    </joint>
+
+  </xacro:macro>
+
 </robot>
-

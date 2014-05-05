@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+<!-- Visual ############################################################### -->
+
+  <!-- ==================================================================== -->
+  <xacro:macro name="base_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/base_link.dae" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/collision/base_link.stl" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="side_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/side_link.dae" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/collision/side_link.stl" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="wheel_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/wheel_link.dae" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/collision/wheel_link.stl" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+
+<!-- Collision ############################################################ -->
+
+  <!-- ==================================================================== -->
+  <xacro:macro name="base_link_collision_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/collision/base_link.stl" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/base_link.dae" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="side_link_collision_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/collision/side_link.stl" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/side_link.dae" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="wheel_link_collision_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/collision/wheel_link.stl" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/wheel_link.dae" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+</robot>
