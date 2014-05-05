@@ -872,45 +872,12 @@ namespace pandora_vision
     }
     #endif
 
-/*
- *    // Perform dilation
- *    Morphology::dilation(&temp, 2);
- *
- *    #ifdef DEBUG_SHOW
- *    if(Parameters::debug_show_denoise_edges) // Debug
- *    {
- *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
- *      msg += " : After 2 steps of dilation";
- *      msgs.push_back(msg);
- *      cv::Mat tmp;
- *      temp.copyTo(tmp);
- *      imgs.push_back(tmp);
- *    }
- *    #endif
- *
- *    // Perform thinning
- *    cv::Mat thinnedImg;
- *    Morphology::thinning(temp, &thinnedImg, 100);
- *
- *    #ifdef DEBUG_SHOW
- *    if(Parameters::debug_show_denoise_edges) // Debug
- *    {
- *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
- *      msg += " : After thinning";
- *      msgs.push_back(msg);
- *      cv::Mat tmp;
- *      thinnedImg.copyTo(tmp);
- *      imgs.push_back(tmp);
- *    }
- *  #endif
- *
- */
+    cv::Mat contaminatedEdges;
+    img->copyTo(contaminatedEdges);
 
-    cv::Mat thinnedImg;
-    img->copyTo(thinnedImg);
-
-    // Perform edge contamination
-    EdgeDetection::applyEdgeContamination(&thinnedImg);
+    // Perform edge contamination:
+    // remove all non-zero pixels adjacent to the image's borders
+    EdgeDetection::applyEdgeContamination(&contaminatedEdges);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #1");
@@ -927,7 +894,7 @@ namespace pandora_vision
       msg += " : After edge contamination";
       msgs.push_back(msg);
       cv::Mat tmp;
-      thinnedImg.copyTo(tmp);
+      contaminatedEdges.copyTo(tmp);
       imgs.push_back(tmp);
     }
     #endif
@@ -935,28 +902,106 @@ namespace pandora_vision
     // Eliminate closed shapes
     for(unsigned int i = 0 ; i < img->rows ; i++)
     {
-      thinnedImg.at<unsigned char>(i, 0) = 0;
-      thinnedImg.at<unsigned char>(i, img->cols - 1) = 0;
+      contaminatedEdges.at<unsigned char>(i, 0) = 0;
+      contaminatedEdges.at<unsigned char>(i, img->cols - 1) = 0;
     }
     for(unsigned int i = 0 ; i < img->cols ; i++)
     {
-      thinnedImg.at<unsigned char>(0, i) = 0;
-      thinnedImg.at<unsigned char>(img->rows - 1, i) = 0;
+      contaminatedEdges.at<unsigned char>(0, i) = 0;
+      contaminatedEdges.at<unsigned char>(img->rows - 1, i) = 0;
     }
 
-    // Must throw away the closed lines
-    cv::Mat closedLines;
-    thinnedImg.copyTo(closedLines);
+    // Apply thinning to the contaminated original edges
+    cv::Mat thinnedImage;
+    contaminatedEdges.copyTo(thinnedImage);
 
-    Morphology::pruningStrictIterative(&closedLines, 1000);
-
-    thinnedImg = thinnedImg - closedLines;
+    Morphology::thinning(contaminatedEdges, &thinnedImage, 100);
 
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : The closed shapes";
+      msg += " : After thinning";
+      msgs.push_back(msg);
+      cv::Mat tmp;
+      thinnedImage.copyTo(tmp);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // By pruning the thinned image,
+    // all pixels that are open-ended are eliminated,
+    // thus leaving behind only those shapes whose ends are connected, aka the
+    // closed shapes
+    cv::Mat thinnedClosedLines;
+    thinnedImage.copyTo(thinnedClosedLines);
+    Morphology::pruningStrictIterative(&thinnedClosedLines, 1000);
+
+    #ifdef DEBUG_SHOW
+    if(Parameters::debug_show_denoise_edges) // Debug
+    {
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : After pruning";
+      msgs.push_back(msg);
+      cv::Mat tmp;
+      thinnedClosedLines.copyTo(tmp);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // The thinnedOpenLines image now features only the thinned,
+    // open-ended shapes
+    cv::Mat thinnedOpenLines = thinnedImage - thinnedClosedLines;
+
+    // We want to preserve the original (unthinned) outline of the closed shapes
+    // and connect the ends of open-ended shapes which are thinned to this point.
+    // So, first, we need to identify the closed shapes in the edge contaminated
+    // image. These will be stored in the closedLines image.
+    cv::Mat closedLines;
+    thinnedClosedLines.copyTo(closedLines);
+
+    bool finished = false;
+
+    while(!finished)
+    {
+      cv::Mat marker;
+      closedLines.copyTo(marker);
+
+      for (int rows = 1; rows < img->rows - 1; rows++)
+      {
+        for (int cols = 1; cols < img->cols - 1; cols++)
+        {
+          if (closedLines.at<unsigned char>(rows, cols) == 0
+            && contaminatedEdges.at<unsigned char>(rows, cols) == 255)
+          {
+            for (int r = -1; r < 2; r++)
+            {
+              for (int c = -1; c < 2; c++)
+              {
+                if (contaminatedEdges.at<unsigned char>(rows + r, cols + c) != 0
+                  && closedLines.at<unsigned char>(rows + r, cols + c) != 0)
+                {
+                  closedLines.at<unsigned char>(rows, cols) = 255;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // The operation has finished when all the original closed shapes have
+      // been found
+      if (cv::countNonZero(closedLines - marker) == 0)
+      {
+        finished = true;
+      }
+    }
+
+    #ifdef DEBUG_SHOW
+    if(Parameters::debug_show_denoise_edges) // Debug
+    {
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : The origninal closed shapes";
       msgs.push_back(msg);
       cv::Mat tmp;
       closedLines.copyTo(tmp);
@@ -971,7 +1016,7 @@ namespace pandora_vision
       msg += " : Without closed shapes";
       msgs.push_back(msg);
       cv::Mat tmp;
-      thinnedImg.copyTo(tmp);
+      thinnedOpenLines.copyTo(tmp);
       imgs.push_back(tmp);
     }
     #endif
@@ -984,6 +1029,10 @@ namespace pandora_vision
     Timer::start("Sector #3");
     #endif
 
+    // In the image that features only open-ended shapes, find their end points.
+    // We will then check if they are eligible for connection, and if they are,
+    // these points will be connected with each other
+
     std::vector<std::set<unsigned int> > lines;
     std::vector<std::pair<GraphNode, GraphNode> > farPts;
     bool hasFinished = false;
@@ -991,15 +1040,15 @@ namespace pandora_vision
     while(!hasFinished)
     {
       hasFinished = true;
-      for(unsigned int i = 1 ; i < thinnedImg.rows - 1; i++)
+      for(unsigned int i = 1 ; i < thinnedOpenLines.rows - 1; i++)
       {
-        for(unsigned int j = 1 ; j < thinnedImg.cols - 1; j++)
+        for(unsigned int j = 1 ; j < thinnedOpenLines.cols - 1; j++)
         {
-          if(thinnedImg.at<unsigned char> (i, j) != 0)
+          if(thinnedOpenLines.at<unsigned char> (i, j) != 0)
           {
             std::set<unsigned int> ret;
             std::pair<GraphNode, GraphNode> pts =
-              findNeighs(&thinnedImg, i, j, &ret);
+              findNeighs(&thinnedOpenLines, i, j, &ret);
             if(ret.size() > Parameters::minimum_curve_points)
             {
               lines.push_back(ret);
@@ -1021,12 +1070,12 @@ namespace pandora_vision
       for(std::set<unsigned int>::iterator it = lines[i].begin() ;
         it != lines[i].end() ; it++)
       {
-        thinnedImg.data[*it] = 255;
+        thinnedOpenLines.data[*it] = 255;
       }
     }
 
-    // Connect pairs
-    connectPairs(&thinnedImg, farPts, 1);
+    // Connect the end points of open shapes
+    connectPairs(&thinnedOpenLines, farPts, 1);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #3");
@@ -1043,13 +1092,13 @@ namespace pandora_vision
       msg += " : After connection of distant edges";
       msgs.push_back(msg);
       cv::Mat tmp;
-      thinnedImg.copyTo(tmp);
+      thinnedOpenLines.copyTo(tmp);
       imgs.push_back(tmp);
     }
     #endif
 
     // Re-enable the closed shapes
-    thinnedImg = thinnedImg + closedLines;
+    *img = thinnedOpenLines + closedLines;
 
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_denoise_edges) // Debug
@@ -1058,13 +1107,12 @@ namespace pandora_vision
       msg += " : After re-insertion of closed shapes";
       msgs.push_back(msg);
       cv::Mat tmp;
-      thinnedImg.copyTo(tmp);
+      img->copyTo(tmp);
       imgs.push_back(tmp);
     }
     #endif
 
     // Extract only the outer border of closed shapes
-    thinnedImg.copyTo(*img);
     getShapesClearBorderSimple(img);
 
     #ifdef DEBUG_TIME
