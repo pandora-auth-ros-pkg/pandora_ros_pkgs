@@ -248,7 +248,17 @@ namespace pandora_vision
 
     //<! Loose ends connection parameters
     Parameters::AB_to_MO_ratio = config.AB_to_MO_ratio;
-    Parameters::minimum_curve_points = config.minimum_curve_points;
+
+    //!< In wavelet mode, the image shrinks by a factor of 4
+    if (config.image_representation_method == 0)
+    {
+      Parameters::minimum_curve_points = config.minimum_curve_points;
+    }
+    else if (config.image_representation_method == 1)
+    {
+      Parameters::minimum_curve_points =
+        static_cast<int>(config.minimum_curve_points / 4);
+    }
 
     // The interpolation method for noise removal
     // 0 for averaging the pixel's neighbor values

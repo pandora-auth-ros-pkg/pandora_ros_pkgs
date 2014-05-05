@@ -860,23 +860,19 @@ namespace pandora_vision
     std::vector<std::string> msgs;
     #endif
 
+    #ifdef DEBUG_SHOW
+    if(Parameters::debug_show_denoise_edges) // Debug
+    {
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Initial Edges";
+      msgs.push_back(msg);
+      cv::Mat tmp;
+      img->copyTo(tmp);
+      imgs.push_back(tmp);
+    }
+    #endif
+
 /*
- *   cv::Mat temp;
- *   img->copyTo(temp);
- *
- *
- *    #ifdef DEBUG_SHOW
- *    if(Parameters::debug_show_denoise_edges) // Debug
- *    {
- *      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
- *      msg += " : Initial Edges";
- *      msgs.push_back(msg);
- *      cv::Mat tmp;
- *      temp.copyTo(tmp);
- *      imgs.push_back(tmp);
- *    }
- *    #endif
- *
  *    // Perform dilation
  *    Morphology::dilation(&temp, 2);
  *
