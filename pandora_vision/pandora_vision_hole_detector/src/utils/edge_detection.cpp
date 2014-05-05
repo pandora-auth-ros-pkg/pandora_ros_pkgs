@@ -478,23 +478,19 @@ namespace pandora_vision
     // from now onwards every image is in the range of 0-255
     if (Parameters::edge_detection_method == 0)
     {
-      EdgeDetection::applyCanny(
-        visualizableDenoisedImage, &denoisedDepthImageEdges);
+      applyCanny(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
     else if (Parameters::edge_detection_method == 1)
     {
-      EdgeDetection::applyScharr(
-        visualizableDenoisedImage, &denoisedDepthImageEdges);
+      applyScharr(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
     else if (Parameters::edge_detection_method == 2)
     {
-      EdgeDetection::applySobel(
-        visualizableDenoisedImage, &denoisedDepthImageEdges);
+      applySobel(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
     else if (Parameters::edge_detection_method == 3)
     {
-      EdgeDetection::applyLaplacian(
-        visualizableDenoisedImage, &denoisedDepthImageEdges);
+      applyLaplacian(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
 
 
@@ -877,7 +873,7 @@ namespace pandora_vision
 
     // Perform edge contamination:
     // remove all non-zero pixels adjacent to the image's borders
-    EdgeDetection::applyEdgeContamination(&contaminatedEdges);
+    applyEdgeContamination(&contaminatedEdges);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #1");
@@ -1049,15 +1045,18 @@ namespace pandora_vision
             std::set<unsigned int> ret;
             std::pair<GraphNode, GraphNode> pts =
               findNeighs(&thinnedOpenLines, i, j, &ret);
+
             if(ret.size() > Parameters::minimum_curve_points)
             {
               lines.push_back(ret);
               farPts.push_back(pts);
             }
+
             hasFinished = false;
             break;
           }
         }
+
         if(!hasFinished)
         {
           break;
@@ -1076,6 +1075,10 @@ namespace pandora_vision
 
     // Connect the end points of open shapes
     connectPairs(&thinnedOpenLines, farPts, 1);
+
+    // Since what could be connected was connected, the rest of the open-ended
+    // shapes are not needed.
+    Morphology::pruningStrictIterative(&thinnedOpenLines, 1000);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #3");
