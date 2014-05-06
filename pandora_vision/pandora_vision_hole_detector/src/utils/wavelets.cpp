@@ -46,6 +46,10 @@ namespace pandora_vision
 
   std::vector<float> Wavelets::getH0(int index)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("getH0", "getLowLow");
+    #endif
+
     std::vector<float> h0;
 
     switch (index)
@@ -96,6 +100,10 @@ namespace pandora_vision
         h0.push_back(0.2303778133);
         break;
     }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("getH0");
+    #endif
 
     return h0;
   }
@@ -154,6 +162,10 @@ namespace pandora_vision
   cv::Mat Wavelets::convCols(const cv::Mat& in,
     const std::vector<float>& kernel)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("convCols", "getLowLow");
+    #endif
+
     int length = in.rows + kernel.size() - 1;
 
     //std::cout<<"Length is : "<<length<<std::endl;
@@ -181,6 +193,10 @@ namespace pandora_vision
       //out.push_back(y);
     }
 
+    #ifdef DEBUG_TIME
+    Timer::tick("convCols");
+    #endif
+
     return temp;
   }
 
@@ -189,6 +205,10 @@ namespace pandora_vision
   cv::Mat Wavelets::convRows(const cv::Mat& in,
     const std::vector<float>& kernel)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("convRows", "getLowLow");
+    #endif
+
     int length = in.cols + kernel.size() - 1;
 
     cv::Mat temp = cv::Mat::zeros(in.rows, length, CV_32FC1);
@@ -211,6 +231,10 @@ namespace pandora_vision
         temp.at<float>(k, i)=y;
       }
     }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("convRows");
+    #endif
 
     return temp;
   }
@@ -268,6 +292,10 @@ namespace pandora_vision
     const double& min, const double& max,
     cv::Mat* outImage)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("getLowLow", "inputDepthImageCallback");
+    #endif
+
     cv::Mat temp = cv::Mat(inImage.size(), CV_8UC1);
 
     temp = Visualization::scaleImageForVisualization(inImage, 0);
@@ -293,6 +321,10 @@ namespace pandora_vision
     // After obtaining the low-low, reverse the scale operation, in an
     // attempt to approximate the initial depth image's values
     *outImage = wave->getLowLow(doubled, H0) * (max - min);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("getLowLow");
+    #endif
   }
 
 
@@ -307,6 +339,10 @@ namespace pandora_vision
    **/
   void Wavelets::getLowLow(const cv::Mat& inImage, cv::Mat* outImage)
   {
+    #ifdef DEBUG_TIME
+    Timer::start("getLowLow", "inputRgbImageCallback");
+    #endif
+
     Wavelets* wave = new Wavelets();
 
     std::vector<float> H0 = wave->getH0(1);
@@ -347,6 +383,10 @@ namespace pandora_vision
     }
 
     *outImage = out;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("getLowLow");
+    #endif
   }
 
 
