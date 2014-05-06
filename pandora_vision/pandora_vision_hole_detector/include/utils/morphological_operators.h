@@ -75,6 +75,17 @@ namespace pandora_vision
         const bool& visualize = false);
 
       /**
+        @brief Performs steps of dilation. Each non-zero pixel is assigned
+        the value of its first checked non-zero neighbor.
+        @param img [cv::Mat&*] The input image in CV_8UC1 format
+        @param steps [const int&] Number of operator steps
+        @param visualize [const bool&] True for step-by-step visualization
+        @return void
+       **/
+      static void dilationRelative(cv::Mat* img, const int& steps,
+        const bool& visualize = false);
+
+      /**
         @brief Performs steps of erosion
         @param img [cv::Mat&] The input image in CV_8UC1 format
         @param steps [const int&] Number of operator steps

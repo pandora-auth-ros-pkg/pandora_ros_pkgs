@@ -114,7 +114,7 @@ namespace pandora_vision
     // non-zero points rather than whole areas.
     // Apply dilation so that the non-zero points expand in size and
     // occupy the area of the matchin texture
-    Morphology::dilation(&backprojectedFrame, 2, false);
+    Morphology::dilation(&backprojectedFrame, 2);
 
     //Visualization::show("dilated", backprojectedFrame, 1);
 

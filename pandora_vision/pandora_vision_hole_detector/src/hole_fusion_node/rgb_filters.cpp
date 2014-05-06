@@ -471,6 +471,11 @@ namespace pandora_vision
     Histogram::getBackprojection(inImage_, inHistogram,
       &backProject, Parameters::secondary_channel);
 
+    // Because the backproject is often sparcely populated, dilate each
+    // zero pixel with non-zero neighours to obtain a more accurate depiction
+    // of the backproject image
+    Morphology::dilationRelative(&backProject, 2);
+
     #ifdef DEBUG_SHOW
     //Visualization::show("backProject", backProject, 1);
     #endif

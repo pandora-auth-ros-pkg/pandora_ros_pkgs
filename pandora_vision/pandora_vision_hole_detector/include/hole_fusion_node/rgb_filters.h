@@ -40,6 +40,7 @@
 #include <math.h>
 #include "utils/histogram.h"
 #include "utils/holes_conveyor.h"
+#include "utils/morphological_operators.h"
 #include "utils/parameters.h"
 #include "utils/visualization.h"
 

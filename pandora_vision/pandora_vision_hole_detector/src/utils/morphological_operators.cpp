@@ -60,7 +60,7 @@ namespace pandora_vision
         Visualization::show("Closing iteration", *img, 500);
       }
 
-      dilation(img, 1, false);
+      dilation(img, 1);
       erosion(img, 1, false);
     }
     #ifdef DEBUG_TIME
@@ -91,6 +91,11 @@ namespace pandora_vision
 
     for(unsigned int s = 0 ; s < steps ; s++)
     {
+      if(visualize)
+      {
+        Visualization::show("dilation iteration", *img, 500);
+      }
+
       for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
       {
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
@@ -142,6 +147,94 @@ namespace pandora_vision
           }
         }
       }
+
+      helper.copyTo(*img);
+    }
+    #ifdef DEBUG_TIME
+    Timer::tick("dilation");
+    #endif
+  }
+
+
+
+  /**
+    @brief Performs steps of dilation. Each non-zero pixel is assigned
+    the value of its first checked non-zero neighbor.
+    @param img [cv::Mat&*] The input image in CV_8UC1 format
+    @param steps [const int&] Number of operator steps
+    @param visualize [const bool&] True for step-by-step visualization
+    @return void
+   **/
+  void Morphology::dilationRelative(cv::Mat* img, const int& steps,
+    const bool& visualize)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("dilation", "checkHolesTextureBackProject");
+    #endif
+
+    cv::Mat helper;
+    img->copyTo(helper);
+
+    static unsigned int p = 0;
+
+    for(unsigned int s = 0 ; s < steps ; s++)
+    {
+      if(visualize)
+      {
+        Visualization::show("dilationRelative iteration", *img, 500);
+      }
+
+      for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
+      {
+        for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
+        {
+          p = i * img->cols + j;
+          if(img->data[i * img->cols + j] == 0) // That's foreground
+          {
+            // Check for all adjacent
+            if(img->data[p + img->cols + 1] != 0)
+            {
+              helper.data[p] = img->data[p + img->cols + 1];
+              continue;
+            }
+            if(img->data[p + img->cols] != 0)
+            {
+              helper.data[p] = img->data[p + img->cols];
+              continue;
+            }
+            if(img->data[p + img->cols - 1] != 0)
+            {
+              helper.data[p] = img->data[p + img->cols - 1];
+              continue;
+            }
+            if(img->data[p + 1] != 0)
+            {
+              helper.data[p] = img->data[p + 1];
+              continue;
+            }
+            if(img->data[p - 1] != 0)
+            {
+              helper.data[p] = img->data[p - 1];
+              continue;
+            }
+            if(img->data[p - img->cols + 1] != 0)
+            {
+              helper.data[p] = img->data[p - img->cols + 1];
+              continue;
+            }
+            if(img->data[p - img->cols] != 0)
+            {
+              helper.data[p] = img->data[p - img->cols];
+              continue;
+            }
+            if(img->data[p - img->cols - 1] != 0)
+            {
+              helper.data[p] = img->data[p - img->cols - 1];
+              continue;
+            }
+          }
+        }
+      }
       helper.copyTo(*img);
     }
     #ifdef DEBUG_TIME
@@ -174,6 +267,7 @@ namespace pandora_vision
       {
         Visualization::show("Erosion iteration", *img, 500);
       }
+
       for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
       {
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
