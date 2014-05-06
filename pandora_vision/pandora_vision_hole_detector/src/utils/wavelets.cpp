@@ -276,13 +276,6 @@ namespace pandora_vision
 
     std::vector<float> H0 = wave->getH0(1);
 
-    std::vector<float> G0 = wave->getG0(H0);
-
-    std::vector<float> G1 = wave->getG1(H0);
-
-    std::vector<float> H1 = wave->getH1(G1);
-
-
     cv::Mat doubled = cv::Mat::zeros(temp.rows, temp.cols, CV_32FC1);
 
     for(int y = 0; y < doubled.rows; y++)
@@ -317,13 +310,6 @@ namespace pandora_vision
     Wavelets* wave = new Wavelets();
 
     std::vector<float> H0 = wave->getH0(1);
-
-    std::vector<float> G0 = wave->getG0(H0);
-
-    std::vector<float> G1 = wave->getG1(H0);
-
-    std::vector<float> H1 = wave->getH1(G1);
-
 
     cv::Mat lowLow[3];
 
