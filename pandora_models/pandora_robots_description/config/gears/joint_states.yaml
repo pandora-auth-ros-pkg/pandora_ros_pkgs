@@ -1,3 +1,5 @@
-source_list: 
+source_list:
   - control/joint_states
   - differential_side_joint_states
+  - dynamixel/joint_states
+  - motor/joint_states
