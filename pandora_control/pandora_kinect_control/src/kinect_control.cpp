@@ -70,7 +70,7 @@ namespace pandora_control
     targetPosition.data = 0;
     kinect_pitch_publisher.publish(targetPosition);
     kinect_yaw_publisher.publish(targetPosition);
-    position_ = START;
+    position_ = CENTER;
 
     timer_ = nodeHandle_.createTimer(
       ros::Duration(0.1),
@@ -104,14 +104,14 @@ namespace pandora_control
      if (
         command_ == pandora_kinect_control::MoveKinectGoal::CENTER )
       {
-        if (position_ != START && position_ != CENTER)
+        if (position_ != CENTER)
         {
           std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
           pitchTargetPosition.data = 0;
           yawTargetPosition.data = 0;
           kinect_pitch_publisher.publish(pitchTargetPosition);
           kinect_yaw_publisher.publish(yawTargetPosition);
-          position_ = START;
+          position_ = CENTER;
         }
         ROS_DEBUG("%s: Succeeded", actionName_.c_str());
         // set the action state to succeeded
@@ -128,29 +128,39 @@ namespace pandora_control
           ros::ok() &&
           command_ == pandora_kinect_control::MoveKinectGoal::MOVE)
         {
-          if ( (ros::Time::now().toSec() - lastTime ) > 3)
+          if ( (ros::Time::now().toSec() - lastTime ) > 1)
           {
             switch (position_)
             {
-              case START:
-                pitchTargetPosition.data = 0;
-                yawTargetPosition.data = 0.25;
-                position_ = LEFT;
-                break;
-              case LEFT:
-                pitchTargetPosition.data = 0;
-                yawTargetPosition.data = 0;
-                position_ = CENTER;
-                break;
               case CENTER:
                 pitchTargetPosition.data = 0;
-                yawTargetPosition.data = -0.25;
-                position_ = RIGHT;
-                break;
-              case RIGHT:
-                pitchTargetPosition.data = 0;
                 yawTargetPosition.data = 0;
-                position_ = START;
+                position_ = HIGH_LEFT;
+                break;
+              case HIGH_LEFT:
+                pitchTargetPosition.data = 0;
+                yawTargetPosition.data = 0.7;
+                position_ = LOW_LEFT;
+                break;
+              case LOW_LEFT:
+                pitchTargetPosition.data = 0.2;
+                yawTargetPosition.data = 0.7;
+                position_ = LOW_CENTER;
+                break;
+              case LOW_CENTER:
+                pitchTargetPosition.data = 0.2;
+                yawTargetPosition.data = 0;
+                position_ = LOW_RIGHT;
+                break;
+              case LOW_RIGHT:
+                pitchTargetPosition.data = 0.2;
+                yawTargetPosition.data = -0.7;
+                position_ = HIGH_RIGHT;
+                break;
+              case HIGH_RIGHT:
+                pitchTargetPosition.data = 0;
+                yawTargetPosition.data = -0.7;
+                position_ = CENTER;
                 break;
             }
             kinect_pitch_publisher.publish(pitchTargetPosition);

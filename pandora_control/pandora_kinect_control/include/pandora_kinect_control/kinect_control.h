@@ -47,10 +47,12 @@ namespace pandora_control
 {
   enum
   {
-    START = 0,
-    LEFT = 1,
-    CENTER = 2,
-    RIGHT = 3
+    CENTER = 0,
+    HIGH_LEFT = 1,
+    LOW_LEFT = 2,
+    LOW_CENTER = 3,
+    LOW_RIGHT = 4,
+    HIGH_RIGHT = 5,
   };
 
   class PandoraMoveKinectActionServer
