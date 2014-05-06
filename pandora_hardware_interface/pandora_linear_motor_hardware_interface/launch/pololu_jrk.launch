@@ -1,0 +1,3 @@
+<launch>
+  <node name="pololu_jrk_communicator_node" pkg="pololu_jrk" type="pololu_jrk_communicator_node" />
+</launch>
