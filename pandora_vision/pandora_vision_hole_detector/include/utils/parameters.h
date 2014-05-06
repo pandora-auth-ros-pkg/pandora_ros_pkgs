@@ -211,6 +211,12 @@ namespace pandora_vision
     // on RGB analysis
     static float holes_validity_threshold_urgent;
 
+    // The depth sensor's horizontal field of view
+    static float horizontal_field_of_view;
+
+    // The depth sensor's vertical field of view
+    static float vertical_field_of_view;
+
   };
 
 } // namespace pandora_vision

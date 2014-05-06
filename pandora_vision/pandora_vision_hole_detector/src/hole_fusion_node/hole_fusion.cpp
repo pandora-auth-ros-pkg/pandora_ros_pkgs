@@ -906,6 +906,10 @@ namespace pandora_vision
     ROS_INFO("Hole Fusion Point Cloud callback");
     #endif
 
+    // Store the frame id and timestamp of the point cloud under processing
+    frame_id_ = msg->header.frame_id;
+    timestamp_ = msg->header.stamp;
+
     // Unpack the point cloud and store it in the member variable
     // pointCloudXYZ_
     MessageConversions::extractPointCloudXYZFromMessage(msg,
@@ -1026,6 +1030,8 @@ namespace pandora_vision
     std::map<int, float> validHolesMap;
     validHolesMap = validateHoles(probabilitiesVector2D);
 
+    // Publish the final holes
+    publishValidHoles(rgbdHolesConveyor, &validHolesMap);
 
     #ifdef DEBUG_SHOW
     if (Parameters::show_final_holes)
@@ -1081,6 +1087,70 @@ namespace pandora_vision
     Timer::tick("processCandidateHoles");
     Timer::printAllMeansTree();
     #endif
+  }
+
+
+  /**
+    @brief Publishes the valid holes' information.
+    @param[in] conveyor [const HolesConveyor&] The overall unique holes
+    found by the depth and RGB nodes.
+    @param[in] map [std::map<int, float>*] A map containing the indices
+    of valid holes and their respective probabilities of validity
+    @return void
+   **/
+  void HoleFusion::publishValidHoles(const HolesConveyor& conveyor,
+    std::map<int, float>* map)
+  {
+    // The depth sensor's horzontal and vertical field of view
+    float hfov = Parameters::horizontal_field_of_view;
+    float vfov = Parameters::vertical_field_of_view;
+
+    // The frame's height and width
+    int height = interpolatedDepthImage_.rows;
+    int width = interpolatedDepthImage_.cols;
+
+    // The overall valid holes found message
+    vision_communications::HolesDirectionsVectorMsg holesVectorMsg;
+
+    // Counter for the holes' identifiers
+    int holeId = 0;
+
+    for (std::map<int, float>::iterator it = map->begin();
+      it != map->end(); it++)
+    {
+      // A single hole's message
+      vision_communications::HoleDirectionMsg holeMsg;
+
+      // The hole's keypoint coordinates relative to the center of the frame
+      float x = conveyor.keyPoints[it->first].pt.x
+        - static_cast<float>(width) / 2;
+      float y = static_cast<float>(height) / 2
+        - conveyor.keyPoints[it->first].pt.y;
+
+      // The keypoint's yaw and pitch
+      float yaw = atan(2 * x / width * tan(hfov / 2));
+      float pitch = atan(2 * y / height * tan(vfov / 2));
+
+      // Setup everything needed by the single hole's message
+      holeMsg.header.frame_id = frame_id_;
+      holeMsg.header.stamp = timestamp_;
+
+      holeMsg.yaw = yaw;
+      holeMsg.pitch = pitch;
+      holeMsg.probability = it->second;
+      holeMsg.holeId = holeId;
+
+      // Fill the overall holes found message with the current hole message
+      holesVectorMsg.holesDirections.push_back(holeMsg);
+
+      holeId++;
+    }
+
+    // Publish the message containing the information about all holes found
+    holesVectorMsg.header.stamp = timestamp_;
+    holesVectorMsg.header.frame_id = frame_id_;
+
+    validHolesPublisher_.publish(holesVectorMsg);
   }
 
 

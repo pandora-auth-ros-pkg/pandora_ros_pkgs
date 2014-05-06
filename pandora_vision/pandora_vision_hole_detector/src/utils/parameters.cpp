@@ -204,4 +204,10 @@ namespace pandora_vision
   // on RGB analysis
   float Parameters::holes_validity_threshold_urgent = 0.6;
 
+  // The depth sensor's horizontal field of view
+  float Parameters::horizontal_field_of_view = 57;
+
+  // The depth sensor's vertical field of view
+  float Parameters::vertical_field_of_view = 43;
+
 } // namespace pandora_vision
