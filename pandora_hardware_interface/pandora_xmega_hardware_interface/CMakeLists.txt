@@ -31,7 +31,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-set(CMAKE_BUILD_TYPE Debug)
+#~ set(CMAKE_BUILD_TYPE Debug)
 
 add_library(
   xmega_interface

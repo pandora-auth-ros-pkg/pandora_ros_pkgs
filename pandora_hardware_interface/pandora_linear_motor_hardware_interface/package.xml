@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_linear_motor_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>Containts pandora linear motor hardware interface.</description>
+
+  <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface</url>
+  
+  <author>Evangelos Apostolidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
+  <build_depend>controller_manager</build_depend>
+  <build_depend>controller_interface</build_depend>
+  <build_depend>serial</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslint</run_depend>
+  <run_depend>controller_manager</run_depend>
+  <run_depend>controller_interface</run_depend>
+  <run_depend>serial</run_depend>
+
+  <export>
+  </export>
+</package>
