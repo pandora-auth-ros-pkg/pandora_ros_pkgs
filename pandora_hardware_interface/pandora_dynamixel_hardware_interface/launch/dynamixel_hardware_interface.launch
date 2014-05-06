@@ -3,6 +3,4 @@
     file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controller_manager.launch" />
   <include
     file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controllers.launch" />
-  <include
-    file="$(find pandora_dynamixel_hardware_interface)/launch/joint_states_wrapper.launch" />
 </launch>
