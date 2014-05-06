@@ -1,0 +1,20 @@
+<launch>
+  <!-- Launcher for every controller-->
+  <!-- Motors -->
+  <include
+    file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/motor_controller.launch" />
+
+  <!-- Dynamixel-->
+  <include
+    file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controllers.launch" />
+
+  <!-- XMega (Power and Range)-->
+  <include
+    file="$(find pandora_xmega_hardware_interface)/launch/power_supply_controller.launch" />
+  <include
+    file="$(find pandora_xmega_hardware_interface)/launch/range_sensor_controller.launch" />
+
+  <!-- IMU -->
+  <include
+    file="$(find pandora_imu_hardware_interface)/launch/imu_controller.launch" />
+</launch>

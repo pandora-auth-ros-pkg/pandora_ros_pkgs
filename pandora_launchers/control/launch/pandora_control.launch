@@ -1,0 +1,12 @@
+<launch>
+  <!--Stabilizer -->
+  <include file="$(find pandora_laser_control)/launch/stabilizer_control.launch" />
+
+  <!--Kinect -->
+  <include file="$(find pandora_kinect_control)/launch/pandora_kinect_control.launch" />
+  <node
+    name="move_kinect_script"
+    pkg="pandora_kinect_control"
+    type="move_kinect_script.py"
+    args="0" />
+</launch>

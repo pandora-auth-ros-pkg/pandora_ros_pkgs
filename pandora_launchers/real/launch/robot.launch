@@ -1,0 +1,43 @@
+<launch>
+
+  <arg name="bag" default="false"/>
+
+  <!--State Manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!--Robot Description -->
+  <include file="$(find pandora_models)/pandora_robots_description/launch/gears/gears_description.launch" />
+
+  <!--Hardware Interface -->
+  <include file="$(find pandora_launchers)/control/launch/pandora_hardware_interface.launch" />
+
+  <!--Controllers -->
+  <include file="$(find pandora_launchers)/control/launch/pandora_controllers.launch" />
+
+  <!--Control -->
+  <include file="$(find pandora_launchers)/control/launch/pandora_control.launch" />
+
+  <!-- Slam -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+  <!-- Navigation -->
+<!--
+  <include file="$(find pandora_move_base)/launch/move_base.launch" />
+  <include file="$(find pandora_target_selector)/launch/target_selector.launch" />
+-->
+
+  <!--Data fusion -->
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+
+  <!-- Vision -->
+  <include file="$(find pandora_vision_hole)/launch/hole_find_node.launch" />
+  <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
+  <rosparam file="$(find pandora_launchers)/simulation/config/kinect_params.yaml" command="load" />
+
+  <group if="$(arg bag)">
+    <node name="bag" type="record" pkg="rosbag"
+        args="/vision/image/compressed " />
+  </group>
+
+</launch>
