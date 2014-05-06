@@ -1,5 +1,5 @@
 find_package(catkin REQUIRED COMPONENTS
-  #roscpp
+  roscpp
   rostest
   )
 
