@@ -1132,8 +1132,8 @@ namespace pandora_vision
       float pitch = atan(2 * y / height * tan(vfov / 2));
 
       // Setup everything needed by the single hole's message
-      holeMsg.header.frame_id = frame_id_;
-      holeMsg.header.stamp = timestamp_;
+      // holeMsg.header.frame_id = frame_id_;
+      // holeMsg.header.stamp = timestamp_;
 
       holeMsg.yaw = yaw;
       holeMsg.pitch = pitch;
