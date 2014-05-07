@@ -474,7 +474,7 @@ namespace pandora_vision
     // Because the backproject is often sparcely populated, dilate each
     // zero pixel with non-zero neighours to obtain a more accurate depiction
     // of the backproject image
-    Morphology::dilationRelative(&backProject, 2);
+    Morphology::dilationRelative(&backProject, 3);
 
     #ifdef DEBUG_SHOW
     //Visualization::show("backProject", backProject, 1);

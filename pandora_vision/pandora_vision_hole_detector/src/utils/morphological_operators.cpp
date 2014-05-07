@@ -101,45 +101,45 @@ namespace pandora_vision
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           p = i * img->cols + j;
-          if(img->data[i * img->cols + j] == 0) // That's foreground
+          if (img->data[p] == 0) // That's foreground
           {
             // Check for all adjacent
-            if(img->data[p + img->cols + 1] != 0)
+            if (img->data[p + img->cols + 1] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p + img->cols] != 0)
+            if (img->data[p + img->cols] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p + img->cols - 1] != 0)
+            if (img->data[p + img->cols - 1] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p + 1] != 0)
+            if (img->data[p + 1] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p - 1] != 0)
+            if (img->data[p - 1] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p - img->cols + 1] != 0)
+            if (img->data[p - img->cols + 1] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p - img->cols] != 0)
+            if (img->data[p - img->cols] != 0)
             {
               helper.data[p] = 255;
               continue;
             }
-            if(img->data[p - img->cols - 1] != 0)
+            if (img->data[p - img->cols - 1] != 0)
             {
               helper.data[p] = 255;
               continue;
@@ -148,8 +148,155 @@ namespace pandora_vision
         }
       }
 
+      // The image's borders where left untouched.
+      // Dilate them here
+
+      // Left-most and right-most columns
+      for (int rows = 1; rows < img->rows - 1; rows++)
+      {
+        // The image's left-most pixels
+        p = rows * img->cols + 0;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols + 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p + 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p + img->cols + 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+        }
+
+
+        // The image's right-most pixels
+        p = rows * img->cols + img->cols - 1;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols - 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p + img->cols - 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p - 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+        }
+      }
+
+      // Upper-most and lower-most rows
+      for (int cols = 1; cols < img->cols - 1; cols++)
+      {
+        // The image's upper-most pixels
+        p = 0 * img->cols + cols;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p + img->cols - 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p + img->cols] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p + img->cols + 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+        }
+
+        // The image's lower-most pixels
+        p = (img->rows - 1) * img->cols + cols;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols - 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p - img->cols] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+          if (img->data[p - img->cols + 1] != 0)
+          {
+            helper.data[p] = 255;
+            continue;
+          }
+        }
+      }
+
+      // Finally, the 4 edges of the image
+
+      // Upper left
+      p = 0;
+
+      if (img->data[p] == 0)
+      {
+        if (img->data[p + img->cols + 1] != 0)
+        {
+          helper.data[p] = 255;
+        }
+      }
+
+      // Upper right
+      p = img->cols - 1;
+
+      if (img->data[p] == 0)
+      {
+        if (img->data[p + img->cols - 1] != 0)
+        {
+          helper.data[p] = 255;
+        }
+      }
+
+      // Lower right
+      p = (img->rows - 1) * img->cols + img->cols - 1;
+
+      if (img->data[p] == 0)
+      {
+        if (img->data[p - img->cols - 1] != 0)
+        {
+          helper.data[p] = 255;
+        }
+      }
+
+      // Lower left
+      p = (img->rows - 1) * img->cols;
+
+      if (img->data[p] == 0)
+      {
+        if (img->data[p - img->cols + 1] != 0)
+        {
+          helper.data[p] = 255;
+        }
+      }
+
       helper.copyTo(*img);
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("dilation");
     #endif
@@ -191,70 +338,184 @@ namespace pandora_vision
           unsigned char max = 0;
 
           p = i * img->cols + j;
-          if(img->data[i * img->cols + j] == 0) // That's foreground
+
+          if(img->data[p] == 0) // That's foreground
           {
             // Check for all adjacent
-            if(img->data[p + img->cols + 1] != 0)
+            if (img->data[p + img->cols + 1] > max)
             {
-              if (max > img->data[p + img->cols + 1])
-              {
-                max = img->data[p + img->cols + 1];
-              }
+              max = img->data[p + img->cols + 1];
             }
-            if(img->data[p + img->cols] != 0)
+            if (img->data[p + img->cols] > max)
             {
-              if (max > img->data[p + img->cols])
-              {
-                max = img->data[p + img->cols];
-              }
+              max = img->data[p + img->cols];
             }
-            if(img->data[p + img->cols - 1] != 0)
+            if (img->data[p + img->cols - 1] > max)
             {
-              if (max > img->data[p + img->cols - 1])
-              {
-                max = img->data[p + img->cols - 1];
-              }
+              max = img->data[p + img->cols - 1];
             }
-            if(img->data[p + 1] != 0)
+            if (img->data[p + 1] > max)
             {
-              if (max > img->data[p + 1])
-              {
-                max = img->data[p + 1];
-              }
+              max = img->data[p + 1];
             }
-            if(img->data[p - 1] != 0)
+            if (img->data[p - 1] > max)
             {
-              if (max > img->data[p - 1])
-              {
-                max = img->data[p - 1];
-              }
+              max = img->data[p - 1];
             }
-            if(img->data[p - img->cols + 1] != 0)
+            if (img->data[p - img->cols + 1] > max)
             {
-              if (max > img->data[p - img->cols + 1])
-              {
-                max = img->data[p - img->cols + 1];
-              }
+              max = img->data[p - img->cols + 1];
             }
-            if(img->data[p - img->cols] != 0)
+            if (img->data[p - img->cols] > max)
             {
-              if (max > img->data[p - img->cols])
-              {
-                max = img->data[p - img->cols];
-              }
+              max = img->data[p - img->cols];
             }
-            if(img->data[p - img->cols - 1] != 0)
+            if (img->data[p - img->cols - 1] > max)
             {
-              if (img->data[p - img->cols - 1])
-              {
-                max = img->data[p - img->cols - 1];
-              }
+              max = img->data[p - img->cols - 1];
             }
 
             helper.data[p] = max;
           }
         }
       }
+
+
+      // The image's borders where left untouched.
+      // Dilate them here
+
+      // Left-most and right-most columns
+      for (int rows = 1; rows < img->rows - 1; rows++)
+      {
+        unsigned char maxLeft = 0;
+        unsigned char maxRight = 0;
+
+        // The image's left-most pixels
+        p = rows * img->cols + 0;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols + 1] > maxLeft)
+          {
+            maxLeft = img->data[p - img->cols + 1];
+          }
+          if (img->data[p + 1] > maxLeft)
+          {
+            maxLeft = img->data[p + 1];
+          }
+          if (img->data[p + img->cols + 1] > maxLeft)
+          {
+            maxLeft = img->data[p + img->cols + 1];
+          }
+
+          helper.data[p] = maxLeft;
+        }
+
+        // The image's right-most pixels
+        p = rows * img->cols + img->cols - 1;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols - 1] > maxRight)
+          {
+            maxRight = img->data[p - img->cols - 1];
+          }
+          if (img->data[p + img->cols - 1] > maxRight)
+          {
+            maxRight = img->data[p + img->cols - 1];
+          }
+          if (img->data[p - 1] > maxRight)
+          {
+            maxRight = img->data[p - 1];
+          }
+
+          helper.data[p] = maxRight;
+        }
+      }
+
+      // Upper-most and lower-most rows
+      for (int cols = 1; cols < img->cols - 1; cols++)
+      {
+        unsigned char maxUp = 0;
+        unsigned char maxDown = 0;
+
+        // The image's upper-most pixels
+        p = 0 * img->cols + cols;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p + img->cols - 1] > maxUp)
+          {
+            maxUp = img->data[p + img->cols - 1];
+          }
+          if (img->data[p + img->cols] > maxUp)
+          {
+            maxUp = img->data[p + img->cols];
+          }
+          if (img->data[p + img->cols + 1] > maxUp)
+          {
+            maxUp = img->data[p + img->cols + 1];
+          }
+
+          helper.data[p] = maxUp;
+        }
+
+
+        // The image's lower-most pixels
+        p = (img->rows - 1) * img->cols + cols;
+
+        if (img->data[p] == 0)
+        {
+          if (img->data[p - img->cols - 1] > maxDown)
+          {
+            maxDown = img->data[p - img->cols - 1];
+          }
+          if (img->data[p - img->cols] > maxDown)
+          {
+            maxDown = img->data[p - img->cols];
+          }
+          if (img->data[p - img->cols + 1] > maxDown)
+          {
+            maxDown = img->data[p - img->cols + 1];
+          }
+
+          helper.data[p] = maxDown;
+        }
+      }
+      // Finally, the 4 edges of the image
+
+      // Upper left
+      p = 0;
+
+      if (img->data[p + img->cols + 1] > img->data[p])
+      {
+        helper.data[p] = img->data[p + img->cols + 1];
+      }
+
+      // Upper right
+      p = img->cols - 1;
+
+      if (img->data[p + img->cols - 1] > img->data[p])
+      {
+        helper.data[p] = img->data[p + img->cols - 1];
+      }
+
+      // Lower right
+      p = (img->rows - 1) * img->cols + img->cols - 1;
+
+      if (img->data[p - img->cols - 1] > img->data[p])
+      {
+        helper.data[p] = img->data[p - img->cols - 1];
+      }
+
+      // Lower left
+      p = (img->rows - 1) * img->cols;
+
+      if (img->data[p - img->cols + 1] > img->data[p])
+      {
+        helper.data[p] = img->data[p - img->cols + 1];
+      }
+
       helper.copyTo(*img);
     }
     #ifdef DEBUG_TIME
