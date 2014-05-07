@@ -57,18 +57,17 @@ namespace pandora_vision
     // that of the pixels after
     EXPECT_LT(nonZerosBefore, nonZerosAfter);
 
+    // The number of non-zero pixels before the dilation should be three times
+    // as many as that of the pixels after
+    EXPECT_EQ( 3 * nonZerosBefore, nonZerosAfter );
+
     // One row higher and one row lower than 100, all pixels should now
     // have a non-zero value
-    for( int i = 1; i < img0_.cols - 1; ++i )
+    for( int cols = 0; cols < img0_.cols; ++cols )
     {
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 99, i ));
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 101, i ));
+      EXPECT_EQ( 255, img0_.at<unsigned char>( 99, cols ));
+      EXPECT_EQ( 255, img0_.at<unsigned char>( 101, cols ));
     }
-
-    EXPECT_EQ( 0, img0_.at<unsigned char>( 99, 0 ));
-    EXPECT_EQ( 0, img0_.at<unsigned char>( 101, 0 ));
-    EXPECT_EQ( 0, img0_.at<unsigned char>( 99, WIDTH - 1 ));
-    EXPECT_EQ( 0, img0_.at<unsigned char>( 101, WIDTH - 1 ));
 
     // Perform dilation on the img1_
     Morphology::dilation( &img1_, 1 );

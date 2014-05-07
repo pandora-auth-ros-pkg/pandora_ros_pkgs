@@ -159,20 +159,12 @@ namespace pandora_vision
 
         if (img->data[p] == 0)
         {
-          if (img->data[p - img->cols + 1] != 0)
+          if (img->data[p - img->cols + 1] != 0
+            || img->data[p + 1] != 0
+            || img->data[p + img->cols + 1] != 0)
+
           {
             helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p + 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p + img->cols + 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
           }
         }
 
@@ -182,20 +174,11 @@ namespace pandora_vision
 
         if (img->data[p] == 0)
         {
-          if (img->data[p - img->cols - 1] != 0)
+          if (img->data[p - img->cols - 1] != 0
+            || img->data[p + img->cols - 1] != 0
+            || img->data[p - 1] != 0)
           {
             helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p + img->cols - 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p - 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
           }
         }
       }
@@ -208,20 +191,11 @@ namespace pandora_vision
 
         if (img->data[p] == 0)
         {
-          if (img->data[p + img->cols - 1] != 0)
+          if (img->data[p + img->cols - 1] != 0
+            || img->data[p + img->cols] != 0
+            || img->data[p + img->cols + 1] != 0)
           {
             helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p + img->cols] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p + img->cols + 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
           }
         }
 
@@ -230,17 +204,9 @@ namespace pandora_vision
 
         if (img->data[p] == 0)
         {
-          if (img->data[p - img->cols - 1] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p - img->cols] != 0)
-          {
-            helper.data[p] = 255;
-            continue;
-          }
-          if (img->data[p - img->cols + 1] != 0)
+          if (img->data[p - img->cols - 1] != 0
+            || img->data[p - img->cols] != 0
+            || img->data[p - img->cols + 1] != 0)
           {
             helper.data[p] = 255;
             continue;
