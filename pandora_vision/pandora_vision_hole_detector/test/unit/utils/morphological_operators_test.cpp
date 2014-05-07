@@ -14,28 +14,39 @@ namespace pandora_vision
         WIDTH = 640;
         HEIGHT = 480;
 
-        img0_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
-        img1_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        dilation0_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        dilation1_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        dilation2_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
-        ASSERT_EQ( HEIGHT, img0_.rows );
-        ASSERT_EQ( WIDTH, img0_.cols );
+        ASSERT_EQ( HEIGHT, dilation0_.rows );
+        ASSERT_EQ( WIDTH, dilation0_.cols );
 
-        // img0_ holds a horizontal white line at row 100,
+        // dilation0_ holds a horizontal white line at row 100,
         // with width of 1 pixel
-        for ( int cols = 0; cols < img0_.cols; ++cols )
+        for ( int cols = 0; cols < dilation0_.cols; ++cols )
         {
-          img0_.at<unsigned char>( 100, cols ) = 255;
+          dilation0_.at<unsigned char>( 100, cols ) = 255;
         }
 
-        // img1_ holds a single non-zero pixel
-        img1_.at<unsigned char>( 100, 100 ) = 255;
+        // dilation1_ holds a single non-zero pixel
+        dilation1_.at<unsigned char>( 100, 100 ) = 255;
+
+        // dilation2_ is a white image except for its borders which are black
+        for ( int rows = 1; rows < dilation2_.rows - 1; rows++ )
+        {
+          for ( int cols = 1; cols < dilation2_.cols - 1; cols++ )
+          {
+            dilation2_.at<unsigned char>(rows, cols) = 255;
+          }
+        }
       }
 
       int WIDTH;
       int HEIGHT;
 
-      cv::Mat img0_;
-      cv::Mat img1_;
+      cv::Mat dilation0_;
+      cv::Mat dilation1_;
+      cv::Mat dilation2_;
 
   };
 
@@ -44,18 +55,22 @@ namespace pandora_vision
   //!< Test Morphology::dilation()
   TEST_F( MorphologyTest, DilationTest )
   {
+    /***************************************************************************
+    * Test dilation0_
+    ***************************************************************************/
+
     // The number of non-zero pixels before dilation
-    int nonZerosBefore = cv::countNonZero( img0_ );
+    int nonZerosBefore = cv::countNonZero( dilation0_ );
 
     // Dilate once
-    Morphology::dilation( &img0_, 1 );
+    Morphology::dilation( &dilation0_, 1 );
 
     // The number of non-zero pixels after dilation
-    int nonZerosAfter = cv::countNonZero( img0_ );
+    int nonZerosAfter = cv::countNonZero( dilation0_ );
 
     // The number of non-zero pixels before the dilation should be less than
     // that of the pixels after
-    EXPECT_LT(nonZerosBefore, nonZerosAfter);
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
 
     // The number of non-zero pixels before the dilation should be three times
     // as many as that of the pixels after
@@ -63,14 +78,18 @@ namespace pandora_vision
 
     // One row higher and one row lower than 100, all pixels should now
     // have a non-zero value
-    for( int cols = 0; cols < img0_.cols; ++cols )
+    for( int cols = 0; cols < dilation0_.cols; ++cols )
     {
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 99, cols ));
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 101, cols ));
+      EXPECT_EQ( 255, dilation0_.at<unsigned char>( 99, cols ));
+      EXPECT_EQ( 255, dilation0_.at<unsigned char>( 101, cols ));
     }
 
-    // Perform dilation on the img1_
-    Morphology::dilation( &img1_, 1 );
+    /***************************************************************************
+    * Test dilation1_
+    ***************************************************************************/
+
+    // Perform dilation on the dilation1_
+    Morphology::dilation( &dilation1_, 1 );
 
     // All pixels surrounding immediately the only non-zero one before dilation
     // should now have a non-zero value
@@ -78,10 +97,30 @@ namespace pandora_vision
     {
       for ( int j = -1; j < 2; ++j )
       {
-        EXPECT_EQ( 255, img1_.at<unsigned char>( 100 + i, 100 + j ));
+        EXPECT_EQ( 255, dilation1_.at<unsigned char>( 100 + i, 100 + j ));
       }
     }
+
+    /***************************************************************************
+     * Test dilation2_
+     ***************************************************************************/
+
+    // The number of non-zero pixels before dilation
+    nonZerosBefore = cv::countNonZero( dilation2_ );
+
+    // Dilate once
+    Morphology::dilation( &dilation2_, 1 );
+
+    // The number of non-zero pixels after dilation
+    nonZerosAfter = cv::countNonZero( dilation2_ );
+
+    // The number of non-zero pixels before the dilation should be less than
+    // that of the pixels after
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // The number of non-zero pixels before the dilation should be three times
+    // as many as that of the pixels after
+    EXPECT_EQ( WIDTH * HEIGHT, nonZerosAfter );
   }
 
 }  // namespace pandora_vision
-
