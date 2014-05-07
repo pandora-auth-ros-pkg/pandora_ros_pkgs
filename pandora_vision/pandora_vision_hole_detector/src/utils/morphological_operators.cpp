@@ -101,6 +101,7 @@ namespace pandora_vision
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           p = i * img->cols + j;
+
           if (img->data[p] == 0) // That's foreground
           {
             // Check for all adjacent
@@ -508,6 +509,8 @@ namespace pandora_vision
     cv::Mat helper;
     img->copyTo(helper);
 
+    static unsigned int p = 0;
+
     for(unsigned int s = 0 ; s < steps ; s++)
     {
       if(visualize)
@@ -519,52 +522,167 @@ namespace pandora_vision
       {
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
-          if(img->at<unsigned char>(i, j) != 0) // That's foreground
+          p = i * img->cols + j;
+
+          if(img->data[p] != 0) // That's foreground
           {
             // Check for all adjacent
-            if(img->at<unsigned char>(i + 1, j + 1) == 0)
+            if(img->data[p + img->cols + 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i + 1, j) == 0)
+            if(img->data[p + img->cols] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i + 1, j - 1) == 0)
+            if(img->data[p + img->cols - 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i, j + 1) == 0)
+            if(img->data[p + 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i, j - 1) == 0)
+            if(img->data[p - 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i - 1, j - 1) == 0)
+            if(img->data[p - img->cols - 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i - 1, j) == 0)
+            if(img->data[p - img->cols] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
-            if(img->at<unsigned char>(i - 1, j + 1) == 0)
+            if(img->data[p - img->cols + 1] == 0)
             {
-              helper.at<unsigned char>(i, j) = 0;
+              img->data[p] = 0;
               continue;
             }
           }
         }
       }
+
+      // The image's borders where left untouched.
+      // Erode them here
+
+      // Left-most and right-most columns
+      for (int rows = 1; rows < img->rows - 1; rows++)
+      {
+        // The image's left-most pixels
+        p = rows * img->cols + 0;
+
+        if (img->data[p] != 0)
+        {
+          if (img->data[p - img->cols + 1] == 0
+            || img->data[p + 1] == 0
+            || img->data[p + img->cols + 1] == 0)
+
+          {
+            helper.data[p] = 0;
+          }
+        }
+
+
+        // The image's right-most pixels
+        p = rows * img->cols + img->cols - 1;
+
+        if (img->data[p] != 0)
+        {
+          if (img->data[p - img->cols - 1] == 0
+            || img->data[p + img->cols - 1] == 0
+            || img->data[p - 1] == 0)
+          {
+            helper.data[p] = 0;
+          }
+        }
+      }
+
+      // Upper-most and lower-most rows
+      for (int cols = 1; cols < img->cols - 1; cols++)
+      {
+        // The image's upper-most pixels
+        p = 0 * img->cols + cols;
+
+        if (img->data[p] != 0)
+        {
+          if (img->data[p + img->cols - 1] == 0
+            || img->data[p + img->cols] == 0
+            || img->data[p + img->cols + 1] == 0)
+          {
+            helper.data[p] = 0;
+          }
+        }
+
+        // The image's lower-most pixels
+        p = (img->rows - 1) * img->cols + cols;
+
+        if (img->data[p] != 0)
+        {
+          if (img->data[p - img->cols - 1] == 0
+            || img->data[p - img->cols] == 0
+            || img->data[p - img->cols + 1] == 0)
+          {
+            helper.data[p] = 0;
+            continue;
+          }
+        }
+      }
+
+      // Finally, the 4 edges of the image
+
+      // Upper left
+      p = 0;
+
+      if (img->data[p] != 0)
+      {
+        if (img->data[p + img->cols + 1] == 0)
+        {
+          helper.data[p] = 0;
+        }
+      }
+
+      // Upper right
+      p = img->cols - 1;
+
+      if (img->data[p] != 0)
+      {
+        if (img->data[p + img->cols - 1] == 0)
+        {
+          helper.data[p] = 0;
+        }
+      }
+
+      // Lower right
+      p = (img->rows - 1) * img->cols + img->cols - 1;
+
+      if (img->data[p] != 0)
+      {
+        if (img->data[p - img->cols - 1] == 0)
+        {
+          helper.data[p] = 0;
+        }
+      }
+
+      // Lower left
+      p = (img->rows - 1) * img->cols;
+
+      if (img->data[p] != 0)
+      {
+        if (img->data[p - img->cols + 1] == 0)
+        {
+          helper.data[p] = 0;
+        }
+      }
+
       helper.copyTo(*img);
     }
     #ifdef DEBUG_TIME
