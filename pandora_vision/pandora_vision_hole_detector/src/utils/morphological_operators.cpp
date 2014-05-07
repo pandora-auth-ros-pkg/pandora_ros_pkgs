@@ -159,7 +159,7 @@ namespace pandora_vision
 
   /**
     @brief Performs steps of dilation. Each non-zero pixel is assigned
-    the value of its first checked non-zero neighbor.
+    the maximum value of its non-zero neighbors.
     @param img [cv::Mat&*] The input image in CV_8UC1 format
     @param steps [const int&] Number of operator steps
     @param visualize [const bool&] True for step-by-step visualization
@@ -188,50 +188,70 @@ namespace pandora_vision
       {
         for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
+          unsigned char max = 0;
+
           p = i * img->cols + j;
           if(img->data[i * img->cols + j] == 0) // That's foreground
           {
             // Check for all adjacent
             if(img->data[p + img->cols + 1] != 0)
             {
-              helper.data[p] = img->data[p + img->cols + 1];
-              continue;
+              if (max > img->data[p + img->cols + 1])
+              {
+                max = img->data[p + img->cols + 1];
+              }
             }
             if(img->data[p + img->cols] != 0)
             {
-              helper.data[p] = img->data[p + img->cols];
-              continue;
+              if (max > img->data[p + img->cols])
+              {
+                max = img->data[p + img->cols];
+              }
             }
             if(img->data[p + img->cols - 1] != 0)
             {
-              helper.data[p] = img->data[p + img->cols - 1];
-              continue;
+              if (max > img->data[p + img->cols - 1])
+              {
+                max = img->data[p + img->cols - 1];
+              }
             }
             if(img->data[p + 1] != 0)
             {
-              helper.data[p] = img->data[p + 1];
-              continue;
+              if (max > img->data[p + 1])
+              {
+                max = img->data[p + 1];
+              }
             }
             if(img->data[p - 1] != 0)
             {
-              helper.data[p] = img->data[p - 1];
-              continue;
+              if (max > img->data[p - 1])
+              {
+                max = img->data[p - 1];
+              }
             }
             if(img->data[p - img->cols + 1] != 0)
             {
-              helper.data[p] = img->data[p - img->cols + 1];
-              continue;
+              if (max > img->data[p - img->cols + 1])
+              {
+                max = img->data[p - img->cols + 1];
+              }
             }
             if(img->data[p - img->cols] != 0)
             {
-              helper.data[p] = img->data[p - img->cols];
-              continue;
+              if (max > img->data[p - img->cols])
+              {
+                max = img->data[p - img->cols];
+              }
             }
             if(img->data[p - img->cols - 1] != 0)
             {
-              helper.data[p] = img->data[p - img->cols - 1];
-              continue;
+              if (img->data[p - img->cols - 1])
+              {
+                max = img->data[p - img->cols - 1];
+              }
             }
+
+            helper.data[p] = max;
           }
         }
       }

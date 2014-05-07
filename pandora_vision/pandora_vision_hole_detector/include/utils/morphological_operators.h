@@ -76,7 +76,7 @@ namespace pandora_vision
 
       /**
         @brief Performs steps of dilation. Each non-zero pixel is assigned
-        the value of its first checked non-zero neighbor.
+        the maximum value of its non-zero neighbors.
         @param img [cv::Mat&*] The input image in CV_8UC1 format
         @param steps [const int&] Number of operator steps
         @param visualize [const bool&] True for step-by-step visualization
