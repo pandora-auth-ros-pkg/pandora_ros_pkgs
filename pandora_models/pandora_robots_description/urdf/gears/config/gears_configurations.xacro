@@ -23,19 +23,11 @@
     <xacro:property name="enable_thermal_sensor" value="false" />
     <xacro:property name="enable_co2_sensor" value="false" />
     <xacro:property name="enable_microphone_sensor" value="false" />
-  <!-- Transmission ======================================================= -->
-  <xacro:property name="enable_sensor_transmission" value="true" />
-    <xacro:property name="enable_laser_sensor_transmission" value="true" />
-    <xacro:property name="enable_kinect_sensor_transmission" value="true" />
-  <xacro:property name="enable_wheel_transmission" value="true" />
   <!-- Plugins ============================================================ -->
   <xacro:property name="enable_plugins" value="true" />
     <xacro:property name="enable_pandora_differential_plugin" value="true" />
     <xacro:property name="enable_pandora_p3d_plugin" value="false" />
     <xacro:property name="enable_ros_imu_plugin" value="false" />
-    <xacro:property name="enable_pandora_imu_stabilizer_plugin" value="false" />
-    <xacro:property name="enable_ros_control_plugin" value="true" />
-    <xacro:property name="enable_ros_skid_steer_drive_plugin" value="true" />
   <!-- SDF Physics ======================================================== -->
   <xacro:property name="enable_sdf_physics" value="true" />
     <xacro:property name="enable_base_link_sdf_physics" value="true" />

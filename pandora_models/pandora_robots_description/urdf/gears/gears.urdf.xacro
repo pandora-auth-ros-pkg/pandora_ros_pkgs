@@ -99,7 +99,7 @@
   <xacro:if value="${enable_sensors}" >
     <!-- ================================================================== -->
     <xacro:if value="${enable_kinect_sensor}" >
-      <xacro:kinect_sensor />
+      <xacro:kinect_sensor control="$(arg control)" />
     </xacro:if>
     <!-- ================================================================== -->
     <xacro:if value="${enable_hokuyo_laser_sensor}" >
@@ -130,32 +130,24 @@
   <xacro:if value="$(arg control)" >
     <!-- ================================================================== -->
     <xacro:if value="${enable_wheel_links}" >
-      <xacro:if value="${enable_wheel_transmission}" >
-        <xacro:wheel_transmission prefix_y="left" prefix_x="front" />
-        <xacro:wheel_transmission prefix_y="left" prefix_x="rear" />
-        <xacro:wheel_transmission prefix_y="right" prefix_x="front" />
-        <xacro:wheel_transmission prefix_y="right" prefix_x="rear" />
-      </xacro:if>
+      <xacro:wheel_transmission prefix_y="left" prefix_x="front" />
+      <xacro:wheel_transmission prefix_y="left" prefix_x="rear" />
+      <xacro:wheel_transmission prefix_y="right" prefix_x="front" />
+      <xacro:wheel_transmission prefix_y="right" prefix_x="rear" />
     </xacro:if>
     <!-- ================================================================== -->
     <xacro:if value="${enable_sensors}" >
-      <xacro:if value="${enable_sensor_transmission}" >
-        <!-- ============================================================== -->
-        <xacro:if value="${enable_kinect_sensor}" >
-          <xacro:if value="${enable_kinect_sensor_transmission}" >
-            <xacro:sensor_transmission sensor="kinect" rotation="pitch" />
-            <xacro:sensor_transmission sensor="kinect" rotation="yaw" />
-          </xacro:if>
-        </xacro:if>
-        <!-- ============================================================== -->
-        <xacro:if value="${enable_hokuyo_laser_sensor}" >
-          <xacro:if value="${enable_laser_sensor_transmission}" >
-            <xacro:sensor_transmission sensor="laser" rotation="roll" />
-            <xacro:sensor_transmission sensor="laser" rotation="pitch" />
-          </xacro:if>
-        </xacro:if>
-        <!-- ============================================================== -->
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_kinect_sensor}" >
+        <xacro:sensor_transmission sensor="kinect" rotation="pitch" />
+        <xacro:sensor_transmission sensor="kinect" rotation="yaw" />
       </xacro:if>
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_hokuyo_laser_sensor}" >
+        <xacro:sensor_transmission sensor="laser" rotation="roll" />
+        <xacro:sensor_transmission sensor="laser" rotation="pitch" />
+      </xacro:if>
+      <!-- ================================================================ -->
     </xacro:if>
     <!-- ================================================================== -->
   </xacro:if>
@@ -172,27 +164,27 @@
       <xacro:pandora_p3d_plugin />
     </xacro:if>
     <!-- ================================================================== -->
-    <xacro:if value="${enable_ros_imu_plugin}" >
-      <xacro:unless value="${enable_pandora_imu_stabilizer_plugin}" >
-        <xacro:ros_imu_plugin />
-      </xacro:unless>
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_pandora_imu_stabilizer_plugin}" >
-      <xacro:unless value="${enable_ros_imu_plugin}" >
-        <xacro:pandora_imu_stabilizer_plugin />
-      </xacro:unless>
+    <xacro:if value="$(arg control)" >
+      <xacro:gazebo_ros_control_plugin />
     </xacro:if>
     <!-- ================================================================== -->
     <xacro:if value="$(arg control)" >
-      <xacro:if value="${enable_ros_control_plugin}" >
-        <xacro:gazebo_ros_control_plugin />
+      <xacro:if value="${enable_ros_imu_plugin}" >
+        <xacro:ros_imu_plugin />
       </xacro:if>
     </xacro:if>
     <!-- ================================================================== -->
-    <xacro:if value="${enable_ros_skid_steer_drive_plugin}" >
-      <xacro:ros_skid_steer_drive_plugin />
+    <xacro:if value="${enable_sensors}" >
+      <xacro:if value="${enable_hokuyo_laser_sensor}" >
+        <xacro:unless value="$(arg control)" >
+          <xacro:pandora_imu_stabilizer_plugin />
+        </xacro:unless>
+      </xacro:if>
     </xacro:if>
+    <!-- ================================================================== -->
+    <xacro:unless value="$(arg control)" >
+      <xacro:ros_skid_steer_drive_plugin />
+    </xacro:unless>
   <!-- ==================================================================== -->
   </xacro:if>
 

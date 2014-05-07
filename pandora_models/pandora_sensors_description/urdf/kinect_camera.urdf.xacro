@@ -3,7 +3,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <xacro:macro name="kinect_caster"
-               params="parent *origin" >
+               params="parent control *origin" >
 
     <link name="kinect_link" >
 
@@ -144,38 +144,75 @@
 
     </link>
 
-    <joint name="kinect_pitch_joint"
-           type="revolute" >
+    <xacro:if value="${control}" >
 
-      <parent link="${parent}" />
-      <child link="kinect_base_link" />
+      <joint name="kinect_pitch_joint"
+             type="revolute" >
 
-      <xacro:insert_block name="origin" />
+        <parent link="${parent}" />
+        <child link="kinect_base_link" />
 
-      <axis xyz="0 1 0" />
-      <limit lower="-1.57"
-             upper="1.57"
-             effort="300"
-             velocity="100.0" />
+        <xacro:insert_block name="origin" />
 
-    </joint>
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57"
+               upper="1.57"
+               effort="300"
+               velocity="100.0" />
 
-    <joint name="kinect_yaw_joint"
-           type="revolute" >
+      </joint>
+      
+    </xacro:if>
 
-      <parent link="kinect_base_link" />
-      <child link="kinect_link" />
+    <xacro:unless value="${control}" >
 
-      <origin xyz="0 0 0"
-              rpy="0 0 0" />
+      <joint name="kinect_pitch_joint"
+             type="fixed" >
 
-      <axis xyz="0 0 1" />
-      <limit lower="-1.57"
-             upper="1.57"
-             effort="300"
-             velocity="100.0" />
+        <parent link="${parent}" />
+        <child link="kinect_base_link" />
 
-    </joint>
+        <xacro:insert_block name="origin" />
+
+      </joint>
+      
+    </xacro:unless>
+
+    <xacro:if value="${control}" >
+
+      <joint name="kinect_yaw_joint"
+             type="revolute" >
+
+        <parent link="kinect_base_link" />
+        <child link="kinect_link" />
+
+        <origin xyz="0 0 0"
+                rpy="0 0 0" />
+
+        <axis xyz="0 0 1" />
+        <limit lower="-1.57"
+               upper="1.57"
+               effort="300"
+               velocity="100.0" />
+
+      </joint>
+      
+    </xacro:if>
+
+    <xacro:unless value="${control}" >
+
+      <joint name="kinect_yaw_joint"
+             type="fixed" >
+
+        <parent link="kinect_base_link" />
+        <child link="kinect_link" />
+
+        <origin xyz="0 0 0"
+                rpy="0 0 0" />
+
+      </joint>
+      
+    </xacro:unless>
 
   </xacro:macro>
 

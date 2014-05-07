@@ -20,9 +20,10 @@
 
 <!-- Kinect ############################################################### -->
 
-  <xacro:macro name="kinect_sensor" >
+  <xacro:macro name="kinect_sensor"
+               params="control" >
     <!-- ================================================================== -->
-    <xacro:kinect_caster parent="${base_link_name}_link" >
+    <xacro:kinect_caster parent="${base_link_name}_link" control="${control}" >
 
       <origin xyz="0.156 0.0 0.526"
               rpy="${zero}" />
