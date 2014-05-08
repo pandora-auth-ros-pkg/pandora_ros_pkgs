@@ -118,43 +118,14 @@ namespace pandora_vision
         const bool& visualize = false);
 
       /**
-        @brief Performs steps of pruning
-        @param img [cv::Mat*] The input image in CV_8UC1 format
-        @param steps [const int&] Number of operator steps
-        @param visualize [const bool&] True for step-by-step visualization
-        @return void
-       **/
-      static void pruning(cv::Mat* inImage, const int& steps,
-        const bool& visualize = false);
-
-      /**
         @brief Performs steps of strict pruning (removes more stuff)
-        @param img [cv::Mat*] The input image in CV_8UC1 format
-        @param steps [const int&] Number of operator steps
-        @param visualize [const bool&] True for step-by-step visualization
-        @return void
-       **/
-      static void pruningStrict(cv::Mat* inImage, const int& steps,
-        const bool& visualize = false);
-
-      /**
-        @brief Performs steps of strict pruning (removes more stuff)
+        Caution: This method presupposes that the input image @param img is
+        a thinned image
         @param img [cv::Mat*] The input image in CV_8UC1 format
         @param steps [const int&] Number of operator steps
         @return void
        **/
       static void pruningStrictIterative(cv::Mat* inImage, const int& steps);
-
-      /**
-        @brief Performs steps of thickenning
-        @param inImage [const cv::Mat&] The input image in CV_8UC1 format
-        @param outImage [cv::Mat*] The output image in CV_8UC1 format
-        @param steps [const int&] Number of operator steps
-        @param visualize [const bool&] True for step-by-step visualization
-        @return void
-       **/
-      static void thickenning(const cv::Mat& inImage, cv::Mat* outImage,
-        const int& steps, const bool& visualize = false);
 
       /**
         @brief Performs steps of thinning

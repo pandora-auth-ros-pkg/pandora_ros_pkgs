@@ -53,6 +53,7 @@ namespace pandora_vision
 
         pixel_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
         line_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+        thick_line_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
         square_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
         frame_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
 
@@ -60,13 +61,21 @@ namespace pandora_vision
         ASSERT_EQ( WIDTH, line_.cols );
 
         // pixel_ holds a single non-zero pixel
-        pixel_.at<unsigned char>( 100, 100 ) = 255;
+        pixel_.at< unsigned char >( 100, 100 ) = 255;
 
         // line_ holds a horizontal white line at row 100,
         // with width of 1 pixel
         for ( int cols = 0; cols < line_.cols; ++cols )
         {
-          line_.at<unsigned char>( 100, cols ) = 255;
+          line_.at< unsigned char >( 100, cols ) = 255;
+        }
+
+        // thick_line_ holds horizontal white lines at rows 99, 100 and 101
+        for ( int cols = 0; cols < line_.cols; ++cols )
+        {
+          thick_line_.at< unsigned char >( 99, cols ) = 255;
+          thick_line_.at< unsigned char >( 100, cols ) = 255;
+          thick_line_.at< unsigned char >( 101, cols ) = 255;
         }
 
         // square_ is a 100 X 100 opaque square,
@@ -76,7 +85,7 @@ namespace pandora_vision
         {
           for ( int cols = 0; cols < 100; cols++ )
           {
-            square_.at<unsigned char>( rows, cols ) = 255;
+            square_.at< unsigned char >( rows, cols ) = 255;
           }
         }
 
@@ -85,19 +94,40 @@ namespace pandora_vision
         {
           for ( int cols = 1; cols < frame_.cols - 1; cols++ )
           {
-            frame_.at<unsigned char>( rows, cols ) = 255;
+            frame_.at< unsigned char >( rows, cols ) = 255;
           }
         }
       }
 
-      // A frame's width and height
+
+      // The images' width and height
       int WIDTH;
       int HEIGHT;
 
-      cv::Mat line_;
+      // pixel_ holds a single non-zero pixel
       cv::Mat pixel_;
+
+      // line_ holds a horizontal white line at row 100,
+      // with width of 1 pixel
+      cv::Mat line_;
+
+      // thick_line_ holds horizontal white lines at rows 99, 100 and 101
+      cv::Mat thick_line_;
+
+      // square_ is a 100 X 100 opaque square,
+      // with its upper left corner placed at the upper left corner of the
+      // image
       cv::Mat square_;
+
+      // frame_ is a white image with only its borders in black colour
       cv::Mat frame_;
+
+
+      // The number of non-zero value pixels before the appliance of an operator
+      int nonZerosBefore;
+
+      // The number of non-zero value pixels after the appliance of an operator
+      int nonZerosAfter;
 
   };
 
@@ -110,47 +140,98 @@ namespace pandora_vision
      * Test pixel_
      **************************************************************************/
 
-    // Keep the original image in the originalPixel_ image
-    cv::Mat originalPixel_;
-    pixel_.copyTo(originalPixel_);
+    // Keep the original image in the originalPixel image
+    cv::Mat originalPixel;
+    pixel_.copyTo( originalPixel );
 
     // Apply the closing operator
     Morphology::closing( &pixel_, 1 );
 
     // diff_pixel is the difference between the original and the
     // closed pixel_ images
-    cv::Mat diff_pixel = originalPixel_ - pixel_;
+    cv::Mat diff_pixel = originalPixel - pixel_;
 
     // The diff image should be filled with zero value pixels only
     for ( int rows = 0; rows < pixel_.rows; rows++ )
     {
       for ( int cols = 0; cols < pixel_.cols; cols++ )
       {
-        EXPECT_EQ( 0, diff_pixel.at<unsigned char>( rows, cols ));
+        EXPECT_EQ( 0, diff_pixel.at< unsigned char >( rows, cols ));
       }
     }
+
+
+    /***************************************************************************
+     * Test line_
+     **************************************************************************/
+
+    // Keep the original image in the originalLine image
+    cv::Mat originalLine;
+    pixel_.copyTo( originalLine );
+
+    // Apply the closing operator
+    Morphology::closing( &line_, 1 );
+
+    // diff_pixel is the difference between the original and the
+    // closed line_ mages
+    cv::Mat diff_line = originalLine - line_;
+
+    // The diff image should be filled with zero value pixels only
+    for ( int rows = 0; rows < pixel_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < pixel_.cols; cols++ )
+      {
+        EXPECT_EQ( 0, diff_line.at< unsigned char >( rows, cols ));
+      }
+    }
+
+
+    /***************************************************************************
+     * Test thick_line_
+     **************************************************************************/
+
+    // Keep the original image in the originalThick_line image
+    cv::Mat originalThick_line;
+    pixel_.copyTo( originalThick_line );
+
+    // Apply the closing operator
+    Morphology::closing( &thick_line_, 1 );
+
+    // diff_pixel is the difference between the original and the
+    // closed pixel_ images
+    cv::Mat diffThick_line = originalThick_line - thick_line_;
+
+    // The diff image should be filled with zero value pixels only
+    for ( int rows = 0; rows < pixel_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < pixel_.cols; cols++ )
+      {
+        EXPECT_EQ( 0, diffThick_line.at< unsigned char >( rows, cols ));
+      }
+    }
+
 
     /***************************************************************************
      * Test square_
      **************************************************************************/
 
-    // Keep the original image in the originalsquare_ image
-    cv::Mat originalsquare_;
-    square_.copyTo(originalsquare_);
+    // Keep the original image in the originalSquare image
+    cv::Mat originalSquare;
+    square_.copyTo( originalSquare );
 
     // Apply the closing operator
     Morphology::closing( &square_, 1 );
 
     // diff_square is the difference between the original and the
     // closed square_ images
-    cv::Mat diff_square = originalsquare_ - square_;
+    cv::Mat diff_square = originalSquare - square_;
 
     // The diff image should be filled with zero value pixels only
     for ( int rows = 0; rows < square_.rows; rows++ )
     {
       for ( int cols = 0; cols < square_.cols; cols++ )
       {
-        EXPECT_EQ( 0, diff_square.at<unsigned char>( rows, cols ));
+        EXPECT_EQ( 0, diff_square.at< unsigned char >( rows, cols ));
       }
     }
   }
@@ -173,7 +254,7 @@ namespace pandora_vision
     {
       for ( int j = -1; j < 2; ++j )
       {
-        EXPECT_EQ( 255, pixel_.at<unsigned char>( 100 + i, 100 + j ));
+        EXPECT_EQ( 255, pixel_.at< unsigned char >( 100 + i, 100 + j ));
       }
     }
 
@@ -183,13 +264,13 @@ namespace pandora_vision
      **************************************************************************/
 
     // The number of non-zero pixels before dilation
-    int nonZerosBefore = cv::countNonZero( line_ );
+    nonZerosBefore = cv::countNonZero( line_ );
 
     // Dilate once
     Morphology::dilation( &line_, 1 );
 
     // The number of non-zero pixels after dilation
-    int nonZerosAfter = cv::countNonZero( line_ );
+    nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the dilation should be less than
     // that of the pixels after
@@ -203,8 +284,8 @@ namespace pandora_vision
     // have a non-zero value
     for( int cols = 0; cols < line_.cols; ++cols )
     {
-      EXPECT_EQ( 255, line_.at<unsigned char>( 99, cols ));
-      EXPECT_EQ( 255, line_.at<unsigned char>( 101, cols ));
+      EXPECT_EQ( 255, line_.at< unsigned char >( 99, cols ));
+      EXPECT_EQ( 255, line_.at< unsigned char >( 101, cols ));
     }
 
 
@@ -228,6 +309,25 @@ namespace pandora_vision
     // The number of non-zero pixels after the dilation should be
     // increased by twice the square_'s size, plus one non-zero pixel
     EXPECT_EQ( nonZerosBefore + 200 + 1, nonZerosAfter );
+
+
+    /***************************************************************************
+     * Test frame_
+     **************************************************************************/
+
+    // Dilate once
+    Morphology::dilation( &frame_, 1 );
+
+    // The number of non-zero pixels after dilation
+    nonZerosAfter = cv::countNonZero( frame_ );
+
+    // The number of non-zero pixels before the dilation should be less than
+    // that of the pixels after
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // The number of non-zero pixels after the dilation should be equal to the
+    // area of the image
+    EXPECT_EQ( WIDTH * HEIGHT, nonZerosAfter );
   }
 
 
@@ -248,7 +348,7 @@ namespace pandora_vision
     {
       for ( int j = -1; j < 2; ++j )
       {
-        EXPECT_EQ( 255, pixel_.at<unsigned char>( 100 + i, 100 + j ));
+        EXPECT_EQ( 255, pixel_.at< unsigned char >( 100 + i, 100 + j ));
       }
     }
 
@@ -258,13 +358,13 @@ namespace pandora_vision
      **************************************************************************/
 
     // The number of non-zero pixels before dilation
-    int nonZerosBefore = cv::countNonZero( line_ );
+    nonZerosBefore = cv::countNonZero( line_ );
 
     // Dilate once
     Morphology::dilationRelative( &line_, 1 );
 
     // The number of non-zero pixels after dilation
-    int nonZerosAfter = cv::countNonZero( line_ );
+    nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the dilation should be less than
     // that of the pixels after
@@ -278,8 +378,8 @@ namespace pandora_vision
     // have a non-zero value
     for( int cols = 0; cols < line_.cols; ++cols )
     {
-      EXPECT_EQ( 255, line_.at<unsigned char>( 99, cols ));
-      EXPECT_EQ( 255, line_.at<unsigned char>( 101, cols ));
+      EXPECT_EQ( 255, line_.at< unsigned char >( 99, cols ));
+      EXPECT_EQ( 255, line_.at< unsigned char >( 101, cols ));
     }
 
 
@@ -303,6 +403,25 @@ namespace pandora_vision
     // The number of non-zero pixels after the dilation should be
     // increased by twice the square_'s size, plus one non-zero pixel
     EXPECT_EQ( nonZerosBefore + 200 + 1, nonZerosAfter );
+
+
+    /***************************************************************************
+     * Test frame_
+     **************************************************************************/
+
+    // Dilate once
+    Morphology::dilationRelative( &frame_, 1 );
+
+    // The number of non-zero pixels after dilationRelative
+    nonZerosAfter = cv::countNonZero( frame_ );
+
+    // The number of non-zero pixels before the dilationRelative should be
+    // less than that of the pixels after
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // The number of non-zero pixels after the dilation should be equal to the
+    // area of the image
+    EXPECT_EQ( WIDTH * HEIGHT, nonZerosAfter );
   }
 
 
@@ -315,13 +434,13 @@ namespace pandora_vision
      **************************************************************************/
 
     // The number of non-zero pixels before erosion
-    int nonZerosBefore = cv::countNonZero( line_ );
+    nonZerosBefore = cv::countNonZero( line_ );
 
     // Erode once
     Morphology::erosion( &line_, 1 );
 
     // The number of non-zero pixels after erosion
-    int nonZerosAfter = cv::countNonZero( line_ );
+    nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the erosion should be
     // less than that of the pixels after
@@ -423,11 +542,7 @@ namespace pandora_vision
      * Test pixel_
      **************************************************************************/
 
-    // Keep the original image in the originalPixel_ image
-    cv::Mat originalPixel_;
-    pixel_.copyTo(originalPixel_);
-
-    // Apply the closing operator
+    // Apply the opening operator
     Morphology::opening( &pixel_, 1 );
 
     // The diff image should be filled with zero value pixels only
@@ -435,7 +550,71 @@ namespace pandora_vision
     {
       for ( int cols = 0; cols < pixel_.cols; cols++ )
       {
-        EXPECT_EQ( 0, pixel_.at<unsigned char>( rows, cols ));
+        EXPECT_EQ( 0, pixel_.at< unsigned char >( rows, cols ));
+      }
+    }
+
+
+    /***************************************************************************
+     * Test line_
+     **************************************************************************/
+
+    // Apply the opening operator
+    Morphology::opening( &line_, 1 );
+
+    // The diff image should be filled with zero value pixels only
+    for ( int rows = 0; rows < line_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < line_.cols; cols++ )
+      {
+        EXPECT_EQ( 0, line_.at< unsigned char >( rows, cols ));
+      }
+    }
+
+
+    /***************************************************************************
+     * Test square_
+     **************************************************************************/
+
+    // Keep the original image in the originalSquare image
+    cv::Mat originalSquare;
+    square_.copyTo( originalSquare );
+
+    // Apply the opening operator
+    Morphology::opening( &square_, 1 );
+
+    // diff_square is the difference between the original and the
+    // closed square_ images
+    cv::Mat diff_square = originalSquare - square_;
+
+    // The diff image should be filled with zero value pixels only
+    for ( int rows = 0; rows < square_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < square_.cols; cols++ )
+      {
+        EXPECT_EQ( 0, diff_square.at< unsigned char >( rows, cols ));
+      }
+    }
+  }
+
+
+
+  //! Test Morphology::pruningStrictIterative()
+  TEST_F ( MorphologyTest, PruningStrictIterativeTest )
+  {
+    /***************************************************************************
+     * Test pixel_
+     **************************************************************************/
+
+    // Apply the pruningStrictIterative operator
+    Morphology::pruningStrictIterative( &pixel_, 1 );
+
+    // The image should be filled with zero value pixels only
+    for ( int rows = 0; rows < pixel_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < pixel_.cols; cols++ )
+      {
+        EXPECT_EQ( 0, pixel_.at< unsigned char >( rows, cols ));
       }
     }
 
@@ -445,18 +624,25 @@ namespace pandora_vision
      **************************************************************************/
 
     // Keep the original image in the originalPixel_ image
-    cv::Mat originalLine_;
-    line_.copyTo(originalLine_);
+    cv::Mat originalLine;
+    line_.copyTo( originalLine );
 
-    // Apply the closing operator
-    Morphology::opening( &line_, 1 );
+    // Attach some garbage pixels to the line in line_.
+    // They should be deleted by the pruningStrictIterative operator
+    line_.at< unsigned char >(101, 99) = 255;
+    line_.at< unsigned char >(440, 101) = 255;
+    line_.at< unsigned char >(440, 99) = 255;
 
-    // The diff image should be filled with zero value pixels only
+    // Apply the pruningStrictIterative operator
+    Morphology::pruningStrictIterative( &line_, 1 );
+
+    // Garbage pixels should be deleted
     for ( int rows = 0; rows < line_.rows; rows++ )
     {
       for ( int cols = 0; cols < line_.cols; cols++ )
       {
-        EXPECT_EQ( 0, line_.at<unsigned char>( rows, cols ));
+        EXPECT_EQ ( originalLine.at< unsigned char >( rows, cols ),
+          line_.at< unsigned char >( rows, cols ) );
       }
     }
 
@@ -465,25 +651,69 @@ namespace pandora_vision
      * Test square_
      **************************************************************************/
 
-    // Keep the original image in the originalsquare_ image
-    cv::Mat originalsquare_;
-    square_.copyTo(originalsquare_);
+    // The number of non-zero pixels before pruningStrictIterative
+    nonZerosBefore = cv::countNonZero( square_ );
 
-    // Apply the closing operator
-    Morphology::opening( &square_, 1 );
+    // Apply the pruningStrictIterative operator
+    Morphology::pruningStrictIterative( &square_, 1 );
 
-    // diff_square is the difference between the original and the
-    // closed square_ images
-    cv::Mat diff_square = originalsquare_ - square_;
+    // The number of non-zero pixels after pruningStrictIterative
+    nonZerosAfter = cv::countNonZero( square_ );
 
-    // The diff image should be filled with zero value pixels only
-    for ( int rows = 0; rows < square_.rows; rows++ )
-    {
-      for ( int cols = 0; cols < square_.cols; cols++ )
-      {
-        EXPECT_EQ( 0, diff_square.at<unsigned char>( rows, cols ));
-      }
-    }
+    // Only the bottom right corner should be deleted
+    EXPECT_EQ( nonZerosBefore - 1, nonZerosAfter );
+
+
+    /***************************************************************************
+     * Test frame_
+     **************************************************************************/
+
+    // The number of non-zero pixels before pruningStrictIterative
+    nonZerosBefore = cv::countNonZero( frame_ );
+
+    // Apply the pruningStrictIterative operator
+    Morphology::pruningStrictIterative( &frame_, 1 );
+
+    // The number of non-zero pixels after pruningStrictIterative
+    nonZerosAfter = cv::countNonZero( frame_ );
+
+    // The frame's four corners should be deleted
+    EXPECT_EQ( nonZerosBefore - 4, nonZerosAfter );
+  }
+
+
+
+  //! Test Morphology::thinning()
+  TEST_F ( MorphologyTest, ThinningTest )
+  {
+    /***************************************************************************
+     * Test thick_line_
+     **************************************************************************/
+
+    // Apply the thinning operator
+    cv::Mat thinnedThick_line;
+    Morphology::thinning ( line_, &thinnedThick_line, 1 );
+
+    nonZerosAfter = cv::countNonZero ( thinnedThick_line );
+
+    // The line should be the width of one pixel
+    EXPECT_EQ ( WIDTH, nonZerosAfter );
+
+
+    /***************************************************************************
+     * Test square_
+     **************************************************************************/
+
+    // Apply the thinning operator
+    cv::Mat thinnedSquare;
+    Morphology::thinning ( square_, &thinnedSquare, 1 );
+
+    nonZerosAfter = cv::countNonZero ( thinnedSquare );
+
+    // square_ should have shrunk by 196 pixels: the right hand side and the
+    // bottom side are affected, with the 3 vertices between them intact
+    EXPECT_EQ ( 10000 - 196, nonZerosAfter );
+
   }
 
 }  // namespace pandora_vision

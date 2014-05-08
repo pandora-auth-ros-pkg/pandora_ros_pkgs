@@ -760,187 +760,9 @@ namespace pandora_vision
 
 
   /**
-    @brief Performs steps of pruning
-    @param img [cv::Mat*] The input image in CV_8UC1 format
-    @param steps [const int&] Number of operator steps
-    @param visualize [const bool&] True for step-by-step visualization
-    @return void
-   **/
-  void Morphology::pruning(cv::Mat* img, const int& steps,
-    const bool& visualize)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("pruning");
-    #endif
-
-    static const char kernels[9][3][3] = {
-      { {0, 0, 0},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {1, 0, 0},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {0, 1, 0},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {0, 0, 1},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {0, 0, 0},
-        {1, 1, 0},
-        {0, 0, 0} },
-
-      { {0, 0, 0},
-        {0, 1, 1},
-        {0, 0, 0} },
-
-      { {0, 0, 0},
-        {0, 1, 0},
-        {1, 0, 0} },
-
-      { {0, 0, 0},
-        {0, 1, 0},
-        {0, 1, 0} },
-
-      { {0, 0, 0},
-        {0, 1, 0},
-        {0, 0, 1} }
-    };
-
-    bool isRunning;
-    for (unsigned int s = 0; s < steps; s++)
-    {
-      if(visualize)
-      {
-        Visualization::show("Pruning iteration", *img, 100);
-      }
-
-      isRunning = false;
-      for (int kernelId = 0; kernelId < 9; kernelId++)
-      {
-        for (unsigned int rows = 1; rows < img->rows - 1; rows++)
-        {
-          for (unsigned int cols = 1; cols < img->cols - 1; cols++)
-          {
-            if(img->at<unsigned char>(rows, cols) != 0)
-            {
-              if (kernelCheck(kernels[kernelId], *img, cv::Point(cols, rows)))
-              {
-                img->at<unsigned char>(rows, cols) = 0;
-                isRunning = true;
-              }
-            }
-          }
-        }
-      }
-      if (!isRunning)
-      {
-        break;
-      }
-    }
-    #ifdef DEBUG_TIME
-    Timer::tick("pruning");
-    #endif
-  }
-
-
-
-  /**
     @brief Performs steps of strict pruning (removes more stuff)
-    @param img [cv::Mat*] The input image in CV_8UC1 format
-    @param steps [const int*] Number of operator steps
-    @param visualize [const bool&] True for step-by-step visualization
-    @return void
-   **/
-  void Morphology::pruningStrict(cv::Mat* img, const int& steps,
-    const bool& visualize)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("pruningStrict");
-    #endif
-
-    static const char kernels[9][3][3] = {
-      { {0, 0, 0},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {1, 2, 0},
-        {2, 1, 0},
-        {0, 0, 0} },
-
-      { {2, 1, 2},
-        {0, 1, 0},
-        {0, 0, 0} },
-
-      { {0, 2, 1},
-        {0, 1, 2},
-        {0, 0, 0} },
-
-      { {2, 0, 0},
-        {1, 1, 0},
-        {2, 0, 0} },
-
-      { {0, 0, 2},
-        {0, 1, 1},
-        {0, 0, 2} },
-
-      { {0, 0, 0},
-        {2, 1, 0},
-        {1, 2, 0} },
-
-      { {0, 0, 0},
-        {0, 1, 0},
-        {2, 1, 2} },
-
-      { {0, 0, 0},
-        {0, 1, 2},
-        {0, 2, 1} }
-    };
-
-    bool isRunning;
-    for (unsigned int s = 0; s < steps; s++)
-    {
-      if(visualize)
-      {
-        Visualization::show("Pruning iteration", *img, 100);
-      }
-
-      isRunning = false;
-      for (int kernelId = 0; kernelId < 9; kernelId++)
-      {
-        for (unsigned int rows = 1; rows < img->rows - 1; rows++)
-        {
-          for (unsigned int cols = 1; cols < img->cols - 1; cols++)
-          {
-            if(img->at<unsigned char>(rows, cols) != 0)
-            {
-              if (kernelCheck(kernels[kernelId], *img, cv::Point(cols, rows)))
-              {
-                img->at<unsigned char>(rows, cols) = 0;
-                isRunning = true;
-              }
-            }
-          }
-        }
-      }
-      if (!isRunning)
-      {
-        break;
-      }
-    }
-    #ifdef DEBUG_TIME
-    Timer::tick("pruningStrict");
-    #endif
-  }
-
-
-
-  /**
-    @brief Performs steps of strict pruning (removes more stuff)
+    Caution: This method presupposes that the input image @param img is
+    a thinned image
     @param img [cv::Mat*] The input image in CV_8UC1 format
     @param steps [const int&] Number of operator steps
     @return void
@@ -1139,98 +961,6 @@ namespace pandora_vision
 
 
   /**
-    @brief Performs steps of thickenning
-    @param inImage [const cv::Mat&] The input image in CV_8UC1 format
-    @param outImage [cv::Mat*] The output image in CV_8UC1 format
-    @param steps [const int&] Number of operator steps
-    @param visualize [const bool&] True for step-by-step visualization
-    @return void
-   **/
-  void Morphology::thickenning(const cv::Mat& inImage, cv::Mat* outImage,
-    const int& steps, const bool& visualize)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("thickenning");
-    #endif
-
-    static const char kernels[8][3][3] = {
-      { {1, 1, 2},
-        {1, 0, 2},
-        {1, 2, 0} },
-
-      { {1, 1, 1},
-        {2, 0, 1},
-        {0, 2, 2} },
-
-      { {0, 2, 1},
-        {2, 0, 1},
-        {2, 1, 1} },
-
-      { {2, 2, 0},
-        {1, 0, 2},
-        {1, 1, 1} },
-
-      { {2, 1, 1},
-        {2, 0, 1},
-        {0, 2, 1} },
-
-      { {0, 2, 2},
-        {2, 0, 1},
-        {1, 1, 1} },
-
-      { {1, 2, 0},
-        {1, 0, 2},
-        {1, 1, 2} },
-
-      { {1, 1, 1},
-        {1, 0, 2},
-        {2, 2, 0} }
-    };
-
-    inImage.copyTo(*outImage);
-
-    // if the image is saturated by the thickenning operator,
-    // cease its operation
-    bool isRunning;
-    for (unsigned int s = 0; s < steps; s++)
-    {
-      if(visualize)
-      {
-        Visualization::show("Thickening iteration", *outImage, 500);
-      }
-
-      isRunning = false;
-      for (int kernelId = 0; kernelId < 8; kernelId++)
-      {
-        for (unsigned int rows = 1; rows < outImage->rows - 1; rows++)
-        {
-          for (unsigned int cols = 1; cols < outImage->cols - 1; cols++)
-          {
-            if(outImage->at<unsigned char>(rows, cols) == 0)
-            {
-              if (kernelCheck(kernels[kernelId], *outImage,
-                  cv::Point(cols, rows)))
-              {
-                outImage->at<unsigned char>(rows, cols) = 255;
-                isRunning = true;
-              }
-            }
-          }
-        }
-      }
-      if (!isRunning)
-      {
-        break;
-      }
-    }
-    #ifdef DEBUG_TIME
-    Timer::tick("thickenning");
-    #endif
-  }
-
-
-
-  /**
     @brief Performs steps of thinning
     (http://homepages.inf.ed.ac.uk/rbf/HIPR2/thin.htm)
     @param inImage [const cv::Mat&] The input image in CV_8UC1 format
@@ -1286,8 +1016,10 @@ namespace pandora_vision
     // cease its operation
     bool isRunning;
     static unsigned int limit = 0;
+
     static unsigned int *pts =
       new unsigned int[outImage->cols * outImage->rows];
+
     limit = 0;
 
     for (unsigned int rows = 1; rows < outImage->rows - 1; rows++)
@@ -1319,6 +1051,7 @@ namespace pandora_vision
           }
         }
       }
+
       if (!isRunning)
       {
         break;

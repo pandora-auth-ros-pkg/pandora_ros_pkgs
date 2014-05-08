@@ -9,9 +9,15 @@ find_package(catkin REQUIRED COMPONENTS
 link_directories(${catkin_LIBRARIES_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 
-############## Unit Tests ####################
+############## Unit Tests #####################
 
-catkin_add_gtest(morphological_operators_test unit/utils/morphological_operators_test.cpp)
+#################### utils ####################
+catkin_add_gtest(blob_detection_test
+  unit/utils/blob_detection_test.cpp)
+target_link_libraries(blob_detection_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
+
+catkin_add_gtest(morphological_operators_test
+  unit/utils/morphological_operators_test.cpp)
 target_link_libraries(morphological_operators_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
 
 ############## Functional Tests ###############

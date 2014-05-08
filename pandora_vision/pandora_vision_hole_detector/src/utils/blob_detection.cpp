@@ -63,6 +63,11 @@ namespace pandora_vision
 
     std::set<unsigned int> current, next, visited;
 
+    // The indices of the blob's outline points stored in a set.
+    // If the blobOutlineVector was used, in it there would be redundant copies
+    // of each outline point
+    std::set<unsigned int> blobOutlineSet;
+
     current.insert(
       static_cast<int>(round(inKeyPoint.pt.y) * edgesImage->cols)
       + static_cast<int>(round(inKeyPoint.pt.x)));
@@ -101,7 +106,7 @@ namespace pandora_vision
 
             if (v != 0)
             {
-              blobOutlineVector->push_back(cv::Point2f(x, y));
+              blobOutlineSet.insert(ind);
             }
 
             visited.insert(ind);
@@ -110,6 +115,16 @@ namespace pandora_vision
       }
       current.swap(next);
       next.clear();
+    }
+
+    // Fill the blobOutlineVector with the
+    // transformed content of the blobOutlineSet
+    for (std::set<unsigned int>::iterator it = blobOutlineSet.begin();
+      it != blobOutlineSet.end(); it++)
+    {
+      blobOutlineVector->push_back(
+        cv::Point2f(static_cast<int>(*it) % edgesImage->cols,
+        static_cast<int>(*it) / edgesImage->cols));
     }
 
     *blobArea = static_cast<float>(visited.size());
