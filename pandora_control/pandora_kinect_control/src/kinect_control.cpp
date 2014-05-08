@@ -134,32 +134,32 @@ namespace pandora_control
             {
               case CENTER:
                 pitchTargetPosition.data = 0;
-                yawTargetPosition.data = 0;
+                yawTargetPosition.data = 0.7;
                 position_ = HIGH_LEFT;
                 break;
               case HIGH_LEFT:
-                pitchTargetPosition.data = 0;
+                pitchTargetPosition.data = 0.2;
                 yawTargetPosition.data = 0.7;
                 position_ = LOW_LEFT;
                 break;
               case LOW_LEFT:
                 pitchTargetPosition.data = 0.2;
-                yawTargetPosition.data = 0.7;
+                yawTargetPosition.data = 0;
                 position_ = LOW_CENTER;
                 break;
               case LOW_CENTER:
                 pitchTargetPosition.data = 0.2;
-                yawTargetPosition.data = 0;
+                yawTargetPosition.data = -0.7;
                 position_ = LOW_RIGHT;
                 break;
               case LOW_RIGHT:
-                pitchTargetPosition.data = 0.2;
+                pitchTargetPosition.data = 0;
                 yawTargetPosition.data = -0.7;
                 position_ = HIGH_RIGHT;
                 break;
               case HIGH_RIGHT:
                 pitchTargetPosition.data = 0;
-                yawTargetPosition.data = -0.7;
+                yawTargetPosition.data = 0;
                 position_ = CENTER;
                 break;
             }
