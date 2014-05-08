@@ -14,29 +14,29 @@ namespace pandora_vision
         WIDTH = 640;
         HEIGHT = 480;
 
-        img0_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
-        img1_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
-        img2_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        line_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        smallSquare_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+        bigSquare_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
-        ASSERT_EQ( HEIGHT, img0_.rows );
-        ASSERT_EQ( WIDTH, img0_.cols );
+        ASSERT_EQ( HEIGHT, line_.rows );
+        ASSERT_EQ( WIDTH, line_.cols );
 
-        // img0_ holds a horizontal white line at row 100,
+        // line_ holds a horizontal white line at row 100,
         // with width of 1 pixel
-        for ( int cols = 0; cols < img0_.cols; ++cols )
+        for ( int cols = 0; cols < line_.cols; ++cols )
         {
-          img0_.at<unsigned char>( 100, cols ) = 255;
+          line_.at<unsigned char>( 100, cols ) = 255;
         }
 
-        // img1_ holds a single non-zero pixel
-        img1_.at<unsigned char>( 100, 100 ) = 255;
+        // smallSquare_ holds a single non-zero pixel
+        smallSquare_.at<unsigned char>( 100, 100 ) = 255;
 
-        // img2_ is a white image except for its borders which are black
-        for ( int rows = 1; rows < img2_.rows - 1; rows++ )
+        // bigSquare_ is a white image except for its borders which are black
+        for ( int rows = 1; rows < bigSquare_.rows - 1; rows++ )
         {
-          for ( int cols = 1; cols < img2_.cols - 1; cols++ )
+          for ( int cols = 1; cols < bigSquare_.cols - 1; cols++ )
           {
-            img2_.at<unsigned char>(rows, cols) = 255;
+            bigSquare_.at<unsigned char>(rows, cols) = 255;
           }
         }
       }
@@ -44,9 +44,9 @@ namespace pandora_vision
       int WIDTH;
       int HEIGHT;
 
-      cv::Mat img0_;
-      cv::Mat img1_;
-      cv::Mat img2_;
+      cv::Mat line_;
+      cv::Mat smallSquare_;
+      cv::Mat bigSquare_;
 
   };
 
@@ -56,17 +56,17 @@ namespace pandora_vision
   TEST_F( MorphologyTest, DilationTest )
   {
     /***************************************************************************
-    * Test img0_
-    ***************************************************************************/
+     * Test line_
+     **************************************************************************/
 
     // The number of non-zero pixels before dilation
-    int nonZerosBefore = cv::countNonZero( img0_ );
+    int nonZerosBefore = cv::countNonZero( line_ );
 
     // Dilate once
-    Morphology::dilation( &img0_, 1 );
+    Morphology::dilation( &line_, 1 );
 
     // The number of non-zero pixels after dilation
-    int nonZerosAfter = cv::countNonZero( img0_ );
+    int nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the dilation should be less than
     // that of the pixels after
@@ -78,19 +78,19 @@ namespace pandora_vision
 
     // One row higher and one row lower than 100, all pixels should now
     // have a non-zero value
-    for( int cols = 0; cols < img0_.cols; ++cols )
+    for( int cols = 0; cols < line_.cols; ++cols )
     {
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 99, cols ));
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 101, cols ));
+      EXPECT_EQ( 255, line_.at<unsigned char>( 99, cols ));
+      EXPECT_EQ( 255, line_.at<unsigned char>( 101, cols ));
     }
 
 
     /***************************************************************************
-    * Test img1_
-    ***************************************************************************/
+     * Test smallSquare_
+     **************************************************************************/
 
-    // Perform dilation on the img1_
-    Morphology::dilation( &img1_, 1 );
+    // Perform dilation on the smallSquare_
+    Morphology::dilation( &smallSquare_, 1 );
 
     // All pixels surrounding immediately the only non-zero one before dilation
     // should now have a non-zero value
@@ -98,23 +98,23 @@ namespace pandora_vision
     {
       for ( int j = -1; j < 2; ++j )
       {
-        EXPECT_EQ( 255, img1_.at<unsigned char>( 100 + i, 100 + j ));
+        EXPECT_EQ( 255, smallSquare_.at<unsigned char>( 100 + i, 100 + j ));
       }
     }
 
 
     /***************************************************************************
-     * Test img2_
-     ***************************************************************************/
+     * Test bigSquare_
+     **************************************************************************/
 
     // The number of non-zero pixels before dilation
-    nonZerosBefore = cv::countNonZero( img2_ );
+    nonZerosBefore = cv::countNonZero( bigSquare_ );
 
     // Dilate once
-    Morphology::dilation( &img2_, 1 );
+    Morphology::dilation( &bigSquare_, 1 );
 
     // The number of non-zero pixels after dilation
-    nonZerosAfter = cv::countNonZero( img2_ );
+    nonZerosAfter = cv::countNonZero( bigSquare_ );
 
     // The number of non-zero pixels before the dilation should be less than
     // that of the pixels after
@@ -131,17 +131,17 @@ namespace pandora_vision
   TEST_F( MorphologyTest, DilationRelativeTest )
   {
     /***************************************************************************
-    * Test img0_
-    ***************************************************************************/
+     * Test line_
+     **************************************************************************/
 
     // The number of non-zero pixels before dilationRelativeRelative
-    int nonZerosBefore = cv::countNonZero( img0_ );
+    int nonZerosBefore = cv::countNonZero( line_ );
 
     // Dilate once
-    Morphology::dilationRelative( &img0_, 1 );
+    Morphology::dilationRelative( &line_, 1 );
 
     // The number of non-zero pixels after dilationRelative
-    int nonZerosAfter = cv::countNonZero( img0_ );
+    int nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the dilationRelative should be
     // less than that of the pixels after
@@ -153,19 +153,19 @@ namespace pandora_vision
 
     // One row higher and one row lower than 100, all pixels should now
     // have a non-zero value
-    for( int cols = 0; cols < img0_.cols; ++cols )
+    for( int cols = 0; cols < line_.cols; ++cols )
     {
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 99, cols ));
-      EXPECT_EQ( 255, img0_.at<unsigned char>( 101, cols ));
+      EXPECT_EQ( 255, line_.at<unsigned char>( 99, cols ));
+      EXPECT_EQ( 255, line_.at<unsigned char>( 101, cols ));
     }
 
 
     /***************************************************************************
-    * Test img1_
-    ***************************************************************************/
+     * Test smallSquare_
+     **************************************************************************/
 
     // Perform dilationRelative on the dilationRelative1_
-    Morphology::dilationRelative( &img1_, 1 );
+    Morphology::dilationRelative( &smallSquare_, 1 );
 
     // All pixels surrounding immediately the only non-zero one before
     // dilationRelative should now have a non-zero value
@@ -173,23 +173,23 @@ namespace pandora_vision
     {
       for ( int j = -1; j < 2; ++j )
       {
-        EXPECT_EQ( 255, img1_.at<unsigned char>( 100 + i, 100 + j ));
+        EXPECT_EQ( 255, smallSquare_.at<unsigned char>( 100 + i, 100 + j ));
       }
     }
 
 
     /***************************************************************************
-     * Test img2_
-     ***************************************************************************/
+     * Test bigSquare_
+     **************************************************************************/
 
     // The number of non-zero pixels before dilationRelative
-    nonZerosBefore = cv::countNonZero( img2_ );
+    nonZerosBefore = cv::countNonZero( bigSquare_ );
 
     // Dilate once
-    Morphology::dilationRelative( &img2_, 1 );
+    Morphology::dilationRelative( &bigSquare_, 1 );
 
     // The number of non-zero pixels after dilationRelative
-    nonZerosAfter = cv::countNonZero( img2_ );
+    nonZerosAfter = cv::countNonZero( bigSquare_ );
 
     // The number of non-zero pixels before the dilationRelative should be
     // less than that of the pixels after
@@ -206,17 +206,17 @@ namespace pandora_vision
   TEST_F( MorphologyTest, ErosionTest )
   {
     /***************************************************************************
-    * Test img0_
-    ***************************************************************************/
+     * Test line_
+     **************************************************************************/
 
     // The number of non-zero pixels before erosion
-    int nonZerosBefore = cv::countNonZero( img0_ );
+    int nonZerosBefore = cv::countNonZero( line_ );
 
     // Erode once
-    Morphology::erosion( &img0_, 1 );
+    Morphology::erosion( &line_, 1 );
 
     // The number of non-zero pixels after erosion
-    int nonZerosAfter = cv::countNonZero( img0_ );
+    int nonZerosAfter = cv::countNonZero( line_ );
 
     // The number of non-zero pixels before the erosion should be
     // less than that of the pixels after
@@ -227,17 +227,17 @@ namespace pandora_vision
 
 
     /***************************************************************************
-     * Test img2_
-     ***************************************************************************/
+     * Test bigSquare_
+     **************************************************************************/
 
     // The number of non-zero pixels before erosion
-    nonZerosBefore = cv::countNonZero( img2_ );
+    nonZerosBefore = cv::countNonZero( bigSquare_ );
 
     // Erode once
-    Morphology::erosion( &img2_, 1 );
+    Morphology::erosion( &bigSquare_, 1 );
 
     // The number of non-zero pixels after erosion
-    nonZerosAfter = cv::countNonZero( img2_ );
+    nonZerosAfter = cv::countNonZero( bigSquare_ );
 
     // The number of non-zero pixels before the erosion should be
     // greater than that of the pixels after
@@ -245,7 +245,8 @@ namespace pandora_vision
 
     // The number of non-zero pixels after the erosion should be
     // three times as many as that of the pixels after
-    EXPECT_EQ( nonZerosBefore - 2 * WIDTH -2 * HEIGHT + 4, nonZerosAfter );
+    EXPECT_EQ( nonZerosBefore - 2 * (WIDTH - 2) -2 * (HEIGHT - 2) + 4,
+      nonZerosAfter );
   }
 
 }  // namespace pandora_vision
