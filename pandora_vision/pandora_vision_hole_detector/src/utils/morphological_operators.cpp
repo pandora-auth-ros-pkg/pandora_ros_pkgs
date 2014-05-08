@@ -61,7 +61,7 @@ namespace pandora_vision
       }
 
       dilation(img, 1);
-      erosion(img, 1, false);
+      erosion(img, 1);
     }
     #ifdef DEBUG_TIME
     Timer::tick("closing");
@@ -694,7 +694,9 @@ namespace pandora_vision
 
   /**
     @brief Checks if a kernel in a specific point in an image is satisfied
-    @param kernal [const char [3][3]] The kernel
+    Caution: this method presupposes that @param center does not lie on
+    the edges of @param img
+    @param kernel [const char [3][3]] The kernel
     @param img [const cv::Mat&] The input image (uchar)
     @param center [const cv::Point&] The center of the kernel
     @return bool : True on match
@@ -709,12 +711,12 @@ namespace pandora_vision
     {
       for(int j = -1; j <= 1; j++)
       {
-        if(kernel[i+1][j+1] == 0 &&
+        if(kernel[j + 1][i + 1] == 0 &&
           ptr[ (center.y + j) * img.cols + center.x + i ] != 0)
         {
           return false;
         }
-        else if(kernel[i+1][j+1] == 1 &&
+        else if(kernel[j + 1][i + 1] == 1 &&
           ptr[(center.y + j) * img.cols + center.x + i] == 0)
         {
           return false;
@@ -747,8 +749,8 @@ namespace pandora_vision
         Visualization::show("Opening iteration", *img, 500);
       }
 
-      erosion(img, 1, false);
-      dilation(img, 1, false);
+      erosion(img, 1);
+      dilation(img, 1);
     }
     #ifdef DEBUG_TIME
     Timer::tick("opening");

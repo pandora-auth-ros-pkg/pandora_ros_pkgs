@@ -97,7 +97,9 @@ namespace pandora_vision
 
       /**
         @brief Checks if a kernel in a specific point in an image is satisfied
-        @param kernal [const char [3][3]] The kernel
+        Caution: this method presupposes that @param center does not lie on
+        the edges of @param img
+        @param kernel [const char [3][3]] The kernel
         @param img [const cv::Mat&] The input image (uchar)
         @param center [const cv::Point&] The center of the kernel
         @return bool : True on match
