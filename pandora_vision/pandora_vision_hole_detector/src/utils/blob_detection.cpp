@@ -59,6 +59,12 @@ namespace pandora_vision
     Timer::start("brushfireKeypoint", "validateBlobs");
     #endif
 
+    cv::Mat test = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
+    cv::Mat b_test = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
+    edgesImage->copyTo(test);
+    unsigned char* test_ptr = test.ptr();
+    unsigned char* b_ptr = b_test.ptr();
+
     unsigned char* ptr = edgesImage->ptr();
 
     std::set<unsigned int> current, next, visited;
@@ -78,38 +84,47 @@ namespace pandora_vision
 
     while (current.size() != 0)
     {
-      for (std::set<unsigned int>::iterator it = current.begin() ;
-        it != current.end() ; it++)
+      for (std::set<unsigned int>::iterator it = current.begin();
+        it != current.end(); it++)
       {
         // sweep the neighbors of the current point
         for (int m = -1; m < 2; m++)
         {
           for (int n = -1; n < 2; n++)
           {
-            int x = static_cast<int>(*it) % edgesImage->cols + m;
-            int y = static_cast<int>(*it) / edgesImage->cols + n;
-            int ind = y * edgesImage->cols + x;
-
-            if (x < 0 ||
-              y < 0 ||
-              x > edgesImage->cols - 1 ||
-              y > edgesImage->rows - 1)
+            // This check is needed because it is possible to access
+            // a point diagonal to the current one
+            // that goes out of the border's of interest bounds
+            // (value == 0) while it shouldn't.
+            // This happens when there are "cracks" to the border of a
+            // 1-pixel border
+            if (abs(m) + abs(n) < 2)
             {
-              continue;
-            }
+              int x = static_cast<int>(*it) % edgesImage->cols + m;
+              int y = static_cast<int>(*it) / edgesImage->cols + n;
+              int ind = y * edgesImage->cols + x;
 
-            char v = ptr[ind];
-            if ((v == 0) && visited.find(ind) == visited.end())
-            {
-              next.insert(ind);
-            }
+              if (x < 0 ||
+                y < 0 ||
+                x > edgesImage->cols - 1 ||
+                y > edgesImage->rows - 1)
+              {
+                continue;
+              }
 
-            if (v != 0)
-            {
-              blobOutlineSet.insert(ind);
-            }
+              char v = ptr[ind];
+              if ((v == 0) && visited.find(ind) == visited.end())
+              {
+                next.insert(ind);
+              }
 
-            visited.insert(ind);
+              if (v != 0)
+              {
+                blobOutlineSet.insert(ind);
+              }
+
+              visited.insert(ind);
+            }
           }
         }
       }
@@ -146,7 +161,7 @@ namespace pandora_vision
     @param[out] blobsArea [std::vector<float>*] The area of each blob
     @return void
    **/
-  void BlobDetection::brushfireKeypoint(
+  void BlobDetection::brushfireKeypoints(
     const std::vector<cv::KeyPoint>& inKeyPoints,
     cv::Mat* edgesImage,
     std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
@@ -156,67 +171,22 @@ namespace pandora_vision
     Timer::start("brushfireKeypoint", "validateBlobs");
     #endif
 
-    unsigned char* ptr = edgesImage->ptr();
-
     for (int keypointId = 0; keypointId < inKeyPoints.size(); keypointId++)
     {
-      std::set<unsigned int> current, next, visited;
+      // The outline points of the current blob
+      std::vector<cv::Point2f> blobOutlineVector;
 
-      std::vector<cv::Point2f> keypointOutline;
+      // The area of the current blob
+      float blobArea;
 
-      current.insert(
-        static_cast<int>(
-          round(inKeyPoints[keypointId].pt.y) * edgesImage->cols)
-        + static_cast<int>(round(inKeyPoints[keypointId].pt.x)));
+      // Apply the brushfire algorithm for the current keypoint
+      brushfireKeypoint(
+        inKeyPoints[keypointId], edgesImage, &blobOutlineVector, &blobArea);
 
-      visited.insert(
-        static_cast<int>(
-          round(inKeyPoints[keypointId].pt.y) * edgesImage->cols)
-        + static_cast<int>(round(inKeyPoints[keypointId].pt.x)));
+      // Push back the blobOutlineVector to the overall outline points vector
+      blobsOutlineVector->push_back(blobOutlineVector);
 
-      while (current.size() != 0)
-      {
-        for (std::set<unsigned int>::iterator it = current.begin() ;
-          it != current.end() ; it++)
-        {
-          // sweep the neighbors of the current point
-          for (int m = -1; m < 2; m++)
-          {
-            for (int n = -1; n < 2; n++)
-            {
-              int x = static_cast<int>(*it) % edgesImage->cols + m;
-              int y = static_cast<int>(*it) / edgesImage->cols + n;
-              int ind = y * edgesImage->cols + x;
-
-              if (x < 0 ||
-                y < 0 ||
-                x > edgesImage->cols - 1 ||
-                y > edgesImage->rows - 1)
-              {
-                continue;
-              }
-
-              char v = ptr[ind];
-              if ((v == 0) && visited.find(ind) == visited.end())
-              {
-                next.insert(ind);
-              }
-
-              if (v != 0)
-              {
-                keypointOutline.push_back(cv::Point2f(x, y));
-              }
-
-              visited.insert(ind);
-            }
-          }
-        }
-        current.swap(next);
-        next.clear();
-      }
-
-      blobsArea->push_back(static_cast<float>(visited.size()));
-      blobsOutlineVector->push_back(keypointOutline);
+      blobsArea->push_back(blobArea);
     }
 
     #ifdef DEBUG_TIME

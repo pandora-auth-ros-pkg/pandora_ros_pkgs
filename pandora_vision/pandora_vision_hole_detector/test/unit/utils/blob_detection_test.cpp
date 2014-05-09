@@ -87,54 +87,61 @@ namespace pandora_vision
           {
             if ( square_.at< unsigned char >( rows, cols ) != 0 )
             {
-              square_outline_points_vector_.push_back
+              squareOutlinePointsVector_.push_back
                 ( cv::Point2f ( cols, rows) );
             }
           }
         }
 
-        ASSERT_EQ ( 396, square_outline_points_vector_.size() );
-
-
+        ASSERT_EQ ( 396, squareOutlinePointsVector_.size() );
 
 
         // Construct the squares_ image
+
+        // Construct the lower right square
+        cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
+
         for ( int cols = WIDTH - 100; cols < WIDTH; cols++)
         {
-          squares_.at< unsigned char >( HEIGHT - 100, cols ) = 255;
-          squares_.at< unsigned char >( HEIGHT - 1, cols ) = 255;
+          lowerRightSquare.at< unsigned char >( HEIGHT - 100, cols ) = 255;
+          lowerRightSquare.at< unsigned char >( HEIGHT - 1, cols ) = 255;
         }
 
 
         for ( int rows = HEIGHT - 100; rows < HEIGHT ; rows++)
         {
-          squares_.at< unsigned char >( rows, WIDTH - 100 ) = 255;
-          squares_.at< unsigned char >( rows, WIDTH - 1 ) = 255;
+          lowerRightSquare.at< unsigned char >( rows, WIDTH - 100 ) = 255;
+          lowerRightSquare.at< unsigned char >( rows, WIDTH - 1 ) = 255;
         }
 
         std::vector< cv::Point2f > lowerRightSquareOutline;
-        for ( int rows = 0; rows < squares_.rows; rows++ )
+        for ( int rows = 0; rows < lowerRightSquare.rows; rows++ )
         {
-          for ( int cols = 0; cols < squares_.cols; cols++ )
+          for ( int cols = 0; cols < lowerRightSquare.cols; cols++ )
           {
-            if ( squares_.at< unsigned char>( rows, cols ) != 0)
+            if ( lowerRightSquare.at< unsigned char>( rows, cols ) != 0)
             {
               lowerRightSquareOutline.push_back ( cv::Point2f ( cols, rows ) );
             }
           }
         }
-        squares_outline_points_vector_.push_back( lowerRightSquareOutline );
 
-        // Add the upper left square to the squares_ image
-        square_.copyTo( squares_ );
 
         // Add the vector of outline points of the upper left square to the
         // vector holding the vectors of outline points of the squares_ image
-        squares_outline_points_vector_.push_back
-          ( square_outline_points_vector_ );
+        squaresOutlinePointsVector_.push_back ( squareOutlinePointsVector_ );
 
-        ASSERT_EQ( 396 , squares_outline_points_vector_[0].size() );
-        ASSERT_EQ( 396 , squares_outline_points_vector_[1].size() );
+        // Add the vector of outline points of the lower right square to the
+        // vector holding the vectors of outline points of the squares_ image
+        squaresOutlinePointsVector_.push_back( lowerRightSquareOutline );
+
+        // Add the upper left square and the lower right square
+        squares_ = lowerRightSquare + square_;
+
+
+
+        ASSERT_EQ( 396 , squaresOutlinePointsVector_[0].size() );
+        ASSERT_EQ( 396 , squaresOutlinePointsVector_[1].size() );
 
       }
 
@@ -157,13 +164,14 @@ namespace pandora_vision
 
       // The vector holding the outline points
       // of the square in the square_ image
-      std::vector< cv::Point2f > square_outline_points_vector_;
+      std::vector< cv::Point2f > squareOutlinePointsVector_;
 
       // The vector holding the vector of outline points
       // of the squares in the squares_ image
-      std::vector< std::vector< cv::Point2f > > squares_outline_points_vector_;
+      std::vector< std::vector< cv::Point2f > > squaresOutlinePointsVector_;
 
   };
+
 
 
   //! Test BlobDetection::brushfireKeypoint()
@@ -173,7 +181,7 @@ namespace pandora_vision
      * Test square_
      **************************************************************************/
 
-    cv::KeyPoint k ( 150, 200, 1 );
+    cv::KeyPoint k ( 101, 101, 1 );
 
     std::vector< cv::Point2f > blobOutlineVector;
     float blobArea = 0.0;
@@ -183,25 +191,94 @@ namespace pandora_vision
       ( k, &square_, &blobOutlineVector, &blobArea );
 
     // As a preliminary test, check if the number of outline points found
-    // is equal to the one it should be
-    ASSERT_EQ ( square_outline_points_vector_.size(), blobOutlineVector.size() );
+    // is equal to the one it should be. The four vertices of the square are not
+    // included in the square's outline due to the cross-expanding nature of the
+    // brushfire algorithm
+    ASSERT_EQ ( squareOutlinePointsVector_.size() - 4,
+      blobOutlineVector.size() );
+
+    // The square's area should be the number of visited points of the brushfire
+    // algorithm, which, excluding the square's four vertices, is 100 x 100 - 4
+    EXPECT_EQ ( 9996, blobArea );
 
     // Check whether the outline points found are actually the outline points
     // of the square in square_
     int count_b_in_s = 0;
     for ( int b = 0; b < blobOutlineVector.size(); b++ )
     {
-      for ( int s = 0; s < square_outline_points_vector_.size(); s++ )
+      for ( int s = 0; s < squareOutlinePointsVector_.size(); s++ )
       {
-        if (blobOutlineVector[b].x == square_outline_points_vector_[s].x
-        && blobOutlineVector[b].y == square_outline_points_vector_[s].y)
+        if (blobOutlineVector[b].x == squareOutlinePointsVector_[s].x
+        && blobOutlineVector[b].y == squareOutlinePointsVector_[s].y)
         {
           count_b_in_s++;
         }
       }
     }
 
-    EXPECT_EQ ( square_outline_points_vector_.size(), count_b_in_s );
+    EXPECT_EQ ( squareOutlinePointsVector_.size() - 4, count_b_in_s );
+  }
+
+
+
+  //! Test BlobDetection::brushfireKeypoint()
+  TEST_F ( BlobDetectionTest, BrushfireKeypointsTest )
+  {
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    cv::KeyPoint k_0 ( 150, 101, 1 );
+    cv::KeyPoint k_1 ( WIDTH - 43, HEIGHT - 35, 1 );
+
+    // Push_back the two keypoints
+    std::vector<cv::KeyPoint> inKeyPoints;
+
+    inKeyPoints.push_back( k_0 );
+    inKeyPoints.push_back( k_1 );
+
+    std::vector< std::vector< cv::Point2f > > blobsOutlineVector;
+    std::vector< float > blobsArea;
+
+    // Run BlobDetection::brushfireKeypoints
+    BlobDetection::brushfireKeypoints
+      ( inKeyPoints, &squares_, &blobsOutlineVector, &blobsArea );
+
+    // As a preliminary test, check if the number of outline points found
+    // is equal to the one it should be
+    ASSERT_EQ ( squaresOutlinePointsVector_[0].size() - 4,
+      blobsOutlineVector[0].size() );
+
+    ASSERT_EQ ( squaresOutlinePointsVector_[1].size() - 4,
+      blobsOutlineVector[1].size() );
+
+
+    for ( int sq = 0; sq < 2; sq++ )
+    {
+      // Check whether the outline points found are actually the outline points
+      // of the square in square_
+      int count_b_in_s = 0;
+      for ( int b = 0; b < blobsOutlineVector[sq].size(); b++ )
+      {
+        for ( int s = 0; s < squaresOutlinePointsVector_[sq].size(); s++ )
+        {
+          if (blobsOutlineVector[sq][b].x ==
+            squaresOutlinePointsVector_[sq][s].x
+            && blobsOutlineVector[sq][b].y ==
+            squaresOutlinePointsVector_[sq][s].y)
+          {
+            count_b_in_s++;
+          }
+        }
+      }
+
+      EXPECT_EQ ( squaresOutlinePointsVector_[sq].size() - 4, count_b_in_s );
+
+      // The square's area should be the number of visited points of the
+      // brushfire algorithm, which,
+      // excluding the square's four vertices, is 100 x 100 - 4
+      EXPECT_EQ ( 9996, blobsArea[sq] );
+    }
 
   }
 

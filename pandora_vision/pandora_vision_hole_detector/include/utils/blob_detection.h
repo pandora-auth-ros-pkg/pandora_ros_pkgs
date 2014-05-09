@@ -80,7 +80,7 @@ namespace pandora_vision
         @param[out] blobsArea [std::vector<float>*] The area of each blob
         @return void
        **/
-      static void brushfireKeypoint (
+      static void brushfireKeypoints(
         const std::vector<cv::KeyPoint>& inKeyPoints,
         cv::Mat* edgesImage,
         std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,

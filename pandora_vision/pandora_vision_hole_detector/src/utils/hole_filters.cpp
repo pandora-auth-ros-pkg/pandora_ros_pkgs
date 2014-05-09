@@ -70,7 +70,7 @@ namespace pandora_vision
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
-          BlobDetection::brushfireKeypoint(*keyPoints,
+          BlobDetection::brushfireKeypoints(*keyPoints,
             denoisedDepthImageEdges,
             &blobsOutlineVector,
             &blobsArea);
