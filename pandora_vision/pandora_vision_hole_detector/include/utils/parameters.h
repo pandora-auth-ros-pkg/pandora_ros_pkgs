@@ -49,6 +49,24 @@ namespace pandora_vision
 {
   struct Parameters
   {
+
+    // Topics' names
+    static std::string hole_detector_input_topic;
+
+    static std::string depth_image_topic;
+
+    static std::string rgb_image_topic;
+
+    static std::string synchronizer_unlock_topic;
+
+    static std::string point_cloud_internal_topic;
+
+    static std::string depth_candidate_holes_topic;
+
+    static std::string rgb_candidate_holes_topic;
+
+    static std::string hole_detector_output_topic;
+
     // Show the depth image that arrives in the depth node
     static bool show_depth_image;
 

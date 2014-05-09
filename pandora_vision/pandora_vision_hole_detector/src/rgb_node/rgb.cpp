@@ -47,13 +47,13 @@ namespace pandora_vision
     // Subscribe to the RGB image published by the
     // rgb_depth_synchronizer node
     _frameSubscriber = _nh.subscribe(
-      "/synchronized/camera/rgb/image_raw", 1,
+      Parameters::rgb_image_topic, 1,
       &Rgb::inputRgbImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
     rgbCandidateHolesPublisher_ = _nh.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      "/synchronized/camera/rgb/candidate_holes", 1000);
+      Parameters::rgb_candidate_holes_topic, 1000);
 
     // The dynamic reconfigure (RGB) parameter's callback
     server.setCallback(boost::bind(&Rgb::parametersCallback,

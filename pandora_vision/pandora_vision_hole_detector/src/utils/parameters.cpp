@@ -39,6 +39,32 @@
 
 namespace pandora_vision
 {
+  // Topics' names
+  std::string Parameters::hole_detector_input_topic =
+    "/camera/depth_registered/points";
+
+  std::string Parameters::depth_image_topic =
+    "/synchronized/camera/depth/image_raw";
+
+  std::string Parameters::rgb_image_topic =
+    "/synchronized/camera/rgb/image_raw";
+
+  std::string Parameters::synchronizer_unlock_topic =
+    "/vision/hole_fusion/unlock_rgb_depth_synchronizer";
+
+  std::string Parameters::point_cloud_internal_topic =
+    "/synchronized/camera/depth/points";
+
+  std::string Parameters::depth_candidate_holes_topic =
+    "/synchronized/camera/depth/candidate_holes";
+
+  std::string Parameters::rgb_candidate_holes_topic =
+    "/synchronized/camera/rgb/candidate_holes";
+
+  std::string Parameters::hole_detector_output_topic =
+    "/vision/holes_direction";
+
+
   // Show the depth image that arrives in the depth node
   bool Parameters::show_depth_image = false;
 

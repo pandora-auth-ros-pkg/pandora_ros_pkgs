@@ -94,6 +94,7 @@ add_dependencies(depth_node
 
 ########################### RgbDepthSynchronizerNode ###########################
 add_library(synchronizer_lib
+  src/utils/parameters.cpp
   src/utils/message_conversions.cpp
   src/utils/timer.cpp
 )

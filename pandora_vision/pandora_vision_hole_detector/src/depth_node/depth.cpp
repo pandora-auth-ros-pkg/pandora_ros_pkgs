@@ -51,16 +51,16 @@ namespace pandora_vision
 
     ros::Duration(0.5).sleep();
 
-    // Subscribe to the point cloud published by the
+    // Subscribe to the depth image published by the
     // rgb_depth_synchronizer node
     depthImageSubscriber_ = nodeHandle_.subscribe(
-      "/synchronized/camera/depth/image_raw", 1,
+      Parameters::depth_image_topic, 1,
       &Depth::inputDepthImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      "/synchronized/camera/depth/candidate_holes", 1000);
+      Parameters::depth_candidate_holes_topic, 1000);
 
     // The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&Depth::parametersCallback,

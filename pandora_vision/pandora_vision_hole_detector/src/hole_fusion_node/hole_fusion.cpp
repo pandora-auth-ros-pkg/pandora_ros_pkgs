@@ -58,31 +58,31 @@ namespace pandora_vision
 
     // Advertise the topic that the rgb_depth_synchronizer will be
     // subscribed to in order for the hole_fusion_node to unlock it
-    unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>
-      ("/vision/hole_fusion/unlock_rgb_depth_synchronizer", 1000, true);
+    unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>(
+      Parameters::synchronizer_unlock_topic, 1000, true);
 
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
-      <vision_communications::HolesDirectionsVectorMsg>
-      ("/vision/holes_direction", 1000, true);
+      <vision_communications::HolesDirectionsVectorMsg>(
+        Parameters::hole_detector_output_topic, 1000, true);
 
     // Subscribe to the topic where the depth node publishes
     // candidate holes
     depthCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      "/synchronized/camera/depth/candidate_holes", 1,
+      Parameters::depth_candidate_holes_topic, 1,
       &HoleFusion::depthCandidateHolesCallback, this);
 
     // Subscribe to the topic where the rgb node publishes
     // candidate holes
     rgbCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      "/synchronized/camera/rgb/candidate_holes", 1,
+      Parameters::rgb_candidate_holes_topic, 1,
       &HoleFusion::rgbCandidateHolesCallback, this);
 
     // Subscribe to the topic where the synchronizer node publishes
     // the point cloud
     pointCloudSubscriber_= nodeHandle_.subscribe(
-      "/synchronized/camera/depth/points", 1,
+      Parameters::point_cloud_internal_topic, 1,
       &HoleFusion::pointCloudCallback, this);
 
     // The dynamic reconfigure (hole fusion's) parameter's callback

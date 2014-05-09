@@ -40,6 +40,7 @@
 
 #include "utils/message_conversions.h"
 #include <utils/defines.h>
+#include <utils/parameters.h>
 #include <std_msgs/Empty.h>
 
 /**
