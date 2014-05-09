@@ -485,7 +485,7 @@ namespace pandora_vision
         std::vector<cv::Point2f> outlinePoints = sparceOutlinePoints;
 
         // Because the outline points do not constitute a coherent shape,
-        // we need to draw them, connect them linearly and then those
+        // we need to draw them, connect them linearly and then the
         // points that are drawn will be the hole's outline points
         cv::Mat canvas = cv::Mat::zeros(inImage.size(), CV_8UC1);
         unsigned char* ptr = canvas.ptr();

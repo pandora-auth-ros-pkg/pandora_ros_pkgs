@@ -59,12 +59,6 @@ namespace pandora_vision
     Timer::start("brushfireKeypoint", "validateBlobs");
     #endif
 
-    cv::Mat test = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
-    cv::Mat b_test = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
-    edgesImage->copyTo(test);
-    unsigned char* test_ptr = test.ptr();
-    unsigned char* b_ptr = b_test.ptr();
-
     unsigned char* ptr = edgesImage->ptr();
 
     std::set<unsigned int> current, next, visited;
@@ -87,7 +81,7 @@ namespace pandora_vision
       for (std::set<unsigned int>::iterator it = current.begin();
         it != current.end(); it++)
       {
-        // sweep the neighbors of the current point
+        // Sweep the neighbors of the current point
         for (int m = -1; m < 2; m++)
         {
           for (int n = -1; n < 2; n++)
@@ -104,10 +98,8 @@ namespace pandora_vision
               int y = static_cast<int>(*it) / edgesImage->cols + n;
               int ind = y * edgesImage->cols + x;
 
-              if (x < 0 ||
-                y < 0 ||
-                x > edgesImage->cols - 1 ||
-                y > edgesImage->rows - 1)
+              if (x < 0 || y < 0 ||
+                x > edgesImage->cols - 1 || y > edgesImage->rows - 1)
               {
                 continue;
               }
@@ -118,6 +110,7 @@ namespace pandora_vision
                 next.insert(ind);
               }
 
+              // If this neighbor has a non-zero value, it is an outline point
               if (v != 0)
               {
                 blobOutlineSet.insert(ind);
@@ -337,7 +330,7 @@ namespace pandora_vision
 
   /**
     @brief Implements a raycast algorithm for a blob keypoint in order
-    to find its outline points. The output is a vector of coherent points.
+    to find its outline points. The output is a vector of connected points.
     @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
     @param[in] edgesImage [cv::Mat*] The input image
     @param[in] partitions [const int&] The number of directions
@@ -459,7 +452,7 @@ namespace pandora_vision
 
   /**
     @brief Implements a raycast algorithm for all blob keypoints in order
-    to find blob's outlines. The output is a vector containing a coherent
+    to find blobs' outlines. The output is a vector containing a coherent
     vector of points.
     @param[in,out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
     @param[in] edgesImage [cv::Mat*] The input image
@@ -472,7 +465,7 @@ namespace pandora_vision
     @param[out] blobsArea [std::vector<float>*] The area of each blob
     @return void
    **/
-  void BlobDetection::raycastKeypoint(
+  void BlobDetection::raycastKeypoints(
     std::vector<cv::KeyPoint>* inKeyPoints,
     cv::Mat* edgesImage,
     const int& partitions,
@@ -665,97 +658,6 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("raycastKeypoint");
-    #endif
-  }
-
-
-
-  /**
-    @brief Takes as input a binary image and stores in
-    @outlines the outlines of closed curves.
-    (Assumes that the input image comprises entirely of closed curves.)
-    @param[in] inImage [cv::Mat*] The input binary image
-    @param[out] outlines [std::vector<std::vector<cv::Point2f> >*] The points
-    that each detected closed curve consists of
-    @return void
-   **/
-  void BlobDetection::getClosedCurves(cv::Mat* inImage,
-    std::vector<std::vector<cv::Point2f> >* outlines)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("getClosedCurves");
-    #endif
-
-    unsigned char* ptr = inImage->ptr();
-
-    std::set<unsigned int> current, next, visited, checked;
-    std::vector<cv::Point2f> curve;
-
-    for (unsigned int rows = 0; rows < inImage->rows; rows++)
-    {
-      for (unsigned int cols = 0; cols < inImage->cols; cols++)
-      {
-        int ind = rows * inImage->cols + cols;
-        char v = ptr[ind];
-
-        // Found a new curve?
-        if (v != 0 && checked.find(ind) == checked.end())
-        {
-          current.insert(ind);
-          visited.insert(ind);
-          curve.push_back(cv::Point2f(rows, cols));
-
-          while (current.size() != 0)
-          {
-            for (std::set<unsigned int>::iterator it = current.begin() ;
-              it != current.end() ; it++)
-            {
-              // sweep the neighbors of the current point
-              for (int m = -1; m < 2; m++)
-              {
-                for (int n = -1; n < 2; n++)
-                {
-
-                  int x = static_cast<int>(*it) % inImage->cols + m;
-                  int y = static_cast<int>(*it) / inImage->cols + n;
-
-                  if (x < 0 || y < 0 ||
-                    x > inImage->cols - 1 || y > inImage->rows - 1)
-                  {
-                    continue;
-                  }
-
-                  int nInd = y * inImage->cols + x;
-                  char nV = ptr[nInd];
-
-                  if ((nV != 0) && visited.find(nInd) == visited.end())
-                  {
-                    next.insert(nInd);
-                    curve.push_back(cv::Point2f(y, x));
-                  }
-
-                  visited.insert(nInd);
-                  checked.insert(nInd);
-                }
-              }
-            }
-            current.swap(next);
-            next.clear();
-          }
-
-          outlines->push_back(curve);
-
-          current.clear();
-          next.clear();
-          visited.clear();
-        }
-
-        checked.insert(ind);
-      }
-    }
-
-    #ifdef DEBUG_TIME
-    Timer::tick("getClosedCurves");
     #endif
   }
 

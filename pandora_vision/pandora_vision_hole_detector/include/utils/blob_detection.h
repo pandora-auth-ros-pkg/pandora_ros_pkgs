@@ -111,7 +111,7 @@ namespace pandora_vision
 
       /**
         @brief Implements a raycast algorithm for a blob keypoint in order
-        to find its outline points. The output is a vector of coherent points.
+        to find its outline points. The output is a vector of connected points.
         @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
         @param[in] edgesImage [cv::Mat*] The input image
         @param[in] partitions [const int&] The number of directions
@@ -130,7 +130,7 @@ namespace pandora_vision
 
       /**
         @brief Implements a raycast algorithm for all blob keypoints in order
-        to find blob's outlines. The output is a vector containing a coherent
+        to find blobs' outlines. The output is a vector containing a coherent
         vector of points.
         @param[in,out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
         @param[in] edgesImage [cv::Mat*] The input image
@@ -143,24 +143,12 @@ namespace pandora_vision
         @param[out] blobsArea [std::vector<float>*] The area of each blob
         @return void
        **/
-      static void raycastKeypoint(
+      static void raycastKeypoints(
         std::vector<cv::KeyPoint>* inKeyPoints,
         cv::Mat* edgesImage,
         const int& partitions,
         std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
         std::vector<float>* blobsArea);
-
-      /**
-        @brief Takes as input a binary image and stores in
-        @outlines the outlines of closed curves.
-        (Assumes that the input image comprises entirely of closed curves.)
-        @param[in] inImage [cv::Mat*] The input binary image
-        @param[out] outlines [std::vector<std::vector<cv::Point2f> >*] The points
-        that each detected closed curve consists of
-        @return void
-       **/
-      static void getClosedCurves(cv::Mat* inImage,
-        std::vector<std::vector<cv::Point2f> >* outlines);
 
   };
 

@@ -109,7 +109,7 @@ namespace pandora_vision
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
-          BlobDetection::raycastKeypoint(keyPoints,
+          BlobDetection::raycastKeypoints(keyPoints,
             denoisedDepthImageEdges,
             Parameters::raycast_keypoint_partitions,
             &blobsOutlineVector,

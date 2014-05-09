@@ -47,6 +47,12 @@ namespace pandora_vision
 
       BlobDetectionTest() {}
 
+      //! Sets up two images: square_, which features a single non-zero value
+      //! square of size 100 with its upper left vertex at (100, 100),
+      //! and squares_, which features two non-zero value squares of size 100.
+      //! The first one (order matters here) has its upper left vertex at
+      //! (100, 100) and the second one its lower right vertex at
+      //! (WIDTH - 1, HEIGHT - 1)
       virtual void SetUp()
       {
         WIDTH = 640;
@@ -58,10 +64,10 @@ namespace pandora_vision
 
         // Two squares with vertices
         // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
-        // A' (HEIGHT - 1 - 100, WIDTH - 1 - 100),
-        // B' (HEIGHT - 1 - 100, WIDTH - 1)
-        // C' (HEIGHT - 1, WIDTH - 1)
-        // D' (HEIGHT - 1, WIDTH - 1 - 100)
+        // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
+        // B' (WIDTH - 1 - 100, HEIGHT - 1)
+        // C' (WIDTH - 1, HEIGHT - 1)
+        // D' (WIDTH - 1, HEIGHT - 1 - 100)
         squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
         ASSERT_EQ( HEIGHT, square_.rows );
@@ -93,6 +99,8 @@ namespace pandora_vision
           }
         }
 
+        // The number of actual outline points of the square should be
+        // 4 x 100 - 4
         ASSERT_EQ ( 396, squareOutlinePointsVector_.size() );
 
 
@@ -138,11 +146,10 @@ namespace pandora_vision
         // Add the upper left square and the lower right square
         squares_ = lowerRightSquare + square_;
 
-
-
+        // The number of actual outline points of the squares should be
+        // 4 x 100 - 4
         ASSERT_EQ( 396 , squaresOutlinePointsVector_[0].size() );
         ASSERT_EQ( 396 , squaresOutlinePointsVector_[1].size() );
-
       }
 
 
@@ -156,10 +163,10 @@ namespace pandora_vision
 
       // Two squares with vertices
       // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
-      // A' (HEIGHT - 1 - 100, WIDTH - 1 - 100),
-      // B' (HEIGHT - 1 - 100, WIDTH - 1)
-      // C' (HEIGHT - 1, WIDTH - 1)
-      // D' (HEIGHT - 1, WIDTH - 1 - 100)
+      // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
+      // B' (WIDTH - 1 - 100, HEIGHT - 1)
+      // C' (WIDTH - 1, HEIGHT - 1)
+      // D' (WIDTH - 1, HEIGHT - 1 - 100)
       cv::Mat squares_;
 
       // The vector holding the outline points
@@ -221,7 +228,7 @@ namespace pandora_vision
 
 
 
-  //! Test BlobDetection::brushfireKeypoint()
+  //! Test BlobDetection::brushfireKeypoints()
   TEST_F ( BlobDetectionTest, BrushfireKeypointsTest )
   {
     /***************************************************************************
@@ -256,7 +263,7 @@ namespace pandora_vision
     for ( int sq = 0; sq < 2; sq++ )
     {
       // Check whether the outline points found are actually the outline points
-      // of the square in square_
+      // of the sq-th square in square_
       int count_b_in_s = 0;
       for ( int b = 0; b < blobsOutlineVector[sq].size(); b++ )
       {
@@ -279,7 +286,129 @@ namespace pandora_vision
       // excluding the square's four vertices, is 100 x 100 - 4
       EXPECT_EQ ( 9996, blobsArea[sq] );
     }
+  }
 
+
+
+  //! Test BlobDetection::brushfirePoint()
+  TEST_F ( BlobDetectionTest, BrushfirePointTest )
+  {
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    cv::Point2f p_0 ( 150, 101 );
+    cv::Point2f p_1 ( WIDTH - 43, HEIGHT - 35 );
+
+    // The sets of visted points for each square
+    std::set< unsigned int > visited_0;
+    std::set< unsigned int > visited_1;
+
+
+    // Run BlobDetection::brushfirePoint for the upper left square
+    BlobDetection::brushfirePoint ( p_0, &squares_, &visited_0 );
+
+    // The number of visited points should be the number of visited points
+    // of the brushfire algorithm, which,
+    // excluding the square's four vertices, is 100 x 100 - 4
+    EXPECT_EQ ( 9996, visited_0.size() );
+
+
+    // Run BlobDetection::brushfirePoint for the upper left square
+    BlobDetection::brushfirePoint ( p_1, &squares_, &visited_1 );
+
+    // The number of visited points should be the number of visited points
+    // of the brushfire algorithm, which,
+    // excluding the square's four vertices, is 100 x 100 - 4
+    EXPECT_EQ ( 9996, visited_1.size() );
+  }
+
+
+
+  //! Test BlobDetection::raycastKeypoint
+  TEST_F ( BlobDetectionTest, RaycastKeypointTest )
+  {
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    // The keypoint of the lower right square
+    cv::KeyPoint k_1 ( WIDTH - 43, HEIGHT - 35, 1 );
+
+    // The vector of outline points
+    std::vector< cv::Point2f > blobOutlineVector_1;
+
+    //Run BlobDetection::raycastKeypoint
+    BlobDetection::raycastKeypoint
+      ( k_1, &squares_, 360, &blobOutlineVector_1 );
+
+    // Due to the approximate nature of the raycastKeypoint algorithm,
+    // the number of outline points found should be smaller or equal to the
+    // actual number of outline points of the square
+    EXPECT_GE ( squaresOutlinePointsVector_[1].size(),
+      blobOutlineVector_1.size() );
+
+
+    // The keypoint of the upper left square
+    cv::KeyPoint k_0 ( 101, 103, 1 );
+
+    // The vector of outline points
+    std::vector< cv::Point2f > blobOutlineVector_0;
+
+    //Run BlobDetection::raycastKeypoint
+    BlobDetection::raycastKeypoint
+      ( k_0, &squares_, 360, &blobOutlineVector_0 );
+
+    // Due to the approximate nature of the raycastKeypoint algorithm,
+    // the number of outline points found should be smaller or equal to the
+    // actual number of outline points of the square
+    EXPECT_GE ( squaresOutlinePointsVector_[0].size(),
+      blobOutlineVector_0.size() );
+  }
+
+
+
+  //! Test BlobDetection::raycastKeypoints
+  TEST_F ( BlobDetectionTest, RaycastKeypointsTest )
+  {
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    // The keypoint of the upper left square
+    cv::KeyPoint k_0 ( 150, 103, 1 );
+
+    // The keypoint of the lower right square
+    cv::KeyPoint k_1 ( WIDTH - 43, HEIGHT - 35, 1 );
+
+    // The vector of keypoints
+    std::vector<cv::KeyPoint> inKeyPoints;
+
+    // Push back the two keypoints
+    inKeyPoints.push_back ( k_0 );
+    inKeyPoints.push_back ( k_1 );
+
+    // The vector of outline points
+    std::vector< std::vector< cv::Point2f > > blobsOutlineVector;
+
+    // The vector of blobs' areas
+    std::vector<float> blobsArea;
+
+    //Run BlobDetection::raycastKeypoints
+    BlobDetection::raycastKeypoints
+      ( &inKeyPoints, &squares_, 360, &blobsOutlineVector, &blobsArea );
+
+
+    for ( int sq = 0; sq < 2; sq++ )
+    {
+      // Due to the approximate nature of the raycastKeypoint algorithm,
+      // the number of outline points found should be smaller or equal to the
+      // actual number of outline points of the square
+      EXPECT_GE ( squaresOutlinePointsVector_[sq].size(),
+        blobsOutlineVector[sq].size() );
+
+      EXPECT_GE ( 10000, blobsArea[sq] );
+    }
   }
 
 }  // namespace pandora_vision
