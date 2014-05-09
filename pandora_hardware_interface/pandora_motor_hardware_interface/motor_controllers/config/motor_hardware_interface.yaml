@@ -2,8 +2,8 @@ motor_joints:
   robot_movement_joints:
     left_front_joint: &movement_left_front_joint left_front_wheel_joint
     right_front_joint: &movement_right_front_joint right_front_wheel_joint
-    left_rear_joint: &movement_left_rear_joint left_back_wheel_joint
-    right_rear_joint: &movement_right_rear_joint right_back_wheel_joint
+    left_rear_joint: &movement_left_rear_joint left_rear_wheel_joint
+    right_rear_joint: &movement_right_rear_joint right_rear_wheel_joint
 
 joint_state_controller:
   type: joint_state_controller/JointStateController

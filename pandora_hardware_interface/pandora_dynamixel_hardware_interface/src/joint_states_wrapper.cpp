@@ -72,13 +72,13 @@ namespace dynamixel
 
   JointStatesWrapper::JointStatesWrapper()
   {
-    jointStatesMsg_.name.push_back("/laser_roll_joint");
+    jointStatesMsg_.name.push_back("laser_roll_joint");
     jointStatesMsg_.position.push_back(0);
-    jointStatesMsg_.name.push_back("/laser_pitch_joint");
+    jointStatesMsg_.name.push_back("laser_pitch_joint");
     jointStatesMsg_.position.push_back(0);
-    jointStatesMsg_.name.push_back("/kinect_pitch_joint");
+    jointStatesMsg_.name.push_back("kinect_pitch_joint");
     jointStatesMsg_.position.push_back(0);
-    jointStatesMsg_.name.push_back("/kinect_yaw_joint");
+    jointStatesMsg_.name.push_back("kinect_yaw_joint");
     jointStatesMsg_.position.push_back(0);
 
     laserRollSubscriber_ = nodeHandle_.subscribe(
