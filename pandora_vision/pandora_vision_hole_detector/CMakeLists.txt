@@ -308,6 +308,15 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/rgb_node/rgb.cpp
   src/rgb_node/hole_detector.cpp
   src/rgb_node/rgb_node.cpp
+
+
+##################### tests #####################
+
+  test/unit/bounding_box_detection_test.cpp
+  test/unit/blob_detection_test.cpp
+  test/unit/edge_detection_test.cpp
+  test/unit/morphological_operators_test.cpp
+
   )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

@@ -63,7 +63,6 @@ namespace pandora_vision
         [const std::vector<std::vector<cv::Point2f> >&]
         The outline points of the blobs
         @param[in] blobsArea [const std::vector<float>&] The blobs' area
-        @param[out] outImage [cv::Mat*] The output image
         @param[out] outRectangles [std::vector< std::vector<cv::Point2f> >*]
         The rectangles of the bounding boxes
         @return void
@@ -72,7 +71,6 @@ namespace pandora_vision
         const cv::Mat& inImage,
         const std::vector<std::vector<cv::Point2f> >& blobsOutlineVector,
         const std::vector<float>& blobsArea,
-        cv::Mat* outImage,
         std::vector< std::vector<cv::Point2f> >* outRectangles);
 
   };

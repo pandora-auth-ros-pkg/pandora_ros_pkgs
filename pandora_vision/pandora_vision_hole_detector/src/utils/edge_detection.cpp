@@ -432,6 +432,7 @@ namespace pandora_vision
           }
         }
       }
+
       *outImage += lamda * (cN.mul(deltaNorth) + cS.mul(deltaSouth)
         + cE.mul(deltaEast) + cW.mul(deltaWest));
     }

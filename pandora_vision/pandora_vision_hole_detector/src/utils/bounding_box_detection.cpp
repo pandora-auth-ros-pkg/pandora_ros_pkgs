@@ -47,7 +47,6 @@ namespace pandora_vision
     @param[in] blobsOutlineVector [const std::vector<std::vector<cv::Point2f> >&]
     The outline points of the blobs
     @param[in] blobsArea [const std::vector<float>&] The blobs' area
-    @param[out] outImage [cv::Mat*] The output image
     @param[out] outRectangles [std::vector< std::vector<cv::Point2f> >*] The
     rectangles of the bounding boxes
     @return void
@@ -56,7 +55,6 @@ namespace pandora_vision
     const cv::Mat& inImage,
     const std::vector<std::vector<cv::Point2f> >& blobsOutlineVector,
     const std::vector<float>& blobsArea,
-    cv::Mat* outImage,
     std::vector<std::vector<cv::Point2f> >* outRectangles)
   {
     #ifdef DEBUG_TIME
@@ -73,18 +71,17 @@ namespace pandora_vision
       }
     }
 
-    // Draw polygonal contour + bonding rects
-    cv::RNG rng(12345);
-    cv::Mat drawing = cv::Mat::zeros(inImage.size(), CV_8UC1);
 
+    // For each rotated rectangle whose corresponding blob exceeds the minimum
+    // area threshold, if its vertices reside inside the image's boundaries,
+    // store these vertices
     for(unsigned int i = 0; i < minRect.size(); i++)
     {
-      cv::Scalar color = cv::Scalar(
-        rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-
+      // The for vertices of the rotated rectangle
       cv::Point2f rect_points[4];
       minRect[i].points(rect_points);
 
+      // Check if the vertices reside in the image's boundaries
       int numVerticesWithinImageLimits = 0;
       for (int j = 0; j < 4; j++)
       {
@@ -97,27 +94,27 @@ namespace pandora_vision
         }
       }
 
+      // If the rotated rectangle's edges reside outside the image's edges,
+      // discard this rotated rectangle
       if (numVerticesWithinImageLimits < 4)
       {
         continue;
       }
 
-      // same as rect_points array, but vector
+      // If all four vertices reside inside the image's boundaries,
+      // store them in their respective position
+
+      // Same as rect_points array, but vector
       std::vector<cv::Point2f> rect_points_vector;
 
       for(int j = 0; j < 4; j++)
       {
-        cv::line(drawing, rect_points[j],
-          rect_points[(j + 1) % 4], color, 1, 8);
-
         rect_points_vector.push_back(rect_points[j]);
       }
 
-      // push back the 4 vertices of rectangle i
+      // Push back the 4 vertices of rectangle i
       outRectangles->push_back(rect_points_vector);
     }
-
-    *outImage = drawing;
 
     #ifdef DEBUG_TIME
     Timer::tick("findRotatedBoundingBoxesFromOutline");

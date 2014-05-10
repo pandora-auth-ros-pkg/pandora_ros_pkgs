@@ -40,29 +40,43 @@
 namespace pandora_vision
 {
   // Topics' names
+
+  // The input, depth registered, point cloud topic
   std::string Parameters::hole_detector_input_topic =
     "/camera/depth_registered/points";
 
+  // The topic where the synchronizer node pubishes the
+  // synchronized depth image, extracted from the input point cloud
   std::string Parameters::depth_image_topic =
-    "/synchronized/camera/depth/image_raw";
+    "/hole_detector/synchronized/camera/depth/image_raw";
 
+  // The topic where the synchronizer node pubishes the
+  // synchronized rgb image, extracted from the input point cloud
   std::string Parameters::rgb_image_topic =
-    "/synchronized/camera/rgb/image_raw";
+    "/hole_detector/synchronized/camera/rgb/image_raw";
 
+  // The topic where the hole fusion publishes messages that unlock the
+  // synchronizer node
   std::string Parameters::synchronizer_unlock_topic =
-    "/vision/hole_fusion/unlock_rgb_depth_synchronizer";
+    "/hole_detector/hole_fusion/unlock_rgb_depth_synchronizer";
 
+  // The topic where the synchronized node publishes the input
+  // point cloud to the hole fusion node
   std::string Parameters::point_cloud_internal_topic =
-    "/synchronized/camera/depth/points";
+    "/hole_detector/synchronized/camera/depth/points";
 
+  // The topic where the depth node publishes the candidate holes found
   std::string Parameters::depth_candidate_holes_topic =
-    "/synchronized/camera/depth/candidate_holes";
+    "/hole_detector/synchronized/camera/depth/candidate_holes";
 
+  // The topic where the rgb node publishes the candidate holes found
   std::string Parameters::rgb_candidate_holes_topic =
-    "/synchronized/camera/rgb/candidate_holes";
+    "/hole_detector/synchronized/camera/rgb/candidate_holes";
 
+  // The topic where the hole detector package publishes information
+  // about the holes that considered valid
   std::string Parameters::hole_detector_output_topic =
-    "/vision/holes_direction";
+    "/hole_detector/holes_direction";
 
 
   // Show the depth image that arrives in the depth node

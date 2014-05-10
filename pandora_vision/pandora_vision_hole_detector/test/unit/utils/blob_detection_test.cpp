@@ -1,39 +1,39 @@
 /*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Author: Alexandros Philotheou
-*********************************************************************/
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Author: Alexandros Philotheou
+ *********************************************************************/
 
 #include "utils/blob_detection.h"
 #include "gtest/gtest.h"
@@ -46,6 +46,22 @@ namespace pandora_vision
     protected:
 
       BlobDetectionTest() {}
+
+      /**
+        @brief Constructs a rectangle of width @param x and height of @param y
+        @param[in] upperLeft [const cv::Point2f&] The upper left vertex of the
+        rectangle to be created
+        @param[in] x [const int&] The recgangle's width
+        @param[in] y [const int&] The rectangle's height
+        @param[out] image [cv::Mat*] The image on which the rectangle will be
+        imprinted on
+        return void
+       **/
+      void generateRectangle (
+        const cv::Point2f& upperLeft,
+        const int& x,
+        const int& y,
+        cv::Mat* image );
 
       //! Sets up two images: square_, which features a single non-zero value
       //! square of size 100 with its upper left vertex at (100, 100),
@@ -62,29 +78,9 @@ namespace pandora_vision
         // A (100, 100), B (100, 200), C (200, 200), D (200, 100)
         square_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
-        // Two squares with vertices
-        // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
-        // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
-        // B' (WIDTH - 1 - 100, HEIGHT - 1)
-        // C' (WIDTH - 1, HEIGHT - 1)
-        // D' (WIDTH - 1, HEIGHT - 1 - 100)
-        squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
-
-        ASSERT_EQ( HEIGHT, square_.rows );
-        ASSERT_EQ( WIDTH, square_.cols );
-
-
         // Construct the square_ image
-        for ( int cols = 100; cols < 200; cols++)
-        {
-          square_.at< unsigned char >( 100, cols ) = 255;
-          square_.at< unsigned char >( 199, cols ) = 255;
-        }
-        for ( int rows = 100; rows < 200; rows++)
-        {
-          square_.at< unsigned char >( rows, 100 ) = 255;
-          square_.at< unsigned char >( rows, 199 ) = 255;
-        }
+        BlobDetectionTest::generateRectangle
+          ( cv::Point2f ( 100, 100 ), 100, 100, &square_ );
 
         // Locate the outline points of the square in the square_ image
         for ( int rows = 0; rows < square_.rows; rows++ )
@@ -104,23 +100,25 @@ namespace pandora_vision
         ASSERT_EQ ( 396, squareOutlinePointsVector_.size() );
 
 
+        // Two squares with vertices
+        // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
+        // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
+        // B' (WIDTH - 1 - 100, HEIGHT - 1)
+        // C' (WIDTH - 1, HEIGHT - 1)
+        // D' (WIDTH - 1, HEIGHT - 1 - 100)
+        squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
         // Construct the squares_ image
 
         // Construct the lower right square
         cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
 
-        for ( int cols = WIDTH - 100; cols < WIDTH; cols++)
-        {
-          lowerRightSquare.at< unsigned char >( HEIGHT - 100, cols ) = 255;
-          lowerRightSquare.at< unsigned char >( HEIGHT - 1, cols ) = 255;
-        }
+        BlobDetectionTest::generateRectangle
+          ( cv::Point2f ( WIDTH - 1 - 100, HEIGHT - 1 - 100),
+            100,
+            100,
+            &lowerRightSquare );
 
-
-        for ( int rows = HEIGHT - 100; rows < HEIGHT ; rows++)
-        {
-          lowerRightSquare.at< unsigned char >( rows, WIDTH - 100 ) = 255;
-          lowerRightSquare.at< unsigned char >( rows, WIDTH - 1 ) = 255;
-        }
 
         std::vector< cv::Point2f > lowerRightSquareOutline;
         for ( int rows = 0; rows < lowerRightSquare.rows; rows++ )
@@ -148,8 +146,11 @@ namespace pandora_vision
 
         // The number of actual outline points of the squares should be
         // 4 x 100 - 4
-        ASSERT_EQ( 396 , squaresOutlinePointsVector_[0].size() );
-        ASSERT_EQ( 396 , squaresOutlinePointsVector_[1].size() );
+        ASSERT_EQ( 396, squaresOutlinePointsVector_[0].size() );
+        ASSERT_EQ( 396, squaresOutlinePointsVector_[1].size() );
+
+        ASSERT_EQ( HEIGHT, square_.rows );
+        ASSERT_EQ( WIDTH, square_.cols );
       }
 
 
@@ -173,11 +174,46 @@ namespace pandora_vision
       // of the square in the square_ image
       std::vector< cv::Point2f > squareOutlinePointsVector_;
 
-      // The vector holding the vector of outline points
+      // The vector holding the vectors of outline points
       // of the squares in the squares_ image
       std::vector< std::vector< cv::Point2f > > squaresOutlinePointsVector_;
 
   };
+
+
+
+  /**
+    @brief Constructs a rectangle of width @param x and height of @param y
+    @param[in] upperLeft [const cv::Point2f&] The upper left vertex of the
+    rectangle to be created
+    @param[in] x [const int&] The recgangle's width
+    @param[in] y [const int&] The rectangle's height
+    @param[out] image [cv::Mat*] The image on which the rectangle will be
+    imprinted on
+    return void
+   **/
+  void BlobDetectionTest::generateRectangle (
+    const cv::Point2f& upperLeft,
+    const int& x,
+    const int& y,
+    cv::Mat* image )
+  {
+    // The four vertices of the rectangle
+    cv::Point2f vertex_1(upperLeft.x, upperLeft.y);
+
+    cv::Point2f vertex_2(upperLeft.x, upperLeft.y + y - 1);
+
+    cv::Point2f vertex_3(upperLeft.x + x - 1, upperLeft.y + y - 1);
+
+    cv::Point2f vertex_4(upperLeft.x + x - 1, upperLeft.y);
+
+    cv::Point2f a[] = {vertex_1, vertex_2, vertex_3, vertex_4};
+
+    for(unsigned int j = 0; j < 4; j++)
+    {
+      cv::line(*image, a[j], a[(j + 1) % 4], cv::Scalar(255, 0, 0), 1, 8);
+    }
+  }
 
 
 
@@ -216,7 +252,7 @@ namespace pandora_vision
       for ( int s = 0; s < squareOutlinePointsVector_.size(); s++ )
       {
         if (blobOutlineVector[b].x == squareOutlinePointsVector_[s].x
-        && blobOutlineVector[b].y == squareOutlinePointsVector_[s].y)
+          && blobOutlineVector[b].y == squareOutlinePointsVector_[s].y)
         {
           count_b_in_s++;
         }

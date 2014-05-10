@@ -51,21 +51,36 @@ namespace pandora_vision
   {
 
     // Topics' names
+
+    // The input, depth registered, point cloud topic
     static std::string hole_detector_input_topic;
 
+    // The topic where the synchronizer node pubishes the
+    // synchronized depth image, extracted from the input point cloud
     static std::string depth_image_topic;
 
+    // The topic where the synchronizer node pubishes the
+    // synchronized rgb image, extracted from the input point cloud
     static std::string rgb_image_topic;
 
+    // The topic where the hole fusion publishes messages that unlock the
+    // synchronizer node
     static std::string synchronizer_unlock_topic;
 
+    // The topic where the synchronized node publishes the input
+    // point cloud to the hole fusion node
     static std::string point_cloud_internal_topic;
 
+    // The topic where the depth node publishes the candidate holes found
     static std::string depth_candidate_holes_topic;
 
+    // The topic where the rgb node publishes the candidate holes found
     static std::string rgb_candidate_holes_topic;
 
+    // The topic where the hole detector package publishes information
+    // about the holes that considered valid
     static std::string hole_detector_output_topic;
+
 
     // Show the depth image that arrives in the depth node
     static bool show_depth_image;

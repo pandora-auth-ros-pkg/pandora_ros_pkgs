@@ -70,6 +70,7 @@ namespace pandora_vision
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
+          // Find the outline points of each keypoint
           BlobDetection::brushfireKeypoints(*keyPoints,
             denoisedDepthImageEdges,
             &blobsOutlineVector,
@@ -80,7 +81,6 @@ namespace pandora_vision
           cv::Mat inputDenoisedDepthImageEdges;
           denoisedDepthImageEdges->copyTo(inputDenoisedDepthImageEdges);
 
-          cv::Mat rectanglesImage;
           std::vector< std::vector<cv::Point2f> > rectangles;
 
           // Given the outline of the blob, find the least area
@@ -89,7 +89,6 @@ namespace pandora_vision
             inputDenoisedDepthImageEdges,
             blobsOutlineVector,
             blobsArea,
-            &rectanglesImage,
             &rectangles);
 
           // Correlate each keypoint with each rectangle found.
@@ -109,6 +108,7 @@ namespace pandora_vision
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
           std::vector<float> blobsArea;
 
+          // Find the (approximate) outline points of each keypoint
           BlobDetection::raycastKeypoints(keyPoints,
             denoisedDepthImageEdges,
             Parameters::raycast_keypoint_partitions,
@@ -120,7 +120,6 @@ namespace pandora_vision
           cv::Mat inputDenoisedDepthImageEdges;
           denoisedDepthImageEdges->copyTo(inputDenoisedDepthImageEdges);
 
-          cv::Mat rectanglesImage;
           std::vector< std::vector<cv::Point2f> > rectangles;
 
           // Given the outline of the blob, find the least area
@@ -129,7 +128,6 @@ namespace pandora_vision
             inputDenoisedDepthImageEdges,
             blobsOutlineVector,
             blobsArea,
-            &rectanglesImage,
             &rectangles);
 
           // Correlate each keypoint with each rectangle found.
