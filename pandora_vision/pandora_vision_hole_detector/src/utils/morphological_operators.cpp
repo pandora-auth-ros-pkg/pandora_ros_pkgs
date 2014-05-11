@@ -1026,9 +1026,9 @@ namespace pandora_vision
     {
       for (unsigned int cols = 1; cols < outImage->cols - 1; cols++)
       {
-        if(inImage.data[rows * outImage->cols + cols] != 0)
+        if(inImage.data[rows * inImage.cols + cols] != 0)
         {
-          pts[limit]= rows * outImage->cols + cols;
+          pts[limit]= rows * inImage.cols + cols;
           limit++;
         }
       }
@@ -1038,9 +1038,9 @@ namespace pandora_vision
     {
       isRunning = false;
 
-      for(unsigned int i = 0 ; i < limit ; i++)
+      for (int kernelId = 0; kernelId < 8; kernelId++)
       {
-        for (int kernelId = 0; kernelId < 8; kernelId++)
+        for(unsigned int i = 0; i < limit; i++)
         {
           if (kernelCheck(kernels[kernelId], *outImage,
               cv::Point(pts[i] % outImage->cols, pts[i] / outImage->cols)))

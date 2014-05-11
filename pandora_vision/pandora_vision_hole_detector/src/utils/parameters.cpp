@@ -142,8 +142,8 @@ namespace pandora_vision
   int Parameters::raycast_keypoint_partitions = 8;
 
   //<! Loose ends connection parameters
-  int Parameters::AB_to_MO_ratio = 2;
-  int Parameters::minimum_curve_points = 1200;
+  int Parameters::AB_to_MO_ratio = 4;
+  int Parameters::minimum_curve_points = 100;
 
 
   //// Interpolation parameters

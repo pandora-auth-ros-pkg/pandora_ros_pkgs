@@ -710,9 +710,8 @@ namespace pandora_vision
 
     nonZerosAfter = cv::countNonZero ( thinnedSquare );
 
-    // square_ should have shrunk by 196 pixels: the right hand side and the
-    // bottom side are affected, with the 3 vertices between them intact
-    EXPECT_EQ ( 10000 - 196, nonZerosAfter );
+    // square_ should have shrunk by 4 pixels:
+    EXPECT_EQ ( 10000 - 4, nonZerosAfter );
 
   }
 

@@ -54,11 +54,16 @@ namespace pandora_vision
       this->x = x;
       this->y = y;
     }
-    GraphNode(void){}
+
+    GraphNode(void) {}
+
     int x;
     int y;
+
     std::vector<GraphNode*> connections;
+
     std::vector<int> dists;
+
     unsigned int dist;
   };
 

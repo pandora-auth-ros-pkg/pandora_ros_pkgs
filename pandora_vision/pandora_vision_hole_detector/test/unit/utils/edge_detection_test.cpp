@@ -164,6 +164,7 @@ namespace pandora_vision
         ASSERT_EQ( 396 , squaresOutlinePointsVector_[0].size() );
         ASSERT_EQ( 396 , squaresOutlinePointsVector_[1].size() );
 
+
         ASSERT_EQ( HEIGHT, squares_.rows );
         ASSERT_EQ( WIDTH, squares_.cols );
       }
@@ -268,7 +269,7 @@ namespace pandora_vision
 
 
 
-  //! Test EdgeDetection::applyLaplacian
+  //! Test EdgeDetection::applyEdgeContamination
   TEST_F ( EdgeDetectionTest, ApplyEdgeContaminationTest)
   {
     // Obtain the edges image for the squares_ image.
@@ -284,6 +285,136 @@ namespace pandora_vision
 
     // The number of non-zero pixels after the appliance of edge contamination
     EXPECT_EQ ( 3 * 396 - 4, cv::countNonZero ( squares_edges ) );
+  }
+
+
+
+  //! Test EdgeDetection::computeEdges
+  TEST_F ( EdgeDetectionTest, ComputeEdgesTest )
+  {
+    // Convert squares_ into a CV_32FC1 type image
+    cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );
+
+    for ( int rows = 0; rows < squares_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < squares_.cols; cols++ )
+      {
+        squares_32FC1.at< float >( rows, cols ) =
+          static_cast< float >(squares_.at< unsigned char >( rows, cols )) / 255;
+      }
+    }
+
+    // Add an unfinished square to the squares_32FC1 image
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      squares_32FC1.at< float >( rows, 300 ) = 2.0;
+    }
+
+    for ( int cols = 300; cols < 400; cols++ )
+    {
+      squares_32FC1.at< float >( 300, cols ) = 2.0;
+    }
+
+    cv::Mat denoisedEdges;
+    EdgeDetection::computeEdges ( squares_32FC1, &denoisedEdges );
+
+    ASSERT_EQ ( CV_8UC1, denoisedEdges.type() );
+  }
+
+
+
+  //! Test EdgeDetection::connectPairs
+  TEST_F ( EdgeDetectionTest, ConnectPairsTest )
+  {
+    // Obtain the edges image for the squares_ image.
+    // Here, it does not matter with which operator the edges image is produced,
+    // provided that the the value tested below changes accordingly
+    cv::Mat squares_edges;
+    EdgeDetection::applyLaplacian ( squares_, &squares_edges );
+
+    // Add an unfinished square to the squares_edges image
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      squares_edges.at< unsigned char >( rows, 300 ) = 255;
+    }
+
+    for ( int cols = 300; cols < 400; cols++ )
+    {
+      squares_edges.at< unsigned char >( 300, cols ) = 255;
+    }
+
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p;
+
+    p.first.x = 399;
+    p.first.y = 300;
+
+    p.second.x = 300;
+    p.second.y = 399;
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs;
+    pairs.push_back( p );
+
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    int nonZerosBefore = cv::countNonZero( squares_edges );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &squares_edges, pairs, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    int nonZerosAfter = cv::countNonZero( squares_edges );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+
+    // Connect by line
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( squares_edges );
+
+    // Connect the two points by line
+    EdgeDetection::connectPairs ( &squares_edges, pairs, 0 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( squares_edges );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+  }
+
+
+
+  //! Test EdgeDetection::denoiseEdges
+  TEST_F ( EdgeDetectionTest, DenoiseEdgesTest )
+  {
+    // Obtain the edges image for the squares_ image.
+    // Here, it does not matter with which operator the edges image is produced,
+    // provided that the the value tested below changes accordingly
+    cv::Mat squares_edges;
+    EdgeDetection::applyScharr( squares_, &squares_edges );
+
+    // Add an unfinished square to the squares_edges image
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      squares_edges.at< unsigned char >( rows, 300 ) = 255;
+    }
+
+    for ( int cols = 300; cols < 400; cols++ )
+    {
+      squares_edges.at< unsigned char >( 300, cols ) = 255;
+    }
+
+    // Run EdgeDetection::denoiseEdges
+    EdgeDetection::denoiseEdges( &squares_edges );
   }
 
 } // namespace pandora_vision

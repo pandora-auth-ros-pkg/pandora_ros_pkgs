@@ -47,6 +47,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
   {
+    if (inImage.depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::applyCanny : Inappropriate image depth.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("applyCanny", "computeEdges");
     #endif
@@ -88,6 +97,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::applyScharr (const cv::Mat& inImage, cv::Mat* outImage)
   {
+    if (inImage.depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::applyScharr : Inappropriate image depth.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("applyScharr", "computeEdges");
     #endif
@@ -133,6 +151,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::applySobel (const cv::Mat& inImage, cv::Mat* outImage)
   {
+    if (inImage.depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::applySobel : Inappropriate image depth.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("applySobel", "computeEdges");
     #endif
@@ -178,6 +205,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::applyLaplacian (const cv::Mat& inImage, cv::Mat* outImage)
   {
+    if (inImage.depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::applyLaplacian : Inappropriate image depth.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("applyLaplacian", "computeEdges");
     #endif
@@ -340,6 +376,7 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::start("anisotropicDiffusion");
     #endif
+
     int kappa = 1;
     float lamda = 0.25;
 
@@ -460,9 +497,19 @@ namespace pandora_vision
    **/
   void EdgeDetection::computeEdges(const cv::Mat& inImage, cv::Mat* edges)
   {
+    if (inImage.type() != CV_32FC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::computeEdges : Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("computeEdges", "findHoles");
     #endif
+
 
     cv::Mat denoisedDepthImageEdges;
     cv::Mat visualizableDenoisedImage;
@@ -527,6 +574,14 @@ namespace pandora_vision
     const std::vector<std::pair<GraphNode, GraphNode> >& pairs,
     const int& method)
   {
+    if (inImage->depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::connectPairs: Inappropriate image depth.");
+      #endif
+
+      return;
+    }
 
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
@@ -844,6 +899,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::denoiseEdges(cv::Mat* img)
   {
+    if (img->depth() != CV_8U)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::denoiseEdges: Inappropriate image depth.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("denoiseEdges", "computeEdges");
     #endif
