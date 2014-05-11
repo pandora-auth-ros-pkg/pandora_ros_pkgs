@@ -402,6 +402,9 @@ namespace pandora_vision
     cv::Mat squares_edges;
     EdgeDetection::applyScharr( squares_, &squares_edges );
 
+    // The number of non-zero pixels in the edges image, before denoising
+    int nonZerosBefore = countNonZero ( squares_edges );
+
     // Add an unfinished square to the squares_edges image
     for ( int rows = 300; rows < 400; rows++ )
     {
@@ -415,6 +418,135 @@ namespace pandora_vision
 
     // Run EdgeDetection::denoiseEdges
     EdgeDetection::denoiseEdges( &squares_edges );
+
+    // The number of non-zero pixels in the edges image, after denoising
+    int nonZerosAfter = countNonZero ( squares_edges );
+
+    // The type of the edges image should be CV_8UC1
+    ASSERT_EQ ( squares_edges.type(), CV_8UC1 );
+
+    // In this particular test, where the lower right square vanishes due to
+    // appliance of the edge contamination method, and the unfinished square's
+    // end points are connected, the number of non-zero pixels after the
+    // denoising of the edges image should amount to lower than that of before
+    EXPECT_GT ( nonZerosBefore, nonZerosAfter );
+  }
+
+
+
+  //! Test EdgeDetection::findNeighs
+  TEST_F ( EdgeDetectionTest, FindNeighsTest )
+  {
+    // A gamma shape
+    cv::Mat gamma = cv::Mat::zeros( squares_.size(), CV_8UC1 );
+
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      gamma.at< unsigned char >( rows, 300 ) = 255;
+    }
+
+    for ( int cols = 300; cols < 500; cols++ )
+    {
+      gamma.at< unsigned char >( 300, cols ) = 255;
+    }
+
+    std::set< unsigned int > ret;
+
+    // Find the end points of a curve where a point trully lies on
+    std::pair< GraphNode, GraphNode > p_valid =
+      EdgeDetection::findNeighs ( &gamma, 300, 451, &ret);
+
+    // The point should lie on a curve.
+    // The curve should indeed be a curve: it is constituted by points
+    EXPECT_LT ( 0, ret.size() );
+
+    // The first end point's coordinates
+    EXPECT_EQ ( p_valid.first.x, 300 );
+    EXPECT_EQ ( p_valid.first.y, 499 );
+
+    // The second end point's coordinates
+    EXPECT_EQ ( p_valid.second.x, 399 );
+    EXPECT_EQ ( p_valid.second.y, 300 );
+
+
+    ret.clear();
+
+    // Find the end points of a curve where a point trully lies on
+    std::pair< GraphNode, GraphNode > p_invalid =
+      EdgeDetection::findNeighs ( &gamma, 100, 200, &ret);
+
+    // The point should not lie on a curve.
+    EXPECT_EQ ( 1, ret.size() );
+
+    // The first end point's coordinates will be the origin
+    EXPECT_EQ ( p_invalid.first.x, 0 );
+    EXPECT_EQ ( p_invalid.first.y, 0 );
+
+    // The second end point's coordinates will be also be the origin
+    EXPECT_EQ ( p_invalid.second.x, 0 );
+    EXPECT_EQ ( p_invalid.second.y, 0 );
+
+  }
+
+
+
+  //! Test EdgeDetection::getShapesClearBorder
+  TEST_F ( EdgeDetectionTest, GetShapesClearBorderTest )
+  {
+    // Construct two squares, one within the other
+    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point( 10, 10 ), 200, 200, &squares );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point( 100, 100 ), 100, 100, &squares );
+
+    // The number of non-zero pixels before getting the clear borders
+    int nonZerosBefore = cv::countNonZero ( squares );
+
+    // Run EdgeDetection::getShapesClearBorder
+    EdgeDetection::getShapesClearBorder ( &squares );
+
+    // The number of non-zero pixels after getting the clear borders
+    int nonZerosAfter = cv::countNonZero ( squares );
+
+    // The EdgeDetection::getShapesClearBorder method finds all borders,
+    // not caring about shapes being inside other shapes
+    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
+
+  }
+
+
+
+  //! Test EdgeDetection::getShapesClearBorderSimple
+  TEST_F ( EdgeDetectionTest, GetShapesClearBorderSimpleTest )
+  {
+    // Construct two squares, one within the other
+    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point( 10, 10 ), 200, 200, &squares );
+
+    // The number of non-zero pixels of the shape that encapsulates the one
+    // below
+    int nonZerosBefore = cv::countNonZero ( squares );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point( 100, 100 ), 100, 100, &squares );
+
+
+    // Run EdgeDetection::getShapesClearBorderSimple
+    EdgeDetection::getShapesClearBorderSimple ( &squares );
+
+    // The number of non-zero pixels after getting the clear borders
+    int nonZerosAfter = cv::countNonZero ( squares );
+
+    // The EdgeDetection::getShapesClearBorderSimple method finds borders of
+    // shapes, discarding everything within them: the square does not get
+    // to be detected :(
+    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
+
   }
 
 } // namespace pandora_vision

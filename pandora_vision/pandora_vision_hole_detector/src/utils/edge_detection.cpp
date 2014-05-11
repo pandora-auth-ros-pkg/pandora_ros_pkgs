@@ -1211,8 +1211,10 @@ namespace pandora_vision
 
 
   /**
-    @brief Identifies in which curve a point lies on and returns the curve's
-    two end points
+    @brief Identifies in which curve a point lies on and returns the
+    curve's two end points. If a point does not lie on a curve,
+    the pair returned has both coordinates (x,y) set to zero, and the
+    size of @param ret is one.
     @param[in] img [cv::Mat*] The input binary image
     @param[in] x_ [const int&] The x coordinate of the point
     @param[in] y_ [const int&] The y coordinate of the point
@@ -1452,6 +1454,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::getShapesClearBorder (cv::Mat* inImage)
   {
+    if (inImage->type() != CV_8UC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::getShapesClearBorder : \
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
@@ -1670,6 +1681,15 @@ namespace pandora_vision
    **/
   void EdgeDetection::getShapesClearBorderSimple (cv::Mat* inImage)
   {
+    if (inImage->type() != CV_8UC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::getShapesClearBorderSimple : \
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
