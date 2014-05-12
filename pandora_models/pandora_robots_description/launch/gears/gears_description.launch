@@ -3,15 +3,16 @@
 <launch>
 
   <arg name="control" default="false" />
+  <arg name="interface" default="false" />
 
-  <group if="$(arg control)">
-    <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_controllers.launch" >
-      <arg name="robot" value="gears" />
-    </include>
+  <group if="$(arg control)" >
+    <group unless="$(arg interface)" >
+      <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_controllers.launch" />
+    </group>
   </group>
 
   <param name="robot_description"
-         command="$(find xacro)/xacro.py '$(find pandora_robots_description)/urdf/gears/gears.urdf.xacro' control:=$(arg control)" />
+         command="$(find xacro)/xacro.py '$(find pandora_robots_description)/urdf/gears/gears.urdf.xacro' control:=$(arg control) interface:=$(arg interface)" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 

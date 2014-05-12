@@ -124,7 +124,8 @@
 
 <!-- Ros Control ########################################################## -->
 
-  <xacro:macro name="gazebo_ros_control_plugin" >
+  <xacro:macro name="gazebo_ros_control_plugin"
+               params="hw_sim" >
     <!-- ================================================================== -->
     <gazebo>
 
@@ -134,7 +135,7 @@
       <!-- <robotNamespace>${robot_namespace}</robotNamespace> -->
       <robotNamespace>control</robotNamespace>
 
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+      <robotSimType>${hw_sim}</robotSimType>
 
       </plugin>
 

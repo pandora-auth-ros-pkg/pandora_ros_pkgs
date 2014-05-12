@@ -165,7 +165,12 @@
     </xacro:if>
     <!-- ================================================================== -->
     <xacro:if value="$(arg control)" >
-      <xacro:gazebo_ros_control_plugin />
+      <xacro:if value="$(arg interface)" >
+        <xacro:gazebo_ros_control_plugin hw_sim="pandora_gazebo_interface/GazeboInterface" />
+      </xacro:if>
+      <xacro:unless value="$(arg interface)" >
+        <xacro:gazebo_ros_control_plugin hw_sim="gazebo_ros_control/DefaultRobotHWSim" />
+      </xacro:unless>
     </xacro:if>
     <!-- ================================================================== -->
     <xacro:if value="$(arg control)" >
@@ -177,7 +182,9 @@
     <xacro:if value="${enable_sensors}" >
       <xacro:if value="${enable_hokuyo_laser_sensor}" >
         <xacro:unless value="$(arg control)" >
-          <xacro:pandora_imu_stabilizer_plugin />
+          <xacro:if value="${enable_pandora_imu_stabilizer_plugin}" >
+            <xacro:pandora_imu_stabilizer_plugin />
+          </xacro:if>
         </xacro:unless>
       </xacro:if>
     </xacro:if>

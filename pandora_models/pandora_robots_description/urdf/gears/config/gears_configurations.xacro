@@ -28,6 +28,7 @@
     <xacro:property name="enable_pandora_differential_plugin" value="true" />
     <xacro:property name="enable_pandora_p3d_plugin" value="false" />
     <xacro:property name="enable_ros_imu_plugin" value="false" />
+    <xacro:property name="enable_pandora_imu_stabilizer_plugin" value="true" />
   <!-- SDF Physics ======================================================== -->
   <xacro:property name="enable_sdf_physics" value="true" />
     <xacro:property name="enable_base_link_sdf_physics" value="true" />
