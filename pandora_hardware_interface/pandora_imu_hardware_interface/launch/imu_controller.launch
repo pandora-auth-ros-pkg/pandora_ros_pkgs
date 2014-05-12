@@ -1,16 +1,18 @@
 <launch>
+  <arg name="namespace" default="imu" />
+
   <!-- load configuration -->
   <rosparam
     command="load"
     file="$(find pandora_imu_hardware_interface)/config/imu_sensor_controller.yaml"
-    ns="/imu"/>
+    ns="$(arg namespace)"/>
 
   <!-- spawn controller -->
   <node
     name="imu_controller_spawner"
     pkg="controller_manager"
     type="spawner" output="screen"
-    ns="/imu"
+    ns="$(arg namespace)"
     args="
       imu_sensor_controller" />
 </launch>

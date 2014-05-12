@@ -1,16 +1,18 @@
 <launch>
+  <arg name="namespace" default="motor" />
+
   <!-- load configuration -->
   <rosparam
     command="load"
     file="$(find pandora_motor_hardware_interface)/motor_controllers/config/motor_hardware_interface.yaml"
-    ns="/motor"/>
+    ns="$(arg namespace)"/>
 
   <!-- spawn controller -->
   <node
     name="motor_controller_spawner"
     pkg="controller_manager"
     type="spawner" output="screen"
-    ns="/motor"
+    ns="$(arg namespace)"
     args="
       joint_state_controller
       skid_steer_drive_controller" />
