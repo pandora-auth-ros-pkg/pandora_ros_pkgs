@@ -185,13 +185,13 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::start("validateKeypointsToRectangles", "validateBlobs");
     #endif
-    for (unsigned int keypointId = 0;
-      keypointId < inKeyPoints.size(); keypointId++)
+
+    for (int keypointId = 0; keypointId < inKeyPoints.size(); keypointId++)
     {
       std::vector<int> keypointResidesInRectIds;
 
       // Test to see where (in which rectangle(s)) the keypoint resides.
-      for (unsigned int rectId = 0; rectId < inRectangles.size(); rectId++)
+      for (int rectId = 0; rectId < inRectangles.size(); rectId++)
       {
         if (cv::pointPolygonTest(
             inRectangles[rectId], inKeyPoints[keypointId].pt, false) > 0)
@@ -211,10 +211,9 @@ namespace pandora_vision
         conveyor->outlines.push_back(inContours[keypointId]);
       }
 
-      /*
-       * If the keypoint resides in multiple rectangles choose the one
-       * with the least area.
-       */
+
+      // If the keypoint resides in multiple rectangles,
+      // choose the one with the least area.
       if (keypointResidesInRectIds.size() > 1)
       {
         float minRectArea = 1000000.0;
@@ -232,13 +231,13 @@ namespace pandora_vision
         conveyor->rectangles.push_back(inRectangles[minAreaRectId]);
         conveyor->outlines.push_back(inContours[keypointId]);
       }
+
       /*
-       * If the keypoint has no rectangle attached to it
-       * (if, for example the blob's area was smaller
-       * than blob_min_area_threshold), do not insert the keypoint in the
-       * valid keypoints vector etc.
+       * If the keypoint has no rectangle attached to it,
+       * do not insert the keypoint in the valid keypoints vector, etc.
        */
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("validateKeypointsToRectangles");
     #endif

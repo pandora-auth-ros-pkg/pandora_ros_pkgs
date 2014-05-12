@@ -102,10 +102,10 @@ namespace pandora_vision
 
         // Two squares with vertices
         // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
-        // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
-        // B' (WIDTH - 1 - 100, HEIGHT - 1)
+        // A' (WIDTH - 100, HEIGHT - 100),
+        // B' (WIDTH - 100, HEIGHT - 1)
         // C' (WIDTH - 1, HEIGHT - 1)
-        // D' (WIDTH - 1, HEIGHT - 1 - 100)
+        // D' (WIDTH - 1, HEIGHT - 100)
         squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
         // Construct the squares_ image
@@ -114,7 +114,7 @@ namespace pandora_vision
         cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
 
         BlobDetectionTest::generateRectangle
-          ( cv::Point2f ( WIDTH - 1 - 100, HEIGHT - 1 - 100),
+          ( cv::Point2f ( WIDTH - 100, HEIGHT - 100 ),
             100,
             100,
             &lowerRightSquare );
@@ -164,10 +164,10 @@ namespace pandora_vision
 
       // Two squares with vertices
       // A (100, 100), B (100, 200), C (200, 200), D (200, 100) and
-      // A' (WIDTH - 1 - 100, HEIGHT - 1 - 100),
-      // B' (WIDTH - 1 - 100, HEIGHT - 1)
+      // A' (WIDTH - 100, HEIGHT - 100),
+      // B' (WIDTH - 100, HEIGHT - 1)
       // C' (WIDTH - 1, HEIGHT - 1)
-      // D' (WIDTH - 1, HEIGHT - 1 - 100)
+      // D' (WIDTH - 1, HEIGHT - 100)
       cv::Mat squares_;
 
       // The vector holding the outline points

@@ -24,6 +24,14 @@ catkin_add_gtest(edge_detection_test
   unit/utils/edge_detection_test.cpp)
 target_link_libraries(edge_detection_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
 
+catkin_add_gtest(hole_filters_test
+  unit/utils/hole_filters_test.cpp)
+target_link_libraries(hole_filters_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
+
+catkin_add_gtest(holes_conveyor_test
+  unit/utils/holes_conveyor_test.cpp)
+target_link_libraries(holes_conveyor_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
+
 catkin_add_gtest(morphological_operators_test
   unit/utils/morphological_operators_test.cpp)
 target_link_libraries(morphological_operators_test ${catkin_LIBRARIES} depth_node_lib gtest_main)
