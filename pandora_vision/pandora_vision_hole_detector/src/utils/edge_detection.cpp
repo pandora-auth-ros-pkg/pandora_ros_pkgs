@@ -540,6 +540,19 @@ namespace pandora_vision
     {
       applyLaplacian(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
+    else if (Parameters::edge_detection_method == 4) // Mixed mode
+    {
+      if (Parameters::mixed_edges_toggle_switch == 1)
+      {
+        applyScharr(visualizableDenoisedImage, &denoisedDepthImageEdges);
+        Parameters::mixed_edges_toggle_switch = 2;
+      }
+      else if (Parameters::mixed_edges_toggle_switch == 2)
+      {
+        applySobel(visualizableDenoisedImage, &denoisedDepthImageEdges);
+        Parameters::mixed_edges_toggle_switch = 1;
+      }
+    }
 
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,

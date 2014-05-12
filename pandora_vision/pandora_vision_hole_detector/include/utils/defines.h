@@ -44,8 +44,6 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/ModelCoefficients.h>
 #include <pcl/point_types.h>
 #include <pcl/sample_consensus/method_types.h>

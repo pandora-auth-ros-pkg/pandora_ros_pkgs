@@ -1,5 +1,0 @@
-<launch>
-  <include file="$(find openni2_launch)/launch/openni2.launch" />
-
-  <node name="rgb_node" type="rgb_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
-</launch>

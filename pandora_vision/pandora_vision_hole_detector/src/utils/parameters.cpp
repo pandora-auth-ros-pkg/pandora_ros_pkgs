@@ -58,7 +58,7 @@ namespace pandora_vision
   // The topic where the hole fusion publishes messages that unlock the
   // synchronizer node
   std::string Parameters::synchronizer_unlock_topic =
-    "/hole_detector/hole_fusion/unlock_rgb_depth_synchronizer";
+    "/hole_detector/unlock_rgb_depth_synchronizer";
 
   // The topic where the synchronized node publishes the input
   // point cloud to the hole fusion node
@@ -104,6 +104,13 @@ namespace pandora_vision
 
   // Edge detection parameters
   int Parameters::edge_detection_method = 2;
+
+  // When mixed edge detection is selected, this toggle switch
+  // is needed in order to shift execution from one edge detector
+  // to the other.
+  // 1 for the Scharr edge detector,
+  // 2 for the Sobel edge detector
+  int Parameters::mixed_edges_toggle_switch = 1;
 
   // canny parameters
   int Parameters::canny_ratio = 3;

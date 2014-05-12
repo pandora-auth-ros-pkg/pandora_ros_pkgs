@@ -1,3 +1,0 @@
-<launch>
-  <node name="depth_node" type="depth_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
-</launch>

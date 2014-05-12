@@ -161,29 +161,6 @@ add_dependencies(hole_fusion_node
 )
 
 
-################################# RgbDummyNode #################################
-add_executable(rgb_dummy_node
-  src/rgb_dummy_node/rgb_dummy_node.cpp
-  src/rgb_dummy_node/rgb_dummy.cpp
-  src/utils/hole_filters.cpp
-  src/utils/message_conversions.cpp
-  src/utils/noise_elimination.cpp
-  src/utils/edge_detection.cpp
-  src/utils/blob_detection.cpp
-  src/utils/bounding_box_detection.cpp
-  src/utils/timer.cpp
-  src/utils/parameters.cpp
-  src/utils/morphological_operators.cpp
-  src/utils/visualization.cpp
-)
-
-target_link_libraries(rgb_dummy_node ${catkin_LIBRARIES} )
-
-add_dependencies(rgb_dummy_node
-  vision_communications_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
 ################################ RgbNode ######################################
 add_library(rgb_node_lib
   src/utils/blob_detection.cpp

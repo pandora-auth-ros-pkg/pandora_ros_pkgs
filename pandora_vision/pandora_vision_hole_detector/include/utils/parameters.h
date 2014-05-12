@@ -106,6 +106,13 @@ namespace pandora_vision
     // Edge detection parameters
     static int edge_detection_method;
 
+    // When mixed edge detection is selected, this toggle switch
+    // is needed in order to shift execution from one edge detector
+    // to the other.
+    // 1 for the Scharr edge detector,
+    // 2 for the Sobel edge detector
+    static int mixed_edges_toggle_switch;
+
     // canny parameters
     static int canny_ratio;
     static int canny_kernel_size;

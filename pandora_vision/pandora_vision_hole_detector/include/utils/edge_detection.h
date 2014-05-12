@@ -46,7 +46,6 @@
  **/
 namespace pandora_vision
 {
-
   struct GraphNode
   {
     GraphNode(int x, int y)
@@ -55,7 +54,11 @@ namespace pandora_vision
       this->y = y;
     }
 
-    GraphNode(void) {}
+    GraphNode(void)
+    {
+      this->x = 0;
+      this->y = 0;
+    }
 
     int x;
     int y;

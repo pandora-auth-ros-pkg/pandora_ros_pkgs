@@ -1,13 +1,17 @@
 <launch>
 
-<include file="$(find openni_launch)/launch/openni.launch">
-    <arg name="device_id" value="#1" />
-    <arg name="depth_registration" value="true"/>
-  </include>
+  <group ns="pandora_vision_hole_detector">
 
-  <node name="synchronizer_node" type="synchronizer_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
-  <node name="depth_node"        type="depth_node"        pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
-  <node name="rgb_node"          type="rgb_node"    pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
-  <node name="hole_fusion_node"  type="hole_fusion_node"  pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+    <include file="$(find openni_launch)/launch/openni.launch">
+      <arg name="device_id" value="#1" />
+      <arg name="depth_registration" value="true"/>
+    </include>
+
+    <node name="synchronizer_node" type="synchronizer_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+    <node name="depth_node"        type="depth_node"        pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+    <node name="rgb_node"          type="rgb_node"    pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+    <node name="hole_fusion_node"  type="hole_fusion_node"  pkg="pandora_vision_hole_detector" respawn="False" output="screen" />
+
+    </group>
 
 </launch>
