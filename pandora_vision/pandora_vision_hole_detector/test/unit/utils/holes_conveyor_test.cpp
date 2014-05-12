@@ -40,6 +40,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class HolesConveyorUtilsTest
+    @brief Tests the integrity of methods of class HolesConveyorUtils
+   **/
   class HolesConveyorUtilsTest : public ::testing::Test
   {
     protected:
@@ -113,16 +117,126 @@ namespace pandora_vision
     // 2 entries in dst before appending src to it
     ASSERT_EQ ( 2, HolesConveyorUtils::size(dst) );
 
+    // Run HolesConveyorUtils::append
     HolesConveyorUtils::append( src, &dst );
 
     // 4 entries in dst after appending src to it
     EXPECT_EQ ( 4, HolesConveyorUtils::size(dst) );
 
-    // The first appended entry's keypoint x coordinate should be equal to 100
-    EXPECT_EQ ( 100, dst.keyPoints[2].pt.x );
+    // Check that the initial entries have not been tampered with
+    EXPECT_EQ ( 1, dst.rectangles[0][0].x );
+    EXPECT_EQ ( 1, dst.outlines[0][0].x );
+    EXPECT_EQ ( 1, dst.keyPoints[0].pt.x );
 
-    // The second appended entry's keypoint x coordinate should be equal to 200
-    EXPECT_EQ ( 200, dst.keyPoints[3].pt.x );
+    EXPECT_EQ ( 1, dst.rectangles[0][0].y );
+    EXPECT_EQ ( 1, dst.outlines[0][0].y );
+    EXPECT_EQ ( 1, dst.keyPoints[0].pt.y );
+
+    EXPECT_EQ ( 2, dst.rectangles[1][0].x );
+    EXPECT_EQ ( 2, dst.outlines[1][0].x );
+    EXPECT_EQ ( 2, dst.keyPoints[1].pt.x );
+
+    EXPECT_EQ ( 2, dst.rectangles[1][0].y );
+    EXPECT_EQ ( 2, dst.outlines[1][0].y );
+    EXPECT_EQ ( 2, dst.keyPoints[1].pt.y );
+
+    // Check the newly appended entries' elements against the original ones
+    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    {
+      EXPECT_NEAR ( dst.keyPoints[2 + k].pt.x, src.keyPoints[k].pt.x, 1 );
+      EXPECT_NEAR ( dst.keyPoints[2 + k].pt.y, src.keyPoints[k].pt.y, 1 );
+
+      for ( int r = 0; r < dst.rectangles[2 + k].size(); r++ )
+      {
+        EXPECT_NEAR ( dst.rectangles[2 + k][r].x, src.rectangles[k][r].x, 1 );
+        EXPECT_NEAR ( dst.rectangles[2 + k][r].y, src.rectangles[k][r].y, 1 );
+      }
+
+      for ( int o = 0; o < dst.outlines[2 + k].size(); o++ )
+      {
+        EXPECT_NEAR ( dst.outlines[2 + k][o].x, src.outlines[k][o].x, 1 );
+        EXPECT_NEAR ( dst.outlines[2 + k][o].y, src.outlines[k][o].y, 1 );
+      }
+    }
+  }
+
+
+
+  //! Test HolesConveyorUtils::appendDummyConveyor
+  TEST_F ( HolesConveyorUtilsTest, AppendDummyConveyorTest )
+  {
+    // Run HolesConveyorUtils::appendDummyConveyor
+    HolesConveyorUtils::appendDummyConveyor
+      ( cv::Point2f ( 10, 10 ), cv::Point2f ( 20, 20 ), 10, 10, 5, 5, &dst);
+
+    // There should now be three entries in dst
+    ASSERT_EQ ( 3, HolesConveyorUtils::size( dst ) );
+
+    // Check that the initial entries have not been tampered with
+    EXPECT_EQ ( 1, dst.rectangles[0][0].x );
+    EXPECT_EQ ( 1, dst.outlines[0][0].x );
+    EXPECT_EQ ( 1, dst.keyPoints[0].pt.x );
+
+    EXPECT_EQ ( 1, dst.rectangles[0][0].y );
+    EXPECT_EQ ( 1, dst.outlines[0][0].y );
+    EXPECT_EQ ( 1, dst.keyPoints[0].pt.y );
+
+    EXPECT_EQ ( 2, dst.rectangles[1][0].x );
+    EXPECT_EQ ( 2, dst.outlines[1][0].x );
+    EXPECT_EQ ( 2, dst.keyPoints[1].pt.x );
+
+    EXPECT_EQ ( 2, dst.rectangles[1][0].y );
+    EXPECT_EQ ( 2, dst.outlines[1][0].y );
+    EXPECT_EQ ( 2, dst.keyPoints[1].pt.y );
+
+    // The new entry
+    EXPECT_NEAR ( 22.5, dst.keyPoints[2].pt.x, 1 );
+    EXPECT_NEAR ( 10, dst.rectangles[2][0].x, 1 );
+    EXPECT_NEAR ( 20, dst.outlines[2][0].x, 1 );
+  }
+
+
+
+  //! Test HolesConveyorUtils::clear
+  TEST_F ( HolesConveyorUtilsTest, ClearTest )
+  {
+    // Run HolesConveyorUtils::clear
+    HolesConveyorUtils::clear( &dst );
+
+    // The dst conveyor should be empty
+    ASSERT_EQ ( 0, dst.keyPoints.size() );
+    ASSERT_EQ ( 0, dst.rectangles.size() );
+    ASSERT_EQ ( 0, dst.outlines.size() );
+  }
+
+
+
+  //! Test HolesConveyorUtils::copyTo
+  TEST_F ( HolesConveyorUtilsTest, CopyToTest)
+  {
+    // Run HolesConveyorUtils::copyTo
+    HolesConveyorUtils::copyTo( src, &dst );
+
+    ASSERT_EQ ( 2, dst.keyPoints.size() );
+
+    // Check the newly appended entries' elements against the original ones
+    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    {
+      EXPECT_NEAR ( dst.keyPoints[k].pt.x, src.keyPoints[k].pt.x, 1 );
+      EXPECT_NEAR ( dst.keyPoints[k].pt.y, src.keyPoints[k].pt.y, 1 );
+
+      for ( int r = 0; r < dst.rectangles[k].size(); r++ )
+      {
+        EXPECT_NEAR ( dst.rectangles[k][r].x, src.rectangles[k][r].x, 1 );
+        EXPECT_NEAR ( dst.rectangles[k][r].y, src.rectangles[k][r].y, 1 );
+      }
+
+      for ( int o = 0; o < dst.outlines[k].size(); o++ )
+      {
+        EXPECT_NEAR ( dst.outlines[k][o].x, src.outlines[k][o].x, 1 );
+        EXPECT_NEAR ( dst.outlines[k][o].y, src.outlines[k][o].y, 1 );
+      }
+    }
   }
 
 } // namespace pandora_vision

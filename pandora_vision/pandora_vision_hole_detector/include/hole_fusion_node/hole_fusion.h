@@ -45,6 +45,8 @@
 #include "vision_communications/CandidateHoleMsg.h"
 #include "vision_communications/HolesDirectionsVectorMsg.h"
 #include "vision_communications/HoleDirectionMsg.h"
+#include "vision_communications/EnhancedHolesVectorMsg.h"
+#include "vision_communications/EnhancedHoleMsg.h"
 #include "utils/defines.h"
 #include "utils/histogram.h"
 #include "utils/message_conversions.h"
@@ -77,6 +79,10 @@ namespace pandora_vision
       // produced by this package
       ros::Publisher validHolesPublisher_;
 
+      // The ROS publisher that will be used to publish the enhanced valid holes
+      // produced by this package
+      ros::Publisher enhancedHolesPublisher_;
+
       // The ROS subscriber for acquisition of candidate holes originated
       // from the depth node
       ros::Subscriber depthCandidateHolesSubscriber_;
@@ -88,7 +94,6 @@ namespace pandora_vision
       // The ROS subscriber for acquisition of the point cloud originated
       // from th e synchronizer node
       ros::Subscriber pointCloudSubscriber_;
-
 
       // The timestamp of the point cloud
       ros::Time timestamp_;
@@ -216,6 +221,18 @@ namespace pandora_vision
         @return void
        **/
       void processCandidateHoles();
+
+      /**
+        @brief Publishes the enhanced holes' information.
+        @param[in] conveyor [const HolesConveyor&] The overall unique holes
+        found by the depth and RGB nodes.
+        @param[in] interpolationMethod [const int&] The interpolation method
+        used. 0 if depth analysis is applicable, 1 or 2 for special cases,
+        where the amount of noise in the depth image is overwhelming
+        @return void
+       **/
+      void publishEnhancedHoles (const HolesConveyor& conveyor,
+        const int& interpolationMethod);
 
       /**
         @brief Publishes the valid holes' information.

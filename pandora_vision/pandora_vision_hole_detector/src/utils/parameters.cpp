@@ -78,6 +78,11 @@ namespace pandora_vision
   std::string Parameters::hole_detector_output_topic =
     "/hole_detector/holes_direction";
 
+  // The topic where the hole detector package publishes enhancement
+  // information about the holes considered valid
+  std::string Parameters::enhanced_holes_topic =
+    "/hole_detector/enhanced_holes";
+
 
   // Show the depth image that arrives in the depth node
   bool Parameters::show_depth_image = false;

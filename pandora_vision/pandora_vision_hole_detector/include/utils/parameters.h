@@ -81,6 +81,9 @@ namespace pandora_vision
     // about the holes that considered valid
     static std::string hole_detector_output_topic;
 
+    // The topic where the hole detector package publishes enhancement
+    // information about the holes considered valid
+    static std::string enhanced_holes_topic;
 
     // Show the depth image that arrives in the depth node
     static bool show_depth_image;

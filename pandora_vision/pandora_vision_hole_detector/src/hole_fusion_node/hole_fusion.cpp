@@ -67,6 +67,12 @@ namespace pandora_vision
       <vision_communications::HolesDirectionsVectorMsg>(
         Parameters::hole_detector_output_topic, 1000, true);
 
+    // Advertise the topic that information about the final holes,
+    // will be published to
+    enhancedHolesPublisher_ = nodeHandle_.advertise
+      <vision_communications::EnhancedHolesVectorMsg>(
+        Parameters::enhanced_holes_topic, 1000, true);
+
     // Subscribe to the topic where the depth node publishes
     // candidate holes
     depthCandidateHolesSubscriber_= nodeHandle_.subscribe(
@@ -1033,6 +1039,9 @@ namespace pandora_vision
     // Publish the final holes
     publishValidHoles(rgbdHolesConveyor, &validHolesMap);
 
+    // Publish the enhanced holes message
+    publishEnhancedHoles(rgbdHolesConveyor, Parameters::interpolation_method);
+
     #ifdef DEBUG_SHOW
     if (Parameters::show_final_holes)
     {
@@ -1088,6 +1097,62 @@ namespace pandora_vision
     Timer::printAllMeansTree();
     #endif
   }
+
+
+
+  /**
+    @brief Publishes the enhanced holes' information.
+    @param[in] conveyor [const HolesConveyor&] The overall unique holes
+    found by the depth and RGB nodes.
+    @param[in] interpolationMethod [const int&] The interpolation method
+    used. 0 if depth analysis is applicable, 1 or 2 for special cases,
+    where the amount of noise in the depth image is overwhelming
+    @return void
+   **/
+  void HoleFusion::publishEnhancedHoles (const HolesConveyor& conveyor,
+    const int& interpolationMethod)
+  {
+    // The overall message of enhanced holes that will be published
+    vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
+
+    // Set the frame element in the enhancedHolesMsg message to the rgb image
+    MessageConversions::convertImageToMessage(
+      rgbImage_,
+      sensor_msgs::image_encodings::TYPE_8UC3,
+      enhancedHolesMsg.frame);
+
+    // Set whether depth analysis is applicable
+    enhancedHolesMsg.isDepth = (interpolationMethod == 0);
+
+    // Set the message's header
+    enhancedHolesMsg.header.stamp = timestamp_;
+    enhancedHolesMsg.header.frame_id = frame_id_;
+
+    for (int i = 0; i < HolesConveyorUtils::size(conveyor); i++)
+    {
+      // The enhanced hole message. Used for one hole only
+      vision_communications::EnhancedHoleMsg enhancedHoleMsg;
+
+      // Set the hole's keypoint
+      enhancedHoleMsg.keypointX = conveyor.keyPoints[i].pt.x;
+      enhancedHoleMsg.keypointY = conveyor.keyPoints[i].pt.y;
+
+      // Set the hole's bounding box vertices
+      for (int r = 0; r < conveyor.rectangles[i].size(); r++)
+      {
+        enhancedHoleMsg.verticesX.push_back(conveyor.rectangles[i][r].x);
+        enhancedHoleMsg.verticesY.push_back(conveyor.rectangles[i][r].y);
+      }
+
+      // Set the message's header
+      enhancedHoleMsg.header.stamp = timestamp_;
+      enhancedHoleMsg.header.frame_id = frame_id_;
+    }
+
+    // Publish the overall message
+    enhancedHolesPublisher_.publish(enhancedHolesMsg);
+  }
+
 
 
   /**

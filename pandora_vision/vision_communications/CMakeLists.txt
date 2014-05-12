@@ -17,7 +17,8 @@ add_message_files(
   FaceDirectionMsg.msg
   HolePositionMsg.msg
   HolesPositionsVectorMsg.msg
-  EnhancedHolesMsg.msg
+  EnhancedHoleMsg.msg
+  EnhancedHolesVectorMsg.msg
   MotionMsg.msg
   HazmatAlertMsg.msg
   HazmatAlertsVectorMsg.msg
