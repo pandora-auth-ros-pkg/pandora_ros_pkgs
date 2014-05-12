@@ -75,7 +75,7 @@ target_link_libraries(
 
 # To check lint : catkin_make roslint_pandora_xmega_hardware_interface
 set(ROSLINT_CPP_OPTS
-  "--filter=-build/include_what_you_use, -runtime/references")
+  "--filter=-build/include_what_you_use, -whitespace/comments, -runtime/references")
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
