@@ -18,7 +18,6 @@ add_message_files(
   HolePositionMsg.msg
   HolesPositionsVectorMsg.msg
   MotionMsg.msg
-  LineColorAlertMsg.msg
   HazmatAlertMsg.msg
   HazmatAlertsVectorMsg.msg
   QRAlertMsg.msg
