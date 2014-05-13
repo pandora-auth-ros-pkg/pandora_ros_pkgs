@@ -548,12 +548,27 @@ namespace pandora_vision
 
 
   /**
-    @brief Gets the number of holes in a HolesConveyor
+    @brief Gets the number of holes in a HolesConveyor.
+    In case of discrepancies in the number of keypoints, rectangles and
+    outlines, return -1.
     @param[in] conveyor [const HolesConveyor&] The HolesConveyor struct
     @return int The size of @param conveyor
    **/
   int HolesConveyorUtils::size(const HolesConveyor& conveyor)
   {
+    // The number of keypoints, rectangles and outlines
+    int keypoints = conveyor.keyPoints.size();
+    int rectangles = conveyor.rectangles.size();
+    int outlines = conveyor.outlines.size();
+
+    // Check for discrepancies
+    if (keypoints != rectangles
+      || keypoints != outlines
+      || outlines != rectangles)
+    {
+      return -1;
+    }
+
     return conveyor.keyPoints.size();
   }
 

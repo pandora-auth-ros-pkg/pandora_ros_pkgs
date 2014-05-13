@@ -397,4 +397,119 @@ namespace pandora_vision
     }
   }
 
+
+
+  //! Test HolesConveyorUtils::replace
+  TEST_F ( HolesConveyorUtilsTest, ReplaceTest )
+  {
+    // Run HolesConveyorUtils::replace
+    HolesConveyorUtils::replace ( src, &dst);
+
+    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+
+    // Check the newly replaced entries' elements against the original ones
+    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    {
+      EXPECT_EQ ( dst.keyPoints[k].pt.x, src.keyPoints[k].pt.x );
+      EXPECT_EQ ( dst.keyPoints[k].pt.y, src.keyPoints[k].pt.y );
+
+      for ( int r = 0; r < dst.rectangles[k].size(); r++ )
+      {
+        EXPECT_EQ ( dst.rectangles[k][r].x, src.rectangles[k][r].x );
+        EXPECT_EQ ( dst.rectangles[k][r].y, src.rectangles[k][r].y );
+      }
+
+      for ( int o = 0; o < dst.outlines[k].size(); o++ )
+      {
+        EXPECT_EQ ( dst.outlines[k][o].x, src.outlines[k][o].x );
+        EXPECT_EQ ( dst.outlines[k][o].y, src.outlines[k][o].y );
+      }
+    }
+  }
+
+
+
+  //! Test HolesConveyorUtils::replaceHole
+  TEST_F ( HolesConveyorUtilsTest, ReplaceHoleTest )
+  {
+    // Run HolesConveyorUtils::replaceHole
+    HolesConveyorUtils::replaceHole ( src, 0, &dst, 0 );
+
+    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+
+    EXPECT_EQ ( dst.keyPoints[0].pt.x, src.keyPoints[0].pt.x );
+    EXPECT_EQ ( dst.keyPoints[0].pt.y, src.keyPoints[0].pt.y );
+
+    for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+    {
+      EXPECT_EQ ( dst.rectangles[0][r].x, src.rectangles[0][r].x );
+      EXPECT_EQ ( dst.rectangles[0][r].y, src.rectangles[0][r].y );
+    }
+
+    for ( int o = 0; o < dst.outlines[0].size(); o++ )
+    {
+      EXPECT_EQ ( dst.outlines[0][o].x, src.outlines[0][o].x );
+      EXPECT_EQ ( dst.outlines[0][o].y, src.outlines[0][o].y );
+    }
+  }
+
+
+
+  //! Test HolesConveyorUtils::shuffle
+  TEST_F ( HolesConveyorUtilsTest, ShuffleTest )
+  {
+    // Backup dst
+    HolesConveyor backupDst;
+    HolesConveyorUtils::copyTo ( dst, &backupDst );
+
+    // Run HolesConveyorUtils::shuffle
+    HolesConveyorUtils::shuffle ( &dst );
+
+    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+
+    if ( dst.keyPoints[0].pt.x == backupDst.keyPoints[0].pt.x )
+    {
+      EXPECT_EQ ( dst.keyPoints[0].pt.x, backupDst.keyPoints[0].pt.x );
+      EXPECT_EQ ( dst.keyPoints[0].pt.y, backupDst.keyPoints[0].pt.y );
+
+      for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+      {
+        EXPECT_EQ ( dst.rectangles[0][r].x, backupDst.rectangles[0][r].x );
+        EXPECT_EQ ( dst.rectangles[0][r].y, backupDst.rectangles[0][r].y );
+      }
+
+      for ( int o = 0; o < dst.outlines[0].size(); o++ )
+      {
+        EXPECT_EQ ( dst.outlines[0][o].x, backupDst.outlines[0][o].x );
+        EXPECT_EQ ( dst.outlines[0][o].y, backupDst.outlines[0][o].y );
+      }
+    }
+    else if ( dst.keyPoints[0].pt.x == backupDst.keyPoints[1].pt.x )
+    {
+      EXPECT_EQ ( dst.keyPoints[0].pt.x, backupDst.keyPoints[1].pt.x );
+      EXPECT_EQ ( dst.keyPoints[0].pt.y, backupDst.keyPoints[1].pt.y );
+
+      for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+      {
+        EXPECT_EQ ( dst.rectangles[0][r].x, backupDst.rectangles[1][r].x );
+        EXPECT_EQ ( dst.rectangles[0][r].y, backupDst.rectangles[1][r].y );
+      }
+
+      for ( int o = 0; o < dst.outlines[0].size(); o++ )
+      {
+        EXPECT_EQ ( dst.outlines[0][o].x, backupDst.outlines[1][o].x );
+        EXPECT_EQ ( dst.outlines[0][o].y, backupDst.outlines[1][o].y );
+      }
+    }
+  }
+
+
+
+  //! Test HolesConveyorUtils::size
+  TEST_F ( HolesConveyorUtilsTest, SizeTest )
+  {
+    ASSERT_EQ ( 2, HolesConveyorUtils::size( src ) );
+    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+  }
+
 } // namespace pandora_vision

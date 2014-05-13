@@ -218,7 +218,9 @@ namespace pandora_vision
       static void shuffle(HolesConveyor* src);
 
       /**
-        @brief Gets the number of holes in a HolesConveyor
+        @brief Gets the number of holes in a HolesConveyor.
+        In case of discrepancies in the number of keypoints, rectangles and
+        outlines, return -1.
         @param[in] conveyor [const HolesConveyor&] The HolesConveyor struct
         @return int The size of @param conveyor
        **/
