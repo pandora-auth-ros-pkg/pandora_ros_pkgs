@@ -51,6 +51,11 @@
  **/
 namespace pandora_vision
 {
+  /**
+    @class Depth
+    @brief Provides functionalities for locating holes via
+    analysis of a depth image
+   **/
   class Depth
   {
     private:

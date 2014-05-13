@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class EdgeDetectionTest
+    @brief Tests the integrity of methods of class EdgeDetection
+   **/
   class EdgeDetectionTest : public ::testing::Test
   {
     protected:

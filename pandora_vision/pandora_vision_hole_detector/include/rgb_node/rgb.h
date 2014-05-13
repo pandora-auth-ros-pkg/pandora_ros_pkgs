@@ -48,6 +48,11 @@
 
 namespace pandora_vision
 {
+  /**
+    @class Rgb
+    @brief Provides functionalities for locating holes via
+    analysis of a RGB image
+   **/
   class Rgb
   {
     private:

@@ -64,6 +64,11 @@
  **/
 namespace pandora_vision
 {
+  /**
+    @class HoleFusion
+    @brief Provides functionalities and methods for fusing holes obtained
+    through Depth and RGB analysis
+   **/
   class HoleFusion
   {
     private:

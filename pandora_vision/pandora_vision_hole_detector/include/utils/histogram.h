@@ -47,8 +47,8 @@
 namespace pandora_vision
 {
   /**
-    @class HistogramCalculation
-    @brief Provides methods for calculation of histograms
+    @class Histogram
+    @brief Provides methods pertinent to histograms
    **/
   class Histogram
   {

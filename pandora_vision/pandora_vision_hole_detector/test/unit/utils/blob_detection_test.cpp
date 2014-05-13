@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class BlobDetectionTest
+    @brief Tests the integrity of methods of class BlobDetecion
+   **/
   class BlobDetectionTest : public ::testing::Test
   {
     protected:

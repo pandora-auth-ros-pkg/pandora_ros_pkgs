@@ -48,40 +48,40 @@ namespace pandora_vision
   // The topic where the synchronizer node pubishes the
   // synchronized depth image, extracted from the input point cloud
   std::string Parameters::depth_image_topic =
-    "/hole_detector/synchronized/camera/depth/image_raw";
+    "synchronized/camera/depth/image_raw";
 
   // The topic where the synchronizer node pubishes the
   // synchronized rgb image, extracted from the input point cloud
   std::string Parameters::rgb_image_topic =
-    "/hole_detector/synchronized/camera/rgb/image_raw";
+    "synchronized/camera/rgb/image_raw";
 
   // The topic where the hole fusion publishes messages that unlock the
   // synchronizer node
   std::string Parameters::synchronizer_unlock_topic =
-    "/hole_detector/unlock_rgb_depth_synchronizer";
+    "unlock_rgb_depth_synchronizer";
 
   // The topic where the synchronized node publishes the input
   // point cloud to the hole fusion node
   std::string Parameters::point_cloud_internal_topic =
-    "/hole_detector/synchronized/camera/depth/points";
+    "synchronized/camera/depth/points";
 
   // The topic where the depth node publishes the candidate holes found
   std::string Parameters::depth_candidate_holes_topic =
-    "/hole_detector/synchronized/camera/depth/candidate_holes";
+    "synchronized/camera/depth/candidate_holes";
 
   // The topic where the rgb node publishes the candidate holes found
   std::string Parameters::rgb_candidate_holes_topic =
-    "/hole_detector/synchronized/camera/rgb/candidate_holes";
+    "synchronized/camera/rgb/candidate_holes";
 
   // The topic where the hole detector package publishes information
   // about the holes that considered valid
   std::string Parameters::hole_detector_output_topic =
-    "/hole_detector/holes_direction";
+    "holes_direction";
 
   // The topic where the hole detector package publishes enhancement
   // information about the holes considered valid
   std::string Parameters::enhanced_holes_topic =
-    "/hole_detector/enhanced_holes";
+    "enhanced_holes";
 
 
   // Show the depth image that arrives in the depth node

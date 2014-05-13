@@ -52,7 +52,8 @@ namespace pandora_vision
 {
   /**
     @class RgbFilters
-    @brief Provides functionalities of hole filters relevant to RGB images
+    @brief Provides checks and pertinent methods as a means to validate holes
+    through RGB-image-based analysis
    **/
   class RgbFilters
   {

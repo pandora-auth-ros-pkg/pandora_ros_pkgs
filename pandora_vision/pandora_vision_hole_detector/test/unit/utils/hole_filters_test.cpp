@@ -40,6 +40,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class HoleFiltersTest
+    @brief Tests the integrity of methods of class HoleFilters
+   **/
   class HoleFiltersTest : public ::testing::Test
   {
     protected:

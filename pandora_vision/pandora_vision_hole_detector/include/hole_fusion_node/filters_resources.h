@@ -45,6 +45,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class FiltersResources
+    @brief Provides methods for obtaining hole-related resources
+   **/
   class FiltersResources
   {
     public:

@@ -43,7 +43,7 @@
 namespace pandora_vision
 {
   /**
-    @brief The structure that represents holes found.
+    @brief The structure that represents holes.
     @param keyPoints [std::vector<cv::KeyPoint>] The vector of the
     holes' keypoints
     @param rectangles [std::vector< std::vector<cv::Point2f> >] The
@@ -60,7 +60,7 @@ namespace pandora_vision
 
 
   /**
-    @Class HoleConveyor
+    @Class HoleConveyorUtils
     @brief Provides methods pertinent to the HolesConveyor struct
    **/
   class HolesConveyorUtils

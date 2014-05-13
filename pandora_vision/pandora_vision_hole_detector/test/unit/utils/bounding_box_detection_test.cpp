@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class BoundingBoxDetectionTest
+    @brief Tests the integrity of methods of class BoundingBoxDetection
+   **/
   class BoundingBoxDetectionTest : public ::testing::Test
   {
     protected:

@@ -47,9 +47,13 @@
 
 namespace pandora_vision
 {
+  /**
+    @struct Parameters
+    @brief Provides flexibility by parameterizing variables needed by the
+    hole detector package
+   **/
   struct Parameters
   {
-
     // Topics' names
 
     // The input, depth registered, point cloud topic

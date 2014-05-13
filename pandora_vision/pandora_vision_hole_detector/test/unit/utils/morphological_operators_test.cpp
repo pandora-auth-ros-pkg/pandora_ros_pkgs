@@ -40,6 +40,10 @@
 
 namespace pandora_vision
 {
+  /**
+    @class MorphologyTest
+    @brief Tests the integrity of methods of class Morphology
+   **/
   class MorphologyTest : public ::testing::Test
   {
     protected:

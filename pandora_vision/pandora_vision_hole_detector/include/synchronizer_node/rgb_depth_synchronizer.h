@@ -51,8 +51,8 @@ namespace pandora_vision
 {
   /**
     @class RgbDepthSynchronizer
-    @brief The class responsible for synchronizing two topics' messages:
-    a message containing a point cloud and a message containing a rgb image
+    @brief Responsible for the dissemination of the Depth and RGB images to
+    their respective responsible nodes, extracted from a coloured point cloud.
    **/
   class RgbDepthSynchronizer
   {
