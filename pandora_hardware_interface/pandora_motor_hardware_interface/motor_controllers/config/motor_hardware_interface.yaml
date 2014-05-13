@@ -11,9 +11,9 @@ joint_state_controller:
 
 skid_steer_drive_controller:
   type: pandora_motor/SkidSteerDriveController
-  wheel_separation: 0.4
-  wheel_radius: 0.11
-  max_angular_velocity: 2
+  wheel_separation: 0.39757
+  wheel_radius: 0.088895
+  max_angular_velocity: 22.5
   joints:
     - *movement_left_front_joint
     - *movement_right_front_joint
