@@ -71,6 +71,9 @@ namespace pandora_control
         const sensor_msgs::ImuConstPtr& msg);
       int position_;
       int command_;
+      double maxPitch_;
+      double maxYaw_;
+      double timeStep_;
 
       ros::Timer timer_;
 

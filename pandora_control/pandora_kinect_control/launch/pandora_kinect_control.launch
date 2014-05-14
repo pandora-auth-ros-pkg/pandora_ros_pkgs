@@ -1,9 +1,14 @@
 <launch>
+  <!-- load params -->
+  <rosparam
+    command="load"
+    file="$(find pandora_kinect_control)/config/kinect_control.yaml"/>
 
   <node
     name="kinect_control_node"
     pkg="pandora_kinect_control"
     type="kinect_control_node"
-    respawn="false" output="screen"/>
+    respawn="false"
+    output="screen"/>
 
 </launch>

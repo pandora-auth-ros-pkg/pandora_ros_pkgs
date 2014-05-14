@@ -47,6 +47,11 @@ namespace pandora_control
     actionName_(name),
     nodeHandle_(nodeHandle)
   {
+    // get params from param server
+    nodeHandle_.getParam("max_pitch", maxPitch_);
+    nodeHandle_.getParam("max_yaw", maxYaw_);
+    nodeHandle_.getParam("time_step", timeStep_);
+
     // register the goal and feeback callbacks
     actionServer_.registerGoalCallback(
       boost::bind(
@@ -128,33 +133,33 @@ namespace pandora_control
           ros::ok() &&
           command_ == pandora_kinect_control::MoveKinectGoal::MOVE)
         {
-          if ( (ros::Time::now().toSec() - lastTime ) > 1)
+          if ( (ros::Time::now().toSec() - lastTime ) > timeStep_)
           {
             switch (position_)
             {
               case CENTER:
                 pitchTargetPosition.data = 0;
-                yawTargetPosition.data = 0.7;
+                yawTargetPosition.data = maxYaw_;
                 position_ = HIGH_LEFT;
                 break;
               case HIGH_LEFT:
-                pitchTargetPosition.data = 0.2;
-                yawTargetPosition.data = 0.7;
+                pitchTargetPosition.data = maxPitch_;
+                yawTargetPosition.data = maxYaw_;
                 position_ = LOW_LEFT;
                 break;
               case LOW_LEFT:
-                pitchTargetPosition.data = 0.2;
+                pitchTargetPosition.data = maxPitch_;
                 yawTargetPosition.data = 0;
                 position_ = LOW_CENTER;
                 break;
               case LOW_CENTER:
-                pitchTargetPosition.data = 0.2;
-                yawTargetPosition.data = -0.7;
+                pitchTargetPosition.data = maxPitch_;
+                yawTargetPosition.data = -maxYaw_;
                 position_ = LOW_RIGHT;
                 break;
               case LOW_RIGHT:
                 pitchTargetPosition.data = 0;
-                yawTargetPosition.data = -0.7;
+                yawTargetPosition.data = -maxYaw_;
                 position_ = HIGH_RIGHT;
                 break;
               case HIGH_RIGHT:
