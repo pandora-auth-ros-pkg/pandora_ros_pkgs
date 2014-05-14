@@ -7,8 +7,10 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
 
   <!--Robot Description -->
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
-  
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" >
+    <arg name="real" value="true" />
+  </include>
+
   <group if="$(arg control)">
     <!--Hardware Interface -->
     <include file="$(find pandora_launchers)/control/launch/pandora_hardware_interface.launch" />
