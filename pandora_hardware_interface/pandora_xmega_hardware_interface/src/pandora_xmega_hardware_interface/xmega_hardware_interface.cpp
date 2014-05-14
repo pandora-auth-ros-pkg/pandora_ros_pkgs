@@ -50,7 +50,7 @@ namespace xmega
       100)
   {
     // commented for testing
-    // serialInterface.init();
+    serialInterface.init();
 
     // connect and register power supply interface
     registerPowerSupplyInterface();

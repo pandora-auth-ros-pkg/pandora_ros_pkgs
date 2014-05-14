@@ -97,13 +97,14 @@ void XmegaSerialInterface::receiveData()
     ROS_DEBUG("[xmega] COUNTER_NAK: %d", counter_nak);
     switch (currentState_)
     {
-    case IDLE_STATE:
+	/* <IDLE_STATE indicates the state waiting for start of transmission characters> */
+    case IDLE_STATE: 
       currentState_ = serialIO_.readMessageType();
       gettimeofday(&current, NULL);
       seconds = current.tv_sec - start.tv_sec;
       useconds = current.tv_usec - start.tv_usec;
       ms_elapsed = ((seconds) * 1000 + useconds / 1000.0) + 0.5; 		// +0.5 is used for rounding positive values
-      if(ms_elapsed >= 10000)
+      if(ms_elapsed >= 20000)
         throw std::runtime_error(
                 "xmega doesn't seem to respond! Is it connected?");
       
@@ -161,7 +162,7 @@ void XmegaSerialInterface::receiveData()
     default:
       currentState_ = IDLE_STATE;
       dataSize_ = 0;
-      *pdataBuffer_ = NULL;
+      pdataBuffer_ = NULL;
       break;
 
     }
@@ -192,7 +193,7 @@ int XmegaSerialInterface::processData()
       type = myatoi(temp, 2);
       bufferPointer += 3;	// ' ' after sensor type
       readState = SENSOR_I2C_ADDRESS;
-      if(type == 7)			// battery, not i2c sensor
+      if(type == BATTERY)			// battery, not i2c sensor
         readState = SENSOR_DATA;
       break;
     case SENSOR_I2C_ADDRESS:
@@ -310,6 +311,7 @@ int SerialIO::readMessageType()
 
   serialPtr_->read(command, size);
 
+  /* <If start of data package chars (0x0C , 0x0A)> */
   if ((int)command[0] == 12 && (int)command[1] == 10)
   {
     CRC_ += (int)command[0] + (int)command[1];
@@ -431,8 +433,6 @@ static unsigned char myatoi(char *array, int size)
       result += ((int)array[i] - 55) * pow(16, size - i - 1);
     else if(((int)array[i] >= 48) && ((int)array[i] <= 57))
       result += ((int)array[i] - 48) * pow(16, size - i - 1);
-    else
-      result = NULL;
   }
 
   return result;

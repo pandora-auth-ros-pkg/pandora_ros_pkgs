@@ -56,14 +56,9 @@ enum state
 
 enum sensor_type
 {
-  TPA81,
-  TPA16,
   SRF05_TINY,
-  MLX90614,
-  SMBUS_UNI,
-  SRF235,
-  COMP_TINY,
-  BATTERY
+  BATTERY,
+  ENCODER
 };
 
 enum read_state

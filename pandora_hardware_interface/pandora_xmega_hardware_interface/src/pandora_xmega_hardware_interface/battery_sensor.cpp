@@ -50,12 +50,12 @@ BatterySensor::BatterySensor()
 void BatterySensor::handleData()
 {
   psuVoltage = ((data[0] << 4) | ( data[1] >> 4));
-  psuVoltage *= (2.704 / 4095) * 10;
-  psuVoltage -= psuVoltage * 0.01;
+  psuVoltage *= (3.28 / 4095) * 10;
+  //~ psuVoltage -= psuVoltage * 0.01;
 
   motorVoltage = (((data[1] & 0x0f) << 8) | data[2]) - 153;
-  motorVoltage *= (2.704 / 4095) * 10;
-  motorVoltage -= motorVoltage * 0.01;
+  motorVoltage *= (3.28 / 4095) * 10;
+  //~ motorVoltage -= motorVoltage * 0.01;
 }
 
 BatterySensor::~BatterySensor()
