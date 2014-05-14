@@ -5,5 +5,5 @@ serial_ports:
     baud_rate: 1000000
     min_motor_id: 1
     max_motor_id: 5
-    update_rate: 20
+    update_rate: 50
 
