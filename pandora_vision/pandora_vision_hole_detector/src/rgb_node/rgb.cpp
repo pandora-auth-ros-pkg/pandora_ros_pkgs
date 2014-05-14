@@ -152,7 +152,7 @@ namespace pandora_vision
     const uint32_t& level)
   {
     #ifdef DEBUG_SHOW
-    ROS_INFO("Parameters callback called");
+    ROS_INFO("[RGB node] Parameters callback called");
     #endif
 
     // Show the rgb image that arrives in the rgb node
@@ -257,6 +257,13 @@ namespace pandora_vision
     Parameters::number_of_value_bins = config.number_of_value_bins;
     Parameters::secondary_channel = config.secondary_channel;
 
+    // RGB image segmentation parameters
+    Parameters::spatial_window_radius =
+      config.spatial_window_radius;
+    Parameters::color_window_radius =
+      config.color_window_radius;
+    Parameters::maximum_level_pyramid_segmentation =
+      config.maximum_level_pyramid_segmentation;
 
     // Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;

@@ -244,6 +244,11 @@ namespace pandora_vision
     static int number_of_value_bins;
     static int secondary_channel;
 
+    // RGB image segmentation parameters
+    static int spatial_window_radius;
+    static int color_window_radius;
+    static int maximum_level_pyramid_segmentation;
+
 
     // Holes connection - merger
     static float connect_holes_min_distance;

@@ -73,6 +73,28 @@ namespace pandora_vision
        **/
       HolesConveyor findHoles(const cv::Mat& holeFrame);
 
+      /**
+        @brief Fills an image with random colours per image segment
+        @param[in,out] image [cv::Mat*] The image to be processed
+        @param[in] colorDiff [const cv::Scalar&] Maximal upper and lower
+        brightness/color difference between the currently observed pixel
+        and one of its neighbors belonging to the component.
+        (see http://docs.opencv.org/modules/imgproc/doc/
+        miscellaneous_transformations.html#floodfill)
+        @return void
+       **/
+      static void floodFillPostprocess(cv::Mat* image,
+        const cv::Scalar& colorDiff=cv::Scalar::all(1));
+
+      /**
+        @brief Posterizes a RGB image via segmentation
+        @param[in] inImage [const cv::Mat&] The RGB image to be posterized
+        @param[out] outImage [cv::Mat*] The posterized image
+        @return void
+       **/
+      static void segmentation(const cv::Mat& inImage,
+        cv::Mat* outImage);
+
   };
 
 } // namespace pandora_vision

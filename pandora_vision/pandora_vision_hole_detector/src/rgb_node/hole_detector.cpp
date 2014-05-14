@@ -47,7 +47,7 @@ namespace pandora_vision
     //! Calculate histogram according to a given set of images
     Histogram::getHistogram(&histogram_, Parameters::secondary_channel);
 
-    ROS_INFO("[rgb_node]: HoleDetector instance created");
+    ROS_INFO("[RGB node]: HoleDetector instance created");
   }
 
 
@@ -57,7 +57,7 @@ namespace pandora_vision
    **/
   HoleDetector::~HoleDetector()
   {
-    ROS_INFO("[rgb_node]: HoleDetector instance destroyed");
+    ROS_INFO("[RGB node]: HoleDetector instance destroyed");
   }
 
 
@@ -81,97 +81,101 @@ namespace pandora_vision
     #endif
 
     #ifdef SHOW_DEBUG_IMAGE
-    cv::Mat before_blur;
-    holeFrame.copyTo(before_blur);
+    cv::Mat initialRgbImage;
+    holeFrame.copyTo(initialRgbImage);
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
     msg += " : Initial RGB image";
     msgs.push_back(msg);
-    imgs.push_back(before_blur);
+    imgs.push_back(initialRgbImage);
     #endif
 
-    //! Backprojection of current frame
-    cv::Mat backprojectedFrame = cv::Mat::zeros(holeFrame.size(), CV_8UC1);
+    // Copy the input image to the segmentedHoleFrame one
+    cv::Mat segmentedHoleFrame = cv::Mat(holeFrame.size(), CV_8UC3);
+    holeFrame.copyTo(segmentedHoleFrame);
 
-    // Get the backprojected image of the frame, based on the precalculated
-    // histogram_ histogram
-    Histogram::getBackprojection(holeFrame, histogram_,
-      &backprojectedFrame, Parameters::secondary_channel);
+    // Posterize the image via segmentation
+    segmentation(holeFrame, &segmentedHoleFrame);
+    Visualization::show("segmentedHoleFrame", segmentedHoleFrame, 1);
 
-    //Visualization::show("backproject", backprojectedFrame, 1);
-/*
- *
- *    cv::Mat holeFrameGray;
- *    cv::cvtColor(holeFrame, holeFrameGray, CV_BGR2GRAY);
- *    cv::bitwise_and(holeFrameGray, backprojectedFrame, backprojectedFrame);
- *    Visualization::show("and", backprojectedFrame, 1);
- *
- */
-    // apply thresholds in backprojected image
-    cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
-    //Visualization::show("bp thresholded", backprojectedFrame, 1);
+    // Convert the RGB segmented frame to grayscale
+    cv::Mat segmentedHoleFrame8UC1 =
+      cv::Mat::zeros(segmentedHoleFrame.size(), CV_8UC1);
 
-    // The backprojected image is usually scattered with individual
-    // non-zero points rather than whole areas.
-    // Apply dilation so that the non-zero points expand in size and
-    // occupy the area of the matchin texture
-    Morphology::dilation(&backprojectedFrame, 2);
+    cv::cvtColor(segmentedHoleFrame, segmentedHoleFrame8UC1, CV_BGR2GRAY);
 
-    //Visualization::show("dilated", backprojectedFrame, 1);
 
-    #ifdef SHOW_DEBUG_IMAGE
-    msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-    msg += " : After texture";
-    msgs.push_back(msg);
-    imgs.push_back(backprojectedFrame);
-    #endif
+    Visualization::show("segmentedHoleFrame8UC1", segmentedHoleFrame8UC1, 1);
 
-    cv::Mat temp;
-    holeFrame.copyTo(temp);
-
-    // Detect edges on the backprojection
+    // Apply edge detection to the grayscale posterized input RGB image
     if (Parameters::edge_detection_method == 0)
     {
-      EdgeDetection::applyCanny(backprojectedFrame, &temp);
+      EdgeDetection::applyCanny(segmentedHoleFrame8UC1,
+        &segmentedHoleFrame8UC1);
     }
     else if (Parameters::edge_detection_method == 1)
     {
-      EdgeDetection::applyScharr(backprojectedFrame, &temp);
+      EdgeDetection::applyScharr(segmentedHoleFrame8UC1,
+        &segmentedHoleFrame8UC1);
     }
     else if (Parameters::edge_detection_method == 2)
     {
-      EdgeDetection::applySobel(backprojectedFrame, &temp);
+      EdgeDetection::applySobel(segmentedHoleFrame8UC1,
+        &segmentedHoleFrame8UC1);
     }
     else if (Parameters::edge_detection_method == 3)
     {
-      EdgeDetection::applyLaplacian(backprojectedFrame, &temp);
+      EdgeDetection::applyLaplacian(segmentedHoleFrame8UC1,
+        &segmentedHoleFrame8UC1);
+    }
+    else if (Parameters::edge_detection_method == 4) // Mixed mode
+    {
+      if (Parameters::mixed_edges_toggle_switch == 1)
+      {
+        EdgeDetection::applyScharr(segmentedHoleFrame8UC1,
+          &segmentedHoleFrame8UC1);
+        Parameters::mixed_edges_toggle_switch = 2;
+      }
+      else if (Parameters::mixed_edges_toggle_switch == 2)
+      {
+        EdgeDetection::applySobel(segmentedHoleFrame8UC1,
+          &segmentedHoleFrame8UC1);
+        Parameters::mixed_edges_toggle_switch = 1;
+      }
     }
 
+    cv::threshold(segmentedHoleFrame8UC1, segmentedHoleFrame8UC1,
+      Parameters::threshold_lower_value, 255, 3);
+
+    Visualization::show("segmentation->edges", segmentedHoleFrame8UC1, 1);
+    ///////////////////////// /Segmentation ////////////////////////////////////
+    //cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
+    //Visualization::show("bp thresholded", backprojectedFrame, 1);
+
     // Denoise the edges image
-    EdgeDetection::denoiseEdges(&temp);
+    EdgeDetection::denoiseEdges(&segmentedHoleFrame8UC1);
 
 
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
     msg += " : After denoising";
     msgs.push_back(msg);
-    imgs.push_back(temp);
+    imgs.push_back(segmentedHoleFrame8UC1);
     #endif
 
     //! Find pixels in current frame where there is the same texture
     //! according to the given histogram and calculate
     std::vector<cv::KeyPoint> detectedkeyPoints;
-    BlobDetection::detectBlobs(temp, &detectedkeyPoints);
+    BlobDetection::detectBlobs(segmentedHoleFrame8UC1, &detectedkeyPoints);
 
 
     // The final vectors of keypoints, rectangles and blobs' outlines.
-    struct HolesConveyor conveyor;
+    HolesConveyor conveyor;
 
     HoleFilters::validateBlobs(
       &detectedkeyPoints,
-      &temp,
+      &segmentedHoleFrame8UC1,
       Parameters::bounding_box_detection_method,
       &conveyor);
-
 
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
@@ -180,7 +184,7 @@ namespace pandora_vision
     imgs.push_back(
       Visualization::showHoles(
         msg,
-        before_blur,
+        initialRgbImage,
         -1,
         conveyor.keyPoints,
         conveyor.rectangles,
@@ -198,6 +202,80 @@ namespace pandora_vision
     #endif
 
     return conveyor;
+  }
+
+
+
+  /**
+    @brief Fills an image with random colours per image segment
+    @param[in,out] image [cv::Mat*] The image to be processed
+    @param[in] colorDiff [const cv::Scalar&] Maximal upper and lower
+    brightness/color difference between the currently observed pixel
+    and one of its neighbors belonging to the component.
+    (see http://docs.opencv.org/modules/imgproc/doc/
+    miscellaneous_transformations.html#floodfill)
+    @return void
+   **/
+  void HoleDetector::floodFillPostprocess(cv::Mat* image,
+    const cv::Scalar& colorDiff)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("floodFillPostprocess", "segmentation");
+    #endif
+
+    cv::RNG rng = cv::theRNG();
+    cv::Mat mask = cv::Mat::zeros(image->rows + 2, image->cols + 2, CV_8UC1);
+
+    // Get a pointer on mask to speed-up execution
+    unsigned char* mask_ptr = mask.ptr();
+
+    for (int rows = 0; rows < image->rows; rows++)
+    {
+      for (int cols = 0; cols < image->cols; cols++)
+      {
+        if (mask_ptr[(rows + 1) * mask.cols + (cols + 1)] == 0)
+        {
+          cv::Scalar newVal(rng(256), rng(256), rng(256));
+
+          // Fill this segment with a random colour
+          cv::floodFill(*image, mask, cv::Point(cols, rows), newVal, 0,
+            colorDiff, colorDiff);
+        }
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("floodFillPostprocess");
+    #endif
+  }
+
+
+
+  /**
+    @brief Posterizes a RGB image via segmentation.
+    @param[in] inImage [const cv::Mat&] The RGB image to be posterized
+    @param[out] outImage [cv::Mat*] The posterized image
+    @return void
+   **/
+  void HoleDetector::segmentation(const cv::Mat& inImage,
+    cv::Mat* outImage)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("segmentation", "findHoles");
+    #endif
+
+    // Segment the image
+    cv::pyrMeanShiftFiltering(inImage, *outImage,
+      Parameters::spatial_window_radius,
+      Parameters::color_window_radius,
+      Parameters::maximum_level_pyramid_segmentation);
+
+    // Fill the various segments with colour
+    floodFillPostprocess(outImage, cv::Scalar::all(2));
+
+    #ifdef DEBUG_TIME
+    Timer::tick("segmentation");
+    #endif
   }
 
 } // namespace pandora_vision

@@ -173,7 +173,7 @@ namespace pandora_vision
     const uint32_t& level)
   {
     #ifdef DEBUG_SHOW
-    ROS_INFO("Parameters callback called");
+    ROS_INFO("[Depth node] Parameters callback called");
     #endif
 
     // Show the depth image that arrives in the depth node

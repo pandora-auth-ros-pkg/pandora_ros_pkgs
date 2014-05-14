@@ -650,7 +650,7 @@ namespace pandora_vision
     const uint32_t& level)
   {
     #ifdef DEBUG_SHOW
-    ROS_INFO("Parameters callback called");
+    ROS_INFO("[Hole Fusion node] Parameters callback called");
     #endif
 
     // The product of this package: valid holes

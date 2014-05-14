@@ -521,6 +521,7 @@ namespace pandora_vision
         }
       }
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("transformNoiseToWhite");
     #endif

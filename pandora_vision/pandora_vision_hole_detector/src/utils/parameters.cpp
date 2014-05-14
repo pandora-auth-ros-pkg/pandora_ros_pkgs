@@ -243,6 +243,11 @@ namespace pandora_vision
   int Parameters::number_of_value_bins = 32;
   int Parameters::secondary_channel = 2;
 
+  // RGB image segmentation parameters
+  int Parameters::spatial_window_radius = 4;
+  int Parameters::color_window_radius = 40;
+  int Parameters::maximum_level_pyramid_segmentation = 2;
+
   // Holes connection - merger
   float Parameters::connect_holes_min_distance = 0.1;
   float Parameters::connect_holes_max_distance = 0.2;
