@@ -31,8 +31,8 @@
     <xacro:property name="enable_pandora_imu_stabilizer_plugin" value="true" />
   <!-- SDF Physics ======================================================== -->
   <xacro:property name="enable_sdf_physics" value="true" />
-    <xacro:property name="enable_base_link_sdf_physics" value="true" />
-    <xacro:property name="enable_side_link_sdf_physics" value="true" />
+    <xacro:property name="enable_base_link_sdf_physics" value="false" />
+    <xacro:property name="enable_side_link_sdf_physics" value="false" />
     <xacro:property name="enable_wheel_link_sdf_physics" value="true" />
     <xacro:property name="enable_side_joint_sdf_physics" value="false" />
     <xacro:property name="enable_wheel_joint_sdf_physics" value="false" />
