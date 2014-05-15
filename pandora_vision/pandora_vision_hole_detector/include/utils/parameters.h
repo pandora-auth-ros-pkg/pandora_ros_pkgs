@@ -248,6 +248,7 @@ namespace pandora_vision
     static int spatial_window_radius;
     static int color_window_radius;
     static int maximum_level_pyramid_segmentation;
+    static int segmentation_blur_method;
 
 
     // Holes connection - merger

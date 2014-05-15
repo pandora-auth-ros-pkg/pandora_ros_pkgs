@@ -143,17 +143,10 @@ namespace pandora_vision
       }
     }
 
-    cv::threshold(segmentedHoleFrame8UC1, segmentedHoleFrame8UC1,
-      Parameters::threshold_lower_value, 255, 3);
-
     Visualization::show("segmentation->edges", segmentedHoleFrame8UC1, 1);
-    ///////////////////////// /Segmentation ////////////////////////////////////
-    //cv::threshold(backprojectedFrame, backprojectedFrame, 0, 255, 0);
-    //Visualization::show("bp thresholded", backprojectedFrame, 1);
 
     // Denoise the edges image
     EdgeDetection::denoiseEdges(&segmentedHoleFrame8UC1);
-
 
     #ifdef SHOW_DEBUG_IMAGE
     msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
@@ -264,11 +257,22 @@ namespace pandora_vision
     Timer::start("segmentation", "findHoles");
     #endif
 
-    // Segment the image
-    cv::pyrMeanShiftFiltering(inImage, *outImage,
-      Parameters::spatial_window_radius,
-      Parameters::color_window_radius,
-      Parameters::maximum_level_pyramid_segmentation);
+    // Blur the input image
+    if (Parameters::segmentation_blur_method == 0)
+    {
+      // Segment the image
+      cv::pyrMeanShiftFiltering(inImage, *outImage,
+        Parameters::spatial_window_radius,
+        Parameters::color_window_radius,
+        Parameters::maximum_level_pyramid_segmentation);
+    }
+    else if (Parameters::segmentation_blur_method == 1)
+    {
+      for ( int i = 1; i < 19; i = i + 2 )
+      {
+        cv::medianBlur(inImage, *outImage, i);
+      }
+    }
 
     // Fill the various segments with colour
     floodFillPostprocess(outImage, cv::Scalar::all(2));

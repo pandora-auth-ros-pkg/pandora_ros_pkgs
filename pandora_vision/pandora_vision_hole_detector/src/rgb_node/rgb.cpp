@@ -264,6 +264,8 @@ namespace pandora_vision
       config.color_window_radius;
     Parameters::maximum_level_pyramid_segmentation =
       config.maximum_level_pyramid_segmentation;
+    Parameters::segmentation_blur_method =
+      config.segmentation_blur_method;
 
     // Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;

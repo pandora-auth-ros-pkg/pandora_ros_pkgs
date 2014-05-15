@@ -84,7 +84,7 @@ namespace pandora_vision
         @return void
        **/
       static void floodFillPostprocess(cv::Mat* image,
-        const cv::Scalar& colorDiff=cv::Scalar::all(1));
+        const cv::Scalar& colorDiff = cv::Scalar::all(1));
 
       /**
         @brief Posterizes a RGB image via segmentation
