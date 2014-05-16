@@ -481,21 +481,22 @@ namespace pandora_vision
 
 
   /**
-    @brief Takes as input a depth image containing floats, locates the edges in
-    it and tries to clear as much noise as possible in the edges image. As noise
-    we identify everything that is not, or does not look like, hole-like shapes,
+    @brief Takes as input a depth image containing floats,
+    locates the edges in it and tries to clear as much noise as possible
+    in the edges image. As noise we identify everything that is not,
+    or does not look like, hole-like shapes,
     with the knowledge that these shapes might be open curves, or that
     holes-like shapes in a edge image are not connected to anything else,
     ergo they are standalone shapes in it.
     It outputs a binary image that contains areas that we wish to validate
     as holes.
-    @param[in] inImage [const cv::Mat&] The depth image extracted from the depth
-    sensor, in floats
-    @param[out] edges [cv::Mat*] The final denoised edges image that corresponds
-    to the input image
+    @param[in] inImage [const cv::Mat&] The depth image extracted from the
+    depth sensor, of type CV_32FC1
+    @param[out] edges [cv::Mat*] The final denoised edges image that
+    corresponds to the input image
     @return void
    **/
-  void EdgeDetection::computeEdges(const cv::Mat& inImage, cv::Mat* edges)
+  void EdgeDetection::computeDepthEdges(const cv::Mat& inImage, cv::Mat* edges)
   {
     if (inImage.type() != CV_32FC1)
     {
@@ -567,6 +568,58 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("computeEdges");
+    #endif
+  }
+
+
+
+  /**
+    @brief Takes as input a RGB image of type CV_8UC3,
+    locates the edges in it and tries to clear as much noise as possible
+    in the edges image. As noise we identify everything that is not,
+    or does not look like, hole-like shapes,
+    with the knowledge that these shapes might be open curves, or that
+    holes-like shapes in a edge image are not connected to anything else,
+    ergo they are standalone shapes in it.
+    It outputs a binary image that contains areas that we wish to validate
+    as holes.
+    @param[in] inImage [const cv::Mat&] The RGB image of type CV_32FC1
+    @param[in] inHistogram [const cv::MatND&] The model histogram needed
+    in order to obtain the backprojection of @param inImage
+    @param[out] edges [cv::Mat*] The final denoised edges image that
+    corresponds to the input image
+    @return void
+   **/
+  void EdgeDetection::computeRgbEdges(const cv::Mat& inImage,
+    const cv::MatND& inHistogram, cv::Mat* edges)
+  {
+    if (inImage.type() != CV_8UC3)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::computeRgbEdges: Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::start("computeRgbEdges", "findHoles");
+    #endif
+
+    if (Parameters::rgb_edges_extraction_method == 0)
+    {
+      produceEdgesViaSegmentation(inImage, edges);
+    }
+    else if (Parameters::rgb_edges_extraction_method == 1)
+    {
+      produceEdgesViaBackprojection(inImage, inHistogram, edges);
+    }
+
+    // Denoise the edges image
+    EdgeDetection::denoiseEdges(edges);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("computeRgbEdges");
     #endif
   }
 
@@ -1458,6 +1511,57 @@ namespace pandora_vision
 
 
   /**
+    @brief Fills an image with random colours per image segment
+    @param[in,out] image [cv::Mat*] The image to be processed
+    (see http://docs.opencv.org/modules/imgproc/doc/
+    miscellaneous_transformations.html#floodfill)
+    @return void
+   **/
+  void EdgeDetection::floodFillPostprocess(cv::Mat* image)
+  {
+    if (image->type() != CV_8UC3)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::floodFillPostprocess Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::start("floodFillPostprocess", "produceEdgesViaSegmentation");
+    #endif
+
+    cv::RNG rng = cv::theRNG();
+    cv::Mat mask = cv::Mat::zeros(image->rows + 2, image->cols + 2, CV_8UC1);
+
+    // Get a pointer on mask to speed-up execution
+    unsigned char* mask_ptr = mask.ptr();
+
+    for (int rows = 0; rows < image->rows; rows++)
+    {
+      for (int cols = 0; cols < image->cols; cols++)
+      {
+        if (mask_ptr[(rows + 1) * mask.cols + (cols + 1)] == 0)
+        {
+          cv::Scalar newVal(rng(256), rng(256), rng(256));
+
+          // Fill this segment with a random colour
+          cv::floodFill(*image, mask, cv::Point(cols, rows), newVal, 0,
+            cv::Scalar::all(Parameters::floodfill_lower_colour_difference),
+            cv::Scalar::all(Parameters::floodfill_upper_colour_difference));
+        }
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("floodFillPostprocess");
+    #endif
+  }
+
+
+
+  /**
     @brief With an binary input image (quantized in 0 and 255 levels),
     this function fills closed regions, at first, and then extracts the outline
     of each region. Used when there is a closed region with garbage pixels with
@@ -1824,6 +1928,437 @@ namespace pandora_vision
         imgs, msgs, 1200, 1);
     }
     #endif
+  }
+
+
+
+  /**
+    @brief This method takes as input a RGB image and uses
+    its backprojection (which is based on the precalculated
+    histogram @param inHistogram) in order to identify whole regions whose
+    histogram matches @param inHistogram, although the backprojection image
+    might be sparcely populated. After the identification of the regions
+    of interest, this method extracts their edges and returns the image
+    depicting them.
+    @param[in] inImage [const cv::Mat&] The input RGB image
+    @param[in] inHistogram [const cv::MatND&] The model histogram needed
+    in order to obtain the backprojection of @param inImage
+    @param[out] outImage [cv::Mat*] The output edges image, in CV_8UC1
+    format
+    @return void
+   **/
+  void EdgeDetection::produceEdgesViaBackprojection (
+    const cv::Mat& inImage, const cv::MatND& inHistogram, cv::Mat* outImage)
+  {
+    if (inImage.type() != CV_8UC3)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::produceEdgesViaBackprojection: \
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
+    #if def DEBUG_TIME
+    Timer::start("produceEdgesViaBackprojection", "findHoles");
+    #endif
+
+    #ifdef DEBUG_SHOW
+    std::string msg;
+    std::vector<cv::Mat> imgs;
+    std::vector<std::string> msgs;
+    #endif
+
+    // Backprojection of the RGB inImage
+    cv::Mat backprojectedFrame = cv::Mat::zeros(inImage.size(), CV_8UC1);
+
+    // Get the backprojected image of the frame, based on the precalculated
+    // inHistogram histogram
+    Histogram::getBackprojection(inImage, inHistogram,
+      &backprojectedFrame, Parameters::secondary_channel);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      backprojectedFrame.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Backprojection ";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    cv::threshold(backprojectedFrame, backprojectedFrame,
+      Parameters::compute_edges_backprojection_threshold, 255,
+      cv::THRESH_BINARY);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      backprojectedFrame.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Backprojection thresholded to 128"; // should be parameterized
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // The foreground image needed by the watershed algorithm
+    cv::Mat foreground = cv::Mat::zeros(inImage.size(), CV_8UC1);
+
+    // Copy the backprojection to the foreground image
+    backprojectedFrame.copyTo(foreground);
+
+    // Dilate
+    Morphology::dilationRelative(&foreground,
+      Parameters::watershed_foreground_dilation_factor);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      foreground.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Backprojection dilated by " +
+        TOSTR(Parameters::watershed_foreground_dilation_factor);
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // All non-zero pixels have now a value of 255
+    cv::threshold(foreground, foreground, 0, 255, cv::THRESH_BINARY);
+
+    // Erode. The erosion factor should be greater
+    // than the dilation factor used above
+    Morphology::erosion(&foreground,
+      Parameters::watershed_foreground_erosion_factor);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      foreground.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Foreground eroded by " +
+        TOSTR(Parameters::watershed_foreground_erosion_factor);
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // The background image needed by the watershed algorithm
+    cv::Mat background = cv::Mat::zeros(inImage.size(), CV_8UC1);
+
+    // Copy the backprojection to the background image
+    backprojectedFrame.copyTo(background);
+
+    // Dilate
+    Morphology::dilationRelative(&background,
+      Parameters::watershed_background_dilation_factor);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      background.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Backprojection dilated by " +
+        TOSTR(Parameters::watershed_background_dilation_factor);
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // All non-zero pixels have now a value of 255
+    cv::threshold(background, background, 0, 255, cv::THRESH_BINARY);
+
+    // All zero value pixels turn to white, all white to black
+    cv::threshold(background, background, 0, 255, cv::THRESH_BINARY_INV);
+
+    // Erode. The erosion factor should be greater
+    // than the dilation factor used above. This erosion happens so that
+    // the background pixels belong surely to the background
+    Morphology::erosion(&background,
+      Parameters::watershed_background_erosion_factor);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      background.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Background eroded by " +
+        TOSTR(Parameters::watershed_background_erosion_factor);
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // All zero value pixels' values are elevated to 128.
+    // These belong neither to foreground, nor to background:
+    // they are labeled as so-called "unknown"
+    cv::threshold(background, background, 0, 128, cv::THRESH_BINARY);
+
+    // Create the markers image, needed by the watershed algorighm
+    cv::Mat markers(inImage.size(), CV_8UC1, cv::Scalar(0));
+
+    // The markers array is composed by the foreground, background and
+    // unknown pixels
+    markers = foreground + background;
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      background.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Markers";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // Convert the marker image of type CV_8UC1, to CV_32S
+    cv::Mat markers32S;
+    markers.convertTo(markers32S, CV_32S);
+
+    // Watershed the input image, with regard to the markers constructed
+    // Each pixel p is transformed into
+    // 255p + 255 before conversion
+    cv::watershed(inImage, markers32S);
+
+    // Convert the markers image to back to type CV_8UC1.
+    // This image identifies the whole area that matches the histogram
+    // inHistogram in the input image
+    markers32S.convertTo(*outImage, CV_8U, 255, 255);
+
+    // All zero value pixels turn to white, all white to black.
+    // In essence, this is the edges of the area whose histogram
+    // matches inHistogram
+    cv::threshold(*outImage, *outImage, 0, 255, cv::THRESH_BINARY_INV);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      outImage->copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Edges from watershed";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      Visualization::multipleShow("Final edges", imgs, msgs,
+        Parameters::debug_show_produce_edges_size, 1);
+    }
+    #endif
+
+    #ifdef DEBUG_TIME
+    Timer::tick("produceEdgesViaBackprojection");
+    #endif
+  }
+
+
+
+  /**
+    @brief This method takes as input a RGB image, segments it,
+    and extracts its edges.
+    @param[in] inImage [const cv::Mat&] The input RGB image,
+    of type CV_8UC3
+    @param[out] outImage [cv::Mat*] The output edges image,
+    of type CV_8UC1
+    @return void
+   **/
+  void EdgeDetection::produceEdgesViaSegmentation (const cv::Mat& inImage,
+    cv::Mat* edges)
+  {
+    if (inImage.type() != CV_8UC3)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::produceEdgesViaSegmentation : \
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
+    #if def DEBUG_TIME
+    Timer::start("produceEdgesViaSegmentation", "findHoles");
+    #endif
+
+    #ifdef DEBUG_SHOW
+    std::string msg;
+    std::vector<cv::Mat> imgs;
+    std::vector<std::string> msgs;
+    #endif
+
+    #ifdef DEBUG_SHOW
+    if(Parameters::debug_show_produce_edges) // Debug
+    {
+      cv::Mat tmp;
+      inImage.copyTo(tmp);
+      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Initial RGB image";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // Copy the input image to the segmentedHoleFrame one
+    cv::Mat segmentedHoleFrame = cv::Mat(inImage.size(), CV_8UC3);
+    inImage.copyTo(segmentedHoleFrame);
+
+    // Segment the input image.
+    segmentation(inImage, &segmentedHoleFrame);
+
+    // There is the choice of posterizing the segmented image, which fills
+    // the various segments found, depending on the colour difference between
+    // them, with a random colour
+    if (Parameters::posterize_after_segmentation)
+    {
+      // Fill the various segments with colour
+      floodFillPostprocess(&segmentedHoleFrame);
+    }
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      segmentedHoleFrame.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Segmented RGB image";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // Convert the RGB segmented frame to grayscale
+    cv::Mat segmentedHoleFrame8UC1 =
+      cv::Mat::zeros(segmentedHoleFrame.size(), CV_8UC1);
+
+    // In order to find the edges of the segmented image,
+    // first, turn it to grayscale
+    cv::cvtColor(segmentedHoleFrame, segmentedHoleFrame8UC1, CV_BGR2GRAY);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      segmentedHoleFrame8UC1.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Segmented RGB image in grayscale";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // Apply edge detection to the grayscale posterized input RGB image
+    if (Parameters::edge_detection_method == 0)
+    {
+      EdgeDetection::applyCanny(segmentedHoleFrame8UC1, edges);
+    }
+    else if (Parameters::edge_detection_method == 1)
+    {
+      EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
+    }
+    else if (Parameters::edge_detection_method == 2)
+    {
+      EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
+    }
+    else if (Parameters::edge_detection_method == 3)
+    {
+      EdgeDetection::applyLaplacian(segmentedHoleFrame8UC1, edges);
+    }
+    else if (Parameters::edge_detection_method == 4) // Mixed mode
+    {
+      if (Parameters::mixed_edges_toggle_switch == 1)
+      {
+        EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
+        Parameters::mixed_edges_toggle_switch = 2;
+      }
+      else if (Parameters::mixed_edges_toggle_switch == 2)
+      {
+        EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
+        Parameters::mixed_edges_toggle_switch = 1;
+      }
+    }
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      cv::Mat tmp;
+      edges->copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Edges from the segmented grayscale image";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::debug_show_produce_edges)
+    {
+      Visualization::multipleShow("Final edges", imgs, msgs,
+        Parameters::debug_show_produce_edges_size, 1);
+    }
+    #endif
+
+    #ifdef DEBUG_TIME
+    Timer::tick("produceEdgesViaSegmentation");
+    #endif
+  }
+
+
+
+  /**
+    @brief Segments a RGB image
+    @param[in] inImage [const cv::Mat&] The RGB image to be segmented
+    @param[out] outImage [cv::Mat*] The posterized image
+    @return void
+   **/
+  void EdgeDetection::segmentation(const cv::Mat& inImage, cv::Mat* outImage)
+  {
+    if (inImage.type() != CV_8UC3)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("EdgeDetection::segmentation: Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::start("segmentation", "produceEdgesViaSegmentation");
+    #endif
+
+    // Blur the input image
+    if (Parameters::segmentation_blur_method == 0)
+    {
+      // Segment the image
+      cv::pyrMeanShiftFiltering(inImage, *outImage,
+        Parameters::spatial_window_radius,
+        Parameters::color_window_radius,
+        Parameters::maximum_level_pyramid_segmentation);
+    }
+    else if (Parameters::segmentation_blur_method == 1)
+    {
+      for ( int i = 1; i < 15; i = i + 4 )
+      {
+        cv::medianBlur(inImage, *outImage, i);
+      }
+    }
+
+      #ifdef DEBUG_TIME
+      Timer::tick("segmentation");
+      #endif
   }
 
 } // namespace pandora_vision

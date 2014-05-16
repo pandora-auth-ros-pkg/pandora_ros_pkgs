@@ -67,7 +67,7 @@ namespace pandora_vision
 
     // Edge computation
     cv::Mat denoisedDepthImageEdges;
-    EdgeDetection::computeEdges(interpolatedDepthImage,
+    EdgeDetection::computeDepthEdges(interpolatedDepthImage,
       &denoisedDepthImageEdges);
 
     #ifdef DEBUG_SHOW
@@ -137,7 +137,6 @@ namespace pandora_vision
     }
     #endif
 
-
     #ifdef DEBUG_SHOW
     if(Parameters::debug_show_find_holes) // Debug
     {
@@ -154,7 +153,7 @@ namespace pandora_vision
     }
     if(Parameters::debug_show_find_holes)
     {
-      Visualization::multipleShow("findHoles function", imgs, msgs,
+      Visualization::multipleShow("Depth node", imgs, msgs,
         Parameters::debug_show_find_holes_size, 1);
     }
     #endif

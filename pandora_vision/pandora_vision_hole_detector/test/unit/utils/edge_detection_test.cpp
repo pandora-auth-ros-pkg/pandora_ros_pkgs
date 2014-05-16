@@ -293,8 +293,8 @@ namespace pandora_vision
 
 
 
-  //! Test EdgeDetection::computeEdges
-  TEST_F ( EdgeDetectionTest, ComputeEdgesTest )
+  //! Test EdgeDetection::computeDepthEdges
+  TEST_F ( EdgeDetectionTest, ComputeDepthEdgesTest )
   {
     // Convert squares_ into a CV_32FC1 type image
     cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );
@@ -320,7 +320,7 @@ namespace pandora_vision
     }
 
     cv::Mat denoisedEdges;
-    EdgeDetection::computeEdges ( squares_32FC1, &denoisedEdges );
+    EdgeDetection::computeDepthEdges ( squares_32FC1, &denoisedEdges );
 
     ASSERT_EQ ( CV_8UC1, denoisedEdges.type() );
   }

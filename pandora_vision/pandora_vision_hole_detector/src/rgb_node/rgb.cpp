@@ -258,6 +258,10 @@ namespace pandora_vision
     Parameters::secondary_channel = config.secondary_channel;
 
     // RGB image segmentation parameters
+    Parameters::compute_edges_backprojection_threshold =
+      config.compute_edges_backprojection_threshold;
+    Parameters::rgb_edges_extraction_method =
+      config.rgb_edges_extraction_method;
     Parameters::spatial_window_radius =
       config.spatial_window_radius;
     Parameters::color_window_radius =
@@ -278,14 +282,22 @@ namespace pandora_vision
       config.watershed_background_dilation_factor;
     Parameters::watershed_background_erosion_factor =
       config.watershed_background_erosion_factor;
+    Parameters::posterize_after_segmentation =
+      config.posterize_after_segmentation;
 
     // Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;
     Parameters::debug_show_find_holes_size =
       config.debug_show_find_holes_size;
+
+    Parameters::debug_show_produce_edges = config.debug_show_produce_edges;
+    Parameters::debug_show_produce_edges_size =
+      config.debug_show_produce_edges_size;
+
     Parameters::debug_show_denoise_edges = config.debug_show_denoise_edges;
     Parameters::debug_show_denoise_edges_size =
       config.debug_show_denoise_edges_size;
+
     Parameters::debug_show_connect_pairs = config.debug_show_connect_pairs;
     Parameters::debug_show_connect_pairs_size =
       config.debug_show_connect_pairs_size;

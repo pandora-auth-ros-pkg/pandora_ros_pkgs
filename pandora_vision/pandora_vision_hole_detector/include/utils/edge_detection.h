@@ -38,6 +38,7 @@
 #ifndef UTILS_EDGE_DETECTION_H
 #define UTILS_EDGE_DETECTION_H
 
+#include "utils/histogram.h"
 #include "utils/morphological_operators.h"
 
 /**
@@ -133,21 +134,42 @@ namespace pandora_vision
         cv::Mat* outImage, const int& iterations, const int& method);
 
       /**
-        @brief Takes as input a depth image containing floats, locates the edges
-        in it and tries to clear as much noise as possible in the edges image.
-        As noise we identify everything that is not, or does not look like,
-        hole-like shapes, with the knowledge that these shapes might be open
-        curves, or that holes-like shapes in a edge image are not connected to
-        anything else, ergo they are standalone shapes in it.
+        @brief Takes as input a depth image containing floats,
+        locates the edges in it and tries to clear as much noise as possible
+        in the edges image. As noise we identify everything that is not,
+        or does not look like, hole-like shapes,
+        with the knowledge that these shapes might be open curves, or that
+        holes-like shapes in a edge image are not connected to anything else,
+        ergo they are standalone shapes in it.
         It outputs a binary image that contains areas that we wish to validate
         as holes.
         @param[in] inImage [const cv::Mat&] The depth image extracted from the
-        depth sensor, in floats
+        depth sensor, of type CV_32FC1
         @param[out] edges [cv::Mat*] The final denoised edges image that
         corresponds to the input image
         @return void
        **/
-      static void computeEdges(const cv::Mat& inImage, cv::Mat* edges);
+      static void computeDepthEdges(const cv::Mat& inImage, cv::Mat* edges);
+
+      /**
+        @brief Takes as input a RGB image of type CV_8UC3,
+        locates the edges in it and tries to clear as much noise as possible
+        in the edges image. As noise we identify everything that is not,
+        or does not look like, hole-like shapes,
+        with the knowledge that these shapes might be open curves, or that
+        holes-like shapes in a edge image are not connected to anything else,
+        ergo they are standalone shapes in it.
+        It outputs a binary image that contains areas that we wish to validate
+        as holes.
+        @param[in] inImage [const cv::Mat&] The RGB image of type CV_32FC1
+        @param[in] inHistogram [const cv::MatND&] The model histogram needed
+        in order to obtain the backprojection of @param inImage
+        @param[out] edges [cv::Mat*] The final denoised edges image that
+        corresponds to the input image
+        @return void
+       **/
+      static void computeRgbEdges(const cv::Mat& inImage,
+        const cv::MatND& inHistogram, cv::Mat* edges);
 
       /**
         @brief Connects each point of a number of pair of points  with a line or
@@ -197,6 +219,15 @@ namespace pandora_vision
         const int& x_, const int& y_, std::set<unsigned int>* ret);
 
       /**
+        @brief Fills an image with random colours per image segment
+        @param[in,out] image [cv::Mat*] The image to be processed
+        (see http://docs.opencv.org/modules/imgproc/doc/
+        miscellaneous_transformations.html#floodfill)
+        @return void
+       **/
+      static void floodFillPostprocess(cv::Mat* image);
+
+        /**
         @brief With an binary input image (quantized in 0 and 255 levels),
         this function fills closed regions, at first, and then extracts the
         outline of each region. Used when there is a closed region with garbage
@@ -219,6 +250,46 @@ namespace pandora_vision
         @return void
        **/
       static void getShapesClearBorderSimple (cv::Mat* inImage);
+
+      /**
+        @brief This method takes as input a RGB image and uses
+        its backprojection (which is based on the precalculated
+        histogram histogram_) in order to identify whole regions whose
+        histogram matches histogram_, although the backprojection image
+        might be sparcely populated. After the identification of the regions
+        of interest, this method extracts their edges and returns the image
+        depicting them.
+        @param[in] inImage [const cv::Mat&] The input RGB image
+        @param[in] inHistogram [const cv::MatND&] The model histogram needed
+        in order to obtain the backprojection of @param inImage
+        @param[out] outImage [cv::Mat*] The output edges image, in CV_8UC1
+        format
+        @return void
+       **/
+      static void produceEdgesViaBackprojection (const cv::Mat& inImage,
+        const cv::MatND& inHistogram, cv::Mat* outImage);
+
+      /**
+        @brief This method takes as input a RGB image, segments it,
+        and extracts its edges.
+        @param[in] inImage [const cv::Mat&] The input RGB image,
+        of type CV_8UC3
+        @param[out] outImage [cv::Mat*] The output edges image,
+        of type CV_8UC1
+        @return void
+       **/
+      static void produceEdgesViaSegmentation (const cv::Mat& inImage,
+        cv::Mat* edges);
+
+      /**
+        @brief Segments a RGB image
+        @param[in] inImage [const cv::Mat&] The RGB image to be segmented
+        @param[in] posterize [const bool&] Indicates the appliance of a
+        random color to each segment
+        @param[out] outImage [cv::Mat*] The posterized image
+        @return void
+       **/
+      static void segmentation(const cv::Mat& inImage, cv::Mat* outImage);
 
   };
 

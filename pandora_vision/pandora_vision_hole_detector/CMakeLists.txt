@@ -53,6 +53,7 @@ add_library(depth_node_lib
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
   src/utils/edge_detection.cpp
+  src/utils/histogram.cpp
   src/utils/hole_filters.cpp
   src/utils/holes_conveyor.cpp
   src/utils/message_conversions.cpp
