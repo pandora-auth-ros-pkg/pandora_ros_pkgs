@@ -249,7 +249,12 @@ namespace pandora_vision
     static int color_window_radius;
     static int maximum_level_pyramid_segmentation;
     static int segmentation_blur_method;
-
+    static int floodfill_lower_colour_difference;
+    static int floodfill_upper_colour_difference;
+    static int watershed_foreground_dilation_factor;
+    static int watershed_foreground_erosion_factor;
+    static int watershed_background_dilation_factor;
+    static int watershed_background_erosion_factor;
 
     // Holes connection - merger
     static float connect_holes_min_distance;

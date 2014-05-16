@@ -266,6 +266,18 @@ namespace pandora_vision
       config.maximum_level_pyramid_segmentation;
     Parameters::segmentation_blur_method =
       config.segmentation_blur_method;
+    Parameters::floodfill_lower_colour_difference =
+      config.floodfill_lower_colour_difference;
+    Parameters::floodfill_upper_colour_difference =
+      config.floodfill_upper_colour_difference;
+    Parameters::watershed_foreground_dilation_factor =
+      config.watershed_foreground_dilation_factor;
+    Parameters::watershed_foreground_erosion_factor =
+      config.watershed_foreground_erosion_factor;
+    Parameters::watershed_background_dilation_factor =
+      config.watershed_background_dilation_factor;
+    Parameters::watershed_background_erosion_factor =
+      config.watershed_background_erosion_factor;
 
     // Debug
     Parameters::debug_show_find_holes = config.debug_show_find_holes;

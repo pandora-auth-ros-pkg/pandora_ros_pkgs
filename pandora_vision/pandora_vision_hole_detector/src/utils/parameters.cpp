@@ -248,7 +248,12 @@ namespace pandora_vision
   int Parameters::color_window_radius = 40;
   int Parameters::maximum_level_pyramid_segmentation = 2;
   int Parameters::segmentation_blur_method = 0;
-
+  int Parameters::floodfill_lower_colour_difference = 2;
+  int Parameters::floodfill_upper_colour_difference = 3;
+  int Parameters::watershed_foreground_dilation_factor = 1;
+  int Parameters::watershed_foreground_erosion_factor = 1;
+  int Parameters::watershed_background_dilation_factor = 1;
+  int Parameters::watershed_background_erosion_factor = 1;
 
   // Holes connection - merger
   float Parameters::connect_holes_min_distance = 0.1;
