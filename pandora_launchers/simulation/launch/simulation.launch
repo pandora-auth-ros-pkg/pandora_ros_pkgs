@@ -1,26 +1,37 @@
 <launch>
-  
-  <arg name="navigation" default="true"/>
-  <arg name="fusion" default="true"/>
+
+  <arg name="slam" default="true"/>
+  <arg name="control" default="true"/>
+  <arg name="navigation" default="false"/>
+  <arg name="fusion" default="false"/>
   <arg name="rviz" default="true"/>
   <arg name="vision" default="false"/>
-  
-  <!-- Slam -->
-  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_simulation.launch" />
-  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
 
+  <!-- Slam -->
+  <group if="$(arg slam)">
+    <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_simulation.launch" />
+    <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+  </group>
+
+  <!-- Control -->
+  <group if="$(arg control)">
+    <include file="$(find pandora_kinect_control)/launch/pandora_kinect_control.launch" />
+    <include file="$(find pandora_laser_control)/launch/stabilizer_control.launch" />
+    <node name="kinect_state_changer" pkg="pandora_kinect_control" type="move_kinect_script.py" args="1" ns="control" />
+  </group>
+  
   <!-- Navigation -->
   <group if="$(arg navigation)">
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
     <include file="$(find pandora_target_selector)/launch/target_selector.launch" />
   </group>
-  
+
   <!-- Visualization -->
   <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/visualization.launch" />
-  
+
   <!-- Fusion -->
   <include if="$(arg fusion)" file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
-  
+
   <!-- Vision -->
   <group if="$(arg vision)">
     <include file="$(find pandora_vision_hole)/launch/hole_find_node.launch" />
