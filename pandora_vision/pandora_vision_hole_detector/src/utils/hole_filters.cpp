@@ -111,7 +111,7 @@ namespace pandora_vision
           // Find the (approximate) outline points of each keypoint
           BlobDetection::raycastKeypoints(keyPoints,
             denoisedDepthImageEdges,
-            Parameters::raycast_keypoint_partitions,
+            Parameters::Outline::raycast_keypoint_partitions,
             &blobsOutlineVector,
             &blobsArea);
 

@@ -98,7 +98,7 @@ namespace pandora_vision
 
     // The color homogeneity filter requires a vector of holes' masks
     // that will be used to extract their histograms
-    if (Parameters::run_checker_color_homogeneity > 0)
+    if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
     {
       enable_holesMasksImageVector = true;
     }
@@ -109,7 +109,7 @@ namespace pandora_vision
     // but inside its (inflated) bounding rectangle
     // and the inflated rectangles and indices of the respective
     // valid keypoints
-    if (Parameters::run_checker_luminosity_diff > 0)
+    if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
     {
       enable_holesMasksSetVector = true;
       enable_intermediatePointsSetVector = true;
@@ -123,7 +123,7 @@ namespace pandora_vision
     // as it checks for texture metrics difference between the
     // histograms of the points inside a hole's outline and outside
     // the hole's outline but inside its (inflated) bounding rectangle
-    if (Parameters::run_checker_texture_diff > 0)
+    if (Parameters::HoleFusion::run_checker_texture_diff > 0)
     {
       enable_holesMasksImageVector = true;
       enable_intermediatePointsSetVector = true;
@@ -135,7 +135,7 @@ namespace pandora_vision
     // the indices of points inside holes' outlines and the indices of points
     // outside holes' outlines but inside their (inflated) bounding rectangle.
     // Hence, we also need the construction of inflated rectangles' vectors
-    if (Parameters::run_checker_texture_backproject > 0)
+    if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
     {
       enable_holesMasksSetVector = true;
       enable_intermediatePointsSetVector = true;
@@ -148,14 +148,14 @@ namespace pandora_vision
     {
       // The depth diff filter requires only the contruction of the vectors
       // that have to do with the inflation of holes' rectangles
-      if (Parameters::run_checker_depth_diff > 0)
+      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
       {
         enable_inflatedRectanglesVectorAndIndices = true;
       }
 
       // The depth/area filter requires only the construction of sets that
       // hold the indices of points inside holes' outlines
-      if (Parameters::run_checker_depth_area > 0)
+      if (Parameters::HoleFusion::run_checker_depth_area > 0)
       {
         enable_holesMasksSetVector = true;
       }
@@ -164,7 +164,7 @@ namespace pandora_vision
       // the construction of vectors pertaining to holes' inflation and
       // and a vector of sets of indices of points between holes' outline and
       // their respective (inflated) bounding rectangle
-      if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
+      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
       {
         enable_intermediatePointsSetVector = true;
         enable_inflatedRectanglesVectorAndIndices = true;
@@ -172,14 +172,14 @@ namespace pandora_vision
 
       // The outline of rectangle plane constitution filter requires
       // the construction of vectors pertaining to holes' inflation
-      if (Parameters::run_checker_outline_of_rectangle > 0)
+      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
       {
         enable_inflatedRectanglesVectorAndIndices = true;
       }
 
       // The depth homogeneity filter requires the construction of sets of
       // points' indices; these points are the ones inside holes' outlines
-      if (Parameters::run_checker_depth_homogeneity > 0)
+      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
       {
         enable_holesMasksSetVector = true;
       }

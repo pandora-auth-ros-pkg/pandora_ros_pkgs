@@ -54,13 +54,13 @@ namespace pandora_vision
     // Subscribe to the depth image published by the
     // rgb_depth_synchronizer node
     depthImageSubscriber_ = nodeHandle_.subscribe(
-      Parameters::depth_image_topic, 1,
+      Parameters::Topics::depth_image_topic, 1,
       &Depth::inputDepthImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      Parameters::depth_candidate_holes_topic, 1000);
+      Parameters::Topics::depth_candidate_holes_topic, 1000);
 
     // The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&Depth::parametersCallback,
@@ -108,7 +108,7 @@ namespace pandora_vision
       sensor_msgs::image_encodings::TYPE_32FC1);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::show_depth_image)
+    if (Parameters::Depth::show_depth_image)
     {
       Visualization::showScaled("Depth image", depthImage, 1);
     }
@@ -127,7 +127,7 @@ namespace pandora_vision
 
     // A value of 1 means that the depth image is subtituted by its
     // low-low, wavelet analysis driven, part
-    if (Parameters::image_representation_method == 1)
+    if (Parameters::Image::image_representation_method == 1)
     {
       double min;
       double max;
@@ -176,116 +176,149 @@ namespace pandora_vision
     ROS_INFO("[Depth node] Parameters callback called");
     #endif
 
-    // Show the depth image that arrives in the depth node
-    Parameters::show_depth_image =
-     config.show_depth_image;
-
-    // Depth image representation method.
-    // 0 if the depth image used is the one obtained from the depth sensor,
-    // unadulterated
-    // 1 through wavelet representation
-    Parameters::image_representation_method =
-      config.image_representation_method;
-
-    // Edge detection parameters
-    Parameters::edge_detection_method =
-      config.edge_detection_method;
-
-    // canny parameters
-    Parameters::canny_ratio = config.canny_ratio;
-    Parameters::canny_kernel_size = config.canny_kernel_size;
-    Parameters::canny_low_threshold = config.canny_low_threshold;
-    Parameters::canny_blur_noise_kernel_size =
-      config.canny_blur_noise_kernel_size;
-
-    Parameters::contrast_enhance_alpha = config.contrast_enhance_alpha;
-    Parameters::contrast_enhance_beta = config.contrast_enhance_beta;
-
-    // Threshold parameters
-    Parameters::threshold_lower_value = config.threshold_lower_value;
-
-    // Blob detection parameters
-    Parameters::blob_min_threshold = config.blob_min_threshold;
-    Parameters::blob_max_threshold = config.blob_max_threshold;
-    Parameters::blob_threshold_step = config.blob_threshold_step;
+    // Blob detection - specific parameters
+    Parameters::Blob::blob_min_threshold =
+      config.blob_min_threshold;
+    Parameters::Blob::blob_max_threshold =
+      config.blob_max_threshold;
+    Parameters::Blob::blob_threshold_step =
+      config.blob_threshold_step;
 
     //!< In wavelet mode, the image shrinks by a factor of 4
     if (config.image_representation_method == 0)
     {
-      Parameters::blob_min_area = config.blob_min_area;
-      Parameters::blob_max_area = config.blob_max_area;
+      Parameters::Blob::blob_min_area =
+        config.blob_min_area;
+      Parameters::Blob::blob_max_area =
+        config.blob_max_area;
     }
     else if (config.image_representation_method == 1)
     {
-      Parameters::blob_min_area = static_cast<int>(config.blob_min_area / 4);
-      Parameters::blob_max_area = static_cast<int>(config.blob_max_area / 4);
+      Parameters::Blob::blob_min_area =
+        static_cast<int>(config.blob_min_area / 4);
+      Parameters::Blob::blob_max_area =
+        static_cast<int>(config.blob_max_area / 4);
     }
 
-    Parameters::blob_min_convexity = config.blob_min_convexity;
-    Parameters::blob_max_convexity = config.blob_max_convexity;
-    Parameters::blob_min_inertia_ratio = config.blob_min_inertia_ratio;
-    Parameters::blob_max_circularity = config.blob_max_circularity;
-    Parameters::blob_min_circularity = config.blob_min_circularity;
-    Parameters::blob_filter_by_color = config.blob_filter_by_color;
-    Parameters::blob_filter_by_circularity =
+    Parameters::Blob::blob_min_convexity =
+      config.blob_min_convexity;
+    Parameters::Blob::blob_max_convexity =
+      config.blob_max_convexity;
+    Parameters::Blob::blob_min_inertia_ratio =
+      config.blob_min_inertia_ratio;
+    Parameters::Blob::blob_max_circularity =
+      config.blob_max_circularity;
+    Parameters::Blob::blob_min_circularity =
+      config.blob_min_circularity;
+    Parameters::Blob::blob_filter_by_color =
+      config.blob_filter_by_color;
+    Parameters::Blob::blob_filter_by_circularity =
       config.blob_filter_by_circularity;
 
-    // Bounding boxes parameters
 
-    // The bounding box detection method
-    // 0 for detecting by means of brushfire starting
-    // from the keypoint of the blob
-    // 1 for detecting by means of contours around the edges of the blob
-    Parameters::bounding_box_detection_method =
-      config.bounding_box_detection_method;
+    // Debug
+    Parameters::Debug::show_find_holes =
+      config.show_find_holes;
+    Parameters::Debug::show_find_holes_size =
+      config.show_find_holes_size;
 
-    // When using raycast instead of brushfire to find the (approximate here)
-    // outline of blobs, raycast_keypoint_partitions dictates the number of
-    // rays, or equivalently, the number of partitions in which the blob is
-    // partitioned in search of the blob's borders
-    Parameters::raycast_keypoint_partitions =
-      config.raycast_keypoint_partitions;
+    Parameters::Debug::show_denoise_edges =
+      config.show_denoise_edges;
+    Parameters::Debug::show_denoise_edges_size =
+      config.show_denoise_edges_size;
 
-    //<! Loose ends connection parameters
-    Parameters::AB_to_MO_ratio = config.AB_to_MO_ratio;
+    Parameters::Debug::show_connect_pairs =
+      config.show_connect_pairs;
+    Parameters::Debug::show_connect_pairs_size =
+      config.show_connect_pairs_size;
 
-    //!< In wavelet mode, the image shrinks by a factor of 4
-    if (config.image_representation_method == 0)
-    {
-      Parameters::minimum_curve_points = config.minimum_curve_points;
-    }
-    else if (config.image_representation_method == 1)
-    {
-      Parameters::minimum_curve_points =
-        static_cast<int>(config.minimum_curve_points / 4);
-    }
+    Parameters::Debug::show_get_shapes_clear_border  =
+      config.show_get_shapes_clear_border;
+    Parameters::Debug::show_get_shapes_clear_border_size =
+      config.show_get_shapes_clear_border_size;
+
+
+    // Parameters specific to the Depth node
+
+    // Show the depth image that arrives in the depth node
+    Parameters::Depth::show_depth_image =
+     config.show_depth_image;
 
     // The interpolation method for noise removal
     // 0 for averaging the pixel's neighbor values
     // 1 for brushfire near
     // 2 for brushfire far
-    Parameters::interpolation_method = config.interpolation_method;
+    Parameters::Depth::interpolation_method = config.interpolation_method;
+
+    // Threshold parameters
+    Parameters::Depth::denoised_edges_threshold =
+      config.denoised_edges_threshold;
+
+
+    // Edge detection specific parameters
+
+    // canny parameters
+    Parameters::Edge::canny_ratio =
+      config.canny_ratio;
+    Parameters::Edge::canny_kernel_size =
+      config.canny_kernel_size;
+    Parameters::Edge::canny_low_threshold =
+      config.canny_low_threshold;
+    Parameters::Edge::canny_blur_noise_kernel_size =
+      config.canny_blur_noise_kernel_size;
+
+    Parameters::Edge::contrast_enhance_alpha =
+      config.contrast_enhance_alpha;
+    Parameters::Edge::contrast_enhance_beta =
+      config.contrast_enhance_beta;
+
+    Parameters::Edge::edge_detection_method =
+      config.edge_detection_method;
+
+
+    // Image representation specific parameters
+
+    // Depth image representation method.
+    // 0 if the depth image used is the one obtained from the depth sensor,
+    // unadulterated
+    // 1 through wavelet representation
+    Parameters::Image::image_representation_method =
+      config.image_representation_method;
 
     // Method to scale the CV_32FC1 image to CV_8UC1
-    Parameters::scale_method = config.scale_method;
+    Parameters::Image::scale_method = config.scale_method;
 
-    // Debug
-    Parameters::debug_show_find_holes = config.debug_show_find_holes;
-    Parameters::debug_show_find_holes_size =
-      config.debug_show_find_holes_size;
 
-    Parameters::debug_show_denoise_edges = config.debug_show_denoise_edges;
-    Parameters::debug_show_denoise_edges_size =
-      config.debug_show_denoise_edges_size;
+    // Outline discovery specific parameters
 
-    Parameters::debug_show_connect_pairs = config.debug_show_connect_pairs;
-    Parameters::debug_show_connect_pairs_size =
-      config.debug_show_connect_pairs_size;
+    // The detection method used to obtain the outline of a blob
+    // 0 for detecting by means of brushfire
+    // 1 for detecting by means of raycasting
+    Parameters::Outline::outline_detection_method =
+      config.outline_detection_method;
 
-    Parameters::debug_show_get_shapes_clear_border  =
-      config.debug_show_get_shapes_clear_border;
-    Parameters::debug_show_get_shapes_clear_border_size =
-      config.debug_show_get_shapes_clear_border_size;
+    // When using raycast instead of brushfire to find the (approximate here)
+    // outline of blobs, raycast_keypoint_partitions dictates the number of
+    // rays, or equivalently, the number of partitions in which the blob is
+    // partitioned in search of the blob's borders
+    Parameters::Outline::raycast_keypoint_partitions =
+      config.raycast_keypoint_partitions;
+
+    //<! Loose ends connection parameters
+    Parameters::Outline::AB_to_MO_ratio = config.AB_to_MO_ratio;
+
+    //!< In wavelet mode, the image shrinks by a factor of 4
+    if (config.image_representation_method == 0)
+    {
+      Parameters::Outline::minimum_curve_points =
+        config.minimum_curve_points;
+    }
+    else if (config.image_representation_method == 1)
+    {
+      Parameters::Outline::minimum_curve_points =
+        static_cast<int>(config.minimum_curve_points / 4);
+    }
+
   }
 
 } // namespace pandora_vision

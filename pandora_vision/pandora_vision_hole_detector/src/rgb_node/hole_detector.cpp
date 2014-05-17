@@ -44,8 +44,9 @@ namespace pandora_vision
    **/
   HoleDetector::HoleDetector()
   {
-    //! Calculate histogram according to a given set of images
-    Histogram::getHistogram(&histogram_, Parameters::secondary_channel);
+    // Calculate histogram according to a given set of images
+    Histogram::getHistogram(&histogram_,
+      Parameters::Histogram::secondary_channel);
 
     ROS_INFO("[RGB node]: HoleDetector instance created");
   }
@@ -81,7 +82,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       cv::Mat tmp;
       holeFrame.copyTo(tmp);
@@ -97,7 +98,7 @@ namespace pandora_vision
     EdgeDetection::computeRgbEdges(holeFrame, histogram_, &edges);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       cv::Mat tmp;
       edges.copyTo(tmp);
@@ -108,13 +109,13 @@ namespace pandora_vision
     }
     #endif
 
-    //! Find pixels in current frame where there is the same texture
-    //! according to the given histogram and calculate
+    // Find pixels in current frame where there is the same texture
+    // according to the given histogram and calculate
     std::vector<cv::KeyPoint> keyPoints;
     BlobDetection::detectBlobs(edges, &keyPoints);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Initial keypoints");
@@ -129,11 +130,11 @@ namespace pandora_vision
     HoleFilters::validateBlobs(
       &keyPoints,
       &edges,
-      Parameters::bounding_box_detection_method,
+      Parameters::Outline::outline_detection_method,
       &conveyor);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_find_holes)
+    if (Parameters::Debug::show_find_holes)
     {
       msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Blobs");
@@ -152,10 +153,10 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_find_holes)
+    if (Parameters::Debug::show_find_holes)
     {
       Visualization::multipleShow("RGB node", imgs, msgs,
-        Parameters::debug_show_produce_edges_size, 1);
+        Parameters::Debug::show_find_holes_size, 1);
     }
     #endif
 

@@ -283,23 +283,23 @@ namespace pandora_vision
 
     cv::SimpleBlobDetector::Params params;
 
-    params.minThreshold = Parameters::blob_min_threshold; //40;
-    params.maxThreshold = Parameters::blob_max_threshold; //60;
-    params.thresholdStep = Parameters::blob_threshold_step;
+    params.minThreshold = Parameters::Blob::blob_min_threshold; //40;
+    params.maxThreshold = Parameters::Blob::blob_max_threshold; //60;
+    params.thresholdStep = Parameters::Blob::blob_threshold_step;
 
-    params.minArea = Parameters::blob_min_area;
-    params.maxArea = Parameters::blob_max_area;
+    params.minArea = Parameters::Blob::blob_min_area;
+    params.maxArea = Parameters::Blob::blob_max_area;
 
-    params.minConvexity = Parameters::blob_min_convexity; //0.6;
-    params.maxConvexity = Parameters::blob_max_convexity;
+    params.minConvexity = Parameters::Blob::blob_min_convexity; //0.6;
+    params.maxConvexity = Parameters::Blob::blob_max_convexity;
 
-    params.minInertiaRatio = Parameters::blob_min_inertia_ratio;//0.5;
+    params.minInertiaRatio = Parameters::Blob::blob_min_inertia_ratio;//0.5;
 
-    params.maxCircularity = Parameters::blob_max_circularity;
-    params.minCircularity = Parameters::blob_min_circularity; //0.3;
+    params.maxCircularity = Parameters::Blob::blob_max_circularity;
+    params.minCircularity = Parameters::Blob::blob_min_circularity; //0.3;
 
-    params.filterByColor = Parameters::blob_filter_by_color;
-    params.filterByCircularity = Parameters::blob_filter_by_circularity;
+    params.filterByColor = Parameters::Blob::blob_filter_by_color;
+    params.filterByCircularity = Parameters::Blob::blob_filter_by_circularity;
 
     cv::SimpleBlobDetector blobDetector(params);
     blobDetector.create("SimpleBlob");

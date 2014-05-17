@@ -221,7 +221,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC1 || inImage.type() != CV_8UC3)
     {
       img = scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -303,7 +303,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC1 || inImage.type() != CV_8UC3)
     {
       img = scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -378,7 +378,7 @@ namespace pandora_vision
     cv::Mat img;
     if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
     {
-      img = scaleImageForVisualization(inImage, Parameters::scale_method);
+      img = scaleImageForVisualization(inImage, Parameters::Image::scale_method);
     }
     else
     {
@@ -411,9 +411,8 @@ namespace pandora_vision
     const cv::Mat& inImage,
     const int& ms)
   {
-    cv::imshow(
-      windowTitle, scaleImageForVisualization(inImage,
-        Parameters::scale_method));
+    cv::imshow(windowTitle,
+      scaleImageForVisualization(inImage, Parameters::Image::scale_method));
     cv::waitKey(ms);
   }
 

@@ -243,18 +243,18 @@ namespace pandora_vision
     std = sqrt(std);
     bper = static_cast<float>(blacks) / (image.rows * image.cols);
 
-    Parameters::interpolation_method = 15;
+    Parameters::Depth::interpolation_method = 15;
     if(bper > 0.7)  // Choose close
     {
-      Parameters::interpolation_method = 2;
+      Parameters::Depth::interpolation_method = 2;
     }
     else if(mean < 0.7)
     {
-      Parameters::interpolation_method = 1;
+      Parameters::Depth::interpolation_method = 1;
     }
     else
     {
-      Parameters::interpolation_method = 0;
+      Parameters::Depth::interpolation_method = 0;
     }
     #ifdef DEBUG_TIME
     Timer::tick("chooseInterpolationMethod");
@@ -471,7 +471,7 @@ namespace pandora_vision
 
     chooseInterpolationMethod(inImage);
 
-    switch(Parameters::interpolation_method)
+    switch(Parameters::Depth::interpolation_method)
     {
       case 0: // Thinning-like interpolation
         {

@@ -39,19 +39,19 @@ for f in $(ls $base_path$normal_path); do
   counter=$(($counter+1))
 done
 
-## +50 brightness images path
-#for f in $(ls $base_path$plus_50_path); do
-  #cp $base_path$plus_50_path/$f $base_path/$counter$suffix
-  #echo $f
-  #counter=$(($counter+1))
-#done
+# +50 brightness images path
+for f in $(ls $base_path$plus_50_path); do
+  cp $base_path$plus_50_path/$f $base_path/$counter$suffix
+  echo $f
+  counter=$(($counter+1))
+done
 
-## +100 brightness images path
-#for f in $(ls $base_path$plus_100_path); do
-  #cp $base_path$plus_100_path/$f $base_path/$counter$suffix
-  #echo $f
-  #counter=$(($counter+1))
-#done
+# +100 brightness images path
+for f in $(ls $base_path$plus_100_path); do
+  cp $base_path$plus_100_path/$f $base_path/$counter$suffix
+  echo $f
+  counter=$(($counter+1))
+done
 
 # -50 brightness images path
 for f in $(ls $base_path$minus_50_path); do

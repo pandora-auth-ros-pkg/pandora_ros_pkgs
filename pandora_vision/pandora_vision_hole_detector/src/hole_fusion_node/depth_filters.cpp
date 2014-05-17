@@ -92,10 +92,10 @@ namespace pandora_vision
         conveyor.keyPoints[rectanglesIndices[i]].pt.x) - mean;
 
       // The gaussian mean
-      float m = Parameters::holes_gaussian_mean;
+      float m = Parameters::HoleFusion::holes_gaussian_mean;
 
       // The gaussian standard deviation
-      float s = Parameters::holes_gaussian_stddev;
+      float s = Parameters::HoleFusion::holes_gaussian_stddev;
 
       // The gaussian probability of this hole being valid
       probabilitiesVector->at(rectanglesIndices[i]) =
@@ -463,7 +463,7 @@ namespace pandora_vision
     // values to a range of 0-255
     cv::Mat visualizableDenoisedImage;
     visualizableDenoisedImage = Visualization::scaleImageForVisualization
-      (interpolatedDepthImage, Parameters::scale_method);
+      (interpolatedDepthImage, Parameters::Image::scale_method);
 
     // from now onwards every image is in the range of 0-255
     cv::Mat interpolatedDepthImageEdges;
@@ -472,7 +472,7 @@ namespace pandora_vision
 
     // Threshold the interpolatedDepthImageEdges image
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
-      Parameters::threshold_lower_value, 255, 3);
+      Parameters::Depth::denoised_edges_threshold, 255, 3);
 
     // make all non zero pixels have a value of 255
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
@@ -563,25 +563,25 @@ namespace pandora_vision
 
     std::map<int, int> filtersOrder;
 
-    if (Parameters::run_checker_depth_diff > 0)
+    if (Parameters::HoleFusion::run_checker_depth_diff > 0)
     {
-      filtersOrder[Parameters::run_checker_depth_diff] = 1;
+      filtersOrder[Parameters::HoleFusion::run_checker_depth_diff] = 1;
     }
-    if (Parameters::run_checker_outline_of_rectangle > 0)
+    if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
     {
-      filtersOrder[Parameters::run_checker_outline_of_rectangle] = 2;
+      filtersOrder[Parameters::HoleFusion::run_checker_outline_of_rectangle] = 2;
     }
-    if (Parameters::run_checker_depth_area > 0)
+    if (Parameters::HoleFusion::run_checker_depth_area > 0)
     {
-      filtersOrder[Parameters::run_checker_depth_area] = 3;
+      filtersOrder[Parameters::HoleFusion::run_checker_depth_area] = 3;
     }
-    if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
+    if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
     {
-      filtersOrder[Parameters::run_checker_brushfire_outline_to_rectangle] = 4;
+      filtersOrder[Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle] = 4;
     }
-    if (Parameters::run_checker_depth_homogeneity > 0)
+    if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
     {
-      filtersOrder[Parameters::run_checker_depth_homogeneity] = 5;
+      filtersOrder[Parameters::HoleFusion::run_checker_depth_homogeneity] = 5;
     }
 
     std::vector<cv::Mat> imgs;
@@ -608,7 +608,7 @@ namespace pandora_vision
     } // o_it iterator ends
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_check_holes) // Debug
+    if(Parameters::Debug::show_check_holes) // Debug
     {
       Visualization::multipleShow("depth checkHoles functions",
         imgs, msgs, 1200, 1);
@@ -770,7 +770,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_check_holes) // Debug
+    if(Parameters::Debug::show_check_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" ") + windowMsg;

@@ -284,8 +284,6 @@ namespace pandora_vision
       /**
         @brief Segments a RGB image
         @param[in] inImage [const cv::Mat&] The RGB image to be segmented
-        @param[in] posterize [const bool&] Indicates the appliance of a
-        random color to each segment
         @param[out] outImage [cv::Mat*] The posterized image
         @return void
        **/

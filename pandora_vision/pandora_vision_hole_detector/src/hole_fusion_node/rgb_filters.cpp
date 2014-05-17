@@ -73,7 +73,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -133,7 +133,7 @@ namespace pandora_vision
           }
 
           if (nonZeroInBox >
-            Parameters::non_zero_points_in_box_blob_histogram)
+            Parameters::HoleFusion::non_zero_points_in_box_blob_histogram)
           {
             overallNonZeroBoxes++;
           }
@@ -199,7 +199,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -326,7 +326,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -338,8 +338,8 @@ namespace pandora_vision
     cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
 
     // Histogram-related parameters
-    int h_bins = Parameters::number_of_hue_bins;
-    int s_bins = Parameters::number_of_saturation_bins;
+    int h_bins = Parameters::Histogram::number_of_hue_bins;
+    int s_bins = Parameters::Histogram::number_of_saturation_bins;
     int histSize[] = { h_bins, s_bins };
 
     // hue varies from 0 to 179, saturation from 0 to 255
@@ -387,7 +387,7 @@ namespace pandora_vision
       // is more loosely correlated to the model histogram than the
       // blobToRectangleHistogram is
       if (rectangleToModelCorrelation >=
-        Parameters::match_texture_threshold &&
+        Parameters::HoleFusion::match_texture_threshold &&
         rectangleToModelCorrelation > blobToModelCorrelation)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
@@ -459,7 +459,7 @@ namespace pandora_vision
     if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::scale_method);
+        Parameters::Image::scale_method);
     }
     else
     {
@@ -469,7 +469,7 @@ namespace pandora_vision
     // Obtain the backprojection of the inImage_, according to the inHistogram
     cv::MatND backProject;
     Histogram::getBackprojection(inImage_, inHistogram,
-      &backProject, Parameters::secondary_channel);
+      &backProject, Parameters::Histogram::secondary_channel);
 
     // Because the backproject is often sparcely populated, dilate each
     // zero pixel with non-zero neighours to obtain a more accurate depiction
@@ -594,21 +594,21 @@ namespace pandora_vision
 
     std::map<int, int> filtersOrder;
 
-    if (Parameters::run_checker_color_homogeneity > 0)
+    if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
     {
-      filtersOrder[Parameters::run_checker_color_homogeneity] = 1;
+      filtersOrder[Parameters::HoleFusion::run_checker_color_homogeneity] = 1;
     }
-    if (Parameters::run_checker_luminosity_diff > 0)
+    if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
     {
-      filtersOrder[Parameters::run_checker_luminosity_diff] = 2;
+      filtersOrder[Parameters::HoleFusion::run_checker_luminosity_diff] = 2;
     }
-    if (Parameters::run_checker_texture_diff > 0)
+    if (Parameters::HoleFusion::run_checker_texture_diff > 0)
     {
-      filtersOrder[Parameters::run_checker_texture_diff] = 3;
+      filtersOrder[Parameters::HoleFusion::run_checker_texture_diff] = 3;
     }
-    if (Parameters::run_checker_texture_backproject > 0)
+    if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
     {
-      filtersOrder[Parameters::run_checker_texture_backproject] = 4;
+      filtersOrder[Parameters::HoleFusion::run_checker_texture_backproject] = 4;
     }
 
     std::vector<cv::Mat> imgs;
@@ -636,7 +636,7 @@ namespace pandora_vision
     } // o_it iterator ends
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_check_holes) // Debug
+    if(Parameters::Debug::show_check_holes) // Debug
     {
       Visualization::multipleShow("rgb checkHoles functions",
         imgs, msgs, 1200, 1);
@@ -786,7 +786,7 @@ namespace pandora_vision
 
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_check_holes) // Debug
+    if(Parameters::Debug::show_check_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" ") + windowMsg;

@@ -63,14 +63,14 @@ namespace pandora_vision
     inImage.copyTo(*outImage);
     cv::Mat detected_edges;
     cv::Mat dst;
-    int ratio = Parameters::canny_ratio;
-    int kernel_size = Parameters::canny_kernel_size;
-    int lowThreshold = Parameters::canny_low_threshold;
+    int ratio = Parameters::Edge::canny_ratio;
+    int kernel_size = Parameters::Edge::canny_kernel_size;
+    int lowThreshold = Parameters::Edge::canny_low_threshold;
 
     // Reduce noise with a kernel 3x3
     cv::blur(*outImage, detected_edges, cv::Size(
-        Parameters::canny_blur_noise_kernel_size,
-        Parameters::canny_blur_noise_kernel_size));
+        Parameters::Edge::canny_blur_noise_kernel_size,
+        Parameters::Edge::canny_blur_noise_kernel_size));
 
     // Canny detector
     cv::Canny(detected_edges, detected_edges, lowThreshold,
@@ -521,43 +521,43 @@ namespace pandora_vision
     // Facilitate the edge detection by converting the 32FC1 image \
     values to a range of 0-255
       visualizableDenoisedImage = Visualization::scaleImageForVisualization
-      (tempImg, Parameters::scale_method);
+      (tempImg, Parameters::Image::scale_method);
 
 
     // from now onwards every image is in the range of 0-255
-    if (Parameters::edge_detection_method == 0)
+    if (Parameters::Edge::edge_detection_method == 0)
     {
       applyCanny(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
-    else if (Parameters::edge_detection_method == 1)
+    else if (Parameters::Edge::edge_detection_method == 1)
     {
       applyScharr(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
-    else if (Parameters::edge_detection_method == 2)
+    else if (Parameters::Edge::edge_detection_method == 2)
     {
       applySobel(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
-    else if (Parameters::edge_detection_method == 3)
+    else if (Parameters::Edge::edge_detection_method == 3)
     {
       applyLaplacian(visualizableDenoisedImage, &denoisedDepthImageEdges);
     }
-    else if (Parameters::edge_detection_method == 4) // Mixed mode
+    else if (Parameters::Edge::edge_detection_method == 4) // Mixed mode
     {
-      if (Parameters::mixed_edges_toggle_switch == 1)
+      if (Parameters::Edge::mixed_edges_toggle_switch == 1)
       {
         applyScharr(visualizableDenoisedImage, &denoisedDepthImageEdges);
-        Parameters::mixed_edges_toggle_switch = 2;
+        Parameters::Edge::mixed_edges_toggle_switch = 2;
       }
-      else if (Parameters::mixed_edges_toggle_switch == 2)
+      else if (Parameters::Edge::mixed_edges_toggle_switch == 2)
       {
         applySobel(visualizableDenoisedImage, &denoisedDepthImageEdges);
-        Parameters::mixed_edges_toggle_switch = 1;
+        Parameters::Edge::mixed_edges_toggle_switch = 1;
       }
     }
 
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
-      Parameters::threshold_lower_value, 255, 3);
+      Parameters::Depth::denoised_edges_threshold, 255, 3);
 
     // Make all non zero pixels have a value of 255
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges, 0, 255, 0);
@@ -606,11 +606,11 @@ namespace pandora_vision
     Timer::start("computeRgbEdges", "findHoles");
     #endif
 
-    if (Parameters::rgb_edges_extraction_method == 0)
+    if (Parameters::Rgb::edges_extraction_method == 0)
     {
       produceEdgesViaSegmentation(inImage, edges);
     }
-    else if (Parameters::rgb_edges_extraction_method == 1)
+    else if (Parameters::Rgb::edges_extraction_method == 1)
     {
       produceEdgesViaBackprojection(inImage, inHistogram, edges);
     }
@@ -652,7 +652,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::debug_show_connect_pairs) // Debug
+    if(Parameters::Debug::show_connect_pairs) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Connection before";
@@ -781,7 +781,7 @@ namespace pandora_vision
           // If the curve is close to a straight line,
           // do not connect pair[i].first and pair[i].second
           if (pairsDistance >=
-            Parameters::AB_to_MO_ratio * outlineBisectorPointDist)
+            Parameters::Outline::AB_to_MO_ratio * outlineBisectorPointDist)
           {
             continue;
           }
@@ -918,7 +918,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_connect_pairs) // Debug
+    if(Parameters::Debug::show_connect_pairs) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Connection after";
@@ -927,7 +927,7 @@ namespace pandora_vision
       inImage->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::debug_show_connect_pairs) // Debug
+    if(Parameters::Debug::show_connect_pairs) // Debug
     {
       Visualization::multipleShow("connectPairs function", imgs, msgs, 1200, 1);
     }
@@ -948,8 +948,8 @@ namespace pandora_vision
     Timer::start("enhanceContrast");
     #endif
 
-    inImage.convertTo(*outImage, -1, Parameters::contrast_enhance_alpha,
-      Parameters::contrast_enhance_beta);
+    inImage.convertTo(*outImage, -1, Parameters::Edge::contrast_enhance_alpha,
+      Parameters::Edge::contrast_enhance_beta);
 
     #ifdef DEBUG_TIME
     Timer::tick("enhanceContrast");
@@ -988,7 +988,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Initial Edges";
@@ -1015,7 +1015,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After edge contamination";
@@ -1045,7 +1045,7 @@ namespace pandora_vision
     Morphology::thinning(contaminatedEdges, &thinnedImage, 100);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After thinning";
@@ -1065,7 +1065,7 @@ namespace pandora_vision
     Morphology::pruningStrictIterative(&thinnedClosedLines, 1000);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After pruning";
@@ -1125,7 +1125,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : The origninal closed shapes";
@@ -1137,7 +1137,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Without closed shapes";
@@ -1177,7 +1177,7 @@ namespace pandora_vision
             std::pair<GraphNode, GraphNode> pts =
               findNeighs(&thinnedOpenLines, i, j, &ret);
 
-            if(ret.size() > Parameters::minimum_curve_points)
+            if(ret.size() > Parameters::Outline::minimum_curve_points)
             {
               lines.push_back(ret);
               farPts.push_back(pts);
@@ -1220,7 +1220,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After connection of distant edges";
@@ -1235,7 +1235,7 @@ namespace pandora_vision
     *img = thinnedOpenLines + closedLines;
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After re-insertion of closed shapes";
@@ -1254,7 +1254,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After clear borders";
@@ -1263,10 +1263,10 @@ namespace pandora_vision
       img->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::debug_show_denoise_edges) // Debug
+    if(Parameters::Debug::show_denoise_edges) // Debug
     {
       Visualization::multipleShow("denoiseEdges function", imgs, msgs,
-        Parameters::debug_show_denoise_edges_size, 1);
+        Parameters::Debug::show_denoise_edges_size, 1);
     }
     #endif
 
@@ -1445,7 +1445,7 @@ namespace pandora_vision
 
     std::pair<GraphNode, GraphNode> edgePoints;
     // If it is small avoid the fuzz
-    if(ret->size() < Parameters::minimum_curve_points)
+    if(ret->size() < Parameters::Outline::minimum_curve_points)
     {
       return edgePoints;
     }
@@ -1548,8 +1548,8 @@ namespace pandora_vision
 
           // Fill this segment with a random colour
           cv::floodFill(*image, mask, cv::Point(cols, rows), newVal, 0,
-            cv::Scalar::all(Parameters::floodfill_lower_colour_difference),
-            cv::Scalar::all(Parameters::floodfill_upper_colour_difference));
+            cv::Scalar::all(Parameters::Rgb::floodfill_lower_colour_difference),
+            cv::Scalar::all(Parameters::Rgb::floodfill_upper_colour_difference));
         }
       }
     }
@@ -1583,7 +1583,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Before clear blorders";
@@ -1765,7 +1765,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After clear borders";
@@ -1774,7 +1774,7 @@ namespace pandora_vision
       inImage->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       Visualization::multipleShow("getShapesClearBorder function", imgs, msgs,
         1200, 1);
@@ -1810,7 +1810,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Before clear blorders";
@@ -1913,7 +1913,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After clear borders";
@@ -1922,7 +1922,7 @@ namespace pandora_vision
       inImage->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::debug_show_get_shapes_clear_border) // Debug
+    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
     {
       Visualization::multipleShow("getShapesClearBorderSimple function",
         imgs, msgs, 1200, 1);
@@ -1960,8 +1960,8 @@ namespace pandora_vision
       return;
     }
 
-    #if def DEBUG_TIME
-    Timer::start("produceEdgesViaBackprojection", "findHoles");
+    #ifdef DEBUG_TIME
+    Timer::start("produceEdgesViaBackprojection", "computeRgbEdges");
     #endif
 
     #ifdef DEBUG_SHOW
@@ -1976,10 +1976,10 @@ namespace pandora_vision
     // Get the backprojected image of the frame, based on the precalculated
     // inHistogram histogram
     Histogram::getBackprojection(inImage, inHistogram,
-      &backprojectedFrame, Parameters::secondary_channel);
+      &backprojectedFrame, Parameters::Histogram::secondary_channel);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       backprojectedFrame.copyTo(tmp);
@@ -1991,11 +1991,11 @@ namespace pandora_vision
     #endif
 
     cv::threshold(backprojectedFrame, backprojectedFrame,
-      Parameters::compute_edges_backprojection_threshold, 255,
+      Parameters::Rgb::compute_edges_backprojection_threshold, 255,
       cv::THRESH_BINARY);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       backprojectedFrame.copyTo(tmp);
@@ -2014,16 +2014,16 @@ namespace pandora_vision
 
     // Dilate
     Morphology::dilationRelative(&foreground,
-      Parameters::watershed_foreground_dilation_factor);
+      Parameters::Rgb::watershed_foreground_dilation_factor);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       foreground.copyTo(tmp);
       msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Backprojection dilated by " +
-        TOSTR(Parameters::watershed_foreground_dilation_factor);
+        TOSTR(Parameters::Rgb::watershed_foreground_dilation_factor);
       msgs.push_back(msg);
       imgs.push_back(tmp);
     }
@@ -2035,16 +2035,16 @@ namespace pandora_vision
     // Erode. The erosion factor should be greater
     // than the dilation factor used above
     Morphology::erosion(&foreground,
-      Parameters::watershed_foreground_erosion_factor);
+      Parameters::Rgb::watershed_foreground_erosion_factor);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       foreground.copyTo(tmp);
       msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Foreground eroded by " +
-        TOSTR(Parameters::watershed_foreground_erosion_factor);
+        TOSTR(Parameters::Rgb::watershed_foreground_erosion_factor);
       msgs.push_back(msg);
       imgs.push_back(tmp);
     }
@@ -2058,16 +2058,16 @@ namespace pandora_vision
 
     // Dilate
     Morphology::dilationRelative(&background,
-      Parameters::watershed_background_dilation_factor);
+      Parameters::Rgb::watershed_background_dilation_factor);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       background.copyTo(tmp);
       msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Backprojection dilated by " +
-        TOSTR(Parameters::watershed_background_dilation_factor);
+        TOSTR(Parameters::Rgb::watershed_background_dilation_factor);
       msgs.push_back(msg);
       imgs.push_back(tmp);
     }
@@ -2083,16 +2083,16 @@ namespace pandora_vision
     // than the dilation factor used above. This erosion happens so that
     // the background pixels belong surely to the background
     Morphology::erosion(&background,
-      Parameters::watershed_background_erosion_factor);
+      Parameters::Rgb::watershed_background_erosion_factor);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       background.copyTo(tmp);
       msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Background eroded by " +
-        TOSTR(Parameters::watershed_background_erosion_factor);
+        TOSTR(Parameters::Rgb::watershed_background_erosion_factor);
       msgs.push_back(msg);
       imgs.push_back(tmp);
     }
@@ -2111,7 +2111,7 @@ namespace pandora_vision
     markers = foreground + background;
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       background.copyTo(tmp);
@@ -2142,7 +2142,7 @@ namespace pandora_vision
     cv::threshold(*outImage, *outImage, 0, 255, cv::THRESH_BINARY_INV);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       outImage->copyTo(tmp);
@@ -2154,10 +2154,10 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       Visualization::multipleShow("Final edges", imgs, msgs,
-        Parameters::debug_show_produce_edges_size, 1);
+        Parameters::Debug::show_produce_edges_size, 1);
     }
     #endif
 
@@ -2190,8 +2190,8 @@ namespace pandora_vision
       return;
     }
 
-    #if def DEBUG_TIME
-    Timer::start("produceEdgesViaSegmentation", "findHoles");
+    #ifdef DEBUG_TIME
+    Timer::start("produceEdgesViaSegmentation", "computeRgbEdges");
     #endif
 
     #ifdef DEBUG_SHOW
@@ -2201,7 +2201,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_produce_edges) // Debug
+    if(Parameters::Debug::show_produce_edges) // Debug
     {
       cv::Mat tmp;
       inImage.copyTo(tmp);
@@ -2219,17 +2219,8 @@ namespace pandora_vision
     // Segment the input image.
     segmentation(inImage, &segmentedHoleFrame);
 
-    // There is the choice of posterizing the segmented image, which fills
-    // the various segments found, depending on the colour difference between
-    // them, with a random colour
-    if (Parameters::posterize_after_segmentation)
-    {
-      // Fill the various segments with colour
-      floodFillPostprocess(&segmentedHoleFrame);
-    }
-
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       segmentedHoleFrame.copyTo(tmp);
@@ -2240,16 +2231,31 @@ namespace pandora_vision
     }
     #endif
 
-    // Convert the RGB segmented frame to grayscale
+    // Fill the various segments with colour
+    floodFillPostprocess(&segmentedHoleFrame);
+
+    #ifdef DEBUG_SHOW
+    if (Parameters::Debug::show_produce_edges)
+    {
+      cv::Mat tmp;
+      segmentedHoleFrame.copyTo(tmp);
+      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg += " : Posterized segmented RGB image";
+      msgs.push_back(msg);
+      imgs.push_back(tmp);
+    }
+    #endif
+
+    // Convert the posterized image to grayscale
     cv::Mat segmentedHoleFrame8UC1 =
       cv::Mat::zeros(segmentedHoleFrame.size(), CV_8UC1);
 
-    // In order to find the edges of the segmented image,
+    // In order to find the edges of the posterized image,
     // first, turn it to grayscale
     cv::cvtColor(segmentedHoleFrame, segmentedHoleFrame8UC1, CV_BGR2GRAY);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       segmentedHoleFrame8UC1.copyTo(tmp);
@@ -2261,38 +2267,38 @@ namespace pandora_vision
     #endif
 
     // Apply edge detection to the grayscale posterized input RGB image
-    if (Parameters::edge_detection_method == 0)
+    if (Parameters::Edge::edge_detection_method == 0)
     {
       EdgeDetection::applyCanny(segmentedHoleFrame8UC1, edges);
     }
-    else if (Parameters::edge_detection_method == 1)
+    else if (Parameters::Edge::edge_detection_method == 1)
     {
       EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
     }
-    else if (Parameters::edge_detection_method == 2)
+    else if (Parameters::Edge::edge_detection_method == 2)
     {
       EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
     }
-    else if (Parameters::edge_detection_method == 3)
+    else if (Parameters::Edge::edge_detection_method == 3)
     {
       EdgeDetection::applyLaplacian(segmentedHoleFrame8UC1, edges);
     }
-    else if (Parameters::edge_detection_method == 4) // Mixed mode
+    else if (Parameters::Edge::edge_detection_method == 4) // Mixed mode
     {
-      if (Parameters::mixed_edges_toggle_switch == 1)
+      if (Parameters::Edge::mixed_edges_toggle_switch == 1)
       {
         EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
-        Parameters::mixed_edges_toggle_switch = 2;
+        Parameters::Edge::mixed_edges_toggle_switch = 2;
       }
-      else if (Parameters::mixed_edges_toggle_switch == 2)
+      else if (Parameters::Edge::mixed_edges_toggle_switch == 2)
       {
         EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
-        Parameters::mixed_edges_toggle_switch = 1;
+        Parameters::Edge::mixed_edges_toggle_switch = 1;
       }
     }
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       cv::Mat tmp;
       edges->copyTo(tmp);
@@ -2304,10 +2310,10 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if (Parameters::debug_show_produce_edges)
+    if (Parameters::Debug::show_produce_edges)
     {
       Visualization::multipleShow("Final edges", imgs, msgs,
-        Parameters::debug_show_produce_edges_size, 1);
+        Parameters::Debug::show_produce_edges_size, 1);
     }
     #endif
 
@@ -2340,15 +2346,15 @@ namespace pandora_vision
     #endif
 
     // Blur the input image
-    if (Parameters::segmentation_blur_method == 0)
+    if (Parameters::Rgb::segmentation_blur_method == 0)
     {
       // Segment the image
       cv::pyrMeanShiftFiltering(inImage, *outImage,
-        Parameters::spatial_window_radius,
-        Parameters::color_window_radius,
-        Parameters::maximum_level_pyramid_segmentation);
+        Parameters::Rgb::spatial_window_radius,
+        Parameters::Rgb::color_window_radius,
+        Parameters::Rgb::maximum_level_pyramid_segmentation);
     }
-    else if (Parameters::segmentation_blur_method == 1)
+    else if (Parameters::Rgb::segmentation_blur_method == 1)
     {
       for ( int i = 1; i < 15; i = i + 4 )
       {

@@ -54,233 +54,298 @@ namespace pandora_vision
    **/
   struct Parameters
   {
-    // Topics' names
-
-    // The input, depth registered, point cloud topic
-    static std::string hole_detector_input_topic;
-
-    // The topic where the synchronizer node pubishes the
-    // synchronized depth image, extracted from the input point cloud
-    static std::string depth_image_topic;
-
-    // The topic where the synchronizer node pubishes the
-    // synchronized rgb image, extracted from the input point cloud
-    static std::string rgb_image_topic;
-
-    // The topic where the hole fusion publishes messages that unlock the
-    // synchronizer node
-    static std::string synchronizer_unlock_topic;
-
-    // The topic where the synchronized node publishes the input
-    // point cloud to the hole fusion node
-    static std::string point_cloud_internal_topic;
-
-    // The topic where the depth node publishes the candidate holes found
-    static std::string depth_candidate_holes_topic;
-
-    // The topic where the rgb node publishes the candidate holes found
-    static std::string rgb_candidate_holes_topic;
-
-    // The topic where the hole detector package publishes information
-    // about the holes that considered valid
-    static std::string hole_detector_output_topic;
-
-    // The topic where the hole detector package publishes enhancement
-    // information about the holes considered valid
-    static std::string enhanced_holes_topic;
-
-    // Show the depth image that arrives in the depth node
-    static bool show_depth_image;
-
-    // Show the rgb image that arrives in the rgb node
-    static bool show_rgb_image;
-
-    // Show the holes that each of the depth and RGB nodes transmit to the
-    // hole fusion node, on top of their respective origin images
-    static bool show_respective_holes;
-
-    // The product of this package: valid holes
-    static bool show_final_holes;
-
-    // Depth and RGB images' representation method.
-    // 0 if image used is used as obtained from the image sensor
-    // 1 through wavelet analysis
-    static int image_representation_method;
-
-    // Edge detection parameters
-    static int edge_detection_method;
-
-    // When mixed edge detection is selected, this toggle switch
-    // is needed in order to shift execution from one edge detector
-    // to the other.
-    // 1 for the Scharr edge detector,
-    // 2 for the Sobel edge detector
-    static int mixed_edges_toggle_switch;
-
-    // canny parameters
-    static int canny_ratio;
-    static int canny_kernel_size;
-    static int canny_low_threshold;
-    static int canny_blur_noise_kernel_size;
-
-    static float contrast_enhance_alpha;
-    static float contrast_enhance_beta;
-
-    // Threshold parameters
-    static int threshold_lower_value;
-
-    // Blob detection parameters
-    static int blob_min_threshold;
-    static int blob_max_threshold;
-    static int blob_threshold_step;
-    static int blob_min_area;
-    static int blob_max_area;
-    static double blob_min_convexity;
-    static double blob_max_convexity;
-    static double blob_min_inertia_ratio;
-    static double blob_max_circularity;
-    static double blob_min_circularity;
-    static bool blob_filter_by_color;
-    static bool blob_filter_by_circularity;
-
-    // Bounding boxes parameters
-
-    // The bounding box detection method
-    // 0 for detecting by means of brushfire starting
-    // from the keypoint of the blob
-    // 1 for detecting by means of contours around the edges of the blob
-    static int bounding_box_detection_method;
-
-    // When using raycast instead of brushfire to find the (approximate here)
-    // outline of blobs, raycast_keypoint_partitions dictates the number of
-    // rays, or equivalently, the number of partitions in which the blob is
-    // partitioned in search of the blob's borders
-    static int raycast_keypoint_partitions;
-
-    //<! Loose ends connection parameters
-    static int AB_to_MO_ratio;
-    static int minimum_curve_points;
-
-    //// Interpolation parameters
-
-    // The interpolation method for noise removal
-    // 0 for averaging the pixel's neighbor values
-    // 1 for brushfire near
-    // 2 for brushfire far
-    static int interpolation_method;
-
-    // Hole checkers and their thresholds`
-    static int run_checker_depth_diff;
-    static float checker_depth_diff_threshold;
-
-    static int run_checker_depth_area;
-    static float checker_depth_area_threshold;
-
-    static int run_checker_brushfire_outline_to_rectangle;
-    static float checker_brushfire_outline_to_rectangle_threshold;
-
-    static int run_checker_outline_of_rectangle;
-    static float checker_outline_of_rectangle_threshold;
-
-    static int run_checker_depth_homogeneity;
-    static float checker_depth_homogeneity_threshold;
-
-    static int rectangle_inflation_size;
-    static float holes_gaussian_mean;
-    static float holes_gaussian_stddev;
-
-    static int run_checker_color_homogeneity;
-    static float checker_color_homogeneity_threshold;
-
-    static int run_checker_luminosity_diff;
-    static float checker_luminosity_diff_threshold;
-
-    static int run_checker_texture_diff;
-    static float checker_texture_diff_threshold;
-
-    static int run_checker_texture_backproject;
-    static float checker_texture_backproject_threshold;
-
-    // Plane detection
-    static int segmentation_method;
-    static int max_iterations;
-    static double num_points_to_exclude;
-    static double point_to_plane_distance_threshold;
-
-    // Method to scale the CV_32FC1 image to CV_8UC1
-    static int scale_method;
-
-    // Debug
-    static bool debug_show_find_holes;
-    static int debug_show_find_holes_size;
-
-    static bool debug_show_produce_edges;
-    static int debug_show_produce_edges_size;
-
-    static bool debug_show_denoise_edges;
-    static int debug_show_denoise_edges_size;
-
-    static bool debug_print_connect_pairs;
-    static bool debug_show_connect_pairs;
-    static int debug_show_connect_pairs_size;
-
-    static bool debug_show_get_shapes_clear_border;
-    static int debug_show_get_shapes_clear_border_size;
-
-    static bool debug_show_check_holes;
-    static int debug_show_check_holes_size;
-
-    static bool debug_show_merge_holes;
-    static int debug_show_merge_holes_size;
-
-    // Texture parameters
-    // The threshold for texture matching
-    static float match_texture_threshold;
-
-    // Color homogeneity parameters
-    static int num_bins_threshold;
-    static int non_zero_points_in_box_blob_histogram;
-
-    // Histogram parameters
-    static int number_of_hue_bins;
-    static int number_of_saturation_bins;
-    static int number_of_value_bins;
-    static int secondary_channel;
-
-    // RGB image segmentation parameters
-    static int rgb_edges_extraction_method;
-    static int compute_edges_backprojection_threshold;
-    static int spatial_window_radius;
-    static int color_window_radius;
-    static int maximum_level_pyramid_segmentation;
-    static int segmentation_blur_method;
-    static int floodfill_lower_colour_difference;
-    static int floodfill_upper_colour_difference;
-    static int watershed_foreground_dilation_factor;
-    static int watershed_foreground_erosion_factor;
-    static int watershed_background_dilation_factor;
-    static int watershed_background_erosion_factor;
-    static bool posterize_after_segmentation;
+    //! Blob detection - specific parameters
+    struct Blob
+    {
+      static int blob_min_threshold;
+      static int blob_max_threshold;
+      static int blob_threshold_step;
+      static int blob_min_area;
+      static int blob_max_area;
+      static double blob_min_convexity;
+      static double blob_max_convexity;
+      static double blob_min_inertia_ratio;
+      static double blob_max_circularity;
+      static double blob_min_circularity;
+      static bool blob_filter_by_color;
+      static bool blob_filter_by_circularity;
+    };
 
 
-    // Holes connection - merger
-    static float connect_holes_min_distance;
-    static float connect_holes_max_distance;
+
+    //! Debug-specific parameters
+    struct Debug
+    {
+      static bool show_find_holes;
+      static int show_find_holes_size;
+
+      static bool show_produce_edges;
+      static int show_produce_edges_size;
+
+      static bool show_denoise_edges;
+      static int show_denoise_edges_size;
+
+      static bool print_connect_pairs;
+      static bool show_connect_pairs;
+      static int show_connect_pairs_size;
+
+      static bool show_get_shapes_clear_border;
+      static int show_get_shapes_clear_border_size;
+
+      static bool show_check_holes;
+      static int show_check_holes_size;
+
+      static bool show_merge_holes;
+      static int show_merge_holes_size;
+
+    };
 
 
-    // Holes validity thresholds
-    // Normal : when depth analysis is applicable
-    static float holes_validity_threshold_normal;
 
-    // Urgent : when depth analysis is not applicable, we can only rely
-    // on RGB analysis
-    static float holes_validity_threshold_urgent;
+    //! Parameters specific to the Depth node
+    struct Depth
+    {
+      // Show the depth image that arrives in the depth node
+      static bool show_depth_image;
 
-    // The depth sensor's horizontal field of view
-    static float horizontal_field_of_view;
+      // The interpolation method for noise removal
+      // 0 for averaging the pixel's neighbor values
+      // 1 for brushfire near
+      // 2 for brushfire far
+      static int interpolation_method;
 
-    // The depth sensor's vertical field of view
-    static float vertical_field_of_view;
+      // Threshold parameters
+      static int denoised_edges_threshold;
+
+    };
+
+
+
+    //! Edge detection specific parameters
+    struct Edge
+    {
+      // canny parameters
+      static int canny_ratio;
+      static int canny_kernel_size;
+      static int canny_low_threshold;
+      static int canny_blur_noise_kernel_size;
+
+      static float contrast_enhance_alpha;
+      static float contrast_enhance_beta;
+
+      static int edge_detection_method;
+
+      // When mixed edge detection is selected, this toggle switch
+      // is needed in order to shift execution from one edge detector
+      // to the other.
+      // 1 for the Scharr edge detector,
+      // 2 for the Sobel edge detector
+      static int mixed_edges_toggle_switch;
+
+    };
+
+
+
+    //! Histogram related parameters
+    struct Histogram
+    {
+      static int number_of_hue_bins;
+      static int number_of_saturation_bins;
+      static int number_of_value_bins;
+      static int secondary_channel;
+    };
+
+
+
+    //! Parameters specific to the Hole Fusion node
+    struct HoleFusion
+    {
+      // Show the holes that each of the depth and RGB nodes transmit to the
+      // hole fusion node, on top of their respective origin images
+      static bool show_respective_holes;
+
+      // The product of this package: valid holes
+      static bool show_final_holes;
+
+      // Hole checkers and their thresholds`
+      static int run_checker_depth_diff;
+      static float checker_depth_diff_threshold;
+
+      static int run_checker_depth_area;
+      static float checker_depth_area_threshold;
+
+      static int run_checker_brushfire_outline_to_rectangle;
+      static float checker_brushfire_outline_to_rectangle_threshold;
+
+      static int run_checker_outline_of_rectangle;
+      static float checker_outline_of_rectangle_threshold;
+
+      static int run_checker_depth_homogeneity;
+      static float checker_depth_homogeneity_threshold;
+
+      static int rectangle_inflation_size;
+      static float holes_gaussian_mean;
+      static float holes_gaussian_stddev;
+
+      static int run_checker_color_homogeneity;
+      static float checker_color_homogeneity_threshold;
+
+      static int run_checker_luminosity_diff;
+      static float checker_luminosity_diff_threshold;
+
+      static int run_checker_texture_diff;
+      static float checker_texture_diff_threshold;
+
+      static int run_checker_texture_backproject;
+      static float checker_texture_backproject_threshold;
+
+      // Plane detection
+      static int segmentation_method;
+      static int max_iterations;
+      static double num_points_to_exclude;
+      static double point_to_plane_distance_threshold;
+
+      // Holes connection - merger
+      static float connect_holes_min_distance;
+      static float connect_holes_max_distance;
+
+      // Texture parameters
+      // The threshold for texture matching
+      static float match_texture_threshold;
+
+      // Color homogeneity parameters
+      static int num_bins_threshold;
+      static int non_zero_points_in_box_blob_histogram;
+
+
+      // Holes validity thresholds
+
+      // Normal : when depth analysis is applicable
+      static float holes_validity_threshold_normal;
+
+      // Urgent : when depth analysis is not applicable, we can only rely
+      // on RGB analysis
+      static float holes_validity_threshold_urgent;
+
+      // The depth sensor's horizontal field of view
+      static float horizontal_field_of_view;
+
+      // The depth sensor's vertical field of view
+      static float vertical_field_of_view;
+
+    };
+
+
+
+    //! Image representation specific parameters
+    struct Image
+    {
+      // Depth and RGB images' representation method.
+      // 0 if image used is used as obtained from the image sensor
+      // 1 through wavelet analysis
+      static int image_representation_method;
+
+      // Method to scale the CV_32F images to CV_8UC1
+      static int scale_method;
+    };
+
+
+
+    //! Outline discovery specific parameters
+    struct Outline
+    {
+      // The detection method used to obtain the outline of a blob
+      // 0 for detecting by means of brushfire
+      // 1 for detecting by means of raycasting
+      static int outline_detection_method;
+
+      // When using raycast instead of brushfire to find the (approximate here)
+      // outline of blobs, raycast_keypoint_partitions dictates the number of
+      // rays, or equivalently, the number of partitions in which the blob is
+      // partitioned in search of the blob's borders
+      static int raycast_keypoint_partitions;
+
+      // Loose ends connection parameters
+      static int AB_to_MO_ratio;
+      static int minimum_curve_points;
+
+    };
+
+
+
+    //! Parameters specific to the RGB node
+    struct Rgb
+    {
+      // Show the rgb image that arrives in the rgb node
+      static bool show_rgb_image;
+
+      // Selects the method for extracting a RGB image's edges.
+      // Choices are via segmentation and via backprojection
+      static int edges_extraction_method;
+
+      // The threshold applied to the backprojection of the RGB image
+      // captured by the image sensor
+      static int compute_edges_backprojection_threshold;
+
+      // Parameters specific to the pyrMeanShiftFiltering method
+      static int spatial_window_radius;
+      static int color_window_radius;
+      static int maximum_level_pyramid_segmentation;
+
+      // Applies advanced blurring to achieve segmentation or normal
+      static int segmentation_blur_method;
+
+      // FloodFill options regarding minimum and maximum colour difference
+      static int floodfill_lower_colour_difference;
+      static int floodfill_upper_colour_difference;
+
+      // Watershed-specific parameters
+      static int watershed_foreground_dilation_factor;
+      static int watershed_foreground_erosion_factor;
+      static int watershed_background_dilation_factor;
+      static int watershed_background_erosion_factor;
+
+    };
+
+
+
+    //! Topics' names
+    struct Topics
+    {
+      // The input, depth registered, point cloud topic
+      static std::string hole_detector_input_topic;
+
+      // The topic where the synchronizer node pubishes the
+      // synchronized depth image, extracted from the input point cloud
+      static std::string depth_image_topic;
+
+      // The topic where the synchronizer node pubishes the
+      // synchronized rgb image, extracted from the input point cloud
+      static std::string rgb_image_topic;
+
+      // The topic where the hole fusion publishes messages that unlock the
+      // synchronizer node
+      static std::string synchronizer_unlock_topic;
+
+      // The topic where the synchronized node publishes the input
+      // point cloud to the hole fusion node
+      static std::string point_cloud_internal_topic;
+
+      // The topic where the depth node publishes the candidate holes found
+      static std::string depth_candidate_holes_topic;
+
+      // The topic where the rgb node publishes the candidate holes found
+      static std::string rgb_candidate_holes_topic;
+
+      // The topic where the hole detector package publishes information
+      // about the holes that considered valid
+      static std::string hole_detector_output_topic;
+
+      // The topic where the hole detector package publishes enhancement
+      // information about the holes considered valid
+      static std::string enhanced_holes_topic;
+
+    };
 
   };
 

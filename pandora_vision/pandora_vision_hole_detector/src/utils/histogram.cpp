@@ -155,23 +155,23 @@ namespace pandora_vision
 
       cv::cvtColor(
         Visualization::scaleImageForVisualization(cv::imread(temp_name),
-          Parameters::scale_method),
+          Parameters::Image::scale_method),
         wallImagesHSV[i], cv::COLOR_BGR2HSV);
     }
 
     int* histSize = new int[2];
 
     // The first value will always be with regard to Hue
-    histSize[0] = Parameters::number_of_hue_bins;
+    histSize[0] = Parameters::Histogram::number_of_hue_bins;
 
     if (secondaryChannel == 1)
     {
-      histSize[1] = Parameters::number_of_saturation_bins;
+      histSize[1] = Parameters::Histogram::number_of_saturation_bins;
     }
 
     if (secondaryChannel == 2)
     {
-      histSize[1] = Parameters::number_of_value_bins;
+      histSize[1] = Parameters::Histogram::number_of_value_bins;
     }
     else
     {

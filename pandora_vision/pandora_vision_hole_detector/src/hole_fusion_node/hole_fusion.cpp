@@ -51,7 +51,8 @@ namespace pandora_vision
     ros::Duration(0.5).sleep();
 
     // Calculate the histogram cv::MatND needed for texture comparing
-    Histogram::getHistogram(&wallsHistogram_, Parameters::secondary_channel);
+    Histogram::getHistogram(&wallsHistogram_,
+      Parameters::Histogram::secondary_channel);
 
     // Initialize the numNodesReady variable
     numNodesReady_ = 0;
@@ -59,36 +60,36 @@ namespace pandora_vision
     // Advertise the topic that the rgb_depth_synchronizer will be
     // subscribed to in order for the hole_fusion_node to unlock it
     unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>(
-      Parameters::synchronizer_unlock_topic, 1000, true);
+      Parameters::Topics::synchronizer_unlock_topic, 1000, true);
 
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::HolesDirectionsVectorMsg>(
-        Parameters::hole_detector_output_topic, 1000, true);
+        Parameters::Topics::hole_detector_output_topic, 1000, true);
 
     // Advertise the topic that information about the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::EnhancedHolesVectorMsg>(
-        Parameters::enhanced_holes_topic, 1000, true);
+        Parameters::Topics::enhanced_holes_topic, 1000, true);
 
     // Subscribe to the topic where the depth node publishes
     // candidate holes
     depthCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      Parameters::depth_candidate_holes_topic, 1,
+      Parameters::Topics::depth_candidate_holes_topic, 1,
       &HoleFusion::depthCandidateHolesCallback, this);
 
     // Subscribe to the topic where the rgb node publishes
     // candidate holes
     rgbCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      Parameters::rgb_candidate_holes_topic, 1,
+      Parameters::Topics::rgb_candidate_holes_topic, 1,
       &HoleFusion::rgbCandidateHolesCallback, this);
 
     // Subscribe to the topic where the synchronizer node publishes
     // the point cloud
     pointCloudSubscriber_= nodeHandle_.subscribe(
-      Parameters::point_cloud_internal_topic, 1,
+      Parameters::Topics::point_cloud_internal_topic, 1,
       &HoleFusion::pointCloudCallback, this);
 
     // The dynamic reconfigure (hole fusion's) parameter's callback
@@ -165,8 +166,8 @@ namespace pandora_vision
     FiltersResources::createCheckerRequiredVectors(
       conveyor,
       interpolatedDepthImage_,
-      Parameters::rectangle_inflation_size,
-      Parameters::interpolation_method,
+      Parameters::HoleFusion::rectangle_inflation_size,
+      Parameters::Depth::interpolation_method,
       &holesMasksImageVector,
       &holesMasksSetVector,
       &inflatedRectanglesVector,
@@ -186,19 +187,19 @@ namespace pandora_vision
     // how many rows the vector will accomodate
     int rgbActiveFilters = 0;
 
-    if (Parameters::run_checker_color_homogeneity > 0)
+    if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
     {
       rgbActiveFilters++;
     }
-    if (Parameters::run_checker_luminosity_diff > 0)
+    if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
     {
       rgbActiveFilters++;
     }
-    if (Parameters::run_checker_texture_diff > 0)
+    if (Parameters::HoleFusion::run_checker_texture_diff > 0)
     {
       rgbActiveFilters++;
     }
-    if (Parameters::run_checker_texture_backproject > 0)
+    if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
     {
       rgbActiveFilters++;
     }
@@ -255,29 +256,29 @@ namespace pandora_vision
     // determine the probabilities of validity of the candidate holes
     // by running the depth-based filters and append the respective 2D output
     // probabilities vector to the overall probabilities vector
-    if (Parameters::interpolation_method == 0)
+    if (Parameters::Depth::interpolation_method == 0)
     {
       // Initialize the depth probabilities 2D vector.
       // But first we need to know how many rows the vector will accomodate
       int depthActiveFilters = 0;
 
-      if (Parameters::run_checker_depth_diff > 0)
+      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
       {
         depthActiveFilters++;
       }
-      if (Parameters::run_checker_outline_of_rectangle > 0)
+      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
       {
         depthActiveFilters++;
       }
-      if (Parameters::run_checker_depth_area > 0)
+      if (Parameters::HoleFusion::run_checker_depth_area > 0)
       {
         depthActiveFilters++;
       }
-      if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
+      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
       {
         depthActiveFilters++;
       }
-      if (Parameters::run_checker_depth_homogeneity > 0)
+      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
       {
         depthActiveFilters++;
       }
@@ -419,7 +420,7 @@ namespace pandora_vision
     #endif
 
     // Normal mode
-    if (Parameters::image_representation_method == 0)
+    if (Parameters::Image::image_representation_method == 0)
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
@@ -455,7 +456,7 @@ namespace pandora_vision
       }
     }
     // Wavelet mode
-    else if (Parameters::image_representation_method == 1)
+    else if (Parameters::Image::image_representation_method == 1)
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
@@ -510,7 +511,7 @@ namespace pandora_vision
         std::vector<cv::Point2f> outline;
         BlobDetection::raycastKeypoint(holeKeypoint,
           &canvas,
-          Parameters::raycast_keypoint_partitions,
+          Parameters::Outline::raycast_keypoint_partitions,
           &outline);
 
         conveyor->outlines.push_back(outline);
@@ -558,7 +559,7 @@ namespace pandora_vision
     std::vector<cv::Mat> canvases;
     std::vector<std::string> titles;
 
-    if(Parameters::debug_show_merge_holes)
+    if(Parameters::Debug::show_merge_holes)
     {
       // Push back the identifier of each keypoint
       for (int i = 0; i < conveyorBeforeMerge.keyPoints.size(); i++)
@@ -581,7 +582,7 @@ namespace pandora_vision
 
 
     // Try to merge holes that can be assimilated, amalgamated or connected
-    if (Parameters::interpolation_method == 0)
+    if (Parameters::Depth::interpolation_method == 0)
     {
       for (int i = 0; i < 3; i++)
       {
@@ -606,7 +607,7 @@ namespace pandora_vision
 
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_merge_holes)
+    if(Parameters::Debug::show_merge_holes)
     {
       msgs.clear();
       // Push back the identifier of each keypoint
@@ -627,7 +628,7 @@ namespace pandora_vision
         TOSTR(conveyor->keyPoints.size()) + " holes after merging");
 
       Visualization::multipleShow("Merged Keypoints",
-        canvases, titles, Parameters::debug_show_merge_holes_size, 1);
+        canvases, titles, Parameters::Debug::show_merge_holes_size, 1);
     }
     #endif
 
@@ -653,243 +654,194 @@ namespace pandora_vision
     ROS_INFO("[Hole Fusion node] Parameters callback called");
     #endif
 
-    // The product of this package: valid holes
-    Parameters::show_final_holes =
-     config.show_final_holes;
+    // Debug
+    Parameters::Debug::show_find_holes =
+      config.show_find_holes;
+    Parameters::Debug::show_find_holes_size =
+      config.show_find_holes_size;
+    Parameters::Debug::show_denoise_edges =
+      config.show_denoise_edges;
+    Parameters::Debug::show_denoise_edges_size =
+      config.show_denoise_edges_size;
+    Parameters::Debug::show_connect_pairs =
+      config.show_connect_pairs;
+    Parameters::Debug::show_connect_pairs_size =
+      config.show_connect_pairs_size;
 
-    // Show the holes that each of the depth and RGB nodes transmit to the
-    // hole fusion node, on top of their respective origin images
-    Parameters::show_respective_holes =
-      config.show_respective_holes;
+    Parameters::Debug::show_get_shapes_clear_border  =
+      config.show_get_shapes_clear_border;
+    Parameters::Debug::show_get_shapes_clear_border_size =
+      config.show_get_shapes_clear_border_size;
 
-    // Depth and RGB image representation method.
-    // 0 if the image used is the one obtained from the sensor,
-    // unadulterated
-    // 1 through wavelet representation
-    Parameters::image_representation_method =
-      config.image_representation_method;
+    Parameters::Debug::show_check_holes =
+      config.show_check_holes;
+    Parameters::Debug::show_check_holes_size =
+      config.show_check_holes_size;
 
-    // canny parameters
-    Parameters::canny_ratio =
-      config.canny_ratio;
-    Parameters::canny_kernel_size =
-      config.canny_kernel_size;
-    Parameters::canny_low_threshold =
-      config.canny_low_threshold;
-    Parameters::canny_blur_noise_kernel_size =
-      config.canny_blur_noise_kernel_size;
+    Parameters::Debug::show_merge_holes =
+      config.show_merge_holes;
+    Parameters::Debug::show_merge_holes_size =
+      config.show_merge_holes_size;
 
-    Parameters::contrast_enhance_beta =
-      config.contrast_enhance_beta;
-    Parameters::contrast_enhance_alpha =
-      config.contrast_enhance_alpha;
-
-    // Threshold parameters
-    Parameters::threshold_lower_value =
-      config.threshold_lower_value;
-
-    // Blob detection parameters
-    Parameters::blob_min_threshold =
-      config.blob_min_threshold;
-    Parameters::blob_max_threshold =
-      config.blob_max_threshold;
-    Parameters::blob_threshold_step =
-      config.blob_threshold_step;
-
-    //!< In wavelet mode, the image shrinks by a factor of 4
-    if (config.image_representation_method == 0)
-    {
-      Parameters::blob_min_area = config.blob_min_area;
-      Parameters::blob_max_area = config.blob_max_area;
-    }
-    else if (config.image_representation_method == 1)
-    {
-      Parameters::blob_min_area = static_cast<int>(config.blob_min_area / 4);
-      Parameters::blob_max_area = static_cast<int>(config.blob_max_area / 4);
-    }
-
-    Parameters::blob_min_convexity =
-      config.blob_min_convexity;
-    Parameters::blob_max_convexity =
-      config.blob_max_convexity;
-    Parameters::blob_min_inertia_ratio =
-      config.blob_min_inertia_ratio;
-    Parameters::blob_max_circularity =
-      config.blob_max_circularity;
-    Parameters::blob_min_circularity =
-      config.blob_min_circularity;
-    Parameters::blob_filter_by_color =
-      config.blob_filter_by_color;
-    Parameters::blob_filter_by_circularity =
-      config.blob_filter_by_circularity;
-
-    // The bounding box detection zzmethod
-    // 0 for detecting by means of brushfire starting
-    // from the keypoint of the blob
-    // 1 for detecting by means of contours around the edges of the blob
-    Parameters::bounding_box_detection_method =
-      config.bounding_box_detection_method;
-
-    // When using raycast instead of brushfire to find the (approximate here)
-    // outline of blobs, raycast_keypoint_partitions dictates the number of
-    // rays, or equivalently, the number of partitions in which the blob is
-    // partitioned in search of the blob's borders
-    Parameters::raycast_keypoint_partitions =
-      config.raycast_keypoint_partitions;
-
-    // Loose ends connection parameters
-    Parameters::AB_to_MO_ratio =
-      config.AB_to_MO_ratio;
-    Parameters::minimum_curve_points =
-      config.minimum_curve_points;
-
-    // Interpolation parameters
 
     // The interpolation method for noise removal
     // 0 for averaging the pixel's neighbor values
     // 1 for brushfire near
     // 2 for brushfire far
-    Parameters::interpolation_method =
+    Parameters::Depth::interpolation_method =
       config.interpolation_method;
 
-    // Method to scale the CV_32FC1 image to CV_8UC1
-    Parameters::scale_method =
-      config.scale_method;
+    // Threshold parameters
+    Parameters::Depth::denoised_edges_threshold =
+      config.denoised_edges_threshold;
+
+
+
+    // Histogram parameters
+    Parameters::Histogram::number_of_hue_bins =
+      config.number_of_hue_bins;
+    Parameters::Histogram::number_of_saturation_bins =
+      config.number_of_saturation_bins;
+    Parameters::Histogram::number_of_value_bins =
+      config.number_of_value_bins;
+    Parameters::Histogram::secondary_channel =
+      config.secondary_channel;
+
+
+
+    // Show the holes that each of the depth and RGB nodes transmit to the
+    // hole fusion node, on top of their respective origin images
+    Parameters::HoleFusion::show_respective_holes =
+      config.show_respective_holes;
+
+    // The product of this package: valid holes
+    Parameters::HoleFusion::show_final_holes =
+     config.show_final_holes;
 
     // Hole checkers and their thresholds
-    Parameters::run_checker_depth_diff =
+    Parameters::HoleFusion::run_checker_depth_diff =
       config.run_checker_depth_diff;
-    Parameters::checker_depth_diff_threshold =
+    Parameters::HoleFusion::checker_depth_diff_threshold =
       config.checker_depth_diff_threshold;
 
-    Parameters::run_checker_outline_of_rectangle =
+    Parameters::HoleFusion::run_checker_outline_of_rectangle =
       config.run_checker_outline_of_rectangle;
-    Parameters::checker_outline_of_rectangle_threshold =
+    Parameters::HoleFusion::checker_outline_of_rectangle_threshold =
       config.checker_outline_of_rectangle_threshold;
 
-    Parameters::run_checker_depth_area =
+    Parameters::HoleFusion::run_checker_depth_area =
       config.run_checker_depth_area;
-    Parameters::checker_depth_area_threshold =
+    Parameters::HoleFusion::checker_depth_area_threshold =
       config.checker_depth_area_threshold;
 
-    Parameters::run_checker_brushfire_outline_to_rectangle =
+    Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle =
       config.run_checker_brushfire_outline_to_rectangle;
-    Parameters::checker_brushfire_outline_to_rectangle_threshold =
+    Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold =
       config.checker_brushfire_outline_to_rectangle_threshold;
 
-    Parameters::run_checker_depth_homogeneity =
+    Parameters::HoleFusion::run_checker_depth_homogeneity =
       config.run_checker_depth_homogeneity;
-    Parameters::checker_depth_homogeneity_threshold =
+    Parameters::HoleFusion::checker_depth_homogeneity_threshold =
       config.checker_depth_homogeneity_threshold;
 
-
-    Parameters::rectangle_inflation_size =
+    Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;
 
-    Parameters::holes_gaussian_mean=
+    Parameters::HoleFusion::holes_gaussian_mean=
       config.holes_gaussian_mean;
-    Parameters::holes_gaussian_stddev=
+    Parameters::HoleFusion::holes_gaussian_stddev=
       config.holes_gaussian_stddev;
 
-
-    Parameters::run_checker_color_homogeneity =
+    Parameters::HoleFusion::run_checker_color_homogeneity =
       config.run_checker_color_homogeneity;
-    Parameters::checker_color_homogeneity_threshold =
+    Parameters::HoleFusion::checker_color_homogeneity_threshold =
       config.checker_color_homogeneity_threshold;
 
-    Parameters::run_checker_luminosity_diff =
+    Parameters::HoleFusion::run_checker_luminosity_diff =
       config.run_checker_luminosity_diff;
-    Parameters::checker_luminosity_diff_threshold =
+    Parameters::HoleFusion::checker_luminosity_diff_threshold =
       config.checker_luminosity_diff_threshold;
 
-    Parameters::run_checker_texture_diff =
+    Parameters::HoleFusion::run_checker_texture_diff =
       config.run_checker_texture_diff;
-    Parameters::checker_texture_diff_threshold =
+    Parameters::HoleFusion::checker_texture_diff_threshold =
       config.checker_texture_diff_threshold;
 
-    Parameters::run_checker_texture_backproject =
+    Parameters::HoleFusion::run_checker_texture_backproject =
       config.run_checker_texture_backproject;
-    Parameters::checker_texture_backproject_threshold =
+    Parameters::HoleFusion::checker_texture_backproject_threshold =
       config.checker_texture_backproject_threshold;
 
-    Parameters::segmentation_method =
+    // Plane detection
+    Parameters::HoleFusion::segmentation_method =
       config.segmentation_method;
-    Parameters::max_iterations =
+    Parameters::HoleFusion::max_iterations =
       config.max_iterations;
-    Parameters::num_points_to_exclude =
+    Parameters::HoleFusion::num_points_to_exclude =
       config.num_points_to_exclude;
-    Parameters::point_to_plane_distance_threshold =
+    Parameters::HoleFusion::point_to_plane_distance_threshold =
       config.point_to_plane_distance_threshold;
 
-
-    // Debug
-    Parameters::debug_show_find_holes =
-      config.debug_show_find_holes;
-    Parameters::debug_show_find_holes_size =
-      config.debug_show_find_holes_size;
-    Parameters::debug_show_denoise_edges =
-      config.debug_show_denoise_edges;
-    Parameters::debug_show_denoise_edges_size =
-      config.debug_show_denoise_edges_size;
-    Parameters::debug_show_connect_pairs =
-      config.debug_show_connect_pairs;
-    Parameters::debug_show_connect_pairs_size =
-      config.debug_show_connect_pairs_size;
-
-    Parameters::debug_show_get_shapes_clear_border  =
-      config.debug_show_get_shapes_clear_border;
-    Parameters::debug_show_get_shapes_clear_border_size =
-      config.debug_show_get_shapes_clear_border_size;
-
-    Parameters::debug_show_check_holes =
-      config.debug_show_check_holes;
-    Parameters::debug_show_check_holes_size =
-      config.debug_show_check_holes_size;
-
-    Parameters::debug_show_merge_holes =
-      config.debug_show_merge_holes;
-    Parameters::debug_show_merge_holes_size =
-      config.debug_show_merge_holes_size;
-
+    // Holes connection - merger
+    Parameters::HoleFusion::connect_holes_min_distance =
+      config.connect_holes_min_distance;
+    Parameters::HoleFusion::connect_holes_max_distance =
+      config.connect_holes_max_distance;
 
     // Texture parameters
     // The threshold for texture matching
-    Parameters::match_texture_threshold =
+    Parameters::HoleFusion::match_texture_threshold =
       config.match_texture_threshold;
 
-    Parameters::non_zero_points_in_box_blob_histogram =
-      config.non_zero_points_in_box_blob_histogram;
-
     //Color homogeneity parameters
-    Parameters::num_bins_threshold =
+    Parameters::HoleFusion::num_bins_threshold =
       config.num_bins_threshold;
-
-    // Histogram parameters
-    Parameters::number_of_hue_bins =
-      config.number_of_hue_bins;
-    Parameters::number_of_saturation_bins =
-      config.number_of_saturation_bins;
-    Parameters::number_of_value_bins =
-      config.number_of_value_bins;
-    Parameters::secondary_channel =
-      config.secondary_channel;
-
-    // Holes connection - merger
-    Parameters::connect_holes_min_distance =
-      config.connect_holes_min_distance;
-    Parameters::connect_holes_max_distance =
-      config.connect_holes_max_distance;
-
+    Parameters::HoleFusion::non_zero_points_in_box_blob_histogram =
+      config.non_zero_points_in_box_blob_histogram;
 
     // Holes validity thresholds
     // Normal : when depth analysis is applicable
-    Parameters::holes_validity_threshold_normal =
+    Parameters::HoleFusion::holes_validity_threshold_normal =
       config.holes_validity_threshold_normal;
 
     // Urgent : when depth analysis is not applicable, we can only rely
     // on RGB analysis
-    Parameters::holes_validity_threshold_urgent =
+    Parameters::HoleFusion::holes_validity_threshold_urgent =
       config.holes_validity_threshold_urgent;
+
+
+    // Depth and RGB image representation method.
+    // 0 if the image used is the one obtained from the sensor,
+    // unadulterated
+    // 1 through wavelet representation
+    Parameters::Image::image_representation_method =
+      config.image_representation_method;
+
+    // Method to scale the CV_32FC1 image to CV_8UC1
+    Parameters::Image::scale_method =
+      config.scale_method;
+
+
+    // The detection method used to obtain the outline of a blob
+    // 0 for detecting by means of brushfire
+    // 1 for detecting by means of raycasting
+    Parameters::Outline::outline_detection_method =
+      config.outline_detection_method;
+
+    // When using raycast instead of brushfire to find the (approximate here)
+    // outline of blobs, raycast_keypoint_partitions dictates the number of
+    // rays, or equivalently, the number of partitions in which the blob is
+    // partitioned in search of the blob's borders
+    Parameters::Outline::raycast_keypoint_partitions =
+      config.raycast_keypoint_partitions;
+
+    // Loose ends connection parameters
+    Parameters::Outline::AB_to_MO_ratio =
+      config.AB_to_MO_ratio;
+
+    Parameters::Outline::minimum_curve_points =
+      config.minimum_curve_points;
+
   }
 
 
@@ -973,7 +925,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if (Parameters::show_respective_holes)
+    if (Parameters::HoleFusion::show_respective_holes)
     {
       std::vector<std::string> msgs;
 
@@ -1040,10 +992,11 @@ namespace pandora_vision
     publishValidHoles(rgbdHolesConveyor, &validHolesMap);
 
     // Publish the enhanced holes message
-    publishEnhancedHoles(rgbdHolesConveyor, Parameters::interpolation_method);
+    publishEnhancedHoles(rgbdHolesConveyor,
+      Parameters::Depth::interpolation_method);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::show_final_holes)
+    if (Parameters::HoleFusion::show_final_holes)
     {
       // The holes conveyor containing only the valid holes
       HolesConveyor validHolesConveyor;
@@ -1167,8 +1120,8 @@ namespace pandora_vision
     std::map<int, float>* map)
   {
     // The depth sensor's horzontal and vertical field of view
-    float hfov = Parameters::horizontal_field_of_view;
-    float vfov = Parameters::vertical_field_of_view;
+    float hfov = Parameters::HoleFusion::horizontal_field_of_view;
+    float vfov = Parameters::HoleFusion::vertical_field_of_view;
 
     // The frame's height and width
     int height = interpolatedDepthImage_.rows;
@@ -1409,21 +1362,21 @@ namespace pandora_vision
       // depending on the interpolation method used for the input depth image
       // and their presence is not always certain in the probabilitiesVector2D
       int rgbActiveFilters = 0;
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_color_homogeneity > 0)
+        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
         {
           rgbActiveFilters++;
         }
-        if (Parameters::run_checker_luminosity_diff > 0)
+        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
         {
           rgbActiveFilters++;
         }
-        if (Parameters::run_checker_texture_diff > 0)
+        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
         {
           rgbActiveFilters++;
         }
-        if (Parameters::run_checker_texture_backproject > 0)
+        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
         {
           rgbActiveFilters++;
         }
@@ -1438,96 +1391,96 @@ namespace pandora_vision
       // The depth homogeneity is considered the least confident measure of
       // a potential hole's validity. Hence,
       // Priotity{depth_homogeneity} = 0
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_depth_homogeneity > 0)
+        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
         {
           sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::run_checker_depth_homogeneity - 1][i];
+            + Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
 
           exponent++;
         }
       }
 
       // Priotity{texture_diff} = 1
-      if (Parameters::run_checker_texture_diff > 0)
+      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::run_checker_texture_diff - 1][i];
+          Parameters::HoleFusion::run_checker_texture_diff - 1][i];
 
         exponent++;
       }
 
       // Priotity{texture_backproject} = 2
-      if (Parameters::run_checker_texture_backproject > 0)
+      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::run_checker_texture_backproject - 1][i];
+          Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
 
         exponent++;
       }
 
       // Priotity{color_homogeneity} = 3
-      if (Parameters::run_checker_color_homogeneity > 0)
+      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::run_checker_color_homogeneity - 1][i];
+          Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
 
         exponent++;
       }
 
       // Priotity{luminosity_diff} = 4
-      if (Parameters::run_checker_luminosity_diff > 0)
+      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::run_checker_luminosity_diff - 1][i];
+          Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
 
         exponent++;
       }
 
       // Priotity{brushfire_outline_to_rectangle} = 5
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_brushfire_outline_to_rectangle > 0)
+        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
         {
           sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::run_checker_brushfire_outline_to_rectangle - 1][i];
+            + Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
 
           exponent++;
         }
       }
 
       // Priotity{outline_of_rectangle} = 6
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_outline_of_rectangle > 0)
+        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
         {
           sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::run_checker_outline_of_rectangle - 1][i];
+            + Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
 
           exponent++;
         }
       }
 
       // Priotity{depth_diff} = 7
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_depth_diff > 0)
+        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
         {
           sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::run_checker_depth_diff - 1][i];
+            + Parameters::HoleFusion::run_checker_depth_diff - 1][i];
 
           exponent++;
         }
       }
 
       // Priotity{depth_area} = 8
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        if (Parameters::run_checker_depth_area > 0)
+        if (Parameters::HoleFusion::run_checker_depth_area > 0)
         {
           sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::run_checker_depth_area - 1][i];
+            + Parameters::HoleFusion::run_checker_depth_area - 1][i];
 
           exponent++;
         }
@@ -1537,13 +1490,13 @@ namespace pandora_vision
 
       // The validity acceptance threshold
       float threshold = 0.0;
-      if (Parameters::interpolation_method == 0)
+      if (Parameters::Depth::interpolation_method == 0)
       {
-        threshold = Parameters::holes_validity_threshold_normal;
+        threshold = Parameters::HoleFusion::holes_validity_threshold_normal;
       }
       else
       {
-        threshold = Parameters::holes_validity_threshold_urgent;
+        threshold = Parameters::HoleFusion::holes_validity_threshold_urgent;
       }
 
       if (sum > threshold)

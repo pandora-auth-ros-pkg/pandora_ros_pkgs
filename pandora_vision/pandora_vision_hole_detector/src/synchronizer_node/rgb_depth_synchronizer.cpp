@@ -53,26 +53,26 @@ namespace pandora_vision
 
     // Subscribe to the RGB point cloud topic
     pointCloudSubscriber_ = nodeHandle_.subscribe(
-      Parameters::hole_detector_input_topic, 1,
+      Parameters::Topics::hole_detector_input_topic, 1,
       &RgbDepthSynchronizer::synchronizedCallback, this);
 
     // Subscribe to the hole_fusion lock/unlock topic
     holeFusionSubscriber_ = nodeHandle_.subscribe(
-      Parameters::synchronizer_unlock_topic, 1,
+      Parameters::Topics::synchronizer_unlock_topic, 1,
       &RgbDepthSynchronizer::holeFusionCallback, this);
 
 
     // Advertise the synchronized point cloud
     synchronizedPointCloudPublisher_ = nodeHandle_.advertise
-      <sensor_msgs::PointCloud2>(Parameters::point_cloud_internal_topic, 1000);
+      <sensor_msgs::PointCloud2>(Parameters::Topics::point_cloud_internal_topic, 1000);
 
     // Advertise the synchronized depth image
     synchronizedDepthImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(Parameters::depth_image_topic, 1000);
+      <sensor_msgs::Image>(Parameters::Topics::depth_image_topic, 1000);
 
     // Advertise the synchronized rgb image
     synchronizedRGBImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(Parameters::rgb_image_topic, 1000);
+      <sensor_msgs::Image>(Parameters::Topics::rgb_image_topic, 1000);
 
     ROS_INFO("RgbDepthSynchronizer node initiated");
 

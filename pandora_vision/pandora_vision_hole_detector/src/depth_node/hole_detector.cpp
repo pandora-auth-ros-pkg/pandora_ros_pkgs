@@ -54,7 +54,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Interpolated depth image";
@@ -71,7 +71,7 @@ namespace pandora_vision
       &denoisedDepthImageEdges);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Edges after denoise");
@@ -88,7 +88,7 @@ namespace pandora_vision
     BlobDetection::detectBlobs(denoisedDepthImageEdges, &keyPoints);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Initial keypoints");
@@ -115,11 +115,11 @@ namespace pandora_vision
     HoleFilters::validateBlobs(
       &keyPoints,
       &denoisedDepthImageEdges,
-      Parameters::bounding_box_detection_method,
+      Parameters::Outline::outline_detection_method,
       &conveyor);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Blobs");
@@ -138,7 +138,7 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::debug_show_find_holes) // Debug
+    if(Parameters::Debug::show_find_holes) // Debug
     {
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Keypoints sent to hole_fusion");
@@ -151,10 +151,10 @@ namespace pandora_vision
           conveyor.keyPoints)
         );
     }
-    if(Parameters::debug_show_find_holes)
+    if(Parameters::Debug::show_find_holes)
     {
       Visualization::multipleShow("Depth node", imgs, msgs,
-        Parameters::debug_show_find_holes_size, 1);
+        Parameters::Debug::show_find_holes_size, 1);
     }
     #endif
 

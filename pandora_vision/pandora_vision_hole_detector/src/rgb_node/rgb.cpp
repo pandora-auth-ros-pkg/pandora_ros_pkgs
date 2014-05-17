@@ -47,19 +47,19 @@ namespace pandora_vision
     // Subscribe to the RGB image published by the
     // rgb_depth_synchronizer node
     _frameSubscriber = _nh.subscribe(
-      Parameters::rgb_image_topic, 1,
+      Parameters::Topics::rgb_image_topic, 1,
       &Rgb::inputRgbImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
     rgbCandidateHolesPublisher_ = _nh.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      Parameters::rgb_candidate_holes_topic, 1000);
+      Parameters::Topics::rgb_candidate_holes_topic, 1000);
 
     // The dynamic reconfigure (RGB) parameter's callback
     server.setCallback(boost::bind(&Rgb::parametersCallback,
         this, _1, _2));
 
-    ROS_INFO("[rgb_node] : Created Rgb instance");
+    ROS_INFO("[RGB node] : Created Rgb instance");
   }
 
 
@@ -69,7 +69,7 @@ namespace pandora_vision
    **/
   Rgb::~Rgb()
   {
-    ROS_DEBUG("[rgb_node] : Destroying Hole Detection instance");
+    ROS_DEBUG("[RGB node] : Destroying Hole Detection instance");
   }
 
 
@@ -101,7 +101,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_SHOW
-    if (Parameters::show_rgb_image)
+    if (Parameters::Rgb::show_rgb_image)
     {
       Visualization::show("RGB image", _holeFrame, 1);
     }
@@ -114,7 +114,7 @@ namespace pandora_vision
 
     // A value of 1 means that the rgb image is subtituted by its
     // low-low, wavelet analysis driven, part
-    if (Parameters::image_representation_method == 1)
+    if (Parameters::Image::image_representation_method == 1)
     {
       Wavelets::getLowLow(_holeFrame, &_holeFrame);
     }
@@ -155,157 +155,202 @@ namespace pandora_vision
     ROS_INFO("[RGB node] Parameters callback called");
     #endif
 
-    // Show the rgb image that arrives in the rgb node
-    Parameters::show_rgb_image =
-     config.show_rgb_image;
+    // Blob detection - specific parameters
+    Parameters::Blob::blob_min_threshold =
+      config.blob_min_threshold;
+
+    Parameters::Blob::blob_max_threshold =
+      config.blob_max_threshold;
+
+    Parameters::Blob::blob_threshold_step =
+      config.blob_threshold_step;
+
+    // In wavelet mode, the image shrinks by a factor of 4
+    if (config.image_representation_method == 0)
+    {
+      Parameters::Blob::blob_min_area =
+        config.blob_min_area;
+
+      Parameters::Blob::blob_max_area =
+        config.blob_max_area;
+    }
+    else if (config.image_representation_method == 1)
+    {
+      Parameters::Blob::blob_min_area =
+        static_cast<int>(config.blob_min_area / 4);
+
+      Parameters::Blob::blob_max_area =
+        static_cast<int>(config.blob_max_area / 4);
+    }
+
+    Parameters::Blob::blob_min_convexity =
+      config.blob_min_convexity;
+
+    Parameters::Blob::blob_max_convexity =
+      config.blob_max_convexity;
+
+    Parameters::Blob::blob_min_inertia_ratio =
+      config.blob_min_inertia_ratio;
+
+    Parameters::Blob::blob_max_circularity =
+      config.blob_max_circularity;
+
+    Parameters::Blob::blob_min_circularity =
+      config.blob_min_circularity;
+
+    Parameters::Blob::blob_filter_by_color =
+      config.blob_filter_by_color;
+
+    Parameters::Blob::blob_filter_by_circularity =
+      config.blob_filter_by_circularity;
+
+
+    // Debug
+    Parameters::Debug::show_find_holes =
+      config.show_find_holes;
+    Parameters::Debug::show_find_holes_size =
+      config.show_find_holes_size;
+
+    Parameters::Debug::show_produce_edges =
+      config.show_produce_edges;
+    Parameters::Debug::show_produce_edges_size =
+      config.show_produce_edges_size;
+
+    Parameters::Debug::show_denoise_edges =
+      config.show_denoise_edges;
+    Parameters::Debug::show_denoise_edges_size =
+      config.show_denoise_edges_size;
+
+    Parameters::Debug::show_connect_pairs =
+      config.show_connect_pairs;
+    Parameters::Debug::show_connect_pairs_size =
+      config.show_connect_pairs_size;
+
+    Parameters::Debug::show_get_shapes_clear_border  =
+      config.show_get_shapes_clear_border;
+    Parameters::Debug::show_get_shapes_clear_border_size =
+      config.show_get_shapes_clear_border_size;
+
+
+    // Edge detection parameters
+    Parameters::Edge::edge_detection_method =
+      config.edge_detection_method;
+
+    // canny parameters
+    Parameters::Edge::canny_ratio =
+      config.canny_ratio;
+
+    Parameters::Edge::canny_kernel_size =
+      config.canny_kernel_size;
+
+    Parameters::Edge::canny_low_threshold =
+      config.canny_low_threshold;
+
+    Parameters::Edge::canny_blur_noise_kernel_size =
+      config.canny_blur_noise_kernel_size;
+
+    Parameters::Edge::contrast_enhance_beta =
+      config.contrast_enhance_beta;
+
+    Parameters::Edge::contrast_enhance_alpha =
+      config.contrast_enhance_alpha;
+
+
+    // Parameters needed for histogram calculation
+    Parameters::Histogram::number_of_hue_bins =
+      config.number_of_hue_bins;
+
+    Parameters::Histogram::number_of_saturation_bins =
+      config.number_of_saturation_bins;
+
+    Parameters::Histogram::number_of_value_bins =
+      config.number_of_value_bins;
+
+    Parameters::Histogram::secondary_channel =
+      config.secondary_channel;
+
 
     // RGB image representation method.
     // 0 if the depth image used is the one obtained from the depth sensor,
     // unadulterated
     // 1 through wavelet representation
-    Parameters::image_representation_method =
+    Parameters::Image::image_representation_method =
       config.image_representation_method;
 
-    // Edge detection parameters
-    Parameters::edge_detection_method =
-      config.edge_detection_method;
 
-    // canny parameters
-    Parameters::canny_ratio = config.canny_ratio;
-    Parameters::canny_kernel_size = config.canny_kernel_size;
-    Parameters::canny_low_threshold = config.canny_low_threshold;
-    Parameters::canny_blur_noise_kernel_size =
-      config.canny_blur_noise_kernel_size;
-
-    Parameters::contrast_enhance_beta = config.contrast_enhance_beta;
-    Parameters::contrast_enhance_alpha = config.contrast_enhance_alpha;
-
-    // Threshold parameters
-    Parameters::threshold_lower_value = config.threshold_lower_value;
-
-    // Blob detection parameters
-    Parameters::blob_min_threshold = config.blob_min_threshold;
-    Parameters::blob_max_threshold = config.blob_max_threshold;
-    Parameters::blob_threshold_step = config.blob_threshold_step;
-
-    //!< In wavelet mode, the image shrinks by a factor of 4
-    if (config.image_representation_method == 0)
-    {
-      Parameters::blob_min_area = config.blob_min_area;
-      Parameters::blob_max_area = config.blob_max_area;
-    }
-    else if (config.image_representation_method == 1)
-    {
-      Parameters::blob_min_area = static_cast<int>(config.blob_min_area / 4);
-      Parameters::blob_max_area = static_cast<int>(config.blob_max_area / 4);
-    }
-
-    Parameters::blob_min_convexity = config.blob_min_convexity;
-    Parameters::blob_max_convexity = config.blob_max_convexity;
-    Parameters::blob_min_inertia_ratio = config.blob_min_inertia_ratio;
-    Parameters::blob_max_circularity = config.blob_max_circularity;
-    Parameters::blob_min_circularity = config.blob_min_circularity;
-    Parameters::blob_filter_by_color = config.blob_filter_by_color;
-    Parameters::blob_filter_by_circularity =
-      config.blob_filter_by_circularity;
-
-    // Bounding boxes parameters
-
-    // The bounding box detection method
-    // 0 for detecting by means of brushfire starting
-    // from the keypoint of the blob
-    // 1 for detecting by means of contours around the edges of the blob
-    Parameters::bounding_box_detection_method =
-      config.bounding_box_detection_method;
+    // The detection method used to obtain the outline of a blob
+    // 0 for detecting by means of brushfire
+    // 1 for detecting by means of raycasting
+    Parameters::Outline::outline_detection_method =
+      config.outline_detection_method;
 
     // When using raycast instead of brushfire to find the (approximate here)
     // outline of blobs, raycast_keypoint_partitions dictates the number of
     // rays, or equivalently, the number of partitions in which the blob is
     // partitioned in search of the blob's borders
-    Parameters::raycast_keypoint_partitions =
+    Parameters::Outline::raycast_keypoint_partitions =
       config.raycast_keypoint_partitions;
 
     //<! Loose ends connection parameters
-    Parameters::AB_to_MO_ratio = config.AB_to_MO_ratio;
+    Parameters::Outline::AB_to_MO_ratio = config.AB_to_MO_ratio;
 
     //!< In wavelet mode, the image shrinks by a factor of 4
     if (config.image_representation_method == 0)
     {
-      Parameters::minimum_curve_points = config.minimum_curve_points;
+      Parameters::Outline::minimum_curve_points =
+        config.minimum_curve_points;
     }
     else if (config.image_representation_method == 1)
     {
-      Parameters::minimum_curve_points =
+      Parameters::Outline::minimum_curve_points =
         static_cast<int>(config.minimum_curve_points / 4);
     }
 
 
-    // Interpolation parameters
-
-    // The interpolation method for noise removal
-    // 0 for averaging the pixel's neighbor values
-    // 1 for brushfire near
-    // 2 for brushfire far
-    Parameters::interpolation_method = config.interpolation_method;
-
-    // Method to scale the CV_32FC1 image to CV_8UC1
-    Parameters::scale_method = config.scale_method;
-
-    // Parameters needed for histogram calculation
-    Parameters::number_of_hue_bins = config.number_of_hue_bins;
-    Parameters::number_of_saturation_bins = config.number_of_saturation_bins;
-    Parameters::number_of_value_bins = config.number_of_value_bins;
-    Parameters::secondary_channel = config.secondary_channel;
+    // Show the rgb image that arrives in the rgb node
+    Parameters::Rgb::show_rgb_image =
+      config.show_rgb_image;
 
     // RGB image segmentation parameters
-    Parameters::compute_edges_backprojection_threshold =
+
+    // Selects the method for extracting a RGB image's edges.
+    // Choices are via segmentation and via backprojection
+    Parameters::Rgb::edges_extraction_method =
+      config.edges_extraction_method;
+
+    // The threshold applied to the backprojection of the RGB image
+    // captured by the image sensor
+    Parameters::Rgb::compute_edges_backprojection_threshold =
       config.compute_edges_backprojection_threshold;
-    Parameters::rgb_edges_extraction_method =
-      config.rgb_edges_extraction_method;
-    Parameters::spatial_window_radius =
+
+    // Parameters specific to the pyrMeanShiftFiltering method
+    Parameters::Rgb::spatial_window_radius =
       config.spatial_window_radius;
-    Parameters::color_window_radius =
+    Parameters::Rgb::color_window_radius =
       config.color_window_radius;
-    Parameters::maximum_level_pyramid_segmentation =
+    Parameters::Rgb::maximum_level_pyramid_segmentation =
       config.maximum_level_pyramid_segmentation;
-    Parameters::segmentation_blur_method =
+
+    // Applies advanced blurring to achieve segmentation or normal
+    Parameters::Rgb::segmentation_blur_method =
       config.segmentation_blur_method;
-    Parameters::floodfill_lower_colour_difference =
+
+    // FloodFill options regarding minimum and maximum colour difference
+    Parameters::Rgb::floodfill_lower_colour_difference =
       config.floodfill_lower_colour_difference;
-    Parameters::floodfill_upper_colour_difference =
+    Parameters::Rgb::floodfill_upper_colour_difference =
       config.floodfill_upper_colour_difference;
-    Parameters::watershed_foreground_dilation_factor =
+
+    // Watershed-specific parameters
+    Parameters::Rgb::watershed_foreground_dilation_factor =
       config.watershed_foreground_dilation_factor;
-    Parameters::watershed_foreground_erosion_factor =
+    Parameters::Rgb::watershed_foreground_erosion_factor =
       config.watershed_foreground_erosion_factor;
-    Parameters::watershed_background_dilation_factor =
+    Parameters::Rgb::watershed_background_dilation_factor =
       config.watershed_background_dilation_factor;
-    Parameters::watershed_background_erosion_factor =
+    Parameters::Rgb::watershed_background_erosion_factor =
       config.watershed_background_erosion_factor;
-    Parameters::posterize_after_segmentation =
-      config.posterize_after_segmentation;
 
-    // Debug
-    Parameters::debug_show_find_holes = config.debug_show_find_holes;
-    Parameters::debug_show_find_holes_size =
-      config.debug_show_find_holes_size;
-
-    Parameters::debug_show_produce_edges = config.debug_show_produce_edges;
-    Parameters::debug_show_produce_edges_size =
-      config.debug_show_produce_edges_size;
-
-    Parameters::debug_show_denoise_edges = config.debug_show_denoise_edges;
-    Parameters::debug_show_denoise_edges_size =
-      config.debug_show_denoise_edges_size;
-
-    Parameters::debug_show_connect_pairs = config.debug_show_connect_pairs;
-    Parameters::debug_show_connect_pairs_size =
-      config.debug_show_connect_pairs_size;
-
-    Parameters::debug_show_get_shapes_clear_border  =
-      config.debug_show_get_shapes_clear_border;
-    Parameters::debug_show_get_shapes_clear_border_size =
-      config.debug_show_get_shapes_clear_border_size;
   }
 
 } // namespace pandora_vision

@@ -16,16 +16,15 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   message_filters
   roslint
-)
+  )
 
 generate_dynamic_reconfigure_options(
   cfg/depth_cfg.cfg
   cfg/hole_fusion_cfg.cfg
   cfg/rgb_cfg.cfg
-)
+  )
 
 catkin_package(
-  DEPENDS
   CATKIN_DEPENDS
   roscpp
   vision_communications
@@ -40,16 +39,14 @@ catkin_package(
   roslint
   INCLUDE_DIRS
   include
-  LIBRARIES
-)
+  )
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
-)
+  )
 
-
-########################### DepthNode ############################
-add_library(depth_node_lib
+################################ Utils library #################################
+add_library(utils_lib
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
   src/utils/edge_detection.cpp
@@ -64,140 +61,15 @@ add_library(depth_node_lib
   src/utils/visualization.cpp
   src/utils/wavelets.cpp
   )
-target_link_libraries(depth_node_lib
+
+target_link_libraries(utils_lib
   ${catkin_LIBRARIES}
-)
+  )
 
-add_executable(depth_node
-  src/depth_node/depth.cpp
-  src/depth_node/depth_node.cpp
-  src/depth_node/hole_detector.cpp
-)
-
-set (DEPTH_COMPILE_FLAGS "-Wno-deprecated")
-
-target_link_libraries(depth_node
-  depth_node_lib
-  ${catkin_LIBRARIES}
-)
-
-set_target_properties(depth_node
-  PROPERTIES COMPILE_FLAGS
-  ${DEPTH_COMPILE_FLAGS}
-)
-
-add_dependencies(depth_node
-  ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
-
-########################### RgbDepthSynchronizerNode ###########################
-add_library(synchronizer_lib
-  src/utils/parameters.cpp
-  src/utils/message_conversions.cpp
-  src/utils/timer.cpp
-)
-target_link_libraries(synchronizer_lib
-  ${catkin_LIBRARIES}
-)
-
-add_executable(synchronizer_node
-  src/synchronizer_node/rgb_depth_synchronizer.cpp
-  src/synchronizer_node/rgb_depth_synchronizer_node.cpp
-)
-
-target_link_libraries(synchronizer_node
-  synchronizer_lib
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(synchronizer_node
-  ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
-
-############################## HoleFusionNode ##################################
-add_library(hole_fusion_lib
-  src/utils/blob_detection.cpp
-  src/utils/bounding_box_detection.cpp
-  src/utils/edge_detection.cpp
-  src/utils/histogram.cpp
-  src/utils/hole_filters.cpp
-  src/utils/holes_conveyor.cpp
-  src/utils/message_conversions.cpp
-  src/utils/morphological_operators.cpp
-  src/utils/noise_elimination.cpp
-  src/utils/parameters.cpp
-  src/utils/timer.cpp
-  src/utils/visualization.cpp
-)
-
-target_link_libraries(hole_fusion_lib
-  ${catkin_LIBRARIES}
-)
-
-add_executable(hole_fusion_node
-  src/hole_fusion_node/hole_fusion.cpp
-  src/hole_fusion_node/hole_fusion_node.cpp
-  src/hole_fusion_node/hole_merger.cpp
-  src/hole_fusion_node/filters_resources.cpp
-  src/hole_fusion_node/rgb_filters.cpp
-  src/hole_fusion_node/depth_filters.cpp
-  src/hole_fusion_node/planes_detection.cpp
-)
-
-target_link_libraries(hole_fusion_node
-  hole_fusion_lib
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(hole_fusion_node
-  ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
-
-
-################################ RgbNode ######################################
-add_library(rgb_node_lib
-  src/utils/blob_detection.cpp
-  src/utils/bounding_box_detection.cpp
-  src/utils/edge_detection.cpp
-  src/utils/histogram.cpp
-  src/utils/hole_filters.cpp
-  src/utils/holes_conveyor.cpp
-  src/utils/message_conversions.cpp
-  src/utils/noise_elimination.cpp
-  src/utils/morphological_operators.cpp
-  src/utils/visualization.cpp
-  src/utils/parameters.cpp
-  src/utils/timer.cpp
-  src/utils/wavelets.cpp
-)
-
-target_link_libraries(rgb_node_lib
-  ${catkin_LIBRARIES} )
-
-add_executable(rgb_node
-  src/rgb_node/rgb_node.cpp
-  src/rgb_node/rgb.cpp
-  src/rgb_node/hole_detector.cpp
-)
-
-target_link_libraries(rgb_node
-  rgb_node_lib
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(rgb_node
-  ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
+add_subdirectory(src/depth_node)
+add_subdirectory(src/hole_fusion_node)
+add_subdirectory(src/rgb_node)
+add_subdirectory(src/synchronizer_node)
 
 
 
@@ -288,7 +160,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/rgb_node/rgb_node.cpp
 
 
-##################### tests #####################
+  ##################### tests #####################
 
   test/unit/bounding_box_detection_test.cpp
   test/unit/blob_detection_test.cpp
