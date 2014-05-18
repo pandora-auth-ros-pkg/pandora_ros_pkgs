@@ -162,6 +162,11 @@ namespace pandora_vision
         It outputs a binary image that contains areas that we wish to validate
         as holes.
         @param[in] inImage [const cv::Mat&] The RGB image of type CV_32FC1
+        @param[in] extractionMethod [const int&] Chooses by which process the
+        edges will be extracted. 0 for extraction via segmentation,
+        1 for extraction via backprojection and watersheding
+        @param[in] segmentationMethod [const int&] The method by which the
+        segmentation of @param inImage will be performed.
         @param[in] inHistogram [const cv::MatND&] The model histogram needed
         in order to obtain the backprojection of @param inImage
         @param[out] edges [cv::Mat*] The final denoised edges image that
@@ -169,6 +174,7 @@ namespace pandora_vision
         @return void
        **/
       static void computeRgbEdges(const cv::Mat& inImage,
+        const int& extractionMethod, const int& segmentationMethod,
         const cv::MatND& inHistogram, cv::Mat* edges);
 
       /**
@@ -227,7 +233,7 @@ namespace pandora_vision
        **/
       static void floodFillPostprocess(cv::Mat* image);
 
-        /**
+      /**
         @brief With an binary input image (quantized in 0 and 255 levels),
         this function fills closed regions, at first, and then extracts the
         outline of each region. Used when there is a closed region with garbage
@@ -274,20 +280,25 @@ namespace pandora_vision
         and extracts its edges.
         @param[in] inImage [const cv::Mat&] The input RGB image,
         of type CV_8UC3
+        @param[in] segmentationMethod [const int&] The method by which the
+        segmentation of @param inImage will be performed.
         @param[out] outImage [cv::Mat*] The output edges image,
         of type CV_8UC1
         @return void
        **/
       static void produceEdgesViaSegmentation (const cv::Mat& inImage,
-        cv::Mat* edges);
+        const int& segmentationMethod, cv::Mat* edges);
 
       /**
         @brief Segments a RGB image
         @param[in] inImage [const cv::Mat&] The RGB image to be segmented
+        @param[in] segmentationMethod [const int&] The method by which the
+        segmentation of @param inImage will be performed.
         @param[out] outImage [cv::Mat*] The posterized image
         @return void
        **/
-      static void segmentation(const cv::Mat& inImage, cv::Mat* outImage);
+      static void segmentation(const cv::Mat& inImage,
+        const int& segmentationMethod, cv::Mat* outImage);
 
   };
 

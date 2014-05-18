@@ -250,10 +250,6 @@ namespace pandora_vision
     // 2 for brushfire far
     Parameters::Depth::interpolation_method = config.interpolation_method;
 
-    // Threshold parameters
-    Parameters::Depth::denoised_edges_threshold =
-      config.denoised_edges_threshold;
-
 
     // Edge detection specific parameters
 
@@ -274,6 +270,10 @@ namespace pandora_vision
 
     Parameters::Edge::edge_detection_method =
       config.edge_detection_method;
+
+    // Threshold parameters
+    Parameters::Edge::denoised_edges_threshold =
+      config.denoised_edges_threshold;
 
 
     // Image representation specific parameters

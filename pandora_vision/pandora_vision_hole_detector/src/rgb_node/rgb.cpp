@@ -236,6 +236,9 @@ namespace pandora_vision
     Parameters::Edge::edge_detection_method =
       config.edge_detection_method;
 
+    Parameters::Edge::denoised_edges_threshold =
+      config.denoised_edges_threshold;
+
     // canny parameters
     Parameters::Edge::canny_ratio =
       config.canny_ratio;
@@ -330,6 +333,10 @@ namespace pandora_vision
       config.color_window_radius;
     Parameters::Rgb::maximum_level_pyramid_segmentation =
       config.maximum_level_pyramid_segmentation;
+
+    // True to posterize the product of the segmentation
+    Parameters::Rgb::posterize_after_segmentation =
+      config.posterize_after_segmentation;
 
     // Applies advanced blurring to achieve segmentation or normal
     Parameters::Rgb::segmentation_blur_method =

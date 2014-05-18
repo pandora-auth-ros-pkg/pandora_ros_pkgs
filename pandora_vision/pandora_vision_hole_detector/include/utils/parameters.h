@@ -113,10 +113,6 @@ namespace pandora_vision
       // 1 for brushfire near
       // 2 for brushfire far
       static int interpolation_method;
-
-      // Threshold parameters
-      static int denoised_edges_threshold;
-
     };
 
 
@@ -134,6 +130,9 @@ namespace pandora_vision
       static float contrast_enhance_beta;
 
       static int edge_detection_method;
+
+      // Threshold parameters
+      static int denoised_edges_threshold;
 
       // When mixed edge detection is selected, this toggle switch
       // is needed in order to shift execution from one edge detector
@@ -294,6 +293,9 @@ namespace pandora_vision
 
       // Applies advanced blurring to achieve segmentation or normal
       static int segmentation_blur_method;
+
+      // True to posterize the product of the segmentation
+      static bool posterize_after_segmentation;
 
       // FloodFill options regarding minimum and maximum colour difference
       static int floodfill_lower_colour_difference;

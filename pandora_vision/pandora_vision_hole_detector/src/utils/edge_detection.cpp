@@ -557,7 +557,7 @@ namespace pandora_vision
 
 
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
-      Parameters::Depth::denoised_edges_threshold, 255, 3);
+      Parameters::Edge::denoised_edges_threshold, 255, 3);
 
     // Make all non zero pixels have a value of 255
     cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges, 0, 255, 0);
@@ -584,6 +584,11 @@ namespace pandora_vision
     It outputs a binary image that contains areas that we wish to validate
     as holes.
     @param[in] inImage [const cv::Mat&] The RGB image of type CV_32FC1
+    @param[in] extractionMethod [const int&] Chooses by which process the
+    edges will be extracted. 0 for extraction via segmentation,
+    1 for extraction via backprojection and watersheding
+    @param[in] segmentationMethod [const int&] The method by which the
+    segmentation of @param inImage will be performed.
     @param[in] inHistogram [const cv::MatND&] The model histogram needed
     in order to obtain the backprojection of @param inImage
     @param[out] edges [cv::Mat*] The final denoised edges image that
@@ -591,6 +596,7 @@ namespace pandora_vision
     @return void
    **/
   void EdgeDetection::computeRgbEdges(const cv::Mat& inImage,
+    const int& extractionMethod, const int& segmentationMethod,
     const cv::MatND& inHistogram, cv::Mat* edges)
   {
     if (inImage.type() != CV_8UC3)
@@ -606,14 +612,21 @@ namespace pandora_vision
     Timer::start("computeRgbEdges", "findHoles");
     #endif
 
-    if (Parameters::Rgb::edges_extraction_method == 0)
+    if (extractionMethod == 0)
     {
-      produceEdgesViaSegmentation(inImage, edges);
+      produceEdgesViaSegmentation(inImage, segmentationMethod, edges);
     }
-    else if (Parameters::Rgb::edges_extraction_method == 1)
+    else if (extractionMethod == 1)
     {
       produceEdgesViaBackprojection(inImage, inHistogram, edges);
     }
+
+    // Apply a threshold so as to get rid of, what we perceive to be, noise
+    cv::threshold(*edges, *edges,
+      Parameters::Edge::denoised_edges_threshold, 255, 3);
+
+    // Make all non zero pixels have a value of 255
+    cv::threshold(*edges, *edges, 0, 255, 0);
 
     // Denoise the edges image
     EdgeDetection::denoiseEdges(edges);
@@ -1549,7 +1562,8 @@ namespace pandora_vision
           // Fill this segment with a random colour
           cv::floodFill(*image, mask, cv::Point(cols, rows), newVal, 0,
             cv::Scalar::all(Parameters::Rgb::floodfill_lower_colour_difference),
-            cv::Scalar::all(Parameters::Rgb::floodfill_upper_colour_difference));
+            cv::Scalar::all(Parameters::Rgb::floodfill_upper_colour_difference)
+            );
         }
       }
     }
@@ -2173,12 +2187,14 @@ namespace pandora_vision
     and extracts its edges.
     @param[in] inImage [const cv::Mat&] The input RGB image,
     of type CV_8UC3
+    @param[in] segmentationMethod [const int&] The method by which the
+    segmentation of @param inImage will be performed.
     @param[out] outImage [cv::Mat*] The output edges image,
     of type CV_8UC1
     @return void
    **/
   void EdgeDetection::produceEdgesViaSegmentation (const cv::Mat& inImage,
-    cv::Mat* edges)
+    const int& segmentationMethod, cv::Mat* edges)
   {
     if (inImage.type() != CV_8UC3)
     {
@@ -2217,7 +2233,7 @@ namespace pandora_vision
     inImage.copyTo(segmentedHoleFrame);
 
     // Segment the input image.
-    segmentation(inImage, &segmentedHoleFrame);
+    segmentation(inImage, segmentationMethod, &segmentedHoleFrame);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_produce_edges)
@@ -2231,20 +2247,24 @@ namespace pandora_vision
     }
     #endif
 
-    // Fill the various segments with colour
-    floodFillPostprocess(&segmentedHoleFrame);
-
-    #ifdef DEBUG_SHOW
-    if (Parameters::Debug::show_produce_edges)
+    // Posterize the product of the segmentation
+    if (Parameters::Rgb::posterize_after_segmentation)
     {
-      cv::Mat tmp;
-      segmentedHoleFrame.copyTo(tmp);
-      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
-      msg += " : Posterized segmented RGB image";
-      msgs.push_back(msg);
-      imgs.push_back(tmp);
+      // Fill the various segments with colour
+      floodFillPostprocess(&segmentedHoleFrame);
+
+      #ifdef DEBUG_SHOW
+      if (Parameters::Debug::show_produce_edges)
+      {
+        cv::Mat tmp;
+        segmentedHoleFrame.copyTo(tmp);
+        msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+        msg += " : Posterized segmented RGB image";
+        msgs.push_back(msg);
+        imgs.push_back(tmp);
+      }
+      #endif
     }
-    #endif
 
     // Convert the posterized image to grayscale
     cv::Mat segmentedHoleFrame8UC1 =
@@ -2327,10 +2347,13 @@ namespace pandora_vision
   /**
     @brief Segments a RGB image
     @param[in] inImage [const cv::Mat&] The RGB image to be segmented
+    @param[in] segmentationMethod [const int&] The method by which the
+    segmentation of @param inImage will be performed.
     @param[out] outImage [cv::Mat*] The posterized image
     @return void
    **/
-  void EdgeDetection::segmentation(const cv::Mat& inImage, cv::Mat* outImage)
+  void EdgeDetection::segmentation(const cv::Mat& inImage,
+    const int& segmentationMethod, cv::Mat* outImage)
   {
     if (inImage.type() != CV_8UC3)
     {
@@ -2346,7 +2369,7 @@ namespace pandora_vision
     #endif
 
     // Blur the input image
-    if (Parameters::Rgb::segmentation_blur_method == 0)
+    if (segmentationMethod == 0)
     {
       // Segment the image
       cv::pyrMeanShiftFiltering(inImage, *outImage,
@@ -2354,7 +2377,7 @@ namespace pandora_vision
         Parameters::Rgb::color_window_radius,
         Parameters::Rgb::maximum_level_pyramid_segmentation);
     }
-    else if (Parameters::Rgb::segmentation_blur_method == 1)
+    else if (segmentationMethod == 1)
     {
       for ( int i = 1; i < 15; i = i + 4 )
       {

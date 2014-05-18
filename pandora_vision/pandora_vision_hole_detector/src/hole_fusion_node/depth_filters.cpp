@@ -472,7 +472,7 @@ namespace pandora_vision
 
     // Threshold the interpolatedDepthImageEdges image
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
-      Parameters::Depth::denoised_edges_threshold, 255, 3);
+      Parameters::Edge::denoised_edges_threshold, 255, 3);
 
     // make all non zero pixels have a value of 255
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,

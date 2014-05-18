@@ -691,10 +691,10 @@ namespace pandora_vision
     Parameters::Depth::interpolation_method =
       config.interpolation_method;
 
-    // Threshold parameters
-    Parameters::Depth::denoised_edges_threshold =
-      config.denoised_edges_threshold;
 
+    // Threshold parameters
+    Parameters::Edge::denoised_edges_threshold =
+      config.denoised_edges_threshold;
 
 
     // Histogram parameters

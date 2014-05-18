@@ -95,7 +95,12 @@ namespace pandora_vision
 
     // Locate the edges of the RGB image
     cv::Mat edges;
-    EdgeDetection::computeRgbEdges(holeFrame, histogram_, &edges);
+    EdgeDetection::computeRgbEdges(
+      holeFrame,
+      Parameters::Rgb::edges_extraction_method,
+      Parameters::Rgb::segmentation_blur_method,
+      histogram_,
+      &edges);
 
     #ifdef DEBUG_SHOW
     if(Parameters::Debug::show_find_holes) // Debug

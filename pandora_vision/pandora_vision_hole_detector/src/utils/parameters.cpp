@@ -91,9 +91,6 @@ namespace pandora_vision
   // 2 for brushfire far
   int Parameters::Depth::interpolation_method = 0;
 
-  // Threshold parameters
-  int Parameters::Depth::denoised_edges_threshold = 10;
-
 
 
   // Edge detection specific parameters
@@ -108,6 +105,9 @@ namespace pandora_vision
   float Parameters::Edge::contrast_enhance_beta = 2;
 
   int Parameters::Edge::edge_detection_method = 2;
+
+  // Threshold parameters
+  int Parameters::Edge::denoised_edges_threshold = 10;
 
   // When mixed edge detection is selected, this toggle switch
   // is needed in order to shift execution from one edge detector
@@ -249,13 +249,16 @@ namespace pandora_vision
   int Parameters::Rgb::compute_edges_backprojection_threshold = 128;
 
   // Parameters specific to the pyrMeanShiftFiltering method
-  int Parameters::Rgb::spatial_window_radius = 4;
+  int Parameters::Rgb::spatial_window_radius = 18;
   int Parameters::Rgb::color_window_radius = 40;
   int Parameters::Rgb::maximum_level_pyramid_segmentation = 2;
 
 
   // Applies advanced blurring to achieve segmentation or normal
   int Parameters::Rgb::segmentation_blur_method = 0;
+
+  // True to posterize the product of the segmentation
+  bool Parameters::Rgb::posterize_after_segmentation = false;
 
   // FloodFill options regarding minimum and maximum colour difference
   int Parameters::Rgb::floodfill_lower_colour_difference = 2;
