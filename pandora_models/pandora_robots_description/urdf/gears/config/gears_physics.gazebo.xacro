@@ -38,6 +38,50 @@
 
   </xacro:macro>
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_link_sdf_physics" >
+
+    <gazebo reference="${linear_elevator_link_name}_link" >
+
+      <!-- <material>Gazebo/Grey</material> -->
+      <!-- <gravity>false</gravity> -->
+      <!-- <dampingFactor>0.0</dampingFactor> -->
+      <!-- <maxVel>0.0</maxVel> -->
+      <!-- <minDepth>0.0</minDepth> -->
+      <!-- <mu1>0.0</mu1> -->
+      <!-- <mu2>0.0</mu2> -->
+      <!-- <fdir1>0 0 0</fdir1> -->
+      <!-- <kp>0.0</kp> -->
+      <!-- <kd>0.0</kd> -->
+      <!-- <selfCollide>false</selfCollide> -->
+      <!-- <maxContacts>1</maxContacts> -->
+      <!-- <laserRetro>0.0</laserRetro> -->
+
+    </gazebo>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_link_sdf_physics" >
+
+    <gazebo reference="${linear_head_link_name}_link" >
+
+      <!-- <material>Gazebo/Grey</material> -->
+      <!-- <gravity>false</gravity> -->
+      <!-- <dampingFactor>0.0</dampingFactor> -->
+      <!-- <maxVel>0.0</maxVel> -->
+      <!-- <minDepth>0.0</minDepth> -->
+      <!-- <mu1>0.0</mu1> -->
+      <!-- <mu2>0.0</mu2> -->
+      <!-- <fdir1>0 0 0</fdir1> -->
+      <!-- <kp>0.0</kp> -->
+      <!-- <kd>0.0</kd> -->
+      <!-- <selfCollide>false</selfCollide> -->
+      <!-- <maxContacts>1</maxContacts> -->
+      <!-- <laserRetro>0.0</laserRetro> -->
+
+    </gazebo>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="side_link_sdf_physics"
                params="prefix_y" >
 
@@ -88,6 +132,57 @@
 <!-- Joints (SDF) ######################################################### -->
 
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_joint_sdf_physics" >
+
+    <gazebo reference="${linear_elevator_joint_name}_joint" >
+
+      <!-- <kp>0.0</kp> -->
+      <!-- <kd>0.0</kd> -->
+      <!-- <stopCfm>0.0</stopCfm> -->
+      <!-- <stopErp>0.0</stopErp> -->
+      <!-- <provideFeedback>false</provideFeedback> -->
+      <!-- <cfmDamping>true</cfmDamping> -->
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <!-- <fudgeFactor>0.0</fudgeFactor> -->
+
+    </gazebo>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_pitch_joint_sdf_physics" >
+
+    <gazebo reference="${linear_head_pitch_joint_name}_joint" >
+
+      <!-- <kp>0.0</kp> -->
+      <!-- <kd>0.0</kd> -->
+      <!-- <stopCfm>0.0</stopCfm> -->
+      <!-- <stopErp>0.0</stopErp> -->
+      <!-- <provideFeedback>false</provideFeedback> -->
+      <!-- <cfmDamping>true</cfmDamping> -->
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <!-- <fudgeFactor>0.0</fudgeFactor> -->
+
+    </gazebo>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_yaw_joint_sdf_physics" >
+
+    <gazebo reference="${linear_head_yaw_joint_name}_joint" >
+
+      <!-- <kp>0.0</kp> -->
+      <!-- <kd>0.0</kd> -->
+      <!-- <stopCfm>0.0</stopCfm> -->
+      <!-- <stopErp>0.0</stopErp> -->
+      <!-- <provideFeedback>false</provideFeedback> -->
+      <!-- <cfmDamping>true</cfmDamping> -->
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <!-- <fudgeFactor>0.0</fudgeFactor> -->
+
+    </gazebo>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="side_joint_sdf_physics"
                params="prefix_y" >
 
@@ -128,6 +223,72 @@
 <!-- Joints (URDF) ######################################################## -->
 
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_joint_urdf_physics" >
+
+    <axis xyz="0 0 1" />
+
+    <!-- <calibration rising="0.0"
+                      falling="0.0" /> -->
+
+    <!-- <dynamics damping="0.0"
+                   friction="0.0" /> --> 
+
+    <limit lower="${linear_elevator_joint_min_limit}"
+           upper="${linear_elevator_joint_max_limit}"
+           effort="100.0"
+           velocity="100.0" />
+
+    <!-- <safety_controller soft_lower_limit="0.0"
+                            soft_upper_limit="0.0"
+                            k_position="0.0"
+                            k_velocity="0.0" /> -->
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_pitch_joint_urdf_physics" >
+
+    <axis xyz="0 1 0" />
+
+    <!-- <calibration rising="0.0"
+                      falling="0.0" /> -->
+
+    <!-- <dynamics damping="0.0"
+                   friction="0.0" /> --> 
+
+    <limit lower="${linear_head_pitch_joint_min_limit}"
+           upper="${linear_head_pitch_joint_max_limit}"
+           effort="50.0"
+           velocity="50.0" />
+
+    <!-- <safety_controller soft_lower_limit="0.0"
+                            soft_upper_limit="0.0"
+                            k_position="0.0"
+                            k_velocity="0.0" /> -->
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_yaw_joint_urdf_physics" >
+
+    <axis xyz="0 0 1" />
+
+    <!-- <calibration rising="0.0"
+                      falling="0.0" /> -->
+
+    <!-- <dynamics damping="0.0"
+                   friction="0.0" /> --> 
+
+    <limit lower="${linear_head_yaw_joint_min_limit}"
+           upper="${linear_head_yaw_joint_max_limit}"
+           effort="50.0"
+           velocity="50.0" />
+
+    <!-- <safety_controller soft_lower_limit="0.0"
+                            soft_upper_limit="0.0"
+                            k_position="0.0"
+                            k_velocity="0.0" /> -->
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="side_joint_urdf_physics" >
 
     <axis xyz="0 1 0" />
@@ -138,10 +299,10 @@
     <dynamics damping="${side_joint_damping}" />
          <!-- friction="0.0" /> --> 
 
-    <limit lower="-${side_joint_max_angle}"
-           upper="${side_joint_max_angle}"
-           effort="100.0"
-           velocity="100.0" />
+    <limit lower="${side_joint_min_limit}"
+           upper="${side_joint_max_limit}"
+           effort="150.0"
+           velocity="150.0" />
 
     <!-- <safety_controller soft_lower_limit="0.0"
                             soft_upper_limit="0.0"
@@ -160,8 +321,8 @@
     <!-- <dynamics damping="0.0"
                    friction="0.0" /> --> 
 
-    <limit effort="50.0"
-           velocity="50.0" />
+    <limit effort="100.0"
+           velocity="100.0" />
       <!-- lower="-0.0" -->
       <!-- upper="0.0" -->
 

@@ -2,6 +2,45 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
+<!-- Linear Elevator ###################################################### -->
+
+  <xacro:macro name="linear_elevator_transmission" >
+    <!-- ================================================================== -->
+    <transmission name="${linear_elevator_link_name}_transmission" >
+
+      <type>transmission_interface/SimpleTransmission</type>
+
+      <joint name="${linear_elevator_joint_name}_joint" />
+
+      <actuator name="linear_elevator_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1.0</mechanicalReduction>
+      </actuator>
+
+    </transmission>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Linear Head ########################################################## -->
+
+  <xacro:macro name="linear_head_transmission"
+               params="rotation" >
+    <!-- ================================================================== -->
+    <transmission name="${linear_head_link_name}_${rotation}_transmission" >
+
+      <type>transmission_interface/SimpleTransmission</type>
+
+      <joint name="${linear_head_link_name}_${rotation}_joint" />
+
+      <actuator name="${linear_head_link_name}_${rotation}_motor" >
+        <hardwareInterface>EffortJointInterface</hardwareInterface>
+        <mechanicalReduction>1.0</mechanicalReduction>
+      </actuator>
+
+    </transmission>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
 <!-- Wheel ################################################################ -->
 
   <xacro:macro name="wheel_transmission"

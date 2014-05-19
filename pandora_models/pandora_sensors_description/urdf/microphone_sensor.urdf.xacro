@@ -8,14 +8,15 @@
     <link name="microphone_link" >
 
       <inertial>
-        <mass value="0.1" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="1"
+        <origin xyz="0.005 0.0 0.0"
+                rpy="0 0 0" />
+        <mass value="0.005" />
+        <inertia ixx="2.1208E-7"
                  ixy="0"
                  ixz="0"
-                 iyy="1"
+                 iyy="4.033E-7"
                  iyz="0"
-                 izz="1" />
+                 izz="2.1208E-7" />
       </inertial>
 
       <visual name="visual" >
@@ -27,10 +28,9 @@
       </visual>
 
       <collision name="collision" >
-        <origin xyz="0 0 0"
-                rpy="0 0 0" />
+        <origin xyz="0.007 0.0 0.0" />
         <geometry>
-          <box size="0.01 0.01 0.01" />
+          <box size="0.025 0.025 0.025" />
         </geometry>
       </collision>
 

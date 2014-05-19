@@ -4,7 +4,8 @@
 
 <!-- Differential ######################################################### -->
 
-  <xacro:macro name="pandora_differential_plugin" >
+  <xacro:macro name="pandora_differential_plugin" 
+               params="publish_joint_states" >
     <!-- ================================================================== -->
     <gazebo>
 
@@ -12,6 +13,8 @@
               filename="libpandora_differential_plugin.so" >
 
         <robotNamespace>${robot_namespace}</robotNamespace>
+        
+        <publishJointStates>${publish_joint_states}</publishJointStates>
 
         <baseLink>${base_link_name}_link</baseLink>
         <leftFrontWheelLink>left_front_${wheel_link_name}_link</leftFrontWheelLink>
@@ -21,7 +24,7 @@
         <leftSideJoint>left_${side_joint_name}_joint</leftSideJoint>
         <rightSideJoint>right_${side_joint_name}_joint</rightSideJoint>
 
-        <maxAngle>${side_joint_max_angle}</maxAngle>
+        <maxAngle>${side_joint_max_limit}</maxAngle>
         <sideJointDamping>${side_joint_damping}</sideJointDamping>
 
         <P>120.0</P>
@@ -125,7 +128,7 @@
 <!-- Ros Control ########################################################## -->
 
   <xacro:macro name="gazebo_ros_control_plugin"
-               params="hw_sim" >
+               params="hw_sim ns" >
     <!-- ================================================================== -->
     <gazebo>
 
@@ -133,7 +136,7 @@
               filename="libgazebo_ros_control.so" >
 
       <!-- <robotNamespace>${robot_namespace}</robotNamespace> -->
-      <robotNamespace>control</robotNamespace>
+      <robotNamespace>${ns}</robotNamespace>
 
       <robotSimType>${hw_sim}</robotSimType>
 

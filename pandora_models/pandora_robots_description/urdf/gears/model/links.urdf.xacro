@@ -29,6 +29,81 @@
     <!-- ================================================================== -->
   </xacro:macro>
 
+<!-- Linear Elevator ###################################################### -->
+
+  <xacro:macro name="linear_elevator_link" >
+    <!-- ================================================================== -->
+    <link name="${linear_elevator_link_name}_link" >
+
+      <inertial>
+        <xacro:linear_elevator_link_inertial_origin />
+        <xacro:linear_elevator_link_mass />
+        <xacro:linear_elevator_link_inertia />
+      </inertial>
+
+      <visual>
+        <xacro:linear_elevator_link_visual_origin />
+        <xacro:linear_elevator_link_visual_mesh />
+        <material name="linear_elevator" />
+      </visual>
+
+      <collision>
+        <xacro:linear_elevator_link_collision_origin />
+        <xacro:linear_elevator_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
+<!-- Linear Head ########################################################## -->
+
+  <xacro:macro name="linear_head_links" >
+    <!-- ================================================================== -->
+    <link name="${linear_head_link_name}_base_link" >
+
+      <inertial>
+        <xacro:linear_head_base_link_inertial_origin />
+        <xacro:linear_head_base_link_mass />
+        <xacro:linear_head_base_link_inertia />
+      </inertial>
+
+      <visual>
+        <xacro:linear_head_base_link_visual_origin />
+        <xacro:linear_head_base_link_visual_mesh />
+        <material name="linear_head_base" />
+      </visual>
+
+      <collision>
+        <xacro:linear_head_base_link_collision_origin />
+        <xacro:linear_head_base_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+    <link name="${linear_head_link_name}_link" >
+
+      <inertial>
+        <xacro:linear_head_link_inertial_origin />
+        <xacro:linear_head_link_mass />
+        <xacro:linear_head_link_inertia />
+      </inertial>
+
+      <visual>
+        <xacro:linear_head_link_visual_origin />
+        <xacro:linear_head_link_visual_mesh />
+        <material name="linear_head" />
+      </visual>
+
+      <collision>
+        <xacro:linear_head_link_collision_origin />
+        <xacro:linear_head_link_collision_mesh />
+      </collision>
+
+    </link>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
 <!-- Side ################################################################# -->
 
   <xacro:macro name="side_link"

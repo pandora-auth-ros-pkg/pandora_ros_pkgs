@@ -3,20 +3,20 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <xacro:macro name="thermal_caster"
-               params="parent *origin" >
+               params="parent prefix_y *origin" >
 
-    <link name="thermal_link" >
+    <link name="${prefix_y}_thermal_link" >
 
       <inertial>
-        <origin xyz="0 0 0.186"
+        <origin xyz="0.005 0.0 0.0"
                 rpy="0 0 0" />
-        <mass value="0.1" />
-        <inertia ixx="1.0"
-                 ixy="0.0"
-                 ixz="0.0"
-                 iyy="1.0"
-                 iyz="0.0"
-                 izz="1.0" />
+        <mass value="0.005" />
+        <inertia ixx="2.1208E-7"
+                 ixy="0"
+                 ixz="0"
+                 iyy="4.033E-7"
+                 iyz="0"
+                 izz="2.1208E-7" />
       </inertial>
 
       <visual name="visual" >
@@ -26,14 +26,15 @@
       </visual>
 
       <collision name="collision" >
+        <origin xyz="0.007 0.0 0.0" />
         <geometry>
-          <box size="0.01 0.01 0.01" />
+          <box size="0.025 0.025 0.025" />
         </geometry>
       </collision>
 
     </link>
 
-    <gazebo reference="thermal_link" >
+    <gazebo reference="${prefix_y}_thermal_link" >
       <sensor name="thermal"
               type="camera" >
 
@@ -69,11 +70,11 @@
 
     </gazebo>
 
-    <joint name="thermal_joint"
+    <joint name="${prefix_y}_thermal_joint"
            type="fixed" >
 
       <parent link="${parent}" />
-      <child link="thermal_link" />
+      <child link="${prefix_y}_thermal_link" />
 
       <xacro:insert_block name="origin" />
 

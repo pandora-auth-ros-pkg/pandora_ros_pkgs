@@ -3,6 +3,27 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_joint_origin" >
+
+    <origin xyz="0.09368 -0.0005 0.23995"
+            rpy="${zero}" />
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_pitch_joint_origin" >
+
+    <origin xyz="-0.0145 0.0686 0.35787"
+            rpy="${zero}" />
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_yaw_joint_origin" >
+
+    <origin xyz="0.0 0.037 0.021"
+            rpy="${zero}" />
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="side_joint_origin"
                params="reflect_y" >
 

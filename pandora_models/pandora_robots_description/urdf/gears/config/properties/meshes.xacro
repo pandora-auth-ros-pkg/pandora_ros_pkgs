@@ -14,6 +14,32 @@
 
   </xacro:macro>
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/linear_elevator_link.dae" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/collision/linear_elevator_link.stl" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_base_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/servo_motor.dae" />
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_link_visual_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/visual/linear_head_link.dae" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/collision/linear_head_link.stl" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="side_link_visual_mesh" >
 
     <geometry>
@@ -41,6 +67,32 @@
     <geometry>
       <mesh filename="package://pandora_robots_description/meshes/gears/collision/base_link.stl" />
       <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/base_link.dae" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_elevator_link_collision_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/collision/linear_elevator_link.stl" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/linear_elevator_link.dae" /> -->
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_base_link_collision_mesh" >
+  
+    <geometry>
+      <box size="0.050 0.032 0.041" />
+    </geometry>
+
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="linear_head_link_collision_mesh" >
+
+    <geometry>
+      <mesh filename="package://pandora_robots_description/meshes/gears/collision/linear_head_link.stl" />
+      <!-- <mesh filename="package://pandora_robots_description/meshes/gears/visual/linear_head_link.dae" /> -->
     </geometry>
 
   </xacro:macro>

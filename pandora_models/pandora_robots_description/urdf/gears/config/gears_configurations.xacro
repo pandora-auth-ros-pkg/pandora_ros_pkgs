@@ -9,43 +9,57 @@
   <!-- Links ============================================================== -->
   <xacro:property name="enable_links" value="true" />
     <xacro:property name="enable_base_link" value="true" />
+    <xacro:property name="enable_linear_elevator_link" value="true" />
+    <xacro:property name="enable_linear_head_link" value="true" />
     <xacro:property name="enable_side_links" value="true" />
     <xacro:property name="enable_wheel_links" value="true" />
   <!-- Joints ============================================================= -->
   <xacro:property name="enable_joints" value="true" />
+    <xacro:property name="enable_linear_elevator_joint" value="true" />
+    <xacro:property name="enable_linear_head_joints" value="true" />
     <xacro:property name="enable_side_joints" value="true" />
     <xacro:property name="enable_wheel_joints" value="true" />
   <!-- Sensors ============================================================ -->
   <xacro:property name="enable_sensors" value="true" />
-    <xacro:property name="enable_kinect_sensor" value="true" />
     <xacro:property name="enable_hokuyo_laser_sensor" value="true" />
-    <xacro:property name="enable_sonar_sensor" value="false" />
-    <xacro:property name="enable_thermal_sensor" value="false" />
-    <xacro:property name="enable_co2_sensor" value="false" />
-    <xacro:property name="enable_microphone_sensor" value="false" />
+    <xacro:property name="enable_kinect_sensor" value="true" />
+    <xacro:property name="enable_sonar_sensors" value="true" />
+    <xacro:property name="enable_thermal_sensors" value="true" />
+    <xacro:property name="enable_co2_sensor" value="true" />
+    <xacro:property name="enable_microphone_sensor" value="true" />
   <!-- Plugins ============================================================ -->
   <xacro:property name="enable_plugins" value="true" />
     <xacro:property name="enable_pandora_differential_plugin" value="true" />
     <xacro:property name="enable_pandora_p3d_plugin" value="false" />
     <xacro:property name="enable_ros_imu_plugin" value="false" />
-    <xacro:property name="enable_pandora_imu_stabilizer_plugin" value="true" />
+    <xacro:property name="enable_pandora_imu_stabilizer_plugin" value="false" />
   <!-- SDF Physics ======================================================== -->
   <xacro:property name="enable_sdf_physics" value="true" />
     <xacro:property name="enable_base_link_sdf_physics" value="false" />
+    <xacro:property name="enable_linear_elevator_link_sdf_physics" value="false" />
+    <xacro:property name="enable_linear_head_link_sdf_physics" value="false" />
     <xacro:property name="enable_side_link_sdf_physics" value="false" />
     <xacro:property name="enable_wheel_link_sdf_physics" value="true" />
+    <xacro:property name="enable_linear_elevator_joint_sdf_physics" value="false" />
+    <xacro:property name="enable_linear_head_pitch_joint_sdf_physics" value="false" />
+    <xacro:property name="enable_linear_head_yaw_joint_sdf_physics" value="false" />
     <xacro:property name="enable_side_joint_sdf_physics" value="false" />
     <xacro:property name="enable_wheel_joint_sdf_physics" value="false" />
   <!-- Meshes ============================================================= -->
   <!-- TODO -->
-  <xacro:property name="enable_simlified_visual_base_link_mesh" value="false" />
-  <xacro:property name="enable_simlified_visual_side_link_mesh" value="false" />
-  <xacro:property name="enable_simlified_visual_wheel_link_mesh" value="false" />
+  <xacro:property name="enable_simplified_visual_base_link_mesh" value="false" />
+  <xacro:property name="enable_simplified_visual_linear_elevator_link_mesh" value="false" />
+  <xacro:property name="enable_simplified_visual_linear_head_link_mesh" value="false" />
+  <xacro:property name="enable_simplified_visual_side_link_mesh" value="false" />
+  <xacro:property name="enable_simplified_visual_wheel_link_mesh" value="false" />
   <!-- ==================================================================== -->
 
 <!-- Gears Misc ########################################################### -->
 
   <!-- ==================================================================== -->
+  <xacro:property name="linear_elevator_joint_type" value="prismatic" />
+  <xacro:property name="linear_head_pitch_joint_type" value="revolute" />
+  <xacro:property name="linear_head_yaw_joint_type" value="revolute" />
   <xacro:property name="side_joint_type" value="revolute" />
   <xacro:property name="wheel_joint_type" value="continuous" />
   <!-- ==================================================================== -->
@@ -59,8 +73,24 @@
   <xacro:property name="wheel_k_d" value="1.0" />
   <xacro:property name="wheel_min_depth" value="0.001" />
   <!-- ==================================================================== -->
-  <xacro:property name="side_joint_max_angle" value="0.785" />
   <xacro:property name="side_joint_damping" value="0.0" />
+  <!-- ==================================================================== -->
+  <xacro:property name="side_joint_min_limit" value="-0.785" />
+  <xacro:property name="side_joint_max_limit" value="0.785" />
+  <xacro:property name="linear_elevator_joint_min_limit" value="0.0" />
+  <xacro:property name="linear_elevator_joint_max_limit" value="0.23" />
+  <xacro:property name="linear_head_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="linear_head_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <xacro:property name="linear_head_yaw_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="linear_head_yaw_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <xacro:property name="laser_roll_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="laser_roll_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <xacro:property name="laser_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="laser_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <xacro:property name="kinect_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="kinect_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <xacro:property name="kinect_yaw_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="kinect_yaw_joint_max_limit" value="1.57" /> <!--FIXME-->
   <!-- ==================================================================== -->
   <xacro:property name="max_robot_linear_velocity" value="2.0" />
   <xacro:property name="max_robot_angular_velocity" value="2.0" />
@@ -68,6 +98,7 @@
   <xacro:property name="max_laser_angular_velocity" value="2.5" />
   <!-- ==================================================================== -->
   <xacro:property name="max_robot_linear_acceleration" value="1.0" />
+  <xacro:property name="max_robot_angular_acceleration" value="0.2" />
   <xacro:property name="max_kinect_angular_acceleration" value="0.0" />
   <xacro:property name="max_laser_angular_acceleration" value="0.0" />
   <!-- ==================================================================== -->

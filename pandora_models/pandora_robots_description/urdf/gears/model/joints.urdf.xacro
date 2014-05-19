@@ -2,6 +2,102 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
+<!-- Linear Elevator ###################################################### -->
+
+  <xacro:macro name="linear_elevator_joint"
+               params="control" >
+
+    <xacro:if value="${control}" >
+      <!-- ================================================================ -->
+      <joint name="${linear_elevator_joint_name}_joint"
+             type="${linear_elevator_joint_type}" >
+
+        <parent link="${base_link_name}_link" />
+        <child link="${linear_elevator_link_name}_link" />
+
+        <xacro:linear_elevator_joint_origin />
+
+        <xacro:linear_elevator_joint_urdf_physics />
+
+      </joint>
+      <!-- ================================================================ -->
+    </xacro:if>
+
+    <xacro:unless value="${control}" >
+      <!-- ================================================================ -->
+      <joint name="${linear_elevator_joint_name}_joint"
+             type="fixed" >
+
+        <parent link="${base_link_name}_link" />
+        <child link="${linear_elevator_link_name}_link" />
+
+        <xacro:linear_elevator_joint_origin />
+
+      </joint>
+      <!-- ================================================================ -->
+    </xacro:unless>
+    
+  </xacro:macro>
+
+<!-- Linear Head  ######################################################### -->
+
+  <xacro:macro name="linear_head_joints"
+               params="control" >
+
+    <xacro:if value="${control}" >
+      <!-- ================================================================ -->
+      <joint name="${linear_head_pitch_joint_name}_joint"
+             type="${linear_head_pitch_joint_type}" >
+
+        <parent link="${linear_elevator_link_name}_link" />
+        <child link="${linear_head_link_name}_base_link" />
+
+        <xacro:linear_head_pitch_joint_origin />
+
+        <xacro:linear_head_pitch_joint_urdf_physics />
+
+      </joint>
+      <!-- ================================================================ -->
+      <joint name="${linear_head_yaw_joint_name}_joint"
+             type="${linear_head_yaw_joint_type}" >
+
+        <parent link="${linear_head_link_name}_base_link" />
+        <child link="${linear_head_link_name}_link" />
+
+        <xacro:linear_head_yaw_joint_origin />
+
+        <xacro:linear_head_yaw_joint_urdf_physics />
+
+      </joint>
+      <!-- ================================================================ -->
+    </xacro:if>
+
+    <xacro:unless value="${control}" >
+      <!-- ================================================================ -->
+      <joint name="${linear_head_pitch_joint_name}_joint"
+             type="fixed" >
+             
+        <parent link="${linear_elevator_link_name}_link" />
+        <child link="${linear_head_link_name}_base_link" />
+
+        <xacro:linear_head_pitch_joint_origin />
+
+      </joint>
+      <!-- ================================================================ -->
+      <joint name="${linear_head_yaw_joint_name}_joint"
+             type="fixed" >
+
+        <parent link="${linear_head_link_name}_base_link" />
+        <child link="${linear_head_link_name}_link" />
+
+        <xacro:linear_head_yaw_joint_origin />
+
+      </joint>
+      <!-- ================================================================ -->
+    </xacro:unless>
+    
+  </xacro:macro>
+
 <!-- Side ################################################################# -->
 
   <xacro:macro name="side_joint"

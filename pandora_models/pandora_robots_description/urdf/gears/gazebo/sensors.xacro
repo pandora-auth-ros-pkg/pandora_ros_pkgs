@@ -18,30 +18,41 @@
   <xacro:include filename="$(find pandora_sensors_description)/urdf/microphone_sensor.urdf.xacro" />
   <!-- ==================================================================== -->
 
+<!-- Hokuyo Laser ######################################################### -->
+
+  <xacro:macro name="hokuyo_laser_sensor"
+               params="control" >
+    <!-- ================================================================== -->
+    <xacro:hokuyo_caster parent="${base_link_name}_link"
+                         control="${control}"
+                         roll_min_limit="${laser_roll_joint_min_limit}" 
+                         roll_max_limit="${laser_roll_joint_max_limit}"
+                         pitch_min_limit="${laser_pitch_joint_min_limit}" 
+                         pitch_max_limit="${laser_pitch_joint_max_limit}" >
+
+      <origin xyz="0.1894 0.0 0.09679"
+              rpy="${zero}" />
+
+    </xacro:hokuyo_caster>
+    <!-- ================================================================== -->
+  </xacro:macro>
+
 <!-- Kinect ############################################################### -->
 
   <xacro:macro name="kinect_sensor"
                params="control" >
     <!-- ================================================================== -->
-    <xacro:kinect_caster parent="${base_link_name}_link" control="${control}" >
+    <xacro:kinect_caster parent="${linear_elevator_link_name}_link"
+                         control="${control}"
+                         pitch_min_limit="${kinect_pitch_joint_min_limit}" 
+                         pitch_max_limit="${kinect_pitch_joint_max_limit}" 
+                         yaw_min_limit="${kinect_yaw_joint_min_limit}" 
+                         yaw_max_limit="${kinect_yaw_joint_max_limit}" >
 
-      <origin xyz="0.156 0.0 0.526"
+      <origin xyz="0.05148 0.01239 0.19742"
               rpy="${zero}" />
 
     </xacro:kinect_caster>
-    <!-- ================================================================== -->
-  </xacro:macro>
-
-<!-- Hokuyo Laser ######################################################### -->
-
-  <xacro:macro name="hokuyo_laser_sensor" >
-    <!-- ================================================================== -->
-    <xacro:hokuyo_caster parent="${base_link_name}_link" >
-
-      <origin xyz="0.2 0.0 0.15"
-              rpy="${zero}" />
-
-    </xacro:hokuyo_caster>
     <!-- ================================================================== -->
   </xacro:macro>
 
@@ -53,8 +64,8 @@
     <xacro:sonar_caster name="${prefix_y}_rear"
                         parent="${base_link_name}_link" >
 
-      <origin xyz="-0.2 ${ reflect_y * ( 0.15 ) } 0.13"
-              rpy="0.0 0.0 ${PI}" />
+      <origin xyz="-0.15519 ${ reflect_y * ( 0.113 + ( - 1 ) * reflect_y * 0.00051 ) } 0.14305"
+              rpy="0.0 0.0 ${ PI + ( - 1 ) * reflect_y * PI_6 }" />
 
     </xacro:sonar_caster>
     <!-- ================================================================== -->
@@ -62,12 +73,29 @@
 
 <!-- Thermal ############################################################## -->
 
-  <xacro:macro name="thermal_sensor" >
+  <xacro:macro name="thermal_sensors" >
     <!-- ================================================================== -->
-    <xacro:thermal_caster parent="${base_link_name}_link" >
+    <xacro:thermal_caster parent="${linear_head_link_name}_link"
+                          prefix_y="middle" >
 
-      <origin xyz="0.2 -0.05 0.23"
+      <origin xyz="0.01039 0.00007 0.04532"
               rpy="${zero}" />
+
+    </xacro:thermal_caster>
+    <!-- ================================================================== -->
+    <xacro:thermal_caster parent="${linear_head_link_name}_link"
+                          prefix_y="right" >
+
+      <origin xyz="-0.00128 0.04774 0.03108"
+              rpy="0 0 ${PI_3}" />
+
+    </xacro:thermal_caster>
+    <!-- ================================================================== -->
+    <xacro:thermal_caster parent="${linear_head_link_name}_link"
+                          prefix_y="left" >
+
+      <origin xyz="-0.00128 -0.04774 0.03108"
+              rpy="0 0 ${ - PI_3}" />
 
     </xacro:thermal_caster>
     <!-- ================================================================== -->
@@ -77,9 +105,9 @@
 
   <xacro:macro name="co2_sensor" >
     <!-- ================================================================== -->
-    <xacro:co2_caster parent="${base_link_name}_link" >
+    <xacro:co2_caster parent="${linear_head_link_name}_link" >
 
-      <origin xyz="0.2 0.0 0.36"
+      <origin xyz="0.01039 -0.01556 0.02386"
               rpy="${zero}" />
 
     </xacro:co2_caster>
@@ -90,9 +118,9 @@
 
   <xacro:macro name="microphone_sensor" >
     <!-- ================================================================== -->
-    <xacro:microphone_caster parent="${base_link_name}_link" >
+    <xacro:microphone_caster parent="${linear_head_link_name}_link" >
 
-      <origin xyz="0.2 0.0 0.38"
+      <origin xyz="0.01039 0.01556 0.02386"
               rpy="${zero}" />
 
     </xacro:microphone_caster>
