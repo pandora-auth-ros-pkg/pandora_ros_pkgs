@@ -36,6 +36,9 @@ catkin_add_gtest(morphological_operators_test
   unit/utils/morphological_operators_test.cpp)
 target_link_libraries(morphological_operators_test ${catkin_LIBRARIES} utils_lib gtest_main)
 
+catkin_add_gtest(noise_elimination_test
+  unit/utils/noise_elimination_test.cpp)
+target_link_libraries(noise_elimination_test ${catkin_LIBRARIES} utils_lib gtest_main)
 
 
 ############## Functional Tests ###############

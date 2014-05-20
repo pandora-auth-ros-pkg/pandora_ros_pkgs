@@ -165,8 +165,9 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   test/unit/bounding_box_detection_test.cpp
   test/unit/blob_detection_test.cpp
   test/unit/edge_detection_test.cpp
-  test/unit/morphological_operators_test.cpp
   test/unit/hole_filters_test.cpp
+  test/unit/morphological_operators_test.cpp
+  test/unit/noise_elimination_test.cpp
 
   )
 

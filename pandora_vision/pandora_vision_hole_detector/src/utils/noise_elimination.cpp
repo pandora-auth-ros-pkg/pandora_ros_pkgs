@@ -49,33 +49,30 @@ namespace pandora_vision
   void NoiseElimination::brushfireNear(const cv::Mat& inImage,
     cv::Mat* outImage)
   {
+    if (inImage.type() != CV_32FC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("NoiseElimination::brushfireNear : Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("brushfireNear", "performNoiseElimination");
     #endif
 
     inImage.copyTo(*outImage);
+
     bool finished = false;
-
-    // Assign the image borders a non zero value
-    for(unsigned int i = 0 ; i < outImage->rows ; i++)
-    {
-      outImage->at<float>(i, 0) = 1;
-      outImage->at<float>(i, outImage->cols - 1) = 1;
-    }
-
-    for(unsigned int i = 0 ; i < outImage->cols ; i++)
-    {
-      outImage->at<float>(0, i) = 1;
-      outImage->at<float>(outImage->rows - 1, i) = 1;
-    }
 
     while(!finished)
     {
       finished = true;
 
-      for(unsigned int i = 1 ; i < outImage->rows - 1 ; i++)
+      for(unsigned int i = 1; i < outImage->rows - 1; i++)
       {
-        for(unsigned int j = 1 ; j< outImage->cols - 1 ; j++)
+        for(unsigned int j = 1; j < outImage->cols - 1; j++)
         {
           if(outImage->at<float>(i, j) == 0.0)  // Found black
           {
@@ -91,6 +88,7 @@ namespace pandora_vision
         }
       }
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("brushfireNear");
     #endif
@@ -108,6 +106,16 @@ namespace pandora_vision
   void NoiseElimination::brushfireNearStep(cv::Mat* image,
     const int& index)
   {
+    if (image->type() != CV_32FC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("NoiseElimination::brushfireNearStep :\
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("brushfireNearStep");
     #endif
@@ -132,7 +140,15 @@ namespace pandora_vision
             x = static_cast<int>(current[i]) / image->cols + m;
             y = static_cast<int>(current[i]) % image->cols + n;
 
-            if((image->at<float>(x, y) == 0) &&
+            // Boundaries check.
+            // If a neighboring points goes out of bounds, discard it
+            if (x < 0 || y < 0 ||
+              x > image->rows - 1 || y > image->cols - 1)
+            {
+              continue;
+            }
+
+            if((image->at<float>(x, y) == 0.0) &&
               visited.find(x * image->cols + y) == visited.end())
             {
               next.push_back(x * image->cols + y);
@@ -140,14 +156,18 @@ namespace pandora_vision
             }
           }
         }
-
       }
+
       current.swap(next);
       next.clear();
     }
 
-    float lower = 10000.0;
-    float val = 0;
+    // Find the lowest non-zero value outside this concentration of
+    // zero-value pixels
+    const float lowest = 10000.0;
+    float lower = lowest;
+    float val = 0.0;
+    const float noise = 0.0;
 
     for(std::set<unsigned int>::iterator it = visited.begin();
       it != visited.end(); it++)
@@ -155,35 +175,75 @@ namespace pandora_vision
       x = *it / image->cols;
       y = *it % image->cols;
 
-      val = image->at<float>(x-1, y+1);
-      if(val < lower && val != 0) lower = val;
+      // Because we will check for the value of neighboring points,
+      // if a point happens to be on the edges, it probably won't have any
+      // non-zero neighbors; discard it
+      if (x < 1 || x >= image->rows - 1
+        || y < 1 || y >= image->cols - 1)
+      {
+        continue;
+      }
 
-      val = image->at<float>(x-1, y-1);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x - 1, y + 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x-1, y);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x - 1, y - 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x+1, y+1);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x - 1, y);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x+1, y-1);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x + 1, y + 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x+1, y);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x + 1, y - 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x, y-1);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x + 1, y);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
 
-      val = image->at<float>(x, y+1);
-      if(val < lower && val != 0) lower = val;
+      val = image->at<float>(x, y - 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
+
+      val = image->at<float>(x, y + 1);
+      if(val < lower && val != noise)
+      {
+        lower = val;
+      }
     }
 
-    for(std::set<unsigned int>::iterator it = visited.begin();
-      it != visited.end(); it++)
+    // If the whole of the image is not black
+    if (lower != lowest)
     {
-      image->at<float>(*it / image->cols, *it % image->cols) = lower;
+      // Now that the lowest value of non-zero neighboring pixels of
+      // this black concentration of pixels has been found,
+      // assign it to the whole of the concentration
+      for(std::set<unsigned int>::iterator it = visited.begin();
+        it != visited.end(); it++)
+      {
+        image->at<float>(*it / image->cols, *it % image->cols) = lower;
+      }
     }
 
     #ifdef DEBUG_TIME
@@ -200,21 +260,31 @@ namespace pandora_vision
    **/
   void NoiseElimination::chooseInterpolationMethod(const cv::Mat& image)
   {
+    if (image.type() != CV_32FC1)
+    {
+      #ifdef DEBUG_SHOW
+      ROS_ERROR("NoiseElimination::chooseInterpolationMethod : \
+        Inappropriate image type.");
+      #endif
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("chooseInterpolationMethod");
     #endif
 
     unsigned int blacks = 0;
-    float mean = 0;
-    float std = 0;
-    float bper = 0;
+    float mean = 0.0;
+    float std = 0.0;
+    float bper = 0.0;
 
     for(unsigned int i = 0 ; i < image.rows ; i++)
     {
       for(unsigned int j = 0 ; j < image.cols ; j++)
       {
         float d = image.at<float>(i, j);
-        if(d == 0)
+        if(d == 0.0)
         {
           blacks++;
         }
@@ -232,7 +302,7 @@ namespace pandora_vision
       for(unsigned int j = 0 ; j < image.cols ; j++)
       {
         float d = image.at<float>(i, j);
-        if(d != 0)
+        if(d != 0.0)
         {
           std += pow(d - mean, 2);
         }
@@ -293,15 +363,19 @@ namespace pandora_vision
     }
 
     // interpolate the corners
-    /// top left
+
+    // top left
     inImage->at<float>(0, 0) = inImage->at<float>(1, 1);
-    /// top right
+
+    // top right
     inImage->at<float>(0, inImage->cols - 1) =
       inImage->at<float>(1, inImage->cols - 2);
-    /// bottom left
+
+    // bottom left
     inImage->at<float>(inImage->rows - 1, 0) =
       inImage->at<float>(inImage->rows - 2, 1);
-    /// bottom right
+
+    // bottom right
     inImage->at<float>(inImage->rows - 1, inImage->cols - 1) =
       inImage->at<float>(inImage->rows - 2, inImage->cols - 2);
 
@@ -328,7 +402,7 @@ namespace pandora_vision
     const int& col,
     bool* endFlag)
   {
-    float sumValueOfNonZeroPixels = 0;
+    float sumValueOfNonZeroPixels = 0.0;
     int countOfNonZeroPixels = 0;
 
     float p2 = inImage.at<float>(row - 1, col);
@@ -340,59 +414,61 @@ namespace pandora_vision
     float p8 = inImage.at<float>(row, col - 1);
     float p9 = inImage.at<float>(row - 1, col - 1);
 
-    if (p2 != 0)
+    if (p2 != 0.0)
     {
       sumValueOfNonZeroPixels += p2;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p3 != 0)
+    if (p3 != 0.0)
     {
       sumValueOfNonZeroPixels += p3;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p4 != 0)
+    if (p4 != 0.0)
     {
       sumValueOfNonZeroPixels += p4;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p5 != 0)
+    if (p5 != 0.0)
     {
       sumValueOfNonZeroPixels += p5;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p6 != 0)
+    if (p6 != 0.0)
     {
       sumValueOfNonZeroPixels += p6;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p7 != 0)
+    if (p7 != 0.0)
     {
       sumValueOfNonZeroPixels += p7;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p8 != 0)
+    if (p8 != 0.0)
     {
       sumValueOfNonZeroPixels += p8;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
-    if (p9 != 0)
+    if (p9 != 0.0)
     {
       sumValueOfNonZeroPixels += p9;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (countOfNonZeroPixels > 0)
     {
       return (sumValueOfNonZeroPixels / countOfNonZeroPixels);
     }
-    return 0;
+
+    return 0.0;
   }
 
 
@@ -440,7 +516,7 @@ namespace pandora_vision
     {
       for (int j = 1; j < inImage->cols - 1; j++)
       {
-        if (inImage->at<float>(i, j) == 0)
+        if (inImage->at<float>(i, j) == 0.0)
         {
           marker.at<float>(i, j) =
             interpolateZeroPixel(*inImage, i, j, &flag);
@@ -489,6 +565,7 @@ namespace pandora_vision
           break;
         }
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("performNoiseElimination");
     #endif
@@ -511,11 +588,11 @@ namespace pandora_vision
 
     inImage.copyTo(*outImage);
 
-    for(unsigned int i = 0 ; i < inImage.rows ; i++)
+    for(unsigned int i = 0; i < inImage.rows; i++)
     {
-      for(unsigned int j = 0 ; j < inImage.cols ; j++)
+      for(unsigned int j = 0; j < inImage.cols; j++)
       {
-        if(inImage.at<float>(i, j) != 0)
+        if(inImage.at<float>(i, j) == 0.0)
         {
           outImage->at<float>(i, j) = 4.0;
         }
