@@ -94,7 +94,7 @@ void PandoraCo2Plugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   if (this->topic_name_ != "")
   {
     // Custom Callback Queue
-    ros::AdvertiseOptions ao = ros::AdvertiseOptions::create<controllers_and_sensors_communications::co2Msg>(
+    ros::AdvertiseOptions ao = ros::AdvertiseOptions::create<pandora_arm_hardware_interface::Co2Msg>(
       this->topic_name_,1,
       boost::bind( &PandoraCo2Plugin::CameraConnect,this),
       boost::bind( &PandoraCo2Plugin::CameraDisconnect,this), ros::VoidPtr(), &this->camera_queue_);
@@ -259,10 +259,15 @@ void PandoraCo2Plugin:: PutCo2Data ( common:: Time & _updateTime ) {
 
   //----------------------------------------------------------------------
 
-  tmsg .header .stamp = ros:: Time:: now ( ) ; 
-  tmsg .ppm = ppm ; 
+  co2Msg_ .header .stamp = ros:: Time:: now ( ) ; 
+  co2Msg_ .header .frame_id = this ->frame_name_ ; 
+  
+  co2Msg_ .ppm = ppm ; 
+  
+  // TODO
+  // co2Msg_ .co2_percentage = maxPpm ; 
     
-  this ->pub_ .publish ( this ->tmsg ) ; 
+  this ->pub_ .publish ( this ->co2Msg_ ) ; 
   
   //----------------------------------------------------------------------
   
