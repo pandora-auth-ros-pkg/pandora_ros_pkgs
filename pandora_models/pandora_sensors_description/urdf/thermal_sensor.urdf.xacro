@@ -61,7 +61,7 @@
         <plugin name="thermal2ros"
                 filename="libpandora_thermal_plugin.so" >
 
-          <frameName>thermal_link</frameName>
+          <frameName>${prefix_y}_thermal_link</frameName>
           <topicName>sensors/thermal</topicName>
 
         </plugin>

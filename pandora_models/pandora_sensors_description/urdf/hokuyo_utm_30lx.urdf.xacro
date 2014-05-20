@@ -72,7 +72,7 @@
         <plugin name="laser2Ros"
                 filename="libgazebo_ros_laser.so" >
 
-          <topicName>/slam/scan</topicName>
+          <topicName>/laser/scan</topicName>
           <frameName>/laser_link</frameName>
 
         </plugin>
