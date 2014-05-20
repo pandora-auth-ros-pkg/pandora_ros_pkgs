@@ -33,6 +33,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  Chris Zalidis
 *********************************************************************/
 #ifndef PANDORA_KINECT_CONTROL_KINECT_CONTROL_H
 #define PANDORA_KINECT_CONTROL_KINECT_CONTROL_H
@@ -75,13 +76,8 @@ namespace pandora_control
       double maxYaw_;
       double timeStep_;
 
-      ros::Timer timer_;
+      void callback(const pandora_kinect_control::MoveKinectGoalConstPtr& goal);
 
-      void goalCallback();
-
-      void preemptCallback();
-
-      void timerCallback(const ros::TimerEvent&);
     public:
       PandoraMoveKinectActionServer(
         std::string name,

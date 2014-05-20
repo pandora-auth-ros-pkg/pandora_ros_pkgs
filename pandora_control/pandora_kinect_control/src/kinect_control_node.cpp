@@ -47,6 +47,5 @@ int main(int argc, char **argv)
     pandoraMoveKinectActionServer(
       actionName,
       nodeHandle);
-  ros::MultiThreadedSpinner spinner(2);
-  spinner.spin();
+  ros::spin();
 }
