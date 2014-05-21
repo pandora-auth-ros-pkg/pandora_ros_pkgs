@@ -299,7 +299,7 @@ void Predator::getGeneralParams()
   
   packagePath = ros::package::getPath("pandora_vision_predator");
   
-   //! Publishers
+  //! Publishers
     
   //! Declare publisher and advertise topic
   //! where algorithm results are posted if it works alone
@@ -318,7 +318,7 @@ void Predator::getGeneralParams()
   //! where algorithm results are posted if it works in compination with landoltc3d
   if (_nh.getParam("published_topic_names/predator_landoltc_output", param))
   {
-    _landoltc3dPredatorPublisher = 
+    _landoltc3dPredatorPublisher =
       _nh.advertise<vision_communications::LandoltcPredatorMsg>(param, 1000);
   
   }
@@ -415,8 +415,8 @@ void Predator::getGeneralParams()
   }
   else
   {
-   ROS_FATAL("Camera name not found");
-   ROS_BREAK(); 
+    ROS_FATAL("Camera name not found");
+    ROS_BREAK(); 
   }
 
   //!< Get the images's frame_id;

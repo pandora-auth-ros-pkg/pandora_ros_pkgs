@@ -3,7 +3,7 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
   
   <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
-    <arg name="camID" value="/dev/video1"/>
+    <arg name="camID" value="/dev/video0"/>
     <arg name="name" value="kinect"/>
     <arg name="topic_name" value="/kinect/image"/>
     <arg name="frame_id" value="kinect_link"/>
