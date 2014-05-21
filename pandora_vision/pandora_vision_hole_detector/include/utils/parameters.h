@@ -239,6 +239,12 @@ namespace pandora_vision
     //! Image representation specific parameters
     struct Image
     {
+      // Fallback values. See the input point cloud callback of the
+      // synchronizer node
+      static int HEIGHT;
+      static int WIDTH;
+      static int POINT_STEP;
+
       // Depth and RGB images' representation method.
       // 0 if image used is used as obtained from the image sensor
       // 1 through wavelet analysis

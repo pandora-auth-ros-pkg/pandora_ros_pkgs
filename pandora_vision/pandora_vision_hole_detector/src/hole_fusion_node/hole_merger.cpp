@@ -198,100 +198,88 @@ namespace pandora_vision
         float da = 0.0;
         float dd = 0.0;
 
-        // Because of the nature of the assimilation operation,
-        // that is, the assimilator does not change in shape or otherwise,
-        // there is no need to check the validity of the outcome of the
-        // assimilation operation. Either way, the assimilatable will be
-        // absorbed by the assimilator.
-        if (operationId != 0)
+        // Obtain the activeId-th candidate hole in order for it
+        // to be checked against the selected filters
+        HolesConveyor ithHole =
+          HolesConveyorUtils::getHole(tempHolesConveyor, activeId);
+
+
+        // Determines the selected filters execution
+        std::map<int, int> filtersOrder;
+
+        // Depth diff runs first
+        filtersOrder[1] = 1;
+
+        // Depth / Area runs second
+        filtersOrder[2] = 3;
+
+        // Create the necessary vectors for each hole checker and
+        // merger used
+        std::vector<cv::Mat> imgs;
+        std::vector<std::string> msgs;
+        std::vector<std::vector<cv::Point2f> > rectanglesVector;
+        std::vector<int> rectanglesIndices;
+        std::vector<std::set<unsigned int> > intermediatePointsSetVector;
+
+        // The inflated rectangles vector is used in the
+        // checkHolesDepthDiff and checkHolesRectangleEdgesPlaneConstitution
+        // checkers
+        FiltersResources::createInflatedRectanglesVector(
+          ithHole,
+          image,
+          Parameters::HoleFusion::rectangle_inflation_size,
+          &rectanglesVector,
+          &rectanglesIndices);
+
+        // The 2D vector with rows = 2 and cols = 1.
+        // The value of the element in row 0 and col 0 is the probability
+        // that the ithHole has, passing through the depth diff checker,
+        // while the value of the element in row 1 and col 0 is the
+        // probability that the ithHole has, passing through the
+        // depth / area filter.
+        std::vector<std::vector<float> >probabilitiesVector(2,
+          std::vector<float>(1, 0.0));
+
+        int counter = 0;
+        for (std::map<int, int>::iterator o_it = filtersOrder.begin();
+          o_it != filtersOrder.end(); ++o_it)
         {
-          // Obtain the activeId-th candidate hole in order for it
-          // to be checked against the selected filters
-          HolesConveyor ithHole =
-            HolesConveyorUtils::getHole(tempHolesConveyor, activeId);
-
-
-          // Determines the selected filters execution
-          std::map<int, int> filtersOrder;
-
-          // Depth diff runs first
-          filtersOrder[1] = 1;
-
-          // Depth / Area runs second
-          filtersOrder[2] = 3;
-
-          // Create the necessary vectors for each hole checker and
-          // merger used
-          std::vector<cv::Mat> imgs;
-          std::vector<std::string> msgs;
-          std::vector<std::vector<cv::Point2f> > rectanglesVector;
-          std::vector<int> rectanglesIndices;
-          std::vector<std::set<unsigned int> > intermediatePointsSetVector;
-
-          // The inflated rectangles vector is used in the
-          // checkHolesDepthDiff and checkHolesRectangleEdgesPlaneConstitution
-          // checkers
-          FiltersResources::createInflatedRectanglesVector(
-            ithHole,
+          DepthFilters::applyFilter(
+            o_it->second,
             image,
-            Parameters::HoleFusion::rectangle_inflation_size,
-            &rectanglesVector,
-            &rectanglesIndices);
+            pointCloud,
+            ithHole,
+            tempHolesMasksSetVector,
+            rectanglesVector,
+            rectanglesIndices,
+            intermediatePointsSetVector,
+            &probabilitiesVector.at(counter),
+            &imgs,
+            &msgs);
 
-          // The 2D vector with rows = 2 and cols = 1.
-          // The value of the element in row 0 and col 0 is the probability
-          // that the ithHole has, passing through the depth diff checker,
-          // while the value of the element in row 1 and col 0 is the
-          // probability that the ithHole has, passing through the
-          // depth / area filter.
-          std::vector<std::vector<float> >probabilitiesVector(2,
-            std::vector<float>(1, 0.0));
+          counter++;
+        } // o_it iterator ends
 
-          int counter = 0;
-          for (std::map<int, int>::iterator o_it = filtersOrder.begin();
-            o_it != filtersOrder.end(); ++o_it)
-          {
-            DepthFilters::applyFilter(
-              o_it->second,
-              image,
-              pointCloud,
-              ithHole,
-              tempHolesMasksSetVector,
-              rectanglesVector,
-              rectanglesIndices,
-              intermediatePointsSetVector,
-              &probabilitiesVector.at(counter),
-              &imgs,
-              &msgs);
-
-            counter++;
-          } // o_it iterator ends
-
-          dd = probabilitiesVector[0][0];
-          da = probabilitiesVector[1][0];
-        }
+        dd = probabilitiesVector[0][0];
+        da = probabilitiesVector[1][0];
 
         // Probabilities threshold for merge acceptance.
         // In the assimilation operation, the temp conveyor unconditionally
         // replaces the original conveyor
         if ((dd >= Parameters::HoleFusion::checker_depth_diff_threshold
-          && da >= Parameters::HoleFusion::checker_depth_area_threshold)
-          || (operationId == 0))
+          && da >= Parameters::HoleFusion::checker_depth_area_threshold))
         {
           // Since the tempHolesConveyor's ithHole has been positively tested,
           // the tempHolesConveyor is now the new rgbdHolesConveyor
           HolesConveyorUtils::replace(tempHolesConveyor, rgbdHolesConveyor);
 
-
           // ..and the new holesMasksSetVector is the positively tested
           // temp one
           holesMasksSetVector = tempHolesMasksSetVector;
 
-
           // Delete the passiveId-th entry of the finishVector since the
           // passiveId-th hole has been absorbed by the activeId-th hole
           finishVector.erase(finishVector.begin() + passiveId);
-
 
           // Because of the merge happening, the activeId-th
           // candidate hole must re-examine all the other holes

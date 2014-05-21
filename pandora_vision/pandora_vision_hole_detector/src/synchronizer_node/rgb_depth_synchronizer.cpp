@@ -106,6 +106,10 @@ namespace pandora_vision
   {
     if (!isLocked_)
     {
+      // Lock the rgb_depth_synchronizer node; aka prevent the execution
+      // of this if-block without the explicit request of the hole_fusion node
+      isLocked_ = true;
+
       #ifdef DEBUG_SHOW
       ROS_INFO("Synchronizer unlocked");
       #endif
@@ -135,19 +139,68 @@ namespace pandora_vision
       Timer::start("synchronizedCallback", "", true);
       #endif
 
+      // For simulation purposes, the width and height parameters of the
+      // point cloud must be set.
+      sensor_msgs::PointCloud2 pointCloud(*pointCloudMessage);
 
-      // Lock the rgb_depth_synchronizer node; aka prevent the execution
-      // of this if-block without the explicit request of the hole_fusion node
-      isLocked_ = true;
+      // The input point cloud is unorganized, in other words,
+      // simulation is running. Variables are needed to be set in order for
+      // the point cloud to be functionally exploitable.
+      // See http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html
+      if (pointCloud.height == 1)
+      {
+        // The namespace dictated in the launch file
+        std::string ns = nodeHandle_.getNamespace();
+
+        // Read "height" from the nodehandle
+        int height;
+        if (nodeHandle_.getParam(ns + "/synchronizer_node/height", height))
+        {
+          pointCloud.height = height;
+        }
+        else
+        {
+          pointCloud.height = Parameters::Image::HEIGHT;
+        }
+
+        // Read "width" from the nodehandle
+        int width;
+        if (nodeHandle_.getParam(ns + "/synchronizer_node/width", width))
+        {
+          pointCloud.width = width;
+        }
+        else
+        {
+          pointCloud.width= Parameters::Image::WIDTH;
+        }
+
+        // Read "point_step" from the nodehandle
+        int point_step;
+        if (nodeHandle_.getParam(ns + "/synchronizer_node/point_step", point_step))
+        {
+          pointCloud.point_step = point_step;
+        }
+        else
+        {
+          pointCloud.point_step = Parameters::Image::POINT_STEP;
+        }
+
+        pointCloud.row_step = pointCloud.width * pointCloud.point_step;
+      }
+
+      // Take a pointer on the constructed point cloud
+      const sensor_msgs::PointCloud2ConstPtr& pointCloudMsg =
+        boost::make_shared<sensor_msgs::PointCloud2>(pointCloud);
+
 
       // Extract the RGB image from the point cloud
       cv::Mat rgbImage = MessageConversions::convertPointCloudMessageToImage(
-        pointCloudMessage, CV_8UC3);
+        pointCloudMsg, CV_8UC3);
 
       // Convert the rgbImage to a ROS message
       cv_bridge::CvImagePtr rgbImageMessagePtr(new cv_bridge::CvImage());
 
-      rgbImageMessagePtr->header = pointCloudMessage->header;
+      rgbImageMessagePtr->header = pointCloudMsg->header;
       rgbImageMessagePtr->encoding = sensor_msgs::image_encodings::BGR8;
       rgbImageMessagePtr->image = rgbImage;
 
@@ -157,12 +210,12 @@ namespace pandora_vision
 
       // Extract the depth image from the point cloud
       cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
-        pointCloudMessage, CV_32FC1);
+        pointCloudMsg, CV_32FC1);
 
       // Convert the depthImage to a ROS message
       cv_bridge::CvImagePtr depthImageMessagePtr(new cv_bridge::CvImage());
 
-      depthImageMessagePtr->header = pointCloudMessage->header;
+      depthImageMessagePtr->header = pointCloudMsg->header;
       depthImageMessagePtr->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
       depthImageMessagePtr->image = depthImage;
 
@@ -172,7 +225,7 @@ namespace pandora_vision
 
 
       // Publish the synchronized point cloud
-      synchronizedPointCloudPublisher_.publish(pointCloudMessage);
+      synchronizedPointCloudPublisher_.publish(pointCloudMsg);
 
       #ifdef DEBUG_TIME
       Timer::tick("synchronizedCallback");

@@ -89,9 +89,9 @@ namespace pandora_vision
     pcl_conversions::toPCL(*pointCloudMessage, pointCloud);
 
     // prepare the output image
-    cv::Mat image(pointCloud.height, pointCloud.width,
-      encoding);
+    cv::Mat image(pointCloud.height, pointCloud.width, encoding);
 
+    // For the depth image
     if (encoding == CV_32FC1)
     {
       // convert the point cloud from
@@ -107,15 +107,14 @@ namespace pandora_vision
             pointCloudXYZ->points[col + pointCloudXYZ->width * row].z;
 
           // if element is nan make it a zero
-          if (image.at<float>(row, col) !=
-            image.at<float>(row, col))
+          if (image.at<float>(row, col) != image.at<float>(row, col))
           {
             image.at<float>(row, col) = 0.0;
           }
         }
       }
     }
-    else if (encoding == CV_8UC3)
+    else if (encoding == CV_8UC3) // For the rgb image
     {
       // convert the point cloud from
       // pcl::PCLPointCloud2 to pcl::PointCloudXYZRGB
