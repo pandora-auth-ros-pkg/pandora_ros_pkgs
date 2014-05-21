@@ -243,7 +243,7 @@
       <xacro:if value="$(arg control)" >
         <xacro:if value="$(arg interface)" >
           <xacro:gazebo_ros_control_plugin hw_sim="pandora_gazebo_interface/GazeboInterface"
-                                           ns="control" />
+                                           ns="/" />
         </xacro:if>
         <xacro:unless value="$(arg interface)" >
           <xacro:gazebo_ros_control_plugin hw_sim="gazebo_ros_control/DefaultRobotHWSim"

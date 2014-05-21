@@ -8,8 +8,11 @@
   
   <group unless="$(arg real)" >
     <group if="$(arg control)" >
+      <group if="$(arg interface)" >
+        <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_position_controllers.launch" />
+      </group>
       <group unless="$(arg interface)" >
-        <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_controllers.launch" />
+        <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_effort_controllers.launch" />
       </group>
     </group>
   </group>
