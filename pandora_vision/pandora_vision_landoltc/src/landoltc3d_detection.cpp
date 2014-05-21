@@ -35,7 +35,8 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
-#include "pandora_vision_landoltc/landoltc_detection.h"
+#include "pandora_vision_landoltc/landoltc3d_detection.h"
+
 
 namespace pandora_vision
 {
@@ -46,26 +47,30 @@ namespace pandora_vision
 @return void
 **/
 
-LandoltCDetection::LandoltCDetection() : _nh(), landoltcNowON(true)
+LandoltC3dDetection::LandoltC3dDetection(): _nh(), landoltc3dNowON(true) 
 {
   getGeneralParams();
-
-  //!< Initiliaze and preprocess reference image
-  _landoltcDetector.initializeReferenceImage(patternPath);
-
-  _inputImageSubscriber = _nh.subscribe(imageTopic, 1,
-                                        &LandoltCDetection::imageCallback, this);
   
+  //!< Initiliaze and preprocess reference image
+  _landoltc3dDetector.initializeReferenceImage(patternPath);
+  
+  if(PredatorOn)
+  {
+    _landoltc3dPredator = _nh.subscribe("/pandora_vision_predator/PredatorAlert", 1,
+    &LandoltC3dDetection::predatorCallback, this);
+  }
+  else
+  {
+    _inputImageSubscriber = _nh.subscribe(imageTopic, 1,
+    &LandoltC3dDetection::imageCallback, this);
+  }
+
   //!< Declare publisher and advertise topic
   //!< where algorithm results are posted
-  _landoltcPublisher =
-      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>("landoltc_alert", 10, true);
+  _landoltc3dPublisher =
+      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>("landoltc3d_alert", 10, true);
       
-  //!< The dynamic reconfigure parameter's callback
-  server.setCallback(boost::bind(&LandoltCDetection::parametersCallback, this, _1, _2));
-      
-      
-  ROS_INFO("[landoltc_node] : Created LandoltC Detection instance");
+  ROS_INFO("[landoltc3d_node] : Created LandoltC3d Detection instance");
 
 }
 
@@ -74,16 +79,16 @@ LandoltCDetection::LandoltCDetection() : _nh(), landoltcNowON(true)
 @return void
 **/
 
-LandoltCDetection::~LandoltCDetection(void)
+LandoltC3dDetection::~LandoltC3dDetection(void)
 {
-  ROS_INFO("[landoltc_node] : Destroying LandoltC Detection instance");
+  ROS_INFO("[landoltc3d_node] : Destroying LandoltC3d Detection instance");
 }
 
 /**
 @brief Get parameters referring to view and frame characteristics
 @return void
 **/
-void LandoltCDetection::getGeneralParams()
+void LandoltC3dDetection::getGeneralParams()
 {
   packagePath = ros::package::getPath("pandora_vision_landoltc");
 
@@ -95,13 +100,24 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter patternPath not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter patternPath not found. Using Default");
     std:: string temp = "/bold.jpg";
     patternPath.assign(packagePath);
     patternPath.append(temp);
   }
+  
+  //!< Get the PredatorOn value
+  if(_nh.hasParam("PredatorOn"))
+  {
+    _nh.getParam("PredatorOn", PredatorOn);
+  }
+  else
+  {
+    ROS_DEBUG("[landoltc3d_node] : Parameter PredatorOn not found. Using Default");
+    PredatorOn = false;
+  }
 
-  //!< Get the camera to be used by landoltc node;
+  //!< Get the camera to be used by landoltc3d node;
   if (_nh.hasParam("camera_name"))
   {
     _nh.getParam("camera_name", cameraName);
@@ -109,7 +125,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter frameHeight not found. Using Default");
     cameraName = "camera";
   }
 
@@ -121,7 +137,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter frameHeight not found. Using Default");
     frameHeight = DEFAULT_HEIGHT;
   }
 
@@ -133,7 +149,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter frameWidth not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter frameWidth not found. Using Default");
     frameWidth = DEFAULT_WIDTH;
   }
 
@@ -145,7 +161,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter imageTopic not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter imageTopic not found. Using Default");
     imageTopic = "/camera_head/image_raw";
   }
 
@@ -157,7 +173,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter camera_frame_id not found. Using Default");
+    ROS_DEBUG("[landoltc3d_node] : Parameter camera_frame_id not found. Using Default");
     cameraFrameId = "/camera";
   }
 }
@@ -168,7 +184,7 @@ void LandoltCDetection::getGeneralParams()
 @return void
 **/
 
-void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
+void LandoltC3dDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
 
   cv_bridge::CvImagePtr in_msg;
@@ -176,36 +192,50 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   landoltCFrame = in_msg -> image.clone();
   if ( landoltCFrame.empty() )
   {
-    ROS_ERROR("[landoltc_node] : No more Frames");
+    ROS_ERROR("[landoltc3d_node] : No more Frames");
     return;
   }
+  //ROS_INFO("Getting Frame From Camera");
 
-  landoltcCallback();
+  landoltc3dCallback();
 
 }
 
+void LandoltC3dDetection::predatorCallback(const vision_communications::PredatorAlertMsg& msg)
+{
+ 
+  cv_bridge::CvImagePtr in_msg;
+  in_msg = cv_bridge::toCvCopy(msg.img, sensor_msgs::image_encodings::BGR8);
+  landoltCFrame = in_msg -> image.clone();
+  cv::Rect bounding_box = cv::Rect(msg.x, msg.y, msg.width, msg.height);
+  float posterior = msg.posterior;
+  //ROS_INFO("Getting Frame From Predator");
+  landoltc3dCallback();
+}
+
+
 /**
  @brief main function called for publishing messages in
-  data fusion. In this function an object of class landoltcDetector
+  data fusion. In this function an object of class landoltc3dDetector
   is created to identify landoltCs in current frame.
  @param void
  @return void
  **/
 
-void LandoltCDetection::landoltcCallback()
+void LandoltC3dDetection::landoltc3dCallback()
 {
-  if(!landoltcNowON)
+  if(!landoltc3dNowON)
   {
     return;
   }
     
-  _landoltcDetector.begin(&landoltCFrame);
+  _landoltc3dDetector.begin(&landoltCFrame);
   
   //!< Create message of Landoltc Detector
-  vision_communications::LandoltcAlertsVectorMsg LandoltcVectorMsg;
-  vision_communications::LandoltcAlertMsg LandoltccodeMsg;
-  LandoltcVectorMsg.header.frame_id = cameraFrameId;
-  LandoltcVectorMsg.header.stamp = ros::Time::now();
+  vision_communications::LandoltcAlertsVectorMsg Landoltc3dVectorMsg;
+  vision_communications::LandoltcAlertMsg Landoltc3dcodeMsg;
+  Landoltc3dVectorMsg.header.frame_id = cameraFrameId;
+  Landoltc3dVectorMsg.header.stamp = ros::Time::now();
 }
 
 /**
@@ -213,12 +243,12 @@ void LandoltCDetection::landoltcCallback()
   @param newState [int] The robot's new state
   @return void
 */
-void LandoltCDetection::startTransition(int newState)
+void LandoltC3dDetection::startTransition(int newState)
 {
   curState = newState;
 
   //!< check if datamatrix algorithm should be running now
-  landoltcNowON =
+  landoltc3dNowON =
     (curState ==
      state_manager_communications::robotModeMsg::MODE_EXPLORATION)
     || (curState ==
@@ -246,26 +276,9 @@ void LandoltCDetection::startTransition(int newState)
  @brief After completion of state transition
  @return void
  */
-void LandoltCDetection::completeTransition()
+void LandoltC3dDetection::completeTransition()
 {
-  ROS_INFO("[Landoltc_node] : Transition Complete");
+  ROS_INFO("[Landoltc3d_node] : Transition Complete");
 }
 
-/**
-  @brief The function called when a parameter is changed
-  @param[in] config [const pandora_vision_landoltc::landoltc_cfgConfig&]
-  @param[in] level [const uint32_t] The level 
-  @return void
-**/
-void LandoltCDetection::parametersCallback(
-  const pandora_vision_landoltc::landoltc_cfgConfig& config,
-  const uint32_t& level)
-  {
-    //!< Threshold parameters
-    LandoltcParameters::gradientThreshold = config.gradientThreshold;
-    LandoltcParameters::centerThreshold = config.centerThreshold;
-    LandoltcParameters::huMomentsPrec = config.huMomentsPrec;
-    LandoltcParameters::adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
-    
-  }
 } // namespace pandora_vision

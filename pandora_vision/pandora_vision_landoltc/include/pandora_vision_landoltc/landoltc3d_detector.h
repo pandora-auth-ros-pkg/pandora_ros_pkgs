@@ -34,34 +34,32 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H
 
 #include "ros/ros.h"
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
 #include <stdlib.h>
-#include "pandora_vision_landoltc/landoltc_parameters.h"
-
 
 namespace pandora_vision
 {
   
-struct LandoltC{
+struct LandoltC3D{
   cv::Point center;
   int count;
   std::vector<float> angles;
   std::vector<cv::Scalar> color;
   std::vector<cv::Rect> bbox;
   int probability;
-  LandoltC() {}
+  LandoltC3D() {}
 };
 
-class LandoltCDetector
+class LandoltC3dDetector
 {
-private:
-
+  private:
+    
   //!<Value for threshholding gradients
   int _minDiff;
   //!<Value for thresholding values in voting array
@@ -76,27 +74,31 @@ private:
   std::vector<cv::Point> _newCenters;
   //!<Vector containing contour points of reference C
   std::vector<std::vector<cv::Point> > _refContours;
-  //!<Vector containing edge points of C, found using findRotationB function
-  std::vector<cv::Point> _edgePoints;
-  //!<Value representing the number of edges found, again using finRotationB function  
-  int _edges;
   //!<2D Matrix containing "votes" of each pixel, used for finding the centers
   cv::Mat _voting;
   //!<2D Matrix containing landoltsC's, each colored with a unique color
   cv::Mat _coloredContours;
-  //!<2D Matric used for separating each LandoltC to each parts
+  //!<Pointer used for Contrast Limited Adaptive Histogram Equalization
+  cv::Ptr<cv::CLAHE> clahe;
+  //!<2D Matric used for separating each LandoltC3D to each parts
   cv::Mat _mask;
-  //!<Vector containing LandoltC structs
-  std::vector<LandoltC> _landoltc;
-
-public:
-
+  //!<Vector containing edge points of C, found using findRotationB function
+  std::vector<cv::Point> _edgePoints;
+  //!<Value representing the number of edges found, again using finRotationB function  
+  int _edges;
+  //!<Vector containing LandoltC3D structs
+  std::vector<LandoltC3D> _landoltc3d;
+  //!<Boolean value for alternating thresholding value
+  bool _bradley;
+  
+  public:
+  
   //!< Constructor
-  LandoltCDetector();
-
+  LandoltC3dDetector();
+    
   //!< Destructor
-  ~LandoltCDetector();
-
+  ~LandoltC3dDetector();
+    
   /**
   @brief Function for the initialization of the reference image
   @param path [std::string] The path of the reference image
@@ -111,7 +113,7 @@ public:
   @return void
   **/
   void rasterizeLine(cv::Point A, cv::Point B);
-
+    
   /**
   @brief Finds Centers based on gradient
   @param rows [int] Number of rows of matrix
@@ -131,9 +133,9 @@ public:
   @return void
   **/
   void findLandoltContours(const cv::Mat& inImage, int rows, int cols, std::vector<cv::Point> ref);
-
+  
   /**
-  @brief Mask for separating a LandoltC Contour to its components
+  @brief Mask for separating a LandoltC3D Contour to its components
   @return void
   **/
   void applyMask();
@@ -152,32 +154,32 @@ public:
   @return void
   **/
   void thinningIter(cv::Mat* in, int iter);
-
+    
   /**
   @brief Function called for the initiation of LandoltC search in the frame
   @param input [cv::Mat*] Matrix containing the frame received from the camera
   @return void
   **/
   void begin(cv::Mat* input);
-  
+    
   /**
-  @brief Calculation of rotation based on moments.Precision is good for a
-  distance up to 30cm from the camera
-  @param in [const cv::Mat&] Matrix containing the padded frame
-  @param temp [LandoltC*] Struct of Landoltc
+  @brief Function for applying BradleyThresholding on Image
+  @param in [cv::Mat&] Input Image to be thresholded
+  @param out [cv::Mat*] Output, thresholded image
   @return void
   **/
-  void findRotationA(const cv::Mat& in, LandoltC* temp);  
+    
+  void applyBradleyThresholding(const cv::Mat& in, cv::Mat* out);
   
   /**
   @brief Calculation of rotation based on thinning.Precision is good for a
   distance up to 50cm from the camera, gives more accurate results than the first
   method but it's slower.
   @param in [const cv::Mat&] Matrix containing the padded frame
-  @param temp [LandoltC*] Struct of LandoltC
+  @param temp [LandoltC3D*] Struct of LandoltC3D
   @return void
   **/  
-  void findRotationB(const cv::Mat&in, LandoltC* temp);
+  void findRotation(const cv::Mat&in, LandoltC3D* temp);
   
   /**
   @brief Function for calculating the neighbours of pixels considering
@@ -203,15 +205,15 @@ public:
   @return void
   **/
   void clear();
-  
+    
   /**
-  @brief Performs fusion taking in consideration number of C's in each Landolt
-  @param void
+  @brief Function for fusing results from both LandoltC3D and
+  Predator
   @return void
   **/
+    
   void fusion();
-  
-
+    
 };
 } // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H

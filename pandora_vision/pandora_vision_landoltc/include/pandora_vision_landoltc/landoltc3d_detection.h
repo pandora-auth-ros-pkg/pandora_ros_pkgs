@@ -34,8 +34,8 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H 
+#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H 
 
 #include "ros/ros.h"
 #include <ros/package.h>
@@ -51,56 +51,63 @@
 #include <stdlib.h>
 #include "state_manager/state_client.h"
 #include "vision_communications/LandoltcAlertsVectorMsg.h"
-#include "pandora_vision_landoltc/landoltc_detector.h"
+#include "vision_communications/PredatorAlertMsg.h"
+#include "pandora_vision_landoltc/landoltc3d_detector.h"
 //!< default frame height
 #define DEFAULT_HEIGHT 480
 
 //!< default frame width
 #define DEFAULT_WIDTH 640
 
-
 namespace pandora_vision
 {
-class LandoltCDetection
+class LandoltC3dDetection
 {
 private:
   //!<Subscriber of RGB Image
   ros::Subscriber _inputImageSubscriber;
+  
+  //!<Subscriber for Predator
+  ros::Subscriber _landoltc3dPredator;
+  
   //!<Node Handler
   ros::NodeHandle _nh;
+  
   //!< Current frame to be processed
   cv::Mat landoltCFrame;
-
-  LandoltCDetector _landoltcDetector;
   
+  //!<Landoltc3d Detector object
+  LandoltC3dDetector _landoltc3dDetector;
+  
+  //!<Current package path
   std::string packagePath;
-
+  
+  //!<Current pattern path
   std::string patternPath;
   
-  
-  /// Frame height
+  //!<Frame Height
   int frameHeight;
   
-  /// Frame width
+  //!<Frame Width
   int frameWidth;
-
+  
+  //!<Camera Name
   std::string cameraName;
+  
+  //!<Camera Frame ID
   std::string cameraFrameId;
 
   //!< The topic subscribed to for the front camera
   std::string imageTopic;
   
   //!< Variable used for State Managing
-  bool landoltcNowON;
+  bool landoltc3dNowON;
   
   //!< Publishers for LandoltcDetector result messages
-  ros::Publisher _landoltcPublisher;
+  ros::Publisher _landoltc3dPublisher;
   
-  //!< The dynamic reconfigure (landoltc) parameters' server
-  dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc_cfgConfig>
-  server;
-  
-  dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc_cfgConfig>::CallbackType f;
+  //!< Variable for checking if Predator is On
+  bool PredatorOn;
   
   /**
   @brief Callback for the RGB Image
@@ -108,6 +115,13 @@ private:
   @return void
   **/
   void imageCallback(const sensor_msgs::ImageConstPtr& msg);
+  
+  /**
+  @brief Predator Callback
+  @param msg [const vision_communications::PredatorAlertMsg& msg]
+  @return void
+  **/
+  void predatorCallback(const vision_communications::PredatorAlertMsg& msg);
 
   /**
   @brief main function called for publishing messages in
@@ -116,18 +130,8 @@ private:
   @param void
   @return void
   **/
-  void landoltcCallback();
-  
-  /**
-  @brief The function called when a parameter is changed
-  @param[in] config [const pandora_vision_landoltc::landoltc_cfgConfig&]
-  @param[in] level [const uint32_t] The level 
-  @return void
-  **/
-  void parametersCallback(
-  const pandora_vision_landoltc::landoltc_cfgConfig& config,
-  const uint32_t& level);
-  
+  void landoltc3dCallback();
+
 public:
 
   /**
@@ -135,13 +139,13 @@ public:
   @param ref [cv::Mat&] Reference Image
   @return void
   **/
-  LandoltCDetection();
+  LandoltC3dDetection();
 
   /**
   @brief Default Destructor
   @return void
   **/
-  ~LandoltCDetection();
+  ~LandoltC3dDetection();
 
   /**
   @brief Get parameters referring to view and frame characteristics
@@ -150,20 +154,22 @@ public:
   void getGeneralParams();
   
   /**
-    @brief Node's state manager
-    @param newState [int] The robot's new state
-    @return void
-  */
-    void startTransition(int newState);
+  @brief Node's state manager
+  @param newState [int] The robot's new state
+  @return void
+  **/
+  void startTransition(int newState);
 
   /**
-    @brief After completion of state transition
-    @return void
-  */
-    void completeTransition(void);
+  @brief After completion of state transition
+  @return void
+  **/
+  void completeTransition(void);
     
-    int curState;
-    int prevState;
+  int curState;
+  int prevState;
+  
 };
 } // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
+

@@ -26,6 +26,9 @@ add_message_files(
   QRAlertsVectorMsg.msg
   DataMatrixAlertMsg.msg
   DataMatrixAlertsVectorMsg.msg
+  LandoltcAlertMsg.msg
+  LandoltcAlertsVectorMsg.msg
+  PredatorAlertMsg.msg
   )
 
 generate_messages(

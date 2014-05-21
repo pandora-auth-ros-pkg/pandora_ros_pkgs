@@ -1,0 +1,16 @@
+<launch>
+  <group ns="pandora_vision_predator">
+  
+  <param name="camera_name" value="kinect" />
+  
+  <node name="predator_node" type="predator_node" pkg="pandora_vision_predator" respawn="False" output="screen" />
+  <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+  
+  <param name="pattern_path" type="str" value="$(find pandora_vision_predator)/model"/>
+  <param name="learning_enabled" type="bool" value="false"/>
+  <param name="export_path" type="str" value="$(find pandora_vision_predator)/model"/>
+  <param name="publisher_topic" type="str" value="PredatorAlert"/>
+  <param name="subscribe_topic" type="str" value="/kinect/image"/>
+
+  </group>
+</launch>
