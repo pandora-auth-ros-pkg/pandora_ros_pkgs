@@ -201,7 +201,7 @@ void LandoltC3dDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 }
 
-void LandoltC3dDetection::predatorCallback(const vision_communications::PredatorAlertMsg& msg)
+void LandoltC3dDetection::predatorCallback(const vision_communications::LandoltcPredatorMsg& msg)
 {
  
   cv_bridge::CvImagePtr in_msg;

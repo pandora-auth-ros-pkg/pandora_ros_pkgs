@@ -51,8 +51,9 @@
 #include <stdlib.h>
 #include "state_manager/state_client.h"
 #include "vision_communications/LandoltcAlertsVectorMsg.h"
-#include "vision_communications/PredatorAlertMsg.h"
+#include "vision_communications/LandoltcPredatorMsg.h"
 #include "pandora_vision_landoltc/landoltc3d_detector.h"
+
 //!< default frame height
 #define DEFAULT_HEIGHT 480
 
@@ -121,7 +122,7 @@ private:
   @param msg [const vision_communications::PredatorAlertMsg& msg]
   @return void
   **/
-  void predatorCallback(const vision_communications::PredatorAlertMsg& msg);
+  void predatorCallback(const vision_communications::LandoltcPredatorMsg& msg);
 
   /**
   @brief main function called for publishing messages in

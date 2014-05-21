@@ -31,6 +31,8 @@ Predator::Predator(): _nh()
 {
   modelLoaded = false;
   
+  operationState = false;
+  
   getGeneralParams();
   
   ROS_INFO("[predator_node] : Created Predator instance");
@@ -61,8 +63,6 @@ Predator::Predator(): _nh()
   detectorCascade->numFeatures = 15;
   detectorCascade->nnClassifier->thetaTP = 0.65;
   detectorCascade->nnClassifier->thetaFP = 0.5;
-  
-  _predatorPublisher = _nh.advertise<vision_communications::PredatorAlertMsg>(publisher_topic_name, 1000);
   
   _inputImageSubscriber = _nh.subscribe(imageTopic, 1, &Predator::imageCallback, this);
 }
@@ -298,13 +298,40 @@ void Predator::getGeneralParams()
 {
   
   packagePath = ros::package::getPath("pandora_vision_predator");
-
-  //!< Get the path to the pattern used for detection
-  if (_nh.hasParam("pattern_path"))
+  
+   //! Publishers
+    
+  //! Declare publisher and advertise topic
+  //! where algorithm results are posted if it works alone
+  if (_nh.getParam("published_topic_names/predator_alert", param))
   {
-    _nh.getParam("pattern_path", patternPath);
-    ROS_DEBUG_STREAM("pattern_path: " << patternPath);
-    ROS_INFO("Pattern path loaded from launcher");
+    _predatorPublisher = 
+      _nh.advertise<vision_communications::PredatorAlertMsg>(param, 1000);
+  }
+  else
+  {
+    ROS_FATAL("Predator alert topic name not found");
+    ROS_BREAK();
+  }
+  
+  //! Declare publisher and advertise topic
+  //! where algorithm results are posted if it works in compination with landoltc3d
+  if (_nh.getParam("published_topic_names/predator_landoltc_output", param))
+  {
+    _landoltc3dPredatorPublisher = 
+      _nh.advertise<vision_communications::LandoltcPredatorMsg>(param, 1000);
+  
+  }
+  else
+  {
+    ROS_FATAL("Predator to landoltc alert topic name not found");
+    ROS_BREAK();
+  }
+  
+    
+  //!< Get the path to the pattern used for detection
+  if (_nh.getParam("pattern_path", patternPath))
+  {
     if(is_file_exist(patternPath))
     {
       ROS_INFO("Model Loaded From Launcher");
@@ -321,11 +348,9 @@ void Predator::getGeneralParams()
   }
   
   //!<Get Model Export Path
-  if(_nh.hasParam("export_path"))
+  if( _nh.getParam("export_path", exportPath))
   {
-    _nh.getParam("export_path", exportPath);
     ROS_DEBUG_STREAM("export_path: " << exportPath);
-    ROS_INFO("Export Path Loaded From Launcher");
   }
   else
   {
@@ -335,24 +360,11 @@ void Predator::getGeneralParams()
     exportPath.append(temp);
   }
   
-  //!<Get Publisher Topic Name
-  if(_nh.hasParam("publisher_topic"))
-  {
-    _nh.getParam("publisher_topic", publisher_topic_name);
-    ROS_DEBUG_STREAM("publisher_topic: " << publisher_topic_name);
-    ROS_INFO("Publisher Topic Name Loaded From Launcher");
-  }
-  else
-  {
-    ROS_INFO("Publisher Topic Name Not Loaded From Launcher. Using Default");
-    publisher_topic_name = "PredatorAlert";
-  }
-    
+  
   //!< Get value for enabling or disabling TLD learning mode
   
-  if(_nh.hasParam("learning_enabled"))
+  if( _nh.getParam("learning_enabled", learningEnabled))
   {
-    _nh.getParam("learning_enabled", learningEnabled);
     ROS_INFO("Learning Enabled Value From Launcher");
   }
   else
@@ -396,16 +408,15 @@ void Predator::getGeneralParams()
     frameWidth = DEFAULT_WIDTH;
   }
 
-  //!< Get the subscriber's topic;
-  if (_nh.hasParam("subscribe_topic"))
+  //!< Get the listener's topic;
+  if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
   {
-    _nh.getParam("subscribe_topic", imageTopic);
-    ROS_DEBUG_STREAM("subscribe_topic : " << imageTopic);
+    ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
   }
   else
   {
-    ROS_DEBUG("[predator_node] : Parameter subscribe_topic not found. Using Default");
-    imageTopic = "/camera_head/image_raw";
+   ROS_FATAL("Camera name not found");
+   ROS_BREAK(); 
   }
 
   //!< Get the images's frame_id;
@@ -430,17 +441,24 @@ void Predator::getGeneralParams()
   
 void Predator::sendMessage(const cv::Rect& rec, const float& posterior, const sensor_msgs::ImageConstPtr& frame)
 {
-  vision_communications::PredatorAlertMsg predatorAlertMsg;
-  
-  predatorAlertMsg.x = rec.x;
-  predatorAlertMsg.y = rec.y;
-  predatorAlertMsg.width = rec.width;
-  predatorAlertMsg.height = rec.height;
-  predatorAlertMsg.posterior = posterior;
-  predatorAlertMsg.img = *frame;
-  
-  _predatorPublisher.publish(predatorAlertMsg);  
-  
+  if( operationState == true){
+    
+    vision_communications::LandoltcPredatorMsg predatorLandoltcMsg;
+    
+    predatorLandoltcMsg.x = rec.x;
+    predatorLandoltcMsg.y = rec.y;
+    predatorLandoltcMsg.width = rec.width;
+    predatorLandoltcMsg.height = rec.height;
+    predatorLandoltcMsg.posterior = posterior;
+    predatorLandoltcMsg.img = *frame;
+    
+    _landoltc3dPredatorPublisher.publish(predatorLandoltcMsg);  
+  }
+  else{
+    vision_communications::PredatorAlertMsg predatorAlertMsg;
+    predatorAlertMsg.header.frame_id = cameraFrameId;
+    predatorAlertMsg.probability = posterior;
+  }
 }  
 
 

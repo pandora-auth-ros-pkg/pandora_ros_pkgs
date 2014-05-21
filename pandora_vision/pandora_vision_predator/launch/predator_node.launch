@@ -9,8 +9,9 @@
   <param name="pattern_path" type="str" value="$(find pandora_vision_predator)/model"/>
   <param name="learning_enabled" type="bool" value="false"/>
   <param name="export_path" type="str" value="$(find pandora_vision_predator)/model"/>
-  <param name="publisher_topic" type="str" value="PredatorAlert"/>
-  <param name="subscribe_topic" type="str" value="/kinect/image"/>
-
+  
+  <rosparam file="$(find pandora_vision_predator)/config/predator_topics.yaml" 
+        command="load" ns="predator"/>
+    
   </group>
 </launch>

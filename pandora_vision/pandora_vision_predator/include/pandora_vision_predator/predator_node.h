@@ -34,7 +34,9 @@
 #include <iostream>
 #include <stdlib.h>
 #include <sys/stat.h>
+
 #include "vision_communications/PredatorAlertMsg.h"
+#include "vision_communications/LandoltcPredatorMsg.h"
 
 #include "../tld/TLD.h"
 
@@ -51,7 +53,7 @@ namespace pandora_vision
 class Predator
 {
   private:
-  
+    
     //!<Node Handler
     ros::NodeHandle _nh;
     
@@ -60,6 +62,9 @@ class Predator
     
     //!<Predator Publisher
     ros::Publisher _predatorPublisher;
+    
+    //!<Predator Publisher for use in combination with landoltc3d
+    ros::Publisher _landoltc3dPredatorPublisher;
   
     //!< Current frame to be processed
     cv::Mat PredatorFrame;
@@ -118,6 +123,10 @@ class Predator
     //!<Value for enabling or disabling TLD learning mode
     bool learningEnabled;
     
+    ///Flag to identify if it works alone or in compination with
+    ///landoltc3d_node
+    bool operationState;
+    
     /**
     @brief Callback for the RGB Image
     @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image
@@ -125,7 +134,8 @@ class Predator
     **/
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     
-    
+    std::string param;
+
   public:
   
   

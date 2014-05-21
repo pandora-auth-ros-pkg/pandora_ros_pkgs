@@ -28,6 +28,7 @@ add_message_files(
   DataMatrixAlertsVectorMsg.msg
   LandoltcAlertMsg.msg
   LandoltcAlertsVectorMsg.msg
+  LandoltcPredatorMsg.msg
   PredatorAlertMsg.msg
   )
 
