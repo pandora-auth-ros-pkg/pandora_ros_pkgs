@@ -1068,11 +1068,18 @@ namespace pandora_vision
     // The overall message of enhanced holes that will be published
     vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
 
-    // Set the frame element in the enhancedHolesMsg message to the rgb image
+    // Set the rgbImage in the enhancedHolesMsg message to the rgb image
     MessageConversions::convertImageToMessage(
       rgbImage_,
       sensor_msgs::image_encodings::TYPE_8UC3,
-      enhancedHolesMsg.frame);
+      enhancedHolesMsg.rgbImage);
+
+    // Set the depthImage in the enhancedHolesMsg message to the depth image
+    MessageConversions::convertImageToMessage(
+      Visualization::scaleImageForVisualization(interpolatedDepthImage_,
+        Parameters::Image::scale_method),
+      sensor_msgs::image_encodings::TYPE_8UC1,
+      enhancedHolesMsg.depthImage);
 
     // Set whether depth analysis is applicable
     enhancedHolesMsg.isDepth = (interpolationMethod == 0);

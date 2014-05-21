@@ -282,8 +282,8 @@ namespace pandora_vision
 
   // The input, depth registered, point cloud topic
   std::string Parameters::Topics::hole_detector_input_topic =
-    //"/camera/depth_registered/points";
-    "/kinect/point_cloud";
+    "/camera/depth_registered/points";
+    //"/kinect/point_cloud";
 
   // The topic where the synchronizer node pubishes the
   // synchronized depth image, extracted from the input point cloud
