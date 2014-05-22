@@ -55,6 +55,11 @@ namespace pandora_vision
     // transactionary affairs with
     getTopicNames();
 
+    // Acquire the information about the input point cloud that cannot be
+    // acquired from the point cloud message.
+    // The parameters concerned are needed only if in simulation mode
+    getSimulationDimensions();
+
     // Subscribe to the RGB point cloud topic
     inputPointCloudSubscriber_ = nodeHandle_.subscribe(inputPointCloudTopic_, 1,
       &RgbDepthSynchronizer::synchronizedCallback, this);
@@ -92,6 +97,69 @@ namespace pandora_vision
   RgbDepthSynchronizer::~RgbDepthSynchronizer(void)
   {
     ROS_INFO("[Synchronizer node] Terminated");
+  }
+
+
+
+  /**
+    @brief Variables regarding the point cloud are needed to be set in
+    simulation mode: the point cloud's heigth, width and point step.
+    This method reads them and sets their respective Parameters.
+    @param void
+    @return void
+   **/
+  void RgbDepthSynchronizer::getSimulationDimensions()
+  {
+    // The namespace dictated in the launch file
+    std::string ns = nodeHandle_.getNamespace();
+
+    // Read "height" from the nodehandle
+    if (nodeHandle_.hasParam(ns + "/synchronizer_node/height"))
+    {
+      if (nodeHandle_.getParam(ns + "/synchronizer_node/height",
+          Parameters::Image::HEIGHT))
+      {
+#ifdef DEBUG_SHOW
+        ROS_INFO ("[Synchronizer Node] Input dimension height read");
+#endif
+      }
+      else
+      {
+        ROS_ERROR("[Synchronizer Node] Input dimension height failed to be read");
+      }
+    }
+
+    // Read "width" from the nodehandle
+    if (nodeHandle_.hasParam(ns + "/synchronizer_node/width"))
+    {
+      if (nodeHandle_.getParam(ns + "/synchronizer_node/width",
+          Parameters::Image::WIDTH))
+      {
+#ifdef DEBUG_SHOW
+        ROS_INFO ("[Synchronizer Node] Input dimension width read");
+#endif
+      }
+      else
+      {
+        ROS_ERROR("[Synchronizer Node] Input dimension width failed to be read");
+      }
+    }
+
+    // Read "point_step" from the nodehandle
+    if (nodeHandle_.hasParam(ns + "/synchronizer_node/point_step"))
+    {
+      if (nodeHandle_.getParam(ns + "/synchronizer_node/point_step",
+          Parameters::Image::POINT_STEP))
+      {
+#ifdef DEBUG_SHOW
+        ROS_INFO ("[Synchronizer Node] Input dimension point_step read");
+#endif
+      }
+      else
+      {
+        ROS_ERROR("[Synchronizer Node] Input dimension point_step failed to be read");
+      }
+    }
   }
 
 
@@ -254,42 +322,16 @@ namespace pandora_vision
       // See http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html
       if (pointCloud.height == 1)
       {
-        // The namespace dictated in the launch file
-        std::string ns = nodeHandle_.getNamespace();
+        // The point cloud's height
+        pointCloud.height = Parameters::Image::HEIGHT;
 
-        // Read "height" from the nodehandle
-        int height;
-        if (nodeHandle_.getParam(ns + "/height", height))
-        {
-          pointCloud.height = height;
-        }
-        else
-        {
-          pointCloud.height = Parameters::Image::HEIGHT;
-        }
+        // The point cloud's width
+        pointCloud.width = Parameters::Image::WIDTH;
 
-        // Read "width" from the nodehandle
-        int width;
-        if (nodeHandle_.getParam(ns + "/width", width))
-        {
-          pointCloud.width = width;
-        }
-        else
-        {
-          pointCloud.width= Parameters::Image::WIDTH;
-        }
+        // The size of each point of the point cloud in bytes
+        pointCloud.point_step = Parameters::Image::POINT_STEP;
 
-        // Read "point_step" from the nodehandle
-        int point_step;
-        if (nodeHandle_.getParam(ns + "/point_step", point_step))
-        {
-          pointCloud.point_step = point_step;
-        }
-        else
-        {
-          pointCloud.point_step = Parameters::Image::POINT_STEP;
-        }
-
+        // The size of each row of the point cloud in bytes
         pointCloud.row_step = pointCloud.width * pointCloud.point_step;
       }
 

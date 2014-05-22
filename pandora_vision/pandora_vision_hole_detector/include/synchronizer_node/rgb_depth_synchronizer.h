@@ -105,6 +105,15 @@ namespace pandora_vision
       int ticks_;
 
       /**
+        @brief Variables regarding the point cloud are needed to be set in
+        simulation mode: the point cloud's heigth, width and point step.
+        This method reads them and sets their respective Parameters.
+        @param void
+        @return void
+       **/
+      void getSimulationDimensions();
+
+      /**
         @brief Acquires topics' names needed to be subscribed to and advertise
         to by the synchronizer node
         @param void
