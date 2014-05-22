@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
       visualization_msgs
       tf
       pandora_navigation_communications 
-      pandora_data_fusion_msgs
+      data_fusion_communications
 )
 
 include_directories(
@@ -21,7 +21,7 @@ catkin_package(
       visualization_msgs
       tf
       pandora_navigation_communications 
-      pandora_data_fusion_msgs
+      data_fusion_communications
     INCLUDE_DIRS 
     LIBRARIES # TODO
 )
@@ -32,4 +32,4 @@ add_dependencies(navigation_visualization  pandora_navigation_communications_gen
 
 add_executable(data_fusion_object_visualization src/data_fusion_object_visualization.cpp)
 target_link_libraries(data_fusion_object_visualization ${catkin_LIBRARIES} )
-add_dependencies(data_fusion_object_visualization  pandora_data_fusion_msgs_gencpp )
+add_dependencies(data_fusion_object_visualization  data_fusion_communications_gencpp )
