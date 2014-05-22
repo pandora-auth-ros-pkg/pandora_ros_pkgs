@@ -1,8 +1,8 @@
 #include "ros/ros.h"
 
 #include <tf/transform_broadcaster.h>
-#include "data_fusion_communications/GetObjectsSrv.h"
-#include "data_fusion_communications/GetMarkersSrv.h"
+#include "pandora_data_fusion_msgs/GetObjectsSrv.h"
+#include "pandora_data_fusion_msgs/GetMarkersSrv.h"
 
 typedef std::vector<geometry_msgs::PoseStamped> poseStampedVector;
 
@@ -16,7 +16,7 @@ class ObjectVisualization {
 	ros::Publisher _hazmat_marker_pub ; 
 	ros::Publisher _hole_marker_pub ;
 	ros::Publisher _qr_marker_pub ;
-	ros::Publisher _tpa_marker_pub ;
+	ros::Publisher _thermal_marker_pub ;
 	ros::Publisher _victims_visiter_marker_pub ;
 	ros::Publisher _victims_to_go_marker_pub ;
 
@@ -30,8 +30,8 @@ class ObjectVisualization {
 
 	ros::NodeHandle _nh;
 
-	data_fusion_communications::GetObjectsSrv _objectsSrv;
-	data_fusion_communications::GetMarkersSrv _markersSrv;
+	pandora_data_fusion_msgs::GetObjectsSrv _objectsSrv;
+	pandora_data_fusion_msgs::GetMarkersSrv _markersSrv;
 	
 	void broadcastTimerCb(const ros::TimerEvent& event);
 	
@@ -66,16 +66,16 @@ ObjectVisualization::ObjectVisualization(){
 	//~ ros::Duration(15).sleep();
 	
 	
-	_getObjectsClient = _nh.serviceClient<data_fusion_communications::GetObjectsSrv>
+	_getObjectsClient = _nh.serviceClient<pandora_data_fusion_msgs::GetObjectsSrv>
 		("/data_fusion/get_objects");
 		
-	_getMarkersClient = _nh.serviceClient<data_fusion_communications::GetMarkersSrv>
+	_getMarkersClient = _nh.serviceClient<pandora_data_fusion_msgs::GetMarkersSrv>
 		("/data_fusion/get_markers");
 
 	_hazmat_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("hazmats_markers", 1);
 	_hole_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("holes_markers", 1);
 	_qr_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("qrs_markers", 1);
-	_tpa_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("tpas_markers", 1);
+	_thermal_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("thermals_markers", 1);
 	_victims_visiter_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("victims_to_go_markers", 1);
 	_victims_to_go_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("victims_visited_markers", 1);
 
@@ -92,9 +92,8 @@ void ObjectVisualization::broadcastTimerCb(const ros::TimerEvent& event){
 	broadcastPoseVector(_objectsSrv.response.holes);
 	broadcastPoseVector(_objectsSrv.response.qrs);
 	broadcastPoseVector(_objectsSrv.response.hazmats);
-	broadcastPoseVector(_objectsSrv.response.tpas);
+	broadcastPoseVector(_objectsSrv.response.thermals);
 	broadcastPoseVector(_objectsSrv.response.victimsToGo);
-	broadcastPoseVector(_objectsSrv.response.approachPoints);
 }
 
 void ObjectVisualization::broadcastTimerCb2(const ros::TimerEvent& event){
@@ -105,7 +104,7 @@ void ObjectVisualization::broadcastTimerCb2(const ros::TimerEvent& event){
 		ros::Duration(0.5).sleep();
 	}
 	
-	if (_markersSrv.response.holes.markers.size()>0 || _markersSrv.response.qrs.markers.size() || _markersSrv.response.hazmats.markers.size() >0){
+	if (_markersSrv.response.holes.markers.size()>0 || _markersSrv.response.qrs.markers.size()>0 || _markersSrv.response.hazmats.markers.size() >0){
 		
 		std::cout << "holes size: " << _markersSrv.response.holes.markers.size() << "\n";
 		std::cout << "qrs size: " << _markersSrv.response.qrs.markers.size() << "\n";
@@ -115,7 +114,7 @@ void ObjectVisualization::broadcastTimerCb2(const ros::TimerEvent& event){
 	_hole_marker_pub.publish(_markersSrv.response.holes);
 	_hazmat_marker_pub.publish(_markersSrv.response.qrs);
 	_qr_marker_pub.publish(_markersSrv.response.hazmats);
-	_tpa_marker_pub.publish(_markersSrv.response.tpas);
+	_thermal_marker_pub.publish(_markersSrv.response.thermals);
 	_victims_visiter_marker_pub.publish(_markersSrv.response.victimsToGo);
 	_victims_to_go_marker_pub.publish(_markersSrv.response.victimsVisited);
 

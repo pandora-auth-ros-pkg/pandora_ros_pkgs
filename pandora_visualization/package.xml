@@ -21,13 +21,13 @@
  <build_depend>tf</build_depend> 
  <build_depend>visualization_msgs</build_depend> 
  <build_depend>pandora_navigation_communications</build_depend> 
- <build_depend>data_fusion_communications</build_depend> 
+ <build_depend>pandora_data_fusion_msgs</build_depend> 
  
  <run_depend>roscpp</run_depend> 
  <run_depend>tf</run_depend> 
  <run_depend>visualization_msgs</run_depend> 
  <run_depend>pandora_navigation_communications</run_depend> 
- <run_depend>data_fusion_communications</run_depend> 
+ <run_depend>pandora_data_fusion_msgs</run_depend> 
  <run_depend>rviz</run_depend> 
 
   <export>
