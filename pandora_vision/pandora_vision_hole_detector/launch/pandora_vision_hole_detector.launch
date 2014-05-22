@@ -1,17 +1,61 @@
 <launch>
 
+  <!-- Namespace of the hole detector package -->
   <arg name="namespace" default="pandora_vision/hole_detector" />
 
-    <node name="synchronizer_node" type="synchronizer_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" ns="$(arg namespace)" >
-      <param name="width" value="640" />
-      <param name="height" value="480" />
-      <param name="point_step" value="32" />
-    </node>
+  <!-- The synchronizer node -->
+  <node name="synchronizer_node"
+        type="synchronizer_node"
+        pkg="pandora_vision_hole_detector"
+        respawn="False"
+        output="screen"
+        ns="$(arg namespace)" >
 
-    <node name="depth_node" type="depth_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" ns="$(arg namespace)" />
+    <param name="width" value="640" />
+    <param name="height" value="480" />
+    <param name="point_step" value="32" />
 
-    <node name="rgb_node" type="rgb_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" ns="$(arg namespace)" />
+    <rosparam file="$(find pandora_vision_hole_detector)/config/synchronizer_node_topics.yaml"
+              command="load" />
+  </node>
 
-    <node name="hole_fusion_node" type="hole_fusion_node" pkg="pandora_vision_hole_detector" respawn="False" output="screen" ns="$(arg namespace)" />
+
+  <!-- The depth node -->
+  <node name="depth_node"
+        type="depth_node"
+        pkg="pandora_vision_hole_detector"
+        respawn="False"
+        output="screen"
+        ns="$(arg namespace)" >
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/depth_node_topics.yaml"
+              command="load" />
+  </node>
+
+
+  <!-- The RGB node -->
+  <node name="rgb_node"
+        type="rgb_node"
+        pkg="pandora_vision_hole_detector"
+        respawn="False"
+        output="screen"
+        ns="$(arg namespace)" >
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/rgb_node_topics.yaml"
+              command="load" />
+  </node>
+
+
+  <!-- The hole fusion node -->
+  <node name="hole_fusion_node"
+        type="hole_fusion_node"
+        pkg="pandora_vision_hole_detector"
+        respawn="False"
+        output="screen"
+        ns="$(arg namespace)" >
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/hole_fusion_node_topics.yaml"
+              command="load" />
+  </node>
 
 </launch>

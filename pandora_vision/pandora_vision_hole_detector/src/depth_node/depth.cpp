@@ -51,22 +51,25 @@ namespace pandora_vision
 
     ros::Duration(0.5).sleep();
 
+    // Acquire the names of topics which the depth node will be having
+    // transactionary affairs with
+    getTopicNames();
+
     // Subscribe to the depth image published by the
     // rgb_depth_synchronizer node
-    depthImageSubscriber_ = nodeHandle_.subscribe(
-      Parameters::Topics::depth_image_topic, 1,
+    depthImageSubscriber_ = nodeHandle_.subscribe(depthImageTopic_, 1,
       &Depth::inputDepthImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      Parameters::Topics::depth_candidate_holes_topic, 1000);
+      candidateHolesTopic_, 1000);
 
     // The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&Depth::parametersCallback,
         this, _1, _2));
 
-    ROS_INFO("Depth node initiated");
+    ROS_INFO("[Depth node] Initiated");
 
     #ifdef DEBUG_TIME
     Timer::tick("Depth");
@@ -81,7 +84,7 @@ namespace pandora_vision
    **/
   Depth::~Depth(void)
   {
-    ROS_INFO("Depth node terminated");
+    ROS_INFO("[Depth node] Terminated");
   }
 
 
@@ -158,6 +161,57 @@ namespace pandora_vision
     #endif
 
     return;
+  }
+
+
+
+  /**
+    @brief Acquires topics' names needed to be subscribed to and advertise
+    to by the depth node
+    @param void
+    @return void
+   **/
+  void Depth::getTopicNames ()
+  {
+    // The namespace dictated in the launch file
+    std::string ns = nodeHandle_.getNamespace();
+
+    // Read the name of the topic from where the depth node acquires the
+    // unadulterated depth image and store it in a private member variable
+    if (nodeHandle_.getParam(
+        ns + "/depth_node/subscribed_topics/depth_image_topic",
+        depthImageTopic_ ))
+    {
+      // Make the topic's name absolute
+      depthImageTopic_ = ns + "/" + depthImageTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Depth Node] Subscribed to the input depth image");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Depth Node] Could not find topic depth_image_topic");
+    }
+
+    // Read the name of the topic to which the depth node will be publishing
+    // information about the candidate holes found and store it in a private
+    // member variable
+    if (nodeHandle_.getParam(
+        ns + "/depth_node/published_topics/candidate_holes_topic",
+        candidateHolesTopic_))
+    {
+      // Make the topic's name absolute
+      candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Depth Node] Advertising to the candidate holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Depth Node] Could not find topic candidate_holes_topic");
+    }
   }
 
 

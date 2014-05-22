@@ -80,25 +80,53 @@ namespace pandora_vision
       // synchronizer_node
       ros::Publisher unlockPublisher_;
 
+      // The name of the topic where the Hole Fusion node will publish messages
+      // in order to unlock the Synchronizer node
+      std::string unlockTopic_;
+
       // The ROS publisher that will be used to publish the final valid holes
       // produced by this package
       ros::Publisher validHolesPublisher_;
+
+      // The name of the topic where the Hole Fusion node will publish
+      // information pertaining to the valid holes found by the Hole Detector
+      // package
+      std::string validHolesTopic_;
 
       // The ROS publisher that will be used to publish the enhanced valid holes
       // produced by this package
       ros::Publisher enhancedHolesPublisher_;
 
+      // The name of the topic where the Hole Fusion node will publish
+      // additional information, in respect to the valid holes topic,
+      // pertaining to the valid holes found by the Hole Detector package
+      std::string enhancedHolesTopic_;
+
       // The ROS subscriber for acquisition of candidate holes originated
       // from the depth node
       ros::Subscriber depthCandidateHolesSubscriber_;
+
+      // The name of the topic where the Hole Fusion node is subscribed to
+      // for acquiring information about candidate holes found by the Depth
+      // node
+      std::string depthCandidateHolesTopic_;
 
       // The ROS subscriber for acquisition of candidate holes originated
       // from the rgb node
       ros::Subscriber rgbCandidateHolesSubscriber_;
 
+      // The name of the topic where the Hole Fusion node is subscribed to
+      // for acquiring information about candidate holes found by the Rgb
+      // node
+      std::string rgbCandidateHolesTopic_;
+
       // The ROS subscriber for acquisition of the point cloud originated
-      // from th e synchronizer node
+      // from the synchronizer node
       ros::Subscriber pointCloudSubscriber_;
+
+      // The name of the topic where the Hole Fusion node is subscribed to
+      // where it acquires the point cloud from the Synchronizer node
+      std::string pointCloudTopic_;
 
       // The timestamp of the point cloud
       ros::Time timestamp_;
@@ -181,6 +209,14 @@ namespace pandora_vision
         candidateHolesVector,
         HolesConveyor* conveyor,
         const cv::Mat& inImage);
+
+      /**
+        @brief Acquires topics' names needed to be subscribed to and advertise
+        to by the Hole Fusion node
+        @param void
+        @return void
+       **/
+      void getTopicNames();
 
       /**
         @brief With an input a conveyor of holes, this method, depending on

@@ -62,7 +62,19 @@ namespace pandora_vision
       ros::NodeHandle nodeHandle_;
 
       // The subscriber to the point cloud topic
-      ros::Subscriber pointCloudSubscriber_;
+      ros::Subscriber inputPointCloudSubscriber_;
+
+      // The name of the topic from where the input point cloud is acquired
+      std::string inputPointCloudTopic_;
+
+      // The subscriber to the topic where the hole_fusion node publishes
+      // lock/unlock messages concerning the rgb_depth_synchronizer's
+      // behaviour
+      ros::Subscriber unlockSubscriber_;
+
+      // The name of the topic that the Hole Fusion node publishes messages to
+      // in order to unlock the synchronizer node
+      std::string unlockTopic_;
 
       // The publishers which will advertise the
       // synchronized point cloud, depth and rgb images extracted from the
@@ -71,14 +83,17 @@ namespace pandora_vision
       ros::Publisher synchronizedDepthImagePublisher_;
       ros::Publisher synchronizedRGBImagePublisher_;
 
+      // The names of the topic to which the synchronizer node publishes the
+      // synchronized point cloud, depth and rgb images extracted from the
+      // point cloud;
+      std::string synchronizedPointCloudTopic_;
+      std::string synchronizedDepthImageTopic_;
+      std::string synchronizedRgbImageTopic_;
+
+
       // A boolean indicating whether the node is publishing through the
       // above two publishers
       bool isLocked_;
-
-      // The subscriber to the topic where the hole_fusion node publishes
-      // lock/unlock messages concerning the rgb_depth_synchronizer's
-      // behaviour
-      ros::Subscriber holeFusionSubscriber_;
 
       // Records the time for each synchronizer invocation
       double invocationTime_;
@@ -88,6 +103,14 @@ namespace pandora_vision
 
       // Amount of synchronizer's invocations
       int ticks_;
+
+      /**
+        @brief Acquires topics' names needed to be subscribed to and advertise
+        to by the synchronizer node
+        @param void
+        @return void
+       **/
+      void getTopicNames();
 
       /**
         @brief The synchronized callback for the point cloud

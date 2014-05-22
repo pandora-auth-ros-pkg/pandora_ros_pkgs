@@ -51,30 +51,32 @@ namespace pandora_vision
 
     isLocked_ = true;
 
+    // Acquire the names of topics which the synchronizer node will be having
+    // transactionary affairs with
+    getTopicNames();
+
     // Subscribe to the RGB point cloud topic
-    pointCloudSubscriber_ = nodeHandle_.subscribe(
-      Parameters::Topics::hole_detector_input_topic, 1,
+    inputPointCloudSubscriber_ = nodeHandle_.subscribe(inputPointCloudTopic_, 1,
       &RgbDepthSynchronizer::synchronizedCallback, this);
 
     // Subscribe to the hole_fusion lock/unlock topic
-    holeFusionSubscriber_ = nodeHandle_.subscribe(
-      Parameters::Topics::synchronizer_unlock_topic, 1,
+    unlockSubscriber_ = nodeHandle_.subscribe(unlockTopic_, 1,
       &RgbDepthSynchronizer::holeFusionCallback, this);
 
 
     // Advertise the synchronized point cloud
     synchronizedPointCloudPublisher_ = nodeHandle_.advertise
-      <sensor_msgs::PointCloud2>(Parameters::Topics::point_cloud_internal_topic, 1000);
+      <sensor_msgs::PointCloud2>(synchronizedPointCloudTopic_, 1000);
 
     // Advertise the synchronized depth image
     synchronizedDepthImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(Parameters::Topics::depth_image_topic, 1000);
+      <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1000);
 
     // Advertise the synchronized rgb image
     synchronizedRGBImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(Parameters::Topics::rgb_image_topic, 1000);
+      <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1000);
 
-    ROS_INFO("RgbDepthSynchronizer node initiated");
+    ROS_INFO("[Synchronizer node] Initiated");
 
     #ifdef DEBUG_TIME
     Timer::tick("RgbDepthSynchronizer");
@@ -89,7 +91,110 @@ namespace pandora_vision
    **/
   RgbDepthSynchronizer::~RgbDepthSynchronizer(void)
   {
-    ROS_INFO("RgbDepthSynchronizer node terminated");
+    ROS_INFO("[Synchronizer node] Terminated");
+  }
+
+
+
+  /**
+    @brief Acquires topics' names needed to be subscribed to and advertise
+    to by the synchronizer node
+    @param void
+    @return void
+   **/
+  void RgbDepthSynchronizer::getTopicNames ()
+  {
+    // The namespace dictated in the launch file
+    std::string ns = nodeHandle_.getNamespace();
+
+    // Read the name of the topic from where the synchronizer node acquires the
+    // input point cloud
+    if (nodeHandle_.getParam(
+        ns + "/synchronizer_node/subscribed_topics/input_topic",
+        inputPointCloudTopic_ ))
+    {
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Synchronizer Node] Subscribed to the input point cloud");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Synchronizer Node] Could not find topic input_topic");
+    }
+
+    // Read the name of the topic that the Hole Fusion node uses to unlock
+    // the synchronizer node
+    if (nodeHandle_.getParam(
+        ns + "/synchronizer_node/subscribed_topics/unlock_topic",
+        unlockTopic_))
+    {
+      // Make the topic's name absolute
+      unlockTopic_ = ns + "/" + unlockTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Synchronizer Node] Subscribed to the unlock topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Synchronizer Node] Could not find topic unlock_topic");
+    }
+
+    // Read the name of the topic that the synchronizer node will be publishing
+    // the input point cloud to
+    if (nodeHandle_.getParam(
+        ns + "/synchronizer_node/published_topics/point_cloud_internal_topic",
+        synchronizedPointCloudTopic_))
+    {
+      // Make the topic's name absolute
+      synchronizedPointCloudTopic_ = ns + "/" + synchronizedPointCloudTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Synchronizer Node] "
+        "Advertising to the internal point cloud topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Synchronizer Node] "
+        "Could not find topic point_cloud_internal_topic");
+    }
+
+    // Read the name of the topic that the synchronizer node will be publishing
+    // the depth image extracted from the input point cloud to
+    if (nodeHandle_.getParam(
+        ns + "/synchronizer_node/published_topics/depth_image_topic",
+        synchronizedDepthImageTopic_))
+    {
+      // Make the topic's name absolute
+      synchronizedDepthImageTopic_ = ns + "/" + synchronizedDepthImageTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Synchronizer Node] Advertising to the internal depth image");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Synchronizer Node] Could not find topic depth_image_topic");
+    }
+
+    // Read the name of the topic that the synchronizer node will be publishing
+    // the depth image extracted from the input point cloud to
+    if (nodeHandle_.getParam(
+        ns + "/synchronizer_node/published_topics/rgb_image_topic",
+        synchronizedRgbImageTopic_))
+    {
+      // Make the topic's name absolute
+      synchronizedRgbImageTopic_ = ns + "/" + synchronizedRgbImageTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Synchronizer Node] Advertising to the internal rgb image");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Synchronizer Node] Could not find topic rgb_image_topic");
+    }
   }
 
 
@@ -154,7 +259,7 @@ namespace pandora_vision
 
         // Read "height" from the nodehandle
         int height;
-        if (nodeHandle_.getParam(ns + "/synchronizer_node/height", height))
+        if (nodeHandle_.getParam(ns + "/height", height))
         {
           pointCloud.height = height;
         }
@@ -165,7 +270,7 @@ namespace pandora_vision
 
         // Read "width" from the nodehandle
         int width;
-        if (nodeHandle_.getParam(ns + "/synchronizer_node/width", width))
+        if (nodeHandle_.getParam(ns + "/width", width))
         {
           pointCloud.width = width;
         }
@@ -176,7 +281,7 @@ namespace pandora_vision
 
         // Read "point_step" from the nodehandle
         int point_step;
-        if (nodeHandle_.getParam(ns + "/synchronizer_node/point_step", point_step))
+        if (nodeHandle_.getParam(ns + "/point_step", point_step))
         {
           pointCloud.point_step = point_step;
         }

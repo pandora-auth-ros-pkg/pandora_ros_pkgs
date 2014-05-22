@@ -50,6 +50,10 @@ namespace pandora_vision
 
     ros::Duration(0.5).sleep();
 
+    // Acquire the names of topics which the Hole Fusion node will be having
+    // transactionary affairs with
+    getTopicNames();
+
     // Calculate the histogram cv::MatND needed for texture comparing
     Histogram::getHistogram(&wallsHistogram_,
       Parameters::Histogram::secondary_channel);
@@ -60,36 +64,36 @@ namespace pandora_vision
     // Advertise the topic that the rgb_depth_synchronizer will be
     // subscribed to in order for the hole_fusion_node to unlock it
     unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>(
-      Parameters::Topics::synchronizer_unlock_topic, 1000, true);
+      unlockTopic_, 1000, true);
 
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::HolesDirectionsVectorMsg>(
-        Parameters::Topics::hole_detector_output_topic, 1000, true);
+        validHolesTopic_, 1000, true);
 
     // Advertise the topic that information about the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::EnhancedHolesVectorMsg>(
-        Parameters::Topics::enhanced_holes_topic, 1000, true);
+        enhancedHolesTopic_, 1000, true);
 
     // Subscribe to the topic where the depth node publishes
     // candidate holes
     depthCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      Parameters::Topics::depth_candidate_holes_topic, 1,
+      depthCandidateHolesTopic_, 1,
       &HoleFusion::depthCandidateHolesCallback, this);
 
     // Subscribe to the topic where the rgb node publishes
     // candidate holes
     rgbCandidateHolesSubscriber_= nodeHandle_.subscribe(
-      Parameters::Topics::rgb_candidate_holes_topic, 1,
+      rgbCandidateHolesTopic_, 1,
       &HoleFusion::rgbCandidateHolesCallback, this);
 
     // Subscribe to the topic where the synchronizer node publishes
     // the point cloud
     pointCloudSubscriber_= nodeHandle_.subscribe(
-      Parameters::Topics::point_cloud_internal_topic, 1,
+      pointCloudTopic_, 1,
       &HoleFusion::pointCloudCallback, this);
 
     // The dynamic reconfigure (hole fusion's) parameter's callback
@@ -97,7 +101,7 @@ namespace pandora_vision
         this, _1, _2));
 
 
-    ROS_INFO("HoleFusion node initiated");
+    ROS_INFO("[Hole Fusion node] Initiated");
 
     // Start the synchronizer
     unlockSynchronizer();
@@ -114,7 +118,7 @@ namespace pandora_vision
    **/
   HoleFusion::~HoleFusion(void)
   {
-    ROS_INFO("HoleFusion node terminated");
+    ROS_INFO("[Hole Fusion node] Terminated");
   }
 
 
@@ -521,6 +525,132 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("fromCandidateHoleMsgToConveyor");
     #endif
+  }
+
+
+
+  /**
+    @brief Acquires topics' names needed to be subscribed to and advertise
+    to by the Hole Fusion node
+    @param void
+    @return void
+   **/
+  void HoleFusion::getTopicNames ()
+  {
+    // The namespace dictated in the launch file
+    std::string ns = nodeHandle_.getNamespace();
+
+    // Read the name of the topic from where the Hole Fusion node acquires the
+    // input point cloud
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/subscribed_topics/point_cloud_internal_topic",
+        pointCloudTopic_))
+    {
+      // Make the topic's name absolute
+      pointCloudTopic_ = ns + "/" + pointCloudTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] "
+        "Subscribed to the internal point cloud topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic point_cloud_internal_topic");
+    }
+
+    // Read the name of the topic from where the Hole Fusion node acquires the
+    // candidate holes originated from the Depth node
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/subscribed_topics/depth_candidate_holes_topic",
+        depthCandidateHolesTopic_))
+    {
+      // Make the topic's name absolute
+      depthCandidateHolesTopic_ = ns + "/" + depthCandidateHolesTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] "
+        "Subscribed to the Depth candidate holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic depth_candidate_holes_topic");
+    }
+
+    // Read the name of the topic from where the Hole Fusion node acquires the
+    // candidate holes originated from the Rgb node
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/subscribed_topics/rgb_candidate_holes_topic",
+        rgbCandidateHolesTopic_))
+    {
+      // Make the topic's name absolute
+      rgbCandidateHolesTopic_ = ns + "/" + rgbCandidateHolesTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] "
+        "Subscribed to the Rgb candidate holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic rgb_candidate_holes_topic");
+    }
+
+    // Read the name of the topic that the Hole Fusion node uses to unlock
+    // the synchronizer node
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/synchronizer_unlock_topic",
+        unlockTopic_))
+    {
+      // Make the topic's name absolute
+      unlockTopic_ = ns + "/" + unlockTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] Advertising to the unlock topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic synchronizer_unlock_topic");
+    }
+
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // information about the valid holes found by the Hole Detector package
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/hole_detector_output_topic",
+        validHolesTopic_))
+    {
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] Advertising to the valid holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic hole_detector_output_topic");
+    }
+
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // additional information about the valid holes found by the
+    // Hole Detector package
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/enhanced_holes_topic",
+        enhancedHolesTopic_))
+    {
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[Hole Fusion Node] Advertising to the enhanced holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[Hole Fusion Node] "
+        "Could not find topic enhanced_holes_topic");
+    }
   }
 
 

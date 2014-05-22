@@ -65,8 +65,15 @@ namespace pandora_vision
       // Subscriber of Kinect point cloud
       ros::Subscriber depthImageSubscriber_;
 
+      // The name of the topic where the depth image is acquired from
+      std::string depthImageTopic_;
+
       // ROS publisher for the candidate holes
       ros::Publisher candidateHolesPublisher_;
+
+      // The name of the topic where the candidate holes that the depth node
+      // locates are published to
+      std::string candidateHolesTopic_;
 
       // The dynamic reconfigure (depth) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::depth_cfgConfig>
@@ -82,6 +89,14 @@ namespace pandora_vision
         @return void
        **/
       void inputDepthImageCallback(const sensor_msgs::Image& msg);
+
+      /**
+        @brief Acquires topics' names needed to be subscribed to and advertise
+        to by the depth node
+        @param void
+        @return void
+       **/
+      void getTopicNames();
 
       /**
         @brief The function called when a parameter is changed

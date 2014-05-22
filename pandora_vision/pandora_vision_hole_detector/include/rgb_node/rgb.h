@@ -58,28 +58,24 @@ namespace pandora_vision
     private:
 
       // The NodeHandle
-      ros::NodeHandle _nh;
+      ros::NodeHandle nodeHandle_;
 
       // Frame processed by FaceDetector
       cv::Mat _holeFrame;
 
-      //FaceDetector frame timestamp
-      ros::Time _holeFrameTimestamp;
-
       // The ROS subscriber for acquisition of the RGB image through the
-      //depth sensor
-      ros::Subscriber _frameSubscriber;
+      // depth sensor
+      ros::Subscriber rgbImageSubscriber_;
+
+      // The name of the topic where the rgb image is acquired from
+      std::string rgbImageTopic_;
 
       // The ROS publisher ofcandidate holes
-      ros::Publisher rgbCandidateHolesPublisher_;
+      ros::Publisher candidateHolesPublisher_;
 
-      // Current state of robot
-      int curState;
-      // Previous state of robot
-      int prevState;
-
-      // Variable used for State Managing
-      bool holeNowON;
+      // The name of the topic where the candidate holes that the rgb node
+      // locates are published to
+      std::string candidateHolesTopic_;
 
       // Class HoleDetector instance that finds and locates tha position
       // potentional holes in current frame
@@ -99,6 +95,14 @@ namespace pandora_vision
         @return void
        **/
       void inputRgbImageCallback(const sensor_msgs::Image& inImage);
+
+      /**
+        @brief Acquires topics' names needed to be subscribed to and advertise
+        to by the rgb node
+        @param void
+        @return void
+       **/
+      void getTopicNames();
 
       /**
         @brief The function called when a parameter is changed

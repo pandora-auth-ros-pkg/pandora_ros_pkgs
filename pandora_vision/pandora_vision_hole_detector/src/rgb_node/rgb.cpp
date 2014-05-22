@@ -42,24 +42,27 @@ namespace pandora_vision
   /**
     @brief Constructor
   **/
-  Rgb::Rgb(): _nh(), holeNowON(false)
+  Rgb::Rgb()
   {
+    // Acquire the names of topics which the rgb node will be having
+    // transactionary affairs with
+    getTopicNames();
+
     // Subscribe to the RGB image published by the
     // rgb_depth_synchronizer node
-    _frameSubscriber = _nh.subscribe(
-      Parameters::Topics::rgb_image_topic, 1,
+    rgbImageSubscriber_= nodeHandle_.subscribe( rgbImageTopic_, 1,
       &Rgb::inputRgbImageCallback, this);
 
     // Advertise the candidate holes found by the depth node
-    rgbCandidateHolesPublisher_ = _nh.advertise
+    candidateHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::CandidateHolesVectorMsg>(
-      Parameters::Topics::rgb_candidate_holes_topic, 1000);
+      candidateHolesTopic_, 1000);
 
     // The dynamic reconfigure (RGB) parameter's callback
     server.setCallback(boost::bind(&Rgb::parametersCallback,
         this, _1, _2));
 
-    ROS_INFO("[RGB node] : Created Rgb instance");
+    ROS_INFO("[RGB node] Initiated");
   }
 
 
@@ -69,7 +72,7 @@ namespace pandora_vision
    **/
   Rgb::~Rgb()
   {
-    ROS_DEBUG("[RGB node] : Destroying Hole Detection instance");
+    ROS_DEBUG("[RGB node] Terminated");
   }
 
 
@@ -92,13 +95,6 @@ namespace pandora_vision
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     _holeFrame = in_msg->image.clone();
-    _holeFrameTimestamp = msg.header.stamp;
-
-    if (_holeFrame.empty() )
-    {
-      ROS_ERROR("[rgb_node] : No more Frames");
-      return;
-    }
 
     #ifdef DEBUG_SHOW
     if (Parameters::Rgb::show_rgb_image)
@@ -131,12 +127,63 @@ namespace pandora_vision
       &rgbCandidateHolesMsg,
       sensor_msgs::image_encodings::TYPE_8UC3, msg);
 
-    rgbCandidateHolesPublisher_.publish(rgbCandidateHolesMsg);
+    candidateHolesPublisher_.publish(rgbCandidateHolesMsg);
 
     #ifdef DEBUG_TIME
     Timer::tick("inputRgbImageCallback");
     Timer::printAllMeansTree();
     #endif
+  }
+
+
+
+  /**
+    @brief Acquires topics' names needed to be subscribed to and advertise
+    to by the rgb node
+    @param void
+    @return void
+   **/
+  void Rgb::getTopicNames()
+  {
+    // The namespace dictated in the launch file
+    std::string ns = nodeHandle_.getNamespace();
+
+    // Read the name of the topic from where the rgb node acquires the
+    // rgb image and store it in a private member variable
+    if (nodeHandle_.getParam(
+        ns + "/rgb_node/subscribed_topics/rgb_image_topic",
+        rgbImageTopic_))
+    {
+      // Make the topic's name absolute
+      rgbImageTopic_ = ns + "/" + rgbImageTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[RGB Node] Subscribed to the input RGB image");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[RGB Node] Could not find topic rgb_image_topic");
+    }
+
+    // Read the name of the topic to which the rgb node will be publishing
+    // information about the candidate holes found and store it in a private
+    // member variable
+    if (nodeHandle_.getParam(
+        ns + "/rgb_node/published_topics/candidate_holes_topic",
+        candidateHolesTopic_))
+    {
+      // Make the topic's name absolute
+      candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
+
+      #ifdef DEBUG_SHOW
+      ROS_INFO ("[RGB Node] Advertising to the candidate holes topic");
+      #endif
+    }
+    else
+    {
+      ROS_ERROR ("[RGB Node] Could not find topic candidate_holes_topic");
+    }
   }
 
 

@@ -1,0 +1,8 @@
+subscribed_topics:
+  input_topic: /kinect/point_cloud
+  unlock_topic: unlock_rgb_depth_synchronizer
+
+published_topics:
+  point_cloud_internal_topic: synchronized/camera/depth/points
+  depth_image_topic: synchronized/camera/depth/image
+  rgb_image_topic: synchronized/camera/rgb/image

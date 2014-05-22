@@ -1,0 +1,5 @@
+subscribed_topics:
+  depth_image_topic: synchronized/camera/depth/image
+
+published_topics:
+  candidate_holes_topic: synchronized/camera/depth/candidate_holes
