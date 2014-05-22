@@ -28,8 +28,11 @@
     pkg="pandora_vision_hole_detector"
     respawn="False"
     output="screen"
-    ns="$(arg namespace)"
-  />
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/synchronizer_node_topics.yaml"
+              command="load" />
+ </node>
 
   <node
     name="depth_node"
@@ -37,8 +40,11 @@
     pkg="pandora_vision_hole_detector"
     respawn="False"
     output="screen"
-    ns="$(arg namespace)"
-  />
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/depth_node_topics.yaml"
+              command="load" />
+  </node>
 
   <node
     name="rgb_node"
@@ -46,8 +52,11 @@
     pkg="pandora_vision_hole_detector"
     respawn="False"
     output="screen"
-    ns="$(arg namespace)"
-  />
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/rgb_node_topics.yaml"
+              command="load" />
+  </node>
 
   <node
     name="hole_fusion_node"
@@ -55,7 +64,10 @@
     pkg="pandora_vision_hole_detector"
     respawn="False"
     output="screen"
-    ns="$(arg namespace)"
-  />
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole_detector)/config/hole_fusion_node_topics.yaml"
+              command="load" />
+  </node>
 
 </launch>
