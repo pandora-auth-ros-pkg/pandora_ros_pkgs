@@ -51,9 +51,8 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_32FC1)
     {
-      #ifdef DEBUG_SHOW
-      ROS_ERROR("NoiseElimination::brushfireNear : Inappropriate image type.");
-      #endif
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::brushfireNear : Inappropriate image type.");
 
       return;
     }
@@ -108,10 +107,8 @@ namespace pandora_vision
   {
     if (image->type() != CV_32FC1)
     {
-      #ifdef DEBUG_SHOW
-      ROS_ERROR("NoiseElimination::brushfireNearStep :\
-        Inappropriate image type.");
-      #endif
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::brushfireNearStep : Inappropriate image type.");
 
       return;
     }
@@ -262,10 +259,8 @@ namespace pandora_vision
   {
     if (image.type() != CV_32FC1)
     {
-      #ifdef DEBUG_SHOW
-      ROS_ERROR("NoiseElimination::chooseInterpolationMethod : \
-        Inappropriate image type.");
-      #endif
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::chooseInterpolationMethod : Inappropriate image type.");
 
       return;
     }

@@ -43,11 +43,10 @@
   @param argv [char**] The input arguments
   @return int : 0 for success
  **/
-int main(int argc, char** argv) {
-  srand (time(NULL));
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "depth_node");
   pandora_vision::Depth depth;
   ros::spin();
   return 0;
 }
-

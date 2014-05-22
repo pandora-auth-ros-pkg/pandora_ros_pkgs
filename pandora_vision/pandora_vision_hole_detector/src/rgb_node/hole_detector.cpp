@@ -48,7 +48,8 @@ namespace pandora_vision
     Histogram::getHistogram(&histogram_,
       Parameters::Histogram::secondary_channel);
 
-    ROS_INFO("[RGB node]: HoleDetector instance created");
+    ROS_INFO_NAMED("hole_detector",
+      "[RGB node]: HoleDetector instance created");
   }
 
 
@@ -58,7 +59,8 @@ namespace pandora_vision
    **/
   HoleDetector::~HoleDetector()
   {
-    ROS_INFO("[RGB node]: HoleDetector instance destroyed");
+    ROS_INFO_NAMED("hole_detector",
+      "[RGB node]: HoleDetector instance destroyed");
   }
 
 

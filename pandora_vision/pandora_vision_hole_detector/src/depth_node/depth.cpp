@@ -69,7 +69,7 @@ namespace pandora_vision
     server.setCallback(boost::bind(&Depth::parametersCallback,
         this, _1, _2));
 
-    ROS_INFO("[Depth node] Initiated");
+    ROS_INFO_NAMED("hole_detector", "[Depth node] Initiated");
 
     #ifdef DEBUG_TIME
     Timer::tick("Depth");
@@ -84,7 +84,7 @@ namespace pandora_vision
    **/
   Depth::~Depth(void)
   {
-    ROS_INFO("[Depth node] Terminated");
+    ROS_INFO_NAMED("hole_detector", "[Depth node] Terminated");
   }
 
 
@@ -101,9 +101,7 @@ namespace pandora_vision
     Timer::start("inputDepthImageCallback", "", true);
     #endif
 
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Depth node callback");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Depth node callback");
 
     // Obtain the depth image
     cv::Mat depthImage;
@@ -185,13 +183,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       depthImageTopic_ = ns + "/" + depthImageTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Depth Node] Subscribed to the input depth image");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Depth Node] Subscribed to the input depth image");
     }
     else
     {
-      ROS_ERROR ("[Depth Node] Could not find topic depth_image_topic");
+      ROS_ERROR_NAMED("hole_detector",
+        "[Depth Node] Could not find topic depth_image_topic");
     }
 
     // Read the name of the topic to which the depth node will be publishing
@@ -204,13 +202,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Depth Node] Advertising to the candidate holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Depth Node] Advertising to the candidate holes topic");
     }
     else
     {
-      ROS_ERROR ("[Depth Node] Could not find topic candidate_holes_topic");
+      ROS_ERROR_NAMED("hole_detector",
+        "[Depth Node] Could not find topic candidate_holes_topic");
     }
   }
 
@@ -226,9 +224,7 @@ namespace pandora_vision
     const pandora_vision_hole_detector::depth_cfgConfig& config,
     const uint32_t& level)
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("[Depth node] Parameters callback called");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "[Depth node] Parameters callback called");
 
     // Blob detection - specific parameters
     Parameters::Blob::blob_min_threshold =

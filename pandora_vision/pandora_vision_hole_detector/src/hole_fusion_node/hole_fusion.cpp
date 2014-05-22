@@ -101,7 +101,7 @@ namespace pandora_vision
         this, _1, _2));
 
 
-    ROS_INFO("[Hole Fusion node] Initiated");
+    ROS_INFO_NAMED("hole_detector", "[Hole Fusion node] Initiated");
 
     // Start the synchronizer
     unlockSynchronizer();
@@ -118,7 +118,7 @@ namespace pandora_vision
    **/
   HoleFusion::~HoleFusion(void)
   {
-    ROS_INFO("[Hole Fusion node] Terminated");
+    ROS_INFO_NAMED("hole_detector", "[Hole Fusion node] Terminated");
   }
 
 
@@ -226,10 +226,15 @@ namespace pandora_vision
         intermediatePointsSetVector,
         &rgbProbabilitiesVector2D);
 
-      #ifdef DEBUG_SHOW
+      // If there are holes found
       if (conveyor.keyPoints.size() > 0)
       {
-        ROS_ERROR("RGB: Candidate Holes' probabilities");
+        ROS_INFO_NAMED ("hole_detector",
+          "-------------------------------------------");
+
+        ROS_INFO_NAMED ("hole_detector",
+          "RGB: Candidate Holes' probabilities");
+
         for (int j = 0; j < conveyor.keyPoints.size(); j++)
         {
           std::string probsString;
@@ -238,11 +243,12 @@ namespace pandora_vision
             probsString += TOSTR(rgbProbabilitiesVector2D[i][j]) + " | ";
           }
 
-          ROS_ERROR("P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
-            conveyor.keyPoints[j].pt.y, probsString.c_str());
+          ROS_INFO_NAMED ("hole_detector",
+            "P_%d [%f %f] : %s",
+            j, conveyor.keyPoints[j].pt.x, conveyor.keyPoints[j].pt.y,
+            probsString.c_str());
         }
       }
-      #endif
 
       // Fill the probabilitiesVector2D with the rgb one
       for (int i = 0; i < rgbProbabilitiesVector2D.size(); i++)
@@ -304,11 +310,14 @@ namespace pandora_vision
           intermediatePointsSetVector,
           &depthProbabilitiesVector2D);
 
-        #ifdef DEBUG_SHOW
-        ROS_ERROR("-------------------------------------------");
+        // If there are holes found
         if (conveyor.keyPoints.size() > 0)
         {
-          ROS_ERROR("Depth : Candidate Holes' probabilities");
+          ROS_INFO_NAMED ("hole_detector",
+            "-------------------------------------------");
+
+          ROS_INFO_NAMED ("hole_detector",
+            "Depth : Candidate Holes' probabilities");
           for (int j = 0; j < conveyor.keyPoints.size(); j++)
           {
             std::string probsString;
@@ -317,11 +326,14 @@ namespace pandora_vision
               probsString += TOSTR(depthProbabilitiesVector2D[i][j]) + " | ";
             }
 
-            ROS_ERROR("P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
+            ROS_INFO_NAMED ("hole_detector",
+              "P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
               conveyor.keyPoints[j].pt.y, probsString.c_str());
           }
+
+          ROS_INFO_NAMED ("hole_detector",
+            "-------------------------------------------");
         }
-        #endif
 
         // Fill the probabilitiesVector2D with the depth one
         for (int i = 0; i < depthProbabilitiesVector2D.size(); i++)
@@ -362,9 +374,7 @@ namespace pandora_vision
     Timer::start("depthCandidateHolesCallback", "", true);
     #endif
 
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Hole Fusion Depth callback");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Hole Fusion Depth callback");
 
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
@@ -549,15 +559,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       pointCloudTopic_ = ns + "/" + pointCloudTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] "
-        "Subscribed to the internal point cloud topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Subscribed to the internal point cloud topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic point_cloud_internal_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic point_cloud_internal_topic");
     }
 
     // Read the name of the topic from where the Hole Fusion node acquires the
@@ -569,15 +577,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       depthCandidateHolesTopic_ = ns + "/" + depthCandidateHolesTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] "
-        "Subscribed to the Depth candidate holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Subscribed to the Depth candidate holes topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic depth_candidate_holes_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic depth_candidate_holes_topic");
     }
 
     // Read the name of the topic from where the Hole Fusion node acquires the
@@ -589,15 +595,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       rgbCandidateHolesTopic_ = ns + "/" + rgbCandidateHolesTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] "
-        "Subscribed to the Rgb candidate holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Subscribed to the Rgb candidate holes topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic rgb_candidate_holes_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic rgb_candidate_holes_topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to unlock
@@ -609,14 +613,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       unlockTopic_ = ns + "/" + unlockTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] Advertising to the unlock topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Advertising to the unlock topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic synchronizer_unlock_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic synchronizer_unlock_topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
@@ -625,14 +628,13 @@ namespace pandora_vision
         ns + "/hole_fusion_node/published_topics/hole_detector_output_topic",
         validHolesTopic_))
     {
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] Advertising to the valid holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Advertising to the valid holes topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic hole_detector_output_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic hole_detector_output_topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
@@ -642,14 +644,13 @@ namespace pandora_vision
         ns + "/hole_fusion_node/published_topics/enhanced_holes_topic",
         enhancedHolesTopic_))
     {
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[Hole Fusion Node] Advertising to the enhanced holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Advertising to the enhanced holes topic");
     }
     else
     {
-      ROS_ERROR ("[Hole Fusion Node] "
-        "Could not find topic enhanced_holes_topic");
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic enhanced_holes_topic");
     }
   }
 
@@ -780,9 +781,8 @@ namespace pandora_vision
     const pandora_vision_hole_detector::hole_fusion_cfgConfig &config,
     const uint32_t& level)
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("[Hole Fusion node] Parameters callback called");
-    #endif
+    ROS_INFO_NAMED("hole_detector",
+      "[Hole Fusion node] Parameters callback called");
 
     // Debug
     Parameters::Debug::show_find_holes =
@@ -990,9 +990,7 @@ namespace pandora_vision
     Timer::start("pointCloudCallback", "", true);
     #endif
 
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Hole Fusion Point Cloud callback");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Hole Fusion Point Cloud callback");
 
     // Store the frame id and timestamp of the point cloud under processing
     frame_id_ = msg->header.frame_id;
@@ -1046,9 +1044,7 @@ namespace pandora_vision
    **/
   void HoleFusion::processCandidateHoles()
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Processing candidate holes");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Processing candidate holes");
 
     #ifdef DEBUG_TIME
     Timer::start("processCandidateHoles", "", true);
@@ -1118,10 +1114,14 @@ namespace pandora_vision
     std::map<int, float> validHolesMap;
     validHolesMap = validateHoles(probabilitiesVector2D);
 
-    // Publish the final holes
-    publishValidHoles(rgbdHolesConveyor, &validHolesMap);
+    // If there are valid holes, publish them
+    if (HolesConveyorUtils::size(rgbdHolesConveyor) > 0)
+    {
+      publishValidHoles(rgbdHolesConveyor, &validHolesMap);
+    }
 
     // Publish the enhanced holes message
+    // regardless of the amount of valid holes
     publishEnhancedHoles(rgbdHolesConveyor,
       Parameters::Depth::interpolation_method);
 
@@ -1287,9 +1287,6 @@ namespace pandora_vision
       float pitch = atan(2 * y / height * tan(vfov / 2));
 
       // Setup everything needed by the single hole's message
-      // holeMsg.header.frame_id = frame_id_;
-      // holeMsg.header.stamp = timestamp_;
-
       holeMsg.yaw = yaw;
       holeMsg.pitch = pitch;
       holeMsg.probability = it->second;
@@ -1303,7 +1300,8 @@ namespace pandora_vision
 
     // Publish the message containing the information about all holes found
     holesVectorMsg.header.stamp = timestamp_;
-    holesVectorMsg.header.frame_id = frame_id_;
+    holesVectorMsg.header.frame_id = "kinect_link";
+    //holesVectorMsg.header.frame_id = frame_id_;
 
     validHolesPublisher_.publish(holesVectorMsg);
   }
@@ -1326,9 +1324,7 @@ namespace pandora_vision
     Timer::start("rgbCandidateHolesCallback", "", true);
     #endif
 
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Hole Fusion RGB callback");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Hole Fusion RGB callback");
 
     // Clear the current rgbHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
@@ -1405,9 +1401,7 @@ namespace pandora_vision
    **/
   void HoleFusion::unlockSynchronizer()
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("Sending unlock message");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "Sending unlock message");
 
     std_msgs::Empty unlockMsg;
     unlockPublisher_.publish(unlockMsg);
@@ -1710,7 +1704,8 @@ namespace pandora_vision
 
     HolesConveyorUtils::shuffle(dummy);
 
-    ROS_ERROR("keypoints before: %d ", HolesConveyorUtils::size(*dummy));
+    ROS_INFO_NAMED ("hole_detector",
+      "keypoints before: %d ", HolesConveyorUtils::size(*dummy));
 
     std::vector<std::string> msgs;
     Visualization::showHoles("before", interpolatedDepthImage_, *dummy,
@@ -1725,7 +1720,9 @@ namespace pandora_vision
         i);
     }
 
-    ROS_ERROR("keypoints after: %d ", HolesConveyorUtils::size(*dummy));
+    ROS_INFO_NAMED ("hole_detector",
+      "keypoints after: %d ", HolesConveyorUtils::size(*dummy));
+
     Visualization::showHoles("after", interpolatedDepthImage_, *dummy,
       1, msgs);
 

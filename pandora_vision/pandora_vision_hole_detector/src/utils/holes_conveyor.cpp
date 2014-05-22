@@ -333,34 +333,42 @@ namespace pandora_vision
     const int& id,
     const std::string& prefix)
   {
-    ROS_ERROR("cv::KeyPoint %s_k(%f, %f, 1);",
+    ROS_ERROR_NAMED("hole_detector", "cv::KeyPoint %s_k(%f, %f, 1);",
       prefix.c_str(),
       conveyor.keyPoints[id].pt.x,
       conveyor.keyPoints[id].pt.y);
 
-    ROS_ERROR("dummy.keyPoints.push_back(%s_k);", prefix.c_str());
-
-    ROS_ERROR("std::vector<std::vector<cv::Point2f> > %s_outlines;",
+    ROS_ERROR_NAMED("hole_detector", "dummy.keyPoints.push_back(%s_k);",
       prefix.c_str());
+
+    ROS_ERROR_NAMED("hole_detector",
+      "std::vector<std::vector<cv::Point2f> > %s_outlines;",
+      prefix.c_str());
+
     for (int i = 0; i < conveyor.outlines[id].size(); i++)
     {
-      ROS_ERROR("%s_outlines.push_back(cv::Point2f(%f, %f));",
+      ROS_ERROR_NAMED("hole_detector",
+        "%s_outlines.push_back(cv::Point2f(%f, %f));",
         prefix.c_str(),
         conveyor.outlines[id][i].x,
         conveyor.outlines[id][i].y);
     }
-    ROS_ERROR("dummy.outlines.push_back(%s_outlines);", prefix.c_str());
+    ROS_ERROR_NAMED("hole_detector",
+      "dummy.outlines.push_back(%s_outlines);", prefix.c_str());
 
-    ROS_ERROR("std::vector<std::vector<cv::Point2f> > %s_rectangles;",
+    ROS_ERROR_NAMED("hole_detector",
+      "std::vector<std::vector<cv::Point2f> > %s_rectangles;",
       prefix.c_str());
     for (int i = 0; i < conveyor.rectangles[id].size(); i++)
     {
-      ROS_ERROR("%s_outlines.push_back(cv::Point2f(%f, %f));",
+      ROS_ERROR_NAMED("hole_detector",
+        "%s_outlines.push_back(cv::Point2f(%f, %f));",
         prefix.c_str(),
         conveyor.rectangles[id][i].x,
         conveyor.rectangles[id][i].y);
     }
-    ROS_ERROR("dummy.rectangles.push_back(%s_outlines);", prefix.c_str());
+    ROS_ERROR_NAMED("hole_detector",
+      "dummy.rectangles.push_back(%s_outlines);", prefix.c_str());
   }
 
 

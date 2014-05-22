@@ -7,10 +7,10 @@ std::map<std::string,double> Timer::mean_time = std::map<std::string,double>();
 std::map<std::string,double> Timer::sum_time = std::map<std::string,double>();
 
 std::map<std::string,unsigned long> Timer::count =
-  std::map<std::string,unsigned long>();
+std::map<std::string,unsigned long>();
 
 std::map<std::string,std::set<std::string> > Timer::timer_tree =
-  std::map<std::string,std::set<std::string> >();
+std::map<std::string,std::set<std::string> >();
 
 std::string Timer::top_node = "";
 
@@ -18,22 +18,22 @@ struct timeval Timer::msTime = timeval();
 
 void Timer::printMsInternal(double t)
 {
-  std::cout << t << " ms\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", t << " ms");
 }
 
 void Timer::printSecInternal(double t)
 {
-  std::cout << t / 1000.0 << " sec\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 << " sec");
 }
 
 void Timer::printMinInternal(double t)
 {
-  std::cout << t / 1000.0 / 60.0 << " minutes\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 / 60.0 << " minutes");
 }
 
 void Timer::printHoursInternal(double t)
 {
-  std::cout << t / 1000.0 / 60.0 / 60.0 << " hours\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 / 60.0 / 60.0 << " hours");
 }
 
 void Timer::printLiteralInternal(double t)
@@ -50,22 +50,22 @@ void Timer::printLiteralInternal(double t)
       if(hours >= 1)
       {
         min -= hours * 60;
-        std::cout << min << " hours " <<hours << " minutes " << sec
-          << " sec " << t << " ms\n";
+        ROS_INFO_STREAM_NAMED("hole_detector", min << " hours " <<hours << " minutes " << sec
+          << " sec " << t << " ms");
       }
       else
       {	// Mins
-        std::cout << min << " minutes " << sec << " sec " << t << " ms\n";
+        ROS_INFO_STREAM_NAMED("hole_detector", min << " minutes " << sec << " sec " << t << " ms\n");
       }
     }
     else
     {	// Sec
-      std::cout << sec << " sec " << t << " ms\n";
+      ROS_INFO_STREAM_NAMED("hole_detector", sec << " sec " << t << " ms");
     }
   }
   else
   {	// Ms
-    std::cout << t << " ms\n";
+    ROS_INFO_STREAM_NAMED("hole_detector", t << " ms");
   }
 }
 
@@ -110,7 +110,7 @@ double Timer::stop(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    std::cout << "Invalid timer id : " << timerId << "\n";
+    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
     return -1;
   }
   else
@@ -126,7 +126,7 @@ double Timer::mean(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    std::cout << "Invalid timer id : " << timerId << "\n";
+    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
     return -1;
   }
   else
@@ -140,7 +140,7 @@ void Timer::tick(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    std::cout << "Invalid timer id : " << timerId << "\n";
+    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
   }
   else
   {
@@ -160,31 +160,31 @@ void Timer::tick(std::string timerId)
 
 void Timer::printMs(std::string timerId)
 {
-  std::cout << "Timer " << timerId << " : ";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
   printMsInternal(stop(timerId));
 }
 
 void Timer::printSec(std::string timerId)
 {
-  std::cout << "Timer " << timerId << " : ";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
   printSecInternal(stop(timerId));
 }
 
 void Timer::printMin(std::string timerId)
 {
-  std::cout << "Timer " << timerId << " : ";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
   printMinInternal(stop(timerId));
 }
 
 void Timer::printHours(std::string timerId)
 {
-  std::cout << "Timer " << timerId << " : ";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
   printHoursInternal(stop(timerId));
 }
 
 void Timer::printLiteral(std::string timerId)
 {
-  std::cout << "Timer " << timerId << " : ";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
   printLiteralInternal(stop(timerId));
 }
 
@@ -193,29 +193,29 @@ void Timer::printLiteralMean(std::string timerId, std::string identation)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    std::cout << "Invalid timer id : " << timerId << "\n";
+    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
   }
   else
   {
-    std::cout << identation << timerId <<
+    ROS_INFO_STREAM_NAMED("hole_detector", identation << timerId <<
       "' [" << times[timerId] << " - " <<
       min_time[timerId] << " , " << mean_time[timerId] << " , " <<
-      max_time[timerId] << " - " << count[timerId] << "]\n";
+      max_time[timerId] << " - " << count[timerId] << "]");
   }
 }
 
 void Timer::printAll(void)
 {
-  std::cout << "Timers available :\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available :");
   for(MsdCIt it = times.begin() ; it != times.end() ; it++)
   {
-    std::cout << "\t";
+    ROS_INFO_STREAM_NAMED("hole_detector", "\t");
     printLiteral(it->first);
   }
 }
 void Timer::printAllMeans(void)
 {
-  std::cout << "Timers available :\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available :");
   Mfs tms;
   for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {
@@ -223,14 +223,13 @@ void Timer::printAllMeans(void)
   }
   for(MfsIt it = tms.begin() ; it != tms.end() ; it++)
   {
-    std::cout << "\t";
-    printLiteralMean(it->second);
+    ROS_INFO_STREAM_NAMED("hole_detector", "\t"; printLiteralMean(it->second));
   }
 }
 
 void Timer::printAllMeansTree(void)
 {
-  std::cout << "\nTimers available : [curr - min , mean , max - ticks]\n";
+  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available : [curr - min , mean , max - ticks]\n");
   Mfs tms;
   for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {
@@ -245,6 +244,6 @@ void Timer::printIterativeTree(std::string node, std::string identation)
   for(std::set<std::string>::iterator it = timer_tree[node].begin() ; it !=
     timer_tree[node].end() ; it++)
   {
-    printIterativeTree(*it,identation + "├ ");
+    printIterativeTree(*it,identation + "|-");
   }
 }

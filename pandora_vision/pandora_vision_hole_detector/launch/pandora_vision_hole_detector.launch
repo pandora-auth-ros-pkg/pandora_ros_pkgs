@@ -15,7 +15,7 @@
     <param name="height" value="480" />
     <param name="point_step" value="32" />
 
-    <rosparam file="$(find pandora_vision_hole_detector)/config/synchronizer_node_topics.yaml"
+    <rosparam file="$(find pandora_vision_hole_detector)/cfg/synchronizer_node_topics.yaml"
               command="load" />
   </node>
 
@@ -28,7 +28,7 @@
         output="screen"
         ns="$(arg namespace)" >
 
-    <rosparam file="$(find pandora_vision_hole_detector)/config/depth_node_topics.yaml"
+    <rosparam file="$(find pandora_vision_hole_detector)/cfg/depth_node_topics.yaml"
               command="load" />
   </node>
 
@@ -41,7 +41,7 @@
         output="screen"
         ns="$(arg namespace)" >
 
-    <rosparam file="$(find pandora_vision_hole_detector)/config/rgb_node_topics.yaml"
+    <rosparam file="$(find pandora_vision_hole_detector)/cfg/rgb_node_topics.yaml"
               command="load" />
   </node>
 
@@ -54,7 +54,7 @@
         output="screen"
         ns="$(arg namespace)" >
 
-    <rosparam file="$(find pandora_vision_hole_detector)/config/hole_fusion_node_topics.yaml"
+    <rosparam file="$(find pandora_vision_hole_detector)/cfg/hole_fusion_node_topics.yaml"
               command="load" />
   </node>
 

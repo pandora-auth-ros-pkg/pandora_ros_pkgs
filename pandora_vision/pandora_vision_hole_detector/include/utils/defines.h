@@ -82,9 +82,7 @@
 #include "utils/timer.h"
 
 #define DEBUG_SHOW
-//#define DEBUG_PRINT
 #define DEBUG_TIME
-#define SHOW_DEBUG_IMAGE
 
 //!< Transforms a float number to string
 #define TOSTR( x )      static_cast< std::ostringstream & >( \

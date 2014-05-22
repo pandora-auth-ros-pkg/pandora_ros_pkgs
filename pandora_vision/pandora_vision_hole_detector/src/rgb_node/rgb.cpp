@@ -62,7 +62,7 @@ namespace pandora_vision
     server.setCallback(boost::bind(&Rgb::parametersCallback,
         this, _1, _2));
 
-    ROS_INFO("[RGB node] Initiated");
+    ROS_INFO_NAMED("hole_detector", "[RGB node] Initiated");
   }
 
 
@@ -72,7 +72,7 @@ namespace pandora_vision
    **/
   Rgb::~Rgb()
   {
-    ROS_DEBUG("[RGB node] Terminated");
+    ROS_INFO_NAMED("hole_detector", "[RGB node] Terminated");
   }
 
 
@@ -84,9 +84,7 @@ namespace pandora_vision
   */
   void Rgb::inputRgbImageCallback(const sensor_msgs::Image& msg)
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("RGB node callback");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "RGB node callback");
 
     #ifdef DEBUG_TIME
     Timer::start("inputRgbImageCallback", "", true);
@@ -157,13 +155,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       rgbImageTopic_ = ns + "/" + rgbImageTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[RGB Node] Subscribed to the input RGB image");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[RGB Node] Subscribed to the input RGB image");
     }
     else
     {
-      ROS_ERROR ("[RGB Node] Could not find topic rgb_image_topic");
+      ROS_ERROR_NAMED("hole_detector",
+        "[RGB Node] Could not find topic rgb_image_topic");
     }
 
     // Read the name of the topic to which the rgb node will be publishing
@@ -176,13 +174,13 @@ namespace pandora_vision
       // Make the topic's name absolute
       candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
 
-      #ifdef DEBUG_SHOW
-      ROS_INFO ("[RGB Node] Advertising to the candidate holes topic");
-      #endif
+      ROS_INFO_NAMED("hole_detector",
+        "[RGB Node] Advertising to the candidate holes topic");
     }
     else
     {
-      ROS_ERROR ("[RGB Node] Could not find topic candidate_holes_topic");
+      ROS_ERROR_NAMED("hole_detector",
+        "[RGB Node] Could not find topic candidate_holes_topic");
     }
   }
 
@@ -198,9 +196,7 @@ namespace pandora_vision
     const pandora_vision_hole_detector::rgb_cfgConfig& config,
     const uint32_t& level)
   {
-    #ifdef DEBUG_SHOW
-    ROS_INFO("[RGB node] Parameters callback called");
-    #endif
+    ROS_INFO_NAMED("hole_detector", "[RGB node] Parameters callback called");
 
     // Blob detection - specific parameters
     Parameters::Blob::blob_min_threshold =

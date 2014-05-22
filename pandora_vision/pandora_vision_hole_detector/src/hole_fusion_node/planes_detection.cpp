@@ -268,9 +268,8 @@ namespace pandora_vision
 
       if (inliers->indices.size () == 0)
       {
-        #ifdef DEBUG_SHOW
-        ROS_ERROR("Could not estimate a planar model for the given dataset.");
-        #endif
+        ROS_ERROR_NAMED("hole_detector",
+          "Could not estimate a planar model for the given dataset.");
 
         break;
       }
@@ -412,9 +411,8 @@ namespace pandora_vision
 
         if (inliers->indices.size () == 0)
         {
-          #ifdef DEBUG_SHOW
-          ROS_ERROR("Could not estimate a planar model for the given dataset.");
-          #endif
+          ROS_ERROR_NAMED("hole_detector",
+            "Could not estimate a planar model for the given dataset.");
 
           break;
         }

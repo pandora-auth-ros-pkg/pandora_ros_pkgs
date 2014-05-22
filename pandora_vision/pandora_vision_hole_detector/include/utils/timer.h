@@ -9,7 +9,10 @@
 #include <fstream>
 #include <sys/time.h>
 
-class Timer{
+#include "defines.h"
+
+class Timer
+{
   typedef std::map<std::string,double> Msd;
   typedef std::map<float,std::string> Mfs;
   typedef std::map<float,std::string>::iterator MfsIt;
@@ -18,7 +21,7 @@ class Timer{
   typedef std::map<std::string,double>::const_iterator MsdCIt;
   typedef std::pair<std::string,double> Psd;
   typedef std::pair<std::string,unsigned long> Psul;
-  
+
   static Msd times;
   static Msd max_time;
   static Msd min_time;
@@ -27,18 +30,20 @@ class Timer{
   static Msul count;
   static struct timeval msTime;
   static std::map<std::string,std::set<std::string> > timer_tree;
-  
+
   static std::string top_node;
 
   Timer(void){}
+
   static void printMsInternal(double t);
   static void printSecInternal(double t);
   static void printMinInternal(double t);
   static void printHoursInternal(double t);
   static void printLiteralInternal(double t);
-public:
-  static void start(std::string timerId, std::string father = "", 
-    bool top = false);
+
+  public:
+
+  static void start(std::string timerId, std::string father = "", bool top = false);
   static double stop(std::string timerId);
   static double mean(std::string timerId);
   static void tick(std::string timerId);
@@ -53,7 +58,5 @@ public:
   static void printAllMeansTree(void);
   static void printIterativeTree(std::string node, std::string identation);
 };
-
-
 
 #endif

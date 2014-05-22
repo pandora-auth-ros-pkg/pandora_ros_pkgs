@@ -377,9 +377,6 @@ namespace pandora_vision
       double blobToModelCorrelation = cv::compareHist(
         blobHistogram, inHistogram, CV_COMP_CORREL);
 
-      //ROS_ERROR("R2M: %f", static_cast<float> (rectangleToModelCorrelation));
-      //ROS_ERROR("B2M: %f", static_cast<float> (blobToModelCorrelation));
-
       // This blob is considered valid if there is a correlation between
       // blobToRectangleHistogram and the model histogram
       // (inHistogram)

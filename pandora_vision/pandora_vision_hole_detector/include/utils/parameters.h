@@ -97,7 +97,6 @@ namespace pandora_vision
 
       static bool show_merge_holes;
       static int show_merge_holes_size;
-
     };
 
 

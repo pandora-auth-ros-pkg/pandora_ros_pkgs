@@ -45,7 +45,6 @@
  **/
 int main(int argc, char** argv)
 {
-  srand (time(NULL));
   ros::init(argc, argv, "synchronizer_node");
   pandora_vision::RgbDepthSynchronizer synchronizer;
   ros::spin();
