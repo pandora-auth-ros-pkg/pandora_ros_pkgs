@@ -21,7 +21,7 @@
   <run_depend>watchdog_communications</run_depend>
   <run_depend>remote_mutex</run_depend>
   <run_depend>remote_mutex_communications</run_depend>
-  <run_depend>common_communications</run_depend>
+  <run_depend>pandora_common_msgs</run_depend>
 
   <export>
     <metapackage/>
