@@ -162,18 +162,23 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
 
   ##################### tests #####################
 
-  test/unit/bounding_box_detection_test.cpp
-  test/unit/blob_detection_test.cpp
-  test/unit/edge_detection_test.cpp
-  test/unit/hole_filters_test.cpp
-  test/unit/morphological_operators_test.cpp
-  test/unit/noise_elimination_test.cpp
+  ##################### utils #####################
+  test/unit/utils/bounding_box_detection_test.cpp
+  test/unit/utils/blob_detection_test.cpp
+  test/unit/utils/edge_detection_test.cpp
+  test/unit/utils/hole_filters_test.cpp
+  test/unit/utils/morphological_operators_test.cpp
+  test/unit/utils/noise_elimination_test.cpp
+
+  ################## depth node ###################
+  test/unit/depth_node/hole_detector_test.cpp
 
   )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
+
+##################################### Testing ##################################
 if(CATKIN_ENABLE_TESTING)
   add_subdirectory(test)
 endif()
-

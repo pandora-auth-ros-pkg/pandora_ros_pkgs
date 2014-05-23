@@ -323,6 +323,12 @@ namespace pandora_vision
     Parameters::Image::image_representation_method =
       config.image_representation_method;
 
+  // Term criteria for segmentation purposes
+    Parameters::Image::term_criteria_max_iterations =
+      config.term_criteria_max_iterations;
+    Parameters::Image::term_criteria_max_epsilon =
+      config.term_criteria_max_epsilon;
+
 
     // The detection method used to obtain the outline of a blob
     // 0 for detecting by means of brushfire

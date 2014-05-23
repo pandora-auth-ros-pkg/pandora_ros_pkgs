@@ -9,9 +9,10 @@ find_package(catkin REQUIRED COMPONENTS
 link_directories(${catkin_LIBRARIES_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 
-############## Unit Tests #####################
+###############################  Unit Tests ####################################
 
-#################### utils ####################
+#################################### utils #####################################
+
 catkin_add_gtest(blob_detection_test
   unit/utils/blob_detection_test.cpp)
 target_link_libraries(blob_detection_test ${catkin_LIBRARIES} utils_lib gtest_main)
@@ -39,6 +40,16 @@ target_link_libraries(morphological_operators_test ${catkin_LIBRARIES} utils_lib
 catkin_add_gtest(noise_elimination_test
   unit/utils/noise_elimination_test.cpp)
 target_link_libraries(noise_elimination_test ${catkin_LIBRARIES} utils_lib gtest_main)
+
+
+################################ depth node ####################################
+add_library(depth_node_lib
+  ../src/depth_node/hole_detector.cpp
+  )
+
+catkin_add_gtest(hole_detector_test
+  unit/depth_node/hole_detector_test.cpp)
+target_link_libraries(hole_detector_test ${catkin_LIBRARIES} utils_lib depth_node_lib gtest_main)
 
 
 ############## Functional Tests ###############

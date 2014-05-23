@@ -55,7 +55,7 @@ namespace pandora_vision
         @brief Constructs a rectangle of width @param x and height of @param y
         @param[in] upperLeft [const cv::Point2f&] The upper left vertex of the
         rectangle to be created
-        @param[in] x [const int&] The recgangle's width
+        @param[in] x [const int&] The rectangle's width
         @param[in] y [const int&] The rectangle's height
         @param[out] image [cv::Mat*] The image on which the rectangle will be
         imprinted on

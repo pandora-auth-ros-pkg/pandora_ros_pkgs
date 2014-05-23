@@ -2350,14 +2350,21 @@ namespace pandora_vision
     Timer::start("segmentation", "produceEdgesViaSegmentation");
     #endif
 
-    // Blur the input image
+    // Segment the input image
     if (segmentationMethod == 0)
     {
+      // Termination criteria for the segmentation below
+      cv::TermCriteria criteria(
+        CV_TERMCRIT_ITER | CV_TERMCRIT_EPS,
+        Parameters::Image::term_criteria_max_iterations,
+        Parameters::Image::term_criteria_max_epsilon);
+
       // Segment the image
       cv::pyrMeanShiftFiltering(inImage, *outImage,
         Parameters::Rgb::spatial_window_radius,
         Parameters::Rgb::color_window_radius,
-        Parameters::Rgb::maximum_level_pyramid_segmentation);
+        Parameters::Rgb::maximum_level_pyramid_segmentation,
+        criteria);
     }
     else if (segmentationMethod == 1)
     {

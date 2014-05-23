@@ -217,6 +217,9 @@ namespace pandora_vision
   // Method to scale the CV_32F image to CV_8UC1
   int Parameters::Image::scale_method = 0;
 
+  // Term criteria for segmentation purposes
+  int Parameters::Image::term_criteria_max_iterations = 1;
+  double Parameters::Image::term_criteria_max_epsilon = 1;
 
 
   // Outline discovery specific parameters

@@ -251,6 +251,10 @@ namespace pandora_vision
 
       // Method to scale the CV_32F images to CV_8UC1
       static int scale_method;
+
+      // Term criteria for segmentation purposes
+      static int term_criteria_max_iterations;
+      static double term_criteria_max_epsilon;
     };
 
 
