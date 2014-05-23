@@ -11,7 +11,7 @@ from vision_communications.msg import HazmatAlertMsg
 from vision_communications.msg import HazmatAlertsVectorMsg
 from vision_communications.msg import QRAlertsVectorMsg
 from vision_communications.msg import QRAlertMsg
-from data_fusion_communications.msg import ThermalDirectionAlertMsg
+from pandora_common_msgs.msg import GeneralAlertMsg
 
 class BadBossOrderFile(Exception):
     def __init__(self, value):
@@ -36,8 +36,8 @@ class AlertDeliveryBoy:
         self.hole_msg = HolesDirectionsVectorMsg()
         self.hole_msg.header.frame_id = self.frame_id
 
-        self.tpa_msg = ThermalDirectionAlertMsg()
-        self.tpa_msg.header.frame_id = self.frame_id
+        self.thermal_msg = GeneralAlertMsg()
+        self.thermal_msg.header.frame_id = self.frame_id
         
         self.hazmatDeliveryAddress = '/vision/hazmat_alert'
         self.hazmat_pub = rospy.Publisher(self.hazmatDeliveryAddress, 
@@ -45,14 +45,12 @@ class AlertDeliveryBoy:
         self.qrDeliveryAddress = '/vision/qr_alert'
         self.qr_pub = rospy.Publisher(self.qrDeliveryAddress, 
                                       QRAlertsVectorMsg)
-        self.holeDeliveryAddress = '/data_fusion/victim_fusion/'+\
-                                   'hole_direction_alert'
+        self.holeDeliveryAddress = '/vision/hole_direction_alert'
         self.hole_pub = rospy.Publisher(self.holeDeliveryAddress, 
                                         HolesDirectionsVectorMsg)
-        self.tpaDeliveryAddress = '/data_fusion/victim_fusion/'+\
-                                  'tpa_direction_alert'
-        self.tpa_pub = rospy.Publisher(self.tpaDeliveryAddress,
-                                       ThermalDirectionAlertMsg)
+        self.thermalDeliveryAddress = '/sensor_processors/thermal_direction_alert'
+        self.thermal_pub = rospy.Publisher(self.thermalDeliveryAddress,
+                                       GeneralAlertMsg)
 
     def deliverHoleOrder(self, orderYaw, 
                         orderPitch, orderId, orderProbability = 1):
@@ -85,13 +83,13 @@ class AlertDeliveryBoy:
                                               QRcontent = orderContent))
         self.qr_pub.publish(self.qr_msg)
 
-    def deliverTpaOrder(self, orderYaw, orderPitch, orderProbability):
+    def deliverThermalOrder(self, orderYaw, orderPitch, orderProbability):
 
-        self.tpa_msg.header.stamp = rospy.get_rostime()
-        self.tpa_msg.yaw = orderYaw
-        self.tpa_msg.pitch = orderPitch
-        self.tpa_msg.probability = orderProbability
-        self.tpa_pub.publish(self.tpa_msg)
+        self.thermal_msg.header.stamp = rospy.get_rostime()
+        self.thermal_msg.yaw = orderYaw
+        self.thermal_msg.pitch = orderPitch
+        self.thermal_msg.probability = orderProbability
+        self.thermal_pub.publish(self.thermal_msg)
 
     def deliverNextOrder(self):
         
@@ -104,8 +102,8 @@ class AlertDeliveryBoy:
             self.hazmat_pub.publish(nextOrder[0])
         elif nextOrder[1] == 'hole':
             self.hole_pub.publish(nextOrder[0])
-        elif nextOrder[1] == 'tpa':
-            self.tpa_pub.publish(nextOrder[0])
+        elif nextOrder[1] == 'thermal':
+            self.thermal_pub.publish(nextOrder[0])
 
     def clearOrderList(self):
 
@@ -159,15 +157,15 @@ class AlertDeliveryBoy:
                                                         holeId = int(a[3])))
                     self.orderWaitingList.append((hole_msg, 'hole'))
 
-                elif a[0] == 'tpa:':
+                elif a[0] == 'thermal:':
                     if len(a) != 4:
                         raise BadBossOrderFile("Not right argument numbers.")
-                    tpa_msg = ThermalDirectionAlertMsg()
-                    tpa_msg.header.frame_id = self.frame_id
-                    tpa_msg.yaw = float(a[1])
-                    tpa_msg.pitch = float(a[2])
-                    tpa_msg.probability = float(a[3])
-                    self.orderWaitingList.append((tpa_msg, 'tpa'))
+                    thermal_msg = ThermalDirectionAlertMsg()
+                    thermal_msg.header.frame_id = self.frame_id
+                    thermal_msg.yaw = float(a[1])
+                    thermal_msg.pitch = float(a[2])
+                    thermal_msg.probability = float(a[3])
+                    self.orderWaitingList.append((thermal_msg, 'thermal'))
                 
                 else:
                     raise BadBossOrderFile("Not recognized object type.")

@@ -21,17 +21,17 @@
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
+  namespace pandora_alert_handler
+  {
 
-using geometry_msgs::Point;
-using geometry_msgs::Pose;
-using geometry_msgs::PoseStamped;
+    using geometry_msgs::Point;
+    using geometry_msgs::Pose;
+    using geometry_msgs::PoseStamped;
 
-typedef std::vector<PoseStamped> PoseStampedVector;
-typedef nav_msgs::OccupancyGrid Map;
-typedef nav_msgs::OccupancyGridPtr MapPtr;
-typedef nav_msgs::OccupancyGridConstPtr MapConstPtr;
+    typedef std::vector<PoseStamped> PoseStampedVector;
+    typedef nav_msgs::OccupancyGrid Map;
+    typedef nav_msgs::OccupancyGridPtr MapPtr;
+    typedef nav_msgs::OccupancyGridConstPtr MapConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>Containts pandora data fusion packages</description>
 
-  <maintainer email="afourast@gmail.com">Afouras Triantafyllos</maintainer>
+  <maintainer email="chritsir@auth.gr">Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -16,8 +16,7 @@
   
   <buildtool_depend>catkin</buildtool_depend>
   
-  <run_depend>data_fusion_communications</run_depend>
-  <run_depend>pandora_victim_fusion</run_depend>
+  <run_depend>pandora_data_fusion_msgs</run_depend>
   <run_depend>pandora_alert_handler</run_depend>
   <run_depend>pandora_data_fusion_launchers</run_depend>
 

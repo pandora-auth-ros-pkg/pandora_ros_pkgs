@@ -10,7 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
           state_manager
           dynamic_reconfigure
           roslint
-          data_fusion_communications 
+          pandora_data_fusion_msgs 
+          pandora_common_msgs
           vision_communications
           )
 
@@ -42,7 +43,7 @@ target_link_libraries(utils
           ${catkin_LIBRARIES}
           )
 add_dependencies(utils 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   )
 
 ##################### filter_model ############################################
@@ -53,71 +54,46 @@ target_link_libraries(filter_model
           ${catkin_LIBRARIES}
           ${BFL_LIBRARIES}
           )
-add_dependencies(filter_model 
-  data_fusion_communications_gencpp
-  )
 
 ###################### objects #########################################
 
-add_library(objects 
-        src/objects.cpp)
+add_library(base_object
+        src/base_object.cpp)
+target_link_libraries(base_object
+          ${catkin_LIBRARIES}
+          )
+
+add_library(objects
+        src/hole.cpp
+        src/hazmat.cpp
+        src/qr.cpp
+        src/thermal.cpp
+        src/face.cpp
+        src/motion.cpp
+        src/sound.cpp
+        src/co2.cpp
+        )
 target_link_libraries(objects
           ${catkin_LIBRARIES}
+          ${BFL_LIBRARIES}
           utils
+          base_object
           filter_model
           )
-add_dependencies(objects 
-  data_fusion_communications_gencpp
-  ) 
-
-add_library(hazmat 
-        src/hazmat.cpp)
-target_link_libraries(hazmat
-          ${catkin_LIBRARIES}
-          objects
-          )
-add_dependencies(hazmat
-  data_fusion_communications_gencpp
-  ) 
-
-add_library(hole
-        src/hole.cpp)
-target_link_libraries(hole
-          ${catkin_LIBRARIES}
-          objects
-          )
-add_dependencies(hole
-  data_fusion_communications_gencpp
-  ) 
-
-add_library(qr 
-        src/qr.cpp)
-target_link_libraries(qr 
-          ${catkin_LIBRARIES}
-          objects
-          )
-add_dependencies(qr 
-  data_fusion_communications_gencpp
-  ) 
-
-add_library(tpa 
-        src/tpa.cpp)
-target_link_libraries(tpa 
-          ${catkin_LIBRARIES}
-          objects
-          )
-add_dependencies(tpa
-  data_fusion_communications_gencpp
+add_dependencies(objects
+  pandora_data_fusion_msgs_gencpp
   ) 
 
 add_library(victim 
         src/victim.cpp)
 target_link_libraries(victim
           ${catkin_LIBRARIES}
-          objects 
+          utils
+          base_object
+          objects
           )
 add_dependencies(victim 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   ) 
 
 ###################### victim_list #####################################
@@ -126,12 +102,10 @@ add_library(victim_list
         src/victim_list.cpp)
 target_link_libraries(victim_list
           ${catkin_LIBRARIES}
-          utils
-          filter_model
           victim
           )
 add_dependencies(victim_list 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   )           
 
 #################### ros_tf_listener ####################################
@@ -142,7 +116,7 @@ target_link_libraries(ros_tf_listener
           ${catkin_LIBRARIES}
           )
 add_dependencies(ros_tf_listener
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   ) 
 
 #################### pose_finder ########################################
@@ -151,12 +125,11 @@ add_library(pose_finder
         src/pose_finder.cpp)
 target_link_libraries(pose_finder
           ${catkin_LIBRARIES}
-          ros_tf_listener
-          objects
           utils
+          ros_tf_listener
           )
 add_dependencies(pose_finder 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   ) 
 
 #################### object_factory ###################################
@@ -166,15 +139,12 @@ add_library(object_factory
 target_link_libraries(object_factory
           ${catkin_LIBRARIES}
           pose_finder
-          hazmat
-          hole
-          qr
-          tpa
-          utils
+          objects
           )
 add_dependencies(object_factory 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   vision_communications_gencpp
+  pandora_common_msgs_gencpp
   ) 
          
 #################### victim_clusterer ###################################
@@ -183,10 +153,11 @@ add_library(victim_clusterer
         src/victim_clusterer.cpp)
 target_link_libraries(victim_clusterer 
           ${catkin_LIBRARIES}
+          utils
           victim
           )
 add_dependencies(victim_clusterer 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   )           
 
 #################### victim_handler #####################################
@@ -195,12 +166,13 @@ add_library(victim_handler
         src/victim_handler.cpp)
 target_link_libraries(victim_handler
           ${catkin_LIBRARIES}
+          utils
           victim
-          victim_clusterer
           victim_list
+          victim_clusterer
           )
 add_dependencies(victim_handler 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   ) 
           
 ##################### object_handler ####################################
@@ -209,9 +181,12 @@ add_library(object_handler
         src/object_handler.cpp)
 target_link_libraries(object_handler 
           ${catkin_LIBRARIES}
+          utils
+          objects
+          victim_list
           )
 add_dependencies(object_handler 
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
   ) 
 
 ##################### alert_handler #####################################
@@ -220,11 +195,16 @@ add_library(alert_handler
         src/alert_handler.cpp)
 target_link_libraries(alert_handler 
           ${catkin_LIBRARIES}
+          object_factory
+          object_handler
+          victim_handler
+          victim_list
           )
 add_dependencies(alert_handler 
   pandora_alert_handler_gencfg 
   vision_communications_gencpp
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
+  pandora_common_msgs_gencpp
   state_manager_communications_gencpp
   ) 
 
@@ -235,26 +215,12 @@ add_executable(alert_handler_node
 target_link_libraries(alert_handler_node 
           ${catkin_LIBRARIES}
           alert_handler
-          object_factory
-          object_handler
-          pose_finder
-          ros_tf_listener
-          victim_handler
-          victim_clusterer
-          victim_list
-          utils
-          filter_model
-          objects
-          hazmat
-          hole
-          qr
-          tpa
-          victim
           )
 add_dependencies(alert_handler_node 
   pandora_alert_handler_gencfg 
   vision_communications_gencpp
-  data_fusion_communications_gencpp
+  pandora_data_fusion_msgs_gencpp
+  pandora_common_msgs_gencpp
   state_manager_communications_gencpp
   ) 
 
@@ -289,12 +255,12 @@ set(ROSLINT_CPP_OPTS
     "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens,-whitespace/braces")
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST 
     RELATIVE ${PROJECT_SOURCE_DIR} 
-    test/*
+    test/unit/*
     )
 roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 #roslint_add_test()
 
-####### Testing ####
+####### Testing #######
 
 if(CATKIN_ENABLE_TESTING)
   add_subdirectory(test)

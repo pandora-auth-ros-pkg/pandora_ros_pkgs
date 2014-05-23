@@ -1,0 +1,7 @@
+#goal
+int32 victimId
+bool victimValid
+---
+#result
+---
+#feedback

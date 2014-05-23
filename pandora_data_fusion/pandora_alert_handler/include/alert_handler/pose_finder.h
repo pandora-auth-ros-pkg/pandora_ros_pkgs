@@ -14,62 +14,59 @@
 #include "alert_handler/defines.h"
 #include "alert_handler/tf_finder.h"
 #include "alert_handler/tf_listener.h"
-#include "alert_handler/objects.h"
 #include "alert_handler/utils.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
+  namespace pandora_alert_handler
+  {
 
-class PoseFinder : private boost::noncopyable
-{
- public:
+    class PoseFinder : private boost::noncopyable
+    {
+      public:
 
-  PoseFinder(const MapPtr& map, const std::string& mapType);
-  Pose findAlertPose(float alertYaw, float alertPitch,
-    tf::Transform tfTransform);
-  tf::Transform lookupTransformFromWorld(std_msgs::Header header);
+        PoseFinder(const MapPtr& map, const std::string& mapType);
+        Pose findAlertPose(float alertYaw, float alertPitch,
+            tf::Transform tfTransform);
+        tf::Transform lookupTransformFromWorld(std_msgs::Header header);
 
-  void updateParams(float occupiedCellThres,
-    float heightHighThres, float heightLowThres,
-    float approachDist,
-    float orientationDist, float orientationCircle);
+        void updateParams(float occupiedCellThres,
+            float heightHighThres, float heightLowThres,
+            float orientationDist, float orientationCircle);
 
- private:
+      private:
 
-  Point positionOnWall(Point startPoint, float angle);
-  float calcHeight(float alertPitch, float height, float distFromAlert);
-  geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
-      Point alertPoint);
-  std::pair<Point, Point> findDiameterEndPointsOnWall(
-      std::vector<Point> points);
+        Point positionOnWall(Point startPoint, float angle);
+        float calcHeight(float alertPitch, float height, float distFromAlert);
+        geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
+            Point alertPoint);
+        std::pair<Point, Point> findDiameterEndPointsOnWall(
+            std::vector<Point> points);
 
-  void publishVisionTransform(float alertYaw, float alertPitch,
-      tf::Transform worldHeadCameraTransform);
+        void publishVisionTransform(float alertYaw, float alertPitch,
+            tf::Transform worldHeadCameraTransform);
 
- private:
+      private:
 
-  friend class PoseFinderTest;
+        friend class PoseFinderTest;
 
- private:
+      private:
 
-  const MapPtr& map_;
+        const MapPtr& map_;
 
-  TfListenerPtr listener_;
-  // tf::TransformBroadcaster victimFrameBroadcaster;
+        TfListenerPtr listener_;
+        // tf::TransformBroadcaster victimFrameBroadcaster;
 
-  //!< params
-  float ORIENTATION_CIRCLE;
-  float ORIENTATION_DIST;
-  float APPROACH_DIST;
-  float HEIGHT_HIGH_THRES;
-  float HEIGHT_LOW_THRES;
-  float OCCUPIED_CELL_THRES;
+        //!< params
+        float ORIENTATION_CIRCLE;
+        float ORIENTATION_DIST;
+        float HEIGHT_HIGH_THRES;
+        float HEIGHT_LOW_THRES;
+        float OCCUPIED_CELL_THRES;
 
-};
+    };
 
-typedef boost::scoped_ptr< PoseFinder > PoseFinderPtr;
+    typedef boost::scoped_ptr< PoseFinder > PoseFinderPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

@@ -4,7 +4,6 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
 
   <!--Victim fusion and alert handler-->
-  <include file="$(find pandora_victim_fusion)/launch/victim_fusion.launch" /> 
   <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
 
   <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_params.yaml" 

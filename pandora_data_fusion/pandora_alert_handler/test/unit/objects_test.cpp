@@ -1,120 +1,231 @@
-/*Copyright [2014] <Chamzas Konstantinos>*/ 
+// "Copyright [2014] <Chamzas Konstantinos>"
+
+#include "gtest/gtest.h"
 
 #include "alert_handler/objects.h"
-#include "gtest/gtest.h"
+#include "alert_handler/utils.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
-
-class ObjectsTest : public ::testing::Test 
-{
-protected:
-
-  ObjectsTest()
+  namespace pandora_alert_handler
   {
-    QrPtr2.reset(new Qr);
-    HazmatPtr2.reset(new Hazmat);
-    HazmatPtr3.reset(new Hazmat);
-    HolePtr2.reset(new Hole);
-    TpaPtr2.reset(new Tpa);
-  }
 
-// Seting up all the differnet Objects that will be used for our test cases
-// The distance Between the points (0,0,0,) (4,3,2) is 5 
-  
-  virtual void SetUp() 
-  {
-     
-    pose1.position.x = 0;
-    pose1.position.y = 0;
-    pose1.position.z = 0;
-    pose2.position.x = 4;
-    pose2.position.y = 3;
-    pose2.position.z = 0;
-    Qr1.setPose(pose1);
-    QrPtr2->setPose(pose2);
-    Hazmat1.setPose(pose1);
-    Hazmat1.setPattern(1);
-    HazmatPtr2->setPose(pose2);
-    HazmatPtr2->setPattern(1);
-    HazmatPtr3->setPose(pose2);
-    HazmatPtr3->setPattern(0);
-    Hole1.setPose(pose1);
-    HolePtr2->setPose(pose2);
-    Tpa1.setPose(pose1);
-    TpaPtr2->setPose(pose2);
-  }
-  
-  /* Variables */
+    class ObjectsTest : public ::testing::Test 
+    {
+      protected:
 
-  geometry_msgs::Pose pose1;
-  geometry_msgs::Pose pose2;
-  Object Object1;
-  Qr Qr1;
-  QrPtr QrPtr2;
-  Hazmat Hazmat1;
-  HazmatPtr HazmatPtr2;
-  HazmatPtr HazmatPtr3;
-  Hole Hole1;
-  HolePtr HolePtr2;
-  Tpa Tpa1;
-  TpaPtr TpaPtr2;
-};
+        ObjectsTest() 
+        {
+          qr1_.reset( new Qr );
+          qr2_.reset( new Qr );
+          hazmat1_.reset( new Hazmat );
+          hazmat2_.reset( new Hazmat );
+          hole1_.reset( new Hole );
+          hole2_.reset( new Hole );
+          thermal1_.reset( new Thermal );
+          thermal2_.reset( new Thermal );
+        }
 
-TEST_F(ObjectsTest, Construstors)
-  {
-  EXPECT_FALSE(Object1.getLegit());
-  EXPECT_STREQ("qr", Qr1.getType().c_str());    
-  EXPECT_STREQ("hazmat", Hazmat1.getType().c_str());
-  EXPECT_STREQ("hole", Hole1.getType().c_str());
-  EXPECT_STREQ("tpa", Tpa1.getType().c_str());
-  }
+        // Seting up all the different objects that will be used 
+        // for our test cases. The distance between the points 
+        // (0,0,0), (4,3,0) is 5.
+        virtual void SetUp() 
+        {
+          pose1_.position.x = 0;
+          pose1_.position.y = 0;
+          pose1_.position.z = 0;
+          pose2_.position.x = 4;
+          pose2_.position.y = 3;
+          pose2_.position.z = 0;
+          EXPECT_EQ(5, distance(pose1_, pose2_));
 
-// Checks  if isSameObject() behaves correctly for all possible inputs(Qr)
+          Qr::setType("QR");
+          Qr::setDistanceThres(6);
+          Qr::setProbabilityThres(0.75);
+          qr1_->setPose(pose1_);
+          qr1_->setId(1);
+          qr1_->setProbability(0.5);
+          qr1_->initializeObjectFilter();
 
-TEST_F(ObjectsTest, IsSameQr)
-  {
-  EXPECT_FALSE(Qr1.isSameObject( ObjectConstPtr(QrPtr2), 4));
-  EXPECT_FALSE(Qr1.isSameObject( ObjectConstPtr(QrPtr2), -8));
-  EXPECT_TRUE(Qr1.isSameObject( ObjectConstPtr(QrPtr2), 6));
-  }
-         
-// Checks  if isSameObject() behaves correctly for all possible inputs(Hazmat)
-     
-TEST_F(ObjectsTest, IsSameHazmat)
-  {
-  EXPECT_FALSE(Hazmat1.isSameObject( ObjectConstPtr(HazmatPtr2), 4));
-  EXPECT_FALSE(Hazmat1.isSameObject( ObjectConstPtr(HazmatPtr2), -8));
-  EXPECT_FALSE(Hazmat1.isSameObject( ObjectConstPtr(HazmatPtr3), 6));  
-  EXPECT_TRUE(Hazmat1.isSameObject( ObjectConstPtr(HazmatPtr2), 6));
-  }
-  
-// Checks  if isSameObject() behaves correctly for all possible inputs(Hole)
-     
-TEST_F(ObjectsTest, IsSameHole) 
-  {
-  EXPECT_FALSE(Hole1.isSameObject( ObjectConstPtr(HolePtr2), 4));
-  EXPECT_FALSE(Hole1.isSameObject( ObjectConstPtr(HolePtr2), -8));
-  EXPECT_TRUE(Hole1.isSameObject( ObjectConstPtr(HolePtr2), 6));
-  }
+          //!< Check that initializeObjectFilter works as intended!
+          ASSERT_FLOAT_EQ(Utils::stdDevFromProbability(
+                qr1_->getDistanceThres(), 0.5), qr1_->getStdDevX());
 
-// Checks  if isSameObject() behaves correctly for all possible inputs(Tpa)
-     
-TEST_F(ObjectsTest, isSameTpa) 
-  {
-  EXPECT_FALSE(Tpa1.isSameObject( ObjectConstPtr(TpaPtr2), 4));
-  EXPECT_FALSE(Tpa1.isSameObject( ObjectConstPtr(TpaPtr2), -8));
-  EXPECT_TRUE(Tpa1.isSameObject( ObjectConstPtr(TpaPtr2), 6));
-  }
+          qr2_->setPose(pose2_);
+          qr2_->setId(2);
+          qr2_->setProbability(0.5);
+          qr2_->initializeObjectFilter(); 
+
+          Hazmat::setType("HAZMAT");
+          Hazmat::setDistanceThres(6);
+          Hazmat::setProbabilityThres(0.75);
+          hazmat1_->setPose(pose1_);
+          hazmat1_->setId(1);
+          hazmat1_->setProbability(0.5);
+          hazmat1_->initializeObjectFilter();
+          hazmat2_->setPose(pose2_);
+          hazmat2_->setId(2);
+          hazmat2_->setProbability(0.5);
+          hazmat2_->initializeObjectFilter();
+
+          Hole::setType("HOLE");
+          Hole::setDistanceThres(6);
+          Hole::setProbabilityThres(0.75);
+          hole1_->setPose(pose1_);
+          hole1_->setId(1);
+          hole1_->setProbability(0.5);
+          hole1_->initializeObjectFilter();
+          hole2_->setPose(pose2_);
+          hole2_->setId(2);
+          hole2_->setProbability(0.5);
+          hole2_->initializeObjectFilter();
+
+          Thermal::setType("THERMAL");
+          Thermal::setDistanceThres(6);
+          Thermal::setProbabilityThres(0.75);
+          thermal1_->setPose(pose1_);
+          thermal1_->setId(2);
+          thermal1_->setProbability(0.5);
+          thermal1_->initializeObjectFilter();
+          thermal2_->setPose(pose2_);
+          thermal2_->setId(2);
+          thermal2_->setProbability(0.5);
+          thermal2_->initializeObjectFilter();
+        }
+
+        /* Helper functions */
+
+        float distance(Pose pose1, Pose pose2)
+        {
+          float x = pose1.position.x - pose2.position.x;
+          float y = pose1.position.y - pose2.position.y;
+          float z = pose1.position.z - pose2.position.z;
+          return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+        }
+
+        /* Variables */
+
+        geometry_msgs::Pose pose1_;
+        geometry_msgs::Pose pose2_;
+        QrPtr qr1_;
+        QrPtr qr2_;
+        HazmatPtr hazmat1_;
+        HazmatPtr hazmat2_;
+        HolePtr hole1_;
+        HolePtr hole2_;
+        ThermalPtr thermal1_;
+        ThermalPtr thermal2_;
+    };
+
+    TEST_F(ObjectsTest, QrConstrustor)
+    {
+      EXPECT_FALSE(qr1_->getLegit());
+      EXPECT_EQ(Qr::getObjectType(), qr1_->getType()); 
+    }
+
+    TEST_F(ObjectsTest, HazmatConstrustor)
+    {
+      EXPECT_FALSE(hazmat1_->getLegit());
+      EXPECT_EQ(Hazmat::getObjectType(), hazmat1_->getType()); 
+    }
+
+    TEST_F(ObjectsTest, HoleConstrustor)
+    {
+      EXPECT_FALSE(hole1_->getLegit());
+      EXPECT_EQ(Hole::getObjectType(), hole1_->getType()); 
+    }
+
+    TEST_F(ObjectsTest, ThermalConstrustor)
+    {
+      EXPECT_FALSE(thermal1_->getLegit());
+      EXPECT_EQ(Thermal::getObjectType(), thermal1_->getType()); 
+    }
+
+    TEST_F(ObjectsTest, isSameObject)
+    {
+      EXPECT_FALSE(qr1_->isSameObject(hazmat1_));
+      EXPECT_FALSE(hazmat1_->isSameObject(hole1_));
+      EXPECT_FALSE(hole1_->isSameObject(thermal1_));
+      EXPECT_FALSE(thermal1_->isSameObject(qr1_));
+
+      EXPECT_TRUE(thermal1_->isSameObject(thermal2_));
+      EXPECT_TRUE(thermal2_->isSameObject(thermal1_));
+
+      EXPECT_TRUE(hole1_->isSameObject(hole2_));
+    }
+
+    TEST_F(ObjectsTest, isSameQr)
+    {
+      qr1_->setContent("Voula");
+      qr2_->setContent("Voula");
+      EXPECT_TRUE(qr1_->isSameObject(qr2_));
+      Qr::setDistanceThres(4);
+      EXPECT_FALSE(qr1_->isSameObject(qr2_));
+      Qr::setDistanceThres(6);
+      qr2_->setContent("Vicky");
+      EXPECT_FALSE(qr1_->isSameObject(qr2_));
+    }
+
+    TEST_F(ObjectsTest, isSameHazmat)
+    {
+      hazmat1_->setPattern(1);
+      hazmat2_->setPattern(1);
+      EXPECT_TRUE(hazmat1_->isSameObject(hazmat2_));
+      Hazmat::setDistanceThres(4);
+      EXPECT_FALSE(hazmat1_->isSameObject(hazmat2_));
+      Hazmat::setDistanceThres(6);
+      hazmat2_->setPattern(4);
+      EXPECT_FALSE(hazmat1_->isSameObject(hazmat2_));
+    }
+
+    TEST_F(ObjectsTest, checkLegit)
+    {
+      qr1_->setProbability(0.8);
+      EXPECT_FALSE(qr1_->getLegit());
+      qr1_->checkLegit();
+      EXPECT_TRUE(qr1_->getLegit());
+    }
+
+    TEST_F(ObjectsTest, update)
+    {
+      ASSERT_EQ(0.5, qr1_->getProbability());
+      ASSERT_GE(qr2_->getProbability(), 0.5);
+      float probabilityBefore = qr1_->getProbability();
+      float stdDevBefore = qr1_->getStdDevX();
+      Pose poseBefore = qr1_->getPose();
+      EXPECT_FALSE(qr1_->getLegit());
+      qr1_->update(qr2_);
+      EXPECT_FALSE(qr1_->getLegit());
+      EXPECT_GT(qr1_->getProbability(), probabilityBefore);
+      EXPECT_LT(qr1_->getStdDevX(), stdDevBefore);
+      EXPECT_LT(distance(qr1_->getPose(), qr2_->getPose()),
+          distance(poseBefore, qr2_->getPose()));
+
+      probabilityBefore = qr1_->getProbability();
+      stdDevBefore = qr1_->getStdDevX();
+      poseBefore = qr1_->getPose();
+      qr1_->update(qr2_);
+      EXPECT_TRUE(qr1_->getLegit());
+      EXPECT_GT(qr1_->getProbability(), probabilityBefore);
+      EXPECT_LT(qr1_->getStdDevX(), stdDevBefore);
+      EXPECT_LT(distance(qr1_->getPose(), qr2_->getPose()),
+          distance(poseBefore, qr2_->getPose()));
+    }
+
+    TEST_F(ObjectsTest, updateWithZeroProbability)
+    {
+      qr2_->setProbability(0);
+      qr2_->initializeObjectFilter();
+      float probabilityBefore = qr1_->getProbability();
+      float stdDevBefore = qr1_->getStdDevX();
+      Pose poseBefore = qr1_->getPose();
+      qr1_->update(qr2_);
+      EXPECT_FALSE(qr1_->getLegit());
+      EXPECT_LT(qr1_->getProbability(), probabilityBefore);
+      EXPECT_GT(qr1_->getStdDevX(), stdDevBefore);
+      EXPECT_LT(distance(qr1_->getPose(), poseBefore), 0.6);
+    }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-int main(int argc, char **argv)
-  {
-  ros::Time::init();
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-  }

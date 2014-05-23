@@ -1,22 +1,22 @@
 subscribed_topic_names:
-  holeDirection: /data_fusion/victim_fusion/hole_direction_alert
-  tpaDirection: /data_fusion/victim_fusion/tpa_direction_alert
-  victimVerification: /data_fusion/victim_fusion/victim_verification
+  holeDirection: /vision/hole_direction_alert
+  thermalDirection: /sensor_processors/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
-  currentVictim: /data_fusion/victim_fusion/selected_victim
+  faceDirection: /vision/face_direction_alert
+  co2Direction: /sensor_processors/co2_direction_alert
+  motionDirection: /vision/motion_alert
+  soundDirection: /sensor_processors/sound_direction_alert
   map: /slam/map
 published_topic_names:  
-  victim_found : victim_found
-  victim_update : victim_update
-  victim_verified : victim_verified
+  victims : victims
   valid_victims_counter : valid_victims_counter
   qr_notification : qr_notification
   robocup_score : robocup_score
 action_server_names:
-  get_victims: get_victims
-  delete_current_victim: delete_current_victim
-  validate_current_hole: validate_current_hole
+  select_victim: select_victim
+  delete_victim: delete_victim
+  validate_victim: validate_victim
 service_server_names:
   get_objects: /data_fusion/get_objects
   get_markers: /data_fusion/get_markers

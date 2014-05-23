@@ -9,8 +9,8 @@ import rospy
 
 import alert_delivery
 
-from data_fusion_communications.srv import GetObjectsSrv
-from data_fusion_communications.srv import GetObjectsSrvResponse
+from pandora_data_fusion_msgs.srv import GetObjectsSrv
+from pandora_data_fusion_msgs.srv import GetObjectsSrvResponse
 from std_srvs.srv import Empty
 from geometry_msgs.msg import Point
 

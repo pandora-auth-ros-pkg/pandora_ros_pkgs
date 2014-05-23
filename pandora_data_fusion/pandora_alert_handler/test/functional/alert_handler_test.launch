@@ -15,8 +15,6 @@
   <!--<node name="data_fusion_object_visualization" type="data_fusion_object_visualization"-->
   <!--  pkg="pandora_visualization" respawn="true" ns="data_fusion" />                     -->
 
-  <node name="state_changer" type="state_changer" pkg="state_manager" args="2" />
-
   <!--<include file="$(find pandora_visualization)/launch/rviz/rviz.launch" />             -->
 
   <test test-name="AlertHandlerTest" pkg="pandora_alert_handler"

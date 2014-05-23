@@ -18,11 +18,6 @@ from test_base import distance
 from test_base import direction
 import test_base
 
-from data_fusion_communications.srv import GetObjectsSrv
-from data_fusion_communications.srv import GetObjectsSrvResponse
-from std_srvs.srv import Empty
-from geometry_msgs.msg import Point
-
 class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_works(self):
@@ -60,23 +55,23 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertEqual(len(outs[0].holes), 1)
         self.assertEqual(len(outs[0].hazmats), 0)
         self.assertEqual(len(outs[0].qrs), 0)
-        self.assertEqual(len(outs[0].tpas), 0)
+        self.assertEqual(len(outs[0].thermals), 0)
         self.assertEqual(len(outs[1].holes), 1)
         self.assertEqual(len(outs[1].hazmats), 0)
         self.assertEqual(len(outs[1].qrs), 1)
-        self.assertEqual(len(outs[1].tpas), 0)
+        self.assertEqual(len(outs[1].thermals), 0)
         self.assertEqual(len(outs[2].holes), 1)
         self.assertEqual(len(outs[2].hazmats), 1)
         self.assertEqual(len(outs[2].qrs), 1)
-        self.assertEqual(len(outs[2].tpas), 0)
+        self.assertEqual(len(outs[2].thermals), 0)
         self.assertEqual(len(outs[3].holes), 1)
         self.assertEqual(len(outs[3].hazmats), 1)
         self.assertEqual(len(outs[3].qrs), 1)
-        self.assertEqual(len(outs[3].tpas), 0)
+        self.assertEqual(len(outs[3].thermals), 0)
         self.assertEqual(len(outs[4].holes), 1)
         self.assertEqual(len(outs[4].hazmats), 1)
         self.assertEqual(len(outs[4].qrs), 1)
-        self.assertEqual(len(outs[4].tpas), 1)
+        self.assertEqual(len(outs[4].thermals), 1)
 
     def test_kalman_filter_of_one_object(self):
         
@@ -93,7 +88,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
             self.assertEqual(len(outs[-1].holes), 1)
             self.assertEqual(len(outs[-1].hazmats), 0)
             self.assertEqual(len(outs[-1].qrs), 0)
-            self.assertEqual(len(outs[-1].tpas), 0)
+            self.assertEqual(len(outs[-1].thermals), 0)
         position0 = outs[0].holes[0].pose.position
         position1 = outs[1].holes[0].pose.position
         position4 = outs[4].holes[0].pose.position
@@ -146,7 +141,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
             self.assertEqual(len(outs[-1].holes), 1)
             self.assertEqual(len(outs[-1].hazmats), 0)
             self.assertEqual(len(outs[-1].qrs), 0)
-            self.assertEqual(len(outs[-1].tpas), 0)
+            self.assertEqual(len(outs[-1].thermals), 0)
             if len(outs) > 1:
                 self.assertEqual(distance(outs[-1].holes[0].pose.position, 
                   outs[-2].holes[0].pose.position), 0)

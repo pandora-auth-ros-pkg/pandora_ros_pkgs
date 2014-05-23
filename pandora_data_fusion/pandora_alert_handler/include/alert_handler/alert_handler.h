@@ -17,195 +17,212 @@
 #include <std_srvs/Empty.h>
 #include <std_msgs/Int16.h>
 
-#include "data_fusion_communications/VictimVerificationMsg.h"
-#include "data_fusion_communications/GetVictimsAction.h"
-#include "data_fusion_communications/VictimInfoMsg.h"
-#include "data_fusion_communications/DeleteCurrentVictimAction.h"
-#include "data_fusion_communications/ValidateCurrentHoleAction.h"
-#include "data_fusion_communications/GetObjectsSrv.h"
-#include "data_fusion_communications/DatafusionGeotiffSrv.h"
-#include "data_fusion_communications/GetMarkersSrv.h"
+#include "pandora_data_fusion_msgs/VictimsMsg.h"
+#include "pandora_data_fusion_msgs/VictimInfoMsg.h"
+#include "pandora_data_fusion_msgs/ChooseVictimAction.h"
+#include "pandora_data_fusion_msgs/ValidateVictimAction.h"
+#include "pandora_data_fusion_msgs/GetObjectsSrv.h"
+#include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
+#include "pandora_data_fusion_msgs/GetMarkersSrv.h"
 
 #include "vision_communications/HolesDirectionsVectorMsg.h"
 #include "vision_communications/FaceDirectionMsg.h"
 #include "vision_communications/QRAlertsVectorMsg.h"
 #include "vision_communications/HazmatAlertsVectorMsg.h"
 #include "vision_communications/HolesPositionsVectorMsg.h"
-#include "data_fusion_communications/ThermalDirectionAlertMsg.h"
-
-#include "state_manager/state_client.h"
+#include "pandora_common_msgs/GeneralAlertMsg.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
 #include "alert_handler/defines.h"
 #include "alert_handler/object_list.h"
+#include "alert_handler/victim_list.h"
 #include "alert_handler/object_factory.h"
-#include "alert_handler/pose_finder.h"
 #include "alert_handler/object_handler.h"
 #include "alert_handler/victim_handler.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
+  namespace pandora_alert_handler
+  {
 
-typedef actionlib::SimpleActionServer
-    <data_fusion_communications::GetVictimsAction> GetVictimsServer;
-typedef actionlib::SimpleActionServer
-    <data_fusion_communications::DeleteCurrentVictimAction> DeleteVictimServer;
-typedef actionlib::SimpleActionServer
-    <data_fusion_communications::ValidateCurrentHoleAction>
-                                                    ValidateCurrentHoleServer;
+    typedef actionlib::SimpleActionServer
+      <pandora_data_fusion_msgs::ChooseVictimAction> ChooseVictimServer;
+    typedef actionlib::SimpleActionServer 
+      <pandora_data_fusion_msgs::ValidateVictimAction> 
+      ValidateVictimServer;
+    typedef boost::shared_ptr<const ValidateVictimServer::Goal> GoalConstPtr;
 
-class AlertHandler : public StateClient, private boost::noncopyable
-{
- public:
+    class AlertHandler : private boost::noncopyable
+    {
+      public:
 
-  /**
-   * @brief Constructor
-   * @param ns [std::string const&] Has the namespace of the node.
-   */
-  explicit AlertHandler(const std::string& ns);
+        /**
+         * @brief Constructor
+         * @param ns [std::string const&] Has the namespace of the node.
+         */
+        explicit AlertHandler(const std::string& ns);
 
-  /* Alert-concerned Subscribers */
-  void holeDirectionAlertCallback(
-    const vision_communications::HolesDirectionsVectorMsg& msg);
-  void holePositionAlertCallback(
-    const vision_communications::HolesPositionsVectorMsg& msg);
-  void faceDirectionAlertCallback(
-    const vision_communications::FaceDirectionMsg& msg);
-  void tpaDirectionAlertCallback(
-    const data_fusion_communications::ThermalDirectionAlertMsg& msg);
-  void mlxDirectionAlert(
-    const data_fusion_communications::ThermalDirectionAlertMsg& msg);
-  void hazmatAlertCallback(
-    const vision_communications::HazmatAlertsVectorMsg& msg);
-  void qrAlertCallback(const vision_communications::QRAlertsVectorMsg& msg);
+        /* Alert-concerned Subscribers */
+        void holeDirectionAlertCallback(
+            const vision_communications::HolesDirectionsVectorMsg& msg);
+        void thermalDirectionAlertCallback(
+            const pandora_common_msgs::GeneralAlertMsg& msg);
+        void hazmatAlertCallback(
+            const vision_communications::HazmatAlertsVectorMsg& msg);
+        void qrAlertCallback(const vision_communications::QRAlertsVectorMsg& msg);
+        template <class ObjectType> 
+          void objectDirectionAlertCallback(
+              const pandora_common_msgs::GeneralAlertMsg& msg);
 
-  /* Victim-concerned Subscribers */
-  /**
-   * @brief Communication with VictimFusion (possibly needs to change).
-   * @param msg [const data_fusion_communications::VictimVerificationMsg&] Msg
-   * @return void
-   */
-  void victimVerificationCallback(
-    const data_fusion_communications::VictimVerificationMsg& msg);
-  /**
-   * @brief Communication with Navigation (possibly needs to change).
-   * @param msg [const std_msgs::Int16&] Msg
-   * @return void
-   */
-  void selectedVictimCallback(const std_msgs::Int16& msg);
+        /* Victim-concerned Subscribers */
 
-  /* MapSubsriber Callback - Communication with SLAM */
-  /**
-   * @brief Communication with SLAM. Gets current global map.
-   * @param msg [const nav_msgs::OccupancyGridConstPtr&] Contains map info.
-   * @return void
-   */
-  void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
+        /* MapSubsriber Callback - Communication with SLAM */
 
-  /* Victim-concerned Goal Callbacks */
-  /**
-   * @brief Client is Navigation. Sends Victims (possibly needs to change).
-   * @return void
-   */
-  void getVictimsCallback();
-  /**
-   * @brief Client is FSM. Order to delete Victim.
-   * @return void
-   */
-  void deleteVictimCallback();
-  /**
-   * @brief Client is FSM. Orded to validate current hole (identification mode).
-   * @param msg [const nav_msgs::OccupancyGridConstPtr&] Contains map info.
-   * @return void
-   */
-  void validateCurrentHoleCallback();
+        /**
+         * @brief Communication with SLAM. Gets current global map.
+         * @param msg [const nav_msgs::OccupancyGridConstPtr&] Contains map info.
+         * @return void
+         */
+        void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
 
-  /* Dynamic Reconfiguration Callback */
-  void dynamicReconfigCallback(
-      const ::pandora_alert_handler::AlertHandlerConfig &config,
-        uint32_t level);
+        /* Victim-concerned Goal Callbacks */
 
-  /* Services Callbacks */
-  bool flushQueues(
-    std_srvs::Empty::Request& rq,
-      std_srvs::Empty::Response &rs);
-  //!< Map Visualization Callbacks
-  bool getObjectsServiceCb(
-    data_fusion_communications::GetObjectsSrv::Request& rq,
-      data_fusion_communications::GetObjectsSrv::Response &rs);
+        /**
+         * @brief Communication with Agent. Chooses current victim to inspect.
+         * @return void
+         */
+        void selectVictimCallback();
 
-  bool geotiffServiceCb(
-    data_fusion_communications::DatafusionGeotiffSrv::Request &req,
-      data_fusion_communications::DatafusionGeotiffSrv::Response &res);
+        /**
+         * @brief Client is Agent. Order to delete Victim.
+         * @return void
+         */
+        void deleteVictimCallback();
 
-  bool getMarkersServiceCb(
-    data_fusion_communications::GetMarkersSrv::Request& rq,
-      data_fusion_communications::GetMarkersSrv::Response &rs);
+        /**
+         * @brief Client is Agent. Order to validate current victim (identification mode).
+         * @return void
+         */
+        void validateVictimCallback();
 
-  /* Current Victim Timer Callback */
-  void currentVictimTimerCb(const ros::TimerEvent& event);
+        /* Dynamic Reconfiguration Callback */
+        void dynamicReconfigCallback(
+            const ::pandora_alert_handler::AlertHandlerConfig &config,
+            uint32_t level);
 
- private:
+        /* Services Callbacks */
+        bool flushQueues(
+            std_srvs::Empty::Request& rq,
+            std_srvs::Empty::Response &rs);
+        //!< Map Visualization Callbacks
+        bool getObjectsServiceCb(
+            pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
+            pandora_data_fusion_msgs::GetObjectsSrv::Response &rs);
 
-  void initRosInterfaces();
+        bool geotiffServiceCb(
+            pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request &req,
+            pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response &res);
 
-  virtual void startTransition(int newState);
+        bool getMarkersServiceCb(
+            pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
+            pandora_data_fusion_msgs::GetMarkersSrv::Response &rs);
 
- private:
+        /* Current Victim Timer Callback */
+        void currentVictimTimerCb(const ros::TimerEvent& event);
 
-  ros::NodeHandle nh_;
-  ros::Subscriber holeDirectionSubscriber_;
-  ros::Subscriber holePositionSubscriber_;
-  ros::Subscriber faceDirectionSubscriber_;
-  ros::Subscriber tpaDirectionSubscriber_;
-  ros::Subscriber mlxDirectionSubscriber_;
-  ros::Subscriber qrSubscriber_;
-  ros::Subscriber hazmatSubscriber_;
-  
-  ros::Subscriber victimVerificationSubscriber_;
-  ros::Subscriber currentVictimSubscriber_;
+      private:
 
-  ros::Subscriber mapSubscriber_;
+        /**
+         * @brief Takes info from VictimsToGo_ and publishes it to the Agent.
+         * @return void
+         */
+        void publishVictims();
 
-  ros::ServiceServer flushService_;
-  ros::ServiceServer getObjectsService_;
-  ros::ServiceServer geotiffService_;
-  ros::ServiceServer getMarkersService_;
+        void initRosInterfaces();
 
-  tf::TransformBroadcaster currentVictimBroadcaster_;
+      private:
 
-  ros::Timer currentVictimTimer_;
+        ros::NodeHandle nh_;
 
-  boost::shared_ptr<GetVictimsServer> victimsServer_;
-  boost::shared_ptr<DeleteVictimServer> deleteVictimServer_;
-  boost::shared_ptr<ValidateCurrentHoleServer> validateCurrentHoleServer_;
+        ros::Subscriber holeDirectionSubscriber_;
+        ros::Subscriber faceDirectionSubscriber_;
+        ros::Subscriber co2DirectionSubscriber_;
+        ros::Subscriber motionDirectionSubscriber_;
+        ros::Subscriber thermalDirectionSubscriber_;
+        ros::Subscriber soundDirectionSubscriber_;
+        ros::Subscriber qrSubscriber_;
+        ros::Subscriber hazmatSubscriber_;
 
-  dynamic_reconfigure::Server< ::pandora_alert_handler::AlertHandlerConfig >
-    dynReconfserver_;
+        ros::Subscriber mapSubscriber_;
 
-  MapPtr map_;
+        ros::ServiceServer flushService_;
+        ros::ServiceServer getObjectsService_;
+        ros::ServiceServer geotiffService_;
+        ros::ServiceServer getMarkersService_;
 
-  //!< save for geotiff
-  int prevxMin;
-  int prevyMin;
+        ros::Publisher victimsPublisher_;
 
-  HoleListPtr holes_;
-  QrListPtr qrs_;
-  HazmatListPtr hazmats_;
-  TpaListPtr tpas_;
+        tf::TransformBroadcaster currentVictimBroadcaster_;
 
-  ObjectFactoryPtr objectFactory_;
-  ObjectHandlerPtr objectHandler_;
-  VictimHandlerPtr victimHandler_;
+        ros::Timer currentVictimTimer_;
 
-  int currentVictimId;
+        boost::shared_ptr<ChooseVictimServer> selectVictimServer_;
+        boost::shared_ptr<ChooseVictimServer> deleteVictimServer_;
+        boost::shared_ptr<ValidateVictimServer> validateVictimServer_;
 
-  int curState;
-  bool eraseHolesQrs;
+        dynamic_reconfigure::Server< ::pandora_alert_handler::AlertHandlerConfig >
+          dynReconfserver_;
 
-};
+        MapPtr map_;
+
+        //!< save for geotiff
+        int prevxMin;
+        int prevyMin;
+
+        //!< The alerts list
+        HoleListPtr holes_;
+        QrListPtr qrs_;
+        MotionListPtr motions_;
+        FaceListPtr faces_;
+        SoundListPtr sounds_;
+        Co2ListPtr co2s_;
+        HazmatListPtr hazmats_;
+        ThermalListPtr thermals_;
+
+        //!< The unvisited victims list  
+        VictimListPtr victimsToGo_;
+        //!< The visited victims list  
+        VictimListPtr victimsVisited_;
+
+        ObjectFactoryPtr objectFactory_;
+        ObjectHandlerPtr objectHandler_;
+        VictimHandlerPtr victimHandler_;
+    };
+
+    template <class ObjectType> 
+      void AlertHandler::objectDirectionAlertCallback(
+          const pandora_common_msgs::GeneralAlertMsg& msg)
+      {    
+        ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",  
+            ObjectType::getObjectType() << " ALERT ARRIVED!");
+
+        typename ObjectType::PtrVectorPtr objectsVectorPtr;
+        try
+        {
+          objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
+        }
+        catch (AlertException ex)
+        {
+          ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+          return;
+        }
+
+        objectHandler_->handleObjects<ObjectType>(objectsVectorPtr);
+
+        victimHandler_->inspect();
+
+        publishVictims();
+      }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

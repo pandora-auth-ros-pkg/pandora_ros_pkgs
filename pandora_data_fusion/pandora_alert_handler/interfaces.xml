@@ -2,21 +2,26 @@
 
   <node>
     /data_fusion/alert_handler
-    <subscriber>/data_fusion/face_direction_alert</subscriber>
-    <subscriber>/data_fusion/hole_direction_alert</subscriber>
-    <subscriber>/data_fusion/mlx_direction_alert</subscriber>
-    <subscriber>/data_fusion/tpa_direction_alert</subscriber>
-    
-    <subscriber>/data_fusion/selected_victim</subscriber>
-    <subscriber>/data_fusion/tpa_direction_alert</subscriber>
+    <subscriber>/vision/hole_direction_alert</subscriber>
+    <subscriber>/sensor_processors/thermal_direction_alert</subscriber>
+    <subscriber>/vision/qr_alert</subscriber>
+    <subscriber>/vision/hazmat_alert</subscriber>
+    <subscriber>/vision/face_direction_alert</subscriber>
+    <subscriber>/vision/motion_alert</subscriber>
+    <subscriber>/sensor_processors/sound_direction_alert</subscriber>
+    <subscriber>/sensor_processors/co2_direction_alert</subscriber>
+
+    <subscriber>/slam_map/map</subscriber>
     <subscriber>/tf</subscriber>
+
+    <publisher>/data_fusion/alert_hander/victims</publisher>
+    <publisher>/data_fusion/alert_hander/valid_victims_counter</publisher>
+    <publisher>/data_fusion/alert_hander/qr_notification</publisher>
+    <publisher>/data_fusion/alert_hander/robocup_score</publisher>
     
-    <actionClient>/slam/slamMap</actionClient>
-    
-    <actionServer>/data_fusion/get_victims</actionServer>
-    
-    <publisher>/data_fusion/victim_found</publisher>
-    <publisher>/data_fusion/victim_updated</publisher>
+    <actionServer>/data_fusion/alert_handler/select_victim</actionServer>
+    <actionServer>/data_fusion/alert_handler/delete_victim</actionServer>
+    <actionServer>/data_fusion/alert_handler/validate_victim</actionServer>
 
   </node>
   

@@ -1,74 +1,66 @@
 // "Copyright [year] <Copyright Owner>"
 
-#include "alert_handler/objects.h"
+#include "alert_handler/qr.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
-
-Qr::Qr()
-{
-  type_ = "qr";
-  timeFound_ = ros::Time::now();
-}
-
-PoseStamped Qr::getPoseStamped() const
-{
-  PoseStamped objPose = Object::getPoseStamped();
-  objPose.header.frame_id = "qr_" + boost::to_string(id_) + "_" + content_;
-  return objPose;
-}
-
-bool Qr::isSameObject(const ObjectConstPtr& object, float distance) const
-{
-  bool cond = false;
-
-  if (!object->getType().compare(type_))
+  namespace pandora_alert_handler
   {
-    cond = Object::isSameObject(object, distance)
-      && !content_.compare(
-      boost::dynamic_pointer_cast<const Qr>(object)->getContent());
-  }
 
-  return cond;
-}
+    Qr::Qr() {}
 
-void Qr::fillGeotiff(
-  data_fusion_communications::DatafusionGeotiffSrv::Response* res) const
-{
-  res->qrx.push_back( pose_.position.x );
-  res->qry.push_back( pose_.position.y );
-  res->qrworldx.push_back( pose_.position.x );
-  res->qrworldy.push_back( pose_.position.y );
-  res->qrcontent.push_back(content_);
-  res->qrtimestamp.push_back(timeFound_);
-}
+    PoseStamped Qr::getPoseStamped() const
+    {
+      PoseStamped objPose = Object<Qr>::getPoseStamped();
+      objPose.header.frame_id = objPose.header.frame_id + "_" + content_;
+      return objPose;
+    }
 
-void Qr::getVisualization(visualization_msgs::MarkerArray* markers) const
-{
-  visualization_msgs::Marker marker;
+    bool Qr::isSameObject(const ObjectConstPtr& object) const
+    {
+      bool cond = Object<Qr>::isSameObject(object) 
+        && !content_.compare(
+            boost::dynamic_pointer_cast<const Qr>(object)->getContent());
 
-  marker.header.frame_id = "/world";
-  marker.header.stamp = ros::Time::now();
-  marker.ns = "Qr";
-  marker.id = id_;
+      return cond;
+    }
 
-  marker.pose = pose_;
+    void Qr::fillGeotiff(pandora_data_fusion_msgs::
+        DatafusionGeotiffSrv::Response* res) const
+    {
+      res->qrx.push_back( pose_.position.x );
+      res->qry.push_back( pose_.position.y );
+      res->qrworldx.push_back( pose_.position.x );
+      res->qrworldy.push_back( pose_.position.y );
+      res->qrcontent.push_back(content_);
+      res->qrtimestamp.push_back(timeFound_);
+    }
 
-  marker.type = visualization_msgs::Marker::SPHERE;
+    void Qr::getVisualization(visualization_msgs::
+        MarkerArray* markers) const
+    {
+      visualization_msgs::Marker marker;
 
-  marker.scale.x = 0.1;
-  marker.scale.y = 0.1;
-  marker.scale.z = 0.1;
+      marker.header.frame_id = getFrameId();
+      marker.header.stamp = ros::Time::now();
+      marker.ns = "Qr";
+      marker.id = id_;
 
-  marker.color.r = 0;
-  marker.color.g = 0;
-  marker.color.b = 1;
-  marker.color.a = 0.7;
+      marker.pose = pose_;
 
-  markers->markers.push_back(marker);
-}
+      marker.type = visualization_msgs::Marker::SPHERE;
+
+      marker.scale.x = 0.1;
+      marker.scale.y = 0.1;
+      marker.scale.z = 0.1;
+
+      marker.color.r = 0;
+      marker.color.g = 0;
+      marker.color.b = 1;
+      marker.color.a = 0.7;
+
+      markers->markers.push_back(marker);
+    }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

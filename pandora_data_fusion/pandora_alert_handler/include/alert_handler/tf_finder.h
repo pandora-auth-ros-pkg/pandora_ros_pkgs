@@ -12,31 +12,31 @@
 
 namespace pandora_data_fusion
 {
-namespace pandora_alert_handler
-{
-
-class TfFinder : private boost::noncopyable
-{
- public:
- 
-  static TfListener* newTfListener(const std::string& type)
+  namespace pandora_alert_handler
   {
-    if( type == "SLAM" )
-    {
-      return new RosTfListener;
-    }
-    if( type == "TEST" )
-    {
-      return new TfListener;
-    }
-    else
-    {
-      ROS_ERROR("[ALERT_HANDLER %d]Runtime error: map_type not found.", __LINE__);
-      return NULL;
-    }
-  }
 
-};
+    class TfFinder : private boost::noncopyable
+    {
+      public:
+
+        static TfListener* newTfListener(const std::string& type)
+        {
+          if( type == "SLAM" )
+          {
+            return new RosTfListener;
+          }
+          if( type == "TEST" )
+          {
+            return new TfListener;
+          }
+          else
+          {
+            ROS_ERROR("[ALERT_HANDLER %d]Runtime error: map_type not found.", __LINE__);
+            return NULL;
+          }
+        }
+
+    };
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
