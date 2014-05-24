@@ -48,7 +48,7 @@ namespace pandora_vision
     candidate holes conveyor
     @param[in] image [const cv::Mat&] An image used for filters' resources
     creation and size usage
-    @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+    @param[in] pointCloud [const PointCloudPtr] An interpolated point
     cloud used in the connection operation; it is used to obtain real world
     distances between holes
     @param[in] operationId [const int&] The identifier of the merging
@@ -59,7 +59,7 @@ namespace pandora_vision
   void HoleMerger::applyMergeOperation(
     HolesConveyor* rgbdHolesConveyor,
     const cv::Mat& image,
-    const PointCloudXYZPtr& pointCloud,
+    const PointCloudPtr& pointCloud,
     const int& operationId)
   {
     #ifdef DEBUG_TIME
@@ -382,7 +382,7 @@ namespace pandora_vision
     candidate holes conveyor
     @param[in] image [const cv::Mat&] An image used for filters' resources
     creation and size usage
-    @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+    @param[in] pointCloud [const PointCloudPtr] An interpolated point
     cloud used in the connection operation; it is used to obtain real world
     distances between holes
     @param[in] operationId [const int&] The identifier of the merging
@@ -393,7 +393,7 @@ namespace pandora_vision
   void HoleMerger::applyMergeOperationWithoutValidation(
     HolesConveyor* rgbdHolesConveyor,
     const cv::Mat& image,
-    const PointCloudXYZPtr& pointCloud,
+    const PointCloudPtr& pointCloud,
     const int& operationId)
   {
     #ifdef DEBUG_TIME
@@ -907,7 +907,7 @@ namespace pandora_vision
     @param[in] connectableHoleMaskSet [const std::set<unsigned int>&]
     A set that includes the indices of points inside the connectable's
     outline
-    @param[in] pointCloudXYZ [const PointCloudXYZPtr&] The point cloud
+    @param[in] pointCloud [const PointCloudPtr&] The point cloud
     obtained from the depth sensor, used to measure distances in real
     space
     @return [bool] True if the connectable is capable of being connected
@@ -919,7 +919,7 @@ namespace pandora_vision
     const int& connectableId,
     const std::set<unsigned int>& connectorHoleMaskSet,
     const std::set<unsigned int>& connectableHoleMaskSet,
-    const PointCloudXYZPtr& pointCloudXYZ)
+    const PointCloudPtr& pointCloud)
   {
     #ifdef DEBUG_TIME
     Timer::start("isCapableOfConnecting", "applyMergeOperation");
@@ -968,19 +968,19 @@ namespace pandora_vision
     {
       // The connectable's current outline point x,y,z coordinates
       // measured by the depth sensor
-      float connectableOutlinePointX = pointCloudXYZ->points[
+      float connectableOutlinePointX = pointCloud->points[
         static_cast<int>(conveyor.outlines[connectableId][av].x)
-        + pointCloudXYZ->width *
+        + pointCloud->width *
         static_cast<int>(conveyor.outlines[connectableId][av].y)].x;
 
-      float connectableOutlinePointY = pointCloudXYZ->points[
+      float connectableOutlinePointY = pointCloud->points[
         static_cast<int>(conveyor.outlines[connectableId][av].x)
-        + pointCloudXYZ->width *
+        + pointCloud->width *
         static_cast<int>(conveyor.outlines[connectableId][av].y)].y;
 
-      float connectableOutlinePointZ = pointCloudXYZ->points[
+      float connectableOutlinePointZ = pointCloud->points[
         static_cast<int>(conveyor.outlines[connectableId][av].x)
-        + pointCloudXYZ->width *
+        + pointCloud->width *
         static_cast<int>(conveyor.outlines[connectableId][av].y)].z;
 
 
@@ -988,19 +988,19 @@ namespace pandora_vision
       {
         // The connector's current outline point x,y,z coordinates
         // measured by the depth sensor
-        float connectorOutlinePointX = pointCloudXYZ->points[
+        float connectorOutlinePointX = pointCloud->points[
           static_cast<int>(conveyor.outlines[connectorId][ac].x)
-          + pointCloudXYZ->width *
+          + pointCloud->width *
           static_cast<int>(conveyor.outlines[connectorId][ac].y)].x;
 
-        float connectorOutlinePointY = pointCloudXYZ->points[
+        float connectorOutlinePointY = pointCloud->points[
           static_cast<int>(conveyor.outlines[connectorId][ac].x)
-          + pointCloudXYZ->width *
+          + pointCloud->width *
           static_cast<int>(conveyor.outlines[connectorId][ac].y)].y;
 
-        float connectorOutlinePointZ = pointCloudXYZ->points[
+        float connectorOutlinePointZ = pointCloud->points[
           static_cast<int>(conveyor.outlines[connectorId][ac].x)
-          + pointCloudXYZ->width *
+          + pointCloud->width *
           static_cast<int>(conveyor.outlines[connectorId][ac].y)].z;
 
 

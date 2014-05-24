@@ -68,43 +68,31 @@ namespace pandora_vision
 
   /**
     @brief Extracts an image from a point cloud message
-    @param pointCloud[in] [const sensor_msgs::PointCloud2ConstPtr&]
+    @param pointCloud[in] [const PointCloudPtr&]
     The input point cloud message
     @param[in] id [const int&] The enconding of the converted image.
     CV_32FC1 for depth image, CV_8UC3 for rgb image
     @return cv::Mat The output image
    **/
   cv::Mat MessageConversions::convertPointCloudMessageToImage(
-    const sensor_msgs::PointCloud2ConstPtr& pointCloudMessage,
-    const int& encoding)
+    const PointCloudPtr& pointCloud, const int& encoding)
   {
     #ifdef DEBUG_TIME
     Timer::start("convertPointCloudMessageToImage");
     #endif
 
-    PointCloud pointCloud;
-
-    // convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
-    // to pcl::PCLPointCloud2
-    pcl_conversions::toPCL(*pointCloudMessage, pointCloud);
-
     // prepare the output image
-    cv::Mat image(pointCloud.height, pointCloud.width, encoding);
+    cv::Mat image(pointCloud->height, pointCloud->width, encoding);
 
     // For the depth image
     if (encoding == CV_32FC1)
     {
-      // convert the point cloud from
-      // pcl::PCLPointCloud2 to pcl::PointCloudXYZ
-      PointCloudXYZPtr pointCloudXYZ (new PointCloudXYZ);
-      pcl::fromPCLPointCloud2 (pointCloud, *pointCloudXYZ);
-
-      for (unsigned int row = 0; row < pointCloudXYZ->height; ++row)
+      for (unsigned int row = 0; row < pointCloud->height; ++row)
       {
-        for (unsigned int col = 0; col < pointCloudXYZ->width; ++col)
+        for (unsigned int col = 0; col < pointCloud->width; ++col)
         {
           image.at<float>(row, col) =
-            pointCloudXYZ->points[col + pointCloudXYZ->width * row].z;
+            pointCloud->points[col + pointCloud->width * row].z;
 
           // if element is nan make it a zero
           if (image.at<float>(row, col) != image.at<float>(row, col))
@@ -116,21 +104,16 @@ namespace pandora_vision
     }
     else if (encoding == CV_8UC3) // For the rgb image
     {
-      // convert the point cloud from
-      // pcl::PCLPointCloud2 to pcl::PointCloudXYZRGB
-      PointCloudXYZRGBPtr pointCloudXYZRGB (new PointCloudXYZRGB);
-      pcl::fromPCLPointCloud2 (pointCloud, *pointCloudXYZRGB);
-
-      for (unsigned int row = 0; row < pointCloudXYZRGB->height; ++row)
+      for (unsigned int row = 0; row < pointCloud->height; ++row)
       {
-        for (unsigned int col = 0; col < pointCloudXYZRGB->width; ++col)
+        for (unsigned int col = 0; col < pointCloud->width; ++col)
         {
           image.at<unsigned char>(row, 3 * col + 2) =
-            pointCloudXYZRGB->points[col + pointCloudXYZRGB->width * row].r;
+            pointCloud->points[col + pointCloud->width * row].r;
           image.at<unsigned char>(row, 3 * col + 1) =
-            pointCloudXYZRGB->points[col + pointCloudXYZRGB->width * row].g;
+            pointCloud->points[col + pointCloud->width * row].g;
           image.at<unsigned char>(row, 3 * col + 0) =
-            pointCloudXYZRGB->points[col + pointCloudXYZRGB->width * row].b;
+            pointCloud->points[col + pointCloud->width * row].b;
         }
       }
     }
@@ -140,39 +123,6 @@ namespace pandora_vision
     #endif
 
     return image;
-  }
-
-
-
-  /**
-    @brief Converts a point cloud of type PointCloudXYZPtr to
-    a point cloud of type PointCloud and packs it in a message
-    @param[in] pointCloudXYZ [const PointCloudXYZPtr&] The point cloud to be
-    converted
-    @param[out] pointCloud [sensor_msgs::PointCloud2*]
-    The converted point cloud message
-    @return void
-   **/
-  void MessageConversions::convertPointCloudXYZToMessage(
-    const PointCloudXYZPtr& pointCloudXYZPtr,
-    sensor_msgs::PointCloud2* pointCloudMsg)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("convertPointCloudXYZToMessage");
-    #endif
-
-    PointCloud pointCloud;
-
-    // Convert the pcl::PointCloud<pcl::PointXYZ>::Ptr aka PointCloudXYZPtr
-    // to pcl::PCLPointCloud2
-    pcl::toPCLPointCloud2(*pointCloudXYZPtr, pointCloud);
-
-    // Pack the point cloud to a ROS message
-    pcl_conversions::fromPCL(pointCloud, *pointCloudMsg);
-
-    #ifdef DEBUG_TIME
-    Timer::tick("convertPointCloudXYZToMessage");
-    #endif
   }
 
 
@@ -321,39 +271,6 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("createCandidateHolesVector");
-    #endif
-  }
-
-
-
-  /**
-    @brief Extracts a PointCloudXYZPtr (see defines.h)
-    from a point cloud message
-    @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The input point
-    cloud message
-    @param[out] pointCloudXYZ [PointCloudXYZPtr*] The extracted point cloud
-    @return void
-   **/
-  void MessageConversions::extractPointCloudXYZFromMessage(
-    const sensor_msgs::PointCloud2ConstPtr& msg,
-    PointCloudXYZPtr* pointCloudXYZ)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("extractPointCloudXYZFromMessage");
-    #endif
-
-    PointCloud pointCloud;
-
-    // convert the point cloud from sensor_msgs::PointCloud2ConstrPtr
-    // to pcl::PCLPointCloud2
-    pcl_conversions::toPCL(*msg, pointCloud);
-
-    // Convert the pcl::PCLPointCloud2 to pcl::PointCloud<pcl::PointXYZ>::Ptr
-    // aka PointCloudXYZPtr
-    pcl::fromPCLPointCloud2 (pointCloud, *(*pointCloudXYZ));
-
-    #ifdef DEBUG_TIME
-    Timer::tick("extractPointCloudXYZFromMessage");
     #endif
   }
 

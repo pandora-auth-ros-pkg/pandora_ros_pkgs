@@ -71,28 +71,14 @@ namespace pandora_vision
 
       /**
         @brief Extracts an image from a point cloud message
-        @param pointCloud[in] [const sensor_msgs::PointCloud2ConstPtr&]
+        @param pointCloud[in] [const PointCloudPtr&]
         The input point cloud message
         @param[in] id [const int&] The enconding of the converted image.
         CV_32FC1 for depth image, CV_8UC3 for rgb image
         @return cv::Mat The output image
        **/
       static cv::Mat convertPointCloudMessageToImage(
-        const sensor_msgs::PointCloud2ConstPtr& pointCloudMessage,
-        const int& encoding);
-
-      /**
-        @brief Converts a point cloud of type PointCloudXYZPtr to
-        a point cloud of type PointCloud and packs it in a message
-        @param[in] pointCloudXYZ [const PointCloudXYZPtr&] The point cloud to be
-        converted
-        @param[out] pointCloud [sensor_msgs::PointCloud2*]
-        The converted point cloud message
-        @return void
-       **/
-      static void convertPointCloudXYZToMessage(
-        const PointCloudXYZPtr& pointCloudXYZPtr,
-        sensor_msgs::PointCloud2* pointCloudMsg);
+        const PointCloudPtr& pointCloud, const int& encoding);
 
       /**
         @brief Constructs a vision_communications/CandidateHolesVectorMsg
@@ -151,18 +137,6 @@ namespace pandora_vision
         const HolesConveyor& conveyor,
         std::vector<vision_communications::CandidateHoleMsg>*
         candidateHolesVector);
-
-      /**
-        @brief Extracts a PointCloudXYZPtr (see defines.h)
-        from a point cloud message
-        @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The input point
-        cloud message
-        @param[out] pointCloudXYZ [PointCloudXYZPtr*] The extracted point cloud
-        @return void
-       **/
-      static void extractPointCloudXYZFromMessage(
-        const sensor_msgs::PointCloud2ConstPtr& msg,
-        PointCloudXYZPtr* pointCloudXYZ);
 
       /**
         @brief Extracts a cv::Mat image from a ROS image message pointer

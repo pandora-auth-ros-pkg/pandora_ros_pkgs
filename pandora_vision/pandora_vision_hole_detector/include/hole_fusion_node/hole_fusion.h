@@ -141,8 +141,8 @@ namespace pandora_vision
       // The rgb received by the RGB node
       cv::Mat rgbImage_;
 
-      // The point cloud received by the depth node
-      PointCloudXYZPtr pointCloudXYZ_;
+      // The point cloud received by the synchronizer node
+      PointCloudPtr pointCloud_;
 
       // The interpolated depth image received by the depth node
       cv::Mat interpolatedDepthImage_;
@@ -250,11 +250,11 @@ namespace pandora_vision
       /**
         @brief Callback for the point cloud that the synchronizer node
         publishes
-        @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The message
+        @param[in] msg [const PointCloudPtr&] The message
         containing the point cloud
         @return void
        **/
-      void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg);
+      void pointCloudCallback(const PointCloudPtr& msg);
 
       /**
         @brief Implements a strategy to combine
@@ -306,7 +306,7 @@ namespace pandora_vision
         @return void
        **/
       void setDepthValuesInPointCloud(const cv::Mat& inImage,
-        PointCloudXYZPtr* pointCloudXYZPtr);
+        PointCloudPtr* pointCloudPtr);
 
       /**
         @brief Requests from the synchronizer to process a new point cloud
@@ -323,7 +323,6 @@ namespace pandora_vision
         candidate holes message obtained through the depth node
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
-        @param[out] pointCloudXYZ [PointCloudXYZPtr*] The output point cloud
         @param[out] interpolatedDepthImage [cv::Mat*] The output interpolated
         depth image
         @return void

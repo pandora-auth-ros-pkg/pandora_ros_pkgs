@@ -197,8 +197,7 @@ namespace pandora_vision
     considered valid, the @param probabilitiesVector hint to the
     validity of the candidate hole through this filter
     @param[in] inImage [const cv::Mat&] The input depth image
-    @param[in] initialPointCloud
-    [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
+    @param[in] initialPointCloud [const PointCloudPtr&]
     The point cloud acquired from the depth sensor, interpolated
     @param[in] intermediatePointsSetVector
     [const std::vector<std::set<unsigned int> >& ] A vector that holds for each
@@ -222,7 +221,7 @@ namespace pandora_vision
    **/
   void DepthFilters::checkHolesOutlineToRectanglePlaneConstitution(
     const cv::Mat& inImage,
-    const PointCloudXYZPtr& initialPointCloud,
+    const PointCloudPtr& initialPointCloud,
     const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
     const std::vector<int>& rectanglesIndices,
     std::vector<float>* probabilitiesVector,
@@ -304,8 +303,7 @@ namespace pandora_vision
     planes are considered valid, the @param probabilitiesVector hint
     to the validity of the candidate hole through this filter
     @param[in] inImage [const cv::Mat&] The input depth image
-    @param[in] initialPointCloud
-    [const pcl::PointCloud<pcl::PointXYZ>::Ptr&]
+    @param[in] initialPointCloud [const PointCloudPtr&]
     The point cloud acquired from the depth sensor, interpolated
     @param[in] rectanglesVector
     [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
@@ -327,7 +325,7 @@ namespace pandora_vision
    **/
   void DepthFilters::checkHolesRectangleEdgesPlaneConstitution(
     const cv::Mat& inImage,
-    const PointCloudXYZPtr& initialPointCloud,
+    const PointCloudPtr& initialPointCloud,
     const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
     const std::vector<int>& rectanglesIndices,
     std::vector<float>* probabilitiesVector,
@@ -518,8 +516,7 @@ namespace pandora_vision
     @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] interpolatedDepthImage [const cv::Mat&] The denoised
     depth image
-    @param[in] interpolatedPointCloud
-    [const pcl::PointCloud<pcl::PointXYZ>::Ptr]
+    @param[in] interpolatedPointCloud [const PointCloudPtr&]
     The interpolated input point cloud
     @param[in] holesMasksSetVector
     [const std::vector<std::set<unsigned int> >&]
@@ -550,7 +547,7 @@ namespace pandora_vision
   void DepthFilters::checkHoles(
     const HolesConveyor& conveyor,
     const cv::Mat& interpolatedDepthImage,
-    const pcl::PointCloud<pcl::PointXYZ>::Ptr& interpolatedPointCloud,
+    const PointCloudPtr& interpolatedPointCloud,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
     const std::vector<int>& rectanglesIndices,
@@ -658,7 +655,7 @@ namespace pandora_vision
   void DepthFilters::applyFilter(
     const int& method,
     const cv::Mat& img,
-    const PointCloudXYZPtr& pointCloud,
+    const PointCloudPtr& pointCloud,
     const HolesConveyor& conveyor,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<std::vector<cv::Point2f> >& rectanglesVector,

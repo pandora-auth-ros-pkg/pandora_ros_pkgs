@@ -69,7 +69,7 @@ namespace pandora_vision
         candidate holes conveyor
         @param[in] image [const cv::Mat&] An image used for filters' resources
         creation and size usage
-        @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+        @param[in] pointCloud [const PointCloudPtr] An interpolated point
         cloud used in the connection operation; it is used to obtain real world
         distances between holes
         @param[in] operationId [const int&] The identifier of the merging
@@ -80,7 +80,7 @@ namespace pandora_vision
       static void applyMergeOperation(
         HolesConveyor* rgbdHolesConveyor,
         const cv::Mat& image,
-        const PointCloudXYZPtr& pointCloud,
+        const PointCloudPtr& pointCloud,
         const int& operationId);
 
       /**
@@ -94,7 +94,7 @@ namespace pandora_vision
         candidate holes conveyor
         @param[in] image [const cv::Mat&] An image used for filters' resources
         creation and size usage
-        @param[in] pointCloud [const PointCloudXYZPtr] An interpolated point
+        @param[in] pointCloud [const PointCloudPtr] An interpolated point
         cloud used in the connection operation; it is used to obtain real world
         distances between holes
         @param[in] operationId [const int&] The identifier of the merging
@@ -105,7 +105,7 @@ namespace pandora_vision
       static void applyMergeOperationWithoutValidation(
         HolesConveyor* rgbdHolesConveyor,
         const cv::Mat& image,
-        const PointCloudXYZPtr& pointCloud,
+        const PointCloudPtr& pointCloud,
         const int& operationId);
 
       /**
@@ -196,7 +196,7 @@ namespace pandora_vision
         @param[in] connectableHoleMaskSet [const std::set<unsigned int>&]
         A set that includes the indices of points inside the connectable's
         outline
-        @param[in] pointCloudXYZ [const PointCloudXYZPtr&] The point cloud
+        @param[in] pointCloud [const PointCloudPtr&] The point cloud
         obtained from the depth sensor, used to measure distances in real
         space
         @return [bool] True if the connectable is capable of being connected
@@ -208,7 +208,7 @@ namespace pandora_vision
         const int& connectableId,
         const std::set<unsigned int>& connectorHoleMaskSet,
         const std::set<unsigned int>& connectableHoleMaskSet,
-        const PointCloudXYZPtr& pointCloudXYZ);
+        const PointCloudPtr& pointCloud);
 
       /**
         @brief Intended to use after the check of the

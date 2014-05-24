@@ -41,7 +41,6 @@
 #include <fstream>
 #include <cmath>
 
-#include <pcl/PCLPointCloud2.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/ModelCoefficients.h>
@@ -73,7 +72,6 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include "ros/ros.h"
-#include "sensor_msgs/PointCloud2.h"
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <image_transport/image_transport.h>
@@ -102,14 +100,11 @@
  **/
 namespace pandora_vision
 {
-  typedef pcl::PCLPointCloud2 PointCloud;
-  typedef pcl::PCLPointCloud2::Ptr PointCloudPtr;
-
   typedef pcl::PointCloud<pcl::PointXYZ> PointCloudXYZ;
   typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudXYZPtr;
 
-  typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloudXYZRGB;
-  typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr PointCloudXYZRGBPtr;
+  typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+  typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr PointCloudPtr;
 
 } // namespace pandora_vision
 

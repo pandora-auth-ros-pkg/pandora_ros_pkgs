@@ -42,7 +42,7 @@ namespace pandora_vision
   /**
     @brief The HoleFusion constructor
    **/
-  HoleFusion::HoleFusion(void) : pointCloudXYZ_(new PointCloudXYZ)
+  HoleFusion::HoleFusion(void) : pointCloud_(new PointCloud)
   {
     #ifdef DEBUG_TIME
     Timer::start("HoleFusion");
@@ -303,7 +303,7 @@ namespace pandora_vision
         DepthFilters::checkHoles(
           conveyor,
           interpolatedDepthImage_,
-          pointCloudXYZ_,
+          pointCloud_,
           holesMasksSetVector,
           inflatedRectanglesVector,
           inflatedRectanglesIndices,
@@ -720,7 +720,7 @@ namespace pandora_vision
         HoleMerger::applyMergeOperation(
           conveyor,
           interpolatedDepthImage_,
-          pointCloudXYZ_,
+          pointCloud_,
           i);
       }
     }
@@ -731,7 +731,7 @@ namespace pandora_vision
         HoleMerger::applyMergeOperationWithoutValidation(
           conveyor,
           interpolatedDepthImage_,
-          pointCloudXYZ_,
+          pointCloud_,
           i);
       }
     }
@@ -979,12 +979,11 @@ namespace pandora_vision
   /**
     @brief Callback for the point cloud that the synchronizer node
     publishes
-    @param[in] msg [const sensor_msgs::PointCloud2ConstPtr&] The message
+    @param[in] msg [const PointCloudPtr&] The message
     containing the point cloud
     @return void
    **/
-  void HoleFusion::pointCloudCallback(
-    const sensor_msgs::PointCloud2ConstPtr& msg)
+  void HoleFusion::pointCloudCallback(const PointCloudPtr& msg)
   {
     #ifdef DEBUG_TIME
     Timer::start("pointCloudCallback", "", true);
@@ -992,14 +991,20 @@ namespace pandora_vision
 
     ROS_INFO_NAMED("hole_detector", "Hole Fusion Point Cloud callback");
 
-    // Store the frame id and timestamp of the point cloud under processing
-    frame_id_ = msg->header.frame_id;
-    timestamp_ = msg->header.stamp;
+    // Convert the header of the point cloud message
+    std_msgs::Header header;
+    pcl_conversions::fromPCL(msg->header, header);
 
-    // Unpack the point cloud and store it in the member variable
-    // pointCloudXYZ_
-    MessageConversions::extractPointCloudXYZFromMessage(msg,
-      &pointCloudXYZ_);
+    // Store the frame_id and timestamp of the point cloud under processing.
+    // The respective variables in the headers of the published messages will
+    // be set to these values
+    frame_id_ = header.frame_id;
+    timestamp_ = header.stamp;
+
+    // Because the input point cloud is marked as const,
+    // and we need to interpolate the noise in it,
+    // copy the input point cloud to a local one.
+    pcl::copyPointCloud(*msg, *pointCloud_);
 
     // Extract the depth image from the point cloud message
     cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
@@ -1012,7 +1017,7 @@ namespace pandora_vision
 
     // Set the interpolatedDepthImage's values as the depth values
     // of the point cloud
-    setDepthValuesInPointCloud(interpolatedDepthImage, &pointCloudXYZ_);
+    setDepthValuesInPointCloud(interpolatedDepthImage, &pointCloud_);
 
     numNodesReady_++;
 
@@ -1363,11 +1368,11 @@ namespace pandora_vision
     @brief Sets the depth values of a point cloud according to the
     values of a depth image
     @param[in] inImage [const cv::Mat&] The depth image in CV_32FC1 format
-    @param[out] pointCloudXYZPtr [PointCloudXYZPtr*] The point cloud
+    @param[out] pointCloudPtr [PointCloudPtr*] The point cloud
     @return void
    **/
   void HoleFusion::setDepthValuesInPointCloud(const cv::Mat& inImage,
-    PointCloudXYZPtr* pointCloudXYZPtr)
+    PointCloudPtr* pointCloudPtr)
   {
     #ifdef DEBUG_TIME
     Timer::start("setDepthValuesInPointCloud", "pointCloudCallback");
@@ -1379,11 +1384,11 @@ namespace pandora_vision
       return;
     }
 
-    for (unsigned int row = 0; row < (*pointCloudXYZPtr)->height; ++row)
+    for (unsigned int row = 0; row < (*pointCloudPtr)->height; ++row)
     {
-      for (unsigned int col = 0; col < (*pointCloudXYZPtr)->width; ++col)
+      for (unsigned int col = 0; col < (*pointCloudPtr)->width; ++col)
       {
-        (*pointCloudXYZPtr)->points[col + (*pointCloudXYZPtr)->width * row].z =
+        (*pointCloudPtr)->points[col + (*pointCloudPtr)->width * row].z =
           inImage.at<float>(row, col);
       }
     }
@@ -1418,7 +1423,6 @@ namespace pandora_vision
     candidate holes message obtained through the depth node
     @param[out] conveyor [HolesConveyor*] The output conveyor
     struct
-    @param[out] pointCloudXYZ [PointCloudXYZPtr*] The output point cloud
     @param[out] interpolatedDepthImage [cv::Mat*] The output interpolated
     depth image
     @return void
@@ -1716,7 +1720,7 @@ namespace pandora_vision
       HoleMerger::applyMergeOperation(
         dummy,
         interpolatedDepthImage_,
-        pointCloudXYZ_,
+        pointCloud_,
         i);
     }
 

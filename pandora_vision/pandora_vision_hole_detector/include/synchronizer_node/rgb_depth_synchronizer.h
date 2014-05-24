@@ -124,12 +124,11 @@ namespace pandora_vision
       /**
         @brief The synchronized callback for the point cloud
         obtained by the depth sensor.
-        @param[in] pointCloudMessage [const sensor_msgs::PointCloud2ConstPtr&]
+        @param[in] pointCloudMessage [const PointCloudPtr&]
         The input point cloud
         @return void
        **/
-      void synchronizedCallback(
-        const sensor_msgs::PointCloud2ConstPtr& pointCloudMessage);
+      void synchronizedCallback(const PointCloudPtr& pointCloudMessage);
 
       /**
         @brief The callback for the hole_fusion node request for the

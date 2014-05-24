@@ -1,0 +1,49 @@
+<package>
+
+  <node>
+    /synchronizer_node
+
+    <subscriber>/kinect/point_cloud</subscriber>
+    <subscriber>/unlock_rgb_depth_synchronizer</subscriber>
+
+    <publisher>/synchronized/depth/points</publisher>
+    <publisher>/synchronized/depth/image</publisher>
+    <publisher>/synchronized/rgb/image/</publisher>
+
+  </node>
+
+
+  <node>
+    /depth_node
+
+    <subscriber>/syncronized/depth/image</subscriber>
+
+    <publisher>/synchronized/depth/candidate_holes</publisher>
+
+  </node>
+
+
+  <node>
+    /rgb_node
+
+    <subscriber>/synchronized/rgb/image</subscriber>
+
+    <publisher>/synchronized/rgb/candidate_holes</publisher>
+
+  </node>
+
+
+  <node>
+    /hole_fusion_node
+
+    <subscriber>/synchronized/depth/points</subscriber>
+    <subscriber>/synchronized/depth/candidate_holes</subscriber>
+    <subscriber>/synchronized/depth/candidate_holes</subscriber>
+
+    <publisher>/vision/holes_direction</publisher>
+    <publisher>/vision/enhanced_holes</publisher>
+    <publisher>/unlock_rgb_depth_synchronizer</publisher>
+
+  </node>
+
+</package>

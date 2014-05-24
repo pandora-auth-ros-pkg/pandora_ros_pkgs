@@ -1,7 +1,7 @@
 subscribed_topics:
-  point_cloud_internal_topic: synchronized/camera/depth/points
-  depth_candidate_holes_topic: synchronized/camera/depth/candidate_holes
-  rgb_candidate_holes_topic: synchronized/camera/rgb/candidate_holes
+  point_cloud_internal_topic: synchronized/depth/points
+  depth_candidate_holes_topic: synchronized/depth/candidate_holes
+  rgb_candidate_holes_topic: synchronized/rgb/candidate_holes
 
 published_topics:
   synchronizer_unlock_topic: unlock_rgb_depth_synchronizer
