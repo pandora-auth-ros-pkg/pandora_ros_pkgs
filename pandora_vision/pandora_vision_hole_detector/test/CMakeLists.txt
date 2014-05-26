@@ -1,6 +1,7 @@
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
+  pcl_ros
   #node_tests
   #node_tests_msgs
   rostest
@@ -50,6 +51,29 @@ add_library(depth_node_lib
 catkin_add_gtest(hole_detector_test
   unit/depth_node/hole_detector_test.cpp)
 target_link_libraries(hole_detector_test ${catkin_LIBRARIES} utils_lib depth_node_lib gtest_main)
+
+
+############################# hole fusion node #################################
+add_library(hole_fusion_node_lib
+  ../src/hole_fusion_node/depth_filters.cpp
+  ../src/hole_fusion_node/filters_resources.cpp
+  ../src/hole_fusion_node/hole_merger.cpp
+  ../src/hole_fusion_node/planes_detection.cpp
+  ../src/hole_fusion_node/rgb_filters.cpp
+  )
+
+catkin_add_gtest(depth_filters_test
+  unit/hole_fusion_node/depth_filters_test.cpp)
+target_link_libraries(depth_filters_test ${catkin_LIBRARIES} utils_lib hole_fusion_node_lib gtest_main)
+
+
+add_library(filters_resources_lib
+  ../src/hole_fusion_node/filters_resources.cpp
+  )
+
+catkin_add_gtest(filters_resources_test
+  unit/hole_fusion_node/filters_resources_test.cpp)
+target_link_libraries(filters_resources_test ${catkin_LIBRARIES} utils_lib filters_resources_lib gtest_main)
 
 
 ############## Functional Tests ###############

@@ -196,14 +196,14 @@ namespace pandora_vision
         @param[in] conveyor [const HolesConveyor&] The conveyor of holes
         @param[in] image [const cv::Mat&] An image needed only for
         its size
-        @param[in] rectanglesVector
+        @param[in] inflatedRectanglesVector
         [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
         the vertices of each rectangle that corresponds to a specific hole
         inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding rectangle.
+        Used primarily because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
         @param[in] image [const cv::Mat&] An image needed only for
         its size
         A vector that holds the image of the intermediate points between
@@ -218,8 +218,8 @@ namespace pandora_vision
       static void createIntermediateHolesPointsVectors(
         const HolesConveyor& conveyor,
         const cv::Mat& image,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
         std::vector<cv::Mat>* intermediatePointsImageVector,
         std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
 
@@ -230,14 +230,14 @@ namespace pandora_vision
         @param[in] conveyor [const HolesConveyor&] The conveyor of holes
         @param[in] image [const cv::Mat&] An image needed only for
         its size
-        @param[in] rectanglesVector
+        @param[in] inflatedRectanglesVector
         [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
         the vertices of each rectangle that corresponds to a specific hole
         inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding rectangle.
+        Used primarily because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
         @param[out] intermediatePointsImageVector [std::vector<cv::Mat>*]
         A vector that holds the image of the intermediate points between
         a hole's outline and its bounding box, for each hole whose identifier
@@ -247,8 +247,8 @@ namespace pandora_vision
       static void createIntermediateHolesPointsImageVector(
         const HolesConveyor& conveyor,
         const cv::Mat& image,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
         std::vector<cv::Mat>* intermediatePointsImageVector);
 
       /**

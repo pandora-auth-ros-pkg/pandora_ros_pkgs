@@ -35,21 +35,21 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "depth_node/hole_detector.h"
+#include "hole_fusion_node/depth_filters.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
 {
   /**
-    @class HoleDetectorTest
-    @brief Tests the integrity of methods of class HoleDetector
+    @class DepthFiltersTest
+    @brief Tests the integrity of methods of class DepthFilters
    **/
-  class HoleDetectorTest : public ::testing::Test
+  class DepthFiltersTest : public ::testing::Test
   {
     protected:
 
-      HoleDetectorTest() {}
+      DepthFiltersTest() {}
 
       /**
         @brief Constructs a rectangle of width @param x and height of @param y.
@@ -60,7 +60,7 @@ namespace pandora_vision
         @param[in] depthIn [const float&] The depth value for all points inside
         the rectangle
         @param[out] image [cv::Mat*] The image on which the rectangle will be
-        imprinted on
+        imprinted
         return void
        **/
       void generateDepthRectangle (
@@ -70,8 +70,22 @@ namespace pandora_vision
         const float& depthIn,
         cv::Mat* image );
 
-      //! Sets up one image: squares_,
-      //! which features three squares of size 100.
+      /**
+        @brief Constructs the internals of a rectangular hole
+        of width @param x and height of @param y
+        @param[in] upperLeft [const cv::Point2f&] The upper left vertex of the
+        rectangle to be created
+        @param[in] x [const int&] The recgangle's width
+        @param[in] y [const int&] The rectangle's height
+        return [HolesConveyor] A struct containing the elements of one hole
+       **/
+      HolesConveyor getConveyor (
+        const cv::Point2f& upperLeft,
+        const int& x,
+        const int& y );
+
+        //! Sets up one image: squares_,
+        //! which features three squares of size 100.
       //! The first one (order matters here) has its upper left vertex at
       //! (100, 100),
       //! the second one has its upper right vertex at (WIDTH - 3, 3)
@@ -85,6 +99,9 @@ namespace pandora_vision
 
         // The image upon which the squares will be inprinted
         squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
+
+        // The overall conveyor holding the holes
+        HolesConveyor conveyor;
 
         // Construct the squares_ image
 
@@ -100,33 +117,51 @@ namespace pandora_vision
         // Construct the lower right square
         cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1 );
 
-        HoleDetectorTest::generateDepthRectangle
+        DepthFiltersTest::generateDepthRectangle
           ( cv::Point2f ( WIDTH - 100, HEIGHT - 100 ),
             100,
             100,
             1.2,
             &lowerRightSquare );
 
+        HolesConveyorUtils::append(
+          getConveyor( cv::Point2f ( WIDTH - 100, HEIGHT - 100 ),
+            100,
+            100 ),
+          &conveyor);
+
+
         // Construct the upper right image
         cv::Mat upperRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1 );
 
-        HoleDetectorTest::generateDepthRectangle
+        DepthFiltersTest::generateDepthRectangle
           ( cv::Point2f ( WIDTH - 103, 3 ),
             100,
             100,
             2.2,
             &upperRightSquare );
 
+        HolesConveyorUtils::append(
+          getConveyor( cv::Point2f ( WIDTH - 103, 3 ),
+            100,
+            100 ),
+          &conveyor);
+
         // Construct the upper left square
         cv::Mat upperLeftSquare = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
 
-        // Construct the square_ image
-        HoleDetectorTest::generateDepthRectangle
+        DepthFiltersTest::generateDepthRectangle
           ( cv::Point2f ( 100, 100 ),
             100,
             100,
             1.8,
             &upperLeftSquare );
+
+        HolesConveyorUtils::append(
+          getConveyor( cv::Point2f ( 100, 100 ),
+            100,
+            100 ),
+          &conveyor);
 
         // Synthesize the final squares_ image
         squares_ = lowerRightSquare + upperRightSquare + upperLeftSquare;
@@ -157,7 +192,7 @@ namespace pandora_vision
     imprinted on
     return void
    **/
-  void HoleDetectorTest::generateDepthRectangle (
+  void DepthFiltersTest::generateDepthRectangle (
     const cv::Point2f& upperLeft,
     const int& x,
     const int& y,
@@ -183,35 +218,74 @@ namespace pandora_vision
 
 
 
-  // Test HoleDetector::findHoles
-  TEST_F ( HoleDetectorTest, FindHolesTest )
+  /**
+    @brief Constructs the internals of a rectangular hole
+    of width @param x and height of @param y
+    @param[in] upperLeft [const cv::Point2f&] The upper left vertex of the
+    rectangle to be created
+    @param[in] x [const int&] The recgangle's width
+    @param[in] y [const int&] The rectangle's height
+    return [HolesConveyor] A struct containing the elements of one hole
+   **/
+  HolesConveyor DepthFiltersTest::getConveyor (
+    const cv::Point2f& upperLeft,
+    const int& x,
+    const int& y )
   {
-    // Run HoleDetector:findHoles
-    HolesConveyor conveyor = HoleDetector::findHoles ( squares_ );
+    // What will be returned: the internal elements of one hole
+    HolesConveyor conveyor;
 
-    // The number of keypoints found
-    int size = HolesConveyorUtils::size( conveyor );
+    // The hole's keypoint
+    cv::KeyPoint k (  upperLeft.x + x / 2, upperLeft.y + y / 2 , 1 );
 
-    // There should be two keypoints: the one of the upper left square
-    // and the one of the upper right square. The lower right square is
-    // adjacent to the edges of the image and will be clipped by the
-    // edge contamination method
-    ASSERT_EQ ( 2, size );
+    conveyor.keyPoints.push_back(k);
 
-    // For every keypoint found, make assertions and expectations
-    for (int k = 0; k < size; k++)
+
+    // The four vertices of the rectangle
+    cv::Point2f vertex_1( upperLeft.x, upperLeft.y );
+
+    cv::Point2f vertex_2( upperLeft.x, upperLeft.y + y - 1 );
+
+    cv::Point2f vertex_3( upperLeft.x + x - 1, upperLeft.y + y - 1 );
+
+    cv::Point2f vertex_4( upperLeft.x + x - 1, upperLeft.y );
+
+    std::vector<cv::Point2f> rectangle;
+    rectangle.push_back(vertex_1);
+    rectangle.push_back(vertex_2);
+    rectangle.push_back(vertex_3);
+    rectangle.push_back(vertex_4);
+
+    conveyor.rectangles.push_back(rectangle);
+
+
+    // The outline points of the hole will be obtained through the depiction
+    // of the points consisting the rectangle
+    cv::Mat image = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    cv::Point2f a[] = {vertex_1, vertex_2, vertex_3, vertex_4};
+
+    for(unsigned int j = 0; j < 4; j++)
     {
-      // The location of the keypoint should near the center of the square
-      // in which it lies
-      EXPECT_NEAR ( conveyor.keyPoints[k].pt.x,
-        conveyor.rectangles[k][0].x + 50, 1 );
-
-      // The hole should have exactly four vertices
-      EXPECT_EQ ( 4, conveyor.rectangles[k].size() );
-
-      // There should be 400 outline points
-      EXPECT_EQ ( 400, conveyor.outlines[k].size() );
+      cv::line(image, a[j], a[(j + 1) % 4], cv::Scalar(255, 0, 0), 1, 8);
     }
+
+
+    std::vector<cv::Point2f> outline;
+    for ( int rows = 0; rows < image.rows; rows++ )
+    {
+      for ( int cols = 0; cols < image.cols; cols++ )
+      {
+        if ( image.at<unsigned char>( rows, cols ) != 0 )
+        {
+          outline.push_back( cv::Point2f ( cols, rows ) );
+        }
+      }
+    }
+
+    conveyor.outlines.push_back(outline);
+
+    return conveyor;
 
   }
 

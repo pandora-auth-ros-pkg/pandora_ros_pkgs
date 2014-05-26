@@ -61,18 +61,115 @@ namespace pandora_vision
     public:
 
       /**
+        @brief Apply a cascade-like hole checker. Each filter applied is
+        attached to an order which relates to the sequence of the
+        overall filter execution.
+        @param[in] method [const int&] The filter identifier to execute
+        @param[in] img [const cv::Mat&] The input depth image
+        @param[in] pointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr&] The
+        original point cloud that corresponds to the input depth image
+        @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points; each point is internal to its
+        respective hole
+        @param[in] inflatedRectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of the inflated rectangle that corresponds to a specific
+        hole inside the coveyor
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding
+        inflated rectangle.
+        Used because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
+        @param[in] intermediatePointsSetVector
+        [const std::vector<std::set<unsigned int> >& ] A vector that holds
+        for each hole a set of points;
+        these points are the points between the hole's outline and its
+        bounding rectangle
+        @param[out] probabilitiesVector [std::vector<float>*] A vector
+        of probabilities hinting to the certainty degree with which each
+        candidate hole is associated. While the returned set may be reduced in
+        size, the size of this vector is the same throughout and equal to the
+        number of keypoints found and published by the rgb node.
+        @param[out] imgs [std::vector<cv::Mat>*] A vector of images which
+        shows the holes that are considered valid by each filter
+        @param[out] msgs [std::vector<std::string>*] Debug messages
+        @return void
+       **/
+      static void applyFilter(
+        const int& method,
+        const cv::Mat& img,
+        const PointCloudPtr& pointCloud,
+        const HolesConveyor& conveyor,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
+        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
+        std::vector<float>* probabilitiesVector,
+        std::vector<cv::Mat>* imgs,
+        std::vector<std::string>* msgs);
+
+      /**
+        @brief Apply a cascade-like hole checker. Each filter applied is
+        attached to an order which relates to the sequence of the overall
+        filter execution.
+        @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] interpolatedDepthImage [const cv::Mat&] The denoised
+        depth image
+        @param[in] interpolatedPointCloud [const PointCloudPtr&]
+        The interpolated input point cloud
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points's indices;
+        each point is internal to its respective hole
+        @param[in] inflatedRectanglesVector
+        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
+        the vertices of the inflated rectangle that corresponds to a specific
+        hole inside the coveyor
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding i
+        nflated rectangle.
+        Used because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
+        @param[in] intermediatePointsSetVector
+        [const std::vector<std::set<unsigned int> >& ] A vector that holds
+        for each hole a set of points;
+        these points are the points between the hole's outline and its
+        bounding rectangle
+        @param[out] probabilitiesVector [std::vector<std::vector<float> >*]
+        A 2D vector of probabilities hinting to the certainty degree with
+        which each candidate hole is associated for every
+        active filter executed.
+        While the returned set may be reduced in size, the size of this vector
+        is the same throughout and equal to the number of active filters by
+        the number of keypoints found and published by the rgb node.
+        @return void
+       **/
+      static void checkHoles(
+        const HolesConveyor& conveyor,
+        const cv::Mat& interpolatedDepthImage,
+        const PointCloudPtr& interpolatedPointCloud,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
+        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
+        std::vector<std::vector<float> >* probabilitiesVector);
+
+      /**
         @brief Checks for valid holes just by the depth difference between
         the keypoint of the blob and the edges of its bounding box
         @param[in] depthImage [const cv::Mat&] The depth image
         @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] rectanglesVector
+        @param[in] inflatedRectanglesVector
         [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
+        the vertices of the inflated rectangle that corresponds to a specific
+        hole inside the coveyor
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding inflated
+        rectangle.
+        Used because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
         @param[out] msgs [std::vector<std::string>*] Messages for debug reasons
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
@@ -85,8 +182,8 @@ namespace pandora_vision
       static void checkHolesDepthDiff(
         const cv::Mat& depthImage,
         const HolesConveyor& conveyor,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
         std::vector<std::string>* msgs,
         std::vector<float>* probabilitiesVector);
 
@@ -125,11 +222,11 @@ namespace pandora_vision
         @param[in] initialPointCloud [const PointCloudPtr&]
         The point cloud acquired from the depth sensor, interpolated
         @param[in] intermediatePointsSetVector
-        [const std::vector<std::set<unsigned int> >& ] A vector that holds
-        for each hole a set of points;
+        [const std::vector<std::set<unsigned int> >& ] A vector that holds for
+        each hole a set of points;
         these points are the points between the hole's outline and its
         bounding rectangle
-        @param[in] rectanglesIndices [const std::vector<int>&] Because
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&] Because
         each hole's bounding rectangle may be inflated, and thus not all holes
         possess a bounding rectangle by this process, in this vector is stored
         the indices of the holes whose inflated bounding box is inside the
@@ -148,7 +245,7 @@ namespace pandora_vision
         const cv::Mat& inImage,
         const PointCloudPtr& initialPointCloud,
         const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
-        const std::vector<int>& rectanglesIndices,
+        const std::vector<int>& inflatedRectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
 
@@ -160,14 +257,15 @@ namespace pandora_vision
         @param[in] inImage [const cv::Mat&] The input depth image
         @param[in] initialPointCloud [const PointCloudPtr&]
         The point cloud acquired from the depth sensor, interpolated
-        @param[in] rectanglesVector
+        @param[in] inflatedRectanglesVector
         [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
+        the vertices of the inflated rectangle that corresponds to a specific
+        hole inside the coveyor
+        @param[in] inflatedRectanglesIndices [const std::vector<int>&]
+        A vector that is used to identify a hole's corresponding inflated
+        rectangle.
+        Used because the rectangles used are inflated rectangles;
+        not all holes possess an inflated rectangle
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
         with which the associated candidate hole is associated.
@@ -181,8 +279,8 @@ namespace pandora_vision
       static void checkHolesRectangleEdgesPlaneConstitution(
         const cv::Mat& inImage,
         const PointCloudPtr& initialPointCloud,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
+        const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
+        const std::vector<int>& inflatedRectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
 
@@ -213,99 +311,6 @@ namespace pandora_vision
         std::vector<std::string>* msgs,
         std::vector<float>* probabilitiesVector);
 
-      /**
-        @brief Apply a cascade-like hole checker. Each filter applied is
-        attached to an order which relates to the sequence of the overall
-        filter execution.
-        @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] interpolatedDepthImage [const cv::Mat&] The denoised
-        depth image
-        @param[in] interpolatedPointCloud [const PointCloudPtr]
-        The interpolated input point cloud
-        @param[in] holesMasksSetVector
-        [const std::vector<std::set<unsigned int> >&]
-        A vector that holds sets of points's indices;
-        each point is internal to its respective hole
-        @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
-        @param[in] intermediatePointsSetVector
-        [const std::vector<std::set<unsigned int> >& ] A vector that holds
-        for each hole a set of points;
-        these points are the points between the hole's outline and its
-        bounding rectangle
-        @param[out] probabilitiesVector [std::vector<std::vector<float> >*]
-        A 2D vector of probabilities hinting to the certainty degree with
-        which each candidate hole is associated for every
-        active filter executed.
-        While the returned set may be reduced in size, the size of this vector
-        is the same throughout and equal to the number of active filters by
-        the number of keypoints found and published by the rgb node.
-        @return void
-       **/
-      static void checkHoles(
-        const HolesConveyor& conveyor,
-        const cv::Mat& interpolatedDepthImage,
-        const PointCloudPtr& interpolatedPointCloud,
-        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
-        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
-        std::vector<std::vector<float> >* probabilitiesVector);
-
-      /**
-        @brief Apply a cascade-like hole checker. Each filter applied is
-        attached to an order which relates to the sequence of the
-        overall filter execution.
-        @param[in] method [const int&] The filter identifier to execute
-        @param[in] img [const cv::Mat&] The input depth image
-        @param[in] pointCloud [const PointCloudPtr&]
-        The original point cloud that corresponds to the input depth image
-        @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] holesMasksSetVector
-        [const std::vector<std::set<unsigned int> >&]
-        A vector that holds sets of points's indices;
-        each point is internal to its respective hole
-        @param[in] rectanglesVector
-        [const std::vector<std::vector<cv::Point2f> >&] A vector that holds
-        the vertices of each rectangle that corresponds to a specific hole
-        inside the coveyor
-        @param[in] rectanglesIndices [const std::vector<int>&] A vector that
-        is used to identify a hole's corresponding rectangle. Used primarily
-        because the rectangles used are inflated rectangles; not all holes
-        possess an inflated rectangle
-        @param[in] intermediatePointsSetVector
-        [const std::vector<std::set<unsigned int> >&] A vector that holds
-        for each hole a set of points;
-        these points are the points between the hole's outline and its
-        bounding rectangle
-        @param[out] probabilitiesVector [std::vector<float>*] A vector
-        of probabilities hinting to the certainty degree with which each
-        candidate hole is associated. While the returned set may be reduced in
-        size, the size of this vector is the same throughout and equal to the
-        number of keypoints found and published by the rgb node.
-        @param[out] imgs [std::vector<cv::Mat>*] A vector of images which
-        shows the holes that are considered valid by each filter
-        @param[out] msgs [std::vector<std::string>*] Debug messages
-        @return void
-       **/
-      static void applyFilter(
-        const int& method,
-        const cv::Mat& img,
-        const PointCloudPtr& pointCloud,
-        const HolesConveyor& conveyor,
-        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
-        const std::vector<std::vector<cv::Point2f> >& rectanglesVector,
-        const std::vector<int>& rectanglesIndices,
-        const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
-        std::vector<float>* probabilitiesVector,
-        std::vector<cv::Mat>* imgs,
-        std::vector<std::string>* msgs);
   };
 
 } // namespace pandora_vision
