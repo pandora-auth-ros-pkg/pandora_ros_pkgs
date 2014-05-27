@@ -1,4 +1,4 @@
 pandora_common
 ============================
 
-Low level software-hardware interface for pandora UGV.
+Common utility packages, used by various packages in PANDORA ecosystem. 
