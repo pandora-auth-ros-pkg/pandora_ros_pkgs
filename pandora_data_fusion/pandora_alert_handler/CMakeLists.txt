@@ -66,6 +66,8 @@ target_link_libraries(base_object
 add_library(objects
         src/hole.cpp
         src/hazmat.cpp
+        src/landoltc.cpp
+        src/data_matrix.cpp
         src/qr.cpp
         src/thermal.cpp
         src/face.cpp
@@ -211,7 +213,7 @@ add_dependencies(alert_handler
 ##################### alert_handler_node ###############################
 
 add_executable(alert_handler_node 
-        src/main.cpp )
+          src/main.cpp )
 target_link_libraries(alert_handler_node 
           ${catkin_LIBRARIES}
           alert_handler

@@ -18,27 +18,16 @@ from test_base import direction
 
 class AlertHandlerTest(test_base.TestBase):
 
-    def setUp(self):
-
-        pass
-
     def test_saloon(self):
 
-        out = []
-        self.fillInfo(out)
-        
-        self.assertEqual(len(out[0].holes), 2)
-        self.assertEqual(len(out[0].victimsToGo), 2)
-        self.assertEqual(distance(out[0].holes[0].pose.position,
-          out[0].victimsToGo[0].pose.position), 0)
-        self.assertEqual(distance(out[0].holes[1].pose.position,
-          out[0].victimsToGo[1].pose.position), 0)
-        self.assertGreater(distance(out[0].holes[0].pose.position,
-          out[0].holes[1].pose.position), 0.2)
+        rospy.sleep(20)
+        self.assertEqual(len(self.currentVictimList), 2)
+        self.assertGreater(distance(self.currentVictimList[0].victimPose.pose.position,
+          self.currentVictimList[1].victimPose.pose.position), 0.2)
+
 
 if __name__ == '__main__':
 
-    rospy.sleep(20)
     rospy.init_node(NAME, anonymous=True, log_level=rospy.DEBUG)
     AlertHandlerTest.connect()
     rostest.rosrun(PKG, NAME, AlertHandlerTest, sys.argv)

@@ -1,4 +1,40 @@
-// "Copyright [year] <Copyright Owner>"
+/*********************************************************************
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: 
+ *   Tsirigotis Christos <tsirif@gmail.com>
+ *********************************************************************/
 
 #ifndef ALERT_HANDLER_KALMAN_OBJECT_H
 #define ALERT_HANDLER_KALMAN_OBJECT_H
@@ -124,7 +160,7 @@ namespace pandora_data_fusion
 
     template <class DerivedObject>
       FilterModelPtr KalmanObject<DerivedObject>::
-      modelPtr_ = FilterModelPtr( new FilterModel(0.05) );
+      modelPtr_ = FilterModelPtr( new FilterModel );
 
     template <class DerivedObject>
       void KalmanObject<DerivedObject>::initializeObjectFilter()
@@ -163,13 +199,13 @@ namespace pandora_data_fusion
       void KalmanObject<DerivedObject>::
       update(const ObjectConstPtr& measurement)
       {
-        ROS_DEBUG_STREAM("KalmanObject::update() : before Measurement probability = " 
-            << measurement->getProbability());
-        float measurementStdDev = Utils::stdDevFromProbability(this->distanceThres_, 
-              measurement->getProbability());
-        ROS_DEBUG_STREAM("KalmanObject::update() : before Measurement std dev = " 
-            << measurementStdDev);
-        modelPtr_->initializeMeasurementModel(measurementStdDev);
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+            "before measurement std dev = " 
+            << std::endl << "x : " << getStdDevX()
+            << std::endl << "y : " << getStdDevY()
+            << std::endl << "z : " << getStdDevZ());
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+            "before measurement probability = " << this->getProbability());
         Point measurementPosition = measurement->getPose().position;
         MatrixWrapper::ColumnVector newPosition(1);
         //!< Filter's input vector
@@ -210,7 +246,8 @@ namespace pandora_data_fusion
         this->pose_ = newObjectPose;
 
         //!< Updating object's probability.
-        ROS_DEBUG_STREAM("KalmanObject::update() : after Measurement std dev = " 
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+            "after Measurement std dev = " 
             << std::endl << "x : " << getStdDevX()
             << std::endl << "y : " << getStdDevY()
             << std::endl << "z : " << getStdDevZ());
@@ -218,8 +255,8 @@ namespace pandora_data_fusion
             Utils::probabilityFromStdDev(this->distanceThres_, getStdDevX()) + 
             Utils::probabilityFromStdDev(this->distanceThres_, getStdDevY()) +
             Utils::probabilityFromStdDev(this->distanceThres_, getStdDevZ())) / 3;
-        ROS_DEBUG_STREAM("KalmanObject::update() : after Measurement probability = " 
-            << this->probability_);
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+            "after Measurement probability = " << this->probability_);
 
         //!< Check if object has become a legitimate one.
         this->checkLegit();

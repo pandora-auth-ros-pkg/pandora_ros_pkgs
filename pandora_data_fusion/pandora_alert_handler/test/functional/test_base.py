@@ -9,6 +9,8 @@ import rospy
 
 import alert_delivery
 
+from pandora_data_fusion_msgs.msg import VictimsMsg 
+from pandora_data_fusion_msgs.msg import VictimInfoMsg 
 from pandora_data_fusion_msgs.srv import GetObjectsSrv
 from pandora_data_fusion_msgs.srv import GetObjectsSrvResponse
 from std_srvs.srv import Empty
@@ -28,12 +30,19 @@ def direction(a, b):
     return dire
 
 class TestBase(unittest.TestCase):
-     
+ 
     deliveryBoy = alert_delivery.AlertDeliveryBoy()
+
+    def mockCallback(self, data):
+
+      self.currentVictimList = data.victims
+      self.worldModelPublished += 1
+      #rospy.logdebug("yolo!"+str(self.worldModelPublished))
+      #rospy.logdebug(self.currentVictimList)
 
     @classmethod
     def connect(cls):
-
+      
         cls.get_objects = rospy.ServiceProxy('/data_fusion/get_objects', GetObjectsSrv, True)
         rospy.wait_for_service('/data_fusion/get_objects')
         cls.flush_lists = rospy.ServiceProxy('/data_fusion/flush_queues', Empty, True)
@@ -47,6 +56,9 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
 
+        self.subscriber = rospy.Subscriber("/data_fusion/victims", VictimsMsg, self.mockCallback)
+        self.currentVictimList = []
+        self.worldModelPublished = 0
         i = 0
         self.deliveryBoy.deliverHazmatOrder(0, 0, 1)
         rospy.sleep(0.2)
@@ -61,6 +73,10 @@ class TestBase(unittest.TestCase):
                 i += 1
                 self.connect()
         self.deliveryBoy.clearOrderList()
+
+    def tearDown(self):
+
+        self.subscriber.unregister()
       
     def fillInfo(self, outs):
 

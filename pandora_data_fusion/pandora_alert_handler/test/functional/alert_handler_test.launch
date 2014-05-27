@@ -2,13 +2,15 @@
 
   <param name="/use_sim_time" value="true"/> 
 
-  <!--<env name="ROSCONSOLE_CONFIG_FILE" -->
-    <!--value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
+  <!--<env name="ROSCONSOLE_CONFIG_FILE"                                             -->
+  <!--  value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
   <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_stand_alone.launch" /> 
   <!--<include file="$(find pandora_vision_hole)/launch/hole_find_node.launch" />-->
 
   <node pkg="rosbag" type="play" name="player" output="screen"
-    args="--clock $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag" /> 
+    args="--clock $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag" >
+    <remap from="/vision/hole_direction" to="/vision/hole_direction_alert" />
+  </node>
 
   <!--<node pkg="image_transport" type="republish" name="republish" args="compressed in:=/vision/image raw out:=/camera_head/image_raw" />-->
 

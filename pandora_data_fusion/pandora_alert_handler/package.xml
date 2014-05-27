@@ -2,7 +2,7 @@
   <name>pandora_alert_handler</name>
   <version>0.0.0</version>
   <description>data_fusion</description>
-   <maintainer email='chritsir@auth.gr'>Tsirigotis Christos</maintainer> 
+   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
 
   <license>BSD</license>
 
@@ -11,6 +11,7 @@
 
   <author>Afouras Triantafyllos</author>
   <author>Chris Zalidis</author>
+  <author>Tsirigotis Christos</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

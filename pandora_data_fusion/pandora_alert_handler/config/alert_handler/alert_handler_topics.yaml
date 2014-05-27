@@ -3,13 +3,15 @@ subscribed_topic_names:
   thermalDirection: /sensor_processors/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
+  landoltc: /vision/landoltc_alert
+  dataMatrix: /vision/dataMatrix_alert
   faceDirection: /vision/face_direction_alert
   co2Direction: /sensor_processors/co2_direction_alert
   motionDirection: /vision/motion_alert
   soundDirection: /sensor_processors/sound_direction_alert
   map: /slam/map
 published_topic_names:  
-  victims : victims
+  victims : /data_fusion/victims
   valid_victims_counter : valid_victims_counter
   qr_notification : qr_notification
   robocup_score : robocup_score

@@ -35,6 +35,7 @@
  * Authors: 
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
+ *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include "alert_handler/victim_list.h"
@@ -44,10 +45,7 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    VictimList::VictimList()
-    {
-      currentVictimIt_ = objects_.end();
-    }
+    VictimList::VictimList() {}
 
     bool VictimList::contains(const VictimConstPtr& victim) const
     {
@@ -71,9 +69,9 @@ namespace pandora_data_fusion
 
     /**
      * @details A victimToUpdate from victim list is selected (this will be the 
-     * current if we are tracking one). Its info is updated by copying the given 
-     * victim's objects and the rest victims that are thought to be the same are 
-     * deleted from victim list. The fsm is informed if necessary.
+     * oldest among the ones from iteratorList). Its info is updated by copying 
+     * the given victim's objects and the rest victims that are thought to be the 
+     * same are deleted from victim list.
      */
     void VictimList::updateObjects(const ConstPtr& victim,
         const IteratorList& iteratorList)
@@ -81,17 +79,15 @@ namespace pandora_data_fusion
       ROS_ASSERT(iteratorList.size() > 0);
 
       iterator victimToUpdate = *(iteratorList.begin());
+      ros::Time oldestVictim = (*victimToUpdate)->getTimeFound();
 
-      if(currentVictimIt_ != objects_.end())
+      for(IteratorList::const_iterator it = ++iteratorList.begin();
+          it != iteratorList.end() ; ++it)
       {
-        for(IteratorList::const_iterator it = iteratorList.begin();
-            it != iteratorList.end() ; ++it)
+        if((*(*it))->getTimeFound() < oldestVictim)
         {
-          if(currentVictimIt_ == (*it))
-          {
-            victimToUpdate = *it;
-            break;
-          }
+          oldestVictim = (*(*it))->getTimeFound();
+          victimToUpdate = *it;
         }
       }
 
@@ -100,7 +96,7 @@ namespace pandora_data_fusion
       for(IteratorList::const_iterator it = iteratorList.begin();
           it != iteratorList.end(); ++it)
       {
-        if(*(it) == victimToUpdate)
+        if((*it) == victimToUpdate)
         {
           continue;
         }
@@ -109,9 +105,9 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details Keeps track of the victims' indices in the sequence they are 
-     * returned so that when setCurrentVictimIndex is called, we can still find
-     * the correct index by its victimId_.
+     * @details Fills VictimsMsg with information about current victim list.
+     * Information given consists of a unique id, victim's pose stamped, probability
+     * and sensors.
      */
     void VictimList::getVictimsInfo(
         pandora_data_fusion_msgs::VictimsMsg* victimsMsg)
@@ -129,7 +125,6 @@ namespace pandora_data_fusion
         victimInfo.victimPose.header.stamp = now;
         victimInfo.victimPose.header.frame_id = (*it)->getFrameId();
         victimInfo.victimPose.pose = (*it)->getPose();
-        // maybe it is necessary to reverse the orientation
         victimInfo.probability = (*it)->getProbability();
         for (ObjectConstPtrVector::const_iterator iter = (*it)->getObjects().begin();
             iter != (*it)->getObjects().end(); ++iter)
@@ -145,45 +140,9 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details victimId = -1 means that currentVictim is to be set to
-     * nothing.
-     */
-    bool VictimList::setCurrentVictim(int victimId)
-    {
-      if(victimId == -1)
-      {
-        currentVictimIt_ = objects_.end();
-        return true;
-      }
-      for(iterator it = objects_.begin(); it != objects_.end(); ++it)
-      {
-        if((*it)->getId() == victimId)
-        {
-          currentVictimIt_ = it;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * @details If there is a victim being tracked returns its transform
-     * with reversed yaw. Else, returns false.
-     */
-    bool VictimList::getCurrentVictimTransform(tf::Transform* Transform) const
-    {
-      if(currentVictimIt_ == objects_.end())
-      {
-        return false;
-      }
-      *Transform = (*currentVictimIt_)->getRotatedTransform();
-      return true;
-    }
-
-    /**
      * @details By Agent's order that victim is erased
-     * from victim list. Next currentVictim iterator points to the end of the
-     * list.
+     * from victim list. Deleted victim is returned to search and delete
+     * its associated objects from their respective lists.
      */
     bool VictimList::deleteVictim(int victimId, VictimPtr deletedVictim)
     {
@@ -192,8 +151,6 @@ namespace pandora_data_fusion
       {
         if((*it)->getId() == victimId)
         {
-          if(it == currentVictimIt_)
-            currentVictimIt_ = objects_.end();
           deletedVictim = *it;
           objects_.erase(it);
           return true;
@@ -203,10 +160,9 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details If the object is valid then the current victim is erased from the
-     * list and returned. If it is not valid, it is erased from the victim's 
-     * objects. If after this erasal the victim is empty, then it is erased and 
-     * returned.
+     * @details Sets the appropriate victim visited. 
+     * Also, sets its validation variable according to agent's order. 
+     * Next this victim is deleted from victim list and returned.
      */
     VictimPtr VictimList::validateVictim(int victimId, bool victimValid)
     {
@@ -221,8 +177,6 @@ namespace pandora_data_fusion
           currentVictim->setValid(victimValid);
           currentVictim->setVisited(true);
           objects_.erase(it);
-          if(it == currentVictimIt_)
-            currentVictimIt_ = objects_.end();
           break;
         }
       }
@@ -241,7 +195,6 @@ namespace pandora_data_fusion
     void VictimList::clear()
     {
       objects_.clear();
-      currentVictimIt_ = objects_.end();  
     }
 
 }  // namespace pandora_alert_handler

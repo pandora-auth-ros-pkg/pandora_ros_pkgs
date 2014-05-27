@@ -36,72 +36,60 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_TF_LISTENER_H
-#define ALERT_HANDLER_TF_LISTENER_H
-
-#include <string>
-#include <boost/shared_ptr.hpp>
-
-#include <ros/ros.h>
-
-#include "alert_handler/utils.h"
+#include "alert_handler/data_matrix.h"
 
 namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
 
-    class TfListener
+    DataMatrix::DataMatrix() {}
+
+    bool DataMatrix::isSameObject(const ObjectConstPtr& object) const
     {
-      public:
+      bool cond = Object<DataMatrix>::isSameObject(object) 
+        && !content_.compare(
+            boost::dynamic_pointer_cast<const DataMatrix>(object)->getContent());
 
-        typedef boost::shared_ptr<TfListener> Ptr;
-        typedef boost::shared_ptr<TfListener const> ConstPtr;
+      return cond;
+    }
 
-        TfListener() {}
-
-        virtual bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
-            std::string* error_msg = NULL) const
-        {
-          return true;
-        }
-        virtual void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            tf::StampedTransform& transform) const
-        {
-          transform.setOrigin(tf::Vector3(5, 5, 0.3));
-          transform.setRotation(tf::createQuaternionFromRPY(0, 0, 0));
-        }
-    };
-
-    typedef TfListener::Ptr TfListenerPtr;
-    typedef TfListener::ConstPtr TfListenerConstPtr;
-
-    class RosTfListener: public TfListener
+    void DataMatrix::getVisualization(visualization_msgs::
+        MarkerArray* markers) const
     {
-      public:
+      visualization_msgs::Marker marker;
+      marker.header.frame_id = getFrameId();
+      marker.header.stamp = ros::Time::now();
+      marker.ns = type_;
+      marker.id = id_;
+      marker.pose = pose_;
+      marker.type = visualization_msgs::Marker::SPHERE;
+      marker.scale.x = 0.1;
+      marker.scale.y = 0.1;
+      marker.scale.z = 0.1;
+      marker.color.r = 0.2;
+      marker.color.g = 0;
+      marker.color.b = 0.8;
+      marker.color.a = 0.7;
+      markers->markers.push_back(marker);
 
-        RosTfListener();
-
-        bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
-            std::string* error_msg = NULL) const;
-        void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            tf::StampedTransform& transform) const;
-
-      private:
-
-        tf::TransformListener listener;
-
-    };
+      visualization_msgs::Marker description;
+      description.header.frame_id = getFrameId();
+      description.header.stamp = ros::Time::now();
+      description.ns = type_;
+      description.id = id_;
+      description.pose = pose_;
+      description.pose.position.z = pose_.position.z + 0.1;
+      description.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+      description.text = type_ + "_" + boost::to_string(id_) + "_" + content_;
+      description.scale.z = 0.1;
+      description.color.r = 0.2;
+      description.color.g = 0;
+      description.color.b = 0.8;
+      description.color.a = 0.7;
+      markers->markers.push_back(description);
+    }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_TF_LISTENER_H

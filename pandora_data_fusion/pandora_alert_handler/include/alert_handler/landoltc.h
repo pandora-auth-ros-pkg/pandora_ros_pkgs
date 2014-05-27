@@ -36,72 +36,75 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_TF_LISTENER_H
-#define ALERT_HANDLER_TF_LISTENER_H
+#ifndef ALERT_HANDLER_LANDOLTC_H
+#define ALERT_HANDLER_LANDOLTC_H
 
-#include <string>
-#include <boost/shared_ptr.hpp>
-
-#include <ros/ros.h>
-
-#include "alert_handler/utils.h"
+#include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
 
-    class TfListener
+    /**
+     * @class Landoltc
+     * @brief Concrete class representing a Landoltc Object. Inherits from Object
+     */ 
+    class Landoltc : public KalmanObject<Landoltc>
     {
       public:
 
-        typedef boost::shared_ptr<TfListener> Ptr;
-        typedef boost::shared_ptr<TfListener const> ConstPtr;
+        //!< Type Definitions
+        typedef boost::shared_ptr<Landoltc> Ptr;
+        typedef boost::shared_ptr<Landoltc const> ConstPtr;
+        typedef std::vector<Ptr> PtrVector;
+        typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
+        typedef boost::shared_ptr< ObjectList<Landoltc> > ListPtr;
+        typedef boost::shared_ptr< const ObjectList<Landoltc> > ListConstPtr;
 
-        TfListener() {}
-
-        virtual bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
-            std::string* error_msg = NULL) const
-        {
-          return true;
-        }
-        virtual void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            tf::StampedTransform& transform) const
-        {
-          transform.setOrigin(tf::Vector3(5, 5, 0.3));
-          transform.setRotation(tf::createQuaternionFromRPY(0, 0, 0));
-        }
-    };
-
-    typedef TfListener::Ptr TfListenerPtr;
-    typedef TfListener::ConstPtr TfListenerConstPtr;
-
-    class RosTfListener: public TfListener
-    {
       public:
 
-        RosTfListener();
+        /**
+         * @brief Constructor
+         */
+        Landoltc();
 
-        bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
-            std::string* error_msg = NULL) const;
-        void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            tf::StampedTransform& transform) const;
+        virtual bool isSameObject(const ObjectConstPtr& object) const;
+
+        virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+
+        /**
+         * @brief Getter for member pattern_
+         * @return int The Landoltc's pattern
+         */
+        std::vector<float> getAngles() const
+        {
+          return angles_;
+        }
+
+        /**
+         * @brief Setter for member angles
+         * @return void
+         */
+        void setAngles(const std::vector<float>& angles)
+        {
+          angles_ = angles;
+        }
 
       private:
 
-        tf::TransformListener listener;
-
+        //!< The hazmat's pattern
+        std::vector<float> angles_;
     };
+
+    typedef Landoltc::Ptr LandoltcPtr;
+    typedef Landoltc::ConstPtr LandoltcConstPtr;
+    typedef Landoltc::PtrVector LandoltcPtrVector;
+    typedef Landoltc::PtrVectorPtr LandoltcPtrVectorPtr;
+    typedef Landoltc::ListPtr LandoltcListPtr;
+    typedef Landoltc::ListConstPtr LandoltcListConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_TF_LISTENER_H
+#endif  // ALERT_HANDLER_LANDOLTC_H

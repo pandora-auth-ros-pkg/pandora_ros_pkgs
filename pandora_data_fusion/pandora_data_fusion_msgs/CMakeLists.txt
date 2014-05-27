@@ -38,7 +38,6 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined messages
 add_message_files(
 	FILES
-	VictimFoundMsg.msg
 	VictimInfoMsg.msg
         VictimsMsg.msg
 	QrNotificationMsg.msg
@@ -53,7 +52,7 @@ add_service_files(
 	
 add_action_files(
 	FILES
-        ChooseVictim.action
+        DeleteVictim.action
 	ValidateVictim.action
 	)
 

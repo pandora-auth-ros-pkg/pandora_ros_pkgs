@@ -95,6 +95,6 @@ target_link_libraries(victim_clusterer_test ${catkin_LIBRARIES}
 
 ########## Functional Tests #########
  
-#add_rostest(functional/alert_handler_static_test.launch)
-#add_rostest(functional/alert_handler_test.launch)
+add_rostest(functional/alert_handler_static_test.launch)
+add_rostest(functional/alert_handler_test.launch)
 

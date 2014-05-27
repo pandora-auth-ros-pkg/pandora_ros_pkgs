@@ -35,6 +35,7 @@
  * Authors: 
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
+ *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_VICTIM_HANDLER_H
@@ -48,8 +49,6 @@
 #include <ros/ros.h>
 
 #include <visualization_msgs/MarkerArray.h>
-#include <std_msgs/Empty.h>
-#include <std_msgs/Int32.h>
 
 #include "pandora_data_fusion_msgs/VictimInfoMsg.h"
 #include "pandora_data_fusion_msgs/VictimsMsg.h"
@@ -107,13 +106,6 @@ namespace pandora_data_fusion
         void flush();
 
         /**
-         * @brief Sets the current victim.
-         * @param index [int] selected victim's unique id.
-         * @return bool true, if selected successfully, false, if not found.
-         */
-        bool selectCurrentVictim(int victimId);
-
-        /**
          * @brief Deletes VictimPtr from VictimsToGo list with victimId.
          * @param victimId [int] victim's id
          * @return bool true if deleted successfully, false if not found
@@ -136,13 +128,6 @@ namespace pandora_data_fusion
          * @return void
          */
         void getVictimsInfo(pandora_data_fusion_msgs::VictimsMsg* victimsMsg);
-
-        /**
-         * @brief Get the current victim pose as a stamped transform
-         * @param stampedTranform [tf::StampedTransform*] The output param
-         * @return bool -1 if no victim is tracked
-         */
-        bool getCurrentVictimTransform(tf::StampedTransform* stampedTranform);
 
         /**
          * @brief Get Poses Stamped of all victims in victimsToGo, victimsVisited and
@@ -187,18 +172,12 @@ namespace pandora_data_fusion
 
       private:
 
-        //!< publisher for valid victims counter
-        ros::Publisher validVictimsPublisher_;
-
         VictimClustererPtr clusterer_;
 
         //!< The unvisited victims list  
         VictimListPtr victimsToGoList_;
         //!< The visited victims list  
         VictimListPtr victimsVisitedList_;
-
-        //!< counts verified victims that were validated by user
-        int validVictimsCounter_;
 
         //!< Radius within which all legit objects are associated with a victim.
         float CLUSTER_RADIUS; 

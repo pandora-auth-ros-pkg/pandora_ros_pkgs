@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>Containts pandora data fusion packages</description>
 
-  <maintainer email="chritsir@auth.gr">Tsirigotis Christos</maintainer>
+  <maintainer email="tsirif@gmail.com">Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -13,6 +13,7 @@
 
   <author>Christos Zalidis</author>
   <author>Afouras Triantafyllos</author>
+  <author>Tsirigotis Christos</author>
   
   <buildtool_depend>catkin</buildtool_depend>
   

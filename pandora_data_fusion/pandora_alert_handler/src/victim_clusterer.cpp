@@ -35,6 +35,7 @@
  * Authors: 
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
+ *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include "alert_handler/victim_clusterer.h"

@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_HAZMAT_H
-#define ALERT_HANDLER_HAZMAT_H
+#ifndef ALERT_HANDLER_DATA_MATRIX_H
+#define ALERT_HANDLER_DATA_MATRIX_H
 
 #include "alert_handler/kalman_object.h"
 
@@ -47,67 +47,85 @@ namespace pandora_data_fusion
   {
 
     /**
-     * @class Hazmat
-     * @brief Concrete class representing a Hazmat Object. Inherits from Object
+     * @class DataMatrix
+     * @brief Concrete class representing a DataMatrix Object. Inherits from Object
      */ 
-    class Hazmat : public KalmanObject<Hazmat>
+    class DataMatrix : public KalmanObject<DataMatrix>
     {
       public:
 
         //!< Type Definitions
-        typedef boost::shared_ptr<Hazmat> Ptr;
-        typedef boost::shared_ptr<Hazmat const> ConstPtr;
+        typedef boost::shared_ptr<DataMatrix> Ptr;
+        typedef boost::shared_ptr<DataMatrix const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<Hazmat> > ListPtr;
-        typedef boost::shared_ptr< const ObjectList<Hazmat> > ListConstPtr;
+        typedef boost::shared_ptr< ObjectList<DataMatrix> > ListPtr;
+        typedef boost::shared_ptr< const ObjectList<DataMatrix> > ListConstPtr;
 
       public:
 
         /**
          * @brief Constructor
          */
-        Hazmat();
+        DataMatrix();
 
         virtual bool isSameObject(const ObjectConstPtr& object) const;
 
-        virtual void fillGeotiff(pandora_data_fusion_msgs::
-            DatafusionGeotiffSrv::Response* res) const;
-
-        virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+        virtual void getVisualization(visualization_msgs::
+            MarkerArray* markers) const;
 
         /**
-         * @brief Getter for member pattern_
-         * @return int The Hazmat's pattern
+         * @brief Getter for member content_
+         * @return std::string The DATAMATRIX's content
          */
-        int getPattern() const
+        std::string getContent() const
         {
-          return pattern_;
+          return content_;
         }
 
         /**
-         * @brief Setter for member pattern_
+         * @brief Setter for member content_
          * @return void
          */
-        void setPattern(int pattern)
+        void setContent(std::string content)
         {
-          pattern_ = pattern;
+          content_ = content;
+        }
+
+        /**
+         * @brief Getter for member timeFound_
+         * @return ros::Time The DATAMATRIX's timeFound
+         */
+        ros::Time getTimeFound() const
+        {
+          return timeFound_;
+        }
+
+        /**
+         * @brief Setter for member timeFound_
+         * @return void
+         */
+        void setTimeFound(ros::Time timeFound)
+        {
+          timeFound_ = timeFound;
         }
 
       private:
 
-        //!< The hazmat's pattern
-        int pattern_;
+        //!< The dataMatrix's content
+        std::string content_;
+        //!< The time when this dataMatrix was first found
+        ros::Time timeFound_;
     };
 
-    typedef Hazmat::Ptr HazmatPtr;
-    typedef Hazmat::ConstPtr HazmatConstPtr;
-    typedef Hazmat::PtrVector HazmatPtrVector;
-    typedef Hazmat::PtrVectorPtr HazmatPtrVectorPtr;
-    typedef Hazmat::ListPtr HazmatListPtr;
-    typedef Hazmat::ListConstPtr HazmatListConstPtr;
+    typedef DataMatrix::Ptr DataMatrixPtr;
+    typedef DataMatrix::ConstPtr DataMatrixConstPtr;
+    typedef DataMatrix::PtrVector DataMatrixPtrVector;
+    typedef DataMatrix::PtrVectorPtr DataMatrixPtrVectorPtr;
+    typedef DataMatrix::ListPtr DataMatrixListPtr;
+    typedef DataMatrix::ListConstPtr DataMatrixListConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_HAZMAT_H
+#endif  // ALERT_HANDLER_DATA_MATRIX_H

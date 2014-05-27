@@ -1,5 +1,11 @@
-hole: 0 0 1
+hole: 0 0 1 0.8
 qr: 0 0 voula
 hazmat: 0 0 1
 hole: 0 0 1 0.58
 thermal: 0 0 0.5
+face: 0 0 0.5
+motion: 0 0 0.5
+sound: 0 0 0.5
+co2: 0 0 0.5
+landoltc: 0 0 
+datamatrix: 0 0 vicky
