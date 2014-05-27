@@ -1,7 +1,7 @@
 <package>
-  <name>pandora_move_base</name>
+  <name>pandora_local_planner</name>
   <version>0.0.0</version>
-  <description>Exploration and navigation controller for PANDORA UGV.</description>
+  <description>Local path planning algorithms using dwa.</description>
   
   <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
 
@@ -14,7 +14,8 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  
+   
   <export>
+
   </export>
 </package>
