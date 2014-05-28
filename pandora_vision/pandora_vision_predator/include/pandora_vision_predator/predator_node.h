@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "common_communications/GeneralAlertMsg.h"
+#include "pandora_common_msgs/GeneralAlertMsg.h"
 #include "vision_communications/LandoltcPredatorMsg.h"
 
 #include "../tld/TLD.h"

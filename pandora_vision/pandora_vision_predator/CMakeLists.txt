@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE Release)
 find_package(catkin REQUIRED COMPONENTS
 cv_bridge
 vision_communications
-common_communications
+pandora_common_msgs
 roscpp
 image_transport
 sensor_msgs
@@ -34,6 +34,7 @@ catkin_package(
  cv_bridge
  image_transport
  vision_communications
+ pandora_common_msgs
  sensor_msgs
  roslint
  DEPENDS system_lib

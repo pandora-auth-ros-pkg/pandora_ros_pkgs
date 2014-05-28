@@ -39,7 +39,11 @@ Predator::Predator(const std::string& ns): _nh(ns)
   model_path_stream << packagePath << "/model";
   
   patternPath = model_path_stream.str();
-  modelLoaded = true;
+  if(is_file_exist(patternPath))
+    modelLoaded = true;
+  else
+    ROS_INFO("Model not found!Waiting... <3 ");
+    
   //!<Get Model Export Path
   exportPath = model_path_stream.str();
   
@@ -321,7 +325,7 @@ void Predator::getGeneralParams()
   if (_nh.getParam("published_topic_names/predator_alert", param))
   {
     _predatorPublisher = 
-      _nh.advertise<common_communications::GeneralAlertMsg>(param, 1000);
+      _nh.advertise<pandora_common_msgs::GeneralAlertMsg>(param, 1000);
   }
   else
   {
@@ -468,18 +472,20 @@ void Predator::sendMessage(const cv::Rect& rec, const float& posterior,
   }
   else{
     
-    common_communications::GeneralAlertMsg predatorAlertMsg;
+    pandora_common_msgs::GeneralAlertMsg predatorAlertMsg;
     
-    predatorAlertMsg.header.frame_id = cameraFrameId;
-    predatorAlertMsg.probability = posterior;
-    int center_x = rec.x + rec.width/2;
-    int center_y = rec.y + rec.height/2;
-    
-    predatorAlertMsg.yaw = ratioX * ( center_x -
-                                   static_cast<double>(frameWidth) / 2 );
-    predatorAlertMsg.pitch = -ratioY * ( center_y -
-                                    static_cast<double>(frameHeight) / 2 );
-    _predatorPublisher.publish(predatorAlertMsg);
+    if(posterior != 0){
+      predatorAlertMsg.header.frame_id = cameraFrameId;
+      predatorAlertMsg.probability = posterior;
+      int center_x = rec.x + rec.width/2;
+      int center_y = rec.y + rec.height/2;
+      
+      predatorAlertMsg.yaw = ratioX * ( center_x -
+                                     static_cast<double>(frameWidth) / 2 );
+      predatorAlertMsg.pitch = -ratioY * ( center_y -
+                                      static_cast<double>(frameHeight) / 2 );
+      _predatorPublisher.publish(predatorAlertMsg);
+    }  
   }
 }  
 
