@@ -154,7 +154,7 @@ namespace pandora_vision
   int Parameters::HoleFusion::rectangle_inflation_size = 20;
 
   float Parameters::HoleFusion::holes_gaussian_mean = 0.3;
-  float Parameters::HoleFusion::holes_gaussian_stddev = 0.3;
+  float Parameters::HoleFusion::holes_gaussian_stddev = 0.2;
 
   int Parameters::HoleFusion::run_checker_color_homogeneity = 1;
   float Parameters::HoleFusion::checker_color_homogeneity_threshold = 0.4;

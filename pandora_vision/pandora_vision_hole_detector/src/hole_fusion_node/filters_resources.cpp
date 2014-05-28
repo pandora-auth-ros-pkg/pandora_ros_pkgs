@@ -126,7 +126,6 @@ namespace pandora_vision
     if (Parameters::HoleFusion::run_checker_texture_diff > 0)
     {
       enable_holesMasksImageVector = true;
-      enable_intermediatePointsSetVector = true;
       enable_intermediatePointsImageVector = true;
       enable_inflatedRectanglesVectorAndIndices = true;
     }
@@ -187,6 +186,8 @@ namespace pandora_vision
 
     // Create the necessary resources
 
+    // The generation of image masks presupposes the generation of set masks
+    // within method createHolesMasksImageVector
     if (enable_holesMasksImageVector && !enable_holesMasksSetVector)
     {
       createHolesMasksImageVector(conveyor, image, holesMasksImageVector);
@@ -197,6 +198,7 @@ namespace pandora_vision
       createHolesMasksSetVector(conveyor, image, holesMasksSetVector);
     }
 
+    // Generate both types of masks
     if (enable_holesMasksSetVector && enable_holesMasksImageVector)
     {
       createHolesMasksVectors(conveyor, image,
@@ -212,6 +214,8 @@ namespace pandora_vision
         inflatedRectanglesIndices);
     }
 
+    // The generation of image masks presupposes the generation of set masks
+    // within method createIntermediateHolesPointsImageVector
     if (enable_intermediatePointsImageVector &&
       !enable_intermediatePointsSetVector)
     {

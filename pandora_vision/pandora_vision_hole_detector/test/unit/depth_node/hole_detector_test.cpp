@@ -129,7 +129,7 @@ namespace pandora_vision
             &upperLeftSquare );
 
         // Synthesize the final squares_ image
-        squares_ = lowerRightSquare + upperRightSquare + upperLeftSquare;
+        squares_ += lowerRightSquare + upperRightSquare + upperLeftSquare;
 
       }
 

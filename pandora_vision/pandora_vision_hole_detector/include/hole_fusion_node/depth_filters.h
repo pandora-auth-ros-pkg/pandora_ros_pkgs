@@ -143,7 +143,7 @@ namespace pandora_vision
         active filter executed.
         While the returned set may be reduced in size, the size of this vector
         is the same throughout and equal to the number of active filters by
-        the number of keypoints found and published by the rgb node.
+        the number of keypoints found and published by the depth and rgb nodes
         @return void
        **/
       static void checkHoles(
@@ -155,6 +155,31 @@ namespace pandora_vision
         const std::vector<int>& inflatedRectanglesIndices,
         const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
         std::vector<std::vector<float> >* probabilitiesVector);
+
+      /**
+        @brief Checks for valid holes by area / depth comparison
+        @param[in] conveyor [const HolesConveyor&] The candidate holes
+        @param[in] depthImage [const cv::Mat&] The depth image
+        @param[in] holesMasksSetVector
+        [const std::vector<std::set<unsigned int> >&]
+        A vector that holds sets of points; each point is internal to its
+        respective hole
+        @param[out] msgs [std::vector<std::string>*] Messages for debug
+        reasons
+        @param[out] probabilitiesVector [std::vector<float>*] A vector
+        of probabilities, each position of which hints to the certainty degree
+        with which the associated candidate hole is associated.
+        While the returned set may be reduced in size, the size of this vector
+        is the same throughout and equal to the number of keypoints found and
+        published by the rgb node
+        @return void
+       **/
+      static void checkHolesDepthArea(
+        const HolesConveyor& conveyor,
+        const cv::Mat& depthImage,
+        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
+        std::vector<std::string>* msgs,
+        std::vector<float>* probabilitiesVector);
 
       /**
         @brief Checks for valid holes just by the depth difference between
@@ -188,15 +213,17 @@ namespace pandora_vision
         std::vector<float>* probabilitiesVector);
 
       /**
-        @brief Checks for valid holes by area / depth comparison
+        @brief Checks the homogeneity of the gradient of an interpolated
+        depth image in areas denoted by the points inside the
+        holesMasksSetVector vector
         @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] depthImage [const cv::Mat&] The depth image
+        @param[in] interpolatedDepthImage [const cv::Mat&] The input
+        interpolated depth image
         @param[in] holesMasksSetVector
         [const std::vector<std::set<unsigned int> >&]
         A vector that holds sets of points; each point is internal to its
         respective hole
-        @param[out] msgs [std::vector<std::string>*] Messages for debug
-        reasons
+        @param[out] msgs [std::vector<std::string>*] Debug messages
         @param[out] probabilitiesVector [std::vector<float>*] A vector
         of probabilities, each position of which hints to the certainty degree
         with which the associated candidate hole is associated.
@@ -205,9 +232,9 @@ namespace pandora_vision
         published by the rgb node
         @return void
        **/
-      static void checkHolesDepthArea(
+      static void checkHolesDepthHomogeneity(
         const HolesConveyor& conveyor,
-        const cv::Mat& depthImage,
+        const cv::Mat& interpolatedDepthImage,
         const std::vector<std::set<unsigned int> >& holesMasksSetVector,
         std::vector<std::string>* msgs,
         std::vector<float>* probabilitiesVector);
@@ -283,33 +310,6 @@ namespace pandora_vision
         const std::vector<int>& inflatedRectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
-
-      /**
-        @brief Checks the homogeneity of the gradient of an interpolated
-        depth image in areas denoted by the points inside the
-        holesMasksSetVector vector
-        @param[in] conveyor [const HolesConveyor&] The candidate holes
-        @param[in] interpolatedDepthImage [const cv::Mat&] The input
-        interpolated depth image
-        @param[in] holesMasksSetVector
-        [const std::vector<std::set<unsigned int> >&]
-        A vector that holds sets of points; each point is internal to its
-        respective hole
-        @param[out] msgs [std::vector<std::string>*] Debug messages
-        @param[out] probabilitiesVector [std::vector<float>*] A vector
-        of probabilities, each position of which hints to the certainty degree
-        with which the associated candidate hole is associated.
-        While the returned set may be reduced in size, the size of this vector
-        is the same throughout and equal to the number of keypoints found and
-        published by the rgb node
-        @return void
-       **/
-      static void checkHolesDepthHomogeneity(
-        const HolesConveyor& conveyor,
-        const cv::Mat& interpolatedDepthImage,
-        const std::vector<std::set<unsigned int> >& holesMasksSetVector,
-        std::vector<std::string>* msgs,
-        std::vector<float>* probabilitiesVector);
 
   };
 

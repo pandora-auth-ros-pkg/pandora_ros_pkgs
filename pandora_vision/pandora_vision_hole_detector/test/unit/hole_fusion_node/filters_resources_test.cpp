@@ -182,7 +182,231 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createHolesMasksVectors
+  //! Test FiltersResources::createCheckerRequiredVectors
+  TEST_F ( FiltersResourcesTest, CreateCheckerRequiredVectorsTest )
+  {
+    // The needed resources
+    std::vector< cv::Mat > holesMasksImageVector;
+    std::vector< std::set< unsigned int > > holesMasksSetVector;
+    std::vector< std::vector< cv::Point2f > > inflatedRectanglesVector;
+    std::vector< int > inflatedRectanglesIndices;
+    std::vector< cv::Mat > intermediatePointsImageVector;
+    std::vector< std::set< unsigned int > > intermediatePointsSetVector;
+
+    for ( int a = 0; a < 2; a++ )
+    {
+      Parameters::HoleFusion::run_checker_color_homogeneity = a;
+
+      for ( int b = 0; b < 2; b++ )
+      {
+        Parameters::HoleFusion::run_checker_luminosity_diff = b;
+
+        for ( int c = 0; c < 2; c++ )
+        {
+          Parameters::HoleFusion::run_checker_texture_diff = c;
+
+          for ( int d = 0; d < 2; d++ )
+          {
+            Parameters::HoleFusion::run_checker_texture_backproject = d;
+
+            for ( int e = 0; e < 2; e++ )
+            {
+              Parameters::HoleFusion::run_checker_depth_diff = e;
+
+              for ( int f = 0; f < 2; f++ )
+              {
+                Parameters::HoleFusion::run_checker_depth_area = f;
+
+                for ( int g = 0; g < 2; g++ )
+                {
+                  Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle = g;
+
+                  for ( int h = 0; h < 2; h++ )
+                  {
+                    Parameters::HoleFusion::run_checker_outline_of_rectangle = h;
+
+                    for ( int i = 0; i < 2; i++ )
+                    {
+                      Parameters::HoleFusion::run_checker_depth_homogeneity = i;
+
+                      // Run FiltersResources::createCheckerRequiredVectors
+                      FiltersResources::createCheckerRequiredVectors(
+                        conveyor,
+                        squares_,
+                        2,
+                        0,
+                        &holesMasksImageVector,
+                        &holesMasksSetVector,
+                        &inflatedRectanglesVector,
+                        &inflatedRectanglesIndices,
+                        &intermediatePointsImageVector,
+                        &intermediatePointsSetVector );
+
+
+                      // Inquire about holesMasksImageVector
+                      if ( a == 1 || c == 1)
+                      {
+                        // There should be three images of masks of holes
+                        EXPECT_EQ ( 3, holesMasksImageVector.size() );
+
+                        for ( int j = 0; j < holesMasksImageVector.size(); j++ )
+                        {
+                          int nonZero = 0;
+                          for ( int rows = 0; rows < squares_.rows; rows++ )
+                          {
+                            for ( int cols = 0; cols < squares_.cols; cols++ )
+                            {
+                              if ( holesMasksImageVector[j].at
+                                < unsigned char > ( rows, cols ) != 0)
+                              {
+                                nonZero++;
+                              }
+                            }
+                          }
+
+                          // There should be 100 X 100 - 4 points in each mask
+                          EXPECT_EQ ( 10000 - 4, nonZero );
+                        }
+                      }
+                      else if ( a != 1 && c != 1 )
+                      {
+                        // No masks if the corresponding filters to variables
+                        // a and c are disabled
+                        EXPECT_EQ ( 0, holesMasksImageVector.size() );
+                      }
+
+
+                      // Inquire about holesMasksSetVector
+                      if ( b == 1 || d == 1 || f == 1 || i == 1 )
+                      {
+                        // There should be three masks of holes
+                        EXPECT_EQ ( 3, holesMasksSetVector.size() );
+
+                        for ( int j = 0; j < holesMasksSetVector.size(); j++ )
+                        {
+                          // Each mask should have 100 X 100 - 4 points
+                          EXPECT_EQ ( 10000 - 4, holesMasksSetVector[j].size() );
+                        }
+                      }
+                      else if ( b != 1 && d != 1 && f != 1 && i != 1 )
+                      {
+                        // No masks if the corresponding filters to variables
+                        // b, d, f and i are disabled
+                        EXPECT_EQ ( 0, holesMasksSetVector.size() );
+                      }
+
+
+                      // Inquire about inflatedRectangles*
+                      if ( b == 1 || c == 1 || d == 1
+                        || e == 1 || g == 1 || h == 1 )
+                      {
+                        // The number of rectangles should be equal to the
+                        // number of indices
+                        EXPECT_EQ ( inflatedRectanglesVector.size(),
+                          inflatedRectanglesIndices.size() );
+
+                        // In this case, with an inflation size of value 10,
+                        // there should be two holes
+                        EXPECT_EQ ( 2, inflatedRectanglesVector.size() );
+
+                        for ( int j = 0; j < inflatedRectanglesVector.size(); j++ )
+                        {
+                          // Each rectangle should have exactly four vertices
+                          EXPECT_EQ ( 4, inflatedRectanglesVector[j].size() );
+                        }
+                      }
+                      else if (b != 1 && c != 1 && d != 1
+                        && e != 1 && g != 1 && h != 1)
+                      {
+                        // The number of rectangles should be equal to the
+                        // number of indices
+                        EXPECT_EQ ( inflatedRectanglesVector.size(),
+                          inflatedRectanglesIndices.size() );
+
+                        // No masks if the corresponding filters to variables
+                        // b, c, d, e, g and h are disabled
+                        EXPECT_EQ ( 0, inflatedRectanglesVector.size() );
+                      }
+
+
+                      // Inquire about intermediatePointsImageVector
+                      if ( c == 1 )
+                      {
+                        // There should be two masks of intermediate points
+                        EXPECT_EQ ( 2, intermediatePointsImageVector.size() );
+
+                        for ( int j = 0;
+                          j < intermediatePointsImageVector.size(); j++ )
+                        {
+                          int nonZero = 0;
+                          for ( int rows = 0; rows < squares_.rows; rows++ )
+                          {
+                            for ( int cols = 0; cols < squares_.cols; cols++ )
+                            {
+                              if ( intermediatePointsImageVector[j].at
+                                < unsigned char > ( rows, cols ) != 0)
+                              {
+                                nonZero++;
+                              }
+                            }
+                          }
+
+                          // There should be more than 400 intermediate points
+                          EXPECT_LT ( 400, nonZero );
+                        }
+                      }
+                      else
+                      {
+                        // No masks if the corresponding filter to variable
+                        // c is disabled
+                        EXPECT_EQ ( 0, intermediatePointsImageVector.size() );
+                      }
+
+
+                      // Inquire about intermediatePointsSetVector
+                      if ( b == 1 || d == 1 || g == 1 )
+                      {
+                        // There should be two masks of intermediate points
+                        EXPECT_EQ ( 2, intermediatePointsSetVector.size() );
+
+                        for ( int j = 0;
+                          j < intermediatePointsSetVector.size(); j++ )
+                        {
+                          // There should be more than 400 intermediate points
+                          EXPECT_LT ( 400,
+                            intermediatePointsSetVector[j].size() );
+                        }
+                      }
+                      else
+                      {
+                        // No masks if the corresponding filters to variables
+                        // b, d and g are disabled
+                        EXPECT_EQ ( 0, intermediatePointsSetVector.size() );
+                      }
+
+
+                      // Clear the vectors for the next run
+                      holesMasksImageVector.clear();
+                      holesMasksSetVector.clear();
+                      inflatedRectanglesVector.clear();
+                      inflatedRectanglesIndices.clear();
+                      intermediatePointsImageVector.clear();
+                      intermediatePointsSetVector.clear();
+
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
+  //! Test FiltersResources::createHolesMasksVectors
   TEST_F ( FiltersResourcesTest, CreateHolesMasksVectorsTest )
   {
     // The vector of images of masks
@@ -236,7 +460,7 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createHolesMasksImageVector
+  //! Test FiltersResources::createHolesMasksImageVector
   TEST_F ( FiltersResourcesTest, CreateHolesMasksImageVectorTest )
   {
     // The vector of images of masks
@@ -282,7 +506,7 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createHolesMasksSetVector
+  //! Test FiltersResources::createHolesMasksSetVector
   TEST_F ( FiltersResourcesTest, CreateHolesMasksSetVectorTest )
   {
     // The indices of points inside the holes in conveyor
@@ -302,26 +526,26 @@ namespace pandora_vision
       EXPECT_EQ ( 10000 - 4, holesMasksSetVector[h].size() );
 
       // Uncomment for visual inspection
-/*
- *
- *      cv::Mat img = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
- *      unsigned char* ptr = img.ptr();
- *
- *      for ( std::set<unsigned int>::iterator it = holesMasksSetVector[h].begin();
- *        it != holesMasksSetVector[h].end(); it++ )
- *      {
- *        ptr[*it] = 255;
- *      }
- *
- *      Visualization::show ( "Mask", img, 0 );
- *
- */
+      /*
+       *
+       *      cv::Mat img = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+       *      unsigned char* ptr = img.ptr();
+       *
+       *      for ( std::set<unsigned int>::iterator it = holesMasksSetVector[h].begin();
+       *        it != holesMasksSetVector[h].end(); it++ )
+       *      {
+       *        ptr[*it] = 255;
+       *      }
+       *
+       *      Visualization::show ( "Mask", img, 0 );
+       *
+       */
     }
   }
 
 
 
-  // Test FiltersResources::createInflatedRectanglesVector
+  //! Test FiltersResources::createInflatedRectanglesVector
   TEST_F ( FiltersResourcesTest, CreateInflatedRectanglesVectorTest )
   {
     // The vector holding the inflated rectangles vertices per hole for
@@ -390,7 +614,7 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createIntermediateHolesPointsVectors
+  //! Test FiltersResources::createIntermediateHolesPointsVectors
   TEST_F ( FiltersResourcesTest, CreateIntermediateHolesPointsVectorsTest )
   {
     // First off, we need to obtain the inflated rectangles vector and the
@@ -515,7 +739,7 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createIntermediateHolesPointsImageVector
+  //! Test FiltersResources::createIntermediateHolesPointsImageVector
   TEST_F ( FiltersResourcesTest, CreateIntermediateHolesPointsImageVectorTest )
   {
     // First off, we need to obtain the inflated rectangles vector and the
@@ -619,7 +843,7 @@ namespace pandora_vision
 
 
 
-  // Test FiltersResources::createIntermediateHolesPointsSetVector
+  //! Test FiltersResources::createIntermediateHolesPointsSetVector
   TEST_F ( FiltersResourcesTest, CreateIntermediateHolesPointsSetVectorTest )
   {
     // First off, we need to obtain the inflated rectangles vector and the
@@ -689,24 +913,24 @@ namespace pandora_vision
     }
 
     // Uncomment for visual inspection
-/*
- *    for ( int h = 0; h < intermediatePointsSetVector_2.size(); h++ )
- *    {
- *
- *      cv::Mat img = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
- *      unsigned char* ptr = img.ptr();
- *
- *      for ( std::set<unsigned int>::iterator it =
- *        intermediatePointsSetVector_2[h].begin();
- *        it != intermediatePointsSetVector_2[h].end(); it++ )
- *      {
- *        ptr[*it] = 255;
- *      }
- *
- *      Visualization::show ( "Intermediate Points", img, 0 );
- *    }
- *
- */
+    /*
+     *    for ( int h = 0; h < intermediatePointsSetVector_2.size(); h++ )
+     *    {
+     *
+     *      cv::Mat img = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+     *      unsigned char* ptr = img.ptr();
+     *
+     *      for ( std::set<unsigned int>::iterator it =
+     *        intermediatePointsSetVector_2[h].begin();
+     *        it != intermediatePointsSetVector_2[h].end(); it++ )
+     *      {
+     *        ptr[*it] = 255;
+     *      }
+     *
+     *      Visualization::show ( "Intermediate Points", img, 0 );
+     *    }
+     *
+     */
   }
 
 } // namespace pandora_vision
