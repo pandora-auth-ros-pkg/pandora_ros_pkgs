@@ -98,7 +98,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_FATAL("Predator alert topic name not found");
+    ROS_FATAL("Landoltc alert topic name not found");
     ROS_BREAK();
   }
   

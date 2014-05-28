@@ -101,6 +101,9 @@ private:
   //!< The topic subscribed to for the front camera
   std::string imageTopic;
   
+  //!< The topic subscribed to if it works with predator
+  std::string predator_topic_name;
+  
   //!< Variable used for State Managing
   bool landoltc3dNowON;
   
@@ -140,7 +143,7 @@ public:
   @param ref [cv::Mat&] Reference Image
   @return void
   **/
-  LandoltC3dDetection();
+  explicit LandoltC3dDetection(const std::string& ns);
 
   /**
   @brief Default Destructor
@@ -169,6 +172,8 @@ public:
     
   int curState;
   int prevState;
+  
+  std::string param;
   
 };
 } // namespace pandora_vision

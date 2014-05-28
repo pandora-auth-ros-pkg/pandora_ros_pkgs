@@ -47,7 +47,7 @@ namespace pandora_vision
 @return void
 **/
 
-LandoltC3dDetection::LandoltC3dDetection(): _nh(), landoltc3dNowON(true) 
+LandoltC3dDetection::LandoltC3dDetection(const std::string& ns): _nh(ns), landoltc3dNowON(true) 
 {
   getGeneralParams();
   
@@ -56,7 +56,7 @@ LandoltC3dDetection::LandoltC3dDetection(): _nh(), landoltc3dNowON(true)
   
   if(PredatorOn)
   {
-    _landoltc3dPredator = _nh.subscribe("/pandora_vision_predator/PredatorAlert", 1,
+    _landoltc3dPredator = _nh.subscribe(predator_topic_name, 1,
     &LandoltC3dDetection::predatorCallback, this);
   }
   else
@@ -64,11 +64,6 @@ LandoltC3dDetection::LandoltC3dDetection(): _nh(), landoltc3dNowON(true)
     _inputImageSubscriber = _nh.subscribe(imageTopic, 1,
     &LandoltC3dDetection::imageCallback, this);
   }
-
-  //!< Declare publisher and advertise topic
-  //!< where algorithm results are posted
-  _landoltc3dPublisher =
-      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>("landoltc3d_alert", 10, true);
       
   ROS_INFO("[landoltc3d_node] : Created LandoltC3d Detection instance");
 
@@ -91,7 +86,33 @@ LandoltC3dDetection::~LandoltC3dDetection(void)
 void LandoltC3dDetection::getGeneralParams()
 {
   packagePath = ros::package::getPath("pandora_vision_landoltc");
-
+  
+  //! Declare publisher and advertise topic
+  //! where algorithm results are posted if it works alone
+  if (_nh.getParam("published_topic_names/landoltc_alert", param))
+  {
+    _landoltc3dPublisher = 
+      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>(param, 10);
+  }
+  else
+  {
+    ROS_FATAL("Landoltc alert topic name not found");
+    ROS_BREAK();
+  }
+  
+  //! Declare subscriber
+  //! where algorithm results are posted if it works with predator
+  if (_nh.getParam("subscribed_topic_names/predator_topic_name", predator_topic_name))
+  {
+    ROS_DEBUG("Loaded topic name to use with predator");
+  }
+  else
+  {
+    ROS_FATAL("Landoltc image topic name not found");
+    ROS_BREAK();
+  }
+  
+  
   //!< Get the path to the pattern used for detection
   if (_nh.hasParam("patternPath"))
   {
@@ -107,9 +128,9 @@ void LandoltC3dDetection::getGeneralParams()
   }
   
   //!< Get the PredatorOn value
-  if(_nh.hasParam("PredatorOn"))
+  if(_nh.getParam("operation_state", PredatorOn))
   {
-    _nh.getParam("PredatorOn", PredatorOn);
+    ROS_DEBUG("[landoltc3d_node] : Loading predator_on parameter");
   }
   else
   {
