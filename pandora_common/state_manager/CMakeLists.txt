@@ -2,17 +2,24 @@ cmake_minimum_required(VERSION 2.8.3)
 project(state_manager)
 
 find_package(catkin REQUIRED COMPONENTS
-                    roscpp
-                    std_msgs
-                    actionlib
-                    state_manager_communications
-                    )
+  roscpp
+  std_msgs
+  actionlib
+  state_manager_communications
+)
+
+catkin_python_setup()
 
 catkin_package(
-   INCLUDE_DIRS include
-   CATKIN_DEPENDS 
-   LIBRARIES state_client 
-   DEPENDS 
+  INCLUDE_DIRS include
+  CATKIN_DEPENDS
+    roscpp
+    std_msgs
+    actionlib
+    state_manager_communications
+  LIBRARIES
+    state_client 
+  DEPENDS 
 )
 
 include_directories(include

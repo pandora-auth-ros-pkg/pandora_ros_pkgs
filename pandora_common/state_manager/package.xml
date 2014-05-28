@@ -6,24 +6,22 @@
 
   <maintainer email="afourast@gmail.com">Afouras Triantafyllos</maintainer> 
 
-  <license>TODO</license>
+  <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  
   
   <build_depend>roscpp</build_depend>
   <build_depend>diagnostic_updater</build_depend>
   <build_depend>state_manager_communications</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
   
   <run_depend>roscpp</run_depend>
-
   <run_depend>diagnostic_updater</run_depend>
   <run_depend>state_manager_communications</run_depend>
-  
-  <run_depend>actionlib</run_depend>
+  <run_depend>std_msgs</run_depend>
   <run_depend>actionlib</run_depend>
 
   <export>
-
   </export>
 </package>
