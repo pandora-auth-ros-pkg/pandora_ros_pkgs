@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "vision_communications/PredatorAlertMsg.h"
+#include "common_communications/GeneralAlertMsg.h"
 #include "vision_communications/LandoltcPredatorMsg.h"
 
 #include "../tld/TLD.h"
@@ -46,6 +46,10 @@
 
 //!< default frame width
 #define DEFAULT_WIDTH 640
+//!< default horizontal field of view
+#define HFOV 61.14
+//!< default vertical field of view
+#define VFOV 48 
 
 namespace pandora_vision
 {
@@ -123,9 +127,9 @@ class Predator
     //!<Value for enabling or disabling TLD learning mode
     bool learningEnabled;
     
-    ///Flag to identify if it works alone or in compination with
+    ///Flag to identify if it works alone or in combination with
     ///landoltc3d_node
-    bool operationState;
+    bool operation_state;
     
     /**
     @brief Callback for the RGB Image
@@ -134,8 +138,11 @@ class Predator
     **/
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     
-    std::string param;
-
+    float ratioX;
+    float ratioY;
+    
+    double hfov;
+    double vfov;
   public:
   
   
@@ -143,7 +150,7 @@ class Predator
   @brief Default Constructor
   @return void
   **/
-  Predator();
+  explicit Predator(const std::string& n);
   
   /**
   @brief Get parameters referring to view and frame characteristics
@@ -173,7 +180,7 @@ class Predator
   **/
   ~Predator();
   
-  
+  std::string param;
 };
 } // namespace pandora_vision
 #endif  // PANDORA_VISION_PREDATOR_PREDATOR_NODE_H

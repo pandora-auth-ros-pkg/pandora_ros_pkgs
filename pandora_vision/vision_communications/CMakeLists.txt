@@ -29,7 +29,6 @@ add_message_files(
   LandoltcAlertMsg.msg
   LandoltcAlertsVectorMsg.msg
   LandoltcPredatorMsg.msg
-  PredatorAlertMsg.msg
   )
 
 generate_messages(

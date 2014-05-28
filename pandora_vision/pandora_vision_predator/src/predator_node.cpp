@@ -27,13 +27,28 @@ namespace pandora_vision
   @brief Default Constructor
   @return void
 **/
-Predator::Predator(): _nh()
+Predator::Predator(const std::string& ns): _nh(ns)
 {
   modelLoaded = false;
-  
-  operationState = false;
-  
+    
   getGeneralParams();
+  
+    
+  //!< Get the path to the pattern used for detection
+  std::stringstream model_path_stream;
+  model_path_stream << packagePath << "/model";
+  
+  patternPath = model_path_stream.str();
+  modelLoaded = true;
+  //!<Get Model Export Path
+  exportPath = model_path_stream.str();
+  
+  //!< Convert field of view from degrees to rads
+  hfov = hfov * CV_PI / 180;
+  vfov = vfov * CV_PI / 180;
+
+  ratioX = hfov / frameWidth;
+  ratioY = vfov / frameHeight;
   
   ROS_INFO("[predator_node] : Created Predator instance");
   
@@ -306,7 +321,7 @@ void Predator::getGeneralParams()
   if (_nh.getParam("published_topic_names/predator_alert", param))
   {
     _predatorPublisher = 
-      _nh.advertise<vision_communications::PredatorAlertMsg>(param, 1000);
+      _nh.advertise<common_communications::GeneralAlertMsg>(param, 1000);
   }
   else
   {
@@ -328,86 +343,83 @@ void Predator::getGeneralParams()
     ROS_BREAK();
   }
   
-    
-  //!< Get the path to the pattern used for detection
-  if (_nh.getParam("pattern_path", patternPath))
-  {
-    if(is_file_exist(patternPath))
-    {
-      ROS_INFO("Model Loaded From Launcher");
-      modelLoaded = true;
-    }
-    else
-    {
-      ROS_INFO("Model Does Not Exist In pattern_path. Awaiting User Input... \n");
-    }
-  }
-  else
-  {
-    ROS_INFO("Pattern Path Not Found, Waiting User Input \n");
-  }
-  
-  //!<Get Model Export Path
-  if( _nh.getParam("export_path", exportPath))
-  {
-    ROS_DEBUG_STREAM("export_path: " << exportPath);
-  }
-  else
-  {
-    ROS_INFO("Export Path Not Defined. Using Default");
-    std:: string temp = "/model";
-    exportPath.assign(packagePath);
-    exportPath.append(temp);
-  }
-  
-  
   //!< Get value for enabling or disabling TLD learning mode
-  
   if( _nh.getParam("learning_enabled", learningEnabled))
   {
     ROS_INFO("Learning Enabled Value From Launcher");
   }
   else
   {
+    learningEnabled = false;
     ROS_INFO("Learning Enabled Value Not Loaded From Launcher");
   }
   
-  //!< Get the camera to be used by predator node;
-  if (_nh.hasParam("camera_name"))
+  //!< Get value of current operation state
+  if( _nh.getParam("operation_state", operation_state))
   {
-    _nh.getParam("camera_name", cameraName);
+    ROS_INFO("Operation state is loaded");
+  }
+  else
+  {
+    operation_state = true;
+    ROS_INFO("Unable to load operation state from launcher");
+  }
+  
+  //!< Get the camera to be used by predator node;
+  if (_nh.getParam("camera_name", cameraName))
+  {
     ROS_DEBUG_STREAM("camera_name : " << cameraName);
   }
   else
   {
-    ROS_DEBUG("[predator_node] : Parameter frameHeight not found. Using Default");
-    cameraName = "camera";
+    ROS_FATAL("[predator_node] : Camera not found");
+    ROS_BREAK();
   }
 
-  //!< Get the Height parameter if available;
-  if (_nh.hasParam("/" + cameraName + "/image_height"))
+  //! Get the Height parameter if available;
+  if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
   {
-    _nh.getParam("/" + cameraName + "/image_height", frameHeight);
     ROS_DEBUG_STREAM("height : " << frameHeight);
   }
   else
   {
-    ROS_DEBUG("[predator_node] : Parameter frameHeight not found. Using Default");
+    ROS_DEBUG("[motion_node] : Parameter frameHeight not found. Using Default");
     frameHeight = DEFAULT_HEIGHT;
   }
-
-  //!< Get the Width parameter if available;
-  if (_nh.hasParam("/" + cameraName + "/image_width"))
+    
+  //! Get the Width parameter if available;
+  if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth))
   {
-    _nh.getParam("/" + cameraName + "/image_width", frameWidth);
     ROS_DEBUG_STREAM("width : " << frameWidth);
   }
   else
   {
-    ROS_DEBUG("[predator_node] : Parameter frameWidth not found. Using Default");
+    ROS_DEBUG("[motion_node] : Parameter frameWidth not found. Using Default");
     frameWidth = DEFAULT_WIDTH;
   }
-
+    
+  //!< Get the HFOV parameter if available;
+  if ( _nh.getParam("/" + cameraName + "/hfov", hfov))
+  {
+    ROS_DEBUG_STREAM("HFOV : " << hfov);
+  }
+  else
+  {
+    hfov = HFOV;
+    ROS_DEBUG_STREAM("HFOV : " << hfov);
+  }
+  
+  //!< Get the VFOV parameter if available;
+  if (_nh.getParam("/" + cameraName + "/vfov", vfov))
+  {
+    ROS_DEBUG_STREAM("VFOV : " << vfov);
+  }
+  else
+  {
+    vfov = VFOV;
+    ROS_DEBUG_STREAM("VFOV : " << vfov);
+  }
+  
   //!< Get the listener's topic;
   if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
   {
@@ -415,14 +427,13 @@ void Predator::getGeneralParams()
   }
   else
   {
-    ROS_FATAL("Camera name not found");
+    ROS_FATAL("Imagetopic not found");
     ROS_BREAK(); 
   }
 
   //!< Get the images's frame_id;
-  if (_nh.hasParam("/" + cameraName + "/camera_frame_id"))
+  if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId))
   {
-    _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
     ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
   }
   else
@@ -439,9 +450,10 @@ void Predator::getGeneralParams()
   @return void
 **/
   
-void Predator::sendMessage(const cv::Rect& rec, const float& posterior, const sensor_msgs::ImageConstPtr& frame)
+void Predator::sendMessage(const cv::Rect& rec, const float& posterior, 
+    const sensor_msgs::ImageConstPtr& frame)
 {
-  if( operationState == true){
+  if( operation_state == true){
     
     vision_communications::LandoltcPredatorMsg predatorLandoltcMsg;
     
@@ -455,9 +467,19 @@ void Predator::sendMessage(const cv::Rect& rec, const float& posterior, const se
     _landoltc3dPredatorPublisher.publish(predatorLandoltcMsg);  
   }
   else{
-    vision_communications::PredatorAlertMsg predatorAlertMsg;
+    
+    common_communications::GeneralAlertMsg predatorAlertMsg;
+    
     predatorAlertMsg.header.frame_id = cameraFrameId;
     predatorAlertMsg.probability = posterior;
+    int center_x = rec.x + rec.width/2;
+    int center_y = rec.y + rec.height/2;
+    
+    predatorAlertMsg.yaw = ratioX * ( center_x -
+                                   static_cast<double>(frameWidth) / 2 );
+    predatorAlertMsg.pitch = -ratioY * ( center_y -
+                                    static_cast<double>(frameHeight) / 2 );
+    _predatorPublisher.publish(predatorAlertMsg);
   }
 }  
 
@@ -467,7 +489,7 @@ void Predator::sendMessage(const cv::Rect& rec, const float& posterior, const se
 int main(int argc, char** argv) 
 {
   ros::init(argc, argv, "predator_node");
-  pandora_vision::Predator predator;  
+  pandora_vision::Predator predator("predator");  
   ros::spin();
   return 0;
 }

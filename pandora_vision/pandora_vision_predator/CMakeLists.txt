@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Release)
 find_package(catkin REQUIRED COMPONENTS
 cv_bridge
 vision_communications
+common_communications
 roscpp
 image_transport
 sensor_msgs
