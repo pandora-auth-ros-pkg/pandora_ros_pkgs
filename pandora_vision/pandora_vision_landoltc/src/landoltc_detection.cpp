@@ -46,21 +46,23 @@ namespace pandora_vision
 @return void
 **/
 
-LandoltCDetection::LandoltCDetection() : _nh(), landoltcNowON(true)
+LandoltCDetection::LandoltCDetection(const std::string& ns) : _nh(ns), landoltcNowON(true)
 {
   getGeneralParams();
 
+  //!< Convert field of view from degrees to rads
+  hfov = hfov * CV_PI / 180;
+  vfov = vfov * CV_PI / 180;
+
+  ratioX = hfov / frameWidth;
+  ratioY = vfov / frameHeight;
+  
   //!< Initiliaze and preprocess reference image
   _landoltcDetector.initializeReferenceImage(patternPath);
 
   _inputImageSubscriber = _nh.subscribe(imageTopic, 1,
                                         &LandoltCDetection::imageCallback, this);
   
-  //!< Declare publisher and advertise topic
-  //!< where algorithm results are posted
-  _landoltcPublisher =
-      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>("landoltc_alert", 10, true);
-      
   //!< The dynamic reconfigure parameter's callback
   server.setCallback(boost::bind(&LandoltCDetection::parametersCallback, this, _1, _2));
       
@@ -86,7 +88,20 @@ LandoltCDetection::~LandoltCDetection(void)
 void LandoltCDetection::getGeneralParams()
 {
   packagePath = ros::package::getPath("pandora_vision_landoltc");
-
+  
+  //! Declare publisher and advertise topic
+  //! where algorithm results are posted if it works alone
+  if (_nh.getParam("published_topic_names/landoltc_alert", param))
+  {
+    _landoltcPublisher = 
+      _nh.advertise<vision_communications::LandoltcAlertsVectorMsg>(param, 10);
+  }
+  else
+  {
+    ROS_FATAL("Predator alert topic name not found");
+    ROS_BREAK();
+  }
+  
   //!< Get the path to the pattern used for detection
   if (_nh.hasParam("patternPath"))
   {
@@ -102,21 +117,19 @@ void LandoltCDetection::getGeneralParams()
   }
 
   //!< Get the camera to be used by landoltc node;
-  if (_nh.hasParam("camera_name"))
+  if (_nh.getParam("camera_name", cameraName))
   {
-    _nh.getParam("camera_name", cameraName);
     ROS_DEBUG_STREAM("camera_name : " << cameraName);
   }
   else
   {
-    ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
-    cameraName = "camera";
+    ROS_FATAL("[landoltc_node] : Camera name not found");
+    ROS_BREAK();
   }
 
   //!< Get the Height parameter if available;
-  if (_nh.hasParam("/" + cameraName + "/image_height"))
+  if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
   {
-    _nh.getParam("/" + cameraName + "/image_height", frameHeight);
     ROS_DEBUG_STREAM("height : " << frameHeight);
   }
   else
@@ -126,9 +139,8 @@ void LandoltCDetection::getGeneralParams()
   }
 
   //!< Get the Width parameter if available;
-  if (_nh.hasParam("/" + cameraName + "/image_width"))
+  if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth))
   {
-    _nh.getParam("/" + cameraName + "/image_width", frameWidth);
     ROS_DEBUG_STREAM("width : " << frameWidth);
   }
   else
@@ -137,6 +149,28 @@ void LandoltCDetection::getGeneralParams()
     frameWidth = DEFAULT_WIDTH;
   }
 
+  //!< Get the HFOV parameter if available;
+  if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
+  {
+    ROS_DEBUG_STREAM("HFOV : " << hfov);
+  }
+  else 
+  {
+    hfov = HFOV;
+    ROS_DEBUG_STREAM("HFOV : " << hfov);
+  }
+  
+  //!< Get the VFOV parameter if available;
+  if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
+  {
+    ROS_DEBUG_STREAM("VFOV : " << vfov);
+  }
+  else 
+  {
+    vfov = VFOV;
+    ROS_DEBUG_STREAM("VFOV : " << vfov);
+  }
+    
   //!< Get the listener's topic;
   if (_nh.hasParam("/" + cameraName + "/topic_name"))
   {
@@ -146,7 +180,7 @@ void LandoltCDetection::getGeneralParams()
   else
   {
     ROS_DEBUG("[landoltc_node] : Parameter imageTopic not found. Using Default");
-    imageTopic = "/camera_head/image_raw";
+    imageTopic = "/kinect/rgb/image_raw";
   }
 
   //!< Get the images's frame_id;
@@ -201,11 +235,39 @@ void LandoltCDetection::landoltcCallback()
     
   _landoltcDetector.begin(&landoltCFrame);
   
+  std::vector<LandoltC> _landoltc = _landoltcDetector.getDetectedLandolt();
+  
   //!< Create message of Landoltc Detector
-  vision_communications::LandoltcAlertsVectorMsg LandoltcVectorMsg;
-  vision_communications::LandoltcAlertMsg LandoltccodeMsg;
-  LandoltcVectorMsg.header.frame_id = cameraFrameId;
-  LandoltcVectorMsg.header.stamp = ros::Time::now();
+  vision_communications::LandoltcAlertsVectorMsg landoltcVectorMsg;
+  vision_communications::LandoltcAlertMsg landoltccodeMsg;
+  
+  bool noAngle = true;
+
+  landoltcVectorMsg.header.frame_id = cameraFrameId;
+  landoltcVectorMsg.header.stamp = ros::Time::now();
+  
+  for(int i = 0; i < _landoltc.size(); i++){
+     
+    landoltccodeMsg.yaw = 
+      ratioX * (_landoltc.at(i).center.x  - static_cast<double>(frameWidth/2));
+    landoltccodeMsg.pitch = 
+      -ratioY * (_landoltc.at(i).center.y  - static_cast<double>(frameHeight/2));
+    landoltccodeMsg.posterior = _landoltc[i].probability;
+    
+    for(int j = 0; j < _landoltc[i].angles.size(); j++)
+      landoltccodeMsg.angles.push_back( _landoltc[i].angles.at(j));
+    
+    if (_landoltc[i].angles.size() > 0)
+      landoltcVectorMsg.landoltcAlerts.push_back(landoltccodeMsg);
+    else
+        noAngle = false;
+  }
+  
+  if(noAngle == true && _landoltc.size() > 0)
+    _landoltcPublisher.publish(landoltcVectorMsg);
+   
+  
+  _landoltcDetector.clear();
 }
 
 /**

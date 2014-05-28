@@ -54,7 +54,7 @@ struct LandoltC{
   std::vector<float> angles;
   std::vector<cv::Scalar> color;
   std::vector<cv::Rect> bbox;
-  int probability;
+  float probability;
   LandoltC() {}
 };
 
@@ -210,6 +210,9 @@ public:
   @return void
   **/
   void fusion();
+  
+  std::vector<LandoltC> getDetectedLandolt();
+  
   
 
 };

@@ -204,9 +204,9 @@ void LandoltCDetector::findRotationB(const cv::Mat& in, LandoltC* temp)
     //std::cout << "Angle of " << i <<" is : " << angle*(180/3.14159265359) << std::endl;
     //ROS_INFO("Angle of %d is %lf \n", i, angle*(180/3.14159265359));
     (*temp).angles.push_back(angle);
-
-    
   }
+  
+  
   
   #ifdef SHOW_DEBUG_IMAGE
     cv::imshow("paddedptr", paddedptr); 
@@ -601,9 +601,9 @@ void LandoltCDetector::begin(cv::Mat* input)
   #endif
   
   fusion();
-
-  clear();
-
+  
+  //~ for(int i = 0; i< _landoltc.size(); i++)
+    //~ ROS_INFO_STREAM("x" << _landoltc.at(i).center.x);
 }
 
 /**
@@ -632,25 +632,27 @@ void LandoltCDetector::fusion()
     LandoltC* temp = &(_landoltc.at(i));
     if((*temp).count == 1)
     {
-      (*temp).probability = 0.2;
+      _landoltc.at(i).probability = 0.2;
     }
     else if((*temp).count == 2)
     {
-      (*temp).probability = 0.4;
+      _landoltc.at(i).probability = 0.4;
     }
     else if((*temp).count == 3)
     {
-      (*temp).probability = 0.6;
+      _landoltc.at(i).probability = 0.6;
     }
     else if((*temp).count == 4)
     {
-      (*temp).probability = 0.8;
+      _landoltc.at(i).probability = 0.8;
     }
     else if((*temp).count == 5)
     {
-      (*temp).probability = 1;
+      _landoltc.at(i).probability = 1;
     }
+   
   }
+  
 }  
 
 /**
@@ -725,5 +727,10 @@ void LandoltCDetector::thinningIter(cv::Mat* in, int iter)
   }
 
   cv::bitwise_and(*in, temp, *in);
+}
+
+std::vector<LandoltC> LandoltCDetector::getDetectedLandolt()
+{
+  return _landoltc;
 }
 } // namespace pandora_vision

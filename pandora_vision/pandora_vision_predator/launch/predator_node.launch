@@ -10,7 +10,4 @@
   <rosparam file="$(find pandora_vision_predator)/config/predator_params.yaml" 
         command="load" ns="predator"/>
         
-  <param name="pattern_path" type="str" value="$(find pandora_vision_predator)/model"/>
-  <param name="export_path" type="str" value="$(find pandora_vision_predator)/model"/>
-
 </launch>

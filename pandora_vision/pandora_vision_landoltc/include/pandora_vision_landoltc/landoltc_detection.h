@@ -52,12 +52,18 @@
 #include "state_manager/state_client.h"
 #include "vision_communications/LandoltcAlertsVectorMsg.h"
 #include "pandora_vision_landoltc/landoltc_detector.h"
+
 //!< default frame height
 #define DEFAULT_HEIGHT 480
 
 //!< default frame width
 #define DEFAULT_WIDTH 640
 
+//!< Horizontal field of view in degrees
+#define HFOV 61.14  
+
+//!< vertical field of view in degrees 
+#define VFOV 48 
 
 namespace pandora_vision
 {
@@ -83,7 +89,16 @@ private:
   
   /// Frame width
   int frameWidth;
+  
+  float ratioX;
+  float ratioY;
 
+  //!< Horizontal Field Of View (rad)
+  double hfov;
+
+  //!< Vertical Field Of View (rad)
+  double vfov;
+  
   std::string cameraName;
   std::string cameraFrameId;
 
@@ -135,7 +150,7 @@ public:
   @param ref [cv::Mat&] Reference Image
   @return void
   **/
-  LandoltCDetection();
+  explicit LandoltCDetection(const std::string& ns);
 
   /**
   @brief Default Destructor
@@ -164,6 +179,7 @@ public:
     
     int curState;
     int prevState;
+    std::string param;
 };
 } // namespace pandora_vision
 #endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H

@@ -1,12 +1,14 @@
 <launch>
-    <group ns="pandora_vision_landoltc">
-      
-      <param name="camera_name" value="kinect" />
-		
-			<node name="landoltc_node" type="landoltc_node" pkg="pandora_vision_landoltc" respawn="False" output="screen" />
-			<!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
-
-      <param name="patternPath" type="str" value="$(find pandora_vision_landoltc)/bold.jpg"/>  
+  
+    <node name="landoltc_node" type="landoltc_node" pkg="pandora_vision_landoltc" respawn="False" output="screen" />
+    
+    <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_topics.yaml" 
+        command="load" ns="landoltc"/>
+        
+    <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_params.yaml" 
+        command="load" ns="landoltc"/>
+        
+    <param name="patternPath" type="str" value="$(find pandora_vision_landoltc)/bold.jpg"/>  
        
-    </group>
+    
 </launch>

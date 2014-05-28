@@ -48,7 +48,7 @@
 int main(int argc, char** argv) 
 {
   ros::init(argc, argv, "landoltc_node");
-  pandora_vision::LandoltCDetection landoltc_finder;  
+  pandora_vision::LandoltCDetection landoltc_finder("landoltc");  
   ros::spin();
   return 0;
 }
