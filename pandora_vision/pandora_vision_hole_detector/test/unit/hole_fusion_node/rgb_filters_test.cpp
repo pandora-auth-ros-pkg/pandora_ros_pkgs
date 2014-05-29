@@ -175,28 +175,17 @@ namespace pandora_vision
         int x = 100;
         int y = 100;
 
+        // The seed for the rand_r method
+        unsigned int seed = 0;
         for( int rows = upperLeft.y; rows < upperLeft.y + y; rows++ )
         {
           for ( int cols = upperLeft.x; cols < upperLeft.x + x; cols++ )
           {
-            struct timeval blue;
-            gettimeofday(&blue, NULL);
-            srand(blue.tv_usec * blue.tv_sec);
+            unsigned char randomBlue = rand_r(&seed) % 256;
 
-            unsigned char randomBlue = rand_r() % 256;
+            unsigned char randomGreen = rand_r(&seed) % 256;
 
-            struct timeval green;
-            gettimeofday(&green, NULL);
-            srand(green.tv_usec * green.tv_sec);
-
-            unsigned char randomGreen = rand_r() % 256;
-
-            struct timeval red;
-
-            gettimeofday(&red, NULL);
-            srand(red.tv_usec * red.tv_sec);
-
-            unsigned char randomRed = rand_r() % 256;
+            unsigned char randomRed = rand_r(&seed) % 256;
 
             middleSquare.at< cv::Vec3b >( rows, cols ).val[0] = randomBlue;
             middleSquare.at< cv::Vec3b >( rows, cols ).val[1] = randomGreen;
