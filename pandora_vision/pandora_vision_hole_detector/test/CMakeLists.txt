@@ -77,6 +77,16 @@ add_library(filters_resources_lib
 target_link_libraries(filters_resources_test ${catkin_LIBRARIES} utils_lib filters_resources_lib gtest_main)
 
 
+catkin_add_gtest(rgb_filters_test
+  unit/hole_fusion_node/rgb_filters_test.cpp)
+
+add_library(rgb_filters_lib
+  ../src/hole_fusion_node/filters_resources.cpp
+  ../src/hole_fusion_node/rgb_filters.cpp)
+
+target_link_libraries(rgb_filters_test ${catkin_LIBRARIES} utils_lib rgb_filters_lib gtest_main)
+
+
 ############## Functional Tests ###############
 
 #if(TARGET tests)
