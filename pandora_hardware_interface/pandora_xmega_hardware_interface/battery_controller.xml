@@ -1,0 +1,11 @@
+<library path="lib/libbattery_controller">
+  <class
+    name="pandora_xmega/BatteryController"
+    type="pandora_hardware_interface::xmega::BatteryController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of all available batteries as
+    pandora_xmega_hardware_interface/BatteryMsg message.
+  </description>
+  </class>
+</library>

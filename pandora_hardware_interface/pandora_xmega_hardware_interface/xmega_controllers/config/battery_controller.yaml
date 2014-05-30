@@ -1,0 +1,3 @@
+battery_controller:
+  type: pandora_xmega/BatteryController
+  publish_rate: 50

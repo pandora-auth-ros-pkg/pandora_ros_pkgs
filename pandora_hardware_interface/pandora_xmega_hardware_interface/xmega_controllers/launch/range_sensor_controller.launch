@@ -1,0 +1,17 @@
+<launch>
+  <arg name="namespace" default="xmega" />
+
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_xmega_hardware_interface)/xmega_controllers/config/range_sensor_controller.yaml"
+    ns = "$(arg namespace)"/>
+
+  <!-- spawn controller -->
+  <node
+    name="range_sensor_controller_spawner"
+    pkg="controller_manager"
+    type="spawner" output="screen"
+    args="range_sensor_controller"
+    ns = "$(arg namespace)"/>
+</launch>
