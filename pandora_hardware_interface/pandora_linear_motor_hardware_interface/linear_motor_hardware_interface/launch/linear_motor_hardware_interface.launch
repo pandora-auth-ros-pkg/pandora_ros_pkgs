@@ -1,0 +1,15 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/config/linear_motor_hardware_interface.yaml"
+    ns="/linear"/>
+
+  <!-- Launch controller manager with pandora hardware interface-->
+  <node
+    name="motor_hardware_interface_node"
+    pkg="pandora_linear_motor_hardware_interface"
+    type="linear_motor_hardware_interface_node"
+    output="screen"
+    ns="/linear"/>
+</launch>

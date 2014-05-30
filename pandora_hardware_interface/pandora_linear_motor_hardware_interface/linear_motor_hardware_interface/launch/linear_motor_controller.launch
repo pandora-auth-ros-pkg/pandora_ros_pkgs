@@ -1,0 +1,17 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/config/linear_motor_hardware_interface.yaml"
+    ns="/linear"/>
+
+  <!-- spawn controller -->
+  <node
+    name="linear_motor_controller_spawner"
+    pkg="controller_manager"
+    type="spawner" output="screen"
+    ns="/linear"
+    args="
+      joint_state_controller
+      linear_motor_controller" />
+</launch>
