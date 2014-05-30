@@ -2,7 +2,7 @@
   <!-- Launcher for every hardware interface-->
   <!-- Motors -->
   <include
-    file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/motor_hardware_interface.launch" />
+    file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />
 
   <!-- Dynamixel -->
   <include
@@ -10,9 +10,17 @@
 
   <!-- XMega -->
   <include
-    file="$(find pandora_xmega_hardware_interface)/launch/xmega_hardware_interface.launch" />
+    file="$(find pandora_xmega_hardware_interface)/xmega_hardware_interface/launch/xmega_hardware_interface.launch" />
 
   <!-- IMU -->
   <include
     file="$(find pandora_imu_hardware_interface)/launch/imu_hardware_interface.launch" />
+
+  <!-- Linear -->
+  <include
+    file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/launch/linear_motor_hardware_interface.launch" />
+    
+  <!-- Arm -->
+  <include
+    file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface.launch" />
 </launch>
