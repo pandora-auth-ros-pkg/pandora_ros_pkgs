@@ -156,7 +156,8 @@ namespace pandora_vision
         rectangle inclusion of the amalgamatable's outline
         @param[in,out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
-        will be modified
+        will be modified. CAUTION: the amalgamatable is not deleted upon
+        amalgamation, only the internals of the amalgamator are modified
         @param[in] amalgamatorId [const int&] The identifier of the
         hole inside the HolesConveyor amalgamator struct
         @param[in,out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
@@ -218,7 +219,8 @@ namespace pandora_vision
         rectangle inclusion of the connectable's outline
         @param[in,out] conveyor [HolesConveyor*] The holes conveyor
         whose keypoint, outline and bounding rectangle entries
-        will be modified
+        will be modified. CAUTION: the connectable is not deleted upon
+        connection, only the internals of the connector are modified
         @param[in] connectorId [const int&] The identifier of the hole inside
         the HolesConveyor connectables struct
         @param[in] connectableId [const int&] The identifier of the hole inside

@@ -74,15 +74,6 @@ namespace pandora_vision
       return;
     }
 
-
-    // The holesMaskSetVector vector is used in the merging processes
-    std::vector<std::set<unsigned int> > holesMasksSetVector;
-    FiltersResources::createHolesMasksSetVector(
-      *rgbdHolesConveyor,
-      image,
-      &holesMasksSetVector);
-
-
     // A vector that indicates when a specific hole has finished
     // examining all the other holes in the conveyor for merging.
     // Initialized at 0 for all conveyor entries, the specific hole
@@ -106,6 +97,13 @@ namespace pandora_vision
     bool isFuseComplete = false;
     while(!isFuseComplete)
     {
+      // The holesMaskSetVector vector is used in the merging processes
+      std::vector<std::set<unsigned int> > holesMasksSetVector;
+      FiltersResources::createHolesMasksSetVector(
+        *rgbdHolesConveyor,
+        image,
+        &holesMasksSetVector);
+
       // Is the activeId-th candidate hole able to
       // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
       bool isAble = false;
@@ -185,6 +183,7 @@ namespace pandora_vision
 
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
+
 
         // Since the {assimilator, amalgamator, connector} is able,
         // delete the assimilable's entries in the vectors needed
@@ -408,15 +407,6 @@ namespace pandora_vision
       return;
     }
 
-
-    // The holesMaskSetVector vector is used in the merging processes
-    std::vector<std::set<unsigned int> > holesMasksSetVector;
-    FiltersResources::createHolesMasksSetVector(
-      *rgbdHolesConveyor,
-      image,
-      &holesMasksSetVector);
-
-
     // A vector that indicates when a specific hole has finished
     // examining all the other holes in the conveyor for merging.
     // Initialized at 0 for all conveyor entries, the specific hole
@@ -440,6 +430,14 @@ namespace pandora_vision
     bool isFuseComplete = false;
     while(!isFuseComplete)
     {
+      // The holesMaskSetVector vector is used in the merging processes
+      std::vector<std::set<unsigned int> > holesMasksSetVector;
+      FiltersResources::createHolesMasksSetVector(
+        *rgbdHolesConveyor,
+        image,
+        &holesMasksSetVector);
+
+
       // Is the activeId-th candidate hole able to
       // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
       bool isAble = false;
@@ -762,7 +760,8 @@ namespace pandora_vision
     rectangle inclusion of the amalgamatable's outline
     @param[in,out] conveyor [HolesConveyor*] The holes conveyor
     whose keypoint, outline and bounding rectangle entries
-    will be modified
+    will be modified. CAUTION: the amalgamatable is not deleted upon
+    amalgamation, only the internals of the amalgamator are modified
     @param[in] amalgamatorId [const int&] The identifier of the
     hole inside the HolesConveyor amalgamator struct
     @param[in,out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
@@ -1057,7 +1056,8 @@ namespace pandora_vision
     rectangle inclusion of the connectable's outline
     @param[in,out] conveyor [HolesConveyor*] The holes conveyor
     whose keypoint, outline and bounding rectangle entries
-    will be modified
+    will be modified. CAUTION: the connectable is not deleted upon
+    connection, only the internals of the connector are modified
     @param[in] connectorId [const int&] The identifier of the hole inside
     the HolesConveyor connectables struct
     @param[in] connectableId [const int&] The identifier of the hole inside

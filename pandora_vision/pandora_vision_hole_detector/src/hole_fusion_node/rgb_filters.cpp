@@ -102,7 +102,7 @@ namespace pandora_vision
 
     switch(method)
     {
-      // Filter #1 (Color homogenity inside blob)-----------------------------
+      // Filter #1 (Color homogeneity inside blob)-----------------------------
       case 1 :
         {
           checkHolesColorHomogeneity(
@@ -115,6 +115,7 @@ namespace pandora_vision
           windowMsg = "Filter: Color homogeneity";
           break;
         }
+
         // Filter #2 (Luminosity difference)----------------------------------
         // Check for luminosity difference between the points that constitute
         // the blob's bounding box and the points inside the blob's outline
@@ -132,6 +133,7 @@ namespace pandora_vision
           windowMsg = "Filter: Luminosity difference";
           break;
         }
+
         // Filter #3 (Texture difference)-------------------------------------
       case 3 :
         {
@@ -148,6 +150,7 @@ namespace pandora_vision
           windowMsg = "Filter: Texture difference";
           break;
         }
+
         // Filter #4 (Back project model histogram)---------------------------
       case 4 :
         {
@@ -500,20 +503,28 @@ namespace pandora_vision
       }
 
       // Mean luminosity of the inside points of the current hole
-      float meanBlobLuminosity = static_cast<float> (blobLuminosity)
-        / holesMasksSetVector[i].size();
+      float meanBlobLuminosity = 0.0;
+      if (holesMasksSetVector[i].size() > 0)
+      {
+        meanBlobLuminosity = static_cast<float> (blobLuminosity)
+          / holesMasksSetVector[i].size();
+      }
+
 
       // Mean luminosity of the intermediate points
-      float meanBoundingBoxLuminosity =
-        static_cast<float> (boundingBoxLuminosity)
-        / intermediatePointsSetVector[i].size();
-
+      float meanBoundingBoxLuminosity = 0.0;
+      if (intermediatePointsSetVector[i].size() > 0)
+      {
+        meanBoundingBoxLuminosity = static_cast<float> (boundingBoxLuminosity)
+          / intermediatePointsSetVector[i].size();
+      }
 
 
       // If the luminosity of the inside of the candidate hole is greater
       // than the luminosity of the points beyond it and restricted by the
       // edges of its bounding box, it surely is not a hole
-      if (meanBlobLuminosity > meanBoundingBoxLuminosity)
+      if (meanBlobLuminosity > meanBoundingBoxLuminosity
+        || meanBoundingBoxLuminosity == 0)
       {
         probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
       }

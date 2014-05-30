@@ -55,6 +55,7 @@ target_link_libraries(hole_detector_test ${catkin_LIBRARIES} utils_lib depth_nod
 
 ############################# hole fusion node #################################
 
+###### depth_filters_test.cpp ######
 catkin_add_gtest(depth_filters_test
   unit/hole_fusion_node/depth_filters_test.cpp)
 
@@ -68,6 +69,21 @@ add_library(depth_filters_lib
 target_link_libraries(depth_filters_test depth_filters_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
 
 
+###### hole_merger_test.cpp ######
+catkin_add_gtest(hole_merger_test
+  unit/hole_fusion_node/hole_merger_test.cpp)
+
+add_library(hole_merger_lib
+  ../src/hole_fusion_node/depth_filters.cpp
+  ../src/hole_fusion_node/filters_resources.cpp
+  ../src/hole_fusion_node/hole_merger.cpp
+  ../src/hole_fusion_node/planes_detection.cpp
+  )
+
+target_link_libraries(hole_merger_test hole_merger_lib pcl_filters ${PCL_LIBRARIES} ${catkin_LIBRARIES} utils_lib gtest_main)
+
+
+###### filters_resources_test.cpp ######
 catkin_add_gtest(filters_resources_test
   unit/hole_fusion_node/filters_resources_test.cpp)
 
@@ -77,6 +93,7 @@ add_library(filters_resources_lib
 target_link_libraries(filters_resources_test ${catkin_LIBRARIES} utils_lib filters_resources_lib gtest_main)
 
 
+###### rgb_filters_test.cpp ######
 catkin_add_gtest(rgb_filters_test
   unit/hole_fusion_node/rgb_filters_test.cpp)
 
