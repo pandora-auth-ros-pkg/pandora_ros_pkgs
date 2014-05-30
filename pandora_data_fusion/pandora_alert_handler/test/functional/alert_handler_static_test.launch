@@ -11,7 +11,7 @@
 
   <!--<env name="ROSCONSOLE_CONFIG_FILE" -->
     <!--value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
-  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_stand_alone.launch" /> 
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> 
   <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
  
   <test test-name="AlertHandlerStaticTest" pkg="pandora_alert_handler"
