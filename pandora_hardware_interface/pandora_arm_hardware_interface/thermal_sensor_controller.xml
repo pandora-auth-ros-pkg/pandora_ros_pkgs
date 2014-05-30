@@ -1,0 +1,11 @@
+<library path="lib/libthermal_sensor_controller">
+  <class
+    name="pandora_arm/ThermalSensorController"
+    type="pandora_hardware_interface::arm::ThermalSensorController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of all available thermal sensors as
+    sensor_msgs/Image message.
+  </description>
+  </class>
+</library>

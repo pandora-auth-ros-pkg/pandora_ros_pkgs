@@ -1,0 +1,22 @@
+co2_sensors:
+  - name: '/sensors/co2'
+    frame_id: 'co2'
+thermal_sensors:
+  - name: '/sensors/left_thermal'
+    frame_id: 'left_thermal'
+    height: 8
+    width: 8
+    step: 8
+    address: 'L'
+  - name: '/sensors/center_thermal'
+    frame_id: 'center_thermal'
+    height: 8
+    width: 8
+    step: 8
+    address: 'C'
+  - name: '/sensors/right_thermal'
+    frame_id: 'right_thermal'
+    height: 8
+    width: 8
+    step: 8
+    address: 'R'

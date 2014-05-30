@@ -1,2 +1,2 @@
 Header header
-int32 ppm
+float32 co2_percentage

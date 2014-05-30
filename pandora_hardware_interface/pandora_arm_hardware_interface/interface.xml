@@ -1,0 +1,13 @@
+<package>
+  <node>
+    /arm_hardware_interface_node
+
+    <publisher>/sensors/co2</publisher>
+    <publisher>/sensors/thermal</publisher>
+    <publisher>/sensors/thermal_mean</publisher>
+  </node>
+  
+  <node>
+    /thermal_sensor_controller_spawner
+  </node>
+</package>

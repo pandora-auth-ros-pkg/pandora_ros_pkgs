@@ -1,0 +1,3 @@
+co2_sensor_controller:
+  type: pandora_arm/Co2SensorController
+  publish_rate: 50

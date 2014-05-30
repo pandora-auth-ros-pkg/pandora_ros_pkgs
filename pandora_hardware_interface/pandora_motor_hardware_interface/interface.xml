@@ -1,0 +1,13 @@
+<package>
+  <node>
+    /motor_hardware_interface_node
+
+    <subscriber>/cmd_vel</subscriber>
+
+    <publisher>/motor/joint_states</publisher>
+  </node>
+  
+  <node>
+    /motor_controller_spawner
+  </node>
+</package>

@@ -1,0 +1,11 @@
+<package>
+  <node>
+    /imu_hardware_interface_node
+
+    <publisher>/sensors/imu</publisher>
+  </node>
+
+  <node>
+    /imu_controller_spawner
+  </node>
+</package>

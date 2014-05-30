@@ -1,13 +1,13 @@
 <package>
   <node>
     /xmega_hardware_interface_node
-  </node>
-  
-  <node>
-    /xmega_controllers_spawner
 
     <publisher>/xmega/joint_states</publisher>
     <publisher>/sensors/battery</publisher>
     <publisher>/sensors/range</publisher>
+  </node>
+  
+  <node>
+    /xmega_controllers_spawner
   </node>
 </package>

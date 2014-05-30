@@ -1,0 +1,3 @@
+thermal_sensor_controller:
+  type: pandora_arm/ThermalSensorController
+  publish_rate: 50

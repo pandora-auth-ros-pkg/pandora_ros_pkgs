@@ -1,0 +1,14 @@
+<package>
+  <node>
+    /motor_hardware_interface_node
+
+    <subscriber>/linear_motor_controller/command</subscriber>
+
+    <publisher>/linear_motor_controller/state</publisher>
+    <publisher>/linear/joint_states</publisher>
+  </node>
+
+  <node>
+    /linear_motor_controller_spawner
+  </node>
+</package>

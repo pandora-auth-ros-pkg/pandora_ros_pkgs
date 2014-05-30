@@ -1,0 +1,30 @@
+<package>
+  <node>
+    /dynamixel_manager
+
+    <subscriber>/laser_roll_controller/command</subscriber>
+    <subscriber>/laser_pitch_controller/command</subscriber>
+    <subscriber>/kinect_pitch_controller/command</subscriber>
+    <subscriber>/kinect_yaw_controller/command</subscriber>
+
+    <publisher>/laser_roll_controller/state</publisher>
+    <publisher>/laser_pitch_controller/state</publisher>
+    <publisher>/kinect_pitch_controller/state</publisher>
+    <publisher>/kinect_yaw_controller/state</publisher>
+  </node>
+  
+  <node>
+    /dynamixel_controller_spawner
+  </node>
+
+  <node>
+    /dynamixel_joint_state_wrapper
+
+    <subscriber>/laser_roll_controller/state</subscriber>
+    <subscriber>/laser_pitch_controller/state</subscriber>
+    <subscriber>/kinect_pitch_controller/state</subscriber>
+    <subscriber>/kinect_yaw_controller/state</subscriber>
+
+    <publisher>/dynamixel/joint_states</publisher>
+  </node>
+</package>

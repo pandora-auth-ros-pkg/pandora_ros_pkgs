@@ -1,0 +1,9 @@
+<launch>
+  <!-- Launch controller manager with pandora hardware interface-->
+  <include
+    file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface.launch" />
+
+  <!-- spawn arm controllers -->
+  <include
+    file="$(find pandora_arm_hardware_interface)/arm_controllers/launch/arm_controllers.launch" />
+</launch>

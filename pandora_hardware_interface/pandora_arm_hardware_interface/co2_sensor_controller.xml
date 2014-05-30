@@ -1,0 +1,11 @@
+<library path="lib/libco2_sensor_controller">
+  <class
+    name="pandora_arm/Co2SensorController"
+    type="pandora_hardware_interface::arm::Co2SensorController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of all available co2 sensors as
+    pandora_arm_hardware_interface/Co2Msg.
+  </description>
+  </class>
+</library>

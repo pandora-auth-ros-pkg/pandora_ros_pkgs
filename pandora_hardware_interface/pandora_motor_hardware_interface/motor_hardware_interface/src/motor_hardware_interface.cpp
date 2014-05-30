@@ -80,18 +80,18 @@ namespace motor
 
   void MotorHardwareInterface::read()
   {
-    //~ int feedback[4];
-    //~ motors_->getRPM(&feedback[2], &feedback[0], &feedback[3], &feedback[1]);
+    int feedback[4];
+    motors_->getRPM(&feedback[2], &feedback[0], &feedback[3], &feedback[1]);
 
-    //~ for (int ii = 0; ii < 4; ii++)
-    //~ {
-      //~ velocity_[ii] = static_cast<double>(feedback[ii]);
-    //~ }
+    for (int ii = 0; ii < 4; ii++)
+    {
+      velocity_[ii] = static_cast<double>(feedback[ii]);
+    }
   }
 
   void MotorHardwareInterface::write()
   {
-    //~ motors_->writeRPM(command_[0], command_[1]);
+    motors_->writeRPM(command_[0], command_[1]);
   }
 
   void MotorHardwareInterface::readJointNameFromParamServer()

@@ -1,0 +1,15 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/config/arm_hardware_interface.yaml"
+    ns = "arm"/>
+    
+  <!-- Launch controller manager with pandora hardware interface-->
+  <node
+    name="arm_hardware_interface_node"
+    pkg="pandora_arm_hardware_interface"
+    type="arm_hardware_interface_node"
+    output="screen"
+    ns = "arm"/>
+</launch>
