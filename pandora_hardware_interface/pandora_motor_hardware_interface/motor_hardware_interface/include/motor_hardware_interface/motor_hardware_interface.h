@@ -42,7 +42,7 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include "orangutan_interface/orangutan_serial_interface.h"
+#include "epos_handler/serial_epos_handler.h"
 
 namespace pandora_hardware_interface
 {
@@ -51,7 +51,7 @@ namespace motor
   class MotorHardwareInterface : public hardware_interface::RobotHW
   {
     private:
-      OrangutanSerialInterface motors_;
+      AbstractEposHandler *motors_;
 
       ros::NodeHandle nodeHandle_;
 

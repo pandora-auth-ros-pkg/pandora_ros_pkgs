@@ -43,10 +43,9 @@ namespace motor
   MotorHardwareInterface::MotorHardwareInterface(
     ros::NodeHandle nodeHandle)
   :
-    nodeHandle_(nodeHandle),
-    motors_("/dev/motors", 9600, 100)
+    nodeHandle_(nodeHandle)
   {
-    motors_.init();
+    //~ motors_ = new SerialEposHandler("/dev/ttyUSB0", 115200, 500);
     readJointNameFromParamServer();
 
     // connect and register the joint state interface
@@ -81,28 +80,18 @@ namespace motor
 
   void MotorHardwareInterface::read()
   {
-    int leftSpeed, rightSpeed;
-    motors_.read();
-    motors_.getSpeeds(&leftSpeed, &rightSpeed);
+    //~ int feedback[4];
+    //~ motors_->getRPM(&feedback[2], &feedback[0], &feedback[3], &feedback[1]);
 
-    std::string str1 = "left";
-    std::string str2 = "right";
-
-    for (int ii = 0; ii < jointNames_.size(); ii++)
-    {
-      std::size_t foundLeft = jointNames_[ii].find(str1);
-      std::size_t foundRight = jointNames_[ii].find(str2);
-
-      if (foundLeft != std::string::npos)
-        velocity_[ii] = command_[0];
-      else if (foundRight != std::string::npos)
-        velocity_[ii] = command_[1];
-    }
+    //~ for (int ii = 0; ii < 4; ii++)
+    //~ {
+      //~ velocity_[ii] = static_cast<double>(feedback[ii]);
+    //~ }
   }
 
   void MotorHardwareInterface::write()
   {
-    motors_.setSpeeds(command_[0], command_[1]);
+    //~ motors_->writeRPM(command_[0], command_[1]);
   }
 
   void MotorHardwareInterface::readJointNameFromParamServer()

@@ -82,7 +82,14 @@ namespace motor
       ROS_ERROR_STREAM("Parameter max_angular_velocity was not defined");
       return false;
     }
-      
+
+    if (controllerNodeHandle.hasParam("gearbox_ratio"))
+      controllerNodeHandle.getParam("gearbox_ratio", gearbox_ratio_);
+    else
+    {
+      ROS_ERROR_STREAM("Parameter gearbox_ratio was not defined");
+      return false;
+    }
 
     command_.push_back(ros::Time::now().toSec());
     command_.push_back(0);
@@ -111,14 +118,17 @@ namespace motor
     if (commandRecency < COMMAND_DELAY_THRESHOLD)
     {
       // Compute wheels velocities:
-      double leftVelocity =
+      double leftRadPerSec =
         (currentCommand[1] - currentCommand[2] * wheelSeparation_ / 2.0)
         / wheelRadius_;
-      double rightVelocity =
+      double rightRadPerSec =
         (currentCommand[1] + currentCommand[2] * wheelSeparation_ / 2.0)
         / wheelRadius_;
 
-      setMotorCommands(leftVelocity, rightVelocity);
+      double leftRpm = leftRadPerSec * 30 / 3.14 * gearbox_ratio_;
+      double rightRpm = rightRadPerSec * 30 / 3.14 * gearbox_ratio_;
+
+      setMotorCommands(leftRpm, rightRpm);
     }
     else
     {
@@ -159,9 +169,6 @@ namespace motor
     }
     else
       rightCommand = rightVelocity;
-
-    modf( (leftCommand/maxAngularVelocity_) * 255, &leftCommand);
-    modf( (rightCommand/maxAngularVelocity_) * 255, &rightCommand);
 
     std::string str1 = "left";
     std::string str2 = "right";

@@ -67,6 +67,7 @@ namespace motor
     double wheelSeparation_;
     double wheelRadius_;
     double maxAngularVelocity_;
+    int gearbox_ratio_;
 
     void twistCallback(const geometry_msgs::Twist& twist);
     void setMotorCommands(

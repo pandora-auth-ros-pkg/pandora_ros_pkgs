@@ -45,51 +45,46 @@
 #include <ros/ros.h>
 #include <serial/serial.h>
 
-namespace pandora_hardware_interface {
-  
-  namespace motor {
-  
-    class OrangutanSerialInterface : private boost::noncopyable
-    {
-     public:
-      OrangutanSerialInterface(
-          const std::string& device,
-          int speed,
-          int timeout);
-      
-      void init();
-      
-      void read();
-      
-      inline void getSpeeds(int* leftSpeed, int* rightSpeed) const
-      {
-        *leftSpeed = leftSpeed_;
-        *rightSpeed = rightSpeed_;
-      }
-      
-      inline void setSpeeds(int leftSpeed, int rightSpeed)
-      {
-        write(leftSpeed, rightSpeed);
-      }
-      
-     private:
-     
-      void write(int leftSpeed, int rightSpeed);
-      
-     private:
-      
-      int leftSpeed_;
-      int rightSpeed_;
-      
-      const std::string device_;
-      const int speed_;
-      const int timeout_;
-  
-      boost::scoped_ptr<serial::Serial> serialPtr_;
-    };
-  
-  }  // namespace motor 
+namespace pandora_hardware_interface
+{
+namespace motor
+{
+  class OrangutanSerialInterface : private boost::noncopyable
+  {
+   public:
+    OrangutanSerialInterface(
+        const std::string& device,
+        int speed,
+        int timeout);
 
+    void init();
+
+    void read();
+
+    inline void getSpeeds(int* leftSpeed, int* rightSpeed) const
+    {
+      *leftSpeed = leftSpeed_;
+      *rightSpeed = rightSpeed_;
+    }
+
+    inline void setSpeeds(int leftSpeed, int rightSpeed)
+    {
+      write(leftSpeed, rightSpeed);
+    }
+
+   private:
+    void write(int leftSpeed, int rightSpeed);
+
+    int leftSpeed_;
+    int rightSpeed_;
+
+    const std::string device_;
+    const int speed_;
+    const int timeout_;
+
+    boost::scoped_ptr<serial::Serial> serialPtr_;
+  };
+}  // namespace motor
 }  // namespace pandora_hardware_interface
 
 #endif  // ORANGUTAN_INTERFACE_ORANGUTAN_SERIAL_INTERFACE_H

@@ -4,5 +4,5 @@ add_executable(
   src/motor_hardware_interface_node.cpp)
 target_link_libraries(
   motor_hardware_interface_node
-  orangutan_serial
+  serial_epos_handler
   ${catkin_LIBRARIES})
