@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/co2_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+  <xacro:macro name="co2_sensor" >
+  
+    <xacro:co2_caster parent="linear_head_main_link" >
+
+      <origin xyz="0.01039 -0.01556 0.02386"
+              rpy="${zero}" />
+
+    </xacro:co2_caster>
+    
+  </xacro:macro>
+
+<!-- ###################################################################### -->
+
+</robot>

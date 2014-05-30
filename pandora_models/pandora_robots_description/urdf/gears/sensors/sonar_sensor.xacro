@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/sonar_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+  <!-- ==================================================================== -->
+  <xacro:macro name="left_rear_sonar_sensor" >
+  
+    <xacro:sonar_caster name="left_rear"
+                        parent="base_link" >
+
+      <origin xyz="-0.15519 0.11249 0.14305"
+              rpy="0.0 0.0 ${ 5 * PI_6 }" />
+
+    </xacro:sonar_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="right_rear_sonar_sensor" >
+  
+    <xacro:sonar_caster name="right_rear"
+                        parent="base_link" >
+
+      <origin xyz="-0.15519 -0.11351 0.14305"
+              rpy="0.0 0.0 ${ 7 * PI_6 }" />
+
+    </xacro:sonar_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+</robot>

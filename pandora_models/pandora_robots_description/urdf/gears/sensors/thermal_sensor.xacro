@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/thermal_sensor.urdf.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+  <!-- ==================================================================== -->
+  <xacro:macro name="middle_thermal_sensor" >
+  
+    <xacro:thermal_caster parent="linear_head_main_link"
+                          prefix_y="middle" >
+
+      <origin xyz="0.01039 0.00007 0.04532"
+              rpy="${zero}" />
+
+    </xacro:thermal_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="left_thermal_sensor" >
+  
+    <xacro:thermal_caster parent="linear_head_main_link"
+                          prefix_y="left" >
+
+      <origin xyz="-0.00128 0.04774 0.03108"
+              rpy="0 0 ${PI_3}" />
+
+    </xacro:thermal_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
+  <xacro:macro name="right_thermal_sensor" >
+  
+    <xacro:thermal_caster parent="linear_head_main_link"
+                          prefix_y="right" >
+
+      <origin xyz="-0.00128 -0.04774 0.03108"
+              rpy="0 0 ${-PI_3}" />
+
+    </xacro:thermal_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+</robot>

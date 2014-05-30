@@ -2,86 +2,70 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
+<!-- ###################################################################### -->
+
   <xacro:macro name="co2_caster"
                params="parent *origin" >
+
+    <!-- ################################################################## -->
 
     <link name="co2_link" >
 
       <inertial>
-        <origin xyz="0.005 0.0 0.0"
-                rpy="0 0 0" />
+        <!-- ============================================================== -->
+        <origin xyz="0.005 0.0 0.0" />
+        <!-- ============================================================== -->
         <mass value="0.005" />
+        <!-- ============================================================== -->
         <inertia ixx="2.1208E-7"
                  ixy="0"
                  ixz="0"
                  iyy="4.033E-7"
                  iyz="0"
                  izz="2.1208E-7" />
+        <!-- ============================================================== -->
       </inertial>
 
-      <visual name="visual" >
+      <visual>
+        <!-- ============================================================== -->
         <origin xyz="0 0 0"
                 rpy="0 0 0" />
+        <!-- ============================================================== -->
         <geometry>
           <mesh filename="package://pandora_sensors_description/meshes/co2_sensor/co2_small.dae" />
         </geometry>
+        <!-- ============================================================== -->
       </visual>
 
-      <collision name="collision" >
-        <origin xyz="0.007 0.0 0.0" />
+      <collision>
+        <!-- ============================================================== -->
+        <origin xyz="0.007 0.0 0.0"
+                rpy="0 0 0" />
+        <!-- ============================================================== -->
         <geometry>
           <box size="0.025 0.025 0.025" />
         </geometry>
+        <!-- ============================================================== -->
       </collision>
 
     </link>
 
-    <gazebo reference="co2_link" >
-
-      <sensor name="co2" type="camera" >
-
-        <camera>
-
-          <horizontal_fov>1.5</horizontal_fov>
-
-          <image>
-            <width>640</width>
-            <height>480</height>
-          </image>
-
-          <clip>
-            <near>0.1</near>
-            <far>0.8</far>
-          </clip>
-
-        </camera>
-
-        <always_on>1</always_on>
-        <update_rate>5</update_rate>
-        <visualize>false</visualize>
-
-        <plugin name="co2ros"
-                filename="libpandora_co2_plugin.so" >
-
-          <frameName>co2</frameName>
-          <topicName>sensors/co2</topicName>
-
-        </plugin>
-
-      </sensor>
-
-    </gazebo>
+    <!-- ################################################################## -->
 
     <joint name="co2_joint"
            type="fixed" >
 
+      <!-- ================================================================ -->
       <parent link="${parent}" />
       <child link="co2_link" />
-
+      <!-- ================================================================ -->
       <xacro:insert_block name="origin" />
-
+      <!-- ================================================================ -->
+      
     </joint>
 
   </xacro:macro>
+
+<!-- ###################################################################### -->
 
 </robot>

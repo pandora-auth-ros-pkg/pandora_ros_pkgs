@@ -19,11 +19,8 @@
   <run_depend>xacro</run_depend>
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>joint_state_publisher</run_depend>
-  <run_depend>gazebo_plugins</run_depend>
-  <run_depend>gazebo_ros_control</run_depend>
-  <run_depend>pandora_gazebo_plugins</run_depend>
-  <run_depend>pandora_gazebo_controllers</run_depend>
   <run_depend>pandora_sensors_description</run_depend>
+  
   <export>
   </export>
   

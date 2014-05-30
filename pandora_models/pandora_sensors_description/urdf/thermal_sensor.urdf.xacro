@@ -2,84 +2,70 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
+<!-- ###################################################################### -->
+
   <xacro:macro name="thermal_caster"
                params="parent prefix_y *origin" >
+
+    <!-- ################################################################## -->
 
     <link name="${prefix_y}_thermal_link" >
 
       <inertial>
-        <origin xyz="0.005 0.0 0.0"
-                rpy="0 0 0" />
+        <!-- ============================================================== -->
+        <origin xyz="0.005 0.0 0.0" />
+        <!-- ============================================================== -->
         <mass value="0.005" />
+        <!-- ============================================================== -->
         <inertia ixx="2.1208E-7"
                  ixy="0"
                  ixz="0"
                  iyy="4.033E-7"
                  iyz="0"
                  izz="2.1208E-7" />
+        <!-- ============================================================== -->
       </inertial>
 
-      <visual name="visual" >
+      <visual>
+        <!-- ============================================================== -->
+        <origin xyz="0 0 0"
+                rpy="0 0 0" />
+        <!-- ============================================================== -->
         <geometry>
           <mesh filename="package://pandora_sensors_description/meshes/thermal_sensor/thermal_small.dae" />
         </geometry>
+        <!-- ============================================================== -->
       </visual>
 
-      <collision name="collision" >
-        <origin xyz="0.007 0.0 0.0" />
+      <collision>
+        <!-- ============================================================== -->
+        <origin xyz="0.007 0.0 0.0"
+                rpy="0 0 0" />
+        <!-- ============================================================== -->
         <geometry>
           <box size="0.025 0.025 0.025" />
         </geometry>
+        <!-- ============================================================== -->
       </collision>
 
     </link>
 
-    <gazebo reference="${prefix_y}_thermal_link" >
-      <sensor name="thermal"
-              type="camera" >
-
-        <camera>
-
-          <horizontal_fov>0.8</horizontal_fov>
-
-          <image>
-            <width>640</width>
-            <height>480</height>
-          </image>
-
-          <clip>
-            <near>0.05</near>
-            <far>1.5</far>
-          </clip>
-
-        </camera>
-
-        <always_on>1</always_on>
-        <update_rate>30</update_rate>
-        <visualize>false</visualize>
-
-        <plugin name="thermal2ros"
-                filename="libpandora_thermal_plugin.so" >
-
-          <frameName>${prefix_y}_thermal_link</frameName>
-          <topicName>sensors/thermal</topicName>
-
-        </plugin>
-
-      </sensor>
-
-    </gazebo>
+    <!-- ################################################################## -->
 
     <joint name="${prefix_y}_thermal_joint"
            type="fixed" >
 
+      <!-- ================================================================ -->
       <parent link="${parent}" />
       <child link="${prefix_y}_thermal_link" />
-
+      <!-- ================================================================ -->
       <xacro:insert_block name="origin" />
+      <!-- ================================================================ -->
 
     </joint>
 
   </xacro:macro>
+
+<!-- ###################################################################### -->
 
 </robot>

@@ -1,283 +1,146 @@
 <?xml version="1.0"?>
 
-<robot name="gears"
-       xmlns:xacro="http://ros.org/wiki/xacro" >
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
 <!-- Import Files ######################################################### -->
 
   <!-- ==================================================================== -->
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/gears_properties.xacro" />
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/gears_configurations.xacro" />
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/config/gears_physics.gazebo.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/urdf_configurations.xacro" />
   <!-- ==================================================================== -->
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/model/links.urdf.xacro" />
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/model/joints.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/properties/constants.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/properties/defaults.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/properties/materials.xacro" />
   <!-- ==================================================================== -->
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/gazebo/sensors.xacro" />
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/gazebo/transmission.xacro" />
-  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/gazebo/plugins.gazebo.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/base_link.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/side_link.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/wheel_link.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/linear_elevator_link.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/linear_head_base_link.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/links/linear_head_main_link.urdf.xacro" />
   <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/joints/side_joint.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/joints/wheel_joint.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/joints/linear_elevator_joint.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/joints/linear_head_pitch_joint.urdf.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/joints/linear_head_yaw_joint.urdf.xacro" />
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/laser_sensor.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/kinect_sensor.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/sonar_sensor.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/thermal_sensor.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/co2_sensor.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/sensors/microphone_sensor.xacro" />
+  <!-- ==================================================================== -->
+  
+<xacro:macro name="gears_urdf"
+             params="fixed" >
 
-<!-- Load Links ########################################################### -->
+<!-- Load Links & Joints ################################################## -->
 
-  <xacro:if value="${enable_links}" >
+  <xacro:if value="${enable_base_link}" >
+    <xacro:base_link />
+  </xacro:if>
+  
+  <xacro:if value="${enable_side_links}" >
     <!-- ================================================================== -->
-    <xacro:if value="${enable_base_link}" >
-      <xacro:base_link />
-    </xacro:if>
+    <xacro:side_link prefix_y="left" reflect_y="1" />
+    <xacro:side_joint prefix_y="left" reflect_y="1" />
+    <!-- ================================================================== -->
+    <xacro:side_link prefix_y="right" reflect_y="-1" />
+    <xacro:side_joint prefix_y="right" reflect_y="-1" />
+    <!-- ================================================================== -->
+  </xacro:if>
+  
+  <xacro:if value="${enable_wheel_links}" >
+    <!-- ================================================================== -->
+    <xacro:wheel_link prefix_y="left" prefix_x="front" reflect_y="1" reflect_x="1" />
+    <xacro:wheel_joint prefix_y="left" prefix_x="front" reflect_y="1" reflect_x="1" />
+    <!-- ================================================================== -->
+    <xacro:wheel_link prefix_y="left" prefix_x="rear" reflect_y="1" reflect_x="-1" />
+    <xacro:wheel_joint prefix_y="left" prefix_x="rear" reflect_y="1" reflect_x="-1" />
+    <!-- ================================================================== -->
+    <xacro:wheel_link prefix_y="right" prefix_x="front" reflect_y="-1" reflect_x="1" />
+    <xacro:wheel_joint prefix_y="right" prefix_x="front" reflect_y="-1" reflect_x="1" />
+    <!-- ================================================================== -->
+    <xacro:wheel_link prefix_y="right" prefix_x="rear" reflect_y="-1" reflect_x="-1" />
+    <xacro:wheel_joint prefix_y="right" prefix_x="rear" reflect_y="-1" reflect_x="-1" />
+    <!-- ================================================================== -->
+  </xacro:if>
+  
+  <xacro:if value="${enable_linear_links}" >
     <!-- ================================================================== -->
     <xacro:if value="${enable_linear_elevator_link}" >
       <xacro:linear_elevator_link />
+      <xacro:linear_elevator_joint fixed="${fixed}" />
     </xacro:if>
     <!-- ================================================================== -->
-    <xacro:if value="${enable_linear_head_link}" >
-      <xacro:linear_head_links />
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_side_links}" >
-      <xacro:side_link prefix_y="left" reflect_y="1" />
-      <xacro:side_link prefix_y="right" reflect_y="-1" />
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_wheel_links}" >
-      <xacro:wheel_link prefix_y="left" prefix_x="front" reflect_y="1" reflect_x="1" />
-      <xacro:wheel_link prefix_y="left" prefix_x="rear" reflect_y="1" reflect_x="-1" />
-      <xacro:wheel_link prefix_y="right" prefix_x="front" reflect_y="-1" reflect_x="1" />
-      <xacro:wheel_link prefix_y="right" prefix_x="rear" reflect_y="-1" reflect_x="-1" />
-    </xacro:if>
-    <!-- ================================================================== -->
-  </xacro:if>
-
-<!-- Load Joints ########################################################## -->
-
-  <xacro:if value="${enable_joints}" >
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_linear_elevator_joint}" >
-      <xacro:if value="$(arg real)" >
-        <xacro:linear_elevator_joint control="true" />
+    <xacro:if value="${enable_linear_head_links}" >
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_linear_head_base_link}" >
+        <xacro:linear_head_base_link />
+        <xacro:linear_head_pitch_joint fixed="${fixed}" />
       </xacro:if>
-      <xacro:unless value="$(arg real)" >
-        <xacro:linear_elevator_joint control="$(arg control)" />
-      </xacro:unless>
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_linear_head_joints}" >
-      <xacro:if value="$(arg real)" >
-        <xacro:linear_head_joints control="true" />
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_linear_head_main_link}" >
+        <xacro:linear_head_main_link />
+        <xacro:linear_head_yaw_joint fixed="${fixed}" />
       </xacro:if>
-      <xacro:unless value="$(arg real)" >
-        <xacro:linear_head_joints control="$(arg control)" />
-      </xacro:unless>
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_side_joints}" >
-      <xacro:side_joint prefix_y="left" reflect_y="1" />
-      <xacro:side_joint prefix_y="right" reflect_y="-1" />
-    </xacro:if>
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_wheel_joints}" >
-      <xacro:wheel_joint prefix_y="left" prefix_x="front" reflect_y="1" reflect_x="1" />
-      <xacro:wheel_joint prefix_y="left" prefix_x="rear" reflect_y="1" reflect_x="-1" />
-      <xacro:wheel_joint prefix_y="right" prefix_x="front" reflect_y="-1" reflect_x="1" />
-      <xacro:wheel_joint prefix_y="right" prefix_x="rear" reflect_y="-1" reflect_x="-1" />
+      <!-- ================================================================ -->
     </xacro:if>
     <!-- ================================================================== -->
   </xacro:if>
-
-<!-- Load Physics ######################################################### -->
-
-  <xacro:unless value="$(arg real)" >
-  
-    <xacro:robot_sdf_physics />
-
-    <xacro:if value="${enable_sdf_physics}" >
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_base_link_sdf_physics}" >
-        <xacro:base_link_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_elevator_link_sdf_physics}" >
-        <xacro:linear_elevator_link_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_head_link_sdf_physics}" >
-        <xacro:linear_head_link_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_side_link_sdf_physics}" >
-        <xacro:side_link_sdf_physics prefix_y="left" />
-        <xacro:side_link_sdf_physics prefix_y="right" />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_wheel_link_sdf_physics}" >
-        <xacro:wheel_link_sdf_physics prefix_y="left" prefix_x="front" />
-        <xacro:wheel_link_sdf_physics prefix_y="left" prefix_x="rear" />
-        <xacro:wheel_link_sdf_physics prefix_y="right" prefix_x="front" />
-        <xacro:wheel_link_sdf_physics prefix_y="right" prefix_x="rear" />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_elevator_joint_sdf_physics}" >
-        <xacro:linear_elevator_joint_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_head_pitch_joint_sdf_physics}" >
-        <xacro:linear_head_pitch_joint_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_head_yaw_joint_sdf_physics}" >
-        <xacro:linear_head_yaw_joint_sdf_physics />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_side_joint_sdf_physics}" >
-        <xacro:side_joint_sdf_physics prefix_y="left" />
-        <xacro:side_joint_sdf_physics prefix_y="right" />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_wheel_joint_sdf_physics}" >
-        <xacro:wheel_joint_sdf_physics prefix_y="left" prefix_x="front" />
-        <xacro:wheel_joint_sdf_physics prefix_y="left" prefix_x="rear" />
-        <xacro:wheel_joint_sdf_physics prefix_y="right" prefix_x="front" />
-        <xacro:wheel_joint_sdf_physics prefix_y="right" prefix_x="rear" />
-      </xacro:if>
-      <!-- ================================================================ -->
-    </xacro:if>
-    
-  </xacro:unless>
 
 <!-- Load Sensors ######################################################### -->
 
   <xacro:if value="${enable_sensors}" >
-    <!-- ================================================================== -->
-    <xacro:if value="${enable_hokuyo_laser_sensor}" >
-      <xacro:if value="$(arg real)" >
-        <xacro:hokuyo_laser_sensor control="true" />
-      </xacro:if>
-      <xacro:unless value="$(arg real)" >
-        <xacro:hokuyo_laser_sensor control="$(arg control)" />
-      </xacro:unless>
+  
+    <xacro:if value="${enable_laser_sensor}" >
+      <xacro:laser_sensor fixed="${fixed}" />
     </xacro:if>
-    <!-- ================================================================== -->
+    
     <xacro:if value="${enable_kinect_sensor}" >
-      <xacro:if value="$(arg real)" >
-        <xacro:kinect_sensor control="true" />
-      </xacro:if>
-      <xacro:unless value="$(arg real)" >
-        <xacro:kinect_sensor control="$(arg control)" />
-      </xacro:unless>
+      <xacro:kinect_sensor fixed="${fixed}" />
     </xacro:if>
-    <!-- ================================================================== -->
+    
     <xacro:if value="${enable_sonar_sensors}" >
-      <xacro:sonar_sensor prefix_y="left" reflect_y="1" />
-      <xacro:sonar_sensor prefix_y="right" reflect_y="-1" />
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_left_rear_sonar_sensor}" >
+        <xacro:left_rear_sonar_sensor />
+      </xacro:if>
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_right_rear_sonar_sensor}" >
+        <xacro:right_rear_sonar_sensor />
+      </xacro:if>
+      <!-- ================================================================ -->
     </xacro:if>
-    <!-- ================================================================== -->
+    
     <xacro:if value="${enable_thermal_sensors}" >
-      <xacro:thermal_sensors />
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_middle_thermal_sensor}" >
+        <xacro:middle_thermal_sensor />
+      </xacro:if>
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_left_thermal_sensor}" >
+        <xacro:left_thermal_sensor />
+      </xacro:if>
+      <!-- ================================================================ -->
+      <xacro:if value="${enable_right_thermal_sensor}" >
+        <xacro:right_thermal_sensor />
+      </xacro:if>
+      <!-- ================================================================ -->
     </xacro:if>
-    <!-- ================================================================== -->
+    
     <xacro:if value="${enable_co2_sensor}" >
       <xacro:co2_sensor />
     </xacro:if>
-    <!-- ================================================================== -->
+    
     <xacro:if value="${enable_microphone_sensor}" >
       <xacro:microphone_sensor />
     </xacro:if>
-    <!-- ================================================================== -->
+    
   </xacro:if>
-
-<!-- Load Transmissions ################################################### -->
-
-  <xacro:unless value="$(arg real)" >
-  
-    <xacro:if value="$(arg control)" >
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_elevator_link}" >
-        <xacro:linear_elevator_transmission />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_linear_head_link}" >
-        <xacro:linear_head_transmission rotation="pitch" />
-        <xacro:linear_head_transmission rotation="yaw" />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_wheel_links}" >
-        <xacro:wheel_transmission prefix_y="left" prefix_x="front" />
-        <xacro:wheel_transmission prefix_y="left" prefix_x="rear" />
-        <xacro:wheel_transmission prefix_y="right" prefix_x="front" />
-        <xacro:wheel_transmission prefix_y="right" prefix_x="rear" />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_sensors}" >
-        <!-- ============================================================== -->
-        <xacro:if value="${enable_hokuyo_laser_sensor}" >
-          <xacro:sensor_transmission sensor="laser" rotation="roll" />
-          <xacro:sensor_transmission sensor="laser" rotation="pitch" />
-        </xacro:if>
-        <!-- ============================================================== -->
-        <xacro:if value="${enable_kinect_sensor}" >
-          <xacro:sensor_transmission sensor="kinect" rotation="pitch" />
-          <xacro:sensor_transmission sensor="kinect" rotation="yaw" />
-        </xacro:if>
-        <!-- ============================================================== -->
-      </xacro:if>
-      <!-- ================================================================ -->
-    </xacro:if>
     
-  </xacro:unless>
-
-<!-- Load Plugins ######################################################### -->
-
-  <xacro:unless value="$(arg real)" >
-  
-    <xacro:if value="${enable_plugins}" >
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_pandora_differential_plugin}" >
-        <xacro:if value="$(arg interface)" >
-          <xacro:pandora_differential_plugin publish_joint_states="false" />
-        </xacro:if>
-        <xacro:unless value="$(arg interface)" >
-          <xacro:pandora_differential_plugin publish_joint_states="true" />
-        </xacro:unless>
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="$(arg control)" >
-        <xacro:if value="$(arg interface)" >
-          <xacro:gazebo_ros_control_plugin hw_sim="pandora_gazebo_interface/GazeboInterface"
-                                           ns="/" />
-        </xacro:if>
-        <xacro:unless value="$(arg interface)" >
-          <xacro:gazebo_ros_control_plugin hw_sim="gazebo_ros_control/DefaultRobotHWSim"
-                                           ns="control" />
-        </xacro:unless>
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_pandora_p3d_plugin}" >
-        <xacro:pandora_p3d_plugin />
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="$(arg control)" >
-        <xacro:if value="${enable_ros_imu_plugin}" >
-          <xacro:ros_imu_plugin />
-        </xacro:if>
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:if value="${enable_sensors}" >
-        <xacro:if value="${enable_hokuyo_laser_sensor}" >
-          <xacro:unless value="$(arg control)" >
-            <xacro:if value="${enable_pandora_imu_stabilizer_plugin}" >
-              <xacro:pandora_imu_stabilizer_plugin />
-            </xacro:if>
-          </xacro:unless>
-        </xacro:if>
-      </xacro:if>
-      <!-- ================================================================ -->
-      <xacro:unless value="$(arg control)" >
-        <xacro:ros_skid_steer_drive_plugin />
-      </xacro:unless>
-    <!-- ================================================================== -->
-    </xacro:if>
-    
-  </xacro:unless>
+</xacro:macro>
 
 <!-- ###################################################################### -->
 

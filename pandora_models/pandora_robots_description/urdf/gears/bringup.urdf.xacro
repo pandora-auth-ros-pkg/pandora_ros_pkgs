@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot name="gears"
+       xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_robots_description)/urdf/gears/gears.urdf.xacro" />
+  <!-- ==================================================================== -->
+  
+  <xacro:gears_urdf fixed="false" />
+
+<!-- ###################################################################### -->
+
+</robot>
