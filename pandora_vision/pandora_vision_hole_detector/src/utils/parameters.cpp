@@ -169,10 +169,10 @@ namespace pandora_vision
   float Parameters::HoleFusion::checker_texture_backproject_threshold = 0.4;
 
   // Plane detection
-  int Parameters::HoleFusion::segmentation_method = 0;
+  float Parameters::HoleFusion::filter_leaf_size = 0.1;
   int Parameters::HoleFusion::max_iterations = 1000;
-  double Parameters::HoleFusion::num_points_to_exclude = 0.1;
-  double Parameters::HoleFusion::point_to_plane_distance_threshold = 0.01;
+  double Parameters::HoleFusion::num_points_to_exclude = 0.2;
+  double Parameters::HoleFusion::point_to_plane_distance_threshold = 0.08;
 
   // Holes connection - merger
   float Parameters::HoleFusion::connect_holes_min_distance = 0.1;

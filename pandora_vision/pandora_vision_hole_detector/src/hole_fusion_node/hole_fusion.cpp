@@ -903,8 +903,8 @@ namespace pandora_vision
       config.checker_texture_backproject_threshold;
 
     // Plane detection
-    Parameters::HoleFusion::segmentation_method =
-      config.segmentation_method;
+    Parameters::HoleFusion::filter_leaf_size =
+      config.filter_leaf_size;
     Parameters::HoleFusion::max_iterations =
       config.max_iterations;
     Parameters::HoleFusion::num_points_to_exclude =

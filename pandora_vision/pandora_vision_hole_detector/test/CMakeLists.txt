@@ -92,6 +92,14 @@ add_library(filters_resources_lib
 
 target_link_libraries(filters_resources_test ${catkin_LIBRARIES} utils_lib filters_resources_lib gtest_main)
 
+###### planes_detection_test.cpp ######
+catkin_add_gtest(planes_detection_test
+  unit/hole_fusion_node/planes_detection_test.cpp)
+
+add_library(planes_detection_lib
+  ../src/hole_fusion_node/planes_detection.cpp)
+
+target_link_libraries(planes_detection_test planes_detection_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
 
 ###### rgb_filters_test.cpp ######
 catkin_add_gtest(rgb_filters_test

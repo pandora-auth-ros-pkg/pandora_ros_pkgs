@@ -198,7 +198,7 @@ namespace pandora_vision
       static float checker_texture_backproject_threshold;
 
       // Plane detection
-      static int segmentation_method;
+      static float filter_leaf_size;
       static int max_iterations;
       static double num_points_to_exclude;
       static double point_to_plane_distance_threshold;

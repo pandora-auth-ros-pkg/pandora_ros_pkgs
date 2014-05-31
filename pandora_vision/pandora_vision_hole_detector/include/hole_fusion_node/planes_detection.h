@@ -81,33 +81,13 @@ namespace pandora_vision
         std::vector<pcl::PointIndices::Ptr>* inliersVector);
 
       /**
-        @brief Identify the planes in a point cloud and return a vector
-        cointaining pointers to them.
-        @param[in] inputCloud [const PointCloudXYZPtr&] The point cloud whose
-        planes we wish to locate
-        @param[in] applyVoxelFilter [const bool&] Apply the voxel filter or not
-        on the input cloud.
-        @param[out] planesVectorOut
-        [std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>*]
-        the output vector of pointers to planes
-        @param[out] coefficientsVectorOut [std::vector<pcl::ModelCoefficients>*]
-        the output vector of coefficients of each plane detected
-        @return void
-       **/
-      static void locatePlanes(const PointCloudXYZPtr& inputCloud,
-        const bool& applyVoxelFilter,
-        std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>* planesVectorOut,
-        std::vector<pcl::ModelCoefficients>* coefficientsVectorOut);
-
-      /**
-        @brief Locates planes using the SACS segmentation
+        @brief Locates planes using the SAC segmentation
         (as stated in http://www.pointclouds.org/documentation/tutorials/
         extract_indices.php#extract-indices)
         @param[in] cloudIn [const PointCloudXYZPtr&] The point cloud whose
         planes we wish to locate
-        @param[out] planesVectorOut
-        [std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>*]
-        the output vector of pointers to planes
+        @param[out] planesVectorOut [std::vector<PointCloudXYZPtr>*]
+        The output vector of pointers to point cloud planes
         @param[out] coefficientsVectorOut [std::vector<pcl::ModelCoefficients>*]
         The output vector of coefficients of each plane detected
         @param[out] inliersVectorOut [std::vector<pcl::PointIndices::Ptr>*]
@@ -116,30 +96,9 @@ namespace pandora_vision
        **/
       static void locatePlanesUsingSACSegmentation
         (const PointCloudXYZPtr& cloudIn,
-         std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>* planesVectorOut,
-         std::vector<pcl::ModelCoefficients>* coefficientsVectorOut,
-         std::vector<pcl::PointIndices::Ptr>* inliersVectorOut);
-
-      /**
-        @brief Locates planes using the normals SACS segmentation
-        (http://pi-robot-ros-pkg.googlecode.com/svn-history/r303/trunk/pi_pcl/
-        src/cylinder.cpp)
-        @param[in] cloudIn [const PointCloudXYZPtr&] The point cloud whose
-        planes we wish to locate
-        @param[out] planesVectorOut
-        [std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>*]
-        The output vector of pointers to planes
-        @param[out] coefficientsVectorOut [std::vector<pcl::ModelCoefficients>*]
-        The output[out] vector of coefficients of each plane detected
-        @param[out] inliersVectorOut [std::vector<pcl::PointIndices::Ptr>*]
-        The inliers for each plane
-        @return void
-       **/
-      static void locatePlanesUsingNormalsSACSegmentation
-        (const PointCloudXYZPtr& cloudIn,
-         std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>* planesVectorOut,
-         std::vector<pcl::ModelCoefficients>* coefficientsVectorOut,
-         std::vector<pcl::PointIndices::Ptr>* inliersVectorOut);
+         std::vector<PointCloudXYZPtr>* planesVector,
+         std::vector<pcl::ModelCoefficients>* coefficientsVector,
+         std::vector<pcl::PointIndices::Ptr>* inliersVector);
 
   };
 

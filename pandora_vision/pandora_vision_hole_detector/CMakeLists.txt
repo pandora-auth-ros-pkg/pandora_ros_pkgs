@@ -176,6 +176,8 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   ############### hole fusion node ################
   test/unit/hole_fusion_node/depth_filters_test.cpp
   test/unit/hole_fusion_node/filters_resources_test.cpp
+  test/unit/hole_fusion_node/hole_merger_test.cpp
+  test/unit/hole_fusion_node/planes_detection_test.cpp
   test/unit/hole_fusion_node/rgb_filters_test.cpp
 
   )

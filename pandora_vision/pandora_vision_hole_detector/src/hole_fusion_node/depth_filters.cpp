@@ -45,7 +45,7 @@ namespace pandora_vision
     overall filter execution.
     @param[in] method [const int&] The filter identifier to execute
     @param[in] img [const cv::Mat&] The input depth image
-    @param[in] pointCloud [const pcl::PointCloud<pcl::PointXYZ>::Ptr&] The
+    @param[in] pointCloud [const PointCloudPtr&] The
     original point cloud that corresponds to the input depth image
     @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] holesMasksSetVector

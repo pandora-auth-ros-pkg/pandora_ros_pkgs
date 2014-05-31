@@ -519,38 +519,24 @@ namespace pandora_vision
         EXPECT_EQ ( conveyor.outlines[i][r].y, originConveyor.outlines[i][r].y);
       }
     }
-  }
 
 
-  //! Test HoleMerger::isCapableOfAssimilating
-  TEST_F ( HoleMergerTest, IsCapableOfAssimilatingTest )
-  {
-    // Construct the hole mask sets for all the holes
-    // Here, the main square will be the assimilator, amalgamator and connector
+    // Restore conveyor to its original state
+    HolesConveyorUtils::replace( originConveyor, &conveyor );
 
-    std::vector< std::set< unsigned int > > holesMasksSetVector;
-    FiltersResources::createHolesMasksSetVector(
-      conveyor,
-      squares_,
-      &holesMasksSetVector );
-
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    // Run HoleMerger::applyMergeOperation for all operations
+    for ( int i = 0; i < 3; i++ )
     {
-      // Run HoleMerger::isCapableOfAssimilating
-      bool result = HoleMerger::isCapableOfAssimilating(
-        holesMasksSetVector[0],
-        holesMasksSetVector[i] );
 
-      // The main square should be able to assimilate only the assimilable
-      if ( i == 1 )
-      {
-        EXPECT_EQ ( true, result );
-      }
-      else
-      {
-        EXPECT_EQ ( false, result );
-      }
+      HoleMerger::applyMergeOperation(
+        &conveyor,
+        squares_,
+        cloud,
+        i);
     }
+
+    // The number of holes should have shrunk by one
+    EXPECT_EQ ( 1, conveyor.keyPoints.size() );
   }
 
 
@@ -745,6 +731,58 @@ namespace pandora_vision
       {
         EXPECT_EQ ( conveyor.outlines[i][r].x, originConveyor.outlines[i][r].x);
         EXPECT_EQ ( conveyor.outlines[i][r].y, originConveyor.outlines[i][r].y);
+      }
+    }
+
+
+    // Restore conveyor to its original state
+    HolesConveyorUtils::replace( originConveyor, &conveyor );
+
+    // Run HoleMerger::applyMergeOperationWithoutValidation
+    // for all operations
+    for ( int i = 0; i < 3; i++ )
+    {
+
+      HoleMerger::applyMergeOperationWithoutValidation(
+        &conveyor,
+        squares_,
+        cloud,
+        i);
+    }
+
+    // The number of holes should have shrunk by one
+    EXPECT_EQ ( 1, conveyor.keyPoints.size() );
+  }
+
+
+
+  //! Test HoleMerger::isCapableOfAssimilating
+  TEST_F ( HoleMergerTest, IsCapableOfAssimilatingTest )
+  {
+    // Construct the hole mask sets for all the holes
+    // Here, the main square will be the assimilator, amalgamator and connector
+
+    std::vector< std::set< unsigned int > > holesMasksSetVector;
+    FiltersResources::createHolesMasksSetVector(
+      conveyor,
+      squares_,
+      &holesMasksSetVector );
+
+    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    {
+      // Run HoleMerger::isCapableOfAssimilating
+      bool result = HoleMerger::isCapableOfAssimilating(
+        holesMasksSetVector[0],
+        holesMasksSetVector[i] );
+
+      // The main square should be able to assimilate only the assimilable
+      if ( i == 1 )
+      {
+        EXPECT_EQ ( true, result );
+      }
+      else
+      {
+        EXPECT_EQ ( false, result );
       }
     }
   }
