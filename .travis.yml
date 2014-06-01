@@ -51,4 +51,4 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - make run_tests
   - catkin_test_results .
 after_success:
-  - coveralls --root $CI_SOURCE_PATH --exclude-pattern test
+  - coveralls 
