@@ -130,6 +130,15 @@ void PandoraSonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
     }
   }
 
+  if (!_sdf->HasElement("publishMsg"))
+  {
+    ROS_INFO("Block laser plugin missing <publishMsg>, defaults to true");
+    this->publish_msg_ = true;
+  }
+  else
+  {
+    this->publish_msg_ = _sdf ->Get < std ::string > ( "publishMsg" ) == "true" ; 
+  }
 
   if (!_sdf->HasElement("gaussianNoise"))
   {
@@ -171,21 +180,23 @@ void PandoraSonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   this->cloud_msg_.channels.clear();
   this->cloud_msg_.channels.push_back(sensor_msgs::ChannelFloat32());
 
-  if (this->topic_name_ != "")
+  if (this->topic_name_ != "" && this->publish_msg_)
   {
+    
     // Custom Callback Queue
     ros::AdvertiseOptions ao = ros::AdvertiseOptions::create<sensor_msgs::Range>(
       this->topic_name_,1,
       boost::bind( &PandoraSonarPlugin::LaserConnect,this),
       boost::bind( &PandoraSonarPlugin::LaserDisconnect,this), ros::VoidPtr(), &this->laser_queue_);
     this->pub_ = this->rosnode_->advertise(ao);
+    
   }
+  
+  if ( this->publish_msg_ ) 
+  
+    // sensor generation off by default
+    this->parent_ray_sensor_->SetActive(false);
 
-
-  // Initialize the controller
-
-  // sensor generation off by default
-  this->parent_ray_sensor_->SetActive(false);
   // start custom queue for laser
   this->callback_laser_queue_thread_ = boost::thread( boost::bind( &PandoraSonarPlugin::LaserQueueThread,this ) );
 
@@ -214,12 +225,18 @@ void PandoraSonarPlugin::OnNewLaserScans()
 {
   if (this->topic_name_ != "")
   {
-    common::Time sensor_update_time = this->parent_sensor_->GetLastUpdateTime();
-    if (last_update_time_ < sensor_update_time)
-    {
-      this->PutLaserData(sensor_update_time);
-      last_update_time_ = sensor_update_time;
+  
+    if ( this->publish_msg_ ) {
+    
+      common::Time sensor_update_time = this->parent_sensor_->GetLastUpdateTime();
+      if (last_update_time_ < sensor_update_time)
+      {
+        this->PutLaserData(sensor_update_time);
+        last_update_time_ = sensor_update_time;
+      }
+    
     }
+    
   }
   else
   {
@@ -366,8 +383,8 @@ void PandoraSonarPlugin::PutLaserData(common::Time &_updateTime)
         point.z = (r+minRange) * sin(pAngle) + this->GaussianKernel(0,this->gaussian_noise_);
         this->cloud_msg_.points.push_back(point);
         if (point.x < sonar_msg_.range) {
-			sonar_msg_.range = point.x;
-		}
+			    sonar_msg_.range = point.x;
+		    }
 		
       } // only 1 channel 
 
@@ -375,11 +392,9 @@ void PandoraSonarPlugin::PutLaserData(common::Time &_updateTime)
     }
   }
   this->parent_ray_sensor_->SetActive(true);
-
+  
   // send data out via ros message
   this->pub_.publish(this->sonar_msg_);
-
-
 
 }
 

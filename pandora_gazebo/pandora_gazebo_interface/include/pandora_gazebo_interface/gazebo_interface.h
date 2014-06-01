@@ -39,6 +39,19 @@
 #ifndef PANDORA_GAZEBO_INTERFACE_GAZEBO_INTERFACE_H
 #define PANDORA_GAZEBO_INTERFACE_GAZEBO_INTERFACE_H
 
+// Gazebo
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/common/common.hh>
+#include <gazebo/sensors/sensors.hh>
+#include <gazebo/sensors/SensorTypes.hh>
+#include <gazebo/plugins/CameraPlugin.hh>
+#include <gazebo/plugins/RayPlugin.hh>
+
+// ROS
+#include <ros/ros.h>
+#include <angles/angles.h>
+#include <pluginlib/class_list_macros.h>
 
 // ros_control
 #include <control_toolbox/pid.h>
@@ -48,18 +61,14 @@
 #include <hardware_interface/robot_hw.h>
 #include <gazebo_ros_control/robot_hw_sim.h>
 
-// Gazebo
-#include <gazebo/common/common.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/gazebo.hh>
-
-// ROS
-#include <ros/ros.h>
-#include <angles/angles.h>
-#include <pluginlib/class_list_macros.h>
-
 // gazebo_ros_control
 #include <gazebo_ros_control/robot_hw_sim.h>
+
+// pandora_ros_control
+#include <xmega_hardware_interface/battery_interface.h>
+#include <xmega_hardware_interface/range_sensor_interface.h>
+#include <arm_hardware_interface/co2_sensor_interface.h>
+#include <arm_hardware_interface/thermal_sensor_interface.h>
 
 // URDF
 #include <urdf/model.h>
@@ -90,9 +99,16 @@ namespace pandora_gazebo_interface
   
     private: 
                       
+      bool registerInterfaces ( void ) ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+                      
       bool initLinks ( void ) ; 
                       
       bool initIMU ( void ) ; 
+    
+      // ----------------------------------------------------------------------
                       
       bool initJoints ( void ) ; 
                       
@@ -105,90 +121,254 @@ namespace pandora_gazebo_interface
       bool initLaser ( void ) ; 
                       
       bool initKinect ( void ) ; 
+    
+      // ----------------------------------------------------------------------
                       
       bool initXMEGA ( void ) ; 
                       
-      bool initSonars ( void ) ; 
+      bool initBatteries ( void ) ; 
+                      
+      bool initRangeSensors ( void ) ; 
+    
+      // ----------------------------------------------------------------------
                       
       bool initARM ( void ) ; 
                       
-      bool initThermals ( void ) ; 
+      bool initCO2Sensors ( void ) ; 
                       
-      bool initCO2 ( void ) ; 
+      bool initThermalSensors ( void ) ; 
                       
-      bool initMicrophone ( void ) ; 
-                      
-      bool registerInterfaces ( void ) ; 
+      bool initMicrophoneSensors ( void ) ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
 
       void readLinks ( void ) ; 
+    
+      // ----------------------------------------------------------------------
 
       void readJoints ( void ) ; 
+    
+      // ----------------------------------------------------------------------
 
       void readXMEGA ( void ) ; 
 
+      void readBatteries ( void ) ; 
+
+      void readRangeSensors ( void ) ; 
+    
+      // ----------------------------------------------------------------------
+
       void readARM ( void ) ; 
+
+      void readCO2Sensors ( void ) ; 
+
+      void readThermalSensors ( void ) ; 
+
+      void readMicrophoneSensors ( void ) ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
 
       void writeLinks ( void ) ; 
 
       void writeJoints ( void ) ; 
-
-      void writeXMEGA ( void ) ; 
-
-      void writeARM ( void ) ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
     
       enum ControlMethod { NONE , 
                            EFFORT , 
                            POSITION , 
                            POSITION_PID , 
                            VELOCITY , 
-                           VELOCITY_PID } ; 
+                           VELOCITY_PID } ;
+    
+      // ---------------------------------------------------------------------- 
+    
+      enum RadiationType { ULTRASOUND , 
+                           INFRARED } ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
                            
       std ::string robotnamespace_ ; 
       ros ::NodeHandle modelNh_ ; 
       gazebo ::physics ::ModelPtr parentModel_ ; 
       const urdf ::Model * urdfModel_ ; 
-      std ::vector < transmission_interface ::TransmissionInfo > transmissions_ ; 
+      std ::vector < transmission_interface ::TransmissionInfo > 
+       transmissions_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
       
       ros ::Time readTime_ ; 
       ros ::Duration readPeriod_ ; 
+    
+      // ----------------------------------------------------------------------
       
       ros ::Time writeTime_ ; 
       ros ::Duration writePeriod_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      
+      hardware_interface ::ImuSensorHandle ::Data imuSensorData_ ; 
+      
+      std ::vector 
+      < pandora_hardware_interface ::xmega ::BatteryHandle ::Data > 
+       batteryData_ ; 
+       
+      std ::vector 
+      < pandora_hardware_interface ::xmega ::RangeSensorHandle ::Data > 
+       rangeSensorData_ ; 
+      
+      std ::vector 
+      < pandora_hardware_interface ::arm ::Co2SensorHandle ::Data > 
+       co2SensorData_ ; 
+       
+      std ::vector 
+      < pandora_hardware_interface ::arm ::ThermalSensorHandle ::Data > 
+       thermalSensorData_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      
+      hardware_interface ::JointStateInterface jointStateInterface_ ; 
+      hardware_interface ::PositionJointInterface positionJointInterface_ ; 
+      hardware_interface ::VelocityJointInterface velocityJointInterface_ ; 
 
       hardware_interface ::ImuSensorInterface imuSensorInterface_ ; 
-      hardware_interface::JointStateInterface jointStateInterface_ ; 
-      hardware_interface::PositionJointInterface positionJointInterface_ ; 
-      hardware_interface::VelocityJointInterface velocityJointInterface_ ; 
       
-      double imuOrientation_ [ 4 ] ; 
-      hardware_interface ::ImuSensorHandle ::Data imuData_ ; 
+      pandora_hardware_interface ::xmega ::BatteryInterface 
+       batteryInterface_ ; 
+      pandora_hardware_interface ::xmega ::RangeSensorInterface 
+       rangeSensorInterface_ ; 
+      
+      pandora_hardware_interface ::arm ::Co2SensorInterface 
+       co2SensorInterface_ ; 
+      pandora_hardware_interface ::arm ::ThermalSensorInterface 
+       thermalSensorInterface_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
       
       unsigned int linkNum_ ; 
-      std ::vector < gazebo ::physics ::LinkPtr > gazeboLinks_ ; 
-      std ::vector < std ::string > linkNames_ ; 
+      
+      std ::vector < gazebo ::physics ::LinkPtr > gazeboLink_ ; 
+      std ::vector < std ::string > linkName_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
       
       unsigned int jointNum_ ; 
-      std ::vector < gazebo ::physics ::JointPtr > gazeboJoints_ ; 
-      std ::vector < std ::string > jointNames_ ; 
-      std ::vector < int > jointTypes_ ; 
       
-      std ::vector < ControlMethod > jointControlMethods_ ; 
-      std ::vector < control_toolbox ::Pid > pidControllers_ ; 
+      std ::vector < gazebo ::physics ::JointPtr > gazeboJoint_ ; 
+      std ::vector < std ::string > jointName_ ; 
+      std ::vector < int > jointType_ ; 
       
-      std ::vector < double > jointLowerLimits_ ; 
-      std ::vector < double > jointUpperLimits_ ; 
-      std ::vector < double > jointEffortLimits_ ; 
+      std ::vector < ControlMethod > jointControlMethod_ ; 
+      std ::vector < control_toolbox ::Pid > pidController_ ; 
+      
+      std ::vector < double > jointLowerLimit_ ; 
+      std ::vector < double > jointUpperLimit_ ; 
+      std ::vector < double > jointEffortLimit_ ; 
       
       std ::vector < double > jointEffort_ ; 
       std ::vector < double > jointPosition_ ; 
       std ::vector < double > jointVelocity_ ; 
       
-      std ::vector < double > jointPositionCommand_ ; 
-      std ::vector < double > jointVelocityCommand_ ; 
+      std ::vector < double > jointCommand_ ; 
       
       std ::vector < double > wheel_velocity_multiplier_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
       
-  } ;
+      double imuOrientation_ [ 4 ] ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      
+      unsigned int batteryNum_ ; 
+      
+      double batteryUpdateRate_ ; 
+      
+      std ::vector < std ::string > batteryName_ ; 
+      std ::vector < double > batteryVoltage_ ; 
+    
+      // ----------------------------------------------------------------------
+      
+      unsigned int rangeSensorNum_ ; 
+      
+      double rangeSensorUpdateRate_ ; 
+      
+      std ::vector < std ::string > rangeSensorName_ ; 
+      std ::vector < std ::string > rangeSensorFrameID_ ; 
+      
+      std ::vector < int > rangeSensorRadiationType_ ; 
+      
+      std ::vector < double > rangeSensorFOV_ ; 
+      std ::vector < double > rangeSensorMinRange_ ; 
+      std ::vector < double > rangeSensorMaxRange_ ; 
+      
+      std ::vector < std ::vector <  double > > rangeSensorRange_ ; 
+      std ::vector < int > rangeSensorBufferCounter_ ; 
+      
+      std ::vector < gazebo ::sensors ::RaySensorPtr > 
+       rangeSensorRay_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      
+      unsigned int co2SensorNum_ ; 
+      
+      double co2SensorUpdateRate_ ; 
+      
+      std ::vector < std ::string > co2SensorName_ ; 
+      std ::vector < std ::string > co2SensorFrameID_ ; 
+      
+      std ::vector < float > co2SensorCo2Percentage_ ; 
+      
+      std ::vector < gazebo ::sensors ::CameraSensorPtr > 
+       co2SensorCamera_ ; 
+    
+      // ----------------------------------------------------------------------
+      
+      unsigned int thermalSensorNum_ ; 
+      
+      double thermalSensorUpdateRate_ ; 
+      
+      std ::vector < std ::string > thermalSensorName_ ; 
+      std ::vector < std ::string > thermalSensorFrameID_ ; 
+      
+      std ::vector < int > thermalSensorHeight_ ; 
+      std ::vector < int > thermalSensorWidth_ ; 
+      std ::vector < int > thermalSensorStep_ ; 
+      
+      std ::vector < std ::vector < uint8_t > > thermalSensorVector_ ; 
+      
+      std ::vector < gazebo ::sensors ::CameraSensorPtr > 
+       thermalSensorCamera_ ; 
+    
+      // ----------------------------------------------------------------------
+      
+      unsigned int microphoneSensorNum_ ; 
+      
+      double microphoneSensorUpdateRate_ ; 
+      
+      std ::vector < std ::string > microphoneSensorName_ ; 
+      std ::vector < std ::string > microphoneSensorFrameID_ ; 
+      
+      std ::vector < double > microphoneSensorSoundCertainty_ ; 
+      
+      std ::vector < gazebo ::sensors ::CameraSensorPtr > 
+       microphoneSensorCamera_ ; 
+    
+      /////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////
+      
+  } ; 
   
 }  // namespace pandora_gazebo_interface
 
