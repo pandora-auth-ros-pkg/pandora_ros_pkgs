@@ -336,6 +336,14 @@ namespace pandora_vision
    **/
   void NoiseElimination::interpolateImageBorders(cv::Mat* inImage)
   {
+    if (inImage->type() != CV_32FC1)
+    {
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::interpolateImageBorders : Inappropriate image type.");
+
+      return;
+    }
+
     #ifdef DEBUG_TIME
     Timer::start("interpolateImageBorders");
     #endif
@@ -397,6 +405,25 @@ namespace pandora_vision
     const int& col,
     bool* endFlag)
   {
+    if (inImage.type() != CV_32FC1)
+    {
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::interpolateZeroPixel : Inappropriate image type.");
+
+      return 0.0;
+    }
+
+    if (row < 1 || row >= inImage.rows - 1
+      || col < 1 || col >= inImage.cols - 1)
+    {
+      ROS_ERROR_NAMED("hole_detector",
+        "NoiseElimination::interpolateZeroPixel : Input row or col not valid.");
+
+      *endFlag = true;
+
+      return 0.0;
+    }
+
     float sumValueOfNonZeroPixels = 0.0;
     int countOfNonZeroPixels = 0;
 
@@ -483,9 +510,12 @@ namespace pandora_vision
     #endif
 
     inImage.copyTo(*outImage);
+
     // in the end, only pixels adjacent to the edge of the
     // image are left black
     while (interpolationIteration(outImage)){}
+
+    interpolateImageBorders(outImage);
 
     #ifdef DEBUG_TIME
     Timer::tick("interpolation");

@@ -337,6 +337,150 @@ namespace pandora_vision
 
 
 
+  //! Test NoiseElimination::interpolateImageBorders
+  TEST_F ( NoiseEliminationTest, InterpolateImageBordersTest )
+  {
+    // Create an image whose borders are non-zero but the rest of it is
+    cv::Mat image = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
+
+    for ( int i = 1; i < image.cols - 1; ++i )
+    {
+      image.at< float >( 0, i ) = 1.0;
+      image.at< float >( image.rows - 1, i ) = 1.0;
+    }
+
+    for ( int i = 1; i < image.rows - 1; ++i )
+    {
+      image.at< float >( i, 0 ) = 1.0;
+      image.at< float >( i, image.cols - 1 ) = 1.0;
+    }
+
+    image.at< float >( 0, 0 ) = 1.0;
+
+    image.at< float >( 0, image.cols - 1 ) = 1.0;
+
+    image.at< float >( image.rows - 1, 0 ) = 1.0;
+
+    image.at< float >( image.rows - 1, image.cols - 1 ) = 1.0;
+
+    // Run NoiseElimination::interpolateImageBorders
+    NoiseElimination::interpolateImageBorders( &image );
+
+    // All border pixels should now have a value of zero
+    EXPECT_EQ ( 0, cv::countNonZero( image ) );
+  }
+
+
+
+  //! Test NoiseElimination::interpolateZeroPixel
+  TEST_F ( NoiseEliminationTest, InterpolateZeroPixelTest )
+  {
+    // The return value of NoiseElimination::interpolateZeroPixel
+    int ret;
+
+    bool endFlag = false;
+
+    // Zero-out some pixels in image interpolationMethod0
+    interpolationMethod0.at< float >( 200, 200 ) = 0.0;
+    interpolationMethod0.at< float >( 1, 500 ) = 0.0;
+    interpolationMethod0.at< float >( 400, 1 ) = 0.0;
+
+    // Run NoiseElimination::interpolateZeroPixel
+    ret = NoiseElimination::interpolateZeroPixel(
+      interpolationMethod0, 200, 200, &endFlag);
+
+    // At ( 200, 200 ) and around it, everything is black
+    EXPECT_EQ ( 0.0, ret );
+    EXPECT_EQ ( false, endFlag );
+
+    // Run NoiseElimination::interpolateZeroPixel
+    ret = NoiseElimination::interpolateZeroPixel(
+      interpolationMethod0, 1, 500, &endFlag);
+
+    // Around ( 1, 500 ), everything is at 1.0 value
+    EXPECT_EQ ( 1.0, ret );
+    EXPECT_EQ ( true, endFlag );
+
+    // Run NoiseElimination::interpolateZeroPixel
+    ret = NoiseElimination::interpolateZeroPixel(
+      interpolationMethod0, 400, 1, &endFlag);
+
+    // Around ( 400, 1 ), everything is at 1.0 value
+    EXPECT_EQ ( 1.0, ret );
+    EXPECT_EQ ( true, endFlag );
+
+    // Run NoiseElimination::interpolateZeroPixel
+    // Error should be received here
+    ret = NoiseElimination::interpolateZeroPixel(
+      interpolationMethod0, 0, 1, &endFlag);
+
+    EXPECT_EQ ( 0.0, ret );
+    EXPECT_EQ ( true, endFlag );
+
+  }
+
+
+
+  //! Test NoiseElimination::interpolation
+  TEST_F ( NoiseEliminationTest, InterpolationTest )
+  {
+    cv::Mat interpolated = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
+
+    // Run NoiseElimination::interpolation
+    NoiseElimination::interpolation( interpolationMethod0, &interpolated );
+
+    int numZeros = 0;
+    for ( int rows = 0; rows < HEIGHT; rows++ )
+    {
+      for ( int cols = 0; cols < WIDTH; cols++ )
+      {
+        if ( interpolated.at< float >( rows, cols ) == 0.0 )
+        {
+          numZeros++;
+        }
+      }
+    }
+
+    EXPECT_EQ ( 0, numZeros );
+  }
+
+
+
+  //! Test NoiseElimination::interpolationIteration
+  TEST_F ( NoiseEliminationTest, InterpolationIterationTest )
+  {
+    // The number of zero pixels before the call to interpolationIteration
+    int nonZerosBefore = cv::countNonZero( interpolationMethod2 );
+
+    // Run NoiseElimination::interpolationIteration
+    NoiseElimination::interpolationIteration(&interpolationMethod2);
+
+    // The number of zero pixels after the call to interpolationIteration
+    int nonZerosAfter = cv::countNonZero( interpolationMethod2 );
+
+    // There should be more black pixels before than after the call to
+    // interpolationIteration
+    EXPECT_GT ( nonZerosAfter, nonZerosBefore );
+  }
+
+
+
+  //! Test NoiseElimination::performeNoiseElimination
+  TEST_F ( NoiseEliminationTest, PerformeNoiseEliminationTest )
+  {
+    // The interpolated input image
+    cv::Mat interpolated;
+
+    // Run NoiseElimination::performeNoiseElimination
+    NoiseElimination::performNoiseElimination(
+      interpolationMethod0, &interpolated );
+
+    // There shouldn't be any black pixels in interpolated
+    EXPECT_EQ ( WIDTH * HEIGHT, cv::countNonZero( interpolated ) );
+  }
+
+
+
   //! Test NoiseElimination::transformNoiseToWhite
   TEST_F ( NoiseEliminationTest, TransformNoiseToWhiteTest )
   {
