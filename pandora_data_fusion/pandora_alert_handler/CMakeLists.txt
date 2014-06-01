@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_alert_handler)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 find_package(catkin REQUIRED COMPONENTS 
           roscpp
           tf 
@@ -22,6 +20,14 @@ generate_dynamic_reconfigure_options(
   config/alert_handler/alert_handler_dynamic.cfg
   config/alert_handler/mass_alert_publisher_dymamic.cfg
   )
+
+# Cmake does not support Coverage option by default, 
+# so we need to do it manually. 
+# To compile with coverage enabled you should invoke `catkin_make` 
+# with `-DCMAKE_BUILD_TYPE=Coverage`.
+# NOTE: you should not set `CMAKE_BUILD_TYPE` variable explicitly
+# in CMakeLists.txt.
+set(CMAKE_CXX_FLAGS_COVERAGE "-fprofile-arcs -ftest-coverage")
 
 catkin_package(
     DEPENDS

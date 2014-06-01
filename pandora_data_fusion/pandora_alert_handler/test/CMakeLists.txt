@@ -58,7 +58,6 @@ gtest_main
 
 ##########  PoseFinderTest ###########   
 
-set(CMAKE_BUILD_TYPE Debug)
 catkin_add_gtest(pose_finder_test unit/pose_finder_test.cpp)
 target_link_libraries(pose_finder_test ${catkin_LIBRARIES}
     pose_finder map_loader gtest_main)
