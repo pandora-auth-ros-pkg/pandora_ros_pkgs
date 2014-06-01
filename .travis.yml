@@ -23,6 +23,7 @@ before_install: # Use this to prepare the system to install prerequisites or dep
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros 
+  - sudo pip install cpp-coveralls
   # Setup rosdep
   - sudo rosdep init
   - rosdep update
@@ -43,8 +44,10 @@ install: # Use this to install any prerequisites or dependencies necessary to ru
 before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
   - source /opt/ros/$ROS_DISTRO/setup.bash  
 script: # All commands must exit with code 0 on success. Anything else is considered failure.
-  - catkin_make -j2
+  - catkin_make -j2 -DCMAKE_BUILD_TYPE=Coverage
   - source devel/setup.bash
   - catkin_make roslint -j1
-  - catkin_make run_tests
+  - catkin_make run_tests -DCMAKE_BUILD_TYPE=Coverage
   - catkin_test_results build
+after_success:
+  - coveralls --exclude-pattern test
