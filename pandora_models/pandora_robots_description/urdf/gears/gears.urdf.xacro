@@ -104,12 +104,12 @@
     
     <xacro:if value="${enable_sonar_sensors}" >
       <!-- ================================================================ -->
-      <xacro:if value="${enable_left_rear_sonar_sensor}" >
-        <xacro:left_rear_sonar_sensor />
+      <xacro:if value="${enable_left_sonar_sensor}" >
+        <xacro:left_sonar_sensor />
       </xacro:if>
       <!-- ================================================================ -->
-      <xacro:if value="${enable_right_rear_sonar_sensor}" >
-        <xacro:right_rear_sonar_sensor />
+      <xacro:if value="${enable_right_sonar_sensor}" >
+        <xacro:right_sonar_sensor />
       </xacro:if>
       <!-- ================================================================ -->
     </xacro:if>

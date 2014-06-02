@@ -9,9 +9,9 @@
 <!-- ###################################################################### -->
 
   <!-- ==================================================================== -->
-  <xacro:macro name="left_rear_sonar_sensor" >
+  <xacro:macro name="left_sonar_sensor" >
   
-    <xacro:sonar_caster name="left_rear"
+    <xacro:sonar_caster name="left"
                         parent="base_link" >
 
       <origin xyz="-0.15519 0.11249 0.14305"
@@ -21,9 +21,9 @@
     
   </xacro:macro>
   <!-- ==================================================================== -->
-  <xacro:macro name="right_rear_sonar_sensor" >
+  <xacro:macro name="right_sonar_sensor" >
   
-    <xacro:sonar_caster name="right_rear"
+    <xacro:sonar_caster name="right"
                         parent="base_link" >
 
       <origin xyz="-0.15519 -0.11351 0.14305"
