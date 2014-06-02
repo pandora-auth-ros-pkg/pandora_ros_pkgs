@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Despoina Paschalidou, Alexandros Philotheou
+ * Authors: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
 #include "rgb_node/hole_detector.h"
@@ -40,38 +40,16 @@
 namespace pandora_vision
 {
   /**
-    @brief Class constructor
-   **/
-  HoleDetector::HoleDetector()
-  {
-    // Calculate histogram according to a given set of images
-    Histogram::getHistogram(&histogram_,
-      Parameters::Histogram::secondary_channel);
-
-    ROS_INFO_NAMED("hole_detector",
-      "[RGB node]: HoleDetector instance created");
-  }
-
-
-
-  /**
-    @brief Class destructor
-   **/
-  HoleDetector::~HoleDetector()
-  {
-    ROS_INFO_NAMED("hole_detector",
-      "[RGB node]: HoleDetector instance destroyed");
-  }
-
-
-
-  /**
     @brief Function that locates the position of potentional holes
     in the current frame.
-    @param holeFrame [const cv::Mat&] current frame to be processed
-    @return void
+    @param[in] holeFrame [const cv::Mat&] current frame to be processed
+    @param[in] histogram [const cv::MatND&] A histogram made of pictures
+    of walls where holes reside
+    @return [HolesConveyor] A collection of holes and found information
+    about them
     */
-  HolesConveyor HoleDetector::findHoles(const cv::Mat& holeFrame)
+  HolesConveyor HoleDetector::findHoles(const cv::Mat& holeFrame,
+    const cv::MatND& histogram)
   {
     #ifdef DEBUG_TIME
     Timer::start("findHoles", "inputRgbImageCallback");
@@ -101,7 +79,7 @@ namespace pandora_vision
       holeFrame,
       Parameters::Rgb::edges_extraction_method,
       Parameters::Rgb::segmentation_blur_method,
-      histogram_,
+      histogram,
       &edges);
 
     #ifdef DEBUG_SHOW

@@ -42,37 +42,29 @@
 
 #include "utils/defines.h"
 #include "utils/hole_filters.h"
-#include "utils/histogram.h"
 
 namespace pandora_vision
 {
+  /**
+    @class HoleDetector
+    @brief Provides the functionalities for detecting holes via analysis
+    of a RGB image
+   **/
   class HoleDetector
   {
-    private:
-
-      // Calculated histogramm according to given images
-      cv::MatND histogram_;
-
-
     public:
-
-      /**
-        @brief Class constructor
-       **/
-      HoleDetector();
-
-      /**
-        @brief Class destructor
-       **/
-      ~HoleDetector();
 
       /**
         @brief Function that locates the position of potentional holes
         in the current frame.
-        @param holeFrame [const cv::Mat&] current frame to be processed
-        @return void
+        @param[in] holeFrame [const cv::Mat&] The current frame to be processed
+        @param[in] histogram [const cv::MatND&] A histogram made of pictures
+        of walls where holes reside
+        @return [HolesConveyor] A collection of holes and found information
+        about them
        **/
-      HolesConveyor findHoles(const cv::Mat& holeFrame);
+      static HolesConveyor findHoles(const cv::Mat& holeFrame,
+        const cv::MatND& histogram);
 
   };
 

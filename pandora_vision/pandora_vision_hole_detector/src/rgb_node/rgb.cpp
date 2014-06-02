@@ -48,6 +48,10 @@ namespace pandora_vision
     // transactionary affairs with
     getTopicNames();
 
+    // Calculate histogram according to a given set of images
+    Histogram::getHistogram(&wallsHistogram_,
+      Parameters::Histogram::secondary_channel);
+
     // Subscribe to the RGB image published by the
     // rgb_depth_synchronizer node
     rgbImageSubscriber_= nodeHandle_.subscribe( rgbImageTopic_, 1,
@@ -114,7 +118,8 @@ namespace pandora_vision
     }
 
     // Find candidate holes in the current frame
-    HolesConveyor conveyor = _holeDetector.findHoles(_holeFrame);
+    HolesConveyor conveyor =
+      HoleDetector::findHoles(_holeFrame, wallsHistogram_);
 
     // With candidate holes found, create the message that includes them
     // and the original RGB image and send them over to the HoleFusion node

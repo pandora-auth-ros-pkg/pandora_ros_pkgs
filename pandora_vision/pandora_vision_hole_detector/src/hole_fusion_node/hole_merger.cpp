@@ -94,19 +94,29 @@ namespace pandora_vision
     // the activeId-th candidate hole
     int passiveId = 1;
 
+    // Is the activeId-th candidate hole able to
+    // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
+    bool isAble = true;
+
+    // The holesMaskSetVector vector is used in the merging processes
+    std::vector<std::set<unsigned int> > holesMasksSetVector;
+
+    // Indicates the end of the merging process
     bool isFuseComplete = false;
+
     while(!isFuseComplete)
     {
-      // The holesMaskSetVector vector is used in the merging processes
-      std::vector<std::set<unsigned int> > holesMasksSetVector;
-      FiltersResources::createHolesMasksSetVector(
-        *rgbdHolesConveyor,
-        image,
-        &holesMasksSetVector);
+      // If a(n) {assimilation, amalgamation, connection} did happen,
+      // regenerate the mask sets in order for them to reflect the new
+      // state of holes
+      if (isAble)
+      {
+        FiltersResources::createHolesMasksSetVector(
+          *rgbdHolesConveyor,
+          image,
+          &holesMasksSetVector);
+      }
 
-      // Is the activeId-th candidate hole able to
-      // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
-      bool isAble = false;
 
       if (operationId == 0)
       {

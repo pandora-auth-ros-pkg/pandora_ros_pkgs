@@ -218,7 +218,7 @@ namespace pandora_vision
   int Parameters::Image::scale_method = 0;
 
   // Term criteria for segmentation purposes
-  int Parameters::Image::term_criteria_max_iterations = 1;
+  int Parameters::Image::term_criteria_max_iterations = 5;
   double Parameters::Image::term_criteria_max_epsilon = 1;
 
 
@@ -251,19 +251,20 @@ namespace pandora_vision
 
   // Selects the method for extracting a RGB image's edges.
   // Choices are via segmentation and via backprojection
-  int Parameters::Rgb::edges_extraction_method = 1;
+  int Parameters::Rgb::edges_extraction_method = 0;
 
   // The threshold applied to the backprojection of the RGB image
   // captured by the image sensor
   int Parameters::Rgb::compute_edges_backprojection_threshold = 128;
 
   // Parameters specific to the pyrMeanShiftFiltering method
-  int Parameters::Rgb::spatial_window_radius = 18;
+  int Parameters::Rgb::spatial_window_radius = 13;
   int Parameters::Rgb::color_window_radius = 40;
   int Parameters::Rgb::maximum_level_pyramid_segmentation = 2;
 
 
-  // Applies advanced blurring to achieve segmentation or normal
+  // Applies advanced blurring to achieve segmentation or
+  // normal blurring
   int Parameters::Rgb::segmentation_blur_method = 0;
 
   // True to posterize the product of the segmentation

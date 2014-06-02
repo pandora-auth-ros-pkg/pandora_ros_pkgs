@@ -51,7 +51,8 @@ namespace pandora_vision
 {
   /**
     @class HoleDetector
-    @brief Provides the functionalities for detecting holes [functional]
+    @brief Provides the functionalities for detecting holes via analysis
+    of a depth image
    **/
   class HoleDetector
   {

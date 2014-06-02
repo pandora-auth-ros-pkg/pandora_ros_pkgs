@@ -32,17 +32,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Despoina Paschalidou
+ * Authors: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
 #ifndef RGB_NODE_RGB_H
 #define RGB_NODE_RGB_H
 
-#include "utils/defines.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
-#include "state_manager/state_client.h"
-#include "utils/parameters.h"
 #include "utils/message_conversions.h"
+#include "utils/histogram.h"
+#include "utils/parameters.h"
 #include "utils/wavelets.h"
 #include "rgb_node/hole_detector.h"
 
@@ -77,9 +76,8 @@ namespace pandora_vision
       // locates are published to
       std::string candidateHolesTopic_;
 
-      // Class HoleDetector instance that finds and locates tha position
-      // potentional holes in current frame
-      HoleDetector _holeDetector;
+      // A histogramm for the texture of walls
+      cv::MatND wallsHistogram_;
 
       // The dynamic reconfigure (RGB) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::rgb_cfgConfig>

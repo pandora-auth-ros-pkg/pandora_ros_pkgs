@@ -45,13 +45,23 @@ target_link_libraries(noise_elimination_test ${catkin_LIBRARIES} utils_lib gtest
 
 
 ################################ depth node ####################################
-catkin_add_gtest(hole_detector_test
+catkin_add_gtest(depth_hole_detector_test
   unit/depth_node/hole_detector_test.cpp)
 
 add_library(depth_node_lib
   ../src/depth_node/hole_detector.cpp)
 
-target_link_libraries(hole_detector_test ${catkin_LIBRARIES} utils_lib depth_node_lib gtest_main)
+target_link_libraries(depth_hole_detector_test ${catkin_LIBRARIES} utils_lib depth_node_lib gtest_main)
+
+
+################################# rgb node #####################################
+catkin_add_gtest(rgb_hole_detector_test
+  unit/rgb_node/hole_detector_test.cpp)
+
+add_library(rgb_node_lib
+  ../src/rgb_node/hole_detector.cpp)
+
+target_link_libraries(rgb_hole_detector_test ${catkin_LIBRARIES} utils_lib rgb_node_lib gtest_main)
 
 ############################# hole fusion node #################################
 
