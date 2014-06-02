@@ -1,7 +1,7 @@
 /*
   Functions and structures for dealing with image features
 
-  Copyright (C) 2006-2010  Rob Hess <hess@eecs.oregonstate.edu>
+  Copyright (C) 2006-2012  Rob Hess <rob@iqengines.com>
 
   @version 1.1.2-20100521
 */
@@ -53,13 +53,13 @@ int import_features( char* filename, int type, struct feature** feat )
       break;
     default:
       fprintf( stderr, "Warning: import_features(): unrecognized feature" \
-         "type, %s, line %d\n", __FILE__, __LINE__ );
+	       "type, %s, line %d\n", __FILE__, __LINE__ );
       return -1;
     }
 
   if( n == -1 )
     fprintf( stderr, "Warning: unable to import features from %s,"	\
-       " %s, line %d\n", filename, __FILE__, __LINE__ );
+	     " %s, line %d\n", filename, __FILE__, __LINE__ );
   return n;
 }
 
@@ -82,7 +82,7 @@ int export_features( char* filename, struct feature* feat, int n )
   if( n <= 0  ||  ! feat )
     {
       fprintf( stderr, "Warning: no features to export, %s line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return 1;
     }
   type = feat[0].type;
@@ -96,13 +96,13 @@ int export_features( char* filename, struct feature* feat, int n )
       break;
     default:
       fprintf( stderr, "Warning: export_features(): unrecognized feature" \
-         "type, %s, line %d\n", __FILE__, __LINE__ );
+	       "type, %s, line %d\n", __FILE__, __LINE__ );
       return -1;
     }
 
   if( r )
     fprintf( stderr, "Warning: unable to export features to %s,"	\
-       " %s, line %d\n", filename, __FILE__, __LINE__ );
+	     " %s, line %d\n", filename, __FILE__, __LINE__ );
   return r;
 }
 
@@ -121,21 +121,21 @@ void draw_features( IplImage* img, struct feature* feat, int n )
   if( n <= 0  ||  ! feat )
     {
       fprintf( stderr, "Warning: no features to draw, %s line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return;
     }
   type = feat[0].type;
   switch( type )
     {
     case FEATURE_OXFD:
-      //draw_oxfd_features( img, feat, n );
+      draw_oxfd_features( img, feat, n );
       break;
     case FEATURE_LOWE:
       draw_lowe_features( img, feat, n );
       break;
     default:
       fprintf( stderr, "Warning: draw_features(): unrecognized feature" \
-         " type, %s, line %d\n", __FILE__, __LINE__ );
+	       " type, %s, line %d\n", __FILE__, __LINE__ );
       break;
     }
 }
@@ -199,7 +199,7 @@ static int import_oxfd_features( char* filename, struct feature** features )
   if( ! ( file = fopen( filename, "r" ) ) )
     {
       fprintf( stderr, "Warning: error opening %s, %s, line %d\n",
-         filename, __FILE__, __LINE__ );
+	       filename, __FILE__, __LINE__ );
       return -1;
     }
 
@@ -207,13 +207,13 @@ static int import_oxfd_features( char* filename, struct feature** features )
   if( fscanf( file, " %d %d ", &d, &n ) != 2 )
     {
       fprintf( stderr, "Warning: file read error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return -1;
     }
   if( d > FEATURE_MAX_D )
     {
       fprintf( stderr, "Warning: descriptor too long, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return -1;
     }
   
@@ -223,12 +223,12 @@ static int import_oxfd_features( char* filename, struct feature** features )
     {
       /* read affine region parameters */
       if( fscanf( file, " %lf %lf %lf %lf %lf ", &x, &y, &a, &b, &c ) != 5 )
-  {
-    fprintf( stderr, "Warning: error reading feature #%d, %s, line %d\n",
-       i+1, __FILE__, __LINE__ );
-    free( f );
-    return -1;
-  }
+	{
+	  fprintf( stderr, "Warning: error reading feature #%d, %s, line %d\n",
+		   i+1, __FILE__, __LINE__ );
+	  free( f );
+	  return -1;
+	}
       f[i].img_pt.x = f[i].x = x;
       f[i].img_pt.y = f[i].y = y;
       f[i].a = a;
@@ -239,16 +239,16 @@ static int import_oxfd_features( char* filename, struct feature** features )
       
       /* read descriptor */
       for( j = 0; j < d; j++ )
-  {
-    if( ! fscanf( file, " %lf ", &dv ) )
-      {
-        fprintf( stderr, "Warning: error reading feature descriptor" \
-           " #%d, %s, line %d\n", i+1, __FILE__, __LINE__ );
-        free( f );
-        return -1;
-      }
-    f[i].descr[j] = dv;
-  }
+	{
+	  if( ! fscanf( file, " %lf ", &dv ) )
+	    {
+	      fprintf( stderr, "Warning: error reading feature descriptor" \
+		       " #%d, %s, line %d\n", i+1, __FILE__, __LINE__ );
+	      free( f );
+	      return -1;
+	    }
+	  f[i].descr[j] = dv;
+	}
 
       f[i].scl = f[i].ori = 0;
       f[i].category = 0;
@@ -260,7 +260,7 @@ static int import_oxfd_features( char* filename, struct feature** features )
   if( fclose(file) )
     {
       fprintf( stderr, "Warning: file close error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       free( f );
       return -1;
     }
@@ -292,13 +292,13 @@ static int export_oxfd_features( char* filename, struct feature* feat, int n )
   if( n <= 0 )
     {
       fprintf( stderr, "Warning: feature count %d, %s, line %d\n",
-         n, __FILE__, __LINE__ );
+	       n, __FILE__, __LINE__ );
       return 1;
     }
   if( ! ( file = fopen( filename, "w" ) ) )
     {
       fprintf( stderr, "Warning: error opening %s, %s, line %d\n",
-         filename, __FILE__, __LINE__ );
+	       filename, __FILE__, __LINE__ );
       return 1;
     }
 
@@ -307,16 +307,16 @@ static int export_oxfd_features( char* filename, struct feature* feat, int n )
   for( i = 0; i < n; i++ )
     {
       fprintf( file, "%f %f %f %f %f", feat[i].x, feat[i].y, feat[i].a,
-         feat[i].b, feat[i].c );
+	       feat[i].b, feat[i].c );
       for( j = 0; j < d; j++ )
-  fprintf( file, " %f", feat[i].descr[j] );
+	fprintf( file, " %f", feat[i].descr[j] );
       fprintf( file, "\n" );
     }
 
   if( fclose(file) )
     {
       fprintf( stderr, "Warning: file close error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return 1;
     }
   return 0;
@@ -352,7 +352,7 @@ static void draw_oxfd_features( IplImage* img, struct feature* feat, int n )
   @param color color in which to draw
 */
 static void draw_oxfd_feature( IplImage* img, struct feature* feat,
-             CvScalar color )
+			       CvScalar color )
 {
   double m[4] = { feat->a, feat->b, feat->b, feat->c };
   double v[4] = { 0 };
@@ -371,13 +371,13 @@ static void draw_oxfd_feature( IplImage* img, struct feature* feat,
   alpha *= 180 / M_PI;
 
   cvEllipse( img, cvPoint( feat->x, feat->y ), cvSize( l2, l1 ), alpha,
-       0, 360, CV_RGB(0,0,0), 3, 8, 0 );
+	     0, 360, CV_RGB(0,0,0), 3, 8, 0 );
   cvEllipse( img, cvPoint( feat->x, feat->y ), cvSize( l2, l1 ), alpha,
-       0, 360, color, 1, 8, 0 );
+	     0, 360, color, 1, 8, 0 );
   cvLine( img, cvPoint( feat->x+2, feat->y ), cvPoint( feat->x-2, feat->y ),
-    color, 1, 8, 0 );
+	  color, 1, 8, 0 );
   cvLine( img, cvPoint( feat->x, feat->y+2 ), cvPoint( feat->x, feat->y-2 ),
-    color, 1, 8, 0 );
+	  color, 1, 8, 0 );
 }
 
 
@@ -405,7 +405,7 @@ static int import_lowe_features( char* filename, struct feature** features )
   if( ! ( file = fopen( filename, "r" ) ) )
     {
       fprintf( stderr, "Warning: error opening %s, %s, line %d\n",
-         filename, __FILE__, __LINE__ );
+	       filename, __FILE__, __LINE__ );
       return -1;
     }
 
@@ -413,13 +413,13 @@ static int import_lowe_features( char* filename, struct feature** features )
   if( fscanf( file, " %d %d ", &n, &d ) != 2 )
     {
       fprintf( stderr, "Warning: file read error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return -1;
     }
   if( d > FEATURE_MAX_D )
     {
       fprintf( stderr, "Warning: descriptor too long, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return -1;
     }
 
@@ -428,12 +428,12 @@ static int import_lowe_features( char* filename, struct feature** features )
     {
       /* read affine region parameters */
       if( fscanf( file, " %lf %lf %lf %lf ", &y, &x, &s, &o ) != 4 )
-  {
-    fprintf( stderr, "Warning: error reading feature #%d, %s, line %d\n",
-       i+1, __FILE__, __LINE__ );
-    free( f );
-    return -1;
-  }
+	{
+	  fprintf( stderr, "Warning: error reading feature #%d, %s, line %d\n",
+		   i+1, __FILE__, __LINE__ );
+	  free( f );
+	  return -1;
+	}
       f[i].img_pt.x = f[i].x = x;
       f[i].img_pt.y = f[i].y = y;
       f[i].scl = s;
@@ -443,16 +443,16 @@ static int import_lowe_features( char* filename, struct feature** features )
 
       /* read descriptor */
       for( j = 0; j < d; j++ )
-  {
-    if( ! fscanf( file, " %lf ", &dv ) )
-      {
-        fprintf( stderr, "Warning: error reading feature descriptor" \
-           " #%d, %s, line %d\n", i+1, __FILE__, __LINE__ );
-        free( f );
-        return -1;
-      }
-    f[i].descr[j] = dv;
-  }
+	{
+	  if( ! fscanf( file, " %lf ", &dv ) )
+	    {
+	      fprintf( stderr, "Warning: error reading feature descriptor" \
+		       " #%d, %s, line %d\n", i+1, __FILE__, __LINE__ );
+	      free( f );
+	      return -1;
+	    }
+	  f[i].descr[j] = dv;
+	}
 
       f[i].a = f[i].b = f[i].c = 0;
       f[i].category = 0;
@@ -464,7 +464,7 @@ static int import_lowe_features( char* filename, struct feature** features )
   if( fclose(file) )
     {
       fprintf( stderr, "Warning: file close error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       free( f );
       return -1;
     }
@@ -495,13 +495,13 @@ static int export_lowe_features( char* filename, struct feature* feat, int n )
   if( n <= 0 )
     {
       fprintf( stderr, "Warning: feature count %d, %s, line %d\n",
-         n, __FILE__, __LINE__ );
+	       n, __FILE__, __LINE__ );
       return 1;
     }
   if( ! ( file = fopen( filename, "w" ) ) )
     {
       fprintf( stderr, "Warning: error opening %s, %s, line %d\n",
-         filename, __FILE__, __LINE__ );
+	       filename, __FILE__, __LINE__ );
       return 1;
     }
 
@@ -510,21 +510,21 @@ static int export_lowe_features( char* filename, struct feature* feat, int n )
   for( i = 0; i < n; i++ )
     {
       fprintf( file, "%f %f %f %f", feat[i].y, feat[i].x,
-         feat[i].scl, feat[i].ori );
+	       feat[i].scl, feat[i].ori );
       for( j = 0; j < d; j++ )
-  {
-    /* write 20 descriptor values per line */
-    if( j % 20 == 0 )
-      fprintf( file, "\n" );
-    fprintf( file, " %d", (int)(feat[i].descr[j]) );
-  }
+	{
+	  /* write 20 descriptor values per line */
+	  if( j % 20 == 0 )
+	    fprintf( file, "\n" );
+	  fprintf( file, " %d", (int)(feat[i].descr[j]) );
+	}
       fprintf( file, "\n" );
     }
 
   if( fclose(file) )
     {
       fprintf( stderr, "Warning: file close error, %s, line %d\n",
-         __FILE__, __LINE__ );
+	       __FILE__, __LINE__ );
       return 1;
     }
   return 0;
@@ -559,7 +559,7 @@ static void draw_lowe_features( IplImage* img, struct feature* feat, int n )
   @param color color in which to draw
 */
 static void draw_lowe_feature( IplImage* img, struct feature* feat,
-             CvScalar color )
+			       CvScalar color )
 {
   int len, hlen, blen, start_x, start_y, end_x, end_y, h1_x, h1_y, h2_x, h2_y;
   double scl, ori;
@@ -586,10 +586,9 @@ static void draw_lowe_feature( IplImage* img, struct feature* feat,
   h1 = cvPoint( h1_x, h1_y );
   h2 = cvPoint( h2_x, h2_y );
 
-  cvCircle(img, start, 3, color, 1, 8, 0);
-  //cvLine( img, start, end, color, 1, 8, 0 );
-  //cvLine( img, end, h1, color, 1, 8, 0 );
-  //cvLine( img, end, h2, color, 1, 8, 0 );
+  cvLine( img, start, end, color, 1, 8, 0 );
+  cvLine( img, end, h1, color, 1, 8, 0 );
+  cvLine( img, end, h2, color, 1, 8, 0 );
 }
 
 

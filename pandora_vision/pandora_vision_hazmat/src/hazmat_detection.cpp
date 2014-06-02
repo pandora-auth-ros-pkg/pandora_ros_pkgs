@@ -50,7 +50,7 @@ namespace pandora_vision
     server.setCallback(boost::bind(&HazmatDetection::parametersCallback,
         this, _1, _2));
          
-    // Get General Parameters, such as frame width & height , camera id
+    /// Get General Parameters
     getGeneralParams();
 
     //initialize hazmat detector
@@ -72,10 +72,12 @@ namespace pandora_vision
 
     hazmatFrame_ = cv::Mat( frameWidth_, frameHeight_, CV_8U );
       
-    //subscribe to input image's topic
-    sub_ = _nh.subscribe
-      (imageTopic_, 1, &HazmatDetection::imageCallback, this);
-
+    for(int ii = 0; ii < _imageTopics.size(); ii++ ){
+      //!< subscribe to input image's topic
+      frameSubscriber = _nh.subscribe(
+        _imageTopics.at(ii), 1, &HazmatDetection::imageCallback, this);
+      _frameSubscribers.push_back(frameSubscriber);
+    }
     //initialize states - robot starts in STATE_OFF 
     curState = state_manager_communications::robotModeMsg::MODE_OFF;
     prevState = state_manager_communications::robotModeMsg::MODE_OFF;
@@ -119,19 +121,36 @@ namespace pandora_vision
       ROS_FATAL("Hazmat alert topic name param not found");
       ROS_BREAK();
     }
-      
     
-    //!< Get the camera to be used by qr node;
-    if (_nh.getParam("camera_name", cameraName)) 
-    {
-      ROS_DEBUG_STREAM("camera_name : " << cameraName);
+    XmlRpc::XmlRpcValue cameras_list;
+    if(_nh.getParam("camera_name", cameras_list)){
+      ROS_ASSERT(cameras_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
+      
+      for(int ii = 0; ii< cameras_list.size(); ii++){
+        ROS_ASSERT(cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
+        cameraName = static_cast<std::string>(cameras_list[ii]);
+        ROS_INFO_STREAM("camera_name : " << cameraName);
+        
+        //!< Get the listener's topic for camera
+        if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
+        {
+          ROS_INFO_STREAM("imageTopic for camera : " << imageTopic);
+        }
+        else
+        {
+         ROS_FATAL("Image topic name not found");
+         ROS_BREAK(); 
+        }
+        _imageTopics.push_back("/"+imageTopic);
+        
+      }
     }
-    else 
+    else
     {
-      ROS_FATAL("Camera name not found");
+      ROS_FATAL("Camera_name not found");
       ROS_BREAK(); 
-    }
-
+    }  
+    
     //! Get the Height parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_height", frameHeight_)) 
     {
@@ -153,29 +172,27 @@ namespace pandora_vision
       ROS_DEBUG("[motion_node] : Parameter frameWidth not found. Using Default");
       frameWidth_ = DEFAULT_WIDTH;
     }
+    //!< Get the HFOV parameter if available;
+    if (_nh.getParam("/" + cameraName + "/hfov", hfov_)) 
+    {
+      ROS_DEBUG_STREAM("HFOV : " << hfov_);
+    }
+    else 
+    {
+      hfov_ = HFOV;
+      ROS_DEBUG_STREAM("HFOV : " << hfov_);
+    }
     
-    //! Get the images's topic;
-    if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic_)) 
+    //!< Get the VFOV parameter if available;
+    if (_nh.getParam("/" + cameraName + "/vfov", vfov_)) 
     {
-      ROS_DEBUG_STREAM("imageTopic : " << imageTopic_);
+      ROS_DEBUG_STREAM("VFOV : " << vfov_);
     }
     else 
     {
-      ROS_FATAL("Camera name not found");
-      ROS_BREAK();
+      vfov_ = VFOV;
+      ROS_DEBUG_STREAM("VFOV : " << vfov_);
     }
-
-    //! Get the images's frame_id;
-    if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId)) 
-    {
-      ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
-    }
-    else 
-    {
-     ROS_FATAL("Camera name not found");
-     ROS_BREAK();
-    }
-  
   }
 
   /**
@@ -185,26 +202,25 @@ namespace pandora_vision
   **/
   void HazmatDetection::imageCallback(const sensor_msgs::Image& msg)
   {
-    
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv::Mat temp = in_msg->image.clone();
     hazmatFrame_ = new IplImage(temp);
     hazmatFrameTimestamp_ = msg.header.stamp;
-    
+    std::string frame_id = msg.header.frame_id;
     if ( hazmatFrame_.empty() )
     {               
       ROS_ERROR("[hazmatNode] : No more Frames");
       return;
     }
-    hazmatCallback();
+    hazmatDetect(frame_id);
   }
 
   /**
   @brief Method called only when a new image message is present
   @return void
   **/
-  void HazmatDetection::hazmatCallback()
+  void HazmatDetection::hazmatDetect(std::string frame_id)
   {
     cv::Mat allblack = cv::Mat( frameWidth_, frameHeight_, CV_8U );
     if(!hazmatNowOn_)
@@ -222,12 +238,12 @@ namespace pandora_vision
     vision_communications::HazmatAlertMsg hazmatMsg;
      
     std::vector<HazmatEpsilon> a = 
-        hazmatDetector_->DetectHazmatEpsilon(hazmatFrame_);
+        hazmatDetector_->detectHazmat(hazmatFrame_);
 
     //if hazmat found
     if (a.size() > 0)
     {
-      hazmatVectorMsg.header.frame_id = cameraFrameId;
+      hazmatVectorMsg.header.frame_id = frame_id;
       hazmatVectorMsg.header.stamp = hazmatFrameTimestamp_;
       for (unsigned int i = 0; i < a.size() ; i++)
       {

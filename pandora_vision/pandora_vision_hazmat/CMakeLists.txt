@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 generate_dynamic_reconfigure_options(
-  cfg/hazmat_cfg.cfg
+  config/hazmat_cfg.cfg
 )
 
 catkin_package(
@@ -81,6 +81,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/hazmat_detector.h
   src/hazmat_detector.cpp
   src/hazmat_detection.cpp
+  src/hazmat_trainer.cpp
   
             
 )

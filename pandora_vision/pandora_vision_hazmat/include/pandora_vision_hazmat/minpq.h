@@ -1,7 +1,7 @@
 /**@file
    Functions and structures for implementing a minimizing priority queue.
 
-   Copyright (C) 2006-2010  Rob Hess <hess@eecs.oregonstate.edu>
+   Copyright (C) 2006-2012  Rob Hess <rob@iqengines.com>
    
    @version 1.1.2-20100521
 */
@@ -11,6 +11,7 @@
 #define MINPQ_H
 
 #include "pandora_vision_hazmat/utils.h"
+
 
 /********************************** Structures *******************************/
 
@@ -34,7 +35,7 @@ struct min_pq
 /*************************** Function Prototypes *****************************/
 
 /**
-  Creates a new minimizing priority queue.
+   Creates a new minimizing priority queue.
 */
 extern struct min_pq* minpq_init();
 
@@ -52,33 +53,33 @@ extern int minpq_insert( struct min_pq* min_pq, void* data, int key );
 
 
 /**
-  Returns the element of a minimizing priority queue with the smallest key
-  without removing it from the queue.
-
-  @param min_pq a minimizing priority queue
-
-  @return Returns the element of \a min_pq with the smallest key or NULL
-   if \a min_pq is empty
+   Returns the element of a minimizing priority queue with the smallest key
+   without removing it from the queue.
+   
+   @param min_pq a minimizing priority queue
+   
+   @return Returns the element of \a min_pq with the smallest key or NULL
+     if \a min_pq is empty
 */
 extern void* minpq_get_min( struct min_pq* min_pq );
 
 
 /**
-  Removes and returns the element of a minimizing priority queue with the
-  smallest key.
-
-  @param min_pq a minimizing priority queue
-
-  @return Returns the element of \a min_pq with the smallest key of NULL
-   if \a min_pq is empty
+   Removes and returns the element of a minimizing priority queue with the
+   smallest key.
+   
+   @param min_pq a minimizing priority queue
+   
+   @return Returns the element of \a min_pq with the smallest key of NULL
+     if \a min_pq is empty
 */
 extern void* minpq_extract_min( struct min_pq* min_pq );
 
 
 /**
-  De-allocates the memory held by a minimizing priorioty queue
+   De-allocates the memory held by a minimizing priorioty queue
 
-  @param min_pq pointer to a minimizing priority queue
+   @param min_pq pointer to a minimizing priority queue
 */
 extern void minpq_release( struct min_pq** min_pq );
 

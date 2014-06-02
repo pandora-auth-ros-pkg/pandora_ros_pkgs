@@ -4,10 +4,10 @@
       respawn="False" output="screen" />
     <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
     
-    <rosparam file="$(find pandora_vision_motion)/cfg/motion_topics.yaml" 
+    <rosparam file="$(find pandora_vision_motion)/config/motion_topics.yaml" 
       command="load" ns="motion"/>
       
-    <rosparam file="$(find pandora_vision_motion)/cfg/motion_params.yaml" 
+    <rosparam file="$(find pandora_vision_motion)/config/motion_params.yaml" 
       command="load" ns="motion"/>
         
 </launch>

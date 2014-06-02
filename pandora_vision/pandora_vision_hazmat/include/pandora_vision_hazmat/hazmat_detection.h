@@ -71,14 +71,20 @@ namespace pandora_vision
       ros::Time hazmatFrameTimestamp_; // HazmatDetector frame timestamp
       
       std::string packagePath_;
-      std::string imageTopic_;
+      std::string imageTopic;
       std::string cameraName;
-      std::string cameraFrameId;
           
       //publisher
       ros::Publisher hazmatPublisher_;
-
-      ros::Subscriber sub_;
+      
+      //!< The topics subscribed to all cameras
+      std::vector<std::string> _imageTopics;
+      
+      //!< The subscribers that listens to the frame topic advertised by the
+      //!< central node for all cameras
+      std::vector<ros::Subscriber> _frameSubscribers;
+      
+      ros::Subscriber frameSubscriber;
             
       //variable used for State Managing
       bool hazmatNowOn_;
@@ -98,7 +104,7 @@ namespace pandora_vision
         @brief Method called only when a new image message is present
         @return void
       **/
-      void hazmatCallback(void);
+      void hazmatDetect(std::string frame_id);
       
       /**
         @brief Callback for a new image

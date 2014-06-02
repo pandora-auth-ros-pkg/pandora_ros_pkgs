@@ -1,2 +1,2 @@
 camera_name: [camera_left, camera_right, kinect]
-
+debugHazmat: true

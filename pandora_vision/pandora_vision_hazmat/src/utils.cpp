@@ -9,8 +9,6 @@
 #include "pandora_vision_hazmat/utils.h"
 
 /*************************** Function Definitions ****************************/
-//~ namespace aaaaaa
-//~ {
 
 /*
   Prints an error message and aborts the program.  The error message is

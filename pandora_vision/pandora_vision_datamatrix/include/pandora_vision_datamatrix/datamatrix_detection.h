@@ -110,8 +110,14 @@ namespace pandora_vision
     std::string imageTopic;
     
     std::string cameraName;
-    std::string cameraFrameId;
     
+    //!< The topics subscribed to all cameras
+    std::vector<std::string> _imageTopics;
+      
+    //!< The subscribers that listens to the frame topic advertised by the
+    //!< central node for all cameras
+    std::vector<ros::Subscriber> _frameSubscribers;
+      
     //!< Publishers for DatamatrixDetector result messages
     ros::Publisher _datamatrixCodePublisher;
 
@@ -134,7 +140,7 @@ namespace pandora_vision
      * all present datamatrixes in a given frame
      * @return void
     */
-    void datamatrixCallback();
+    void datamatrixDetect(std::string frame_id);
           
      /**
       @brief Callback for the RGB Image

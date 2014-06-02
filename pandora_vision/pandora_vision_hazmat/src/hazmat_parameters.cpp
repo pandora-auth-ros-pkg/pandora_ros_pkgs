@@ -43,7 +43,7 @@ namespace pandora_vision
   int HazmatParameters::sideLength = 50;
   double HazmatParameters::maxAreaThreshold = 3300000;
   double HazmatParameters::minAreaThreshold = 100;
-  double HazmatParameters::votingThreshold = 2400;
+  double HazmatParameters::votingThreshold = 1500;
   double HazmatParameters::MOThreshold = 160000;
   int HazmatParameters::featureThreshold = 10;
   int HazmatParameters::numberOfHazmats = 19;

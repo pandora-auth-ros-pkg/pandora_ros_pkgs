@@ -11,8 +11,6 @@
 
 #include "defines.h"
 
-//~ namespace aaaaaa
-//~ {
 /***************************** Inline Functions ******************************/
 /**
   A function to get a pixel value from an 8-bit unsigned image.
@@ -202,16 +200,16 @@ extern double dist_sq_2D( CvPoint2D64f p1, CvPoint2D64f p2 );
 */
 extern void draw_x( IplImage* img, CvPoint pt, int r, int w, CvScalar color );
 
-
 /**
-  Combines two images by scacking one on top of the other
+   Combines two images by scacking one on top of the other
+   
+   @param img1 top image
+   @param img2 bottom image
 
-  @param img1 top image
-  @param img2 bottom image
-
-  @return Returns the image resulting from stacking \a img1 on top if \a img2
+   @return Returns the image resulting from stacking \a img1 on top if \a img2
 */
 extern IplImage* stack_imgs( IplImage* img1, IplImage* img2 );
+
 
 
 /**
