@@ -85,7 +85,7 @@ namespace motor
 
     for (int ii = 0; ii < 4; ii++)
     {
-      velocity_[ii] = static_cast<double>(feedback[ii]);
+      velocity_[ii] = static_cast<double>(feedback[ii]) / 113;
     }
   }
 
