@@ -101,7 +101,7 @@ bool InterfaceTester::checkForSubscribedNode(
   }
   
   for (int jj = 0; jj < payload[1].size(); jj++){
-    if (std::string(paylload[1][jj][0]).find(topic) == 0) {
+    if (std::string(payload[1][jj][0]).find(topic) == 0) {
       for (int ll = 0; ll < payload[1][jj][1].size(); ll++){
         if(std::string(payload[1][jj][1][ll]).find(node) == 0)
           return true;        

@@ -1,6 +1,6 @@
 <package>
 
-  <node name="/data_fusion/victim_fusion">
+  <node name =interface_diagnostics >
     
     <publisher type="std_msgs/Image" name="/data_fusion/face_direction_alert" exclude_states="2, 3" include_states="1" optional="true"/>
     <publisher type="std_msgs/Image" optional="true">/data_fusion/hole_direction_alert</publisher>
@@ -10,6 +10,7 @@
   </node>
 
 
+<!--
   <node>
     /data_fusion/alert_handler
 
@@ -30,5 +31,6 @@
     <publisher>/data_fusion/victim_updated</publisher>
 
   </node>
+-->
 
 </package>

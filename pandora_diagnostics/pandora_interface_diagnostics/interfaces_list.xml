@@ -4,10 +4,11 @@
   <include_rosparam> navigationPackagePath </include_rosparam>
   <include_rosparam> visionPackagePath  </include_rosparam>
   <include_rosparam> slamPackagePath  </include_rosparam>
--->
-  
   <include_rosparam> alertHandlerPackagePath  </include_rosparam>
   <include_rosparam> victimFusionPackagePath  </include_rosparam>
   <include_rosparam> sensorsPackagePath  </include_rosparam
+
+-->
+   <include_rosparam>"interfaceListPackagePath"</include_rosparam>
 
 </packages>

@@ -42,7 +42,7 @@
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "InterfaceDiagnostic");
-  InterfaceDiagnostics id;
+  //~ InterfaceDiagnostics id;
   NodeDiagnostics nd;
   ros::spin();
 }
