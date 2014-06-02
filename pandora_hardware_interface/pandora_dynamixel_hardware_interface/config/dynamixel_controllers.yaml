@@ -49,3 +49,29 @@ kinect_yaw_controller:
         init: 512
         min: 0
         max: 1023
+
+head_pitch_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: head_pitch_joint
+    joint_speed: 2
+    motor:
+        id: 5
+        init: 512
+        min: 0
+        max: 1023
+
+head_yaw_controller:
+    controller:
+        package: dynamixel_controllers
+        module: joint_position_controller
+        type: JointPositionController
+    joint_name: head_yaw_joint
+    joint_speed: 2
+    motor:
+        id: 6
+        init: 512
+        min: 0
+        max: 1023

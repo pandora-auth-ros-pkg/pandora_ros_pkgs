@@ -4,6 +4,6 @@ serial_ports:
     port_name: "/dev/dynamixel"
     baud_rate: 1000000
     min_motor_id: 1
-    max_motor_id: 5
+    max_motor_id: 6
     update_rate: 50
 
