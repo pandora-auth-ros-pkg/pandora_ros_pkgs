@@ -2,8 +2,8 @@ skid_steer_drive_controller:
   type: pandora_motor/SkidSteerDriveController
   wheel_separation: 0.39757
   wheel_radius: 0.088895
-  max_angular_velocity: 22.5
-  gearbox_ratio: 1
+  max_angular_velocity: 5000
+  gearbox_ratio: 113
   joints:
     - movement_left_front_joint
     - movement_right_front_joint

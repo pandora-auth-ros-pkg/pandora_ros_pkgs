@@ -39,9 +39,16 @@ void SerialEposHandler::getRPM(int* leftRearRpm, int* leftFrontRpm,
   epos::Word out[2];
 
   gatewayImpl_->readObject(2, 0x206B, 0, &out[0]); // epos p
-  *rightFrontRpm = (int32_t)out[1];
+  if (out[1]>10000)
+  {
+    *rightFrontRpm = (int32_t)(20000-out[1]); //Fix ST
+  }
+  else
+  {
+    *rightFrontRpm = -(int32_t)out[1];
+  }
   gatewayImpl_->readObject(2, 0x2028, 0, &out[0]);
-  *rightRearRpm = (int16_t)out[1];
+  *rightRearRpm = -(int16_t)out[1];
   gatewayImpl_->readObject(3, 0x2028, 0, &out[0]);
   *leftRearRpm = (int16_t)out[1];
   gatewayImpl_->readObject(4, 0x2028, 0, &out[0]);

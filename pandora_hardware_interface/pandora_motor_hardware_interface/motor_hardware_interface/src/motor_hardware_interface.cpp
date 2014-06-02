@@ -45,7 +45,7 @@ namespace motor
   :
     nodeHandle_(nodeHandle)
   {
-    //~ motors_ = new SerialEposHandler("/dev/ttyUSB0", 115200, 500);
+    motors_ = new SerialEposHandler("/dev/ttyUSB0", 115200, 500);
     readJointNameFromParamServer();
 
     // connect and register the joint state interface
