@@ -56,9 +56,9 @@ bool InterfaceTester::checkForTopicPublishing(
   ros::master::getTopics(topicList);
   
   bool found = false;
-  for (unsigned int i = 0; i < topicList.size(); i++) {
+  for (unsigned int ii = 0; ii < topicList.size(); ii++) {
     ros::master::TopicInfo currentInfo;
-    currentInfo = topicList.at(i);
+    currentInfo = topicList.at(ii);
     
     if (currentInfo.name ==  topicName && currentInfo.datatype == topicType){
       found = true;
@@ -80,8 +80,8 @@ bool InterfaceTester::checkForSubscribed(std::string topic) {
   }
   
   
-  for (int j =0; j< payload[1].size();j++){
-    if (topic == std::string(payload[1][j][0]))
+  for (int jj = 0; jj < payload[1].size(); jj++){
+    if (topic == std::string(payload[1][jj][0]))
       return true;
   }
     
@@ -100,15 +100,16 @@ bool InterfaceTester::checkForSubscribedNode(
     return false;
   }
   
-  for (int j =0; j< payload[1].size();j++){
-    if (std::string(payload[1][j][0]).find(topic)==0) {
-      for (int l=0; l< payload[1][j][1].size();l++){
-        if(std::string(payload[1][j][1][l]).find(node)==0)
+  for (int jj = 0; jj < payload[1].size(); jj++){
+    if (std::string(paylload[1][jj][0]).find(topic) == 0) {
+      for (int ll = 0; ll < payload[1][jj][1].size(); ll++){
+        if(std::string(payload[1][jj][1][ll]).find(node) == 0)
           return true;        
       }
     }
   }
-    
+
+
   return false;
 }
 
@@ -123,10 +124,10 @@ bool InterfaceTester::checkForNodePublishing(
     return false;
   }
   
-  for (int j =0; j< payload[0].size();j++){
-    if (std::string(payload[0][j][0])==topic) {
-      for (int l=0; l< payload[0][j][1].size();l++){
-        if(std::string(payload[0][j][1][l]).find(node)==0)
+  for (int jj = 0; jj < payload[0].size(); jj++){
+    if (std::string(payload[0][jj][0]) == topic) {
+      for (int ll = 0; ll < payload[0][jj][1].size(); ll++){
+        if(std::string(payload[0][jj][1][ll]).find(node) == 0)
           return true;        
       }
     }
@@ -147,14 +148,14 @@ bool InterfaceTester::checkForNodeService(
   }
   
   
-  for (int j =0; j< payload[2].size();j++){
-    if (std::string(payload[2][j][0])==serviceName) {        
-      for (int l=0; l< payload[2][j][1].size();l++)
-        if(std::string(payload[2][j][1][l]).find(node)==0)
+  for (int jj =0; jj< payload[2].size(); jj++){
+    if (std::string(payload[2][jj][0]) == serviceName) {        
+      for (int ll = 0; ll < payload[2][jj][1].size();ll++)
+        if(std::string(payload[2][jj][1][ll]).find(node) == 0)
           return true;        
     }
   }
-    
+
   return false;
 }
 
@@ -165,8 +166,8 @@ bool InterfaceTester::checkForNode(std::string nodeName) {
   ros::master::getNodes (nodes);
   
   bool found = false;
-  for (unsigned int i = 0; i < nodes.size(); i++){
-    if (nodes.at(i) == nodeName){
+  for (unsigned int ii = 0; ii < nodes.size(); ii++){
+    if (nodes.at(ii) == nodeName){
       found = true;
       break;
     }

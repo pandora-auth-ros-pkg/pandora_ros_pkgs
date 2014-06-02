@@ -55,7 +55,7 @@ void NodeDiagnostics::nodeDiagnostics(
   TiXmlElement * packageElement;
   TiXmlElement * nodeElement;
   
-  for(int ii=0;ii<docsVector_.size();ii++){
+  for(int ii=0; ii < docsVector_.size(); ii++){
 
     //~ Suppose there is only one package element in each document
     packageElement = docsVector_[ii]->FirstChildElement("package");

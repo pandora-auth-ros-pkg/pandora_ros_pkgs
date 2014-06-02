@@ -105,7 +105,7 @@ class InterfaceTester {
     static bool checkForActionServer(std::string actionName, std::string type);
     
     /**
-     * Checks for an action server.
+     * Checks for an action server in a specific node.
      * @param actionName the action name
      * @param nodeName the name of the node acting as an action server
      * @return true if action exists
@@ -121,7 +121,7 @@ class InterfaceTester {
     static bool checkForActionClient(std::string actionName, std::string type);
     
     /**
-     * Checks for an node action client.
+     * Checks for an node action client in a specific Node.
      * @param actionName the action name
      * @param nodeName the node acting as client
      * @return true if action exists
@@ -135,7 +135,7 @@ class InterfaceTester {
     static bool checkForMaster();
     
     /**
-     * Checks if any message subscriber.
+     * Checks  any message subscriber.
      * @param topic to check if any node is subscribed
      * @return true if subscribed succesfully
      */
