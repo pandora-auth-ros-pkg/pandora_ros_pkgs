@@ -173,6 +173,9 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   ################## depth node ###################
   test/unit/depth_node/hole_detector_test.cpp
 
+  ################### rgb node ####################
+  test/unit/rgb_node/hole_detector_test.cpp
+
   ############### hole fusion node ################
   test/unit/hole_fusion_node/depth_filters_test.cpp
   test/unit/hole_fusion_node/filters_resources_test.cpp

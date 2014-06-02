@@ -238,6 +238,31 @@ namespace pandora_vision
         std::set<unsigned int>* connectorHoleMaskSet,
         const cv::Mat& image);
 
+      /**
+        @brief With an input a conveyor of holes, this method, depending on
+        the depth image's interpolation method, has holes assimilating,
+        amalgamating or being connected with holes that can be assimilated,
+        amalgamated or connected with or by them. The interpolation method is
+        a basic criterion for the mode of merging holes because the two
+        filters that verify the validity of each merger are depth-based.
+        If there is no valid depth image on which to run these filters, it is
+        sure that the depth sensor is closer to the scene it is witnessing
+        than 0.5-0.6m. In this way of operation, the merging of holes does not
+        consider employing validator filters and simply merges holes that can
+        be merged with each other (assimilated, amalgamated, or connected).
+        @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
+        merged with one another, where applicable.
+        @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
+        depth image
+        @param[in] pointCloud [const PointCloudPtr&] The interpolated point
+        cloud. Needed in the connection process.
+        @return void
+       **/
+      static void mergeHoles(HolesConveyor* conveyor,
+        const int& interpolationMethod,
+        const cv::Mat& interpolatedDepthImage,
+        const PointCloudPtr& pointCloud);
+
   };
 
 } // namespace pandora_vision

@@ -318,7 +318,7 @@ namespace pandora_vision
 
     // The first vertex of the first hole.
     // Upper right corner, going counter-clockwise
-    EXPECT_NEAR ( 100, conveyor.rectangles[0][0].x, 1 );
+    EXPECT_NEAR ( 99, conveyor.rectangles[0][0].x, 2 );
     EXPECT_NEAR ( 199, conveyor.rectangles[0][0].y, 1 );
 
     // The last vertex of the first hole
@@ -355,24 +355,24 @@ namespace pandora_vision
     EXPECT_EQ ( 390, conveyor.outlines[0].size() );
 
     // The first vertex of the first hole.
-    // Upper right corner, going counter-clockwise
-    EXPECT_NEAR ( 100, conveyor.rectangles[0][0].x, 1 );
+    // Lower right corner, going counter-clockwise
+    EXPECT_NEAR ( 199, conveyor.rectangles[0][0].x, 1 );
     EXPECT_NEAR ( 199, conveyor.rectangles[0][0].y, 1 );
 
     // The last vertex of the first hole
-    // Lower right corner, going counter-clockwise
+    // Upper right corner, going counter-clockwise
     EXPECT_NEAR ( 199, conveyor.rectangles[0][3].x, 1 );
-    EXPECT_NEAR ( 199, conveyor.rectangles[0][3].y, 1 );
+    EXPECT_NEAR ( 99, conveyor.rectangles[0][3].y, 1 );
 
     // The first vertex of the second hole
-    // Upper right corner, going counter-clockwise
-    EXPECT_NEAR ( WIDTH - 100, conveyor.rectangles[1][0].x, 1 );
+    // Lower right corner, going counter-clockwise
+    EXPECT_NEAR ( WIDTH - 1, conveyor.rectangles[1][0].x, 1 );
     EXPECT_NEAR ( HEIGHT - 1, conveyor.rectangles[1][0].y, 1 );
 
     // The last vertex of the second hole
     // Lower right corner, going counter-clockwise
     EXPECT_NEAR ( WIDTH - 1, conveyor.rectangles[1][3].x, 1);
-    EXPECT_NEAR ( HEIGHT - 1, conveyor.rectangles[1][3].y, 1 );
+    EXPECT_NEAR ( HEIGHT - 100, conveyor.rectangles[1][3].y, 1 );
 
   }
 

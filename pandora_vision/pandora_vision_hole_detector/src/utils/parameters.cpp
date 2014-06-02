@@ -233,7 +233,7 @@ namespace pandora_vision
   // outline of blobs, raycast_keypoint_partitions dictates the number of
   // rays, or equivalently, the number of partitions in which the blob is
   // partitioned in search of the blob's borders
-  int Parameters::Outline::raycast_keypoint_partitions = 8;
+  int Parameters::Outline::raycast_keypoint_partitions = 32;
 
   // Loose ends connection parameters
   int Parameters::Outline::AB_to_MO_ratio = 4;

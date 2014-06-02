@@ -381,10 +381,12 @@ namespace pandora_vision
     HolesConveyorUtils::clear(&depthHolesConveyor_);
 
     // Unpack the message
-    unpackMessage(depthCandidateHolesVector,
+    MessageConversions::unpackMessage(depthCandidateHolesVector,
       &depthHolesConveyor_,
       &interpolatedDepthImage_,
-      sensor_msgs::image_encodings::TYPE_32FC1);
+      Parameters::Image::image_representation_method,
+      sensor_msgs::image_encodings::TYPE_32FC1,
+      Parameters::Outline::raycast_keypoint_partitions);
 
     numNodesReady_++;
 
@@ -404,136 +406,6 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("depthCandidateHolesCallback");
     Timer::printAllMeansTree();
-    #endif
-  }
-
-
-
-  /**
-    @brief Recreates the HolesConveyor struct for the
-    candidate holes from the
-    vision_communications::CandidateHolerMsg message
-    @param[in]candidateHolesVector
-    [const std::vector<vision_communications::CandidateHoleMsg>&]
-    The input candidate holes
-    @param[out] conveyor [HolesConveyor*] The output conveyor
-    struct
-    @param[in] inImage [const cv::Mat&] An image used for its size.
-    It is needed if the wavelet method is used in the keypoints' extraction,
-    in order to obtain the coherent shape of holes' outline points
-    @return void
-   **/
-  void HoleFusion::fromCandidateHoleMsgToConveyor(
-    const std::vector<vision_communications::CandidateHoleMsg>&
-    candidateHolesVector,
-    HolesConveyor* conveyor,
-    const cv::Mat& inImage)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("fromCandidateHoleMsgToConveyor");
-    #endif
-
-    // Normal mode
-    if (Parameters::Image::image_representation_method == 0)
-    {
-      for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
-      {
-        // Recreate conveyor.keypoints
-        cv::KeyPoint holeKeypoint;
-        holeKeypoint.pt.x = candidateHolesVector[i].keypointX;
-        holeKeypoint.pt.y = candidateHolesVector[i].keypointY;
-        conveyor->keyPoints.push_back(holeKeypoint);
-
-        // Recreate conveyor.rectangles
-        std::vector<cv::Point2f> renctangleVertices;
-        for (unsigned int v = 0;
-          v < candidateHolesVector[i].verticesX.size(); v++)
-        {
-          cv::Point2f vertex;
-          vertex.x = candidateHolesVector[i].verticesX[v];
-          vertex.y = candidateHolesVector[i].verticesY[v];
-          renctangleVertices.push_back(vertex);
-        }
-        conveyor->rectangles.push_back(renctangleVertices);
-
-        // Recreate conveyor.outlines
-        std::vector<cv::Point2f> outlinePoints;
-        for (unsigned int o = 0;
-          o < candidateHolesVector[i].outlineX.size(); o++)
-        {
-          cv::Point2f outlinePoint;
-          outlinePoint.x = candidateHolesVector[i].outlineX[o];
-          outlinePoint.y = candidateHolesVector[i].outlineY[o];
-          outlinePoints.push_back(outlinePoint);
-        }
-        conveyor->outlines.push_back(outlinePoints);
-      }
-    }
-    // Wavelet mode
-    else if (Parameters::Image::image_representation_method == 1)
-    {
-      for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
-      {
-        // Recreate conveyor.keypoints
-        cv::KeyPoint holeKeypoint;
-        holeKeypoint.pt.x = 2 * candidateHolesVector[i].keypointX;
-        holeKeypoint.pt.y = 2 * candidateHolesVector[i].keypointY;
-        conveyor->keyPoints.push_back(holeKeypoint);
-
-        // Recreate conveyor.rectangles
-        std::vector<cv::Point2f> renctangleVertices;
-        for (unsigned int v = 0;
-          v < candidateHolesVector[i].verticesX.size(); v++)
-        {
-          cv::Point2f vertex;
-          vertex.x = 2 * candidateHolesVector[i].verticesX[v];
-          vertex.y = 2 * candidateHolesVector[i].verticesY[v];
-          renctangleVertices.push_back(vertex);
-        }
-        conveyor->rectangles.push_back(renctangleVertices);
-
-        // Recreate conveyor.outlines
-        std::vector<cv::Point2f> sparceOutlinePoints;
-        for (unsigned int o = 0;
-          o < candidateHolesVector[i].outlineX.size(); o++)
-        {
-          cv::Point2f outlinePoint;
-          outlinePoint.x = 2 * candidateHolesVector[i].outlineX[o];
-          outlinePoint.y = 2 * candidateHolesVector[i].outlineY[o];
-          sparceOutlinePoints.push_back(outlinePoint);
-        }
-
-        std::vector<cv::Point2f> outlinePoints = sparceOutlinePoints;
-
-        // Because the outline points do not constitute a coherent shape,
-        // we need to draw them, connect them linearly and then the
-        // points that are drawn will be the hole's outline points
-        cv::Mat canvas = cv::Mat::zeros(inImage.size(), CV_8UC1);
-        unsigned char* ptr = canvas.ptr();
-
-        for(unsigned int a = 0; a < sparceOutlinePoints.size(); a++)
-        {
-          unsigned int ind =
-            sparceOutlinePoints[a].x + inImage.cols * sparceOutlinePoints[a].y;
-
-          ptr[ind] = 255;
-        }
-
-        // The easiest and most efficient way to obtain the same result as
-        // if image_representation_method was 0 is to apply the raycast
-        // algorithm
-        std::vector<cv::Point2f> outline;
-        BlobDetection::raycastKeypoint(holeKeypoint,
-          &canvas,
-          Parameters::Outline::raycast_keypoint_partitions,
-          &outline);
-
-        conveyor->outlines.push_back(outline);
-      }
-    }
-
-    #ifdef DEBUG_TIME
-    Timer::tick("fromCandidateHoleMsgToConveyor");
     #endif
   }
 
@@ -652,120 +524,6 @@ namespace pandora_vision
       ROS_INFO_NAMED ("hole_detector",
         "[Hole Fusion Node] Could not find topic enhanced_holes_topic");
     }
-  }
-
-
-
-  /**
-    @brief With an input a conveyor of holes, this method, depending on
-    the depth image's interpolation method, has holes assimilating,
-    amalgamating or being connected with holes that can be assimilated,
-    amalgamated or connected with or by them. The interpolation method is
-    a basic criterion for the mode of merging holes because the two
-    filters that verify the validity of each merger are depth-based ones.
-    If there is no valid depth image on which to run these filters, it is
-    sure that the depth sensor is closer to the scene it is witnessing
-    than 0.5-0.6m. In this way of operation, the merging of holes does not
-    consider employing validator filters and simply merges holes that can
-    be merged with each other (assimilated, amalgamated, or connected).
-    @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
-    merged with one another, where applicable.
-    @return void
-   **/
-  void HoleFusion::mergeHoles(HolesConveyor* conveyor)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("mergeHoles", "processCandidateHoles");
-    #endif
-
-    // Keep a copy of the initial (not merged) candidate holes for
-    // debugging and exibition purposes
-    HolesConveyor conveyorBeforeMerge;
-
-    HolesConveyorUtils::copyTo(*conveyor, &conveyorBeforeMerge);
-
-
-    #ifdef DEBUG_SHOW
-    std::vector<std::string> msgs;
-    std::vector<cv::Mat> canvases;
-    std::vector<std::string> titles;
-
-    if(Parameters::Debug::show_merge_holes)
-    {
-      // Push back the identifier of each keypoint
-      for (int i = 0; i < conveyorBeforeMerge.keyPoints.size(); i++)
-      {
-        msgs.push_back(TOSTR(i));
-      }
-
-      canvases.push_back(
-        Visualization::showHoles(
-          "",
-          interpolatedDepthImage_,
-          conveyorBeforeMerge,
-          -1,
-          msgs));
-
-      titles.push_back(
-        TOSTR(conveyor->keyPoints.size()) + " holes before merging");
-    }
-    #endif
-
-
-    // Try to merge holes that can be assimilated, amalgamated or connected
-    if (Parameters::Depth::interpolation_method == 0)
-    {
-      for (int i = 0; i < 3; i++)
-      {
-        HoleMerger::applyMergeOperation(
-          conveyor,
-          interpolatedDepthImage_,
-          pointCloud_,
-          i);
-      }
-    }
-    else
-    {
-      for (int i = 0; i < 3; i++)
-      {
-        HoleMerger::applyMergeOperationWithoutValidation(
-          conveyor,
-          interpolatedDepthImage_,
-          pointCloud_,
-          i);
-      }
-    }
-
-
-    #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_merge_holes)
-    {
-      msgs.clear();
-      // Push back the identifier of each keypoint
-      for (int i = 0; i < conveyor->keyPoints.size(); i++)
-      {
-        msgs.push_back(TOSTR(i));
-      }
-
-      canvases.push_back(
-        Visualization::showHoles(
-          "",
-          interpolatedDepthImage_,
-          *conveyor,
-          -1,
-          msgs));
-
-      titles.push_back(
-        TOSTR(conveyor->keyPoints.size()) + " holes after merging");
-
-      Visualization::multipleShow("Merged Keypoints",
-        canvases, titles, Parameters::Debug::show_merge_holes_size, 1);
-    }
-    #endif
-
-    #ifdef DEBUG_TIME
-    Timer::tick("mergeHoles");
-    #endif
   }
 
 
@@ -1098,15 +856,11 @@ namespace pandora_vision
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
       &rgbdHolesConveyor);
 
-    /*//////////////////////////////////////////////////////////////////////////
-    // Uncomment for testing artificial holes' merging process
-    HolesConveyor dummy;
-    testDummyHolesMerging(&dummy);
-    return;
-    //////////////////////////////////////////////////////////////////////////*/
-
     // Apply the {assimilation, amalgamation, connection} processes
-    mergeHoles(&rgbdHolesConveyor);
+    HoleMerger::mergeHoles(&rgbdHolesConveyor,
+      Parameters::Depth::interpolation_method,
+      interpolatedDepthImage_,
+      pointCloud_);
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
@@ -1336,10 +1090,12 @@ namespace pandora_vision
     HolesConveyorUtils::clear(&rgbHolesConveyor_);
 
     // Unpack the message
-    unpackMessage(rgbCandidateHolesVector,
+    MessageConversions::unpackMessage(rgbCandidateHolesVector,
       &rgbHolesConveyor_,
       &rgbImage_,
-      sensor_msgs::image_encodings::TYPE_8UC3);
+      Parameters::Image::image_representation_method,
+      sensor_msgs::image_encodings::TYPE_8UC3,
+      Parameters::Outline::raycast_keypoint_partitions);
 
     numNodesReady_++;
 
@@ -1412,47 +1168,6 @@ namespace pandora_vision
     unlockPublisher_.publish(unlockMsg);
   }
 
-
-
-  /**
-    @brief Unpacks the the HolesConveyor struct for the
-    candidate holes, the interpolated depth image and the point cloud
-    from the vision_communications::CandidateHolesVectorMsg message
-    @param[in] holesMsg
-    [vision_communications::CandidateHolesVectorMsg&] The input
-    candidate holes message obtained through the depth node
-    @param[out] conveyor [HolesConveyor*] The output conveyor
-    struct
-    @param[out] interpolatedDepthImage [cv::Mat*] The output interpolated
-    depth image
-    @return void
-   **/
-  void HoleFusion::unpackMessage(
-    const vision_communications::CandidateHolesVectorMsg& holesMsg,
-    HolesConveyor* conveyor,
-    cv::Mat* image,
-    const std::string& encoding)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("unpackMessage");
-    #endif
-
-    // Unpack the image
-    MessageConversions::extractImageFromMessageContainer(
-      holesMsg,
-      image,
-      encoding);
-
-    // Recreate the conveyor
-    fromCandidateHoleMsgToConveyor(
-      holesMsg.candidateHoles,
-      conveyor,
-      *image);
-
-    #ifdef DEBUG_TIME
-    Timer::tick("unpackMessage");
-    #endif
-  }
 
 
   /**
@@ -1645,94 +1360,6 @@ namespace pandora_vision
     #endif
 
     return valid;
-  }
-
-
-
-  /**
-    @brief Tests the merging operations on artificial holes
-    @param[out] dummy [HolesConveyor*] The hole candidates
-    @return void
-   **/
-  void HoleFusion::testDummyHolesMerging(HolesConveyor* dummy)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("testDummyHolesMerging", "processCandidateHoles");
-    #endif
-
-    // Invalid
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(20, 20), cv::Point2f(30, 30), 50, 50, 30, 30, dummy);
-
-    // Invalid
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(80, 80), cv::Point2f(90, 90), 50, 50, 30, 30, dummy);
-
-
-    // 0-th assimilator - amalgamator - connector
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(370.0, 130.0), cv::Point2f(372.0, 132.0), 80, 80, 76, 76,
-      dummy);
-
-    // 0-th overlapper
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(372.0, 132.0), cv::Point2f(374.0, 134.0), 80, 80, 76, 76,
-      dummy);
-
-    // 0-th assimilable
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(380.0, 140.0), cv::Point2f(382.0, 142.0), 20, 20, 16, 16,
-      dummy);
-
-    // 0-th amalgamatable
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(420.0, 140.0), cv::Point2f(422.0, 142.0), 120, 40, 116, 36,
-      dummy);
-
-    // 0-th connectable
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(510.0, 80.0), cv::Point2f(512.0, 82.0), 40, 40, 36, 36,
-      dummy);
-
-
-    // 1-st assimilator - amalgamator - connector
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(300.0, 300.0), cv::Point2f(302.0, 302.0), 100, 100, 96, 96,
-      dummy);
-
-    // 1-st connectable
-    HolesConveyorUtils::appendDummyConveyor(
-      cv::Point2f(410.0, 350.0), cv::Point2f(412.0, 352.0), 50, 50, 46, 46,
-      dummy);
-
-
-    HolesConveyorUtils::shuffle(dummy);
-
-    ROS_INFO_NAMED ("hole_detector",
-      "keypoints before: %d ", HolesConveyorUtils::size(*dummy));
-
-    std::vector<std::string> msgs;
-    Visualization::showHoles("before", interpolatedDepthImage_, *dummy,
-      1, msgs);
-
-    for (int i = 0; i < 3; i++)
-    {
-      HoleMerger::applyMergeOperation(
-        dummy,
-        interpolatedDepthImage_,
-        pointCloud_,
-        i);
-    }
-
-    ROS_INFO_NAMED ("hole_detector",
-      "keypoints after: %d ", HolesConveyorUtils::size(*dummy));
-
-    Visualization::showHoles("after", interpolatedDepthImage_, *dummy,
-      1, msgs);
-
-    #ifdef DEBUG_TIME
-    Timer::tick("testDummyHolesMerging");
-    #endif
   }
 
 } // namespace pandora_vision

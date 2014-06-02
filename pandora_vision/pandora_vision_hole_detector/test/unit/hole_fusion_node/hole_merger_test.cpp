@@ -535,7 +535,7 @@ namespace pandora_vision
         i);
     }
 
-    // The number of holes should have shrunk by one
+    // The number of holes should have shrunk to one
     EXPECT_EQ ( 1, conveyor.keyPoints.size() );
   }
 
@@ -750,7 +750,7 @@ namespace pandora_vision
         i);
     }
 
-    // The number of holes should have shrunk by one
+    // The number of holes should have shrunk to one
     EXPECT_EQ ( 1, conveyor.keyPoints.size() );
   }
 
@@ -958,6 +958,49 @@ namespace pandora_vision
     EXPECT_GT ( connector.keyPoints[0].pt.x , conveyor.keyPoints[0].pt.x );
     EXPECT_LT ( connector.keyPoints[0].pt.y , conveyor.keyPoints[0].pt.y );
 
+  }
+
+
+
+  //! Test HoleMerger::mergeHoles
+  TEST_F ( HoleMergerTest, MergeHolesTest )
+  {
+    // Keep a backup of the original conveyor
+    HolesConveyor originConveyor;
+    HolesConveyorUtils::copyTo( conveyor, &originConveyor );
+
+    // The interpolation method. 0 for using depth filters validation
+    int interpolationMethod = 0;
+
+    // Restore conveyor to its original state
+    //HolesConveyorUtils::replace( originConveyor, &conveyor );
+
+    // Run HoleMerger::mergeHoles
+    HoleMerger::mergeHoles(
+      &conveyor,
+      interpolationMethod,
+      squares_,
+      cloud);
+
+    // The number of holes should have shrunk to one
+    EXPECT_EQ ( 1, conveyor.keyPoints.size() );
+
+
+    // The interpolation method. 1 for not using depth filters validation
+    interpolationMethod = 1;
+
+    // Restore conveyor to its original state
+    HolesConveyorUtils::replace( originConveyor, &conveyor );
+
+    // Run HoleMerger::mergeHoles
+    HoleMerger::mergeHoles(
+      &conveyor,
+      interpolationMethod,
+      squares_,
+      cloud);
+
+    // The number of holes should have shrunk to one
+    EXPECT_EQ ( 1, conveyor.keyPoints.size() );
   }
 
 }  // namespace pandora_vision

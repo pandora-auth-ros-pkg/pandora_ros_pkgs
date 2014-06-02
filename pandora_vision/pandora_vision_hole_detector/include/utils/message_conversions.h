@@ -39,6 +39,7 @@
 #define UTILS_MESSAGE_CONVERSIONS_H
 
 #include "utils/defines.h"
+#include "utils/blob_detection.h"
 #include "utils/holes_conveyor.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
 
@@ -174,6 +175,58 @@ namespace pandora_vision
       static void extractImageFromMessageContainer(
         const vision_communications::CandidateHolesVectorMsg& msg,
         cv::Mat* image, const std::string& encoding);
+
+      /**
+        @brief Recreates the HolesConveyor struct for the candidate holes
+        from the vision_communications::CandidateHolerMsg message
+        @param[in] candidateHolesVector
+        [const std::vector<vision_communications::CandidateHoleMsg>&]
+        The input candidate holes
+        @param[out] conveyor [HolesConveyor*] The output conveyor
+        struct
+        @param[in] inImage [const cv::Mat&] An image used for its size.
+        It is needed if the wavelet method is used in the keypoints' extraction,
+        in order to obtain the coherent shape of holes' outline points
+        @param[in] representationMethod [const int&] The @param inImage
+        representation method. 0 for normal mode, 1 for wavelet mode
+        @param[in] raycastKeypointPartitions [const int&] The number of rays
+        used, if @param representationMethod = 1, in order to recreate a
+        blob's outline
+        @return void
+       **/
+      static void fromCandidateHoleMsgToConveyor(
+        const std::vector<vision_communications::CandidateHoleMsg>&
+        candidateHolesVector,
+        HolesConveyor* conveyor,
+        const cv::Mat& inImage,
+        const int& representationMethod,
+        const int& raycastKeypointPartitions);
+
+      /**
+        @brief Unpacks the the HolesConveyor struct for the
+        candidate holes, the interpolated depth image or the RGB image
+        from the vision_communications::CandidateHolesVectorMsg message
+        @param[in] holesMsg
+        [vision_communications::CandidateHolesVectorMsg&] The input
+        candidate holes message obtained through the depth node
+        @param[out] conveyor [HolesConveyor*] The output conveyor
+        struct
+        @param[out] image [cv::Mat*] The output image
+        @param[in] representationMethod [const int&] The @param inImage
+        representation method. 0 for normal mode, 1 for wavelet mode
+        @param[in] encoding [const std::string&] The encoding used for
+        @param[in] raycastKeypointPartitions [const int&] The number of rays
+        used, if @param representationMethod = 1, in order to recreate a
+        blob's outline
+        @return void
+       **/
+      static void unpackMessage(
+        const vision_communications::CandidateHolesVectorMsg& holesMsg,
+        HolesConveyor* conveyor,
+        cv::Mat* image,
+        const int& representationMethod,
+        const std::string& encoding,
+        const int& raycastKeypointPartitions);
 
   };
 

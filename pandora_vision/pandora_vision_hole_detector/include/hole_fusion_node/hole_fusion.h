@@ -353,13 +353,6 @@ namespace pandora_vision
       std::map<int, float> validateHoles(
         const std::vector<std::vector<float> >& probabilitiesVector2D);
 
-      /**
-        @brief Tests the merging operations on artificial holes
-        @param[out] dummy [HolesConveyor*] The hole candidates
-        @return void
-       **/
-      void testDummyHolesMerging(HolesConveyor* dummy);
-
 
     public:
 

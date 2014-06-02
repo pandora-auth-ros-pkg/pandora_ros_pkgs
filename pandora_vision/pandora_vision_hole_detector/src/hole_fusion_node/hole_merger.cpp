@@ -327,11 +327,9 @@ namespace pandora_vision
           // Remove the activeId-th candidate hole from its former position
           HolesConveyorUtils::removeHole(rgbdHolesConveyor, activeId);
 
-
           // Remove the activeId-th set from its position and append it
           holesMasksSetVector.push_back(holesMasksSetVector[activeId]);
           holesMasksSetVector.erase(holesMasksSetVector.begin() + activeId);
-
 
           // Since the candidate hole was appended at the end of the
           // rgbdHolesConveyor, the finish vector needs to be shifted
@@ -1198,6 +1196,126 @@ namespace pandora_vision
 
     #ifdef DEBUG_TIME
     Timer::tick("connectOnce");
+    #endif
+  }
+
+
+
+  /**
+    @brief With an input a conveyor of holes, this method, depending on
+    the depth image's interpolation method, has holes assimilating,
+    amalgamating or being connected with holes that can be assimilated,
+    amalgamated or connected with or by them. The interpolation method is
+    a basic criterion for the mode of merging holes because the two
+    filters that verify the validity of each merger are depth-based.
+    If there is no valid depth image on which to run these filters, it is
+    sure that the depth sensor is closer to the scene it is witnessing
+    than 0.5-0.6m. In this way of operation, the merging of holes does not
+    consider employing validator filters and simply merges holes that can
+    be merged with each other (assimilated, amalgamated, or connected).
+    @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
+    merged with one another, where applicable.
+    @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
+    depth image
+    @param[in] pointCloud [const PointCloudPtr&] The interpolated point
+    cloud. Needed in the connection process.
+    @return void
+   **/
+  void HoleMerger::mergeHoles(HolesConveyor* conveyor,
+    const int& interpolationMethod,
+    const cv::Mat& interpolatedDepthImage,
+    const PointCloudPtr& pointCloud)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("mergeHoles", "processCandidateHoles");
+    #endif
+
+    // Keep a copy of the initial (not merged) candidate holes for
+    // debugging and exibition purposes
+    HolesConveyor conveyorBeforeMerge;
+
+    HolesConveyorUtils::copyTo(*conveyor, &conveyorBeforeMerge);
+
+    #ifdef DEBUG_SHOW
+    std::vector<std::string> msgs;
+    std::vector<cv::Mat> canvases;
+    std::vector<std::string> titles;
+
+    if(Parameters::Debug::show_merge_holes)
+    {
+      // Push back the identifier of each keypoint
+      for (int i = 0; i < conveyorBeforeMerge.keyPoints.size(); i++)
+      {
+        msgs.push_back(TOSTR(i));
+      }
+
+      canvases.push_back(
+        Visualization::showHoles(
+          "",
+          interpolatedDepthImage,
+          conveyorBeforeMerge,
+          -1,
+          msgs));
+
+      titles.push_back(
+        TOSTR(conveyor->keyPoints.size()) + " holes before merging");
+    }
+    #endif
+
+
+    // Try to merge holes that can be assimilated, amalgamated or connected
+    if (interpolationMethod == 0)
+    {
+      for (int i = 0; i < 3; i++)
+      {
+        HoleMerger::applyMergeOperation(
+          conveyor,
+          interpolatedDepthImage,
+          pointCloud,
+          i);
+      }
+    }
+    else
+    {
+      for (int i = 0; i < 3; i++)
+      {
+        HoleMerger::applyMergeOperationWithoutValidation(
+          conveyor,
+          interpolatedDepthImage,
+          pointCloud,
+          i);
+      }
+    }
+
+
+    #ifdef DEBUG_SHOW
+    if(Parameters::Debug::show_merge_holes)
+    {
+      msgs.clear();
+      // Push back the identifier of each keypoint
+      for (int i = 0; i < conveyor->keyPoints.size(); i++)
+      {
+        msgs.push_back(TOSTR(i));
+      }
+
+      canvases.push_back(
+        Visualization::showHoles(
+          "",
+          interpolatedDepthImage,
+          *conveyor,
+          -1,
+          msgs));
+
+      titles.push_back(
+        TOSTR(conveyor->keyPoints.size()) + " holes after merging");
+
+      Visualization::multipleShow("Merged Keypoints",
+        canvases, titles, Parameters::Debug::show_merge_holes_size, 1);
+    }
+    #endif
+
+    #ifdef DEBUG_TIME
+    Timer::tick("mergeHoles");
     #endif
   }
 

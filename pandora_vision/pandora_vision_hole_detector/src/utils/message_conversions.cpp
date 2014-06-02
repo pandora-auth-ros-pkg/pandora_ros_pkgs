@@ -361,4 +361,188 @@ namespace pandora_vision
     #endif
   }
 
+
+
+  /**
+    @brief Recreates the HolesConveyor struct for the candidate holes
+    from the vision_communications::CandidateHolerMsg message
+    @param[in] candidateHolesVector
+    [const std::vector<vision_communications::CandidateHoleMsg>&]
+    The input candidate holes
+    @param[out] conveyor [HolesConveyor*] The output conveyor
+    struct
+    @param[in] inImage [const cv::Mat&] An image used for its size.
+    It is needed if the wavelet method is used in the keypoints' extraction,
+    in order to obtain the coherent shape of holes' outline points
+    @param[in] representationMethod [const int&] The @param inImage
+    representation method. 0 for normal mode, 1 for wavelet mode
+    @param[in] raycastKeypointPartitions [const int&] The number of rays
+    used, if @param representationMethod = 1, in order to recreate a
+    blob's outline
+    @return void
+   **/
+  void MessageConversions::fromCandidateHoleMsgToConveyor(
+    const std::vector<vision_communications::CandidateHoleMsg>&
+    candidateHolesVector,
+    HolesConveyor* conveyor,
+    const cv::Mat& inImage,
+    const int& representationMethod,
+    const int& raycastKeypointPartitions)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("fromCandidateHoleMsgToConveyor", "unpackMessage");
+    #endif
+
+    // Normal mode
+    if (representationMethod == 0)
+    {
+      for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
+      {
+        // Recreate conveyor.keypoints
+        cv::KeyPoint holeKeypoint;
+        holeKeypoint.pt.x = candidateHolesVector[i].keypointX;
+        holeKeypoint.pt.y = candidateHolesVector[i].keypointY;
+        conveyor->keyPoints.push_back(holeKeypoint);
+
+        // Recreate conveyor.rectangles
+        std::vector<cv::Point2f> renctangleVertices;
+        for (unsigned int v = 0;
+          v < candidateHolesVector[i].verticesX.size(); v++)
+        {
+          cv::Point2f vertex;
+          vertex.x = candidateHolesVector[i].verticesX[v];
+          vertex.y = candidateHolesVector[i].verticesY[v];
+          renctangleVertices.push_back(vertex);
+        }
+        conveyor->rectangles.push_back(renctangleVertices);
+
+        // Recreate conveyor.outlines
+        std::vector<cv::Point2f> outlinePoints;
+        for (unsigned int o = 0;
+          o < candidateHolesVector[i].outlineX.size(); o++)
+        {
+          cv::Point2f outlinePoint;
+          outlinePoint.x = candidateHolesVector[i].outlineX[o];
+          outlinePoint.y = candidateHolesVector[i].outlineY[o];
+          outlinePoints.push_back(outlinePoint);
+        }
+        conveyor->outlines.push_back(outlinePoints);
+      }
+    }
+    // Wavelet mode
+    else if (representationMethod == 1)
+    {
+      for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
+      {
+        // Recreate conveyor.keypoints
+        cv::KeyPoint holeKeypoint;
+        holeKeypoint.pt.x = 2 * candidateHolesVector[i].keypointX;
+        holeKeypoint.pt.y = 2 * candidateHolesVector[i].keypointY;
+        conveyor->keyPoints.push_back(holeKeypoint);
+
+        // Recreate conveyor.rectangles
+        std::vector<cv::Point2f> renctangleVertices;
+        for (unsigned int v = 0;
+          v < candidateHolesVector[i].verticesX.size(); v++)
+        {
+          cv::Point2f vertex;
+          vertex.x = 2 * candidateHolesVector[i].verticesX[v];
+          vertex.y = 2 * candidateHolesVector[i].verticesY[v];
+          renctangleVertices.push_back(vertex);
+        }
+        conveyor->rectangles.push_back(renctangleVertices);
+
+        // Recreate conveyor.outlines
+        std::vector<cv::Point2f> sparceOutlinePoints;
+        for (unsigned int o = 0;
+          o < candidateHolesVector[i].outlineX.size(); o++)
+        {
+          cv::Point2f outlinePoint;
+          outlinePoint.x = 2 * candidateHolesVector[i].outlineX[o];
+          outlinePoint.y = 2 * candidateHolesVector[i].outlineY[o];
+          sparceOutlinePoints.push_back(outlinePoint);
+        }
+
+        std::vector<cv::Point2f> outlinePoints = sparceOutlinePoints;
+
+        // Because the outline points do not constitute a coherent shape,
+        // we need to draw them, connect them linearly and then the
+        // points that are drawn will be the hole's outline points
+        cv::Mat canvas = cv::Mat::zeros(inImage.size(), CV_8UC1);
+        unsigned char* ptr = canvas.ptr();
+
+        for(unsigned int a = 0; a < sparceOutlinePoints.size(); a++)
+        {
+          unsigned int ind =
+            sparceOutlinePoints[a].x + inImage.cols * sparceOutlinePoints[a].y;
+
+          ptr[ind] = 255;
+        }
+
+        // The easiest and most efficient way to obtain the same result as
+        // if image_representation_method was 0 is to apply the raycast
+        // algorithm
+        std::vector<cv::Point2f> outline;
+        BlobDetection::raycastKeypoint(holeKeypoint,
+          &canvas,
+          raycastKeypointPartitions,
+          &outline);
+
+        conveyor->outlines.push_back(outline);
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("fromCandidateHoleMsgToConveyor");
+    #endif
+  }
+
+
+
+  /**
+    @brief Unpacks the the HolesConveyor struct for the
+    candidate holes, the interpolated depth image or the RGB image
+    from the vision_communications::CandidateHolesVectorMsg message
+    @param[in] holesMsg
+    [vision_communications::CandidateHolesVectorMsg&] The input
+    candidate holes message obtained through the depth node
+    @param[out] conveyor [HolesConveyor*] The output conveyor
+    struct
+    @param[out] image [cv::Mat*] The output image
+    @param[in] representationMethod [const int&] The @param inImage
+    representation method. 0 for normal mode, 1 for wavelet mode
+    @param[in] encoding [const std::string&] The encoding used for
+    @param[in] raycastKeypointPartitions [const int&] The number of rays
+    used, if @param representationMethod = 1, in order to recreate a
+    blob's outline
+    @return void
+   **/
+  void MessageConversions::unpackMessage(
+    const vision_communications::CandidateHolesVectorMsg& holesMsg,
+    HolesConveyor* conveyor,
+    cv::Mat* image,
+    const int& representationMethod,
+    const std::string& encoding,
+    const int& raycastKeypointPartitions)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("unpackMessage");
+    #endif
+
+    // Unpack the image
+    extractImageFromMessageContainer(holesMsg, image, encoding);
+
+    // Recreate the conveyor
+    fromCandidateHoleMsgToConveyor(
+      holesMsg.candidateHoles,
+      conveyor,
+      *image,
+      representationMethod,
+      raycastKeypointPartitions);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("unpackMessage");
+    #endif
+  }
+
 } // namespace pandora_vision
