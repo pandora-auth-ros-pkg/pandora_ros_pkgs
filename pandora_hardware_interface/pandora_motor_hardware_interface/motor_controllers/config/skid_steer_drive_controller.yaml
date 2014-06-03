@@ -1,11 +1,42 @@
 skid_steer_drive_controller:
   type: pandora_motor/SkidSteerDriveController
-  wheel_separation: 0.36
+  left_front_wheel: left_front_wheel_joint
+  right_front_wheel: right_front_wheel_joint
+  left_rear_wheel: left_rear_wheel_joint
+  right_rear_wheel: right_rear_wheel_joint
+  publish_rate: 50
+  wheel_separation_multiplier: 1
+  wheel_radius_multiplier: 1
   wheel_radius: 0.0975
-  max_angular_velocity: 6135
-  gearbox_ratio: 113
-  joints:
-    - movement_left_front_joint
-    - movement_right_front_joint
-    - movement_left_rear_joint
-    - movement_right_rear_joint
+  cmd_vel_timeout: 3
+  base_frame_id: base_link
+  linear:
+    x:
+      has_velocity_limits: true
+      has_acceleration_limits: false
+      max_velocity: 0.5
+      min_velocity: -0.5
+      max_acceleration: 1
+      min_acceleration: 1
+  angular:
+    z:
+      has_velocity_limits: true
+      has_acceleration_limits: false
+      max_velocity: 0.8
+      min_velocity: -0.8
+      max_acceleration: 1
+      min_acceleration: 1
+  pose_covariance_diagonal:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+  twist_covariance_diagonal:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0

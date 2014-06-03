@@ -8,6 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
   serial
   geometry_msgs
   pluginlib
+  urdf
+  angles
+  tf
+  nav_msgs
 )
 
 set(THIS_PACKAGE_INCLUDE_DIRS
@@ -27,6 +31,10 @@ catkin_package(
     serial
     geometry_msgs
     pluginlib
+    urdf
+    angles
+    tf
+    nav_msgs
   LIBRARIES
     skid_steer_drive_controller
 #  DEPENDS
@@ -51,13 +59,13 @@ set(ROSLINT_CPP_OPTS
   
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  motor_hardware_interface/*.h 
+  motor_hardware_interface/*.h
   motor_hardware_interface/*.cpp
-  motor_controllers/*.h 
-  motor_controllers/*.cpp
-  orangutan_interface/*.h 
+  #~ motor_controllers/*.h
+  #~ motor_controllers/*.cpp
+  orangutan_interface/*.h
   orangutan_interface/*.cpp
-  epos_interface/*.h 
+  epos_interface/*.h
   epos_interface/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

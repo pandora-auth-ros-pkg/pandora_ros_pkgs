@@ -62,6 +62,8 @@ namespace motor
       double position_[4];
       double velocity_[4];
       double effort_[4];
+      double maxRPM_;
+      double gearboxRatio_;
 
       void readJointNameFromParamServer();
 
@@ -69,7 +71,7 @@ namespace motor
       explicit MotorHardwareInterface(
         ros::NodeHandle nodeHandle);
       ~MotorHardwareInterface();
-      void read();
+      void read(const ros::Duration& period);
       void write();
   };
 }  // namespace motor

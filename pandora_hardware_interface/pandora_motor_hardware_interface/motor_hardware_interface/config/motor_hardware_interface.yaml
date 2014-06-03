@@ -1,3 +1,5 @@
+max_RPM: 6135.0
+gearbox_ratio: 113.0
 motor_joints:
   robot_movement_joints:
     left_front_joint: left_front_wheel_joint

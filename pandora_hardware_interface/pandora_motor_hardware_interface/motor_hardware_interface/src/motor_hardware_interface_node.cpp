@@ -62,7 +62,7 @@
       period = now - last;
       last = now;
 
-      motorHardwareInterface.read();
+      motorHardwareInterface.read(period);
       controllerManager.update(now, period);
       motorHardwareInterface.write();
       ros::Duration(0.1).sleep();

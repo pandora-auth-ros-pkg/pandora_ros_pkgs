@@ -47,6 +47,8 @@ namespace motor
   {
     motors_ = new SerialEposHandler("/dev/ttyUSB0", 115200, 500);
     readJointNameFromParamServer();
+    nodeHandle_.getParam("max_RPM", maxRPM_);
+    nodeHandle_.getParam("gearbox_ratio", gearboxRatio_);
 
     // connect and register the joint state interface
     for (int ii = 0; ii < jointNames_.size(); ii++)
@@ -78,20 +80,33 @@ namespace motor
   {
   }
 
-  void MotorHardwareInterface::read()
+  void MotorHardwareInterface::read(const ros::Duration& period)
   {
     int feedback[4];
     motors_->getRPM(&feedback[2], &feedback[0], &feedback[3], &feedback[1]);
 
     for (int ii = 0; ii < 4; ii++)
     {
-      velocity_[ii] = static_cast<double>(feedback[ii]) / 113;
+      velocity_[ii] = static_cast<double>(feedback[ii]) / gearboxRatio_
+        / 30 * 3.14;
+      position_[ii] = position_[ii] + period.toSec() * velocity_[ii];
     }
   }
 
   void MotorHardwareInterface::write()
   {
-    motors_->writeRPM(command_[0], command_[1]);
+    double RPMCommand[2];
+    for (int ii = 0; ii < 2; ii++)
+    {
+      RPMCommand[ii] = command_[ii] * gearboxRatio_ * 30 / 3.14;
+      if (fabs(RPMCommand[ii]) > maxRPM_)
+      {
+        ROS_DEBUG_STREAM("Limiting wheel speed, it's to high");
+        RPMCommand[ii] = copysign(maxRPM_, RPMCommand[ii]);
+      }
+    }
+    ROS_DEBUG_STREAM("Commands: " << RPMCommand[0] << ", " << RPMCommand[1]);
+    motors_->writeRPM(RPMCommand[0], RPMCommand[1]);
   }
 
   void MotorHardwareInterface::readJointNameFromParamServer()
