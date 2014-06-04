@@ -78,6 +78,10 @@ namespace pandora_gazebo_interface
     transmissions_ = transmissions ; 
     
     // ------------------------------------------------------------------------
+    
+    world_ = parentModel_ ->GetWorld ( ) ; 
+    
+    // ------------------------------------------------------------------------
   
     if ( ! initLinks ( ) ) {
   
@@ -149,7 +153,7 @@ namespace pandora_gazebo_interface
     
     // ------------------------------------------------------------------------
   
-    readTime_ = time ; 
+    readTime_ = gazebo ::common ::Time ( time .sec , time .nsec ) ; 
     readPeriod_ = period ; 
     
     // ------------------------------------------------------------------------
@@ -173,7 +177,7 @@ namespace pandora_gazebo_interface
     
     // ------------------------------------------------------------------------
   
-    writeTime_ = time ; 
+    writeTime_ = gazebo ::common ::Time ( time .sec , time .nsec ) ; 
     writePeriod_ = period ; 
     
     // ------------------------------------------------------------------------
@@ -195,7 +199,9 @@ namespace pandora_gazebo_interface
   
     // Number of links
     linkNum_ = 1 ; //FIXME
-    linkUpdateRate_ = 50 ; //FIXME
+    
+    linkUpdateRate_ = gazebo ::common ::Time ( 1 / 50.0 ) ; //FIXME
+    linkLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
     
     // ------------------------------------------------------------------------
     
@@ -267,7 +273,9 @@ namespace pandora_gazebo_interface
     // Number of joints
     jointNum_ = 13 ; //FIXME
     //jointNum_ = transmissions .size ( ) ; 
-    jointUpdateRate_ = 50 ; //FIXME
+    
+    jointUpdateRate_ = gazebo ::common ::Time ( 1 / 50.0 ) ; //FIXME
+    jointLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
     
     // ------------------------------------------------------------------------
     
@@ -290,7 +298,9 @@ namespace pandora_gazebo_interface
     
     jointCommand_ . resize ( jointNum_ ) ; 
     
-    wheel_velocity_multiplier_ . resize ( jointNum_ ) ; 
+    wheelVelocityMultiplier_ = 1.0 ; //FIXME
+    wheelRadius_ = 0.09794 ; //FIXME
+    wheelSeparation_ = 0.344 ; //FIXME
     
     // ------------------------------------------------------------------------
     
@@ -408,8 +418,6 @@ namespace pandora_gazebo_interface
       jointEffortLimit_ [ i ] = 100.0 ; //FIXME
     
       jointControlMethod_ [ i ] = VELOCITY ; //FIXME
-      
-      wheel_velocity_multiplier_ [ i ] = 22.5 / 255.0 ; //FIXME
     
     }
     
@@ -667,14 +675,18 @@ namespace pandora_gazebo_interface
   
     // Number of batteries and range sensors
     batteryNum_ = 2 ; //FIXME
+    
     rangeSensorNum_ = 2 ; //FIXME
     
     // ------------------------------------------------------------------------
   
     // Update rates of read methods
       
-    batteryUpdateRate_ = 1 ; //FIXME
-    rangeSensorUpdateRate_ = 10 ; //FIXME
+    batteryUpdateRate_ = gazebo ::common ::Time ( 1 / 1.0 ) ; //FIXME
+    batteryLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
+    
+    rangeSensorUpdateRate_ = gazebo ::common ::Time ( 1 / 2.0 ) ; //FIXME
+    rangeSensorLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
     
     // ------------------------------------------------------------------------
     
@@ -682,6 +694,9 @@ namespace pandora_gazebo_interface
     batteryData_ .resize ( batteryNum_ ) ; 
     batteryName_ .resize ( batteryNum_ ) ; 
     batteryVoltage_ .resize ( batteryNum_ ) ; 
+    batteryVoltageMax_ .resize ( batteryNum_ ) ; 
+    batteryVoltageMin_ .resize ( batteryNum_ ) ; 
+    batteryDuration_ .resize ( batteryNum_ ) ; 
     
     rangeSensorData_ .resize ( rangeSensorNum_ ) ; 
     rangeSensorName_ .resize ( rangeSensorNum_ ) ; 
@@ -731,7 +746,11 @@ namespace pandora_gazebo_interface
     batteryName_ [ 0 ] = "/PSU_battery" ; //FIXME
     batteryData_ [ 0 ] .name = batteryName_ [ 0 ] ; 
     
-    batteryVoltage_ [ 0 ] = 24.0 ; //FIXME
+    batteryVoltageMax_ [ 0 ] = 24.0 ; //FIXME
+    batteryVoltageMin_ [ 0 ] = 18.0 ; //FIXME
+    batteryDuration_ [ 0 ] = 60.0 ; //FIXME
+    
+    batteryVoltage_ [ 0 ] = batteryVoltageMax_ [ 0 ] ; 
     batteryData_ [ 0 ] .voltage = & batteryVoltage_ [ 0 ] ; 
     
     // ------------------------------------------------------------------------
@@ -739,7 +758,11 @@ namespace pandora_gazebo_interface
     batteryName_ [ 1 ] = "/motors_battery" ; //FIXME
     batteryData_ [ 1 ] .name = batteryName_ [ 1 ] ; 
     
-    batteryVoltage_ [ 1 ] = 24.0 ; //FIXME
+    batteryVoltageMax_ [ 1 ] = 24.0 ; //FIXME
+    batteryVoltageMin_ [ 1 ] = 18.0 ; //FIXME
+    batteryDuration_ [ 1 ] = 45.0 ; //FIXME
+    
+    batteryVoltage_ [ 1 ] = batteryVoltageMax_ [ 1 ] ; 
     batteryData_ [ 1 ] .voltage = & batteryVoltage_ [ 1 ] ; 
     
     // ------------------------------------------------------------------------
@@ -771,7 +794,8 @@ namespace pandora_gazebo_interface
     for ( unsigned int i = 0 ; i < rangeSensorNum_ ; i ++ ) { 
     
       rangeSensorRadiationType_ [ i ] = 0 ; //FIXME
-      rangeSensorData_ [ i ] .radiationType = & rangeSensorRadiationType_ [ i ] ; 
+      rangeSensorData_ [ i ] .radiationType = 
+      & rangeSensorRadiationType_ [ i ] ; 
       
       rangeSensorFOV_ [ i ] = 80.0 ; //FIXME
       rangeSensorData_ [ i ] .fieldOfView = & rangeSensorFOV_ [ i ] ; 
@@ -812,16 +836,23 @@ namespace pandora_gazebo_interface
   
     // Number of co2 , thermal and microphone sensors
     co2SensorNum_ = 1 ; //FIXME
+    
     thermalSensorNum_ = 3 ; //FIXME
+    
     microphoneSensorNum_ = 1 ; //FIXME
     
     // ------------------------------------------------------------------------
   
     // Update rates of read methods
       
-    co2SensorUpdateRate_ = 5 ; //FIXME
-    thermalSensorUpdateRate_ = 30 ; //FIXME
-    microphoneSensorUpdateRate_ = 10 ; //FIXME
+    co2SensorUpdateRate_ = gazebo ::common ::Time ( 1 / 2.0 ) ; //FIXME
+    co2SensorLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
+    
+    thermalSensorUpdateRate_ = gazebo ::common ::Time ( 1 / 1.0 ) ; //FIXME
+    thermalSensorLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
+    
+    microphoneSensorUpdateRate_ = gazebo ::common ::Time ( 1 / 2.0 ) ; //FIXME
+    microphoneSensorLastUpdateTime_ = world_ ->GetSimTime ( ) ; 
     
     // ------------------------------------------------------------------------
     
@@ -1186,17 +1217,25 @@ namespace pandora_gazebo_interface
     
     // ------------------------------------------------------------------------
   
-    if ( ! fmod ( ( readTime_ .nsec / 1000000.0 ) , 
-                  ( 1.0 / batteryUpdateRate_ ) ) )
+    if ( ( batteryLastUpdateTime_ + batteryUpdateRate_ ) < 
+         readTime_ ) { 
     
       readBatteries ( ) ; 
+      
+      batteryLastUpdateTime_ = readTime_ ; 
+      
+    }
     
     // ------------------------------------------------------------------------
   
-    if ( ! fmod ( ( readTime_ .nsec / 1000000.0 ) , 
-                  ( 1.0 / rangeSensorUpdateRate_ ) ) ) 
-  
+    if ( ( rangeSensorLastUpdateTime_ + rangeSensorUpdateRate_ ) < 
+         readTime_ ) { 
+    
       readRangeSensors ( ) ; 
+      
+      rangeSensorLastUpdateTime_ = readTime_ ; 
+      
+    }
     
     // ------------------------------------------------------------------------
   
@@ -1209,10 +1248,23 @@ namespace pandora_gazebo_interface
     
     // ------------------------------------------------------------------------
     
-    for ( unsigned int n = 0 ; n < batteryNum_ ; n ++ ) { 
+    for ( unsigned int n = 0 ; n < batteryNum_ ; n ++ ) {
     
-      // TODO
-    
+      double reduction = ( batteryVoltageMax_ [ n ] - batteryVoltageMin_ [ n ] ) 
+                         / ( batteryDuration_ [ n ] * 60.0 ) ; 
+
+      reduction /= batteryUpdateRate_ .sec + 
+                   batteryUpdateRate_ .nsec / pow ( 10 , 9 ) ; 
+      
+      batteryVoltage_ [ n ] -= reduction ; 
+      
+      if ( batteryVoltage_ [ n ] < batteryVoltageMin_ [ n ] )
+      
+        ROS_WARN_ONCE ( "WARNING: The battery \"%s\" has died!" , 
+                         batteryName_ [ n ] .c_str ( ) ) ; 
+        
+        //immobilizeRobot ( batteryName_ [ n ] , batteryVoltage_ [ n ] ) ; // TODO
+     
     }
     
     // ------------------------------------------------------------------------
@@ -1228,10 +1280,110 @@ namespace pandora_gazebo_interface
     
     for ( unsigned int n = 0 ; n < rangeSensorNum_ ; n ++ ) { 
     
+      int i , hja , hjb ; 
+      int j , vja , vjb ; 
+      
+      double vb , hb ; 
+      
+      int    j1 , j2 , j3 , j4 ; 
+      double r1 , r2 , r3 , r4 , r ; 
+    
       gazebo ::math ::Angle maxAngle = rangeSensorRay_ [ n ] ->GetAngleMax ( ) ; 
       gazebo ::math ::Angle minAngle = rangeSensorRay_ [ n ] ->GetAngleMin ( ) ; 
+
+      double maxRange = rangeSensorRay_ [ n ] ->GetRangeMax ( ) ; 
+      double minRange = rangeSensorRay_ [ n ] ->GetRangeMin ( ) ; 
+      int rayCount = rangeSensorRay_ [ n ] ->GetRayCount ( ) ; 
+      int rangeCount = rangeSensorRay_ [ n ] ->GetRangeCount ( ) ; 
+
+      int verticalRayCount = rangeSensorRay_ [ n ] 
+                              ->GetVerticalRayCount ( ) ; 
+      int verticalRangeCount = rangeSensorRay_ [ n ] 
+                                ->GetVerticalRangeCount ( ) ; 
+                                
+      gazebo ::math ::Angle verticalMaxAngle = rangeSensorRay_ [ n ] 
+                                                ->GetVerticalAngleMax ( ) ; 
+      gazebo ::math ::Angle verticalMinAngle = rangeSensorRay_ [ n ] 
+                                                ->GetVerticalAngleMin ( ) ; 
+
+      double yDiff = maxAngle .Radian ( ) - minAngle .Radian ( ) ; 
+      double pDiff = verticalMaxAngle .Radian ( ) - 
+                     verticalMinAngle .Radian ( ) ; 
+    
+      double currentRange = maxRange ; 
+
+      for ( j = 0 ; j < verticalRangeCount ; j++ ) { 
       
-      // TODO
+        vb = ( verticalRangeCount == 1 ) ? 0 : ( double ) j * 
+                                               ( verticalRayCount - 1 ) / 
+                                               ( verticalRangeCount -  1 ) ; 
+        vja = ( int ) floor ( vb ) ; 
+        vjb = std ::min ( vja + 1 , verticalRayCount - 1 ) ; 
+        vb = vb - floor ( vb ) ; 
+
+        assert ( vja >= 0 && vja < verticalRayCount ) ; 
+        assert ( vjb >= 0 && vjb < verticalRayCount ) ; 
+
+        for ( i = 0 ; i < rangeCount ; i++ ) { 
+        
+          hb = ( rangeCount == 1 ) ? 0 : ( double ) i * ( rayCount - 1 ) / 
+                                         ( rangeCount - 1 ) ; 
+          hja = ( int ) floor ( hb ) ; 
+          hjb = std ::min ( hja + 1 , rayCount - 1 ) ; 
+          hb = hb - floor ( hb ) ; 
+
+          assert ( hja >= 0 && hja < rayCount ) ; 
+          assert ( hjb >= 0 && hjb < rayCount ) ; 
+
+          j1 = hja + vja * rayCount ; 
+          j2 = hjb + vja * rayCount ; 
+          j3 = hja + vjb * rayCount ; 
+          j4 = hjb + vjb * rayCount ; 
+          
+          r1 = std ::min ( rangeSensorRay_ [ n ] 
+                            ->GetLaserShape ( ) 
+                             ->GetRange ( j1 ) , 
+                           maxRange - minRange ) ; 
+          r2 = std ::min ( rangeSensorRay_ [ n ] 
+                            ->GetLaserShape ( ) 
+                             ->GetRange ( j2 ) , 
+                           maxRange - minRange ) ; 
+          r3 = std ::min ( rangeSensorRay_ [ n ] 
+                            ->GetLaserShape ( ) 
+                             ->GetRange ( j3 ) , 
+                           maxRange - minRange ) ; 
+          r4 = std ::min ( rangeSensorRay_ [ n ] 
+                            ->GetLaserShape ( ) 
+                             ->GetRange ( j4 ) , 
+                           maxRange - minRange ) ; 
+
+          r = ( 1 - vb ) * ( ( 1 - hb ) * r1 + hb * r2 ) + 
+              vb * ( ( 1 - hb ) * r3 + hb * r4 ) ; 
+          
+          double yAngle = 0.5 * ( hja + hjb ) * yDiff /  ( rayCount - 1 ) 
+                          + minAngle .Radian ( ) ; 
+          double pAngle = 0.5 * ( vja + vjb ) * pDiff / ( verticalRayCount - 1 ) 
+                          + verticalMinAngle .Radian ( ) ; 
+
+          if ( r != maxRange - minRange ) { 
+          
+            double point = ( r + minRange ) * cos ( pAngle ) * cos ( yAngle ) ; 
+            
+            if ( point < currentRange ) 
+            
+			        currentRange = point ; 
+		
+          } 
+          
+        }
+        
+      }
+      
+      rangeSensorRange_ [ n ] [ rangeSensorBufferCounter_ [ n ] ] = 
+      currentRange ; 
+      
+      rangeSensorBufferCounter_ [ n ] = 
+      fmod ( rangeSensorBufferCounter_ [ n ] + 1 , 5 ) ; 
     
     }
     
@@ -1246,24 +1398,36 @@ namespace pandora_gazebo_interface
     
     // ------------------------------------------------------------------------
   
-    if ( ! fmod ( ( readTime_ .nsec / 1000000.0 ) , 
-                  ( 1.0 / co2SensorUpdateRate_ ) ) ) 
+    if ( ( co2SensorLastUpdateTime_ + co2SensorUpdateRate_ ) < 
+         readTime_ ) { 
     
       readCO2Sensors ( ) ; 
+      
+      co2SensorLastUpdateTime_ = readTime_ ; 
+      
+    }
     
     // ------------------------------------------------------------------------
   
-    if ( ! fmod ( ( readTime_ .nsec / 1000000.0 ) , 
-                  ( 1.0 / thermalSensorUpdateRate_ ) ) ) 
+    if ( ( thermalSensorLastUpdateTime_ + thermalSensorUpdateRate_ ) < 
+         readTime_ ) { 
     
       readThermalSensors ( ) ; 
+      
+      thermalSensorLastUpdateTime_ = readTime_ ; 
+      
+    }
     
     // ------------------------------------------------------------------------
   
-    if ( ! fmod ( ( readTime_ .nsec / 1000000.0 ) , 
-                  ( 1.0 / microphoneSensorUpdateRate_ ) ) ) 
+    if ( ( microphoneSensorLastUpdateTime_ + microphoneSensorUpdateRate_ ) < 
+         readTime_ ) { 
     
       readMicrophoneSensors ( ) ; 
+      
+      microphoneSensorLastUpdateTime_ = readTime_ ; 
+      
+    }
     
     // ------------------------------------------------------------------------
     
@@ -1546,6 +1710,8 @@ namespace pandora_gazebo_interface
   /////////////////////////////////////////////////////////////////////////////
 
   void GazeboInterface ::writeJoints ( void ) { 
+  
+    adjustWheelVelocityCommands ( ) ; 
     
     for ( unsigned int i = 0 ; i < jointNum_ ; i ++ ) { 
     
@@ -1567,7 +1733,7 @@ namespace pandora_gazebo_interface
                       jointLowerLimit_ [ i ] , 
                       jointUpperLimit_ [ i ] , 
                       error ) ; 
-            
+        
         else
           
           error = jointCommand  - jointPosition_ [ i ] ; 
@@ -1576,23 +1742,62 @@ namespace pandora_gazebo_interface
                              .computeCommand ( error , writePeriod_ ) ; 
 
         double effortLimit = jointEffortLimit_ [ i ] ; 
-                                    
+                      
         double effort = clamp ( pidCommand , - effortLimit , effortLimit ) ; 
-                                    
+                           
         gazeboJoint_ [ i ] ->SetForce ( 0 , effort ) ; 
-            
+        
       }
     
       // ----------------------------------------------------------------------
 
-      else if ( jointControlMethod_ [ i ] == VELOCITY )  
+      else if ( jointControlMethod_ [ i ] == VELOCITY ) { 
         
         gazeboJoint_ [ i ] 
          ->SetVelocity ( 0 , jointCommand_ [ i ] * 
-                             wheel_velocity_multiplier_ [ i ] ) ; 
+                             wheelVelocityMultiplier_ ) ; 
+        
+      }
       
     }
   
+  }
+    
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+
+  void GazeboInterface ::adjustWheelVelocityCommands ( void ) { 
+  
+    double leftWheelVelocity = jointCommand_ [ 0 ] ; 
+    double rightWheelVelocity = jointCommand_ [ 2 ] ; 
+    
+    double x = ( rightWheelVelocity + leftWheelVelocity ) * 
+               wheelRadius_ / 2.0 ; 
+                            
+    double z = ( rightWheelVelocity - leftWheelVelocity ) * 
+               wheelRadius_ / wheelSeparation_ ; 
+                             
+    double linearVelocity = ( + 9.617364797 ) * ( 0.100 ) * pow ( x , 1 ) + 
+                            ( + 8.486951654 ) * ( 0.010 ) * pow ( x , 3 ) + 
+                            ( - 4.091102287 ) * ( 0.010 ) * pow ( x , 5 ) + 
+                            ( + 5.217505876 ) * ( 0.001 ) * pow ( x , 7 ) ; 
+                            
+    double angularVelocity = ( + 2.249634826 ) * ( 1.000 ) * pow ( z , 1 ) + 
+                             ( + 3.134651056 ) * ( 0.100 ) * pow ( z , 3 ) + 
+                             ( - 4.487225078 ) * ( 0.010 ) * pow ( z , 5 ) + 
+                             ( + 1.217253477 ) * ( 0.001 ) * pow ( z , 7 ) ; 
+                             
+    double newLeftWheelVelocity = 
+    ( linearVelocity - angularVelocity * wheelSeparation_ / 2 ) / wheelRadius_ ; 
+    
+    double newRightWheelVelocity = 
+    ( linearVelocity + angularVelocity * wheelSeparation_ / 2 ) / wheelRadius_ ; 
+    
+    jointCommand_ [ 0 ] = newLeftWheelVelocity ; 
+    jointCommand_ [ 1 ] = newLeftWheelVelocity ; 
+    jointCommand_ [ 2 ] = newRightWheelVelocity ; 
+    jointCommand_ [ 3 ] = newRightWheelVelocity ; 
+    
   }
     
   /////////////////////////////////////////////////////////////////////////////
