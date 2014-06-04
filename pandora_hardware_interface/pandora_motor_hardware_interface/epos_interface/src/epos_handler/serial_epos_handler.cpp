@@ -50,9 +50,9 @@ void SerialEposHandler::getRPM(int* leftRearRpm, int* leftFrontRpm,
   gatewayImpl_->readObject(2, 0x2028, 0, &out[0]);
   *rightRearRpm = -(int16_t)out[1];
   gatewayImpl_->readObject(3, 0x2028, 0, &out[0]);
-  *leftRearRpm = (int16_t)out[1];
-  gatewayImpl_->readObject(4, 0x2028, 0, &out[0]);
   *leftFrontRpm = (int16_t)out[1];
+  gatewayImpl_->readObject(4, 0x2028, 0, &out[0]);
+  *leftRearRpm = (int16_t)out[1];
 }
 
 Current SerialEposHandler::getCurrent()
