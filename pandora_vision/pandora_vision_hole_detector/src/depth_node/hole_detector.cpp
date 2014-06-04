@@ -101,7 +101,7 @@ namespace pandora_vision
     #endif
 
     // The final vectors of keypoints, rectangles and blobs' outlines.
-    struct HolesConveyor conveyor;
+    HolesConveyor conveyor;
 
     /**
       Get me blobs that their center point is inside the image,
@@ -113,7 +113,7 @@ namespace pandora_vision
       packed in the conveyor object.
      **/
     HoleFilters::validateBlobs(
-      &keyPoints,
+      keyPoints,
       &denoisedDepthImageEdges,
       Parameters::Outline::outline_detection_method,
       &conveyor);

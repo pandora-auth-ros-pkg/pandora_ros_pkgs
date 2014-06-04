@@ -170,13 +170,6 @@ namespace pandora_vision
     {
       for ( int cols = upperLeft.x; cols < upperLeft.x + x; cols++ )
       {
-        if (rows == upperLeft.y || rows == upperLeft.y + y - 1
-          || cols == upperLeft.x || cols == upperLeft.x + x - 1)
-        {
-          image->at< cv::Vec3b >( rows, cols ).val[0] = 1;
-          image->at< cv::Vec3b >( rows, cols ).val[1] = 1;
-          image->at< cv::Vec3b >( rows, cols ).val[2] = 1;
-        }
         image->at< cv::Vec3b >( rows, cols ).val[0] = rgbIn;
         image->at< cv::Vec3b >( rows, cols ).val[1] = rgbIn;
         image->at< cv::Vec3b >( rows, cols ).val[2] = rgbIn;

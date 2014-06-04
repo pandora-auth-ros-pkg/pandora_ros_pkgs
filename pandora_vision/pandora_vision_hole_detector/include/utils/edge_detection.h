@@ -120,20 +120,6 @@ namespace pandora_vision
       static void applyEdgeContamination (cv::Mat* inImage);
 
       /**
-        @brief Apply the anisotropic diffusion technique as to facilitate the
-        edge detection of low contrast regions.
-        @param[in] inImage [const cv::Mat &] The input image in CV_32FC1 format
-        @param[out] outImage [cv::Mat*] The output image in CV_32FC1 format
-        @param[in] iterations [const int&] The number of iterations to execute.
-        @param[in] method [const int&] Diffusion equation 0 or 1. see below for
-        more
-        @documentation http://www.csse.uwa.edu.au/~pk/research/matlabfns/
-        @return void
-       **/
-      static void anisotropicDiffusion (const cv::Mat& inImage,
-        cv::Mat* outImage, const int& iterations, const int& method);
-
-      /**
         @brief Takes as input a depth image containing floats,
         locates the edges in it and tries to clear as much noise as possible
         in the edges image. As noise we identify everything that is not,

@@ -63,7 +63,7 @@ namespace pandora_vision
         @brief Given a set of keypoints and an edges image, this function
         returns the valid keypoints and for each one, its respective, least
         area, rotated bounding box and the points of its outline.
-        @param[in,out] keyPoints [std::vector<cv::KeyPoint>*]
+        @param[int] keyPoints [const std::vector<cv::KeyPoint>&]
         The original keypoints found.
         @param[in] denoisedDepthImageEdges [cv::Mat*] The original denoised
         depth edges image
@@ -75,7 +75,7 @@ namespace pandora_vision
         @return void
        **/
       static void validateBlobs(
-        std::vector<cv::KeyPoint>* keyPoints,
+        const std::vector<cv::KeyPoint>& keyPoints,
         cv::Mat* denoisedDepthImageEdges,
         const int& detectionMethod,
         HolesConveyor* conveyor);

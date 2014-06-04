@@ -461,7 +461,7 @@ namespace pandora_vision
 
     // Scale the inImage in [0, 255] into inImage_ if not already
     cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
+    if (inImage.type() != CV_8UC3)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
         Parameters::Image::scale_method);
@@ -523,12 +523,8 @@ namespace pandora_vision
       // If the luminosity of the inside of the candidate hole is greater
       // than the luminosity of the points beyond it and restricted by the
       // edges of its bounding box, it surely is not a hole
-      if (meanBlobLuminosity > meanBoundingBoxLuminosity
-        || meanBoundingBoxLuminosity == 0)
-      {
-        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
-      }
-      else
+      if (meanBlobLuminosity < meanBoundingBoxLuminosity
+        && meanBoundingBoxLuminosity != 0)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
           1 - meanBlobLuminosity / meanBoundingBoxLuminosity;
@@ -592,7 +588,7 @@ namespace pandora_vision
 
     // Scale the inImage in [0, 255] into inImage_ if not already
     cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
+    if (inImage.type() != CV_8UC3)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
         Parameters::Image::scale_method);
@@ -660,10 +656,6 @@ namespace pandora_vision
         probabilitiesVector->at(rectanglesIndices[i]) =
           rectangleMatchProbability - blobMatchProbability;
       }
-      else
-      {
-        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
-      }
 
       msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }
@@ -727,7 +719,7 @@ namespace pandora_vision
 
     // Scale the inImage in [0, 255] into inImage_ if not already
     cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
+    if (inImage.type() != CV_8UC3)
     {
       inImage_ = Visualization::scaleImageForVisualization(inImage,
         Parameters::Image::scale_method);
@@ -741,19 +733,32 @@ namespace pandora_vision
     cv::Mat inImageHSV;
     cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
 
+    int* histSize = new int[2];
+
+    // The first value will always be with regard to Hue
+    histSize[0] = Parameters::Histogram::number_of_hue_bins;
+
     // Histogram-related parameters
-    int h_bins = Parameters::Histogram::number_of_hue_bins;
-    int s_bins = Parameters::Histogram::number_of_saturation_bins;
-    int histSize[] = { h_bins, s_bins };
+    int v_bins = Parameters::Histogram::number_of_value_bins;
+
+    if (Parameters::Histogram::secondary_channel == 1)
+    {
+      histSize[1] = Parameters::Histogram::number_of_saturation_bins;
+    }
+
+    if (Parameters::Histogram::secondary_channel == 2)
+    {
+      histSize[1] = Parameters::Histogram::number_of_value_bins;
+    }
 
     // hue varies from 0 to 179, saturation from 0 to 255
     float h_ranges[] = { 0, 180 };
-    float s_ranges[] = { 0, 256 };
+    float sec_ranges[] = { 0, 256 };
 
-    const float* ranges[] = { h_ranges, s_ranges };
+    const float* ranges[] = { h_ranges, sec_ranges };
 
-    // Use the 0-th and 2-nd channels
-    int channels[] = { 0, 2 };
+    // Use the 0-th and secondaryChannel-st channels
+    int channels[] = { 0, Parameters::Histogram::secondary_channel };
 
 
     for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
@@ -767,19 +772,20 @@ namespace pandora_vision
 
       // Produce the histogram for the points inside the outline of the blob
       cv::MatND blobHistogram;
-      cv::calcHist(&inImageHSV, 1, channels, holesMasksImageVector[i],
+      cv::calcHist(&inImageHSV, 1, channels,
+        holesMasksImageVector[rectanglesIndices[i]],
         blobHistogram, 2, histSize, ranges, true, false);
 
 
       // Find the correlation between the model histogram and the histogram
       // of the inflated rectangle
       double rectangleToModelCorrelation = cv::compareHist(
-        blobToRectangleHistogram, inHistogram, CV_COMP_CORREL);
+        blobToRectangleHistogram, inHistogram, CV_COMP_HELLINGER);
 
       // Find the correlation between the model histogram and the histogram
       // of the points inside the blob
       double blobToModelCorrelation = cv::compareHist(
-        blobHistogram, inHistogram, CV_COMP_CORREL);
+        blobHistogram, inHistogram, CV_COMP_HELLINGER);
 
       // This blob is considered valid if there is a correlation between
       // blobToRectangleHistogram and the model histogram
@@ -787,16 +793,14 @@ namespace pandora_vision
       // greater than a threshold and, simultaneously, the blob's histogram
       // is more loosely correlated to the model histogram than the
       // blobToRectangleHistogram is
-      if (rectangleToModelCorrelation >=
+      // The use of the CV_COMP_HELLINGER for histogram comparison
+      // inverts the inequality checks
+      if (rectangleToModelCorrelation <=
         Parameters::HoleFusion::match_texture_threshold &&
-        rectangleToModelCorrelation > blobToModelCorrelation)
+        rectangleToModelCorrelation < blobToModelCorrelation)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
-          rectangleToModelCorrelation - blobToModelCorrelation;
-      }
-      else
-      {
-        probabilitiesVector->at(rectanglesIndices[i]) = 0.0;
+          blobToModelCorrelation - rectangleToModelCorrelation;
       }
 
       msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));

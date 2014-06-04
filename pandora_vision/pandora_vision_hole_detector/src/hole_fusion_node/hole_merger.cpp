@@ -63,7 +63,7 @@ namespace pandora_vision
     const int& operationId)
   {
     #ifdef DEBUG_TIME
-    Timer::start("applyMergeOperation", "processCandidateHoles");
+    Timer::start("applyMergeOperation", "mergeHoles");
     #endif
 
     // If there are no candidate holes,
@@ -404,7 +404,7 @@ namespace pandora_vision
     const int& operationId)
   {
     #ifdef DEBUG_TIME
-    Timer::start("applyMergeOperation", "processCandidateHoles");
+    Timer::start("applyMergeOperation", "mergeHoles");
     #endif
 
     // If there are no candidate holes,

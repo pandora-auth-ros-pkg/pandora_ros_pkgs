@@ -43,7 +43,7 @@ namespace pandora_vision
     @brief Given a set of keypoints and an edges image, this function
     returns the valid keypoints and for each one, its respective, least
     area, rotated bounding box and the points of its outline.
-    @param[in,out] keyPoints [std::vector<cv::KeyPoint>*]
+    @param[in] keyPoints [const std::vector<cv::KeyPoint>&]
     The original keypoints found.
     @param[in] denoisedDepthImageEdges [cv::Mat*] The original denoised
     depth edges image
@@ -54,7 +54,7 @@ namespace pandora_vision
     @return void
    **/
   void HoleFilters::validateBlobs(
-    std::vector<cv::KeyPoint>* keyPoints,
+    const std::vector<cv::KeyPoint>& keyPoints,
     cv::Mat* denoisedDepthImageEdges,
     const int& detectionMethod,
     HolesConveyor* conveyor)
@@ -71,7 +71,7 @@ namespace pandora_vision
           std::vector<float> blobsArea;
 
           // Find the outline points of each keypoint
-          BlobDetection::brushfireKeypoints(*keyPoints,
+          BlobDetection::brushfireKeypoints(keyPoints,
             denoisedDepthImageEdges,
             &blobsOutlineVector,
             &blobsArea);
@@ -95,7 +95,7 @@ namespace pandora_vision
           // Keep in mind that for a blob to be a potential hole, its area
           // must be greater than Parameters::bounding_box_min_area_threshold
           validateKeypointsToRectangles(
-            *keyPoints,
+            keyPoints,
             rectangles,
             blobsArea,
             blobsOutlineVector,
@@ -134,7 +134,7 @@ namespace pandora_vision
           // Keep in mind that for a blob to be a potential hole, its area
           // must be greater than Parameters::bounding_box_min_area_threshold
           validateKeypointsToRectangles(
-            *keyPoints,
+            keyPoints,
             rectangles,
             blobsArea,
             blobsOutlineVector,

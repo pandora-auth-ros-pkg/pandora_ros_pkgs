@@ -220,16 +220,7 @@ namespace pandora_vision
       !enable_intermediatePointsSetVector)
     {
       // The intermediate points images vector depends on the
-      // inflated rectangles vectors
-      if (!enable_inflatedRectanglesVectorAndIndices)
-      {
-        createInflatedRectanglesVector(conveyor,
-          image,
-          inflationSize,
-          inflatedRectanglesVector,
-          inflatedRectanglesIndices);
-      }
-
+      // inflated rectangles vectors, which has been created previously
       createIntermediateHolesPointsImageVector(conveyor,
         image,
         *inflatedRectanglesVector,
@@ -241,16 +232,7 @@ namespace pandora_vision
       !enable_intermediatePointsImageVector)
     {
       // The intermediate points set vector depends on the
-      // inflated rectangles vectors
-      if (!enable_inflatedRectanglesVectorAndIndices)
-      {
-        createInflatedRectanglesVector(conveyor,
-          image,
-          inflationSize,
-          inflatedRectanglesVector,
-          inflatedRectanglesIndices);
-      }
-
+      // inflated rectangles vectors, which has been created previously
       createIntermediateHolesPointsSetVector(conveyor,
         image,
         *inflatedRectanglesVector,
@@ -262,16 +244,7 @@ namespace pandora_vision
       enable_intermediatePointsImageVector)
     {
       // The intermediate points set vector depends on the
-      // inflated rectangles vectors
-      if (!enable_inflatedRectanglesVectorAndIndices)
-      {
-        createInflatedRectanglesVector(conveyor,
-          image,
-          inflationSize,
-          inflatedRectanglesVector,
-          inflatedRectanglesIndices);
-      }
-
+      // inflated rectangles vectors, which has been created previously
       createIntermediateHolesPointsVectors(conveyor,
         image,
         *inflatedRectanglesVector,

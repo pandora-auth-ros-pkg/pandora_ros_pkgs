@@ -163,13 +163,16 @@ namespace pandora_vision
     seg.setDistanceThreshold(
       Parameters::HoleFusion::point_to_plane_distance_threshold);
 
+    // Copy the input cloud to a point cloud that we will be processing
+    PointCloudXYZPtr pointCloudProcessed (new PointCloudXYZ);
+    pcl::copyPointCloud(*cloudIn, *pointCloudProcessed);
 
     int i = 0;
-    int nr_points = static_cast<int> (cloudIn->points.size());
+    int nr_points = static_cast<int> (pointCloudProcessed->points.size());
 
     // While 100 x num_points_to_exclude % of the original
     // cloud is still there
-    while (cloudIn->points.size() >
+    while (pointCloudProcessed->points.size() >
       Parameters::HoleFusion::num_points_to_exclude * nr_points)
     {
       // The plane's coefficients
@@ -179,7 +182,7 @@ namespace pandora_vision
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
 
       // Segment the largest planar component from the remaining cloud
-      seg.setInputCloud (cloudIn);
+      seg.setInputCloud (pointCloudProcessed);
       seg.segment (*inliers, coefficients);
 
       // Add the coefficients and inliers to their respective vectors
@@ -198,11 +201,11 @@ namespace pandora_vision
       pcl::ExtractIndices<pcl::PointXYZ> extract;
 
       // Extract the inliers
-      extract.setInputCloud (cloudIn);
+      extract.setInputCloud (pointCloudProcessed);
       extract.setIndices (inliers);
 
-      // Remove the plane found from cloudIn and place it in
-      // cloud_p. cloudIn goes unaffected.
+      // Remove the plane found from pointCloudProcessed and place it in
+      // cloud_p. pointCloudProcessed goes unaffected.
       extract.setNegative (false);
 
       // The inliers of the largest planar component create cloud_p
@@ -216,13 +219,14 @@ namespace pandora_vision
       // a plane
       extract.setNegative (true);
 
-      // In short: cloud_f = cloudIn - cloud_p
+      // In short: cloud_f = pointCloudProcessed - cloud_p
       PointCloudXYZPtr cloud_f (new PointCloudXYZ);
       extract.filter (*cloud_f);
 
-      // cloudIn is now without cloud_p, that is, without the points that were
-      // found to lie on the largest planar component of cloudIn
-      *cloudIn = *cloud_f;
+      // pointCloudProcessed is now without cloud_p, that is,
+      // without the points that were
+      // found to lie on the largest planar component of pointCloudProcessed
+      pcl::copyPointCloud(*cloud_f, *pointCloudProcessed);
 
       // Increment the number of planes found
       i++;

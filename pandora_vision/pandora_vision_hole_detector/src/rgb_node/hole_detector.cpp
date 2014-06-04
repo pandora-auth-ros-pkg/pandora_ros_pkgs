@@ -113,7 +113,7 @@ namespace pandora_vision
     HolesConveyor conveyor;
 
     HoleFilters::validateBlobs(
-      &keyPoints,
+      keyPoints,
       &edges,
       Parameters::Outline::outline_detection_method,
       &conveyor);

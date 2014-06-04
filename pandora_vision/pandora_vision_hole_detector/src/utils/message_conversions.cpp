@@ -483,10 +483,13 @@ namespace pandora_vision
         // if image_representation_method was 0 is to apply the raycast
         // algorithm
         std::vector<cv::Point2f> outline;
+        float area = 0.0;
         BlobDetection::raycastKeypoint(holeKeypoint,
           &canvas,
+          false,
           raycastKeypointPartitions,
-          &outline);
+          &outline,
+          &area);
 
         conveyor->outlines.push_back(outline);
       }

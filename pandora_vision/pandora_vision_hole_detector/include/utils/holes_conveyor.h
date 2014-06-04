@@ -151,23 +151,6 @@ namespace pandora_vision
         const HolesConveyor& srcB, HolesConveyor* dst);
 
       /**
-        @brief Prints a hole's data in the console in a form such that
-        they can be easily translated to code, in order for the hole to be
-        cloned and debugged
-        @param[in] conveyor [const HolesConveyor&] The conveyor from which
-        the hole will be printed
-        @param[in] id [const int&] The identifier of the hole inside the
-        conveyor
-        @param[in] prefix [const std::string&] The prefix used to name the
-        outline and rectangle vectors
-        @return void
-       **/
-      static void migrateToArtificialSetting(
-        const HolesConveyor& conveyor,
-        const int& id,
-        const std::string& prefix);
-
-      /**
         @brief Prints data pertaining to the contents of a HolesConveyor struct,
         that is, the keypoints, rectangle points and outline points of the
         holes it contains

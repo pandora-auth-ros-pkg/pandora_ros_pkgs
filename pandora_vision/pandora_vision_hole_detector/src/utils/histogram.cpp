@@ -175,7 +175,7 @@ namespace pandora_vision
     }
     else
     {
-      return;
+      histSize[1] = Parameters::Histogram::number_of_value_bins;
     }
 
     // hue varies from 0 to 179, saturation and value from 0 to 255

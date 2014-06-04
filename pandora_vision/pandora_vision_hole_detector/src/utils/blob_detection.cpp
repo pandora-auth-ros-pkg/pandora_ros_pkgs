@@ -59,6 +59,7 @@ namespace pandora_vision
     Timer::start("brushfireKeypoint", "validateBlobs");
     #endif
 
+    // Get a pointer on the edges image
     unsigned char* ptr = edgesImage->ptr();
 
     std::set<unsigned int> current, next, visited;
@@ -337,15 +338,21 @@ namespace pandora_vision
     towards which the outline of the blob will be sought,
     or the number of partitions in which the blob will be divided by
     the rays. Same deal.
+    @param[in] findArea [const bool&] Indicates whether to calculate
+    the area of the blob
     @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
     The output vector containing the blobs' (rough approximate) outline
+    @param[out] blobArea [float*] The blob's area. Non-zero if @param
+    findArea true
     @return void
    **/
   void BlobDetection::raycastKeypoint(
     const cv::KeyPoint& inKeyPoint,
     cv::Mat* edgesImage,
     const int& partitions,
-    std::vector<cv::Point2f>* blobOutlineVector)
+    const bool& findArea,
+    std::vector<cv::Point2f>* blobOutlineVector,
+    float* blobArea)
   {
     #ifdef DEBUG_TIME
     Timer::start("raycastKeypoint");
@@ -373,12 +380,6 @@ namespace pandora_vision
       {
         counter++;
 
-        // If the 8 pixels surrounding the ray's pixel, including the center
-        // pixel, are found to be all outside the image's borders,
-        // something has gone horribly wrong. The keypoint is not surrounded
-        // entirely by non-zero pixels. The best choice is to delete it.
-        int numPixelsOutsideImageBorders = 0;
-
         for (int m = -1; m < 2; m++)
         {
           for (int n = -1; n < 2; n++)
@@ -386,10 +387,45 @@ namespace pandora_vision
             int x = inKeyPoint.pt.x + m + counter * cos(theta);
             int y = inKeyPoint.pt.y + n + counter * sin(theta);
 
+            // Has the ray gone out of the image's bounds?
+            // If yes, impose limits
+            bool outOfBounds = false;
+
+            if (x < 0)
+            {
+              x = 0;
+              outOfBounds = true;
+            }
+
+            if (y < 0)
+            {
+              y = 0;
+              outOfBounds = true;
+            }
+
+            if (x > edgesImage->cols - 1)
+            {
+              x = edgesImage->cols - 1;
+              outOfBounds = true;
+            }
+
+            if (y > edgesImage->rows - 1)
+            {
+              y = edgesImage->rows - 1;
+              outOfBounds = true;
+            }
+
+            // The index of the neighbor of the ray's end point
             int ind = y * edgesImage->cols + x;
+
+
+            // .. and its value in the edgesImage image
             char v = ptr[ind];
 
-            if (v != 0)
+            // If the neighbor has a non-zero value, or it is a boundary
+            // pixel (hence there is no valid value,
+            // and one has to be imposed), this point is an outline point
+            if (v != 0 || outOfBounds)
             {
               outlineFound = true;
               singleRayPotentialOutlinePoints.push_back(cv::Point2f(x, y));
@@ -398,18 +434,50 @@ namespace pandora_vision
         }
       } // End {while outline not found} loop
 
-      if (outlineFound)
-      {
-        // From the, at most 5, outline points found,
-        // regard only one of them as an outline point, so that, in total,
-        // their number equals the number of partitions
-        // (Needed to approximate fairly accurately the blob's area)
-        keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
-      }
+
+      // From the, at most 5, outline points found,
+      // regard only one of them as an outline point, so that, in total,
+      // their number equals the number of partitions
+      // (Needed to approximate fairly accurately the blob's area)
+      keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
 
       theta += thetaIncrement;
     }
 
+    if (findArea)
+    {
+      // Calculate each blob's approximate area by heron's formula
+      // https://en.wikipedia.org/wiki/Heron's_formula
+      for (unsigned int t = 0; t < keypointOutline.size(); t++)
+      {
+        // calculate the area of each triangle found
+        // O is the keypoint and A, B two successive outline points
+        float lengthOA = sqrt(
+          pow(inKeyPoint.pt.x - keypointOutline[t].x, 2)
+          + pow(inKeyPoint.pt.y - keypointOutline[t].y, 2));
+
+        float lengthOB = sqrt(
+          pow(inKeyPoint.pt.x - keypointOutline[(t + 1) % partitions].x, 2)
+          + pow(inKeyPoint.pt.y - keypointOutline[(t + 1) % partitions].y, 2));
+
+        float lengthAB = sqrt(
+          pow(keypointOutline[t].x
+            - keypointOutline[(t + 1) % partitions].x, 2)
+          + pow(keypointOutline[t].y
+            - keypointOutline[(t + 1) % partitions].y, 2));
+
+        float semiperimeter = (lengthOA + lengthOB + lengthAB) / 2;
+
+        *blobArea += sqrt(semiperimeter
+          * (semiperimeter - lengthOA)
+          * (semiperimeter - lengthOB)
+          * (semiperimeter - lengthAB));
+      }
+    }
+    else
+    {
+      *blobArea = 0.0;
+    }
 
     // Instead of keeping the sparce points that are the product of
     // the raycast algorithm, connect them linearly in order to
@@ -454,7 +522,7 @@ namespace pandora_vision
     @brief Implements a raycast algorithm for all blob keypoints in order
     to find blobs' outlines. The output is a vector containing a coherent
     vector of points.
-    @param[in,out] inKeyPoints [std::vector<cv::KeyPoint>*] The keypoints
+    @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
     @param[in] edgesImage [cv::Mat*] The input image
     @param[in] partitions [const int&] The number of directions
     towards which the outline of the blob will be sought,
@@ -466,7 +534,7 @@ namespace pandora_vision
     @return void
    **/
   void BlobDetection::raycastKeypoints(
-    std::vector<cv::KeyPoint>* inKeyPoints,
+    const std::vector<cv::KeyPoint>& inKeyPoints,
     cv::Mat* edgesImage,
     const int& partitions,
     std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
@@ -476,185 +544,28 @@ namespace pandora_vision
     Timer::start("raycastKeypoint", "validateBlobs");
     #endif
 
-
-    unsigned char* ptr = edgesImage->ptr();
-
-    // Traverse the inKeyPoints vector backwards because a keypoint
-    // might be deleted due to it not being entirely surrounded by
-    // non-zero pixels
-    for (int keypointId = inKeyPoints->size() - 1; keypointId >= 0;
-      keypointId--)
+    for (int i = 0; i < inKeyPoints.size(); i++)
     {
-      // A priori, this keypoint is not to be deleted
-      bool deleteThisKeypoint = false;
-
-      // A vector storing the non-zero pixels surrounding the keypoint
+      // The current blob's outline
       std::vector<cv::Point2f> keypointOutline;
 
-      float theta = 0;
-      float thetaIncrement = 2 * 3.1415926535897 / partitions;
-
-      for (unsigned int angleId = 0; angleId < partitions; angleId++)
-      {
-        bool outlineFound = false;
-        int counter = 0;
-
-        // A ray can hit up to 5 outline points, but only one must be chosen.
-        // Store these points as potential outline points.
-        // We will select only the first found
-        std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
-
-        while(!outlineFound && !deleteThisKeypoint)
-        {
-          counter++;
-
-          // If the 8 pixels surrounding the ray's pixel, including the center
-          // pixel, are found to be all outside the image's borders,
-          // something has gone horribly wrong. The keypoint is not surrounded
-          // entirely by non-zero pixels. The best choice is to delete it.
-          int numPixelsOutsideImageBorders = 0;
-
-          for (int m = -1; m < 2; m++)
-          {
-            for (int n = -1; n < 2; n++)
-            {
-              int x = (*inKeyPoints)[keypointId].pt.x
-                + m + counter * cos(theta);
-              int y = (*inKeyPoints)[keypointId].pt.y
-                + n + counter * sin(theta);
-
-              // If the ray point is not within image borders
-              if (x < 0 || y < 0 ||
-                x > edgesImage->cols - 1 ||
-                y > edgesImage->rows - 1)
-              {
-                numPixelsOutsideImageBorders++;
-
-                if (numPixelsOutsideImageBorders >= 9)
-                {
-                  deleteThisKeypoint = true;
-                }
-
-                continue;
-              }
-
-              int ind = y * edgesImage->cols + x;
-              char v = ptr[ind];
-
-              if (v != 0)
-              {
-                outlineFound = true;
-                singleRayPotentialOutlinePoints.push_back(cv::Point2f(x, y));
-              }
-            }
-          }
-        } // End {while outline not found} loop
-
-        if (outlineFound)
-        {
-          // From the, at most 5, outline points found,
-          // regard only one of them as an outline point, so that, in total,
-          // their number equals the number of partitions
-          // (Needed to approximate fairly accurately the blob's area)
-          keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
-        }
-
-
-        // If this keypoint is to be deleted, break from the angles loop
-        // in order to delete the keypoint and move on to the next one
-        if (deleteThisKeypoint)
-        {
-          break;
-        }
-        else
-        {
-          theta += thetaIncrement;
-        }
-      }
-
-      if (deleteThisKeypoint)
-      {
-        keypointOutline.erase(keypointOutline.begin(),
-          keypointOutline.end());
-
-        inKeyPoints->erase(inKeyPoints->begin() + keypointId);
-        continue;
-      }
-
-
-      // Calculate each blob's approximate area by heron's formula
-      // https://en.wikipedia.org/wiki/Heron's_formula
+      // The current blob's area
       float area = 0.0;
-      for (unsigned int t = 0; t < keypointOutline.size(); t++)
-      {
-        // calculate the area of each triangle found
-        // O is the keypoint and A, B two successive outline points
-        float lengthOA = sqrt(
-          pow((*inKeyPoints)[keypointId].pt.x - keypointOutline[t].x, 2)
-          + pow((*inKeyPoints)[keypointId].pt.y - keypointOutline[t].y, 2));
 
-        float lengthOB = sqrt(
-          pow((*inKeyPoints)[keypointId].pt.x
-            - keypointOutline[(t + 1) % partitions].x, 2)
-          + pow((*inKeyPoints)[keypointId].pt.y
-            - keypointOutline[(t + 1) % partitions].y, 2));
+      // Find the outline and area of the current keypoint
+      raycastKeypoint(inKeyPoints[i],
+        edgesImage,
+        partitions,
+        true,
+        &keypointOutline,
+        &area);
 
-        float lengthAB = sqrt(
-          pow(keypointOutline[t].x
-            - keypointOutline[(t + 1) % partitions].x, 2)
-          + pow(keypointOutline[t].y
-            - keypointOutline[(t + 1) % partitions].y, 2));
-
-        float semiperimeter = (lengthOA + lengthOB + lengthAB) / 2;
-
-        area += sqrt(semiperimeter
-          * (semiperimeter - lengthOA)
-          * (semiperimeter - lengthOB)
-          * (semiperimeter - lengthAB));
-      }
-
+      // Push back the blob's area
       blobsArea->push_back(area);
 
-
-      // Instead of keeping the sparce points that are the product of
-      // the raycast algorithm, connect them linearly in order to
-      // have a coherent set of points as the hole's outline
-      cv::Mat canvas = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
-
-      // Draw the connected outline of the i-th hole onto canvas
-      for(unsigned int j = 0; j < keypointOutline.size(); j++)
-      {
-        cv::line(canvas, keypointOutline[j],
-          keypointOutline[(j + 1) % keypointOutline.size()],
-          cv::Scalar(255, 0, 0), 1, 8 );
-      }
-
-      // Clear the outline vector. It will be filled with the points
-      // drawn on the canvas image
-      keypointOutline.clear();
-
-      // Every non-zero point is a point drawn; it is a point that
-      // belongs to the outline of the hole
-      for (unsigned int rows = 0; rows < canvas.rows; rows++)
-      {
-        for (unsigned int cols = 0; cols < canvas.cols; cols++)
-        {
-          if (canvas.at<unsigned char>(rows, cols) != 0)
-          {
-            keypointOutline.push_back(cv::Point2f(cols, rows));
-          }
-        }
-      }
-
+      // Push back the blob's outline
       blobsOutlineVector->push_back(keypointOutline);
     }
-
-    // Because the keypoints vector is traversed backwards,
-    // but the elements are pushed back into keypointOutline and blobsArea,
-    // we must reverse them in order for them to be accurately corresponded
-    // to one another
-    std::reverse(blobsOutlineVector->begin(), blobsOutlineVector->end());
-    std::reverse(blobsArea->begin(), blobsArea->end());
 
     #ifdef DEBUG_TIME
     Timer::tick("raycastKeypoint");

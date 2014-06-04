@@ -305,7 +305,7 @@ namespace pandora_vision
     HolesConveyor conveyor;
 
     // Run HoleFilters::validateBlobs, using Brushfire
-    HoleFilters::validateBlobs ( &keyPoints, &squares_, 0, &conveyor);
+    HoleFilters::validateBlobs ( keyPoints, &squares_, 0, &conveyor);
 
 
     // There should be two entries in the conveyor
@@ -343,7 +343,7 @@ namespace pandora_vision
 
     HolesConveyorUtils::clear(&conveyor);
 
-    HoleFilters::validateBlobs ( &keyPoints, &squares_, 1, &conveyor);
+    HoleFilters::validateBlobs ( keyPoints, &squares_, 1, &conveyor);
 
 
     // There should be two entries in the conveyor

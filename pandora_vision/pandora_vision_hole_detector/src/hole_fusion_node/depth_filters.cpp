@@ -389,10 +389,6 @@ namespace pandora_vision
       {
         probabilitiesVector->at(i) = 1.0;
       }
-      else
-      {
-        probabilitiesVector->at(i) = 0.0;
-      }
 
       msgs->push_back(TOSTR(low) + std::string(" / ") + TOSTR(high));
     }
@@ -541,8 +537,11 @@ namespace pandora_vision
         }
       }
 
-      probabilitiesVector->at(o) =
-        static_cast<float>(numWhites) / (holesMasksSetVector[o].size());
+      if (holesMasksSetVector[o].size() > 0)
+      {
+        probabilitiesVector->at(o) =
+          static_cast<float>(numWhites) / (holesMasksSetVector[o].size());
+      }
 
       msgs->push_back(TOSTR(probabilitiesVector->at(o)));
     }
@@ -653,18 +652,17 @@ namespace pandora_vision
           }
         }
 
-        probabilitiesVector->at(inflatedRectanglesIndices[i]) =
-          static_cast<float> (maxPoints) / intermediatePointsSetVector[i].size();
+        if (intermediatePointsSetVector[i].size() > 0)
+        {
+          probabilitiesVector->at(inflatedRectanglesIndices[i]) =
+            static_cast<float> (maxPoints) /
+            intermediatePointsSetVector[i].size();
+        }
 
         msgs->push_back(TOSTR(
             probabilitiesVector->at(inflatedRectanglesIndices[i])));
       }
-      else
-      {
-         probabilitiesVector->at(inflatedRectanglesIndices[i]) = 0.0;
 
-        msgs->push_back(TOSTR(0));
-      }
     }
 
     #ifdef DEBUG_TIME
@@ -795,16 +793,10 @@ namespace pandora_vision
       {
         probabilitiesVector->at(inflatedRectanglesIndices[i]) =
           static_cast<float> (maxPoints) / visitedPoints.size();
-
-        msgs->push_back(TOSTR(
-            probabilitiesVector->at(inflatedRectanglesIndices[i])));
       }
-      else
-      {
-        probabilitiesVector->at(inflatedRectanglesIndices[i]) = 0.0;
 
-        msgs->push_back(TOSTR(0));
-      }
+      msgs->push_back(TOSTR(
+          probabilitiesVector->at(inflatedRectanglesIndices[i])));
     }
 
     #ifdef DEBUG_TIME

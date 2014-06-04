@@ -322,6 +322,8 @@ namespace pandora_vision
     // attempt to approximate the initial depth image's values
     *outImage = wave->getLowLow(doubled, H0) * (max - min);
 
+    delete[] wave;
+
     #ifdef DEBUG_TIME
     Timer::tick("getLowLow");
     #endif
@@ -382,7 +384,10 @@ namespace pandora_vision
       }
     }
 
-    *outImage = out;
+    // Copy out to the output image
+    out.copyTo(*outImage);
+
+    delete[] wave;
 
     #ifdef DEBUG_TIME
     Timer::tick("getLowLow");

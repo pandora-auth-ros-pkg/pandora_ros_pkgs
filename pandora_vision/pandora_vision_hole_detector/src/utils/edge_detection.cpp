@@ -357,126 +357,6 @@ namespace pandora_vision
 
 
   /**
-    @brief Apply the anisotropic diffusion technique as to facilitate the
-    edge detection of low contrast regions.
-    @param[in] inImage [const cv::Mat &] The input image in CV_32FC1 format
-    @param[out] outImage [cv::Mat*] The output image in CV_32FC1 format
-    @param[in] iterations [const int&] The number of iterations to execute.
-    @param[in] method [const int&] Diffusion equation 0 or 1. see below for more
-    @documentation http://www.csse.uwa.edu.au/~pk/research/matlabfns/
-    @return void
-   **/
-  void EdgeDetection::anisotropicDiffusion (const cv::Mat& inImage,
-    cv::Mat* outImage, const int& iterations, const int& method)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("anisotropicDiffusion");
-    #endif
-
-    int kappa = 1;
-    float lamda = 0.25;
-
-    inImage.copyTo(*outImage);
-
-    cv::Mat deltaNorth = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat deltaSouth = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat deltaEast  = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat deltaWest  = cv::Mat::zeros(outImage->size(), CV_32FC1);
-
-    cv::Mat cN = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat cS = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat cE = cv::Mat::zeros(outImage->size(), CV_32FC1);
-    cv::Mat cW = cv::Mat::zeros(outImage->size(), CV_32FC1);
-
-    for (unsigned int iter = 0; iter < iterations; iter++)
-    {
-      for (unsigned int rows = 1; rows < outImage->rows - 1; rows++)
-      {
-        for (unsigned int cols = 1; cols < outImage->cols - 1; cols ++)
-        {
-          deltaNorth.at<float>(rows, cols) =
-            outImage->at<float>(rows, cols - 1) -
-            outImage->at<float>(rows, cols);
-
-          deltaSouth.at<float>(rows, cols) =
-            outImage->at<float>(rows, cols + 1) -
-            outImage->at<float>(rows, cols);
-
-          deltaEast.at<float>(rows, cols) =
-            outImage->at<float>(rows + 1, cols) -
-            outImage->at<float>(rows, cols);
-
-          deltaWest.at<float>(rows, cols) =
-            outImage->at<float>(rows - 1, cols) -
-            outImage->at<float>(rows, cols);
-        }
-      }
-
-      if (method == 0)
-      {
-        for (unsigned int rows = 0; rows < outImage->rows; rows++)
-        {
-          for (unsigned int cols = 0; cols < outImage->cols; cols ++)
-          {
-            cN.at<float>(rows, cols) =
-              exp(-pow((deltaNorth.at<float>(rows, cols) / kappa), 2));
-            cS.at<float>(rows, cols) =
-              exp(-pow((deltaSouth.at<float>(rows, cols) / kappa), 2));
-            cE.at<float>(rows, cols) =
-              exp(-pow((deltaEast.at<float>(rows, cols) / kappa), 2));
-            cW.at<float>(rows, cols) =
-              exp(-pow((deltaWest.at<float>(rows, cols) / kappa), 2));
-
-          }
-        }
-      }
-      else if (method == 1)
-      {
-        for (unsigned int rows = 0; rows < outImage->rows; rows++)
-        {
-          for (unsigned int cols = 0; cols < outImage->cols; cols ++)
-          {
-            cN.at<float>(rows, cols) =
-              1 / (1 + pow((deltaNorth.at<float>(rows, cols) / kappa), 2));
-            cS.at<float>(rows, cols) =
-              1 / (1 + pow((deltaSouth.at<float>(rows, cols) / kappa), 2));
-            cE.at<float>(rows, cols) =
-              1 / (1 + pow((deltaEast.at<float>(rows, cols) / kappa), 2));
-            cW.at<float>(rows, cols) =
-              1 / (1 + pow((deltaWest.at<float>(rows, cols) / kappa), 2));
-          }
-        }
-      }
-      else if (method == 2)
-      {
-        for (unsigned int rows = 0; rows < outImage->rows; rows++)
-        {
-          for (unsigned int cols = 0; cols < outImage->cols; cols ++)
-          {
-            cN.at<float>(rows, cols) =
-              exp(pow((deltaNorth.at<float>(rows, cols) * kappa), 2));
-            cS.at<float>(rows, cols) =
-              exp(pow((deltaSouth.at<float>(rows, cols) * kappa), 2));
-            cE.at<float>(rows, cols) =
-              exp(pow((deltaEast.at<float>(rows, cols) * kappa), 2));
-            cW.at<float>(rows, cols) =
-              exp(+pow((deltaWest.at<float>(rows, cols) * kappa), 2));
-
-          }
-        }
-      }
-
-      *outImage += lamda * (cN.mul(deltaNorth) + cS.mul(deltaSouth)
-        + cE.mul(deltaEast) + cW.mul(deltaWest));
-    }
-    #ifdef DEBUG_TIME
-    Timer::tick("anisotropicDiffusion");
-    #endif
-  }
-
-
-
-  /**
     @brief Takes as input a depth image containing floats,
     locates the edges in it and tries to clear as much noise as possible
     in the edges image. As noise we identify everything that is not,
@@ -1501,6 +1381,7 @@ namespace pandora_vision
       }
     }
 
+    // Delete pointers inside nodes
     for(unsigned int d = 0 ; d < nodes.size(); d++)
     {
       delete nodes[d];

@@ -1017,7 +1017,7 @@ namespace pandora_vision
     bool isRunning;
     static unsigned int limit = 0;
 
-    static unsigned int *pts =
+    unsigned int *pts =
       new unsigned int[outImage->cols * outImage->rows];
 
     limit = 0;
@@ -1057,6 +1057,10 @@ namespace pandora_vision
         break;
       }
     }
+
+    // Delete pointer pts
+    delete[] pts;
+
     #ifdef DEBUG_TIME
     Timer::tick("thinning");
     #endif
