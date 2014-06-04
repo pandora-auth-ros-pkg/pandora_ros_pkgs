@@ -486,8 +486,8 @@ namespace pandora_vision
         float area = 0.0;
         BlobDetection::raycastKeypoint(holeKeypoint,
           &canvas,
-          false,
           raycastKeypointPartitions,
+          false,
           &outline,
           &area);
 
