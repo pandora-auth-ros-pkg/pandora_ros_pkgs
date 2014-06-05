@@ -3,3 +3,4 @@ source_list:
   - differential_side_joint_states
   - dynamixel/joint_states
   - motor/joint_states
+rate: 50
