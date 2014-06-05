@@ -45,12 +45,12 @@ class Joystick:
           # Axis event if 6th byte is 2
           elif msg[6] == 2:
             # Axis 3
-            if msg[7] == 3:
+            if msg[7] == 2:
               if int(msg[5]) > 127:
                 self.linear = float(abs(255 - int(msg[5])))/128
               else:
                 self.linear = float(0 - int(msg[5]))/128
-            if msg[7] == 2:
+            if msg[7] == 3:
               if int(msg[5]) > 127:
                 self.angular = float(abs(255 - int(msg[5])))/128
               else:

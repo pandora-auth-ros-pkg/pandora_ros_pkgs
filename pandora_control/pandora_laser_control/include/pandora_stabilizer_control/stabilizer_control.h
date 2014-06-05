@@ -55,6 +55,9 @@ namespace pandora_control
       ros::Publisher laserPitchPublisher_;
 
       void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
+      double rollBuffer_[5];
+      double pitchBuffer_[5];
+      int bufferCounter_;
 
     public:
       StabilizerController(void);

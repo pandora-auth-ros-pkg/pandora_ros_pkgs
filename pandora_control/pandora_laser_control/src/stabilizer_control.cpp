@@ -66,6 +66,12 @@ namespace pandora_control
     laserPitchPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
       "/laser_pitch_controller/command",
       5);
+    for (int ii = 0; ii < 5; ii++)
+    {
+      rollBuffer_[ii]= 0;
+      pitchBuffer_[ii] = 0;
+    }
+    bufferCounter_ = 0;
   }
 
   void StabilizerController::serveImuMessage(
@@ -85,9 +91,22 @@ namespace pandora_control
 
     matrix.getRPY(compassRoll, compassPitch, compassYaw);
 
-    str.data = -compassRoll;
+    rollBuffer_[bufferCounter_] = compassRoll;
+    pitchBuffer_[bufferCounter_] = compassPitch;
+    bufferCounter_ = fmod(bufferCounter_ + 1, 5);
+
+    double command[2];
+    command[0] = 0;
+    command[1] = 0;
+    for (int ii = 0; ii < 2; ii++)
+    {
+      command[0] = command[0] + rollBuffer_[ii] / 5;
+      command[1] = command[1] + pitchBuffer_[ii] / 5;
+    }
+
+    str.data = -command[0];
     laserRollPublisher_.publish(str);
-    str.data = -compassPitch;
+    str.data = -command[1];
     laserPitchPublisher_.publish(str);
   }
 }  // namespace pandora_control
