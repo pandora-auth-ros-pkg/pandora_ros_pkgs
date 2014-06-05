@@ -3,20 +3,6 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
   
 <!-- Elements' Status ##################################################### -->
-
-  <!-- Links ============================================================== -->
-  <xacro:property name="enable_base_link" value="true" />
-    <!-- ================================================================== -->
-  <xacro:property name="enable_side_links" value="true" />
-    <!-- ================================================================== -->
-  <xacro:property name="enable_wheel_links" value="true" />
-    <!-- ================================================================== -->
-  <xacro:property name="enable_linear_links" value="true" />
-    <xacro:property name="enable_linear_elevator_link" value="true" />
-    <xacro:property name="enable_linear_head_links" value="true" />
-      <xacro:property name="enable_linear_head_base_link" value="true" />
-      <xacro:property name="enable_linear_head_main_link" value="true" />
-  <!-- ==================================================================== -->
       
   <!-- Sensors ============================================================ -->
   <xacro:property name="enable_sensors" value="true" />
