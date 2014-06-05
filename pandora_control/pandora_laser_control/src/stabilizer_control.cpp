@@ -41,18 +41,31 @@ namespace pandora_control
   StabilizerController::StabilizerController(void)
   {
     std::string compassTopic;
-    if ( nodeHandle_.hasParam("compassTopic") )
+    if ( nodeHandle_.hasParam("compass_topic") )
     {
-      nodeHandle_.getParam("compassTopic", compassTopic);
+      nodeHandle_.getParam("compass_topic", compassTopic);
       ROS_DEBUG(
-        "[stabilizer_control_node]: Got parameter compassTopic : %s",
+        "[stabilizer_control_node]: Got parameter compass_topic : %s",
         compassTopic.c_str());
     }
     else
     {
       ROS_DEBUG(
-        "[stabilizer_control_node] : Parameter compassTopic not found. Using Default");
+        "[stabilizer_control_node] : Parameter compass_topic not found. Using Default");
       compassTopic = "/sensors/imu";
+    }
+    if ( nodeHandle_.hasParam("buffer_size") )
+    {
+      nodeHandle_.getParam("buffer_size", bufferSize_);
+      ROS_DEBUG_STREAM(
+        "[stabilizer_control_node]: Got parameter buffer_size : "
+        << bufferSize_);
+    }
+    else
+    {
+      ROS_DEBUG_STREAM(
+        "[stabilizer_control_node] : Parameter buffer_size not found. Using Default 5");
+      bufferSize_ = 5;
     }
     compassSubscriber_ = nodeHandle_.subscribe(
       compassTopic,
@@ -66,10 +79,11 @@ namespace pandora_control
     laserPitchPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
       "/laser_pitch_controller/command",
       5);
-    for (int ii = 0; ii < 5; ii++)
+
+    for (int ii = 0; ii < bufferSize_; ii++)
     {
-      rollBuffer_[ii]= 0;
-      pitchBuffer_[ii] = 0;
+      rollBuffer_.push_back(0);
+      pitchBuffer_.push_back(0);
     }
     bufferCounter_ = 0;
   }
@@ -93,15 +107,16 @@ namespace pandora_control
 
     rollBuffer_[bufferCounter_] = compassRoll;
     pitchBuffer_[bufferCounter_] = compassPitch;
-    bufferCounter_ = fmod(bufferCounter_ + 1, 5);
+    bufferCounter_ = fmod(bufferCounter_ + 1, bufferSize_);
 
     double command[2];
     command[0] = 0;
     command[1] = 0;
-    for (int ii = 0; ii < 2; ii++)
+
+    for (int ii = 0; ii < bufferSize_; ii++)
     {
-      command[0] = command[0] + rollBuffer_[ii] / 5;
-      command[1] = command[1] + pitchBuffer_[ii] / 5;
+      command[0] = command[0] + rollBuffer_[ii] / bufferSize_;
+      command[1] = command[1] + pitchBuffer_[ii] / bufferSize_;
     }
 
     str.data = -command[0];

@@ -55,8 +55,9 @@ namespace pandora_control
       ros::Publisher laserPitchPublisher_;
 
       void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
-      double rollBuffer_[5];
-      double pitchBuffer_[5];
+      std::vector<double> rollBuffer_;
+      std::vector<double> pitchBuffer_;
+      int bufferSize_;
       int bufferCounter_;
 
     public:
