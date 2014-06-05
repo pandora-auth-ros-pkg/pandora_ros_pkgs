@@ -262,11 +262,6 @@ namespace pandora_vision
   int Parameters::Rgb::color_window_radius = 40;
   int Parameters::Rgb::maximum_level_pyramid_segmentation = 2;
 
-
-  // Applies advanced blurring to achieve segmentation or
-  // normal blurring
-  int Parameters::Rgb::segmentation_blur_method = 0;
-
   // True to posterize the product of the segmentation
   bool Parameters::Rgb::posterize_after_segmentation = false;
 

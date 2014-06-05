@@ -318,7 +318,7 @@ namespace pandora_vision
     constrained inside each hole. A candidate hole is considered valid
     if its H-V histogram has above a certain number of bins occupied.
     @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inImage [const cv::Mat&] The RGB image in unscaled format
+    @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
     containing the masks needed to produce the histograms of the points
     inside each hole's outline
@@ -342,20 +342,10 @@ namespace pandora_vision
     Timer::start("checkHolesColorHomogeneity", "applyFilter");
     #endif
 
-    // Scale the inImage in [0, 255] into inImage_ if not already
+    // Copy the input image to inImage_ so as to get a pointer on it
     cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3)
-    {
-      inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::Image::scale_method);
 
-      ROS_ERROR_NAMED ("hole_detector",
-        "RgbFilters::checkHolesColorHomogeneity : wrong image type");
-    }
-    else
-    {
-      inImage.copyTo(inImage_);
-    }
+    inImage.copyTo(inImage_);
 
     // Reduce the colours of inImage_.
     // For a value of 16 for div, the maximum possible number of colours
@@ -426,6 +416,7 @@ namespace pandora_vision
     outside the hole's outline and
     (2) the points inside the hole's outline.
     @param[in] conveyor [const blobHolesConveyor&] The candidate holes
+    @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
     A vector that holds sets of points's indices;
     each point is internal to its respective hole
@@ -458,18 +449,6 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::start("checkHolesLuminosityDiff", "applyFilter");
     #endif
-
-    // Scale the inImage in [0, 255] into inImage_ if not already
-    cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3)
-    {
-      inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::Image::scale_method);
-    }
-    else
-    {
-      inImage.copyTo(inImage_);
-    }
 
     // Instead of applying the formula
     // Y = 0.299 * R + 0.587 * G + 0.114 * B to find the luminosity of each
@@ -550,7 +529,7 @@ namespace pandora_vision
     in the back project image, and for the points inside the candidate
     hole's outline to have a low probability in the back project image
     @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inImage [const cv::Mat&] The input RGB image in unscaled format
+    @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
@@ -586,21 +565,9 @@ namespace pandora_vision
     Timer::start("checkHolesTextureBackProject", "applyFilter");
     #endif
 
-    // Scale the inImage in [0, 255] into inImage_ if not already
-    cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3)
-    {
-      inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::Image::scale_method);
-    }
-    else
-    {
-      inImage.copyTo(inImage_);
-    }
-
-    // Obtain the backprojection of the inImage_, according to the inHistogram
+    // Obtain the backprojection of the inImage, according to the inHistogram
     cv::MatND backProject;
-    Histogram::getBackprojection(inImage_, inHistogram,
+    Histogram::getBackprojection(inImage, inHistogram,
       &backProject, Parameters::Histogram::secondary_channel);
 
     // Because the backproject is often sparcely populated, dilate each
@@ -676,8 +643,7 @@ namespace pandora_vision
     histograms of the bounding box and the points inside the outline of the
     blob.
     @param[in] conveyor [const HolesConveyor&] The candidate holes
-    @param[in] inImage [const cv::Mat&] The input RGB image in unscaled
-    format
+    @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
@@ -716,22 +682,9 @@ namespace pandora_vision
     // in the validKeyPointsIndices vector
     std::vector<unsigned int> validKeyPointsIndices;
 
-
-    // Scale the inImage in [0, 255] into inImage_ if not already
-    cv::Mat inImage_;
-    if (inImage.type() != CV_8UC3)
-    {
-      inImage_ = Visualization::scaleImageForVisualization(inImage,
-        Parameters::Image::scale_method);
-    }
-    else
-    {
-      inImage.copyTo(inImage_);
-    }
-
     // inImage transformed from BGR format to HSV
     cv::Mat inImageHSV;
-    cv::cvtColor(inImage_, inImageHSV, cv::COLOR_BGR2HSV);
+    cv::cvtColor(inImage, inImageHSV, cv::COLOR_BGR2HSV);
 
     int* histSize = new int[2];
 

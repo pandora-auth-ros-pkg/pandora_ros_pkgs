@@ -78,7 +78,6 @@ namespace pandora_vision
     EdgeDetection::computeRgbEdges(
       holeFrame,
       Parameters::Rgb::edges_extraction_method,
-      Parameters::Rgb::segmentation_blur_method,
       histogram,
       &edges);
 

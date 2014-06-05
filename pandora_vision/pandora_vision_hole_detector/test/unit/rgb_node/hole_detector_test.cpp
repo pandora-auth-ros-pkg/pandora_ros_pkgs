@@ -74,8 +74,6 @@ namespace pandora_vision
         WIDTH = 640;
         HEIGHT = 480;
 
-
-
         // Construct the lower right square
         cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC3);
 
@@ -158,13 +156,6 @@ namespace pandora_vision
     const unsigned char rgbIn,
     cv::Mat* image )
   {
-    if ( image->type() != CV_8UC3 )
-    {
-      std::cerr << "Image of invalid type. Please use CV_8UC3" << std::endl;
-
-      return;
-    }
-
     // Fill the inside of the desired rectangle with the @param rgbIn provided
     for( int rows = upperLeft.y; rows < upperLeft.y + y; rows++ )
     {

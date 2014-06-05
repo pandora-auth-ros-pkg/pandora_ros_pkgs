@@ -238,6 +238,8 @@ namespace pandora_vision
     EdgeDetection::applyCanny ( squares_, &squares_edges );
 
     ASSERT_EQ ( CV_8UC1, squares_edges.type() );
+
+    EXPECT_LT ( 0, cv::countNonZero( squares_edges ) );
   }
 
 
@@ -249,6 +251,8 @@ namespace pandora_vision
     EdgeDetection::applyScharr ( squares_, &squares_edges );
 
     ASSERT_EQ ( CV_8UC1, squares_edges.type() );
+
+    EXPECT_LT ( 0, cv::countNonZero( squares_edges ) );
   }
 
 
@@ -260,6 +264,8 @@ namespace pandora_vision
     EdgeDetection::applySobel ( squares_, &squares_edges );
 
     ASSERT_EQ ( CV_8UC1, squares_edges.type() );
+
+    EXPECT_LT ( 0, cv::countNonZero( squares_edges ) );
   }
 
 
@@ -271,6 +277,8 @@ namespace pandora_vision
     EdgeDetection::applyLaplacian ( squares_, &squares_edges );
 
     ASSERT_EQ ( CV_8UC1, squares_edges.type() );
+
+    EXPECT_LT ( 0, cv::countNonZero( squares_edges ) );
   }
 
 
@@ -278,6 +286,31 @@ namespace pandora_vision
   //! Test EdgeDetection::applyEdgeContamination
   TEST_F ( EdgeDetectionTest, ApplyEdgeContaminationTest)
   {
+    // Modify the squares_ image. Add squares adjacent to the corners of it.
+
+    // The edges of this square are not touching the image's borders.
+    // Remove "- 1" for that.
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point2f ( 1, 1 ),
+        10,
+        10,
+        &squares_ );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point2f ( 1, HEIGHT - 1 - 10 ),
+        10,
+        10,
+        &squares_ );
+
+    EdgeDetectionTest::generateRectangle
+      ( cv::Point2f ( WIDTH - 1 - 10, 1 ),
+        10,
+        10,
+        &squares_ );
+
+    // Uncomment for visual inspection
+    //Visualization::show("Modified squares_ image", squares_, 0);
+
     // Obtain the edges image for the squares_ image.
     // Here, it does not matter with which operator the edges image is produced,
     // provided that the the value tested below changes accordingly
@@ -285,13 +318,13 @@ namespace pandora_vision
     EdgeDetection::applyLaplacian ( squares_, &squares_edges );
 
     // The number of non-zero pixels before the appliance of edge contamination
-    EXPECT_EQ ( 2 * ( 3 * 396 - 4 ) , cv::countNonZero ( squares_edges ) );
+    EXPECT_EQ ( 2 * ( 3 * 396 - 4 ) + 3 * ( 3 * 36 - 4 ),
+      cv::countNonZero ( squares_edges ) );
 
     // Uncomment for visual inspection
     //Visualization::show("Before calling applyEdgeContamination", squares_edges, 0);
 
     EdgeDetection::applyEdgeContamination ( &squares_edges );
-
 
     // Uncomment for visual inspection
     //Visualization::show("After calling applyEdgeContamination", squares_edges, 0);
@@ -305,39 +338,64 @@ namespace pandora_vision
   //! Test EdgeDetection::computeDepthEdges
   TEST_F ( EdgeDetectionTest, ComputeDepthEdgesTest )
   {
-    // Convert squares_ into a CV_32FC1 type image
-    cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );
-
-    for ( int rows = 0; rows < squares_.rows; rows++ )
+    // Traverse all available edge detectors
+    for ( int p = 0; p < 5; p++ )
     {
-      for ( int cols = 0; cols < squares_.cols; cols++ )
+      Parameters::Edge::edge_detection_method = p;
+
+      // Test the toggle switch
+      for ( int t = 1; t < 3; t++ )
       {
-        squares_32FC1.at< float >( rows, cols ) =
-          static_cast< float >(squares_.at< unsigned char >( rows, cols )) / 255;
+        Parameters::Edge::mixed_edges_toggle_switch == t;
+
+        // Convert squares_ into a CV_32FC1 type image
+        cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );
+
+        for ( int rows = 0; rows < squares_.rows; rows++ )
+        {
+          for ( int cols = 0; cols < squares_.cols; cols++ )
+          {
+            squares_32FC1.at< float >( rows, cols ) =
+              static_cast< float >(squares_.at< unsigned char >( rows, cols )) / 255;
+          }
+        }
+
+        // Add an unfinished square to the squares_32FC1 image
+        for ( int rows = 300; rows < 400; rows++ )
+        {
+          squares_32FC1.at< float >( rows, 300 ) = 2.0;
+        }
+
+        for ( int cols = 300; cols < 400; cols++ )
+        {
+          squares_32FC1.at< float >( 300, cols ) = 2.0;
+        }
+
+        // Uncomment for visual inspection
+        /*
+         *Visualization::showScaled("Before calling computeDepthEdges",
+         * squares_32FC1, 0);
+         */
+
+        cv::Mat denoisedEdges;
+        EdgeDetection::computeDepthEdges ( squares_32FC1, &denoisedEdges );
+
+        // Uncomment for visual inspection
+        //Visualization::show("After calling computeDepthEdges", denoisedEdges, 0);
+
+        ASSERT_EQ ( CV_8UC1, denoisedEdges.type() );
+
+        // Canny cannot locate any edges in the squares_32FC1 image
+        if ( p == 0 )
+        {
+          EXPECT_EQ ( 0, cv::countNonZero( denoisedEdges ) );
+        }
+        else
+        {
+          EXPECT_LT ( 0, cv::countNonZero( denoisedEdges ) );
+        }
       }
     }
-
-    // Add an unfinished square to the squares_32FC1 image
-    for ( int rows = 300; rows < 400; rows++ )
-    {
-      squares_32FC1.at< float >( rows, 300 ) = 2.0;
-    }
-
-    for ( int cols = 300; cols < 400; cols++ )
-    {
-      squares_32FC1.at< float >( 300, cols ) = 2.0;
-    }
-
-    // Uncomment for visual inspection
-    //Visualization::showScaled("Before calling computeDepthEdges", squares_32FC1, 0);
-
-    cv::Mat denoisedEdges;
-    EdgeDetection::computeDepthEdges ( squares_32FC1, &denoisedEdges );
-
-    // Uncomment for visual inspection
-    //Visualization::show("After calling computeDepthEdges", denoisedEdges, 0);
-
-    ASSERT_EQ ( CV_8UC1, denoisedEdges.type() );
 
   }
 
@@ -366,59 +424,33 @@ namespace pandora_vision
 
     // The final edges image
     // extractionMethod = 0
-    // segmentationMethod = 0
-    cv::Mat denoisedEdges_00;
+    cv::Mat denoisedEdges_0;
 
     // A dummy histogram
     cv::MatND histogram = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
 
     // Run EdgeDetection::computeRgbEdges
     EdgeDetection::computeRgbEdges
-      ( squares_8UC3, 0, 0, histogram, &denoisedEdges_00 );
+      ( squares_8UC3, 0, histogram, &denoisedEdges_0 );
+
+    EXPECT_LT ( 0, cv::countNonZero( denoisedEdges_0 ) );
 
     // Uncomment for visual inspection
-    //Visualization::show("After calling computeRgbEdges 0:0", denoisedEdges_00, 0);
-
-    // The final edges image
-    // extractionMethod = 0
-    // segmentationMethod = 1
-    cv::Mat denoisedEdges_01;
-
-    // Run EdgeDetection::computeRgbEdges
-    EdgeDetection::computeRgbEdges
-      ( squares_8UC3, 0, 1, histogram, &denoisedEdges_01 );
-
-    // Uncomment for visual inspection
-    //Visualization::show("After calling computeRgbEdges 0:1", denoisedEdges_01, 0);
+    //Visualization::show("After calling computeRgbEdges 0", denoisedEdges_0, 0);
 
     // The final edges image
     // extractionMethod = 1
-    // segmentationMethod = 0
-    cv::Mat denoisedEdges_10;
+    cv::Mat denoisedEdges_1;
 
     // Run EdgeDetection::computeRgbEdges
     EdgeDetection::computeRgbEdges
-      ( squares_8UC3, 1, 0, histogram, &denoisedEdges_10 );
+      ( squares_8UC3, 1, histogram, &denoisedEdges_1 );
+
+    // Because of the void histogram, the edges image is blank
+    EXPECT_EQ ( 0, cv::countNonZero( denoisedEdges_1 ) );
 
     // Uncomment for visual inspection
-    //Visualization::show("After calling computeRgbEdges 1:0", denoisedEdges_10, 0);
-
-    // The final edges image
-    // extractionMethod = 1
-    // segmentationMethod = 1
-    cv::Mat denoisedEdges_11;
-
-    // Run EdgeDetection::computeRgbEdges
-    EdgeDetection::computeRgbEdges
-      ( squares_8UC3, 1, 1, histogram, &denoisedEdges_11 );
-
-    // Uncomment for visual inspection
-    //Visualization::show("After calling computeRgbEdges 1:1", denoisedEdges_11, 0);
-
-    ASSERT_EQ ( CV_8UC1, denoisedEdges_00.type() );
-    ASSERT_EQ ( CV_8UC1, denoisedEdges_10.type() );
-    ASSERT_EQ ( CV_8UC1, denoisedEdges_01.type() );
-    ASSERT_EQ ( CV_8UC1, denoisedEdges_11.type() );
+    //Visualization::show("After calling computeRgbEdges 1", denoisedEdges_1, 0);
 
   }
 
@@ -447,17 +479,26 @@ namespace pandora_vision
 
     // Construct the pair to be connected: it is the two ends of the unfinished
     // square
-    std::pair< GraphNode, GraphNode > p;
+    std::pair< GraphNode, GraphNode > p_1;
 
-    p.first.x = 399;
-    p.first.y = 300;
+    p_1.first.x = 399;
+    p_1.first.y = 300;
 
-    p.second.x = 300;
-    p.second.y = 399;
+    p_1.second.x = 300;
+    p_1.second.y = 399;
+
+    std::pair< GraphNode, GraphNode > p_2;
+
+    p_2.first.x = 300;
+    p_2.first.y = 399;
+
+    p_2.second.x = 399;
+    p_2.second.y = 300;
 
     // Construct the vector of pairs
     std::vector< std::pair< GraphNode, GraphNode > > pairs;
-    pairs.push_back( p );
+    pairs.push_back( p_1 );
+    pairs.push_back( p_2 );
 
 
     // Connect by arc
@@ -467,6 +508,9 @@ namespace pandora_vision
 
     // Connect the two points by arc
     EdgeDetection::connectPairs ( &squares_edges, pairs, 1 );
+
+    // Uncomment for visual inspection
+    //Visualization::show("squares_edges arc", squares_edges, 0);
 
     // The number of non-zero pixels after the connection of the two points
     int nonZerosAfter = cv::countNonZero( squares_edges );
@@ -490,6 +534,485 @@ namespace pandora_vision
     // If the two points where connected, that means that there should be more
     // non-zero pixels after the connection
     EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("squares_edges line", squares_edges, 0);
+
+
+    // Commence full blown connectPairs test.
+
+    /////////////////////////// Features a U shape /////////////////////////////
+    cv::Mat u = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    for ( int rows = 100; rows < 200; rows++ )
+    {
+      u.at< unsigned char >( rows, 100 ) = 255;
+      u.at< unsigned char >( rows, 199 ) = 255;
+    }
+
+    for ( int cols = 100; cols < 200; cols++ )
+    {
+      u.at< unsigned char >( 199, cols ) = 255;
+    }
+
+    // Backup u
+    cv::Mat u_backup;
+    u.copyTo(u_backup);
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p_u_1;
+
+    p_u_1.first.x = 100;
+    p_u_1.first.y = 100;
+
+    p_u_1.second.x = 100;
+    p_u_1.second.y = 199;
+
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_u_1;
+    pairs_u_1.push_back( p_u_1 );
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( u );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &u, pairs_u_1, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( u );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("u arc forward", u , 0);
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_u_2;
+
+    // Reverse the order of the graph nodes
+    std::pair< GraphNode, GraphNode > p_u_2;
+
+    p_u_2.first.x = 100;
+    p_u_2.first.y = 199;
+
+    p_u_2.second.x = 100;
+    p_u_2.second.y = 100;
+
+    pairs_u_2.push_back( p_u_2 );
+
+    // Reset u
+    u_backup.copyTo(u);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( u );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &u, pairs_u_2, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( u );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("u arc reverse", u , 0);
+
+    // Connect by line
+
+    // Reset u
+    u_backup.copyTo(u);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( u );
+
+    // Connect the two points by line
+    EdgeDetection::connectPairs ( &u, pairs_u_1, 0 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( u );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("u line", u , 0);
+
+
+    /////////////////////////// Features a C shape /////////////////////////////
+    cv::Mat c = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    for ( int rows = 100; rows < 200; rows++ )
+    {
+      c.at< unsigned char >( rows, 100 ) = 255;
+    }
+
+    for ( int cols = 100; cols < 200; cols++ )
+    {
+      c.at< unsigned char >( 100, cols ) = 255;
+      c.at< unsigned char >( 199, cols ) = 255;
+    }
+
+    // Backup c
+    cv::Mat c_backup;
+    c.copyTo(c_backup);
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p_c_1;
+
+    p_c_1.first.x = 100;
+    p_c_1.first.y = 199;
+
+    p_c_1.second.x = 199;
+    p_c_1.second.y = 199;
+
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_c_1;
+    pairs_c_1.push_back( p_c_1 );
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( c );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &c, pairs_c_1, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( c );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("c arc forward", c , 0);
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_c_2;
+
+    // Reverse the order of the graph nodes
+    std::pair< GraphNode, GraphNode > p_c_2;
+
+    p_c_2.first.x = 199;
+    p_c_2.first.y = 199;
+
+    p_c_2.second.x = 100;
+    p_c_2.second.y = 199;
+
+    pairs_c_2.push_back( p_c_2 );
+
+    // Reset c
+    c_backup.copyTo(c);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( c );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &c, pairs_c_2, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( c );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("c arc reverse", c , 0);
+
+    // Connect by line
+
+    // Reset c
+    c_backup.copyTo(c);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( c );
+
+    // Connect the two points by line
+    EdgeDetection::connectPairs ( &c, pairs_c_1, 0 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( c );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("c line", c , 0);
+
+
+    /////////////////////////// Features a pi shape ////////////////////////////
+    cv::Mat pi = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    for ( int rows = 100; rows < 200; rows++ )
+    {
+      pi.at< unsigned char >( rows, 100 ) = 255;
+      pi.at< unsigned char >( rows, 199 ) = 255;
+    }
+
+    for ( int cols = 100; cols < 200; cols++ )
+    {
+      pi.at< unsigned char >( 100, cols ) = 255;
+    }
+
+    // Backup pi
+    cv::Mat pi_backup;
+    pi.copyTo(pi_backup);
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p_pi_1;
+
+    p_pi_1.first.x = 199;
+    p_pi_1.first.y = 100;
+
+    p_pi_1.second.x = 199;
+    p_pi_1.second.y = 199;
+
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_pi_1;
+    pairs_pi_1.push_back( p_pi_1 );
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( pi );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &pi, pairs_pi_1, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( pi );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("pi arc forward", pi , 0);
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_pi_2;
+
+    // Reverse the order of the graph nodes
+    std::pair< GraphNode, GraphNode > p_pi_2;
+
+    p_pi_2.first.x = 199;
+    p_pi_2.first.y = 199;
+
+    p_pi_2.second.x = 199;
+    p_pi_2.second.y = 100;
+
+    pairs_pi_2.push_back( p_pi_2 );
+
+    // Reset pi
+    pi_backup.copyTo(pi);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( pi );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &pi, pairs_pi_2, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( pi );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("pi arc reverse", pi , 0);
+
+    // Connect by line
+
+    // Reset pi
+    pi_backup.copyTo(pi);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( pi );
+
+    // Connect the two points by line
+    EdgeDetection::connectPairs ( &pi, pairs_pi_1, 0 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( pi );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("pi line", pi , 0);
+
+
+    /////////////////////// Features a backwards C shape ///////////////////////
+    cv::Mat bc = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    for ( int rows = 100; rows < 200; rows++ )
+    {
+      bc.at< unsigned char >( rows, 199 ) = 255;
+    }
+
+    for ( int cols = 100; cols < 200; cols++ )
+    {
+      bc.at< unsigned char >( 100, cols ) = 255;
+      bc.at< unsigned char >( 199, cols ) = 255;
+    }
+
+    // Backup bc
+    cv::Mat bc_backup;
+    bc.copyTo(bc_backup);
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p_bc_1;
+
+    p_bc_1.first.x = 100;
+    p_bc_1.first.y = 100;
+
+    p_bc_1.second.x = 199;
+    p_bc_1.second.y = 100;
+
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_bc_1;
+    pairs_bc_1.push_back( p_bc_1 );
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( bc );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &bc, pairs_bc_1, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( bc );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("bc arc forward", bc , 0);
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_bc_2;
+
+    // Reverse the order of the graph nodes
+    std::pair< GraphNode, GraphNode > p_bc_2;
+
+    p_bc_2.first.x = 199;
+    p_bc_2.first.y = 100;
+
+    p_bc_2.second.x = 100;
+    p_bc_2.second.y = 100;
+
+    pairs_bc_2.push_back( p_bc_2 );
+
+    // Reset bc
+    bc_backup.copyTo(bc);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( bc );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &bc, pairs_bc_2, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( bc );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("bc arc reverse", bc , 0);
+
+    // Connect by line
+
+    // Reset bc
+    bc_backup.copyTo(bc);
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( bc );
+
+    // Connect the two points by line
+    EdgeDetection::connectPairs ( &bc, pairs_bc_1, 0 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( bc );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("bc line", bc , 0);
+
+    /////////////////////// Features a | | shape ///////////////////////
+    // This is made to test that if no outline point is found,
+    // the image is preserved and the points are not connected
+    cv::Mat ii = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+    for ( int rows = 100; rows < 200; rows++ )
+    {
+      ii.at< unsigned char >( rows, 100 ) = 255;
+      ii.at< unsigned char >( rows, 199 ) = 255;
+    }
+
+
+    // Backup ii
+    cv::Mat ii_backup;
+    ii.copyTo(ii_backup);
+
+    // Construct the pair to be connected: it is the two ends of the unfinished
+    // square
+    std::pair< GraphNode, GraphNode > p_ii_1;
+
+    p_ii_1.first.x = 100;
+    p_ii_1.first.y = 100;
+
+    p_ii_1.second.x = 100;
+    p_ii_1.second.y = 199;
+
+
+    // Construct the vector of pairs
+    std::vector< std::pair< GraphNode, GraphNode > > pairs_ii_1;
+    pairs_ii_1.push_back( p_ii_1 );
+
+    // Connect by arc
+
+    // The number of non-zero pixels before the connection of the two points
+    nonZerosBefore = cv::countNonZero( ii );
+
+    // Connect the two points by arc
+    EdgeDetection::connectPairs ( &ii, pairs_ii_1, 1 );
+
+    // The number of non-zero pixels after the connection of the two points
+    nonZerosAfter = cv::countNonZero( ii );
+
+    // If the two points where connected, that means that there should be more
+    // non-zero pixels after the connection
+    EXPECT_EQ( nonZerosBefore, nonZerosAfter );
+
+    // Uncomment for visual inspection
+    //Visualization::show("ii failure", ii , 0);
+
   }
 
 
@@ -729,70 +1252,63 @@ namespace pandora_vision
   //! Test EdgeDetection::produceEdgesViaSegmentation
   TEST_F ( EdgeDetectionTest, ProduceEdgesViaSegmentationTest )
   {
-    // Convert squares_ into a CV_8UC3 image
-    cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
-    cv::cvtColor( squares_, squares_8UC3, CV_GRAY2BGR );
-
-    // Add an unfinished square to the squares_8UC3 image
-    for ( int rows = 300; rows < 400; rows++ )
+    // Traverse all available edge detectors
+    for ( int p = 0; p < 5; p++ )
     {
-      squares_8UC3.at< cv::Vec3b >( rows, 300 ) = 128;
+      Parameters::Edge::edge_detection_method = p;
+
+      // Posterize?
+      for ( int f = 0; f < 2; f++ )
+      {
+        Parameters::Rgb::posterize_after_segmentation = f;
+
+        // Convert squares_ into a CV_8UC3 image
+        cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
+        cv::cvtColor( squares_, squares_8UC3, CV_GRAY2BGR );
+
+        // Add an unfinished square to the squares_8UC3 image
+        for ( int rows = 300; rows < 400; rows++ )
+        {
+          squares_8UC3.at< cv::Vec3b >( rows, 300 ) = 128;
+        }
+
+        for ( int cols = 300; cols < 400; cols++ )
+        {
+          squares_8UC3.at< cv::Vec3b >( 300, cols ) = 128;
+        }
+
+
+        // Uncomment for visual inspection
+        //Visualization::show("Before calling produceEdgesViaSegmentation 0",
+        //squares_8UC3, 0);
+
+        // Segmentation using cv::pyrMeanShiftFiltering
+        cv::Mat edges_0;
+
+        // Run EdgeDetection::segmentation
+        // segmentation method = 0
+        EdgeDetection::produceEdgesViaSegmentation ( squares_8UC3, &edges_0 );
+
+        // Uncomment for visual inspection
+        /*
+         *Visualization::show("After calling produceEdgesViaSegmentation 0",
+         *  edges_0, 0);
+         */
+
+        // The image should not be blank
+        ASSERT_LT ( 0, cv::countNonZero ( edges_0 ) );
+
+        // The edges image should be of type CV_8UC1
+        ASSERT_EQ ( CV_8UC1, edges_0.type() );
+
+
+        // Uncomment for visual inspection
+        /*
+         *Visualization::show("Before calling produceEdgesViaSegmentation 1",
+         *squares_8UC3, 0);
+         */
+      }
     }
-
-    for ( int cols = 300; cols < 400; cols++ )
-    {
-      squares_8UC3.at< cv::Vec3b >( 300, cols ) = 128;
-    }
-
-
-    // Uncomment for visual inspection
-    //Visualization::show("Before calling produceEdgesViaSegmentation 0",
-    //squares_8UC3, 0);
-
-    // Segmentation using cv::pyrMeanShiftFiltering
-    cv::Mat edges_0;
-
-    // Run EdgeDetection::segmentation
-    // segmentation method = 0
-    EdgeDetection::produceEdgesViaSegmentation ( squares_8UC3, 0, &edges_0 );
-
-    // Uncomment for visual inspection
-    /*
-     *Visualization::show("After calling produceEdgesViaSegmentation 0",
-     *  edges_0, 0);
-     */
-
-    // The image should not be blank
-    ASSERT_LT ( 0, cv::countNonZero ( edges_0 ) );
-
-    // The edges image should be of type CV_8UC1
-    ASSERT_EQ ( CV_8UC1, edges_0.type() );
-
-
-    // Uncomment for visual inspection
-    /*
-     *Visualization::show("Before calling produceEdgesViaSegmentation 1",
-     *squares_8UC3, 0);
-     */
-
-    // Segmentation using cv::medianBlur
-    cv::Mat edges_1;
-
-    // Run EdgeDetection::segmentation
-    // segmentation method = 1
-    EdgeDetection::produceEdgesViaSegmentation ( squares_8UC3, 1, &edges_1 );
-
-    // Uncomment for visual inspection
-    /*
-     *Visualization::show("After calling produceEdgesViaSegmentation 1",
-     *  edges_1, 0);
-     */
-
-    // The image should be blank
-    ASSERT_EQ ( 0, cv::countNonZero ( edges_1 ) );
-
-    // The edges image should be of type CV_8UC1
-    ASSERT_EQ ( CV_8UC1, edges_1.type() );
   }
 
 
@@ -819,26 +1335,15 @@ namespace pandora_vision
     //Visualization::show("Before calling segmentation", squares_8UC3, 0);
 
     // Segmentation using cv::pyrMeanShiftFiltering
-    cv::Mat segmented_0;
+    cv::Mat segmented;
 
     // Run EdgeDetection::segmentation
-    EdgeDetection::segmentation ( squares_8UC3, 0, &segmented_0 );
+    EdgeDetection::segmentation ( squares_8UC3, &segmented );
 
     // Uncomment for visual inspection
-    //Visualization::show("After calling segmentation 0", segmented_0, 0);
+    //Visualization::show("After calling segmentation", segmented, 0);
 
-    // Segmentation using cv::medianBlur
-    cv::Mat segmented_1;
-
-    // Run EdgeDetection::segmentation
-    EdgeDetection::segmentation ( squares_8UC3, 0, &segmented_1 );
-
-    // Uncomment for visual inspection
-    //Visualization::show("After calling segmentation 1", segmented_1, 0);
-
-    // The type of the output images should still be CV_8UC3
-    ASSERT_EQ ( CV_8UC3, segmented_0.type() );
-    ASSERT_EQ ( CV_8UC3, segmented_1.type() );
+    ASSERT_EQ ( CV_8UC3, segmented.type() );
   }
 
 } // namespace pandora_vision

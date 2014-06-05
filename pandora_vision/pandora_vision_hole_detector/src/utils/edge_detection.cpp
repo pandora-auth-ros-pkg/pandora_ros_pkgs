@@ -66,7 +66,8 @@ namespace pandora_vision
     int kernel_size = Parameters::Edge::canny_kernel_size;
     int lowThreshold = Parameters::Edge::canny_low_threshold;
 
-    // Reduce noise with a kernel 3x3
+    // Reduce noise with a kernel with size
+    // Parameters::Edge::canny_blur_noise_kernel_size ^ 2
     cv::blur(*outImage, detected_edges, cv::Size(
         Parameters::Edge::canny_blur_noise_kernel_size,
         Parameters::Edge::canny_blur_noise_kernel_size));
@@ -389,17 +390,14 @@ namespace pandora_vision
 
     cv::Mat denoisedDepthImageEdges;
     cv::Mat visualizableDenoisedImage;
-    cv::Mat tempImg;
 
-    inImage.copyTo(tempImg);
-
-    // Facilitate the edge detection by converting the 32FC1 image \
-    values to a range of 0-255
-      visualizableDenoisedImage = Visualization::scaleImageForVisualization
-      (tempImg, Parameters::Image::scale_method);
+    // Facilitate the edge detection by converting the 32FC1 image
+    // values to the range of 0-255
+    visualizableDenoisedImage = Visualization::scaleImageForVisualization
+      (inImage, Parameters::Image::scale_method);
 
 
-    // from now onwards every image is in the range of 0-255
+    // From now onwards every image is in the range of 0-255
     if (Parameters::Edge::edge_detection_method == 0)
     {
       applyCanny(visualizableDenoisedImage, &denoisedDepthImageEdges);
@@ -462,8 +460,6 @@ namespace pandora_vision
     @param[in] extractionMethod [const int&] Chooses by which process the
     edges will be extracted. 0 for extraction via segmentation,
     1 for extraction via backprojection and watersheding
-    @param[in] segmentationMethod [const int&] The method by which the
-    segmentation of @param inImage will be performed.
     @param[in] inHistogram [const cv::MatND&] The model histogram needed
     in order to obtain the backprojection of @param inImage
     @param[out] edges [cv::Mat*] The final denoised edges image that
@@ -471,8 +467,9 @@ namespace pandora_vision
     @return void
    **/
   void EdgeDetection::computeRgbEdges(const cv::Mat& inImage,
-    const int& extractionMethod, const int& segmentationMethod,
-    const cv::MatND& inHistogram, cv::Mat* edges)
+    const int& extractionMethod,
+    const cv::MatND& inHistogram,
+    cv::Mat* edges)
   {
     if (inImage.type() != CV_8UC3)
     {
@@ -488,7 +485,7 @@ namespace pandora_vision
 
     if (extractionMethod == 0)
     {
-      produceEdgesViaSegmentation(inImage, segmentationMethod, edges);
+      produceEdgesViaSegmentation(inImage, edges);
     }
     else if (extractionMethod == 1)
     {
@@ -654,6 +651,12 @@ namespace pandora_vision
                 }
               }
             }
+          }
+
+          // An outline point could not be found
+          if (!inLimitsOne && !inLimitsTwo)
+          {
+            break;
           }
         }
 
@@ -1816,8 +1819,8 @@ namespace pandora_vision
 
   /**
     @brief This method takes as input a RGB image and uses
-    its backprojection (which is based on the precalculated
-    histogram @param inHistogram) in order to identify whole regions whose
+    its backprojection, which is based on the precalculated
+    histogram @param inHistogram, in order to identify whole regions whose
     histogram matches @param inHistogram, although the backprojection image
     might be sparcely populated. After the identification of the regions
     of interest, this method extracts their edges and returns the image
@@ -2053,14 +2056,12 @@ namespace pandora_vision
     and extracts its edges.
     @param[in] inImage [const cv::Mat&] The input RGB image,
     of type CV_8UC3
-    @param[in] segmentationMethod [const int&] The method by which the
-    segmentation of @param inImage will be performed.
     @param[out] outImage [cv::Mat*] The output edges image,
     of type CV_8UC1
     @return void
    **/
   void EdgeDetection::produceEdgesViaSegmentation (const cv::Mat& inImage,
-    const int& segmentationMethod, cv::Mat* edges)
+    cv::Mat* edges)
   {
     if (inImage.type() != CV_8UC3)
     {
@@ -2097,7 +2098,7 @@ namespace pandora_vision
     inImage.copyTo(segmentedHoleFrame);
 
     // Segment the input image.
-    segmentation(inImage, segmentationMethod, &segmentedHoleFrame);
+    segmentation(inImage, &segmentedHoleFrame);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_produce_edges)
@@ -2211,13 +2212,10 @@ namespace pandora_vision
   /**
     @brief Segments a RGB image
     @param[in] inImage [const cv::Mat&] The RGB image to be segmented
-    @param[in] segmentationMethod [const int&] The method by which the
-    segmentation of @param inImage will be performed.
     @param[out] outImage [cv::Mat*] The posterized image
     @return void
    **/
-  void EdgeDetection::segmentation(const cv::Mat& inImage,
-    const int& segmentationMethod, cv::Mat* outImage)
+  void EdgeDetection::segmentation(const cv::Mat& inImage, cv::Mat* outImage)
   {
     if (inImage.type() != CV_8UC3)
     {
@@ -2231,29 +2229,18 @@ namespace pandora_vision
     Timer::start("segmentation", "produceEdgesViaSegmentation");
     #endif
 
-    // Segment the input image
-    if (segmentationMethod == 0)
-    {
-      // Termination criteria for the segmentation below
-      cv::TermCriteria criteria(
-        CV_TERMCRIT_ITER | CV_TERMCRIT_EPS,
-        Parameters::Image::term_criteria_max_iterations,
-        Parameters::Image::term_criteria_max_epsilon);
+    // Termination criteria for the segmentation below
+    cv::TermCriteria criteria(
+      CV_TERMCRIT_ITER | CV_TERMCRIT_EPS,
+      Parameters::Image::term_criteria_max_iterations,
+      Parameters::Image::term_criteria_max_epsilon);
 
-      // Segment the image
-      cv::pyrMeanShiftFiltering(inImage, *outImage,
-        Parameters::Rgb::spatial_window_radius,
-        Parameters::Rgb::color_window_radius,
-        Parameters::Rgb::maximum_level_pyramid_segmentation,
-        criteria);
-    }
-    else if (segmentationMethod == 1)
-    {
-      for ( int i = 1; i < 15; i = i + 4 )
-      {
-        cv::medianBlur(inImage, *outImage, i);
-      }
-    }
+    // Segment the image
+    cv::pyrMeanShiftFiltering(inImage, *outImage,
+      Parameters::Rgb::spatial_window_radius,
+      Parameters::Rgb::color_window_radius,
+      Parameters::Rgb::maximum_level_pyramid_segmentation,
+      criteria);
 
       #ifdef DEBUG_TIME
       Timer::tick("segmentation");

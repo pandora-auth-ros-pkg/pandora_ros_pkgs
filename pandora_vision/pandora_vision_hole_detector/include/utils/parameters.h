@@ -300,9 +300,6 @@ namespace pandora_vision
       static int color_window_radius;
       static int maximum_level_pyramid_segmentation;
 
-      // Applies advanced blurring to achieve segmentation or normal
-      static int segmentation_blur_method;
-
       // True to posterize the product of the segmentation
       static bool posterize_after_segmentation;
 

@@ -91,7 +91,6 @@ namespace pandora_vision
         dst.rectangles.push_back ( dst_rectangles );
 
 
-
         std::vector< cv::Point2f > dst_outlines;
         dst_outlines.push_back ( cv::Point2f ( 1, 1 ) );
         dst.outlines.push_back ( dst_outlines );

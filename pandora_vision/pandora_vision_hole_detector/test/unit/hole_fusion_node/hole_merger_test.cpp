@@ -255,13 +255,6 @@ namespace pandora_vision
     const float& depthIn,
     cv::Mat* image )
   {
-    if ( image->type() != CV_32FC1 )
-    {
-      std::cerr << "Image of invalid type. Please use CV_32FC1" << std::endl;
-
-      return;
-    }
-
     // Fill the inside of the desired rectangle with the @param depthIn provided
     for( int rows = upperLeft.y; rows < upperLeft.y + y; rows++ )
     {

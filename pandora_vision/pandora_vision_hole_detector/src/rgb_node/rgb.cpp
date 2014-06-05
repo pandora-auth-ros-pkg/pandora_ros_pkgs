@@ -392,10 +392,6 @@ namespace pandora_vision
     Parameters::Rgb::posterize_after_segmentation =
       config.posterize_after_segmentation;
 
-    // Applies advanced blurring to achieve segmentation or normal
-    Parameters::Rgb::segmentation_blur_method =
-      config.segmentation_blur_method;
-
     // FloodFill options regarding minimum and maximum colour difference
     Parameters::Rgb::floodfill_lower_colour_difference =
       config.floodfill_lower_colour_difference;

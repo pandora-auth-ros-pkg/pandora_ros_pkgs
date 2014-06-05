@@ -110,7 +110,7 @@ namespace pandora_vision
   {
     std::vector<pcl::PointIndices::Ptr> inliersVector;
 
-    // Run PlanesDetection::locatePlanes
+    // Run PlanesDetection::locatePlanes without applying voxel filtering
     int numPlanes = PlanesDetection::locatePlanes( cloud, false, &inliersVector );
 
     // There should be two planes detected
@@ -122,6 +122,21 @@ namespace pandora_vision
 
     // The remaining quarter is the second point cloud
     EXPECT_EQ ( WIDTH * HEIGHT / 4, inliersVector[1]->indices.size() );
+
+    // Run PlanesDetection::locatePlanes with voxel filtering
+    inliersVector.clear();
+
+    numPlanes = PlanesDetection::locatePlanes( cloud, true, &inliersVector );
+
+    // There should be two planes detected
+    EXPECT_EQ ( 2, numPlanes );
+
+    // The first plane is comprised of the one hundredth of three quarters
+    // of the entire point cloud
+    EXPECT_EQ ( WIDTH * HEIGHT * 3 / 4 / 100, inliersVector[0]->indices.size() );
+
+    // The remaining one hundredth quarter is the second point cloud
+    EXPECT_EQ ( WIDTH * HEIGHT / 4 / 100, inliersVector[1]->indices.size() );
   }
 
 
