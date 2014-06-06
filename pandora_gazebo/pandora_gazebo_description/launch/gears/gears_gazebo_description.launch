@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 
 <launch>
+    
+<!-- ###################################################################### -->
 
   <arg name="control" default="true" />
   <arg name="interface" default="true" />
+  
+  <arg name="sensors_viz" default="false" />
+    
+<!-- ###################################################################### -->
   
   <group if="$(arg control)" >
   
@@ -16,11 +22,13 @@
     </group>
     
   </group>
+    
+<!-- ###################################################################### -->
 
   <param name="robot_description"
-         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/gears/gears.gazebo.xacro' control:=$(arg control) interface:=$(arg interface)" />
-
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/gears/gears.gazebo.xacro' control:=$(arg control) interface:=$(arg interface) sensors_viz:=$(arg sensors_viz)" />
+    
+<!-- ###################################################################### -->
   
   <group unless="$(arg control)" >
 
@@ -29,5 +37,11 @@
     </node>
     
   </group>
+    
+<!-- ###################################################################### -->
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    
+<!-- ###################################################################### -->
 
 </launch>

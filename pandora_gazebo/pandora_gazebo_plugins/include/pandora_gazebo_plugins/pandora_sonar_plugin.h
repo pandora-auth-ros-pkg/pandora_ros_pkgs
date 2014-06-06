@@ -107,9 +107,6 @@ namespace gazebo
     /// \brief A mutex to lock access to fields that are used in message callbacks
     private: boost::mutex lock;
 
-    /// update rate of this sensor
-    private: double update_rate_;
-
     /// \brief for setting ROS name space
     private: std::string robot_namespace_;
 
@@ -124,6 +121,7 @@ namespace gazebo
     public: void OnStats( const boost::shared_ptr<msgs::WorldStatistics const> &_msg);
   
     private: bool publish_msg_ ; 
+    private: bool publish_viz_ ; 
 
   };
 
