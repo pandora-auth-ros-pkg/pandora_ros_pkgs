@@ -81,7 +81,7 @@ namespace pandora_vision
     Timer::start("convertPointCloudMessageToImage");
     #endif
 
-    // prepare the output image
+    // Prepare the output image
     cv::Mat image(pointCloud->height, pointCloud->width, encoding);
 
     // For the depth image
@@ -123,100 +123,6 @@ namespace pandora_vision
     #endif
 
     return image;
-  }
-
-
-
-  /**
-    @brief Constructs a vision_communications/CandidateHolesVectorMsg
-    message
-    @param[in] conveyor [HolesConveyor&] A struct containing
-    vectors of the holes' keypoints, bounding rectangles' vertices
-    and blobs' outlines
-    @param[in] image [cv::Mat&] The image to be packed in the message
-    @param[out] candidateHolesVectorMsg
-    [vision_communications::CandidateHolesVectorMsg*] The output message
-    @param[in] encoding [std::string&] The image's encoding
-    @param[in] msg [const sensor_msgs::Image&] Needed to extract
-    its header and place it as the header of the output message
-    @return void
-   **/
-  void MessageConversions::createCandidateHolesVectorMessage(
-    const HolesConveyor& conveyor,
-    const cv::Mat& image,
-    vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
-    const std::string& encoding,
-    const sensor_msgs::Image& msg)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("createCandidateHolesVectorMessage");
-    #endif
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // candidateHoles vector
-    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
-    createCandidateHolesVector(conveyor, &candidateHolesVector);
-
-    candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // image
-    candidateHolesVectorMsg->image =
-      convertImageToMessage(image, encoding, msg);
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // header
-    candidateHolesVectorMsg->header = msg.header;
-
-    #ifdef DEBUG_TIME
-    Timer::tick("createCandidateHolesVectorMessage");
-    #endif
-  }
-
-
-
-  /**
-    @brief Constructs a vision_communications/CandidateHolesVectorMsg
-    message
-    @param[in] conveyor [const HolesConveyor&] A struct containing
-    vectors of the holes' keypoints, bounding rectangles' vertices
-    and blobs' outlines
-    @param[in] image [const sensor_msgs::Image&] The image to be packed
-    in the message
-    @param[out] candidateHolesVectorMsg
-    [vision_communications::CandidateHolesVectorMsg*] The output message
-    @param[in] msg [const sensor_msgs::Image&] Needed to extract
-    its header and place it as the header of the output message
-    @return void
-   **/
-  void MessageConversions::createCandidateHolesVectorMessage(
-    const HolesConveyor& conveyor,
-    const sensor_msgs::Image& image,
-    vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
-    const sensor_msgs::Image& msg)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("createCandidateHolesVectorMessage");
-    #endif
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // candidateHoles vector
-    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
-    createCandidateHolesVector(conveyor, &candidateHolesVector);
-
-    candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // image
-    candidateHolesVectorMsg->image = image;
-
-    // Fill the vision_communications::CandidateHolesVectorMsg's
-    // header
-    candidateHolesVectorMsg->header = msg.header;
-
-    #ifdef DEBUG_TIME
-    Timer::tick("createCandidateHolesMessage");
-    #endif
   }
 
 
@@ -277,30 +183,48 @@ namespace pandora_vision
 
 
   /**
-    @brief Extracts a cv::Mat image from a ROS image message pointer
-    @param[in] msg [const sensor_msgs::ImageConstPtr&] The input ROS image
-    message pointer
-    @param[out] image [cv::Mat*] The output image
-    @param[in] encoding [const std::string&] The image encoding
+    @brief Constructs a vision_communications/CandidateHolesVectorMsg
+    message
+    @param[in] conveyor [HolesConveyor&] A struct containing
+    vectors of the holes' keypoints, bounding rectangles' vertices
+    and blobs' outlines
+    @param[in] image [cv::Mat&] The image to be packed in the message
+    @param[out] candidateHolesVectorMsg
+    [vision_communications::CandidateHolesVectorMsg*] The output message
+    @param[in] encoding [std::string&] The image's encoding
+    @param[in] msg [const sensor_msgs::Image&] Needed to extract
+    its header and place it as the header of the output message
     @return void
    **/
-  void MessageConversions::extractImageFromMessage(
-    const sensor_msgs::ImageConstPtr& msg,
-    cv::Mat* image,
-    const std::string& encoding)
+  void MessageConversions::createCandidateHolesVectorMessage(
+    const HolesConveyor& conveyor,
+    const cv::Mat& image,
+    vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
+    const std::string& encoding,
+    const sensor_msgs::Image& msg)
   {
     #ifdef DEBUG_TIME
-    Timer::start("extractImageFromMessage");
+    Timer::start("createCandidateHolesVectorMessage");
     #endif
 
-    cv_bridge::CvImagePtr in_msg;
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // candidateHoles vector
+    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
+    createCandidateHolesVector(conveyor, &candidateHolesVector);
 
-    in_msg = cv_bridge::toCvCopy(msg, encoding);
+    candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
 
-    *image = in_msg->image.clone();
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // image
+    candidateHolesVectorMsg->image =
+      convertImageToMessage(image, encoding, msg);
+
+    // Fill the vision_communications::CandidateHolesVectorMsg's
+    // header
+    candidateHolesVectorMsg->header = msg.header;
 
     #ifdef DEBUG_TIME
-    Timer::tick("extractImageFromMessage");
+    Timer::tick("createCandidateHolesVectorMessage");
     #endif
   }
 

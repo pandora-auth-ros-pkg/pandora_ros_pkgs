@@ -35,6 +35,10 @@ catkin_add_gtest(holes_conveyor_test
   unit/utils/holes_conveyor_test.cpp)
 target_link_libraries(holes_conveyor_test ${catkin_LIBRARIES} utils_lib gtest_main)
 
+catkin_add_gtest(message_conversions_test
+  unit/utils/message_conversions_test.cpp)
+target_link_libraries(message_conversions_test ${catkin_LIBRARIES} utils_lib gtest_main)
+
 catkin_add_gtest(morphological_operators_test
   unit/utils/morphological_operators_test.cpp)
 target_link_libraries(morphological_operators_test ${catkin_LIBRARIES} utils_lib gtest_main)

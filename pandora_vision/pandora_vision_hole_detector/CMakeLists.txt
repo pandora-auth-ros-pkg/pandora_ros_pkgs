@@ -183,6 +183,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   test/unit/utils/blob_detection_test.cpp
   test/unit/utils/edge_detection_test.cpp
   test/unit/utils/hole_filters_test.cpp
+  test/unit/utils/message_conversions_test.cpp
   test/unit/utils/morphological_operators_test.cpp
   test/unit/utils/noise_elimination_test.cpp
 

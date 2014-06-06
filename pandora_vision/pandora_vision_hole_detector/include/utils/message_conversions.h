@@ -87,6 +87,23 @@ namespace pandora_vision
         @param[in] conveyor [HolesConveyor&] A struct containing
         vectors of the holes' keypoints, bounding rectangles' vertices
         and blobs' outlines
+        @param[out] candidateHolesVector
+        [std::vector<vision_communications::CandidateHolesVectorMsg>*]
+        The vector containing the conveyor's holes in
+        vision_communications::CandidateHolesVectorMsg format
+        @return void
+       **/
+      static void createCandidateHolesVector(
+        const HolesConveyor& conveyor,
+        std::vector<vision_communications::CandidateHoleMsg>*
+        candidateHolesVector);
+
+      /**
+        @brief Constructs a vision_communications/CandidateHolesVectorMsg
+        message
+        @param[in] conveyor [HolesConveyor&] A struct containing
+        vectors of the holes' keypoints, bounding rectangles' vertices
+        and blobs' outlines
         @param[in] image [cv::Mat&] The image to be packed in the message
         @param[out] candidateHolesVectorMsg
         [vision_communications::CandidateHolesVectorMsg*] The output message
@@ -101,55 +118,6 @@ namespace pandora_vision
         vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
         const std::string& encoding,
         const sensor_msgs::Image& msg);
-
-      /**
-        @brief Constructs a vision_communications/CandidateHolesVectorMsg
-        message
-        @param[in] conveyor [const HolesConveyor&] A struct containing
-        vectors of the holes' keypoints, bounding rectangles' vertices
-        and blobs' outlines
-        @param[in] image [const sensor_msgs::Image&] The image to be packed
-        in the message
-        @param[out] candidateHolesVectorMsg
-        [vision_communications::CandidateHolesVectorMsg*] The output message
-        @param[in] msg [const sensor_msgs::Image&] Needed to extract
-        its header and place it as the header of the output message
-        @return void
-       **/
-      static void createCandidateHolesVectorMessage(
-        const HolesConveyor& conveyor,
-        const sensor_msgs::Image& image,
-        vision_communications::CandidateHolesVectorMsg* candidateHolesVectorMsg,
-        const sensor_msgs::Image& msg);
-
-      /**
-        @brief Constructs a vision_communications/CandidateHolesVectorMsg
-        message
-        @param[in] conveyor [HolesConveyor&] A struct containing
-        vectors of the holes' keypoints, bounding rectangles' vertices
-        and blobs' outlines
-        @param[out] candidateHolesVector
-        [std::vector<vision_communications::CandidateHolesVectorMsg>*]
-        The vector containing the conveyor's holes in
-        vision_communications::CandidateHolesVectorMsg format
-        @return void
-       **/
-      static void createCandidateHolesVector(
-        const HolesConveyor& conveyor,
-        std::vector<vision_communications::CandidateHoleMsg>*
-        candidateHolesVector);
-
-      /**
-        @brief Extracts a cv::Mat image from a ROS image message pointer
-        @param[in] msg [const sensor_msgs::ImageConstPtr&] The input ROS image
-        message pointer
-        @param[out] image [cv::Mat*] The output image
-        @param[in] encoding [const std::string&] The image encoding
-        @return void
-       **/
-      static void extractImageFromMessage(
-        const sensor_msgs::ImageConstPtr& msg, cv::Mat* image,
-        const std::string& encoding);
 
       /**
         @brief Extracts a cv::Mat image from a ROS image message

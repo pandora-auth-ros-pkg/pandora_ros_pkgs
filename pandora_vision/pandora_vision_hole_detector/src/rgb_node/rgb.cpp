@@ -94,9 +94,9 @@ namespace pandora_vision
     Timer::start("inputRgbImageCallback", "", true);
     #endif
 
-    cv_bridge::CvImagePtr in_msg;
-    in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    _holeFrame = in_msg->image.clone();
+    // Obtain the rgb image
+    MessageConversions::extractImageFromMessage(msg, &_holeFrame,
+      sensor_msgs::image_encodings::BGR8);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Rgb::show_rgb_image)
