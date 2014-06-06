@@ -387,13 +387,13 @@ namespace pandora_vision
           {
             maxRight = img->data[p - img->cols - 1];
           }
-          if (img->data[p + img->cols - 1] > maxRight)
-          {
-            maxRight = img->data[p + img->cols - 1];
-          }
           if (img->data[p - 1] > maxRight)
           {
             maxRight = img->data[p - 1];
+          }
+          if (img->data[p + img->cols - 1] > maxRight)
+          {
+            maxRight = img->data[p + img->cols - 1];
           }
 
           helper.data[p] = maxRight;

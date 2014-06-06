@@ -55,11 +55,33 @@ namespace pandora_vision
         WIDTH = 640;
         HEIGHT = 480;
 
+        // pixel_ holds a single non-zero pixel
         pixel_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // line_ holds a horizontal white line at row 100,
+        // with width of 1 pixel
         line_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // thick_line_ holds horizontal white lines at rows 99, 100 and 101
         thick_line_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // square_ is a 100 X 100 opaque square,
+        // with its upper left corner placed at the upper left corner of the
+        // image
         square_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // frame_ is a white image with only its borders in black colour
         frame_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // squares_ is an image featuring one square at the edge of each
+        // corner of the image
+        squares_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+        // corners_ is an image featuring one square at the very edge of each
+        // corner of the image
+        corners_ = cv::Mat::zeros ( HEIGHT, WIDTH, CV_8UC1 );
+
+
 
         ASSERT_EQ( HEIGHT, line_.rows );
         ASSERT_EQ( WIDTH, line_.cols );
@@ -101,6 +123,109 @@ namespace pandora_vision
             frame_.at< unsigned char >( rows, cols ) = 255;
           }
         }
+
+        // squares_ is an image featuring one square at the edge of each
+        // corner of the image
+
+        // upper left
+        for (int rows = 1; rows < 100; rows++)
+        {
+          squares_.at<unsigned char>(rows, 1) = 255;
+          squares_.at<unsigned char>(rows, 100) = 255;
+        }
+        for (int cols = 1; cols < 100; cols++)
+        {
+          squares_.at<unsigned char>(1, cols) = 255;
+          squares_.at<unsigned char>(99, cols) = 255;
+        }
+
+        // lower left
+        for (int rows = HEIGHT - 1 - 100; rows < HEIGHT - 1; rows++)
+        {
+          squares_.at<unsigned char>(rows, 1) = 255;
+          squares_.at<unsigned char>(rows, 100) = 255;
+        }
+        for (int cols = 1; cols < 100; cols++)
+        {
+          squares_.at<unsigned char>(HEIGHT - 1 - 100, cols) = 255;
+          squares_.at<unsigned char>(HEIGHT - 2, cols) = 255;
+        }
+
+        // upper right
+        for (int rows = 1; rows < 100; rows++)
+        {
+          squares_.at<unsigned char>(rows, WIDTH - 1 - 100) = 255;
+          squares_.at<unsigned char>(rows, WIDTH - 2) = 255;
+        }
+        for (int cols = WIDTH - 1 - 100; cols < WIDTH - 1; cols++)
+        {
+          squares_.at<unsigned char>(1, cols) = 255;
+          squares_.at<unsigned char>(100, cols) = 255;
+        }
+
+        // lower right
+        for (int rows = HEIGHT - 1 - 100; rows < HEIGHT - 1; rows++)
+        {
+          squares_.at<unsigned char>(rows, WIDTH - 1 - 100) = 255;
+          squares_.at<unsigned char>(rows, WIDTH - 2) = 255;
+        }
+        for (int cols = WIDTH - 1 - 100; cols < WIDTH - 1; cols++)
+        {
+          squares_.at<unsigned char>(HEIGHT - 1 - 100, cols) = 255;
+          squares_.at<unsigned char>(HEIGHT - 2, cols) = 255;
+        }
+
+
+        // corners_ is an image featuring one square at the very edge of each
+        // corner of the image
+
+        // upper left
+        for (int rows = 0; rows < 100; rows++)
+        {
+          corners_.at<unsigned char>(rows, 0) = 255;
+          corners_.at<unsigned char>(rows, 100) = 255;
+        }
+        for (int cols = 0; cols < 100; cols++)
+        {
+          corners_.at<unsigned char>(0, cols) = 255;
+          corners_.at<unsigned char>(99, cols) = 255;
+        }
+
+        // lower left
+        for (int rows = HEIGHT - 1 - 100; rows < HEIGHT; rows++)
+        {
+          corners_.at<unsigned char>(rows, 0) = 255;
+          corners_.at<unsigned char>(rows, 100) = 255;
+        }
+        for (int cols = 0; cols < 100; cols++)
+        {
+          corners_.at<unsigned char>(HEIGHT - 1 - 100, cols) = 255;
+          corners_.at<unsigned char>(HEIGHT - 1, cols) = 255;
+        }
+
+        // upper right
+        for (int rows = 0; rows < 100; rows++)
+        {
+          corners_.at<unsigned char>(rows, WIDTH - 1 - 100) = 255;
+          corners_.at<unsigned char>(rows, WIDTH - 1) = 255;
+        }
+        for (int cols = WIDTH - 1 - 100; cols < WIDTH; cols++)
+        {
+          corners_.at<unsigned char>(0, cols) = 255;
+          corners_.at<unsigned char>(100, cols) = 255;
+        }
+
+        // lower right
+        for (int rows = HEIGHT - 1 - 100; rows < HEIGHT; rows++)
+        {
+          corners_.at<unsigned char>(rows, WIDTH - 1 - 100) = 255;
+          corners_.at<unsigned char>(rows, WIDTH - 1) = 255;
+        }
+        for (int cols = WIDTH - 1 - 100; cols < WIDTH; cols++)
+        {
+          corners_.at<unsigned char>(HEIGHT - 1 - 100, cols) = 255;
+          corners_.at<unsigned char>(HEIGHT - 1, cols) = 255;
+        }
       }
 
 
@@ -126,6 +251,13 @@ namespace pandora_vision
       // frame_ is a white image with only its borders in black colour
       cv::Mat frame_;
 
+      // squares_ is an image featuring one square at the edge of each
+      // corner of the image
+      cv::Mat squares_;
+
+      // corners_ is an image featuring one square at the very edge of each
+      // corner of the image
+      cv::Mat corners_;
 
       // The number of non-zero value pixels before the appliance of an operator
       int nonZerosBefore;
@@ -319,6 +451,9 @@ namespace pandora_vision
      * Test frame_
      **************************************************************************/
 
+    // The number of non-zero pixels before dilation
+    nonZerosBefore = cv::countNonZero( frame_);
+
     // Dilate once
     Morphology::dilation( &frame_, 1 );
 
@@ -332,6 +467,23 @@ namespace pandora_vision
     // The number of non-zero pixels after the dilation should be equal to the
     // area of the image
     EXPECT_EQ( WIDTH * HEIGHT, nonZerosAfter );
+
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    // The number of non-zero pixels before dilation
+    nonZerosBefore = cv::countNonZero( squares_ );
+
+    // Dilate once
+    Morphology::dilation( &squares_, 1 );
+
+    // The number of non-zero pixels after dilation
+    nonZerosAfter = cv::countNonZero( squares_ );
+
+    // The number of non-zero pixels before the dilation should be less than
+    // that of the pixels after
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
   }
 
 
@@ -387,6 +539,7 @@ namespace pandora_vision
     }
 
 
+
     /***************************************************************************
      * Test square_
      **************************************************************************/
@@ -413,6 +566,9 @@ namespace pandora_vision
      * Test frame_
      **************************************************************************/
 
+    // The number of non-zero pixels before dilation
+    nonZerosBefore = cv::countNonZero( frame_ );
+
     // Dilate once
     Morphology::dilationRelative( &frame_, 1 );
 
@@ -426,6 +582,24 @@ namespace pandora_vision
     // The number of non-zero pixels after the dilation should be equal to the
     // area of the image
     EXPECT_EQ( WIDTH * HEIGHT, nonZerosAfter );
+
+
+    /***************************************************************************
+     * Test squares_
+     **************************************************************************/
+
+    // The number of non-zero pixels before dilation
+    nonZerosBefore = cv::countNonZero( squares_ );
+
+    // Dilate once
+    Morphology::dilationRelative( &squares_, 1 );
+
+    // The number of non-zero pixels after dilation
+    nonZerosAfter = cv::countNonZero( squares_ );
+
+    // The number of non-zero pixels before the dilation should be less than
+    // that of the pixels after
+    EXPECT_LT( nonZerosBefore, nonZerosAfter );
   }
 
 
@@ -475,6 +649,28 @@ namespace pandora_vision
     // reduced by the size of frame_, minus its four corners
     EXPECT_EQ( nonZerosBefore - 2 * ( WIDTH - 2 ) - 2 * ( HEIGHT - 2 ) + 4,
       nonZerosAfter );
+
+    /***************************************************************************
+     * Test corners_
+     **************************************************************************/
+
+    // Because each square has a width of one, dilate once so that the
+    // result of the erosion can be visible
+    Morphology::dilation(&corners_, 1);
+
+    // The number of non-zero pixels before erosion
+    nonZerosBefore = cv::countNonZero( corners_ );
+
+    // Erode once
+    Morphology::erosion( &corners_, 1 );
+
+    // The number of non-zero pixels after erosion
+    nonZerosAfter = cv::countNonZero( corners_ );
+
+    // The number of non-zero pixels before the erosion should be
+    // greater than that of the pixels after
+    EXPECT_GT( nonZerosBefore, nonZerosAfter );
+
   }
 
 

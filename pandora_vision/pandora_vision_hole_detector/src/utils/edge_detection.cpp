@@ -826,27 +826,6 @@ namespace pandora_vision
 
 
   /**
-   * @brief Enhances an image's contrast, regardless of its format.
-   * @param[in] inImage [const cv::Mat &] The input image
-   * @param[out] outImage [cv::Mat*] The contrast-enhanced image
-   * @return void
-   **/
-  void EdgeDetection::enhanceContrast(const cv::Mat& inImage, cv::Mat* outImage)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("enhanceContrast");
-    #endif
-
-    inImage.convertTo(*outImage, -1, Parameters::Edge::contrast_enhance_alpha,
-      Parameters::Edge::contrast_enhance_beta);
-
-    #ifdef DEBUG_TIME
-    Timer::tick("enhanceContrast");
-    #endif
-  }
-
-
-  /**
     @brief Takes an input image in unsigned char format and tries to isolate
     hole-like shapes so as to facilitate the blob detection process
     @param[in,out] img [cv::Mat*] The input image in unsigned char format

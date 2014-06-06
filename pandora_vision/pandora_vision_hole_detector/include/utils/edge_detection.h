@@ -178,14 +178,6 @@ namespace pandora_vision
         const int& method);
 
       /**
-        @brief Enhances an image's contrast, regardless of its format.
-        @param[in] inImage [const cv::Mat &] The input image
-        @param[out] outImage [cv::Mat*] The contrast-enhanced image
-        @return void
-       **/
-      static void enhanceContrast(const cv::Mat& inImage, cv::Mat* outImage);
-
-      /**
         @brief Takes an input image in unsigned char format and tries to isolate
         hole-like shapes so as to facilitate the blob detection process
         @param[in,out] img [cv::Mat*] The input image in unsigned char format
