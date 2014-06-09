@@ -94,7 +94,7 @@ namespace pandora_vision
 
 
 
-  //! Test PlanesDetection::applyVoxelGridFilter
+  //! Tests PlanesDetection::applyVoxelGridFilter
   TEST_F ( PlanesDetectionTest, ApplyVoxelGridFilterTest )
   {
     // Run PlanesDetection::applyVoxelGridFilter
@@ -105,7 +105,7 @@ namespace pandora_vision
 
 
 
-  //! Test PlanesDetection::locatePlanes
+  //! Tests PlanesDetection::locatePlanes
   TEST_F ( PlanesDetectionTest, LocatePlanesTest )
   {
     std::vector<pcl::PointIndices::Ptr> inliersVector;
@@ -141,7 +141,7 @@ namespace pandora_vision
 
 
 
-  //! Test PlanesDetection::locatePlanesUsingSACSegmentation
+  //! Tests PlanesDetection::locatePlanesUsingSACSegmentation
   TEST_F ( PlanesDetectionTest, LocatePlanesUsingSACSegmentationTest )
   {
     // The planar point clouds' vector

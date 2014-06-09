@@ -228,7 +228,7 @@ namespace pandora_vision
 
 
 
-  //! Test BoundingBoxDetection::findRotatedBoundingBoxesFromOutline
+  //! Tests BoundingBoxDetection::findRotatedBoundingBoxesFromOutline
   TEST_F ( BoundingBoxDetectionTest, FindRotatedBoundingBoxesFromOutlineTest )
   {
     // The square's area

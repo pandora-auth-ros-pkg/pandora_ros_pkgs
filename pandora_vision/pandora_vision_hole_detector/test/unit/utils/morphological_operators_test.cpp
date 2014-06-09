@@ -269,7 +269,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::closing()
+  //! Tests Morphology::closing()
   TEST_F ( MorphologyTest, ClosingTest )
   {
     /***************************************************************************
@@ -374,7 +374,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::dilation()
+  //! Tests Morphology::dilation()
   TEST_F ( MorphologyTest, DilationTest )
   {
     /***************************************************************************
@@ -488,7 +488,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::dilationRelative()
+  //! Tests Morphology::dilationRelative()
   TEST_F ( MorphologyTest, DilationRelativeTest )
   {
     /***************************************************************************
@@ -604,7 +604,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::erosion()
+  //! Tests Morphology::erosion()
   TEST_F ( MorphologyTest, ErosionTest )
   {
     /***************************************************************************
@@ -671,11 +671,21 @@ namespace pandora_vision
     // greater than that of the pixels after
     EXPECT_GT( nonZerosBefore, nonZerosAfter );
 
+    // Erode once more
+    Morphology::erosion( &corners_, 1 );
+
+    // The number of non-zero pixels after erosion
+    nonZerosAfter = cv::countNonZero( corners_ );
+
+    // The number of non-zero pixels before the erosion should be
+    // greater than that of the pixels after
+    EXPECT_EQ( 0 , nonZerosAfter );
+
   }
 
 
 
-  //! Test Morphology::kernelCheck()
+  //! Tests Morphology::kernelCheck()
   TEST_F ( MorphologyTest, KernelCheckTest )
   {
     /***************************************************************************
@@ -735,7 +745,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::opening()
+  //! Tests Morphology::opening()
   TEST_F ( MorphologyTest, OpeningTest )
   {
     /***************************************************************************
@@ -799,7 +809,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::pruningStrictIterative()
+  //! Tests Morphology::pruningStrictIterative()
   TEST_F ( MorphologyTest, PruningStrictIterativeTest )
   {
     /***************************************************************************
@@ -883,7 +893,7 @@ namespace pandora_vision
 
 
 
-  //! Test Morphology::thinning()
+  //! Tests Morphology::thinning()
   TEST_F ( MorphologyTest, ThinningTest )
   {
     /***************************************************************************

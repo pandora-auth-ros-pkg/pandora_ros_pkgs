@@ -52,195 +52,215 @@ namespace pandora_vision
 
       virtual void SetUp()
       {
-        // Dummy entries
-        src.keyPoints.push_back ( cv::KeyPoint( 100, 100, 1 ) );
-        src.keyPoints.push_back ( cv::KeyPoint( 200, 200, 1 ) );
+        // Dummy entries for the src conveyor
+
+        HoleConveyor holeA;
+
+        cv::KeyPoint k_a ( 100, 100, 1 );
+        holeA.keypoint = k_a;
+        holeA.rectangle.push_back ( cv::Point2f ( 100, 100 ) );
+        holeA.outline.push_back ( cv::Point2f ( 100, 100 ) );
+
+        HoleConveyor holeB;
+
+        cv::KeyPoint k_b ( 200, 200, 1 );
+        holeB.keypoint = k_b;
+        holeB.rectangle.push_back ( cv::Point2f ( 200, 200 ) );
+        holeB.outline.push_back ( cv::Point2f ( 200, 200 ) );
+
+        // Push back the two holes into the src conveyor
+        src.holes.push_back(holeA);
+        src.holes.push_back(holeB);
 
 
-        std::vector< cv::Point2f > src_rectangles;
-        src_rectangles.push_back ( cv::Point2f ( 100, 100 ) );
-        src.rectangles.push_back ( src_rectangles );
+        // Dummy entries for the dst conveyor
 
-        src_rectangles.clear();
-        src_rectangles.push_back ( cv::Point2f ( 200, 200 ) );
-        src.rectangles.push_back ( src_rectangles );
+        HoleConveyor holeC;
 
+        cv::KeyPoint k_c ( 1, 1, 1 );
 
+        holeC.keypoint = k_c;
+        holeC.rectangle.push_back ( cv::Point2f ( 1, 1 ) );
+        holeC.outline.push_back ( cv::Point2f ( 1, 1 ) );
 
-        std::vector< cv::Point2f > src_outlines;
-        src_outlines.push_back ( cv::Point2f ( 100, 100 ) );
-        src.outlines.push_back ( src_outlines );
+        HoleConveyor holeD;
 
-        src_outlines.clear();
-        src_outlines.push_back ( cv::Point2f ( 200, 200 ) );
-        src.outlines.push_back ( src_outlines );
+        cv::KeyPoint k_d ( 2, 2, 1 );
+        holeD.keypoint = k_d;
+        holeD.rectangle.push_back ( cv::Point2f ( 2, 2 ) );
+        holeD.outline.push_back ( cv::Point2f ( 2, 2 ) );
 
-
-
-        // Dummy entries
-        dst.keyPoints.push_back ( cv::KeyPoint( 1, 1, 1 ) );
-        dst.keyPoints.push_back ( cv::KeyPoint( 2, 2, 1 ) );
-
-
-        std::vector< cv::Point2f > dst_rectangles;
-        dst_rectangles.push_back ( cv::Point2f ( 1, 1 ) );
-        dst.rectangles.push_back ( dst_rectangles );
-
-        dst_rectangles.clear();
-        dst_rectangles.push_back ( cv::Point2f ( 2, 2 ) );
-        dst.rectangles.push_back ( dst_rectangles );
-
-
-        std::vector< cv::Point2f > dst_outlines;
-        dst_outlines.push_back ( cv::Point2f ( 1, 1 ) );
-        dst.outlines.push_back ( dst_outlines );
-
-        dst_outlines.clear();
-        dst_outlines.push_back ( cv::Point2f ( 2, 2 ) );
-        dst.outlines.push_back ( dst_outlines );
+        // Push back the two holes into the dst conveyor
+        dst.holes.push_back(holeC);
+        dst.holes.push_back(holeD);
 
       }
 
       // This is the source conveyor
       HolesConveyor src;
 
-      // And this is the destination conveyor
+      // This is the destination conveyor
       HolesConveyor dst;
   };
 
 
 
-  //! Test HolesConveyorUtils::append
+//! Tests HolesConveyorUtils::append
   TEST_F ( HolesConveyorUtilsTest, AppendTest )
   {
+    // Backup the original dst
+    HolesConveyor dstBackup;
+    HolesConveyorUtils::copyTo( dst, &dstBackup );
+
     // 2 entries in dst before appending src to it
-    ASSERT_EQ ( 2, HolesConveyorUtils::size(dst) );
+    ASSERT_EQ ( 2, dst.size() );
 
     // Run HolesConveyorUtils::append
     HolesConveyorUtils::append( src, &dst );
 
     // 4 entries in dst after appending src to it
-    EXPECT_EQ ( 4, HolesConveyorUtils::size(dst) );
+    EXPECT_EQ ( 4, dst.size() );
 
     // Check that the initial entries have not been tampered with
-    EXPECT_EQ ( 1, dst.rectangles[0][0].x );
-    EXPECT_EQ ( 1, dst.outlines[0][0].x );
-    EXPECT_EQ ( 1, dst.keyPoints[0].pt.x );
-
-    EXPECT_EQ ( 1, dst.rectangles[0][0].y );
-    EXPECT_EQ ( 1, dst.outlines[0][0].y );
-    EXPECT_EQ ( 1, dst.keyPoints[0].pt.y );
-
-    EXPECT_EQ ( 2, dst.rectangles[1][0].x );
-    EXPECT_EQ ( 2, dst.outlines[1][0].x );
-    EXPECT_EQ ( 2, dst.keyPoints[1].pt.x );
-
-    EXPECT_EQ ( 2, dst.rectangles[1][0].y );
-    EXPECT_EQ ( 2, dst.outlines[1][0].y );
-    EXPECT_EQ ( 2, dst.keyPoints[1].pt.y );
-
-    // Check the newly appended entries' elements against the original ones
-    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    for ( int i = 0; i < dstBackup.size(); i++ )
     {
-      EXPECT_NEAR ( dst.keyPoints[2 + k].pt.x, src.keyPoints[k].pt.x, 1 );
-      EXPECT_NEAR ( dst.keyPoints[2 + k].pt.y, src.keyPoints[k].pt.y, 1 );
+      EXPECT_EQ ( dst.holes[i].keypoint.pt.x,
+        dstBackup.holes[i].keypoint.pt.x );
 
-      for ( int r = 0; r < dst.rectangles[2 + k].size(); r++ )
+      for ( int v = 0; v < dst.holes[i].rectangle.size(); v++ )
       {
-        EXPECT_NEAR ( dst.rectangles[2 + k][r].x, src.rectangles[k][r].x, 1 );
-        EXPECT_NEAR ( dst.rectangles[2 + k][r].y, src.rectangles[k][r].y, 1 );
+        EXPECT_EQ ( dst.holes[i].rectangle[v].x,
+          dstBackup.holes[i].rectangle[v].x );
+        EXPECT_EQ ( dst.holes[i].rectangle[v].y,
+          dstBackup.holes[i].rectangle[v].y );
       }
 
-      for ( int o = 0; o < dst.outlines[2 + k].size(); o++ )
+      for ( int o = 0; o < dst.holes[i].outline.size(); o++ )
       {
-        EXPECT_NEAR ( dst.outlines[2 + k][o].x, src.outlines[k][o].x, 1 );
-        EXPECT_NEAR ( dst.outlines[2 + k][o].y, src.outlines[k][o].y, 1 );
+        EXPECT_EQ ( dst.holes[i].outline[o].x,
+          dstBackup.holes[i].outline[o].x );
+        EXPECT_EQ ( dst.holes[i].outline[o].y,
+          dstBackup.holes[i].outline[o].y );
+      }
+    }
+
+    // Check the newly appended entries' elements against the original ones
+    for ( int k = 0; k < src.size(); k++ )
+    {
+      EXPECT_EQ ( dst.holes[2 + k].keypoint.pt.x, src.holes[k].keypoint.pt.x);
+      EXPECT_EQ ( dst.holes[2 + k].keypoint.pt.y, src.holes[k].keypoint.pt.y);
+
+      for ( int v = 0; v < dst.holes[k + 2].rectangle.size(); v++ )
+      {
+        EXPECT_EQ ( dst.holes[2 + k].rectangle[v].x,
+          src.holes[k].rectangle[v].x );
+        EXPECT_EQ ( dst.holes[2 + k].rectangle[v].y,
+          src.holes[k].rectangle[v].y );
+      }
+
+      for ( int o = 0; o < dst.holes[k + 2].rectangle.size(); o++ )
+      {
+        EXPECT_EQ ( dst.holes[2 + k].rectangle[o].x,
+          src.holes[k].rectangle[o].x );
+        EXPECT_EQ ( dst.holes[2 + k].rectangle[o].y,
+          src.holes[k].rectangle[o].y );
       }
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::appendDummyConveyor
+  //! Tests HolesConveyorUtils::appendDummyConveyor
   TEST_F ( HolesConveyorUtilsTest, AppendDummyConveyorTest )
   {
+    // Backup the original dst
+    HolesConveyor dstBackup;
+    HolesConveyorUtils::copyTo( dst, &dstBackup );
+
     // Run HolesConveyorUtils::appendDummyConveyor
     HolesConveyorUtils::appendDummyConveyor
       ( cv::Point2f ( 10, 10 ), cv::Point2f ( 20, 20 ), 10, 10, 5, 5, &dst);
 
     // There should now be three entries in dst
-    ASSERT_EQ ( 3, HolesConveyorUtils::size( dst ) );
+    ASSERT_EQ ( 3, dst.size() );
 
     // Check that the initial entries have not been tampered with
-    EXPECT_EQ ( 1, dst.rectangles[0][0].x );
-    EXPECT_EQ ( 1, dst.outlines[0][0].x );
-    EXPECT_EQ ( 1, dst.keyPoints[0].pt.x );
+    for ( int i = 0; i < dstBackup.size(); i++ )
+    {
+      EXPECT_EQ ( dst.holes[i].keypoint.pt.x,
+        dstBackup.holes[i].keypoint.pt.x );
 
-    EXPECT_EQ ( 1, dst.rectangles[0][0].y );
-    EXPECT_EQ ( 1, dst.outlines[0][0].y );
-    EXPECT_EQ ( 1, dst.keyPoints[0].pt.y );
+      for ( int v = 0; v < dst.holes[i].rectangle.size(); v++ )
+      {
+        EXPECT_EQ ( dst.holes[i].rectangle[v].x,
+          dstBackup.holes[i].rectangle[v].x );
+        EXPECT_EQ ( dst.holes[i].rectangle[v].y,
+          dstBackup.holes[i].rectangle[v].y );
+      }
 
-    EXPECT_EQ ( 2, dst.rectangles[1][0].x );
-    EXPECT_EQ ( 2, dst.outlines[1][0].x );
-    EXPECT_EQ ( 2, dst.keyPoints[1].pt.x );
-
-    EXPECT_EQ ( 2, dst.rectangles[1][0].y );
-    EXPECT_EQ ( 2, dst.outlines[1][0].y );
-    EXPECT_EQ ( 2, dst.keyPoints[1].pt.y );
+      for ( int o = 0; o < dst.holes[i].outline.size(); o++ )
+      {
+        EXPECT_EQ ( dst.holes[i].outline[o].x,
+          dstBackup.holes[i].outline[o].x );
+        EXPECT_EQ ( dst.holes[i].outline[o].y,
+          dstBackup.holes[i].outline[o].y );
+      }
+    }
 
     // The new entry
-    EXPECT_NEAR ( 22.5, dst.keyPoints[2].pt.x, 1 );
-    EXPECT_NEAR ( 10, dst.rectangles[2][0].x, 1 );
-    EXPECT_NEAR ( 20, dst.outlines[2][0].x, 1 );
+    EXPECT_NEAR ( 22.5, dst.holes[2].keypoint.pt.x, 1 );
+    EXPECT_NEAR ( 10, dst.holes[2].rectangle[0].x, 1 );
+    EXPECT_NEAR ( 20, dst.holes[2].outline[0].x, 1 );
   }
 
 
 
-  //! Test HolesConveyorUtils::clear
+  //! Tests HolesConveyorUtils::clear
   TEST_F ( HolesConveyorUtilsTest, ClearTest )
   {
     // Run HolesConveyorUtils::clear
     HolesConveyorUtils::clear( &dst );
 
     // The dst conveyor should be empty
-    ASSERT_EQ ( 0, dst.keyPoints.size() );
-    ASSERT_EQ ( 0, dst.rectangles.size() );
-    ASSERT_EQ ( 0, dst.outlines.size() );
+    ASSERT_EQ ( 0, dst.size() );
   }
 
 
 
-  //! Test HolesConveyorUtils::copyTo
+  //! Tests HolesConveyorUtils::copyTo
   TEST_F ( HolesConveyorUtilsTest, CopyToTest)
   {
     // Run HolesConveyorUtils::copyTo
     HolesConveyorUtils::copyTo( src, &dst );
 
-    ASSERT_EQ ( 2, dst.keyPoints.size() );
+    // There should be two hole entries in dst now
+    ASSERT_EQ ( 2, dst.size() );
 
     // Check the newly appended entries' elements against the original ones
-    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    for ( int k = 0; k < src.size(); k++ )
     {
-      EXPECT_NEAR ( dst.keyPoints[k].pt.x, src.keyPoints[k].pt.x, 1 );
-      EXPECT_NEAR ( dst.keyPoints[k].pt.y, src.keyPoints[k].pt.y, 1 );
+      EXPECT_NEAR ( dst.holes[k].keypoint.pt.x, src.holes[k].keypoint.pt.x, 1 );
+      EXPECT_NEAR ( dst.holes[k].keypoint.pt.y, src.holes[k].keypoint.pt.y, 1 );
 
-      for ( int r = 0; r < dst.rectangles[k].size(); r++ )
+      for ( int r = 0; r < dst.holes[k].rectangle.size(); r++ )
       {
-        EXPECT_NEAR ( dst.rectangles[k][r].x, src.rectangles[k][r].x, 1 );
-        EXPECT_NEAR ( dst.rectangles[k][r].y, src.rectangles[k][r].y, 1 );
+        EXPECT_NEAR ( dst.holes[k].rectangle[r].x,
+          src.holes[k].rectangle[r].x, 1 );
+        EXPECT_NEAR ( dst.holes[k].rectangle[r].y,
+          src.holes[k].rectangle[r].y, 1 );
       }
 
-      for ( int o = 0; o < dst.outlines[k].size(); o++ )
+      for ( int o = 0; o < dst.holes[k].outline.size(); o++ )
       {
-        EXPECT_NEAR ( dst.outlines[k][o].x, src.outlines[k][o].x, 1 );
-        EXPECT_NEAR ( dst.outlines[k][o].y, src.outlines[k][o].y, 1 );
+        EXPECT_NEAR ( dst.holes[k].outline[o].x, src.holes[k].outline[o].x, 1 );
+        EXPECT_NEAR ( dst.holes[k].outline[o].y, src.holes[k].outline[o].y, 1 );
       }
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::generateRectangle
+  //! Tests HolesConveyorUtils::generateRectangle
   TEST_F ( HolesConveyorUtilsTest, GenerateRectangleTest )
   {
     // The rectangle's points that will be returned
@@ -277,40 +297,40 @@ namespace pandora_vision
 
 
 
-  //! Test HolesConveyorUtils::getHole
+  //! Tests HolesConveyorUtils::getHole
   TEST_F ( HolesConveyorUtilsTest, GetHoleTest )
   {
     // Run HolesConveyorUtils::getHole
     HolesConveyor hole = HolesConveyorUtils::getHole ( src, 0 );
 
     // There should be one entry inside hole
-    ASSERT_EQ ( 1, HolesConveyorUtils::size(hole) );
+    ASSERT_EQ ( 1, hole.size() );
 
     // src and hole should have exactly the same amount of
     // rectangle and outline points
-    ASSERT_EQ ( src.rectangles[0].size(), hole.rectangles[0].size() );
-    ASSERT_EQ ( src.outlines[0].size(), hole.outlines[0].size() );
+    ASSERT_EQ ( src.holes[0].rectangle.size(), hole.holes[0].rectangle.size() );
+    ASSERT_EQ ( src.holes[0].outline.size(), hole.holes[0].outline.size() );
 
     // Check that the entries in src and hole are exactly the same
-    EXPECT_EQ ( hole.keyPoints[0].pt.x, src.keyPoints[0].pt.x );
-    EXPECT_EQ ( hole.keyPoints[0].pt.y, src.keyPoints[0].pt.y );
+    EXPECT_EQ ( hole.holes[0].keypoint.pt.x, src.holes[0].keypoint.pt.x );
+    EXPECT_EQ ( hole.holes[0].keypoint.pt.y, src.holes[0].keypoint.pt.y );
 
-    for (int r = 0; r < hole.rectangles[0].size(); r++)
+    for (int r = 0; r < hole.holes[0].rectangle.size(); r++)
     {
-      EXPECT_EQ ( src.rectangles[0][r].x, hole.rectangles[0][r].x );
-      EXPECT_EQ ( src.rectangles[0][r].y, hole.rectangles[0][r].y );
+      EXPECT_EQ ( src.holes[0].rectangle[r].x, hole.holes[0].rectangle[r].x );
+      EXPECT_EQ ( src.holes[0].rectangle[r].y, hole.holes[0].rectangle[r].y );
     }
 
-    for (int o = 0; o < hole.rectangles[0].size(); o++)
+    for (int o = 0; o < hole.holes[0].outline.size(); o++)
     {
-      EXPECT_EQ ( src.outlines[0][o].x, hole.outlines[0][o].x );
-      EXPECT_EQ ( src.outlines[0][o].y, hole.outlines[0][o].y );
+      EXPECT_EQ ( src.holes[0].outline[o].x, hole.holes[0].outline[o].x );
+      EXPECT_EQ ( src.holes[0].outline[o].y, hole.holes[0].outline[o].y );
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::merge
+  //! Tests HolesConveyorUtils::merge
   TEST_F ( HolesConveyorUtilsTest, MergeTest)
   {
     // The merged conveyor
@@ -319,196 +339,237 @@ namespace pandora_vision
     // Merge src and dst into merged
     HolesConveyorUtils::merge( src, dst, &merged );
 
-      ASSERT_EQ ( 4, HolesConveyorUtils::size( merged ) );
+    // There should be exactly 2 + 2 = 4 entries in merged
+    ASSERT_EQ ( 4, merged.size() );
 
     // Check the newly appended entries' elements against the original ones
     // Check src
-    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    for ( int k = 0; k < src.size(); k++ )
     {
-      EXPECT_NEAR ( merged.keyPoints[k].pt.x, src.keyPoints[k].pt.x, 1 );
-      EXPECT_NEAR ( merged.keyPoints[k].pt.y, src.keyPoints[k].pt.y, 1 );
+      EXPECT_NEAR ( merged.holes[k].keypoint.pt.x,
+        src.holes[k].keypoint.pt.x, 1 );
+      EXPECT_NEAR ( merged.holes[k].keypoint.pt.y,
+        src.holes[k].keypoint.pt.y, 1 );
 
-      for ( int r = 0; r < merged.rectangles[k].size(); r++ )
+      for ( int r = 0; r < merged.holes[k].rectangle.size(); r++ )
       {
-        EXPECT_NEAR ( merged.rectangles[k][r].x, src.rectangles[k][r].x, 1 );
-        EXPECT_NEAR ( merged.rectangles[k][r].y, src.rectangles[k][r].y, 1 );
+        EXPECT_NEAR ( merged.holes[k].rectangle[r].x,
+          src.holes[k].rectangle[r].x, 1 );
+        EXPECT_NEAR ( merged.holes[k].rectangle[r].y,
+          src.holes[k].rectangle[r].y, 1 );
       }
 
-      for ( int o = 0; o < merged.outlines[k].size(); o++ )
+      for ( int o = 0; o < merged.holes[k].outline.size(); o++ )
       {
-        EXPECT_NEAR ( merged.outlines[k][o].x, src.outlines[k][o].x, 1 );
-        EXPECT_NEAR ( merged.outlines[k][o].y, src.outlines[k][o].y, 1 );
+        EXPECT_NEAR ( merged.holes[k].outline[o].x,
+          src.holes[k].outline[o].x, 1 );
+        EXPECT_NEAR ( merged.holes[k].outline[o].y,
+          src.holes[k].outline[o].y, 1 );
       }
     }
 
 
     // Check dst
-    for ( int k = 0; k < dst.keyPoints.size(); k++ )
+    for ( int k = 0; k < dst.size(); k++ )
     {
-      EXPECT_NEAR ( merged.keyPoints[2 + k].pt.x, dst.keyPoints[k].pt.x, 1 );
-      EXPECT_NEAR ( merged.keyPoints[2 + k].pt.y, dst.keyPoints[k].pt.y, 1 );
+      EXPECT_NEAR ( merged.holes[k + 2].keypoint.pt.x,
+        dst.holes[k].keypoint.pt.x, 1 );
+      EXPECT_NEAR ( merged.holes[k + 2].keypoint.pt.y,
+        dst.holes[k].keypoint.pt.y, 1 );
 
-      for ( int r = 0; r < merged.rectangles[k].size(); r++ )
+      for ( int r = 0; r < merged.holes[k].rectangle.size(); r++ )
       {
-        EXPECT_NEAR ( merged.rectangles[2 + k][r].x, dst.rectangles[k][r].x, 1 );
-        EXPECT_NEAR ( merged.rectangles[2 + k][r].y, dst.rectangles[k][r].y, 1 );
+        EXPECT_NEAR ( merged.holes[k + 2].rectangle[r].x,
+          dst.holes[k].rectangle[r].x, 1 );
+        EXPECT_NEAR ( merged.holes[k + 2].rectangle[r].y,
+          dst.holes[k].rectangle[r].y, 1 );
       }
 
-      for ( int o = 0; o < merged.outlines[k].size(); o++ )
+      for ( int o = 0; o < merged.holes[k].outline.size(); o++ )
       {
-        EXPECT_NEAR ( merged.outlines[2 + k][o].x, dst.outlines[k][o].x, 1 );
-        EXPECT_NEAR ( merged.outlines[2 + k][o].y, dst.outlines[k][o].y, 1 );
+        EXPECT_NEAR ( merged.holes[k + 2].outline[o].x,
+          dst.holes[k].outline[o].x, 1 );
+        EXPECT_NEAR ( merged.holes[k + 2].outline[o].y,
+          dst.holes[k].outline[o].y, 1 );
       }
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::removeHole
+  //! Tests HolesConveyorUtils::removeHole
   TEST_F ( HolesConveyorUtilsTest, RemoveHoleTest )
   {
-    HolesConveyor temp;
-    HolesConveyorUtils::copyTo ( dst, &temp );
+    // Backup dst
+    HolesConveyor dstBackup;
+    HolesConveyorUtils::copyTo ( dst, &dstBackup );
 
     // Two holes before removing one
-    ASSERT_EQ ( 2, HolesConveyorUtils::size(temp) );
+    ASSERT_EQ ( 2, dstBackup.size() );
+    ASSERT_EQ ( 2, dst.size() );
 
     // Run HolesConveyorUtils::removeHole
-    HolesConveyorUtils::removeHole ( &temp, 0 );
+    HolesConveyorUtils::removeHole ( &dst, 0 );
 
     // One hole after removing one
-    ASSERT_EQ ( 1, HolesConveyorUtils::size(temp) );
+    ASSERT_EQ ( 1, dst.size() );
 
     // The first entry should be exactly the same as the previously second one
-    EXPECT_NEAR ( dst.keyPoints[1].pt.x, temp.keyPoints[0].pt.x, 1 );
-    EXPECT_NEAR ( dst.keyPoints[1].pt.y, temp.keyPoints[0].pt.y, 1 );
+    EXPECT_NEAR ( dst.holes[0].keypoint.pt.x,
+      dstBackup.holes[1].keypoint.pt.x, 1 );
+    EXPECT_NEAR ( dst.holes[0].keypoint.pt.y,
+      dstBackup.holes[1].keypoint.pt.y, 1 );
 
-    for ( int r = 0; r < dst.rectangles[1].size(); r++ )
+    for ( int r = 0; r < dst.holes[1].rectangle.size(); r++ )
     {
-      EXPECT_NEAR ( dst.rectangles[1][r].x, temp.rectangles[0][r].x, 1 );
-      EXPECT_NEAR ( dst.rectangles[1][r].y, temp.rectangles[0][r].y, 1 );
+      EXPECT_NEAR ( dst.holes[0].rectangle[r].x,
+        dstBackup.holes[1].rectangle[r].x, 1 );
+      EXPECT_NEAR ( dst.holes[0].rectangle[r].y,
+        dstBackup.holes[1].rectangle[r].y, 1 );
     }
 
-    for ( int o = 0; o < dst.outlines[1].size(); o++ )
+    for ( int o = 0; o < dst.holes[1].outline.size(); o++ )
     {
-      EXPECT_NEAR ( dst.outlines[1][o].x, temp.outlines[0][o].x, 1 );
-      EXPECT_NEAR ( dst.outlines[1][o].y, temp.outlines[0][o].y, 1 );
+      EXPECT_NEAR ( dst.holes[0].outline[o].x,
+        dstBackup.holes[1].outline[o].x, 1 );
+      EXPECT_NEAR ( dst.holes[0].outline[o].y,
+        dstBackup.holes[1].outline[o].y, 1 );
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::replace
+  //! Tests HolesConveyorUtils::replace
   TEST_F ( HolesConveyorUtilsTest, ReplaceTest )
   {
     // Run HolesConveyorUtils::replace
-    HolesConveyorUtils::replace ( src, &dst);
+    HolesConveyorUtils::replace ( src, &dst );
 
-    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+    ASSERT_EQ ( 2, dst.size() );
 
     // Check the newly replaced entries' elements against the original ones
-    for ( int k = 0; k < src.keyPoints.size(); k++ )
+    for ( int k = 0; k < src.size(); k++ )
     {
-      EXPECT_EQ ( dst.keyPoints[k].pt.x, src.keyPoints[k].pt.x );
-      EXPECT_EQ ( dst.keyPoints[k].pt.y, src.keyPoints[k].pt.y );
+      EXPECT_EQ ( dst.holes[k].keypoint.pt.x, src.holes[k].keypoint.pt.x );
+      EXPECT_EQ ( dst.holes[k].keypoint.pt.y, src.holes[k].keypoint.pt.y );
 
-      for ( int r = 0; r < dst.rectangles[k].size(); r++ )
+      for ( int r = 0; r < dst.holes[k].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( dst.rectangles[k][r].x, src.rectangles[k][r].x );
-        EXPECT_EQ ( dst.rectangles[k][r].y, src.rectangles[k][r].y );
+        EXPECT_EQ ( dst.holes[k].rectangle[r].x, src.holes[k].rectangle[r].x );
+        EXPECT_EQ ( dst.holes[k].rectangle[r].y, src.holes[k].rectangle[r].y );
       }
 
-      for ( int o = 0; o < dst.outlines[k].size(); o++ )
+      for ( int o = 0; o < dst.holes[k].outline.size(); o++ )
       {
-        EXPECT_EQ ( dst.outlines[k][o].x, src.outlines[k][o].x );
-        EXPECT_EQ ( dst.outlines[k][o].y, src.outlines[k][o].y );
+        EXPECT_EQ ( dst.holes[k].outline[o].x, src.holes[k].outline[o].x );
+        EXPECT_EQ ( dst.holes[k].outline[o].y, src.holes[k].outline[o].y );
       }
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::replaceHole
+  //! Tests HolesConveyorUtils::replaceHole
   TEST_F ( HolesConveyorUtilsTest, ReplaceHoleTest )
   {
+    // Backup dst
+    HolesConveyor dstBackup;
+    HolesConveyorUtils::copyTo( dst, &dstBackup );
+
     // Run HolesConveyorUtils::replaceHole
     HolesConveyorUtils::replaceHole ( src, 0, &dst, 0 );
 
-    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+    // There should still be two holes inside dst
+    ASSERT_EQ ( 2, dst.size() );
 
-    EXPECT_EQ ( dst.keyPoints[0].pt.x, src.keyPoints[0].pt.x );
-    EXPECT_EQ ( dst.keyPoints[0].pt.y, src.keyPoints[0].pt.y );
+    // The 0-th hole of dst should be the 0-th hole of src
+    EXPECT_EQ ( dst.holes[0].keypoint.pt.x, src.holes[0].keypoint.pt.x );
+    EXPECT_EQ ( dst.holes[0].keypoint.pt.y, src.holes[0].keypoint.pt.y );
 
-    for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+    for ( int r = 0; r < dst.holes[0].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( dst.rectangles[0][r].x, src.rectangles[0][r].x );
-      EXPECT_EQ ( dst.rectangles[0][r].y, src.rectangles[0][r].y );
+      EXPECT_EQ ( dst.holes[0].rectangle[r].x, src.holes[0].rectangle[r].x );
+      EXPECT_EQ ( dst.holes[0].rectangle[r].y, src.holes[0].rectangle[r].y );
     }
 
-    for ( int o = 0; o < dst.outlines[0].size(); o++ )
+    for ( int o = 0; o < dst.holes[0].outline.size(); o++ )
     {
-      EXPECT_EQ ( dst.outlines[0][o].x, src.outlines[0][o].x );
-      EXPECT_EQ ( dst.outlines[0][o].y, src.outlines[0][o].y );
+      EXPECT_EQ ( dst.holes[0].outline[o].x, src.holes[0].outline[o].x );
+      EXPECT_EQ ( dst.holes[0].outline[o].y, src.holes[0].outline[o].y );
+    }
+
+    // The 1-st hole of dst should be the 1-st hole of dstBackup
+    EXPECT_EQ ( dst.holes[1].keypoint.pt.x, dstBackup.holes[1].keypoint.pt.x );
+    EXPECT_EQ ( dst.holes[1].keypoint.pt.y, dstBackup.holes[1].keypoint.pt.y );
+
+    for ( int r = 0; r < dst.holes[0].rectangle.size(); r++ )
+    {
+      EXPECT_EQ ( dst.holes[1].rectangle[r].x,
+        dstBackup.holes[1].rectangle[r].x );
+      EXPECT_EQ ( dst.holes[1].rectangle[r].y,
+        dstBackup.holes[1].rectangle[r].y );
+    }
+
+    for ( int o = 0; o < dst.holes[0].outline.size(); o++ )
+    {
+      EXPECT_EQ ( dst.holes[1].outline[o].x, dstBackup.holes[1].outline[o].x );
+      EXPECT_EQ ( dst.holes[1].outline[o].y, dstBackup.holes[1].outline[o].y );
     }
   }
 
 
 
-  //! Test HolesConveyorUtils::shuffle
+  //! Tests HolesConveyorUtils::shuffle
   TEST_F ( HolesConveyorUtilsTest, ShuffleTest )
   {
     // Backup dst
-    HolesConveyor backupDst;
-    HolesConveyorUtils::copyTo ( dst, &backupDst );
+    HolesConveyor dstBackup;
+    HolesConveyorUtils::copyTo ( dst, &dstBackup );
 
     // Run HolesConveyorUtils::shuffle
     HolesConveyorUtils::shuffle ( &dst );
 
-    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
+    // There should still be 2 entries in dst
+    ASSERT_EQ ( 2, dst.size() );
 
-    if ( dst.keyPoints[0].pt.x == backupDst.keyPoints[0].pt.x )
+    if ( dst.holes[0].keypoint.pt.x == dstBackup.holes[0].keypoint.pt.x )
     {
-      EXPECT_EQ ( dst.keyPoints[0].pt.x, backupDst.keyPoints[0].pt.x );
-      EXPECT_EQ ( dst.keyPoints[0].pt.y, backupDst.keyPoints[0].pt.y );
+      EXPECT_EQ ( dst.holes[0].keypoint.pt.x, dstBackup.holes[0].keypoint.pt.x );
+      EXPECT_EQ ( dst.holes[0].keypoint.pt.y, dstBackup.holes[0].keypoint.pt.y );
 
-      for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+      for ( int r = 0; r < dst.holes[0].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( dst.rectangles[0][r].x, backupDst.rectangles[0][r].x );
-        EXPECT_EQ ( dst.rectangles[0][r].y, backupDst.rectangles[0][r].y );
+        EXPECT_EQ ( dst.holes[0].rectangle[r].x,
+          dstBackup.holes[0].rectangle[r].x );
+        EXPECT_EQ ( dst.holes[0].rectangle[r].y,
+          dstBackup.holes[0].rectangle[r].y );
       }
 
-      for ( int o = 0; o < dst.outlines[0].size(); o++ )
+      for ( int o = 0; o < dst.holes[0].outline.size(); o++ )
       {
-        EXPECT_EQ ( dst.outlines[0][o].x, backupDst.outlines[0][o].x );
-        EXPECT_EQ ( dst.outlines[0][o].y, backupDst.outlines[0][o].y );
+        EXPECT_EQ ( dst.holes[0].outline[o].x, dstBackup.holes[0].outline[o].x );
+        EXPECT_EQ ( dst.holes[0].outline[o].y, dstBackup.holes[0].outline[o].y );
       }
     }
-    else if ( dst.keyPoints[0].pt.x == backupDst.keyPoints[1].pt.x )
+    else if ( dst.holes[0].keypoint.pt.x == dstBackup.holes[1].keypoint.pt.x )
     {
-      EXPECT_EQ ( dst.keyPoints[0].pt.x, backupDst.keyPoints[1].pt.x );
-      EXPECT_EQ ( dst.keyPoints[0].pt.y, backupDst.keyPoints[1].pt.y );
+      EXPECT_EQ ( dst.holes[0].keypoint.pt.x, dstBackup.holes[1].keypoint.pt.x );
+      EXPECT_EQ ( dst.holes[0].keypoint.pt.y, dstBackup.holes[1].keypoint.pt.y );
 
-      for ( int r = 0; r < dst.rectangles[0].size(); r++ )
+      for ( int r = 0; r < dst.holes[0].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( dst.rectangles[0][r].x, backupDst.rectangles[1][r].x );
-        EXPECT_EQ ( dst.rectangles[0][r].y, backupDst.rectangles[1][r].y );
+        EXPECT_EQ ( dst.holes[0].rectangle[r].x,
+          dstBackup.holes[1].rectangle[r].x );
+        EXPECT_EQ ( dst.holes[0].rectangle[r].y,
+          dstBackup.holes[1].rectangle[r].y );
       }
 
-      for ( int o = 0; o < dst.outlines[0].size(); o++ )
+      for ( int o = 0; o < dst.holes[0].outline.size(); o++ )
       {
-        EXPECT_EQ ( dst.outlines[0][o].x, backupDst.outlines[1][o].x );
-        EXPECT_EQ ( dst.outlines[0][o].y, backupDst.outlines[1][o].y );
+        EXPECT_EQ ( dst.holes[0].outline[o].x, dstBackup.holes[1].outline[o].x );
+        EXPECT_EQ ( dst.holes[0].outline[o].y, dstBackup.holes[1].outline[o].y );
       }
     }
-  }
-
-
-
-  //! Test HolesConveyorUtils::size
-  TEST_F ( HolesConveyorUtilsTest, SizeTest )
-  {
-    ASSERT_EQ ( 2, HolesConveyorUtils::size( src ) );
-    ASSERT_EQ ( 2, HolesConveyorUtils::size( dst ) );
   }
 
 } // namespace pandora_vision

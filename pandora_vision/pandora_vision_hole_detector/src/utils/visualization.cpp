@@ -94,7 +94,7 @@ namespace pandora_vision
             big.at<cv::Vec3b>(startRow + i, startCol + j)[2] =
               imgs[im].at<unsigned char>(i, j);
           }
-          else
+          else if(imgs[im].channels() == 3)
           {
             big.at<cv::Vec3b>(startRow + i, startCol + j) =
               imgs[im].at<cv::Vec3b>(i, j);
@@ -193,94 +193,6 @@ namespace pandora_vision
 
 
   /**
-    @brief Depicts the keypoints and bounding boxes
-    @param[in] windowTitle [const std::string&] The window title
-    @param[in] inImage [const cv::Mat&] The image to show
-    @param[in] ms [const int&] How many ms the showing lasts
-    @param[in] keypoints [const std::vector<cv::KeyPoint>&] The keypoints
-    @param[in] bounding_boxes [const std::vector<std::vector<cv::Point2f> >&]
-    The bounding boxes' vertices
-    @param[in] msgs [const std::vector<std::string>&] Message to show to
-    each keypoint
-    @param[in] outlineVector [const std::vector<std::vector<cv::Point2f> >&] The
-    valid holes' outlines
-    @param[in] hz [const float&] If positive holds the Hz
-    @return void
-   **/
-  cv::Mat Visualization::showHoles(
-    const std::string& windowTitle,
-    const cv::Mat& inImage,
-    const int& ms,
-    const std::vector<cv::KeyPoint>& keypoints,
-    const std::vector<std::vector<cv::Point2f> >& bounding_boxes,
-    const std::vector<std::string>& msgs,
-    const std::vector<std::vector<cv::Point2f> >& outlineVector,
-    const float& hz)
-  {
-    cv::Mat img;
-    if (inImage.type() != CV_8UC1 || inImage.type() != CV_8UC3)
-    {
-      img = scaleImageForVisualization(inImage,
-        Parameters::Image::scale_method);
-    }
-    else
-    {
-      inImage.copyTo(img);
-    }
-
-    cv::drawKeypoints(img, keypoints, img, CV_RGB(0, 255, 0),
-      cv::DrawMatchesFlags::DEFAULT);
-
-    for(unsigned int i = 0; i < outlineVector.size(); i++)
-    {
-      for(unsigned int j = 0; j < outlineVector[i].size(); j++)
-      {
-        cv::line(img,
-          cvPoint(outlineVector[i][j].x - 1, outlineVector[i][j].y - 1),
-          cvPoint(outlineVector[i][j].x + 1, outlineVector[i][j].y + 1),
-          cv::Scalar(0, 255, 0), 1, 8 , CV_AA);
-
-        cv::line(img,
-          cvPoint(outlineVector[i][j].x - 1, outlineVector[i][j].y + 1),
-          cvPoint(outlineVector[i][j].x + 1, outlineVector[i][j].y - 1),
-          cv::Scalar(0, 255, 0), 1, 8);
-      }
-    }
-
-    for (int i = 0; i < bounding_boxes.size(); i++)
-    {
-      for(int j = 0; j < 4; j++)
-      {
-        cv::line(img, bounding_boxes[i][j],
-          bounding_boxes[i][(j + 1) % 4], CV_RGB(255, 0, 0), 1, 8);
-      }
-      if(msgs.size() == bounding_boxes.size())
-      {
-        cv::putText(img, msgs[i].c_str(),
-          cvPoint(keypoints[i].pt.x - 20, keypoints[i].pt.y - 20),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 50, 50), 1, CV_AA);
-      }
-    }
-
-    if(hz > 0)
-    {
-      cv::putText(img,
-        (TOSTR(hz)+std::string("Hz")).c_str(),
-        cvPoint(20, 20),
-        cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 255), 1, CV_AA);
-    }
-
-    if(ms >= 0)
-    {
-      Visualization::show(windowTitle.c_str(), img, ms);
-    }
-
-    return img;
-  }
-
-
-
-  /**
     @brief Depicts the contents of a HolesConveyor on an image
     @param[in] windowTitle [const std::string&] The window title
     @param[in] inImage [const cv::Mat&] The image to show
@@ -310,35 +222,44 @@ namespace pandora_vision
       inImage.copyTo(img);
     }
 
-    cv::drawKeypoints(img, conveyor.keyPoints, img, CV_RGB(0, 255, 0),
+    // Construct a keypoints vector to feed into the cv::drawKeypoints method
+    std::vector<cv::KeyPoint> keypointsVector;
+    for (int i = 0; i < conveyor.size(); i++)
+    {
+      keypointsVector.push_back(conveyor.holes[i].keypoint);
+    }
+
+    cv::drawKeypoints(img, keypointsVector, img, CV_RGB(0, 255, 0),
       cv::DrawMatchesFlags::DEFAULT);
 
-    for(unsigned int i = 0; i < conveyor.outlines.size(); i++)
+    for(unsigned int i = 0; i < conveyor.size(); i++)
     {
-      for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
+      for(unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
       {
-        img.at<unsigned char>(conveyor.outlines[i][j].y,
-          3 * conveyor.outlines[i][j].x + 2) = 0;
-        img.at<unsigned char>(conveyor.outlines[i][j].y,
-          3 * conveyor.outlines[i][j].x + 1) = 255;
-        img.at<unsigned char>(conveyor.outlines[i][j].y,
-          3 * conveyor.outlines[i][j].x + 0) = 0;
+        img.at<unsigned char>(conveyor.holes[i].outline[j].y,
+          3 * conveyor.holes[i].outline[j].x + 2) = 0;
+
+        img.at<unsigned char>(conveyor.holes[i].outline[j].y,
+          3 * conveyor.holes[i].outline[j].x + 1) = 255;
+
+        img.at<unsigned char>(conveyor.holes[i].outline[j].y,
+          3 * conveyor.holes[i].outline[j].x + 0) = 0;
       }
     }
 
-    for (int i = 0; i < conveyor.rectangles.size(); i++)
+    for (int i = 0; i < conveyor.size(); i++)
     {
       for(int j = 0; j < 4; j++)
       {
-        cv::line(img, conveyor.rectangles[i][j],
-          conveyor.rectangles[i][(j + 1) % 4], CV_RGB(255, 0, 0), 1, 8);
+        cv::line(img, conveyor.holes[i].rectangle[j],
+          conveyor.holes[i].rectangle[(j + 1) % 4], CV_RGB(255, 0, 0), 1, 8);
       }
 
-      if(msgs.size() == conveyor.rectangles.size())
+      if(msgs.size() == conveyor.size())
       {
         cv::putText(img, msgs[i].c_str(),
-          cvPoint(conveyor.keyPoints[i].pt.x - 20,
-            conveyor.keyPoints[i].pt.y - 20),
+          cvPoint(conveyor.holes[i].keypoint.pt.x - 20,
+            conveyor.holes[i].keypoint.pt.y - 20),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(255, 50, 50), 1, CV_AA);
       }
     }
@@ -376,7 +297,7 @@ namespace pandora_vision
     const std::vector<cv::KeyPoint>& keypoints)
   {
     cv::Mat img;
-    if (inImage.type() != CV_8UC3 || inImage.type() != CV_8UC1)
+    if (inImage.depth() != CV_8U)
     {
       img = scaleImageForVisualization(inImage, Parameters::Image::scale_method);
     }

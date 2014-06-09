@@ -181,52 +181,20 @@ namespace pandora_vision
         continue;
       }
 
-      val = image->at<float>(x - 1, y + 1);
-      if(val < lower && val != noise)
+      // Scan all the neigbors of point (x, y)
+      for (int m = -1; m < 2; m++)
       {
-        lower = val;
-      }
-
-      val = image->at<float>(x - 1, y - 1);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x - 1, y);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x + 1, y + 1);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x + 1, y - 1);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x + 1, y);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x, y - 1);
-      if(val < lower && val != noise)
-      {
-        lower = val;
-      }
-
-      val = image->at<float>(x, y + 1);
-      if(val < lower && val != noise)
-      {
-        lower = val;
+        for (int n = -1; n < 2; n++)
+        {
+          if (m != 0 && n != 0)
+          {
+            val = image->at<float>(x + m, y + n);
+            if(val < lower && val != noise)
+            {
+              lower = val;
+            }
+          }
+        }
       }
     }
 

@@ -41,29 +41,15 @@ namespace pandora_vision
 {
   /**
     @brief Appends one HolesConveyor struct to another.
-    @param[in] src [const HolesConveyor&] The source struct
-    @param[out] dst [HolesConveyor*] The destination struct
+    @param[in] src [const HolesConveyor&] The source conveyor
+    @param[out] dst [HolesConveyor*] The destination conveyor
     @return void
    **/
   void HolesConveyorUtils::append(const HolesConveyor& src, HolesConveyor* dst)
   {
-    for (int i = 0; i < src.keyPoints.size(); i++)
+    for (int i = 0; i < src.size(); i++)
     {
-      dst->keyPoints.push_back(src.keyPoints[i]);
-
-      std::vector<cv::Point2f> tempOutline;
-      for (int j = 0; j < src.outlines[i].size(); j++)
-      {
-        tempOutline.push_back(src.outlines[i][j]);
-      }
-      dst->outlines.push_back(tempOutline);
-
-      std::vector<cv::Point2f> tempRectangle;
-      for (int j = 0; j < src.rectangles[i].size(); j++)
-      {
-        tempRectangle.push_back(src.rectangles[i][j]);
-      }
-      dst->rectangles.push_back(tempRectangle);
+      dst->holes.push_back(src.holes[i]);
     }
   }
 
@@ -90,16 +76,25 @@ namespace pandora_vision
     const int& ox, const int& oy,
     HolesConveyor* conveyor)
   {
-    conveyor->rectangles.push_back(
-      generateRectangle(rectangleUpperLeft, rx, ry, 0));
+    // A conveyor of a single hole
+    HoleConveyor hole;
 
-    conveyor->outlines.push_back(
-      generateRectangle(outlineUpperLeft, ox, oy, 1));
-
+    // Assign the keypoint
     cv::KeyPoint k(outlineUpperLeft.x + ox / 2,
       outlineUpperLeft.y + oy / 2, 1);
 
-    conveyor->keyPoints.push_back(k);
+    hole.keypoint = k;
+
+    // Assign the rectangle points
+    hole.rectangle =
+      generateRectangle(rectangleUpperLeft, rx, ry, 0);
+
+    // Assign the outline points
+    hole.outline =
+      generateRectangle(outlineUpperLeft, ox, oy, 1);
+
+    // Append hole into conveyor
+    conveyor->holes.push_back(hole);
   }
 
 
@@ -112,33 +107,7 @@ namespace pandora_vision
    **/
   void HolesConveyorUtils::clear(HolesConveyor* conveyor)
   {
-    // Delete the keypoints
-    conveyor->keyPoints.erase(conveyor->keyPoints.begin(),
-      conveyor->keyPoints.end());
-
-
-    // Delete each outline point from its respective vector
-    for (int i = 0; i < conveyor->outlines.size(); i++)
-    {
-      conveyor->outlines[i].erase(conveyor->outlines[i].begin(),
-        conveyor->outlines[i].end());
-    }
-
-    // Delete the outline vector alltogether
-    conveyor->outlines.erase(conveyor->outlines.begin(),
-      conveyor->outlines.end());
-
-
-    // Delete each outline point from its respective vector
-    for (int i = 0; i < conveyor->rectangles.size(); i++)
-    {
-      conveyor->rectangles[i].erase(conveyor->rectangles[i].begin(),
-        conveyor->rectangles[i].end());
-    }
-
-    // Delete the rectangles vector alltogether
-    conveyor->rectangles.erase(conveyor->rectangles.begin(),
-      conveyor->rectangles.end());
+    conveyor->holes.clear();
   }
 
 
@@ -154,7 +123,7 @@ namespace pandora_vision
     HolesConveyor* dst)
   {
     // If the dst is not empty, clear it
-    if (dst->keyPoints.size() > 0)
+    if (dst->size() > 0)
     {
       clear(dst);
     }
@@ -181,18 +150,19 @@ namespace pandora_vision
     const cv::Point2f& upperLeft, const int& x, const int& y,
     const int& intent)
   {
+    // The vector of the rectangle's vertices
     std::vector<cv::Point2f> rectangleVertices;
 
+    // The four vertices of the rectangle
     cv::Point2f vertex_1(upperLeft.x, upperLeft.y);
-    rectangleVertices.push_back(vertex_1);
-
     cv::Point2f vertex_2(upperLeft.x, upperLeft.y + y);
-    rectangleVertices.push_back(vertex_2);
-
     cv::Point2f vertex_3(upperLeft.x + x, upperLeft.y + y);
-    rectangleVertices.push_back(vertex_3);
-
     cv::Point2f vertex_4(upperLeft.x + x, upperLeft.y);
+
+    // Push them back into the vector
+    rectangleVertices.push_back(vertex_1);
+    rectangleVertices.push_back(vertex_2);
+    rectangleVertices.push_back(vertex_3);
     rectangleVertices.push_back(vertex_4);
 
     // Outline construction
@@ -237,28 +207,13 @@ namespace pandora_vision
   HolesConveyor HolesConveyorUtils::getHole(const HolesConveyor& conveyor,
     const int& index)
   {
-    HolesConveyor dst;
+    // The conveyor that will be returned
+    HolesConveyor temp;
 
-    // Get the index-th hole's keypoint
-    dst.keyPoints.push_back(conveyor.keyPoints[index]);
+    // Push back the index-th hole of the conveyor into temp
+    temp.holes.push_back(conveyor.holes[index]);
 
-    // Get the index-th hole's outline
-    std::vector<cv::Point2f> tempOutline;
-    for (int j = 0; j < conveyor.outlines[index].size(); j++)
-    {
-      tempOutline.push_back(conveyor.outlines[index][j]);
-    }
-    dst.outlines.push_back(tempOutline);
-
-    // Get the index-th hole's rectangle
-    std::vector<cv::Point2f> tempRectangle;
-    for (int j = 0; j < conveyor.rectangles[index].size(); j++)
-    {
-      tempRectangle.push_back(conveyor.rectangles[index][j]);
-    }
-    dst.rectangles.push_back(tempRectangle);
-
-    return dst;
+    return temp;
   }
 
 
@@ -273,45 +228,17 @@ namespace pandora_vision
   void HolesConveyorUtils::merge(const HolesConveyor& srcA,
     const HolesConveyor& srcB, HolesConveyor* dst)
   {
-    // Insert the srcA HolesConveyor into the dst HolesConveyor
-    for (int i = 0; i < srcA.keyPoints.size(); i++)
+    // Clear the destination conveyor if not empty
+    if (dst->size() > 0)
     {
-      dst->keyPoints.push_back(srcA.keyPoints[i]);
-
-      std::vector<cv::Point2f> tempOutline;
-      for (int j = 0; j < srcA.outlines[i].size(); j++)
-      {
-        tempOutline.push_back(srcA.outlines[i][j]);
-      }
-      dst->outlines.push_back(tempOutline);
-
-      std::vector<cv::Point2f> tempRectangle;
-      for (int j = 0; j < srcA.rectangles[i].size(); j++)
-      {
-        tempRectangle.push_back(srcA.rectangles[i][j]);
-      }
-      dst->rectangles.push_back(tempRectangle);
+      clear(dst);
     }
 
-    // Insert the srcB HolesConveyor into the dst HolesConveyor
-    for (int i = 0; i < srcB.keyPoints.size(); i++)
-    {
-      dst->keyPoints.push_back(srcB.keyPoints[i]);
+    // Append the first source to dst
+    append(srcA, dst);
 
-      std::vector<cv::Point2f> tempOutline;
-      for (int j = 0; j < srcB.outlines[i].size(); j++)
-      {
-        tempOutline.push_back(srcB.outlines[i][j]);
-      }
-      dst->outlines.push_back(tempOutline);
-
-      std::vector<cv::Point2f> tempRectangle;
-      for (int j = 0; j < srcB.rectangles[i].size(); j++)
-      {
-        tempRectangle.push_back(srcB.rectangles[i][j]);
-      }
-      dst->rectangles.push_back(tempRectangle);
-    }
+    // Append the second source to dst
+    append(srcB, dst);
   }
 
 
@@ -326,23 +253,8 @@ namespace pandora_vision
   void HolesConveyorUtils::removeHole(HolesConveyor* conveyor, const int& id)
   {
     // Delete the respective keypoint
-    conveyor->keyPoints.erase(conveyor->keyPoints.begin() + id);
+    conveyor->holes.erase(conveyor->holes.begin() + id);
 
-
-    // Delete each outline point from its respective vector
-    conveyor->outlines[id].erase(conveyor->outlines[id].begin(),
-      conveyor->outlines[id].end());
-
-    // Delete the respective outline vector
-    conveyor->outlines.erase(conveyor->outlines.begin() + id);
-
-
-    // Delete each outline point from its respective vector
-    conveyor->rectangles[id].erase(conveyor->rectangles[id].begin(),
-      conveyor->rectangles[id].end());
-
-    // Delete the respective rectangles vector
-    conveyor->rectangles.erase(conveyor->rectangles.begin() + id);
   }
 
 
@@ -381,23 +293,13 @@ namespace pandora_vision
     const int& srcIndex, HolesConveyor* dst, const int& dstIndex)
   {
     // Replace the dst's dstIndex-th hole's keypoint
-    dst->keyPoints.at(dstIndex) = src.keyPoints.at(srcIndex);
-
-    // Erase the outline points for entry dstIndex of the dst
-    dst->outlines[dstIndex].erase(
-      dst->outlines[dstIndex].begin(),
-      dst->outlines[dstIndex].end());
-
-    // Replace the dst's dstIndex-th hole's outline points
-    dst->outlines.at(dstIndex) = src.outlines[srcIndex];
-
-    // Erase the rectangle points for entry dstIndex of the dst
-    dst->rectangles[dstIndex].erase(
-      dst->rectangles[dstIndex].begin(),
-      dst->rectangles[dstIndex].end());
+    dst->holes[dstIndex].keypoint = src.holes[srcIndex].keypoint;
 
     // Replace the dst's dstIndex-th hole's rectangle points
-    dst->rectangles.at(dstIndex) = src.rectangles[srcIndex];
+    dst->holes[dstIndex].rectangle = src.holes[srcIndex].rectangle;
+
+    // Replace the dst's dstIndex-th hole's outline points
+    dst->holes[dstIndex].outline = src.holes[srcIndex].outline;
   }
 
 
@@ -418,7 +320,7 @@ namespace pandora_vision
 
     // The vector of holes' indices
     std::vector<int> indices;
-    for (int i = 0; i < temp.keyPoints.size(); i++)
+    for (int i = 0; i < temp.size(); i++)
     {
       indices.push_back(i);
     }
@@ -427,37 +329,10 @@ namespace pandora_vision
     std::random_shuffle(indices.begin(), indices.end());
 
     // Fill the src conveyor with the shuffled holes
-    for (int i = 0; i < temp.keyPoints.size(); i++)
+    for (int i = 0; i < temp.size(); i++)
     {
       append(getHole(temp, indices[i]), src);
     }
-  }
-
-
-
-  /**
-    @brief Gets the number of holes in a HolesConveyor.
-    In case of discrepancies in the number of keypoints, rectangles and
-    outlines, return -1.
-    @param[in] conveyor [const HolesConveyor&] The HolesConveyor struct
-    @return int The size of @param conveyor
-   **/
-  int HolesConveyorUtils::size(const HolesConveyor& conveyor)
-  {
-    // The number of keypoints, rectangles and outlines
-    int keypoints = conveyor.keyPoints.size();
-    int rectangles = conveyor.rectangles.size();
-    int outlines = conveyor.outlines.size();
-
-    // Check for discrepancies
-    if (keypoints != rectangles
-      || keypoints != outlines
-      || outlines != rectangles)
-    {
-      return -1;
-    }
-
-    return conveyor.keyPoints.size();
   }
 
 } // namespace pandora_vision

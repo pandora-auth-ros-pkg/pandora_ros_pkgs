@@ -127,11 +127,9 @@ namespace pandora_vision
         Visualization::showHoles(
           msg,
           holeFrame,
+          conveyor,
           -1,
-          conveyor.keyPoints,
-          conveyor.rectangles,
-          std::vector<std::string>(),
-          conveyor.outlines)
+          std::vector<std::string>())
         );
     }
     #endif

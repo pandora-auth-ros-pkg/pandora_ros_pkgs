@@ -291,7 +291,7 @@ namespace pandora_vision
     createHolesMasksSetVector(conveyor, image, holesMasksSetVector);
 
     // Draw each mask set onto an image
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       // The current hole's image mask
       cv::Mat holeMask = cv::Mat::zeros(image.size(), CV_8UC1);
@@ -343,7 +343,7 @@ namespace pandora_vision
     createHolesMasksSetVector(conveyor, image, &holesMasksSetVector);
 
     // Draw each mask set onto an image
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       // The current hole's image mask
       cv::Mat holeMaskImage = cv::Mat::zeros(image.size(), CV_8UC1);
@@ -389,17 +389,17 @@ namespace pandora_vision
     Timer::start("createHolesMasksSetVector", "createCheckerRequiredVectors");
     #endif
 
-    for (int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (int i = 0; i < conveyor.size(); i++)
     {
       // The image on which the i-th hole's outline will be drawn
       cv::Mat holeMask = cv::Mat::zeros(image.size(), CV_8UC1);
 
       // Draw the outline points of the i-th hole onto holeMask
-      for(unsigned int j = 0; j < conveyor.outlines[i].size(); j++)
+      for(unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
       {
         holeMask.at<unsigned char>(
-          conveyor.outlines[i][j].y,
-          conveyor.outlines[i][j].x) = 255;
+          conveyor.holes[i].outline[j].y,
+          conveyor.holes[i].outline[j].x) = 255;
       }
 
       // The set of indices of points inside the i-th hole's outline
@@ -408,7 +408,7 @@ namespace pandora_vision
 
       // The point from which the brushfire will begin
       cv::Point2f keypoint(
-        conveyor.keyPoints[i].pt.x, conveyor.keyPoints[i].pt.y);
+        conveyor.holes[i].keypoint.pt.x, conveyor.holes[i].keypoint.pt.y);
 
       // Brushfire from the keypoint to the hole's outline
       // to obtain the points inside it
@@ -469,18 +469,18 @@ namespace pandora_vision
     double theta;
     double keypointVertDist;
 
-    for (int i = 0; i < conveyor.rectangles.size(); i++)
+    for (int i = 0; i < conveyor.size(); i++)
     {
       std::vector<cv::Point2f> inflatedVertices;
       int inflatedVerticesWithinImageLimits = 0;
 
       for (int j = 0; j < 4; j++)
       {
-        key_y = conveyor.keyPoints[i].pt.y;
-        key_x = conveyor.keyPoints[i].pt.x;
+        key_y = conveyor.holes[i].keypoint.pt.y;
+        key_x = conveyor.holes[i].keypoint.pt.x;
 
-        vert_y = conveyor.rectangles[i][j].y;
-        vert_x = conveyor.rectangles[i][j].x;
+        vert_y = conveyor.holes[i].rectangle[j].y;
+        vert_x = conveyor.holes[i].rectangle[j].x;
 
         theta = atan2(key_y - vert_y, key_x - vert_x);
 
@@ -703,8 +703,8 @@ namespace pandora_vision
     {
       // The brushfire start point is the hole's keypoint
       cv::Point2f keypoint(
-        conveyor.keyPoints[inflatedRectanglesIndices[i]].pt.x,
-        conveyor.keyPoints[inflatedRectanglesIndices[i]].pt.y);
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.x,
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.y);
 
       // The current hole's mask
       cv::Mat intermediatePointsMask = cv::Mat::zeros(image.size(), CV_8UC1);
@@ -716,11 +716,11 @@ namespace pandora_vision
 
       // Draw the outline of the i-th hole onto holeOutlineFilledImage
       for(unsigned int j = 0;
-        j < conveyor.outlines[inflatedRectanglesIndices[i]].size(); j++)
+        j < conveyor.holes[inflatedRectanglesIndices[i]].outline.size(); j++)
       {
         holeOutlineFilledImage.at<unsigned char>(
-          conveyor.outlines[inflatedRectanglesIndices[i]][j].y,
-          conveyor.outlines[inflatedRectanglesIndices[i]][j].x) = 255;
+          conveyor.holes[inflatedRectanglesIndices[i]].outline[j].y,
+          conveyor.holes[inflatedRectanglesIndices[i]].outline[j].x) = 255;
       }
 
       // The set of indices of points inside the i-th hole's outline

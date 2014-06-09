@@ -106,7 +106,6 @@ namespace pandora_vision
       case 1 :
         {
           checkHolesColorHomogeneity(
-            conveyor,
             img,
             holesMasksImageVector,
             probabilitiesVector,
@@ -122,7 +121,6 @@ namespace pandora_vision
       case 2 :
         {
           checkHolesLuminosityDiff(
-            conveyor,
             img,
             holesMasksSetVector,
             intermediatePointsSetVector,
@@ -138,7 +136,6 @@ namespace pandora_vision
       case 3 :
         {
           checkHolesTextureDiff(
-            conveyor,
             img,
             inHistogram,
             holesMasksImageVector,
@@ -155,7 +152,6 @@ namespace pandora_vision
       case 4 :
         {
           checkHolesTextureBackProject(
-            conveyor,
             img,
             inHistogram,
             holesMasksSetVector,
@@ -169,9 +165,9 @@ namespace pandora_vision
         }
     }
 
-    for(int i = 0; i < conveyor.keyPoints.size(); i++)
+    for(int i = 0; i < conveyor.size(); i++)
     {
-      if(msgs_.size() == conveyor.keyPoints.size())
+      if(msgs_.size() == conveyor.size())
       {
         finalMsgs.push_back(msgs_[i]);
       }
@@ -317,7 +313,6 @@ namespace pandora_vision
     @brief Checks for color homogenity in a region where points are
     constrained inside each hole. A candidate hole is considered valid
     if its H-V histogram has above a certain number of bins occupied.
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
     containing the masks needed to produce the histograms of the points
@@ -332,7 +327,6 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesColorHomogeneity(
-    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const std::vector<cv::Mat>& holesMasksImageVector,
     std::vector<float>* probabilitiesVector,
@@ -365,7 +359,7 @@ namespace pandora_vision
     }
 
 
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < holesMasksImageVector.size(); i++)
     {
       // Sets featuring all the different colours found inside each image mask
       std::set<unsigned char> blueColourSet;
@@ -415,7 +409,6 @@ namespace pandora_vision
     (1) the pixels in between a hole's bounding box edges and the points
     outside the hole's outline and
     (2) the points inside the hole's outline.
-    @param[in] conveyor [const blobHolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
     A vector that holds sets of points's indices;
@@ -438,7 +431,6 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesLuminosityDiff(
-    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
@@ -528,7 +520,6 @@ namespace pandora_vision
     and the bounding box's edges to have a high probability
     in the back project image, and for the points inside the candidate
     hole's outline to have a low probability in the back project image
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
@@ -552,7 +543,6 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesTextureBackProject(
-    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const cv::MatND& inHistogram,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
@@ -642,7 +632,6 @@ namespace pandora_vision
     and for major difference between the
     histograms of the bounding box and the points inside the outline of the
     blob.
-    @param[in] conveyor [const HolesConveyor&] The candidate holes
     @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
     @param[in] inHistogram [const cv::MatND&]
     The model histogram's H and S component
@@ -664,7 +653,6 @@ namespace pandora_vision
     @return void
    **/
   void RgbFilters::checkHolesTextureDiff(
-    const HolesConveyor& conveyor,
     const cv::Mat& inImage,
     const cv::MatND& inHistogram,
     const std::vector<cv::Mat>& holesMasksImageVector,

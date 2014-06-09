@@ -205,10 +205,16 @@ namespace pandora_vision
        */
       if (keypointResidesInRectIds.size() == 1)
       {
-        conveyor->keyPoints.push_back(inKeyPoints[keypointId]);
-        conveyor->rectangles.push_back(
-          inRectangles[keypointResidesInRectIds[0]]);
-        conveyor->outlines.push_back(inContours[keypointId]);
+        // A single hole
+        HoleConveyor hole;
+
+        // Accumulate keypoint, rectangle and outline properties onto hole
+        hole.keypoint = inKeyPoints[keypointId];
+        hole.rectangle = inRectangles[keypointResidesInRectIds[0]];
+        hole.outline = inContours[keypointId];
+
+        // Push hole back into the conveyor
+        conveyor->holes.push_back(hole);
       }
 
 
@@ -227,9 +233,16 @@ namespace pandora_vision
           }
         }
 
-        conveyor->keyPoints.push_back(inKeyPoints[keypointId]);
-        conveyor->rectangles.push_back(inRectangles[minAreaRectId]);
-        conveyor->outlines.push_back(inContours[keypointId]);
+        // A single hole
+        HoleConveyor hole;
+
+        // Accumulate keypoint, rectangle and outline properties onto hole
+        hole.keypoint = inKeyPoints[keypointId];
+        hole.rectangle = inRectangles[minAreaRectId];
+        hole.outline = inContours[keypointId];
+
+        // Push hole back into the conveyor
+        conveyor->holes.push_back(hole);
       }
 
       /*

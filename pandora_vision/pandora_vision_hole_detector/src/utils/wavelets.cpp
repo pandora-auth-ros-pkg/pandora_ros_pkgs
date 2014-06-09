@@ -39,126 +39,6 @@
 
 namespace pandora_vision
 {
-
-  Wavelets::Wavelets() {}
-
-
-
-  std::vector<float> Wavelets::getH0(int index)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("getH0", "getLowLow");
-    #endif
-
-    std::vector<float> h0;
-
-    switch (index)
-    {
-
-      case 1: //Haar
-
-        for(int i = 0; i < 2; i++)
-        {
-          h0.push_back(1 / sqrt(2));
-        }
-
-        break;
-
-      case 2: //Daubechies 1
-
-        h0.push_back(0.7071067812);
-        h0.push_back(0.7071067812);
-        break;
-
-      case 3: //Daubechies 2
-
-        h0.push_back(-0.1294095226);
-        h0.push_back(0.2241438680);
-        h0.push_back(0.8365163037);
-        h0.push_back(0.4829629131);
-        break;
-
-      case 4: //Daubechies 3
-
-        h0.push_back(0.0352262919);
-        h0.push_back(-0.0854412739);
-        h0.push_back(-0.1350110200);
-        h0.push_back(0.4598775021);
-        h0.push_back(0.8068915093);
-        h0.push_back(0.3326705530);
-        break;
-
-      case 5: //Daubechies 4
-
-        h0.push_back(-0.0105974018);
-        h0.push_back(0.0328830117);
-        h0.push_back(0.0308413818);
-        h0.push_back(-0.1870348117);
-        h0.push_back(-0.0279837694);
-        h0.push_back(0.6308807679);
-        h0.push_back(0.7148465706);
-        h0.push_back(0.2303778133);
-        break;
-    }
-
-    #ifdef DEBUG_TIME
-    Timer::tick("getH0");
-    #endif
-
-    return h0;
-  }
-
-
-
-  std::vector<float> Wavelets::getG0(const std::vector<float>& H0)
-  {
-    std::vector<float> G0;
-
-    for(int i = 0; i < H0.size(); i++)
-    {
-      G0.push_back(H0.at(i));
-    }
-
-    std::reverse(G0.begin(), G0.end());
-
-    return G0;
-  }
-
-
-
-  std::vector<float> Wavelets::getG1(const std::vector<float>& H0)
-  {
-
-    std::vector<float> G1;
-
-    for(int i = 0; i < H0.size(); i++)
-    {
-      int temp = pow(-1, i);
-
-      G1.push_back(temp * H0.at(i));
-    }
-
-    return G1;
-  }
-
-
-
-  std::vector<float> Wavelets::getH1(const std::vector<float>& G1)
-  {
-    std::vector<float> H1;
-
-    for(int i = 0; i < G1.size(); i++)
-    {
-      H1.push_back(G1.at(i));
-    }
-
-    std::reverse(H1.begin(), H1.end());
-
-    return H1;
-  }
-
-
-
   cv::Mat Wavelets::convCols(const cv::Mat& in,
     const std::vector<float>& kernel)
   {
@@ -302,7 +182,12 @@ namespace pandora_vision
 
     Wavelets* wave = new Wavelets();
 
-    std::vector<float> H0 = wave->getH0(1);
+    std::vector<float> H0;
+
+    for(int i = 0; i < 2; i++)
+    {
+      H0.push_back(1 / sqrt(2));
+    }
 
     cv::Mat doubled = cv::Mat::zeros(temp.rows, temp.cols, CV_32FC1);
 
@@ -347,13 +232,19 @@ namespace pandora_vision
 
     Wavelets* wave = new Wavelets();
 
-    std::vector<float> H0 = wave->getH0(1);
+    std::vector<float> H0;
+
+    for(int i = 0; i < 2; i++)
+    {
+      H0.push_back(1 / sqrt(2));
+    }
 
     cv::Mat lowLow[3];
 
     for (int i = 0; i < 3; i++)
     {
       cv::Mat doubled = cv::Mat::zeros(inImage.rows, inImage.cols, CV_32FC1);
+
       for(int y = 0; y < doubled.rows; y++)
       {
         for(int x = 0; x < doubled.cols; x++)
@@ -392,122 +283,6 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("getLowLow");
     #endif
-  }
-
-
-
-  cv::Mat Wavelets::getLowHigh(const cv::Mat& in,
-    const std::vector<float>& kernel0,
-    const std::vector<float>& kernel1)
-  {
-    cv::Mat temp0 = convCols(in, kernel0);
-
-    cv::Mat tempy0;
-
-    for(int i = 0; i < temp0.rows; i += 2)
-    {
-      tempy0.push_back(temp0.row(i));
-    }
-
-    cv::Mat tempy01 = convRows(tempy0, kernel1);
-
-    cv::Mat tempy001;
-
-    cv::transpose(tempy01, tempy01);
-
-    for(int i = 0; i < tempy01.rows; i+= 2)
-    {
-      tempy001.push_back(tempy01.row(i));
-    }
-
-    cv::transpose(tempy001, tempy001);
-
-    double minVal;
-    double maxVal;
-
-
-    cv::minMaxLoc(tempy001, &minVal, &maxVal);
-
-    tempy001 = tempy001 / maxVal;
-
-    return tempy001;
-  }
-
-
-
-  cv::Mat Wavelets::getHighLow(const cv::Mat& in,
-    const std::vector<float>& kernel0,
-    const std::vector<float>& kernel1)
-  {
-    cv::Mat temp1 = convCols(in, kernel1);
-
-    cv::Mat tempy1;
-
-    for(int i = 0; i < temp1.rows; i += 2)
-    {
-      tempy1.push_back(temp1.row(i));
-    }
-
-    cv::Mat tempy10 = convRows(tempy1, kernel0);
-
-    cv::Mat tempy010;
-
-    cv::transpose(tempy10, tempy10);
-
-    for(int i = 0; i < tempy10.rows; i+= 2)
-    {
-      tempy010.push_back(tempy10.row(i));
-    }
-
-    cv::transpose(tempy010, tempy010);
-
-    double minVal;
-    double maxVal;
-
-
-    cv::minMaxLoc(tempy010, &minVal, &maxVal);
-
-    tempy010 = tempy010 / maxVal;
-
-    return tempy010;
-  }
-
-
-
-  cv::Mat Wavelets::getHighHigh(const cv::Mat& in,
-    const std::vector<float>& kernel)
-  {
-    cv::Mat temp1 = convCols(in, kernel);
-
-    cv::Mat tempy1;
-
-    for(int i = 0; i < temp1.rows; i+= 2)
-    {
-      tempy1.push_back(temp1.row(i));
-    }
-
-    cv::Mat tempy11 = convRows(tempy1, kernel);
-
-    cv::Mat tempy111;
-
-    cv::transpose(tempy11, tempy11);
-
-    for(int i = 0; i < tempy11.rows; i += 2)
-    {
-      tempy111.push_back(tempy11.row(i));
-    }
-
-    cv::transpose(tempy111, tempy111);
-
-    double minVal;
-    double maxVal;
-
-
-    cv::minMaxLoc(tempy111, &minVal, &maxVal);
-
-    tempy111 = tempy111 / maxVal;
-
-    return tempy111;
   }
 
 } // namespace pandora_vision

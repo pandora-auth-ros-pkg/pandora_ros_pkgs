@@ -43,7 +43,7 @@ namespace pandora_vision
     @brief Finds the holes provided a depth image in CV_32FC1 format
     @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
     depth image in CV_32FC1 format
-    @return HolesConveyor The struct that contains the holes
+    @return HolesConveyor The struct that contains the holes found
    **/
   HolesConveyor HoleDetector::findHoles(const cv::Mat& interpolatedDepthImage)
   {
@@ -128,11 +128,9 @@ namespace pandora_vision
         Visualization::showHoles(
           msg,
           interpolatedDepthImage,
+          conveyor,
           -1,
-          conveyor.keyPoints,
-          conveyor.rectangles,
-          std::vector<std::string>(),
-          conveyor.outlines)
+          std::vector<std::string>())
         );
     }
     #endif
@@ -140,6 +138,14 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     if(Parameters::Debug::show_find_holes) // Debug
     {
+      // A vector of keypoints
+      std::vector<cv::KeyPoint> keypointsVector;
+
+      for (int i = 0; i < conveyor.size(); i++)
+      {
+        keypointsVector.push_back(conveyor.holes[i].keypoint);
+      }
+
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Keypoints sent to hole_fusion");
       msgs.push_back(msg);
@@ -148,7 +154,7 @@ namespace pandora_vision
           msg,
           interpolatedDepthImage,
           -1,
-          conveyor.keyPoints)
+          keypointsVector)
         );
     }
     if(Parameters::Debug::show_find_holes)

@@ -295,13 +295,13 @@ namespace pandora_vision
     const int& x,
     const int& y )
   {
-    // What will be returned: the internal elements of one hole
-    HolesConveyor conveyor;
+    // A single hole
+    HoleConveyor hole;
 
     // The hole's keypoint
     cv::KeyPoint k (  upperLeft.x + x / 2, upperLeft.y + y / 2 , 1 );
 
-    conveyor.keyPoints.push_back(k);
+    hole.keypoint = k;
 
 
     // The four vertices of the rectangle
@@ -319,7 +319,7 @@ namespace pandora_vision
     rectangle.push_back(vertex_3);
     rectangle.push_back(vertex_4);
 
-    conveyor.rectangles.push_back(rectangle);
+    hole.rectangle = rectangle;
 
 
     // The outline points of the hole will be obtained through the depiction
@@ -346,7 +346,11 @@ namespace pandora_vision
       }
     }
 
-    conveyor.outlines.push_back(outline);
+    hole.outline = outline;
+
+    // Push hole back into a HolesConveyor
+    HolesConveyor conveyor;
+    conveyor.holes.push_back( hole );
 
     return conveyor;
 
@@ -354,7 +358,7 @@ namespace pandora_vision
 
 
 
-  //! Test RgbFilters::applyFilter
+  //! Tests RgbFilters::applyFilter
   TEST_F ( RgbFiltersTest, ApplyFilterTest )
   {
     // Generate the needed resources for an inflation size of value 0
@@ -411,7 +415,7 @@ namespace pandora_vision
     for ( int m = 1; m < 3; m++ )
     {
       // The vector of probabilities returned
-      std::vector< float > probabilitiesVector_0( conveyor.keyPoints.size(), 0.0 );
+      std::vector< float > probabilitiesVector_0( conveyor.size(), 0.0 );
       std::vector< std::string > msgs;
       std::vector< cv::Mat > imgs;
       cv::MatND histogram;
@@ -509,7 +513,7 @@ namespace pandora_vision
 
     for ( int m = 1; m < 3; m++ )
     {
-      std::vector< float > probabilitiesVector_10( conveyor.keyPoints.size(), 0.0 );
+      std::vector< float > probabilitiesVector_10( conveyor.size(), 0.0 );
       std::vector< std::string > msgs;
       std::vector< cv::Mat > imgs;
       cv::MatND histogram;
@@ -558,7 +562,7 @@ namespace pandora_vision
 
 
 
-  // Test RgbFilters::checkHoles
+  // Tests RgbFilters::checkHoles
   TEST_F ( RgbFiltersTest, CheckHolesTest )
   {
     // Generate the needed resources for an inflation size of value 0
@@ -621,7 +625,7 @@ namespace pandora_vision
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D_0(
       4, // Four rgb filters in total
-      std::vector< float >( conveyor.keyPoints.size(), 0.0 ) );
+      std::vector< float >( conveyor.size(), 0.0 ) );
 
 
     // Run RgbFilters::applyFilter
@@ -719,7 +723,7 @@ namespace pandora_vision
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D_10(
       4, // Four rgb filters in total
-      std::vector< float >( conveyor.keyPoints.size(), 0.0 ) );
+      std::vector< float >( conveyor.size(), 0.0 ) );
 
     // Run RgbFilters::applyFilter
     RgbFilters::checkHoles(
@@ -765,7 +769,7 @@ namespace pandora_vision
 
 
 
-  // Test RgbFilters::checkHolesColorHomogeneity
+  // Tests RgbFilters::checkHolesColorHomogeneity
   TEST_F ( RgbFiltersTest, CheckHolesColorHomogeneityTest )
   {
     // Generate the needed resources
@@ -776,12 +780,11 @@ namespace pandora_vision
       &holesMasksImageVector );
 
     // The vector of probabilities returned
-    std::vector<float> probabilitiesVector( conveyor.keyPoints.size(), 0.0 );
+    std::vector<float> probabilitiesVector( conveyor.size(), 0.0 );
     std::vector<std::string> msgs;
 
     // Run RgbFilters::checkHolesColorHomogeneity
     RgbFilters::checkHolesColorHomogeneity(
-      conveyor,
       squares_,
       holesMasksImageVector,
       &probabilitiesVector,
@@ -799,7 +802,7 @@ namespace pandora_vision
 
 
 
-  //! Test RgbFilters::checkHolesLuminosityDiff
+  //! Tests RgbFilters::checkHolesLuminosityDiff
   TEST_F ( RgbFiltersTest, CheckHolesLuminosityDiffTest )
   {
     // Generate the needed resources for an inflation size of value 0
@@ -835,12 +838,11 @@ namespace pandora_vision
       &intermediatePointsSetVector_0 );
 
     // The vector of probabilities returned
-    std::vector< float > probabilitiesVector_0( conveyor.keyPoints.size(), 0.0 );
+    std::vector< float > probabilitiesVector_0( conveyor.size(), 0.0 );
     std::vector< std::string > msgs;
 
     // Run RgbFilters::checkHolesLuminosityDiff
     RgbFilters::checkHolesLuminosityDiff(
-      conveyor,
       squares_,
       holesMasksSetVector_0,
       intermediatePointsSetVector_0,
@@ -889,12 +891,11 @@ namespace pandora_vision
       &intermediatePointsSetVector_10 );
 
     // The vector of probabilities returned
-    std::vector< float > probabilitiesVector_10( conveyor.keyPoints.size(), 0.0 );
+    std::vector< float > probabilitiesVector_10( conveyor.size(), 0.0 );
     msgs.clear();
 
     // Run RgbFilters::checkHolesLuminosityDiff
     RgbFilters::checkHolesLuminosityDiff(
-      conveyor,
       squares_,
       holesMasksSetVector_10,
       intermediatePointsSetVector_10,
@@ -916,7 +917,7 @@ namespace pandora_vision
 
 
 
-  //! Test RgbFilters::checkHolesTextureBackProject
+  //! Tests RgbFilters::checkHolesTextureBackProject
   TEST_F ( RgbFiltersTest, CheckHolesTextureBackProjectTest )
   {
     // Generate the needed resources for an inflation size of value 0
@@ -952,7 +953,7 @@ namespace pandora_vision
       &intermediatePointsSetVector_0 );
 
     // The vector of probabilities returned
-    std::vector< float > probabilitiesVector_0( conveyor.keyPoints.size(), 0.0 );
+    std::vector< float > probabilitiesVector_0( conveyor.size(), 0.0 );
     std::vector< std::string > msgs;
 
     // Generate the histogram of walls
@@ -962,7 +963,6 @@ namespace pandora_vision
 
     // Run RgbFilters::checkHolesTextureBackProject
     RgbFilters::checkHolesTextureBackProject(
-      conveyor,
       squares_,
       histogram,
       holesMasksSetVector_0,
@@ -1012,12 +1012,11 @@ namespace pandora_vision
       &intermediatePointsSetVector_10 );
 
     // The vector of probabilities returned
-    std::vector< float > probabilitiesVector_10( conveyor.keyPoints.size(), 0.0 );
+    std::vector< float > probabilitiesVector_10( conveyor.size(), 0.0 );
     msgs.clear();
 
     // Run RgbFilters::checkHolesTextureBackProject
     RgbFilters::checkHolesTextureBackProject(
-      conveyor,
       squares_,
       histogram,
       holesMasksSetVector_10,
@@ -1039,7 +1038,7 @@ namespace pandora_vision
 
 
 
-  //! Test RgbFilters::checkHolesTextureDiff
+  //! Tests RgbFilters::checkHolesTextureDiff
   TEST_F ( RgbFiltersTest, CheckHolesTextureDiffTest )
   {
     // Histogram generation : secondary channel toggle
@@ -1098,7 +1097,7 @@ namespace pandora_vision
       }
 
       // The vector of probabilities returned
-      std::vector< float > probabilitiesVector_0( conveyor.keyPoints.size(), 0.0 );
+      std::vector< float > probabilitiesVector_0( conveyor.size(), 0.0 );
       std::vector< std::string > msgs;
 
       // Generate the histogram of walls
@@ -1108,7 +1107,6 @@ namespace pandora_vision
 
       // Run RgbFilters:checkHolesTextureDiff:
       RgbFilters::checkHolesTextureDiff(
-        conveyor,
         squares_,
         histogram,
         holesMasksImageVector_0,
@@ -1182,7 +1180,7 @@ namespace pandora_vision
       }
 
       // The vector of probabilities returned
-      std::vector< float > probabilitiesVector_10( conveyor.keyPoints.size(), 0.0 );
+      std::vector< float > probabilitiesVector_10( conveyor.size(), 0.0 );
       std::vector< std::string > msgs;
 
       // Set the texture threshold to 0.9, or else all probabilities would be
@@ -1196,7 +1194,6 @@ namespace pandora_vision
 
       // Run RgbFilters:checkHolesTextureDiff:
       RgbFilters::checkHolesTextureDiff(
-        conveyor,
         squares_,
         histogram,
         holesMasksImageVector_10,

@@ -149,26 +149,26 @@ namespace pandora_vision
 
     // Fill the vision_communications::CandidateHolesVectorMsg's
     // candidateHoles vector
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       vision_communications::CandidateHoleMsg holeMsg;
 
       // Push back the keypoint
-      holeMsg.keypointX = conveyor.keyPoints[i].pt.x;
-      holeMsg.keypointY = conveyor.keyPoints[i].pt.y;
+      holeMsg.keypointX = conveyor.holes[i].keypoint.pt.x;
+      holeMsg.keypointY = conveyor.holes[i].keypoint.pt.y;
 
       // Push back the bounding rectangle's vertices
-      for (int v = 0; v < conveyor.rectangles[i].size(); v++)
+      for (int v = 0; v < conveyor.holes[i].rectangle.size(); v++)
       {
-        holeMsg.verticesX.push_back(conveyor.rectangles[i][v].x);
-        holeMsg.verticesY.push_back(conveyor.rectangles[i][v].y);
+        holeMsg.verticesX.push_back(conveyor.holes[i].rectangle[v].x);
+        holeMsg.verticesY.push_back(conveyor.holes[i].rectangle[v].y);
       }
 
       // Push back the blob's outline points
-      for (int o = 0; o < conveyor.outlines[i].size(); o++)
+      for (int o = 0; o < conveyor.holes[i].outline.size(); o++)
       {
-        holeMsg.outlineX.push_back(conveyor.outlines[i][o].x);
-        holeMsg.outlineY.push_back(conveyor.outlines[i][o].y);
+        holeMsg.outlineX.push_back(conveyor.holes[i].outline[o].x);
+        holeMsg.outlineY.push_back(conveyor.holes[i].outline[o].y);
       }
 
       // Push back one hole to the holes vector message
@@ -322,13 +322,14 @@ namespace pandora_vision
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
-        // Recreate conveyor.keypoints
-        cv::KeyPoint holeKeypoint;
-        holeKeypoint.pt.x = candidateHolesVector[i].keypointX;
-        holeKeypoint.pt.y = candidateHolesVector[i].keypointY;
-        conveyor->keyPoints.push_back(holeKeypoint);
+        // A single hole
+        HoleConveyor hole;
 
-        // Recreate conveyor.rectangles
+        // Recreate the hole's keypoint
+        hole.keypoint.pt.x = candidateHolesVector[i].keypointX;
+        hole.keypoint.pt.y = candidateHolesVector[i].keypointY;
+
+        // Recreate the hole's rectangle points
         std::vector<cv::Point2f> renctangleVertices;
         for (unsigned int v = 0;
           v < candidateHolesVector[i].verticesX.size(); v++)
@@ -338,9 +339,9 @@ namespace pandora_vision
           vertex.y = candidateHolesVector[i].verticesY[v];
           renctangleVertices.push_back(vertex);
         }
-        conveyor->rectangles.push_back(renctangleVertices);
+        hole.rectangle = renctangleVertices;
 
-        // Recreate conveyor.outlines
+        // Recreate the hole's outline points
         std::vector<cv::Point2f> outlinePoints;
         for (unsigned int o = 0;
           o < candidateHolesVector[i].outlineX.size(); o++)
@@ -350,7 +351,10 @@ namespace pandora_vision
           outlinePoint.y = candidateHolesVector[i].outlineY[o];
           outlinePoints.push_back(outlinePoint);
         }
-        conveyor->outlines.push_back(outlinePoints);
+        hole.outline= outlinePoints;
+
+        // Push hole back into the conveyor
+        conveyor->holes.push_back(hole);
       }
     }
     // Wavelet mode
@@ -358,11 +362,12 @@ namespace pandora_vision
     {
       for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
       {
+        // A single hole
+        HoleConveyor hole;
+
         // Recreate conveyor.keypoints
-        cv::KeyPoint holeKeypoint;
-        holeKeypoint.pt.x = 2 * candidateHolesVector[i].keypointX;
-        holeKeypoint.pt.y = 2 * candidateHolesVector[i].keypointY;
-        conveyor->keyPoints.push_back(holeKeypoint);
+        hole.keypoint.pt.x = 2 * candidateHolesVector[i].keypointX;
+        hole.keypoint.pt.y = 2 * candidateHolesVector[i].keypointY;
 
         // Recreate conveyor.rectangles
         std::vector<cv::Point2f> renctangleVertices;
@@ -374,7 +379,7 @@ namespace pandora_vision
           vertex.y = 2 * candidateHolesVector[i].verticesY[v];
           renctangleVertices.push_back(vertex);
         }
-        conveyor->rectangles.push_back(renctangleVertices);
+        hole.rectangle = renctangleVertices;
 
         // Recreate conveyor.outlines
         std::vector<cv::Point2f> sparceOutlinePoints;
@@ -406,16 +411,17 @@ namespace pandora_vision
         // The easiest and most efficient way to obtain the same result as
         // if image_representation_method was 0 is to apply the raycast
         // algorithm
-        std::vector<cv::Point2f> outline;
         float area = 0.0;
-        BlobDetection::raycastKeypoint(holeKeypoint,
+        BlobDetection::raycastKeypoint(hole.keypoint,
           &canvas,
           raycastKeypointPartitions,
           false,
-          &outline,
+          &hole.outline,
           &area);
 
-        conveyor->outlines.push_back(outline);
+
+        // Push hole back into the conveyor
+        conveyor->holes.push_back(hole);
       }
     }
 

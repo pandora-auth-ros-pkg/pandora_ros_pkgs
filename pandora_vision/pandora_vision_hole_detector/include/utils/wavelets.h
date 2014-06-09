@@ -56,16 +56,6 @@ namespace pandora_vision
   {
     public:
 
-      Wavelets();
-
-      std::vector<float> getH0(int index);
-
-      std::vector<float> getG0(const std::vector<float>& H0);
-
-      std::vector<float> getG1(const std::vector<float>& H0);
-
-      std::vector<float> getH1(const std::vector<float>& G1);
-
       static cv::Mat convCols(const cv::Mat& in,
         const std::vector<float>& kernel);
 
@@ -98,17 +88,6 @@ namespace pandora_vision
         @return void
        **/
       static void getLowLow(const cv::Mat& inImage, cv::Mat* outImage);
-
-      static cv::Mat getLowHigh(const cv::Mat& in,
-        const std::vector<float>& kernel0,
-        const std::vector<float>& kernel1);
-
-      static cv::Mat getHighLow(const cv::Mat& in,
-        const std::vector<float>& kernel0,
-        const std::vector<float>& kernel1);
-
-      static cv::Mat getHighHigh(const cv::Mat& in,
-        const std::vector<float>& kernel);
 
   };
 

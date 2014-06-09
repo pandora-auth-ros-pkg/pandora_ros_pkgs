@@ -38,7 +38,6 @@
 #include "depth_node/hole_detector.h"
 #include "gtest/gtest.h"
 
-
 namespace pandora_vision
 {
   /**
@@ -176,14 +175,14 @@ namespace pandora_vision
 
 
 
-  // Test HoleDetector::findHoles
+  //! Tests HoleDetector::findHoles
   TEST_F ( HoleDetectorTest, FindHolesTest )
   {
     // Run HoleDetector:findHoles
     HolesConveyor conveyor = HoleDetector::findHoles ( squares_ );
 
     // The number of keypoints found
-    int size = HolesConveyorUtils::size( conveyor );
+    int size = conveyor.size();
 
     // There should be two keypoints: the one of the upper left square
     // and the one of the upper right square. The lower right square is
@@ -192,18 +191,18 @@ namespace pandora_vision
     ASSERT_EQ ( 2, size );
 
     // For every keypoint found, make assertions and expectations
-    for (int k = 0; k < size; k++)
+    for ( int k = 0; k < size; k++ )
     {
-      // The location of the keypoint should near the center of the square
+      // The location of the keypoint should be near the center of the square
       // in which it lies
-      EXPECT_NEAR ( conveyor.keyPoints[k].pt.x,
-        conveyor.rectangles[k][0].x + 50, 1 );
+      EXPECT_NEAR ( conveyor.holes[k].keypoint.pt.x,
+        conveyor.holes[k].rectangle[0].x + 50, 1 );
 
       // The hole should have exactly four vertices
-      EXPECT_EQ ( 4, conveyor.rectangles[k].size() );
+      EXPECT_EQ ( 4, conveyor.holes[k].rectangle.size() );
 
       // There should be 400 outline points
-      EXPECT_EQ ( 400, conveyor.outlines[k].size() );
+      EXPECT_EQ ( 400, conveyor.holes[k].outline.size() );
     }
 
   }

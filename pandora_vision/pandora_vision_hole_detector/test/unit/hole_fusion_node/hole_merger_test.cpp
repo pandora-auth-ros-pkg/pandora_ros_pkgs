@@ -281,13 +281,13 @@ namespace pandora_vision
     const int& x,
     const int& y )
   {
-    // What will be returned: the internal elements of one hole
-    HolesConveyor conveyor;
+    // A single hole
+    HoleConveyor hole;
 
     // The hole's keypoint
     cv::KeyPoint k (  upperLeft.x + x / 2, upperLeft.y + y / 2 , 1 );
 
-    conveyor.keyPoints.push_back(k);
+    hole.keypoint = k;
 
 
     // The four vertices of the rectangle
@@ -305,7 +305,7 @@ namespace pandora_vision
     rectangle.push_back(vertex_3);
     rectangle.push_back(vertex_4);
 
-    conveyor.rectangles.push_back(rectangle);
+    hole.rectangle = rectangle;
 
 
     // The outline points of the hole will be obtained through the depiction
@@ -332,7 +332,11 @@ namespace pandora_vision
       }
     }
 
-    conveyor.outlines.push_back(outline);
+    hole.outline = outline;
+
+    // Push the hole back into a HolesConveyor
+    HolesConveyor conveyor;
+    conveyor.holes.push_back( hole );
 
     return conveyor;
 
@@ -340,7 +344,7 @@ namespace pandora_vision
 
 
 
-  //! Test HoleMerger::applyMergeOperation
+  //! Tests HoleMerger::applyMergeOperation
   TEST_F ( HoleMergerTest, ApplyMergeOperationTest )
   {
     // Keep a backup of the original conveyor
@@ -356,58 +360,60 @@ namespace pandora_vision
 
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // Entry #0 should be intact
-    EXPECT_EQ ( conveyor.keyPoints[0].pt.x, originConveyor.keyPoints[0].pt.x);
+    EXPECT_EQ ( conveyor.holes[0].keypoint.pt.x,
+      originConveyor.holes[0].keypoint.pt.x );
 
-    EXPECT_EQ ( conveyor.keyPoints[0].pt.y, originConveyor.keyPoints[0].pt.y);
+    EXPECT_EQ ( conveyor.holes[0].keypoint.pt.y,
+      originConveyor.holes[0].keypoint.pt.y );
 
-    for ( int r = 0; r < conveyor.rectangles[0].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[0].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[0][r].x,
-        originConveyor.rectangles[0][r].x);
+      EXPECT_EQ ( conveyor.holes[0].rectangle[r].x,
+        originConveyor.holes[0].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[0][r].y,
-        originConveyor.rectangles[0][r].y);
+      EXPECT_EQ ( conveyor.holes[0].rectangle[r].y,
+        originConveyor.holes[0].rectangle[r].y );
     }
 
-    for ( int r = 0; r < conveyor.outlines[0].size(); r++ )
+    for ( int o = 0; o < conveyor.holes[0].outline.size(); o++ )
     {
-      EXPECT_EQ ( conveyor.outlines[0][r].x,
-        originConveyor.outlines[0][r].x);
+      EXPECT_EQ ( conveyor.holes[0].outline[o].x,
+        originConveyor.holes[0].outline[o].x );
 
-      EXPECT_EQ ( conveyor.outlines[0][r].y,
-        originConveyor.outlines[0][r].y);
+      EXPECT_EQ ( conveyor.holes[0].outline[o].y,
+        originConveyor.holes[0].outline[o].y );
     }
 
     // Original entry #2 should now be entry #1
     // Original entry #3 should now be entry #2
     // Original entry #4 should now be entry #3
-    for ( int i = 2; i < originConveyor.keyPoints.size(); i++ )
+    for ( int i = 2; i < originConveyor.size(); i++ )
     {
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.x,
-        originConveyor.keyPoints[i].pt.x);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.y,
-        originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i - 1].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i - 1].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i - 1].size(); r++ )
+      for ( int o = 0; o < conveyor.holes[i - 1].outline.size(); o++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].x,
-          originConveyor.outlines[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].x,
+          originConveyor.holes[i].outline[o].x );
 
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].y,
-          originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].y,
+          originConveyor.holes[i].outline[o].y );
       }
     }
 
@@ -424,66 +430,70 @@ namespace pandora_vision
 
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // The amalgamator should have grown in terms of outline points
-    EXPECT_LT ( originConveyor.outlines[0].size(), conveyor.outlines[0].size() );
+    EXPECT_LT ( originConveyor.holes[0].outline.size(),
+      conveyor.holes[0].outline.size() );
 
     // The amalgamator's keypoint should have moved a tiny bit to the right,
     // but not significantly vertically
-    EXPECT_LT ( originConveyor.keyPoints[0].pt.x, conveyor.keyPoints[0].pt.x );
-    EXPECT_NEAR ( originConveyor.keyPoints[0].pt.y,
-      conveyor.keyPoints[0].pt.y, 1 );
+    EXPECT_LT ( originConveyor.holes[0].keypoint.pt.x,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_NEAR ( originConveyor.holes[0].keypoint.pt.y,
+      conveyor.holes[0].keypoint.pt.y, 1 );
 
     // Entry #1 should be intact
-    EXPECT_EQ ( conveyor.keyPoints[1].pt.x, originConveyor.keyPoints[1].pt.x);
+    EXPECT_EQ ( conveyor.holes[1].keypoint.pt.x,
+      originConveyor.holes[1].keypoint.pt.x );
 
-    EXPECT_EQ ( conveyor.keyPoints[1].pt.y, originConveyor.keyPoints[1].pt.y);
+    EXPECT_EQ ( conveyor.holes[1].keypoint.pt.y,
+      originConveyor.holes[1].keypoint.pt.y );
 
-    for ( int r = 0; r < conveyor.rectangles[1].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[1].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[1][r].x,
-        originConveyor.rectangles[1][r].x);
+      EXPECT_EQ ( conveyor.holes[1].rectangle[r].x,
+        originConveyor.holes[1].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[1][r].y,
-        originConveyor.rectangles[1][r].y);
+      EXPECT_EQ ( conveyor.holes[1].rectangle[r].y,
+        originConveyor.holes[1].rectangle[r].y );
     }
 
-    for ( int r = 0; r < conveyor.outlines[1].size(); r++ )
+    for ( int o = 0; o < conveyor.holes[1].outline.size(); o++ )
     {
-      EXPECT_EQ ( conveyor.outlines[1][r].x,
-        originConveyor.outlines[1][r].x);
+      EXPECT_EQ ( conveyor.holes[1].outline[o].x,
+        originConveyor.holes[1].outline[o].x );
 
-      EXPECT_EQ ( conveyor.outlines[1][r].y,
-        originConveyor.outlines[1][r].y);
+      EXPECT_EQ ( conveyor.holes[1].outline[o].y,
+        originConveyor.holes[1].outline[o].y );
     }
 
     for ( int i = 3; i < 5; i++ )
     {
       // Original entry #3 should now be #2
       // Original entry #4 should now be #3
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.x,
-        originConveyor.keyPoints[i].pt.x);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.y,
-        originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i - 1].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i - 1].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i - 1].size(); r++ )
+      for ( int o = 0; o < conveyor.holes[i - 1].outline.size(); o++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].x,
-          originConveyor.outlines[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].x,
+          originConveyor.holes[i].outline[o].x );
 
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].y,
-          originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].y,
+          originConveyor.holes[i].outline[o].y );
       }
     }
 
@@ -504,56 +514,67 @@ namespace pandora_vision
       2 );
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // The connector should have grown in terms of outline points
-    EXPECT_LT ( originConveyor.outlines[0].size(), conveyor.outlines[0].size() );
+    EXPECT_LT ( originConveyor.holes[0].outline.size(),
+      conveyor.holes[0].outline.size() );
 
     // The connector's keypoint should have moved a bit to the left,
     // and a bit lower than before
-    EXPECT_GT ( originConveyor.keyPoints[0].pt.x , conveyor.keyPoints[0].pt.x );
-    EXPECT_LT ( originConveyor.keyPoints[0].pt.y , conveyor.keyPoints[0].pt.y );
+    EXPECT_GT ( originConveyor.holes[0].keypoint.pt.x,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_LT ( originConveyor.holes[0].keypoint.pt.y,
+      conveyor.holes[0].keypoint.pt.y );
 
     // Original entry #1 should now be entry #1
     // Original entry #2 should now be entry #2
     for ( int i = 1; i < 3; i++ )
     {
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.x, originConveyor.keyPoints[i].pt.x);
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.y, originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i].size(); r++ )
+      for ( int o = 0; o < conveyor.holes[i].outline.size(); o++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i][r].x, originConveyor.outlines[i][r].x);
-        EXPECT_EQ ( conveyor.outlines[i][r].y, originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i].outline[o].x,
+          originConveyor.holes[i].outline[o].x );
+        EXPECT_EQ ( conveyor.holes[i].outline[o].y,
+          originConveyor.holes[i].outline[o].y );
       }
     }
 
     // Original entry #4 should now be entry #3
-    EXPECT_EQ ( conveyor.keyPoints[3].pt.x, originConveyor.keyPoints[4].pt.x);
-    EXPECT_EQ ( conveyor.keyPoints[3].pt.y, originConveyor.keyPoints[4].pt.y);
+    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.x,
+      originConveyor.holes[4].keypoint.pt.x );
+    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.y,
+      originConveyor.holes[4].keypoint.pt.y );
 
-    for ( int r = 0; r < conveyor.rectangles[3].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[3].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[3][r].x,
-        originConveyor.rectangles[4][r].x);
+      EXPECT_EQ ( conveyor.holes[3].rectangle[r].x,
+        originConveyor.holes[4].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[3][r].y,
-        originConveyor.rectangles[4][r].y);
+      EXPECT_EQ ( conveyor.holes[3].rectangle[r].y,
+        originConveyor.holes[4].rectangle[r].y );
     }
 
-    for ( int r = 0; r < conveyor.outlines[3].size(); r++ )
+    for ( int o = 0; o < conveyor.holes[3].outline.size(); o++ )
     {
-      EXPECT_EQ ( conveyor.outlines[3][r].x, originConveyor.outlines[4][r].x);
-      EXPECT_EQ ( conveyor.outlines[3][r].y, originConveyor.outlines[4][r].y);
+      EXPECT_EQ ( conveyor.holes[3].outline[o].x,
+        originConveyor.holes[4].outline[o].x );
+      EXPECT_EQ ( conveyor.holes[3].outline[o].y,
+        originConveyor.holes[4].outline[o].y );
     }
 
 
@@ -571,7 +592,7 @@ namespace pandora_vision
     }
 
     // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.keyPoints.size() );
+    EXPECT_EQ ( 2, conveyor.size() );
 
 
     // Apply preposterous thresholds
@@ -592,12 +613,12 @@ namespace pandora_vision
     }
 
     // No assimilation or amalgamation or connection should have happened
-    EXPECT_EQ ( 5, conveyor.keyPoints.size() );
+    EXPECT_EQ ( 5, conveyor.size() );
   }
 
 
 
-  //! Test HoleMerger::applyMergeOperationWithoutValidation
+  //! Tests HoleMerger::applyMergeOperationWithoutValidation
   TEST_F ( HoleMergerTest, ApplyMergeOperationWithoutValidation )
   {
     // Keep a backup of the original conveyor
@@ -613,58 +634,58 @@ namespace pandora_vision
       0 );
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // Entry #0 should be intact
-    EXPECT_EQ ( conveyor.keyPoints[0].pt.x, originConveyor.keyPoints[0].pt.x);
+    EXPECT_EQ ( conveyor.holes[0].keypoint.pt.x, originConveyor.holes[0].keypoint.pt.x);
 
-    EXPECT_EQ ( conveyor.keyPoints[0].pt.y, originConveyor.keyPoints[0].pt.y);
+    EXPECT_EQ ( conveyor.holes[0].keypoint.pt.y, originConveyor.holes[0].keypoint.pt.y);
 
-    for ( int r = 0; r < conveyor.rectangles[0].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[0].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[0][r].x,
-        originConveyor.rectangles[0][r].x);
+      EXPECT_EQ ( conveyor.holes[0].rectangle[r].x,
+        originConveyor.holes[0].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[0][r].y,
-        originConveyor.rectangles[0][r].y);
+      EXPECT_EQ ( conveyor.holes[0].rectangle[r].y,
+        originConveyor.holes[0].rectangle[r].y );
     }
 
-    for ( int r = 0; r < conveyor.outlines[0].size(); r++ )
+    for ( int o = 0; o < conveyor.holes[0].outline.size(); o++ )
     {
-      EXPECT_EQ ( conveyor.outlines[0][r].x,
-        originConveyor.outlines[0][r].x);
+      EXPECT_EQ ( conveyor.holes[0].outline[o].x,
+        originConveyor.holes[0].outline[o].x );
 
-      EXPECT_EQ ( conveyor.outlines[0][r].y,
-        originConveyor.outlines[0][r].y);
+      EXPECT_EQ ( conveyor.holes[0].outline[o].y,
+        originConveyor.holes[0].outline[o].y );
     }
 
     // Original entry #2 should now be entry #1
     // Original entry #3 should now be entry #2
     // Original entry #4 should now be entry #3
-    for ( int i = 2; i < originConveyor.keyPoints.size(); i++ )
+    for ( int i = 2; i < originConveyor.size(); i++ )
     {
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.x,
-        originConveyor.keyPoints[i].pt.x);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.y,
-        originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i - 1].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i - 1].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i - 1].size(); r++ )
+      for ( int o = 0; o < conveyor.holes[i - 1].outline.size(); o++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].x,
-          originConveyor.outlines[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].x,
+          originConveyor.holes[i].outline[o].x );
 
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].y,
-          originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].y,
+          originConveyor.holes[i].outline[o].y );
       }
     }
 
@@ -681,66 +702,70 @@ namespace pandora_vision
       1 );
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // The amalgamator should have grown in terms of outline points
-    EXPECT_LT ( originConveyor.outlines[0].size(), conveyor.outlines[0].size() );
+    EXPECT_LT ( originConveyor.holes[0].outline.size(),
+      conveyor.holes[0].outline.size() );
 
     // The amalgamator's keypoint should have moved a tiny bit to the right,
     // but not significantly vertically
-    EXPECT_LT ( originConveyor.keyPoints[0].pt.x, conveyor.keyPoints[0].pt.x );
-    EXPECT_NEAR ( originConveyor.keyPoints[0].pt.y,
-      conveyor.keyPoints[0].pt.y, 1 );
+    EXPECT_LT ( originConveyor.holes[0].keypoint.pt.x,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_NEAR ( originConveyor.holes[0].keypoint.pt.y,
+      conveyor.holes[0].keypoint.pt.y, 1 );
 
     // Entry #1 should be intact
-    EXPECT_EQ ( conveyor.keyPoints[1].pt.x, originConveyor.keyPoints[1].pt.x);
+    EXPECT_EQ ( conveyor.holes[1].keypoint.pt.x,
+      originConveyor.holes[1].keypoint.pt.x );
 
-    EXPECT_EQ ( conveyor.keyPoints[1].pt.y, originConveyor.keyPoints[1].pt.y);
+    EXPECT_EQ ( conveyor.holes[1].keypoint.pt.y,
+      originConveyor.holes[1].keypoint.pt.y );
 
-    for ( int r = 0; r < conveyor.rectangles[1].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[1].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[1][r].x,
-        originConveyor.rectangles[1][r].x);
+      EXPECT_EQ ( conveyor.holes[1].rectangle[r].x,
+        originConveyor.holes[1].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[1][r].y,
-        originConveyor.rectangles[1][r].y);
+      EXPECT_EQ ( conveyor.holes[1].rectangle[r].y,
+        originConveyor.holes[1].rectangle[r].y );
     }
 
-    for ( int r = 0; r < conveyor.outlines[1].size(); r++ )
+    for ( int o = 0; o < conveyor.holes[1].outline.size(); o++ )
     {
-      EXPECT_EQ ( conveyor.outlines[1][r].x,
-        originConveyor.outlines[1][r].x);
+      EXPECT_EQ ( conveyor.holes[1].outline[o].x,
+        originConveyor.holes[1].outline[o].x );
 
-      EXPECT_EQ ( conveyor.outlines[1][r].y,
-        originConveyor.outlines[1][r].y);
+      EXPECT_EQ ( conveyor.holes[1].outline[o].y,
+        originConveyor.holes[1].outline[o].y );
     }
 
     for ( int i = 3; i < 5; i++ )
     {
       // Original entry #3 should now be #2
       // Original entry #4 should now be #3
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.x,
-        originConveyor.keyPoints[i].pt.x);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( conveyor.keyPoints[i - 1].pt.y,
-        originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i - 1].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i - 1].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i - 1].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i - 1][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i - 1].size(); r++ )
+      for ( int o = 0; o < conveyor.holes[i - 1].outline.size(); o++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].x,
-          originConveyor.outlines[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].x,
+          originConveyor.holes[i].outline[o].x );
 
-        EXPECT_EQ ( conveyor.outlines[i - 1][r].y,
-          originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i - 1].outline[o].y,
+          originConveyor.holes[i].outline[o].y );
       }
     }
 
@@ -762,51 +787,60 @@ namespace pandora_vision
       2 );
 
     // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.keyPoints.size(), originConveyor.keyPoints.size() - 1 );
+    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
 
     // The connector should have grown in terms of outline points
-    EXPECT_LT ( originConveyor.outlines[0].size(), conveyor.outlines[0].size() );
+    EXPECT_LT ( originConveyor.holes[0].outline.size(),
+      conveyor.holes[0].outline.size() );
 
     // The connector's keypoint should have moved a bit to the left,
     // and a bit lower than before
-    EXPECT_GT ( originConveyor.keyPoints[0].pt.x , conveyor.keyPoints[0].pt.x );
-    EXPECT_LT ( originConveyor.keyPoints[0].pt.y , conveyor.keyPoints[0].pt.y );
+    EXPECT_GT ( originConveyor.holes[0].keypoint.pt.x,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_LT ( originConveyor.holes[0].keypoint.pt.y,
+      conveyor.holes[0].keypoint.pt.y );
 
     // Original entry #1 should now be entry #1
     // Original entry #2 should now be entry #2
     for ( int i = 1; i < 3; i++ )
     {
 
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.x, originConveyor.keyPoints[i].pt.x);
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.y, originConveyor.keyPoints[i].pt.y);
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
+        originConveyor.holes[i].keypoint.pt.x );
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
+        originConveyor.holes[i].keypoint.pt.y );
 
-      for ( int r = 0; r < conveyor.rectangles[i].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i].rectangle.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.rectangles[i][r].x,
-          originConveyor.rectangles[i][r].x);
+        EXPECT_EQ ( conveyor.holes[i].rectangle[r].x,
+          originConveyor.holes[i].rectangle[r].x );
 
-        EXPECT_EQ ( conveyor.rectangles[i][r].y,
-          originConveyor.rectangles[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i].rectangle[r].y,
+          originConveyor.holes[i].rectangle[r].y );
       }
 
-      for ( int r = 0; r < conveyor.outlines[i].size(); r++ )
+      for ( int r = 0; r < conveyor.holes[i].outline.size(); r++ )
       {
-        EXPECT_EQ ( conveyor.outlines[i][r].x, originConveyor.outlines[i][r].x);
-        EXPECT_EQ ( conveyor.outlines[i][r].y, originConveyor.outlines[i][r].y);
+        EXPECT_EQ ( conveyor.holes[i].outline[r].x,
+          originConveyor.holes[i].outline[r].x );
+        EXPECT_EQ ( conveyor.holes[i].outline[r].y,
+          originConveyor.holes[i].outline[r].y );
       }
     }
 
     // Original entry #4 should now be entry #3
-    EXPECT_EQ ( conveyor.keyPoints[3].pt.x, originConveyor.keyPoints[4].pt.x);
-    EXPECT_EQ ( conveyor.keyPoints[3].pt.y, originConveyor.keyPoints[4].pt.y);
+    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.x,
+      originConveyor.holes[4].keypoint.pt.x );
+    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.y,
+      originConveyor.holes[4].keypoint.pt.y );
 
-    for ( int r = 0; r < conveyor.rectangles[3].size(); r++ )
+    for ( int r = 0; r < conveyor.holes[3].rectangle.size(); r++ )
     {
-      EXPECT_EQ ( conveyor.rectangles[3][r].x,
-        originConveyor.rectangles[4][r].x);
+      EXPECT_EQ ( conveyor.holes[3].rectangle[r].x,
+        originConveyor.holes[4].rectangle[r].x );
 
-      EXPECT_EQ ( conveyor.rectangles[3][r].y,
-        originConveyor.rectangles[4][r].y);
+      EXPECT_EQ ( conveyor.holes[3].rectangle[r].y,
+        originConveyor.holes[4].rectangle[r].y );
     }
 
 
@@ -825,12 +859,12 @@ namespace pandora_vision
     }
 
     // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.keyPoints.size() );
+    EXPECT_EQ ( 2, conveyor.size() );
   }
 
 
 
-  //! Test HoleMerger::isCapableOfAssimilating
+  //! Tests HoleMerger::isCapableOfAssimilating
   TEST_F ( HoleMergerTest, IsCapableOfAssimilatingTest )
   {
     // Construct the hole mask sets for all the holes
@@ -842,7 +876,7 @@ namespace pandora_vision
       squares_,
       &holesMasksSetVector );
 
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 1; i < conveyor.size(); i++ )
     {
       // Run HoleMerger::isCapableOfAssimilating
       bool result = HoleMerger::isCapableOfAssimilating(
@@ -863,7 +897,7 @@ namespace pandora_vision
 
 
 
-  //! Test HoleMerger::isCapableOfAmalgamating
+  //! Tests HoleMerger::isCapableOfAmalgamating
   TEST_F ( HoleMergerTest, IsCapableOfAmalgamatingTest )
   {
     // Construct the hole mask sets for all the holes
@@ -875,7 +909,7 @@ namespace pandora_vision
       squares_,
       &holesMasksSetVector );
 
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 1; i < conveyor.size(); i++ )
     {
       // Run HoleMerger::isCapableOfAmalgamating
       bool result = HoleMerger::isCapableOfAmalgamating (
@@ -896,7 +930,7 @@ namespace pandora_vision
 
 
 
-  //! Test HoleMerger::amalgamateOnce
+  //! Tests HoleMerger::amalgamateOnce
   TEST_F ( HoleMergerTest, AmalgamateOnceTest )
   {
     // Construct the hole mask sets for all the holes
@@ -918,20 +952,21 @@ namespace pandora_vision
       squares_ );
 
     // The amalgamator should have grown in terms of outline points
-    EXPECT_LT ( amalgamator.outlines[0].size(),
-     conveyor.outlines[0].size() );
+    EXPECT_LT ( amalgamator.holes[0].outline.size(),
+     conveyor.holes[0].outline.size() );
 
     // The amalgamator's keypoint should have moved a tiny bit to the right,
     // but not significantly vertically
-    EXPECT_LT ( amalgamator.keyPoints[0].pt.x , conveyor.keyPoints[0].pt.x );
-    EXPECT_NEAR ( amalgamator.keyPoints[0].pt.y ,
-      conveyor.keyPoints[0].pt.y, 1 );
+    EXPECT_LT ( amalgamator.holes[0].keypoint.pt.x ,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_NEAR ( amalgamator.holes[0].keypoint.pt.y ,
+      conveyor.holes[0].keypoint.pt.y, 1 );
 
   }
 
 
 
-  //! Test HoleMerger::isCapableOfConnecting
+  //! Tests HoleMerger::isCapableOfConnecting
   TEST_F ( HoleMergerTest, IsCapableOfConnectingTest )
   {
     // Construct the hole mask sets for all the holes
@@ -947,7 +982,7 @@ namespace pandora_vision
     Parameters::HoleFusion::connect_holes_min_distance = 3;
     Parameters::HoleFusion::connect_holes_max_distance = 20;
 
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 1; i < conveyor.size(); i++ )
     {
       // Run HoleMerger::isCapableOfConnecting
       bool result = HoleMerger::isCapableOfConnecting(
@@ -975,7 +1010,7 @@ namespace pandora_vision
     Parameters::HoleFusion::connect_holes_min_distance = 10;
     Parameters::HoleFusion::connect_holes_max_distance = 100;
 
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 1; i < conveyor.size(); i++ )
     {
       // Run HoleMerger::isCapableOfConnecting
       bool result = HoleMerger::isCapableOfConnecting(
@@ -1003,7 +1038,7 @@ namespace pandora_vision
     Parameters::HoleFusion::connect_holes_min_distance = 100;
     Parameters::HoleFusion::connect_holes_max_distance = 10;
 
-    for ( int i = 1; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 1; i < conveyor.size(); i++ )
     {
       // Run HoleMerger::isCapableOfConnecting
       bool result = HoleMerger::isCapableOfConnecting(
@@ -1026,7 +1061,7 @@ namespace pandora_vision
 
 
 
-  //! Test HoleMerger::connectOnce
+  //! Tests HoleMerger::connectOnce
   TEST_F ( HoleMergerTest, ConnectOnceTest )
   {
     // Construct the hole mask sets for all the holes
@@ -1050,19 +1085,21 @@ namespace pandora_vision
       squares_ );
 
     // The connector should have grown in terms of outline points
-    EXPECT_LT ( connector.outlines[0].size(),
-     conveyor.outlines[0].size() );
+    EXPECT_LT ( connector.holes[0].outline.size(),
+     conveyor.holes[0].outline.size() );
 
     // The connector's keypoint should have moved a bit to the left,
     // and a bit lower than before
-    EXPECT_GT ( connector.keyPoints[0].pt.x , conveyor.keyPoints[0].pt.x );
-    EXPECT_LT ( connector.keyPoints[0].pt.y , conveyor.keyPoints[0].pt.y );
+    EXPECT_GT ( connector.holes[0].keypoint.pt.x,
+      conveyor.holes[0].keypoint.pt.x );
+    EXPECT_LT ( connector.holes[0].keypoint.pt.y,
+      conveyor.holes[0].keypoint.pt.y );
 
   }
 
 
 
-  //! Test HoleMerger::mergeHoles
+  //! Tests HoleMerger::mergeHoles
   TEST_F ( HoleMergerTest, MergeHolesTest )
   {
     // Keep a backup of the original conveyor
@@ -1087,7 +1124,7 @@ namespace pandora_vision
       cloud);
 
     // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.keyPoints.size() );
+    EXPECT_EQ ( 2, conveyor.size() );
 
 
     // The interpolation method. 1 for not using depth filters validation
@@ -1104,7 +1141,7 @@ namespace pandora_vision
       cloud);
 
     // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.keyPoints.size() );
+    EXPECT_EQ ( 2, conveyor.size() );
   }
 
 }  // namespace pandora_vision

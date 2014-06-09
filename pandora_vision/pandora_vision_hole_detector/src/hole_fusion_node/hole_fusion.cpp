@@ -212,7 +212,7 @@ namespace pandora_vision
     {
       std::vector<std::vector<float> > rgbProbabilitiesVector2D(
         rgbActiveFilters,
-        std::vector<float>(conveyor.keyPoints.size(), 0.0));
+        std::vector<float>(conveyor.size(), 0.0));
 
       // check holes for debugging purposes
       RgbFilters::checkHoles(
@@ -227,7 +227,7 @@ namespace pandora_vision
         &rgbProbabilitiesVector2D);
 
       // If there are holes found
-      if (conveyor.keyPoints.size() > 0)
+      if (conveyor.size() > 0)
       {
         ROS_INFO_NAMED ("hole_detector",
           "-------------------------------------------");
@@ -235,7 +235,7 @@ namespace pandora_vision
         ROS_INFO_NAMED ("hole_detector",
           "RGB: Candidate Holes' probabilities");
 
-        for (int j = 0; j < conveyor.keyPoints.size(); j++)
+        for (int j = 0; j < conveyor.size(); j++)
         {
           std::string probsString;
           for (int i = 0; i < rgbActiveFilters; i++)
@@ -244,8 +244,8 @@ namespace pandora_vision
           }
 
           ROS_INFO_NAMED ("hole_detector",
-            "P_%d [%f %f] : %s",
-            j, conveyor.keyPoints[j].pt.x, conveyor.keyPoints[j].pt.y,
+            "P_%d [%f %f] : %s", j,
+            conveyor.holes[j].keypoint.pt.x, conveyor.holes[j].keypoint.pt.y,
             probsString.c_str());
         }
       }
@@ -297,7 +297,7 @@ namespace pandora_vision
       {
         std::vector<std::vector<float> > depthProbabilitiesVector2D(
           depthActiveFilters,
-          std::vector<float>(conveyor.keyPoints.size(), 0.0));
+          std::vector<float>(conveyor.size(), 0.0));
 
         // check holes for debugging purposes
         DepthFilters::checkHoles(
@@ -311,14 +311,14 @@ namespace pandora_vision
           &depthProbabilitiesVector2D);
 
         // If there are holes found
-        if (conveyor.keyPoints.size() > 0)
+        if (conveyor.size() > 0)
         {
           ROS_INFO_NAMED ("hole_detector",
             "-------------------------------------------");
 
           ROS_INFO_NAMED ("hole_detector",
             "Depth : Candidate Holes' probabilities");
-          for (int j = 0; j < conveyor.keyPoints.size(); j++)
+          for (int j = 0; j < conveyor.size(); j++)
           {
             std::string probsString;
             for (int i = 0; i < depthActiveFilters; i++)
@@ -327,8 +327,8 @@ namespace pandora_vision
             }
 
             ROS_INFO_NAMED ("hole_detector",
-              "P_%d [%f %f] : %s", j, conveyor.keyPoints[j].pt.x,
-              conveyor.keyPoints[j].pt.y, probsString.c_str());
+              "P_%d [%f %f] : %s", j, conveyor.holes[j].keypoint.pt.x,
+              conveyor.holes[j].keypoint.pt.y, probsString.c_str());
           }
 
           ROS_INFO_NAMED ("hole_detector",
@@ -874,7 +874,7 @@ namespace pandora_vision
     validHolesMap = validateHoles(probabilitiesVector2D);
 
     // If there are valid holes, publish them
-    if (HolesConveyorUtils::size(rgbdHolesConveyor) > 0)
+    if (rgbdHolesConveyor.size() > 0)
     {
       publishValidHoles(rgbdHolesConveyor, &validHolesMap);
     }
@@ -977,20 +977,20 @@ namespace pandora_vision
     enhancedHolesMsg.header.stamp = timestamp_;
     enhancedHolesMsg.header.frame_id = frame_id_;
 
-    for (int i = 0; i < HolesConveyorUtils::size(conveyor); i++)
+    for (int i = 0; i < conveyor.size(); i++)
     {
       // The enhanced hole message. Used for one hole only
       vision_communications::EnhancedHoleMsg enhancedHoleMsg;
 
       // Set the hole's keypoint
-      enhancedHoleMsg.keypointX = conveyor.keyPoints[i].pt.x;
-      enhancedHoleMsg.keypointY = conveyor.keyPoints[i].pt.y;
+      enhancedHoleMsg.keypointX = conveyor.holes[i].keypoint.pt.x;
+      enhancedHoleMsg.keypointY = conveyor.holes[i].keypoint.pt.y;
 
       // Set the hole's bounding box vertices
-      for (int r = 0; r < conveyor.rectangles[i].size(); r++)
+      for (int r = 0; r < conveyor.holes[i].rectangle.size(); r++)
       {
-        enhancedHoleMsg.verticesX.push_back(conveyor.rectangles[i][r].x);
-        enhancedHoleMsg.verticesY.push_back(conveyor.rectangles[i][r].y);
+        enhancedHoleMsg.verticesX.push_back(conveyor.holes[i].rectangle[r].x);
+        enhancedHoleMsg.verticesY.push_back(conveyor.holes[i].rectangle[r].y);
       }
 
       // Set the message's header
@@ -1036,10 +1036,10 @@ namespace pandora_vision
       vision_communications::HoleDirectionMsg holeMsg;
 
       // The hole's keypoint coordinates relative to the center of the frame
-      float x = conveyor.keyPoints[it->first].pt.x
+      float x = conveyor.holes[it->first].keypoint.pt.x
         - static_cast<float>(width) / 2;
       float y = static_cast<float>(height) / 2
-        - conveyor.keyPoints[it->first].pt.y;
+        - conveyor.holes[it->first].keypoint.pt.y;
 
       // The keypoint's yaw and pitch
       float yaw = atan(2 * x / width * tan(hfov / 2));

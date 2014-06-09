@@ -205,7 +205,7 @@ namespace pandora_vision
 
 
 
-  // Test NoiseElimination::brushfireNear
+  // Tests NoiseElimination::brushfireNear
   TEST_F ( NoiseEliminationTest, BrushfireNearTest )
   {
     cv::Mat image;
@@ -254,7 +254,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::brushfireNearStep
+  //! Tests NoiseElimination::brushfireNearStep
   TEST_F ( NoiseEliminationTest, BrushfireNearStepTest )
   {
     // Uncomment for visual inspection
@@ -296,7 +296,9 @@ namespace pandora_vision
     // All pixels should be still black
     ASSERT_EQ ( 0, cv::countNonZero ( blank ) );
 
-    // Test an image with square concentrations of noise in each corner of it
+
+    // Test an image with square concentrations of noise in each corner of it.
+    // The rest of the pixels are at random values
     cv::Mat corners_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
 
     unsigned int seed = 0;
@@ -305,7 +307,7 @@ namespace pandora_vision
       for ( int cols = 0; cols < WIDTH; cols++ )
       {
         corners_.at< float >( rows, cols ) =
-          static_cast<float>(rand_r(&seed) % 100) / 1000;
+          static_cast<float>( rand_r(&seed) % 1000 ) / 1000;
       }
     }
 
@@ -346,57 +348,32 @@ namespace pandora_vision
       }
     }
 
-    // The number of non zero pixels before calling any brushfireNearStep
-    int nonZerosOne = cv::countNonZero( corners_ );
 
-    // Run NoiseElimination::brushfireNearStep on image corners_ for the upper
-    // left square concentration of noise
-    NoiseElimination::brushfireNearStep
-      ( &corners_, 1 * WIDTH + 1 );
 
-    // The number of non zero pixels after removing the upper left noise
-    // concentration
-    int nonZerosTwo = cv::countNonZero( corners_ );
+    for ( int rows = 0; rows < HEIGHT; rows++ )
+    {
+      for ( int cols = 0; cols < WIDTH; cols++ )
+      {
+        if ( corners_.at< float >( rows, cols ) == 0.0 )
+        {
+          // The number of non zero pixels before calling any brushfireNearStep
+          int nonZerosOne = cv::countNonZero( corners_ );
 
-    EXPECT_LT ( nonZerosOne, nonZerosTwo );
+          // Run NoiseElimination::brushfireNearStep on image corners_
+          NoiseElimination::brushfireNearStep ( &corners_, rows * WIDTH + cols );
 
-    // Run NoiseElimination::brushfireNearStep on image corners_ for the upper
-    // right square concentration of noise
-    NoiseElimination::brushfireNearStep
-      ( &corners_, 1 * WIDTH + WIDTH - 1 );
+          // The number of non zero pixels after removing the upper left noise
+          // concentration
+          int nonZerosTwo = cv::countNonZero( corners_ );
 
-    // The number of non zero pixels after removing the upper right noise
-    // concentration
-    int nonZerosThree = cv::countNonZero( corners_ );
-
-    EXPECT_LT ( nonZerosTwo, nonZerosThree );
-
-    // Run NoiseElimination::brushfireNearStep on image corners_ for the lower
-    // left square concentration of noise
-    NoiseElimination::brushfireNearStep
-      ( &corners_, ( HEIGHT - 1 ) * WIDTH + 1 );
-
-    // The number of non zero pixels after removing the lower left noise
-    // concentration
-    int nonZerosFour = cv::countNonZero( corners_ );
-
-    EXPECT_LT ( nonZerosThree, nonZerosFour );
-
-    // Run NoiseElimination::brushfireNearStep on image corners_ for the lower
-    // right square concentration of noise
-    NoiseElimination::brushfireNearStep
-      ( &corners_, ( HEIGHT - 1 ) * WIDTH + WIDTH - 1 );
-
-    // The number of non zero pixels after removing the upper left noise
-    // concentration
-    int nonZerosFive = cv::countNonZero( corners_ );
-
-    EXPECT_LT ( nonZerosFour, nonZerosFive );
-
+          EXPECT_LT ( nonZerosOne, nonZerosTwo );
+        }
+      }
+    }
   }
 
 
-  //! Test NoiseElimination::chooseInterpolationMethod
+  //! Tests NoiseElimination::chooseInterpolationMethod
   TEST_F ( NoiseEliminationTest, ChooseInterpolationMethodTest )
   {
     // On interpolationMethod0, Parameters::Depth::interpolation_method
@@ -426,7 +403,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::interpolateImageBorders
+  //! Tests NoiseElimination::interpolateImageBorders
   TEST_F ( NoiseEliminationTest, InterpolateImageBordersTest )
   {
     // Create an image whose borders are non-zero but the rest of it is
@@ -461,7 +438,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::interpolateZeroPixel
+  //! Tests NoiseElimination::interpolateZeroPixel
   TEST_F ( NoiseEliminationTest, InterpolateZeroPixelTest )
   {
     // The return value of NoiseElimination::interpolateZeroPixel
@@ -510,7 +487,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::interpolation
+  //! Tests NoiseElimination::interpolation
   TEST_F ( NoiseEliminationTest, InterpolationTest )
   {
     cv::Mat interpolated = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
@@ -535,7 +512,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::interpolationIteration
+  //! Tests NoiseElimination::interpolationIteration
   TEST_F ( NoiseEliminationTest, InterpolationIterationTest )
   {
     // The number of zero pixels before the call to interpolationIteration
@@ -554,7 +531,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::performeNoiseElimination
+  //! Tests NoiseElimination::performeNoiseElimination
   TEST_F ( NoiseEliminationTest, PerformeNoiseEliminationTest )
   {
     // Remove the noise in interpolationMethod0
@@ -593,7 +570,7 @@ namespace pandora_vision
 
 
 
-  //! Test NoiseElimination::transformNoiseToWhite
+  //! Tests NoiseElimination::transformNoiseToWhite
   TEST_F ( NoiseEliminationTest, TransformNoiseToWhiteTest )
   {
     // Count how many noisy pixels there are on interpolationMethod0

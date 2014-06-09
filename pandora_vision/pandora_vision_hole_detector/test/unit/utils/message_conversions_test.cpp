@@ -71,10 +71,13 @@ namespace pandora_vision
           image.at< unsigned char >( 199, cols ) = 255;
         }
 
+        // A single hole
+        HoleConveyor hole;
+
         // Construct a dummy conveyor
         cv::KeyPoint k_1 ( 150, 150, 1 );
 
-        conveyor.keyPoints.push_back( k_1 );
+        hole.keypoint = k_1;
 
         // The outline of the hole
         std::vector< cv::Point2f > outline;
@@ -90,7 +93,7 @@ namespace pandora_vision
           }
         }
 
-        conveyor.outlines.push_back( outline );
+        hole.outline = outline;
 
         // The vertices of the hole's bounding box
         std::vector< cv::Point2f > rectangle;
@@ -100,7 +103,10 @@ namespace pandora_vision
         rectangle.push_back( cv::Point2f( 199, 199 ) );
         rectangle.push_back( cv::Point2f( 199, 100 ) );
 
-        conveyor.rectangles.push_back( rectangle );
+        hole.rectangle = rectangle;
+
+        // Push hole back into the conveyor
+        conveyor.holes.push_back( hole );
       }
 
       // The images' width and height
@@ -115,7 +121,7 @@ namespace pandora_vision
   };
 
 
-  //! Test MessageConversions::convertImageToMessage
+  //! Tests MessageConversions::convertImageToMessage
   TEST_F ( MessageConversionsTest, ConvertImageToMessageTest )
   {
     // A grayscale image
@@ -222,7 +228,7 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::convertPointCloudMessageToImage
+  //! Tests MessageConversions::convertPointCloudMessageToImage
   TEST_F ( MessageConversionsTest, ConvertPointCloudMessageToImageTest )
   {
     // Create a grayscale image
@@ -341,7 +347,7 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::createCandidateHolesVector
+  //! Tests MessageConversions::createCandidateHolesVector
   TEST_F ( MessageConversionsTest, CreateCandidateHolesVectorTest )
   {
     // The vector of messages of candidate holes
@@ -351,27 +357,29 @@ namespace pandora_vision
     MessageConversions::createCandidateHolesVector( conveyor,
       &candidateHolesVector );
 
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       // The keypoints should be the same
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.x, candidateHolesVector[i].keypointX );
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.y, candidateHolesVector[i].keypointY );
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
+        candidateHolesVector[i].keypointX );
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
+        candidateHolesVector[i].keypointY );
 
-      for (int v = 0; v < conveyor.rectangles[i].size(); v++)
+      for (int v = 0; v < conveyor.holes[i].rectangle.size(); v++)
       {
         // The rectangle's vertices should be the same
-        EXPECT_EQ ( conveyor.rectangles[i][v].x,
+        EXPECT_EQ ( conveyor.holes[i].rectangle[v].x,
           candidateHolesVector[i].verticesX[v]);
-        EXPECT_EQ ( conveyor.rectangles[i][v].y,
+        EXPECT_EQ ( conveyor.holes[i].rectangle[v].y,
           candidateHolesVector[i].verticesY[v]);
       }
 
-      for (int o = 0; o < conveyor.outlines[i].size(); o++)
+      for (int o = 0; o < conveyor.holes[i].outline.size(); o++)
       {
         // The outline points should be the same
-        EXPECT_EQ ( conveyor.outlines[i][o].x,
+        EXPECT_EQ ( conveyor.holes[i].outline[o].x,
           candidateHolesVector[i].outlineX[o]);
-        EXPECT_EQ ( conveyor.outlines[i][o].y,
+        EXPECT_EQ ( conveyor.holes[i].outline[o].y,
           candidateHolesVector[i].outlineY[o]);
       }
     }
@@ -379,7 +387,7 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::createCandidateHolesVectorMessage
+  //! Tests MessageConversions::createCandidateHolesVectorMessage
   TEST_F ( MessageConversionsTest, CreateCandidateHolesVectorMessageTest )
   {
     // Create a grayscale image
@@ -438,29 +446,29 @@ namespace pandora_vision
 
 
     // Check the integrity of the conveyor
-    for (unsigned int i = 0; i < conveyor.keyPoints.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       // The keypoints should be the same
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.x,
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
         candidateHolesVectorMsg.candidateHoles[i].keypointX );
-      EXPECT_EQ ( conveyor.keyPoints[i].pt.y,
+      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
         candidateHolesVectorMsg.candidateHoles[i].keypointY );
 
-      for (int v = 0; v < conveyor.rectangles[i].size(); v++)
+      for (int v = 0; v < conveyor.holes[i].rectangle.size(); v++)
       {
         // The rectangle's vertices should be the same
-        EXPECT_EQ ( conveyor.rectangles[i][v].x,
+        EXPECT_EQ ( conveyor.holes[i].rectangle[v].x,
           candidateHolesVectorMsg.candidateHoles[i].verticesX[v]);
-        EXPECT_EQ ( conveyor.rectangles[i][v].y,
+        EXPECT_EQ ( conveyor.holes[i].rectangle[v].y,
           candidateHolesVectorMsg.candidateHoles[i].verticesY[v]);
       }
 
-      for (int o = 0; o < conveyor.outlines[i].size(); o++)
+      for (int o = 0; o < conveyor.holes[i].outline.size(); o++)
       {
         // The outline points should be the same
-        EXPECT_EQ ( conveyor.outlines[i][o].x,
+        EXPECT_EQ ( conveyor.holes[i].outline[o].x,
           candidateHolesVectorMsg.candidateHoles[i].outlineX[o]);
-        EXPECT_EQ ( conveyor.outlines[i][o].y,
+        EXPECT_EQ ( conveyor.holes[i].outline[o].y,
           candidateHolesVectorMsg.candidateHoles[i].outlineY[o]);
       }
     }
@@ -469,7 +477,7 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::extractImageFromMessage
+  //! Tests MessageConversions::extractImageFromMessage
   TEST_F ( MessageConversionsTest, ExtractImageFromMessageTest )
   {
     // Create a grayscale image
@@ -517,7 +525,7 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::extractImageFromMessageContainer
+  //! Tests MessageConversions::extractImageFromMessageContainer
   TEST_F ( MessageConversionsTest, ExtractImageFromMessageContainerTest )
   {
     // Create a grayscale image
@@ -567,31 +575,32 @@ namespace pandora_vision
 
 
 
-  //! Test MessageConversions::fromCandidateHoleMsgToConveyor
+  //! Tests MessageConversions::fromCandidateHoleMsgToConveyor
   TEST_F ( MessageConversionsTest, FromCandidateHoleMsgToConveyorTest )
   {
     // The vector of candidate holes
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
 
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
       vision_communications::CandidateHoleMsg candidateHole;
-      // conveyor.keypoints
-      candidateHole.keypointX = conveyor.keyPoints[i].pt.x;
-      candidateHole.keypointY = conveyor.keyPoints[i].pt.y;
 
-      // conveyor.rectangles
-      for ( int v = 0; v < conveyor.rectangles[i].size(); v++ )
+      // The keypoints
+      candidateHole.keypointX = conveyor.holes[i].keypoint.pt.x;
+      candidateHole.keypointY = conveyor.holes[i].keypoint.pt.y;
+
+      // The rectangles
+      for ( int v = 0; v < conveyor.holes[i].rectangle.size(); v++ )
       {
-        candidateHole.verticesX.push_back(conveyor.rectangles[i][v].x);
-        candidateHole.verticesY.push_back(conveyor.rectangles[i][v].y);
+        candidateHole.verticesX.push_back(conveyor.holes[i].rectangle[v].x);
+        candidateHole.verticesY.push_back(conveyor.holes[i].rectangle[v].y);
       }
 
-      // conveyor.outlines
-      for ( int o = 0; o < conveyor.outlines[i].size(); o++ )
+      // The outlines
+      for ( int o = 0; o < conveyor.holes[i].outline.size(); o++ )
       {
-        candidateHole.outlineX.push_back(conveyor.outlines[i][o].x);
-        candidateHole.outlineY.push_back(conveyor.outlines[i][o].y);
+        candidateHole.outlineX.push_back(conveyor.holes[i].outline[o].x);
+        candidateHole.outlineY.push_back(conveyor.holes[i].outline[o].y);
       }
 
       candidateHolesVector.push_back(candidateHole);
@@ -610,28 +619,28 @@ namespace pandora_vision
       32);
 
     // Check the integrity of the extracted conveyor
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.x,
-        conveyor.keyPoints[i].pt.x );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.x,
+        conveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.y,
-        conveyor.keyPoints[i].pt.y );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.y,
+        conveyor.holes[i].keypoint.pt.y );
 
-      for ( int v = 0; v < conveyor.rectangles[i].size(); v++ )
+      for ( int v = 0; v < conveyor.holes[i].rectangle.size(); v++ )
       {
-        EXPECT_EQ ( extractedConveyor.rectangles[i][v].x,
-          conveyor.rectangles[i][v].x );
-        EXPECT_EQ ( extractedConveyor.rectangles[i][v].y,
-          conveyor.rectangles[i][v].y );
+        EXPECT_EQ ( extractedConveyor.holes[i].rectangle[v].x,
+          conveyor.holes[i].rectangle[v].x );
+        EXPECT_EQ ( extractedConveyor.holes[i].rectangle[v].y,
+          conveyor.holes[i].rectangle[v].y );
       }
 
-      for ( int v = 0; v < conveyor.outlines[i].size(); v++ )
+      for ( int o = 0; o < conveyor.holes[i].outline.size(); o++ )
       {
-        EXPECT_EQ ( extractedConveyor.outlines[i][v].x,
-          conveyor.outlines[i][v].x );
-        EXPECT_EQ ( extractedConveyor.outlines[i][v].y,
-          conveyor.outlines[i][v].y );
+        EXPECT_EQ ( extractedConveyor.holes[i].outline[o].x,
+          conveyor.holes[i].outline[o].x );
+        EXPECT_EQ ( extractedConveyor.holes[i].outline[o].y,
+          conveyor.holes[i].outline[o].y );
       }
     }
 
@@ -648,25 +657,25 @@ namespace pandora_vision
       32);
 
     // Check the inflated of the extracted conveyor
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.x,
-        2 * conveyor.keyPoints[i].pt.x );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.x,
+        2 * conveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.y,
-        2 * conveyor.keyPoints[i].pt.y );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.y,
+        2 * conveyor.holes[i].keypoint.pt.y );
 
-      EXPECT_EQ ( extractedConveyor.rectangles[i].size(),
-        conveyor.rectangles[i].size() );
+      EXPECT_EQ ( extractedConveyor.holes[i].rectangle.size(),
+        conveyor.holes[i].rectangle.size() );
 
-      EXPECT_GT ( extractedConveyor.outlines[i].size(),
-        conveyor.outlines[i].size() );
+      EXPECT_GT ( extractedConveyor.holes[i].outline.size(),
+        conveyor.holes[i].outline.size() );
     }
   }
 
 
 
-  //! Test MessageConversions::unpackMessage
+  //! Tests MessageConversions::unpackMessage
   TEST_F ( MessageConversionsTest, UnpackMessageTest )
   {
     // The overall message
@@ -675,26 +684,26 @@ namespace pandora_vision
     // The vector of candidate holes
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
 
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
       vision_communications::CandidateHoleMsg candidateHole;
 
-      // conveyor.keypoints
-      candidateHole.keypointX = conveyor.keyPoints[i].pt.x;
-      candidateHole.keypointY = conveyor.keyPoints[i].pt.y;
+      // The keypoints
+      candidateHole.keypointX = conveyor.holes[i].keypoint.pt.x;
+      candidateHole.keypointY = conveyor.holes[i].keypoint.pt.y;
 
-      // conveyor.rectangles
-      for ( int v = 0; v < conveyor.rectangles[i].size(); v++ )
+      // The rectangle points
+      for ( int v = 0; v < conveyor.holes[i].rectangle.size(); v++ )
       {
-        candidateHole.verticesX.push_back(conveyor.rectangles[i][v].x);
-        candidateHole.verticesY.push_back(conveyor.rectangles[i][v].y);
+        candidateHole.verticesX.push_back(conveyor.holes[i].rectangle[v].x);
+        candidateHole.verticesY.push_back(conveyor.holes[i].rectangle[v].y);
       }
 
-      // conveyor.outlines
-      for ( int o = 0; o < conveyor.outlines[i].size(); o++ )
+      // The outline points
+      for ( int o = 0; o < conveyor.holes[i].outline.size(); o++ )
       {
-        candidateHole.outlineX.push_back(conveyor.outlines[i][o].x);
-        candidateHole.outlineY.push_back(conveyor.outlines[i][o].y);
+        candidateHole.outlineX.push_back(conveyor.holes[i].outline[o].x);
+        candidateHole.outlineY.push_back(conveyor.holes[i].outline[o].y);
       }
 
       candidateHolesVector.push_back(candidateHole);
@@ -742,28 +751,28 @@ namespace pandora_vision
 
 
     // Check the integrity of the extracted conveyor
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.x,
-        conveyor.keyPoints[i].pt.x );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.x,
+        conveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.y,
-        conveyor.keyPoints[i].pt.y );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.y,
+        conveyor.holes[i].keypoint.pt.y );
 
-      for ( int v = 0; v < conveyor.rectangles[i].size(); v++ )
+      for ( int v = 0; v < conveyor.holes[i].rectangle.size(); v++ )
       {
-        EXPECT_EQ ( extractedConveyor.rectangles[i][v].x,
-          conveyor.rectangles[i][v].x );
-        EXPECT_EQ ( extractedConveyor.rectangles[i][v].y,
-          conveyor.rectangles[i][v].y );
+        EXPECT_EQ ( extractedConveyor.holes[i].rectangle[v].x,
+          conveyor.holes[i].rectangle[v].x );
+        EXPECT_EQ ( extractedConveyor.holes[i].rectangle[v].y,
+          conveyor.holes[i].rectangle[v].y );
       }
 
-      for ( int o = 0; o < conveyor.outlines[i].size(); o++ )
+      for ( int o = 0; o < conveyor.holes[i].outline.size(); o++ )
       {
-        EXPECT_EQ ( extractedConveyor.outlines[i][o].x,
-          conveyor.outlines[i][o].x );
-        EXPECT_EQ ( extractedConveyor.outlines[i][o].y,
-          conveyor.outlines[i][o].y );
+        EXPECT_EQ ( extractedConveyor.holes[i].outline[o].x,
+          conveyor.holes[i].outline[o].x );
+        EXPECT_EQ ( extractedConveyor.holes[i].outline[o].y,
+          conveyor.holes[i].outline[o].y );
       }
     }
 
@@ -799,19 +808,19 @@ namespace pandora_vision
       32);
 
     // Check the inflated of the extracted conveyor
-    for ( int i = 0; i < conveyor.keyPoints.size(); i++ )
+    for ( int i = 0; i < conveyor.size(); i++ )
     {
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.x,
-        2 * conveyor.keyPoints[i].pt.x );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.x,
+        2 * conveyor.holes[i].keypoint.pt.x );
 
-      EXPECT_EQ ( extractedConveyor.keyPoints[i].pt.y,
-        2 * conveyor.keyPoints[i].pt.y );
+      EXPECT_EQ ( extractedConveyor.holes[i].keypoint.pt.y,
+        2 * conveyor.holes[i].keypoint.pt.y );
 
-      EXPECT_EQ ( extractedConveyor.rectangles[i].size(),
-        conveyor.rectangles[i].size() );
+      EXPECT_EQ ( extractedConveyor.holes[i].rectangle.size(),
+        conveyor.holes[i].rectangle.size() );
 
-      EXPECT_GT ( extractedConveyor.outlines[i].size(),
-        conveyor.outlines[i].size() );
+      EXPECT_GT ( extractedConveyor.holes[i].outline.size(),
+        conveyor.holes[i].outline.size() );
     }
 
     // The number of pixels differing between image_8UC1 and extractedImage

@@ -43,19 +43,39 @@
 namespace pandora_vision
 {
   /**
-    @brief The structure that represents holes.
-    @param keyPoints [std::vector<cv::KeyPoint>] The vector of the
-    holes' keypoints
-    @param rectangles [std::vector< std::vector<cv::Point2f> >] The
-    vector of the holes' rotated bounding boxes vertices
-    @param outlines [std::vector<std::vector<cv::Point2f> >] The
-    vector of the holes' outlines
+    @brief The structure that represents a single hole.
+    @param keypoint [cv::KeyPoint] The hole's keypoint
+    @param rectangle [std::vector<cv::Point2f>] The vector of the hole's
+    rotated bounding box vertices
+    @param outline [std::vector<cv::Point2f>] The vector of the hole's
+    outline points
+   **/
+  struct HoleConveyor
+  {
+    cv::KeyPoint keypoint;
+    std::vector<cv::Point2f> rectangle;
+    std::vector<cv::Point2f> outline;
+  };
+
+
+  /**
+    A struct conveying information about multiple holes
+    @param holes [std::vector<HoleConveyor>] The vector of holes
    **/
   struct HolesConveyor
   {
-    std::vector<cv::KeyPoint> keyPoints;
-    std::vector< std::vector<cv::Point2f> > rectangles;
-    std::vector<std::vector<cv::Point2f> > outlines;
+    std::vector<HoleConveyor> holes;
+
+    /**
+      @brief Returns the size of the @param holes vector
+      @param void
+      @return [unsigned int] The number of entries in the @param holes vector
+     **/
+    unsigned int size() const
+    {
+      return holes.size();
+    }
+
   };
 
 
@@ -69,8 +89,8 @@ namespace pandora_vision
 
       /**
         @brief Appends one HolesConveyor struct to another.
-        @param[in] src [const HolesConveyor&] The source struct
-        @param[out] dst [HolesConveyor*] The destination struct
+        @param[in] src [const HolesConveyor&] The source conveyor
+        @param[out] dst [HolesConveyor*] The destination conveyor
         @return void
        **/
       static void append(const HolesConveyor& src, HolesConveyor* dst);
@@ -199,15 +219,6 @@ namespace pandora_vision
         @return void
        **/
       static void shuffle(HolesConveyor* src);
-
-      /**
-        @brief Gets the number of holes in a HolesConveyor.
-        In case of discrepancies in the number of keypoints, rectangles and
-        outlines, return -1.
-        @param[in] conveyor [const HolesConveyor&] The HolesConveyor struct
-        @return int The size of @param conveyor
-       **/
-      static int size(const HolesConveyor& conveyor);
 
   };
 

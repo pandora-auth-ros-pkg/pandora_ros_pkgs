@@ -170,7 +170,7 @@ namespace pandora_vision
 
 
 
-  //! Test HoleDetector::findHoles
+  //! Tests HoleDetector::findHoles
   TEST_F ( HoleDetectorTest, FindHolesTest )
   {
     // Obtain the histogram of images of walls
@@ -186,7 +186,7 @@ namespace pandora_vision
       HoleDetector::findHoles ( squares_, wallsHistogram );
 
     // The number of keypoints found
-    int size = HolesConveyorUtils::size( conveyor );
+    int size = conveyor.size();
 
     // There should be one keypoint: the one of the upper left square.
     // The lower right square and the upper right square are
@@ -199,14 +199,14 @@ namespace pandora_vision
     {
       // The location of the keypoint should near the center of the square
       // in which it lies
-      EXPECT_NEAR ( conveyor.keyPoints[k].pt.x,
-        conveyor.rectangles[k][0].x + 50, 1 );
+      EXPECT_NEAR ( conveyor.holes[k].keypoint.pt.x,
+        conveyor.holes[k].rectangle[0].x + 50, 1 );
 
       // The hole should have exactly four vertices
-      EXPECT_EQ ( 4, conveyor.rectangles[k].size() );
+      EXPECT_EQ ( 4, conveyor.holes[k].rectangle.size() );
 
       // There should be 400 outline points
-      EXPECT_EQ ( 400, conveyor.outlines[k].size() );
+      EXPECT_EQ ( 400, conveyor.holes[k].outline.size() );
     }
 
 
@@ -220,7 +220,7 @@ namespace pandora_vision
     conveyor = HoleDetector::findHoles ( squares_, wallsHistogram );
 
     // The number of keypoints found
-    size = HolesConveyorUtils::size( conveyor );
+    size = conveyor.size();
 
     // There should be one keypoint: the one of the upper left square.
     // The lower right square and the upper right square are
@@ -233,14 +233,14 @@ namespace pandora_vision
     {
       // The location of the keypoint should near the center of the square
       // in which it lies
-      EXPECT_NEAR ( conveyor.keyPoints[k].pt.x,
-        conveyor.rectangles[k][0].x + 50, 1 );
+      EXPECT_NEAR ( conveyor.holes[k].keypoint.pt.x,
+        conveyor.holes[k].rectangle[0].x + 50, 1 );
 
       // The hole should have exactly four vertices
-      EXPECT_EQ ( 4, conveyor.rectangles[k].size() );
+      EXPECT_EQ ( 4, conveyor.holes[k].rectangle.size() );
 
       // There should be 400 minus 4 (vertices) * 3 (points) outline points
-      EXPECT_EQ ( 400 - 4 * 3, conveyor.outlines[k].size() );
+      EXPECT_EQ ( 400 - 4 * 3, conveyor.holes[k].outline.size() );
     }
   }
 

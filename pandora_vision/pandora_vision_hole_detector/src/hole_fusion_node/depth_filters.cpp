@@ -182,9 +182,9 @@ namespace pandora_vision
         }
     }
 
-    for(int i = 0; i < conveyor.keyPoints.size(); i++)
+    for(int i = 0; i < conveyor.size(); i++)
     {
-      if(msgs_.size() == conveyor.keyPoints.size())
+      if(msgs_.size() == conveyor.size())
       {
         finalMsgs.push_back(msgs_[i]);
       }
@@ -353,7 +353,7 @@ namespace pandora_vision
     Timer::start("checkHolesDepthArea", "applyFilter");
     #endif
 
-    for(unsigned int i = 0 ; i < conveyor.keyPoints.size() ; i++)
+    for(unsigned int i = 0 ; i < conveyor.size() ; i++)
     {
       // The mean depth value of the points inside the i-th hole
       float mean = 0.0;
@@ -450,8 +450,8 @@ namespace pandora_vision
       mean /= inflatedRectanglesVector[i].size();
 
       float value = depthImage.at<float>(
-        conveyor.keyPoints[inflatedRectanglesIndices[i]].pt.y,
-        conveyor.keyPoints[inflatedRectanglesIndices[i]].pt.x) - mean;
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.y,
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.x) - mean;
 
       // The gaussian mean
       float m = Parameters::HoleFusion::holes_gaussian_mean;
@@ -522,14 +522,14 @@ namespace pandora_vision
     // Take a pointer on the interpolatedDepthImageEdges image
     unsigned char* ptr = interpolatedDepthImageEdges.ptr();
 
-    for (unsigned int o = 0; o < conveyor.outlines.size(); o++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
       // The number of non-zero value pixels in the
-      // interpolatedDepthImageEdges image, inside mask o
+      // interpolatedDepthImageEdges image, inside mask i
       int numWhites = 0;
 
-      for (std::set<unsigned int>::iterator it = holesMasksSetVector[o].begin();
-        it != holesMasksSetVector[o].end(); it++)
+      for (std::set<unsigned int>::iterator it = holesMasksSetVector[i].begin();
+        it != holesMasksSetVector[i].end(); it++)
       {
         if (ptr[*it] != 0)
         {
@@ -537,13 +537,13 @@ namespace pandora_vision
         }
       }
 
-      if (holesMasksSetVector[o].size() > 0)
+      if (holesMasksSetVector[i].size() > 0)
       {
-        probabilitiesVector->at(o) =
-          static_cast<float>(numWhites) / (holesMasksSetVector[o].size());
+        probabilitiesVector->at(i) =
+          static_cast<float>(numWhites) / (holesMasksSetVector[i].size());
       }
 
-      msgs->push_back(TOSTR(probabilitiesVector->at(o)));
+      msgs->push_back(TOSTR(probabilitiesVector->at(i)));
     }
 
     #ifdef DEBUG_TIME

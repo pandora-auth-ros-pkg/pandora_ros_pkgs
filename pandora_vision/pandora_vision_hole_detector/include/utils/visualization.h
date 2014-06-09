@@ -95,32 +95,6 @@ namespace pandora_vision
         const int& ms);
 
       /**
-        @brief Depicts the keypoints and bounding boxes
-        @param[in] windowTitle [const std::string&] The window title
-        @param[in] inImage [const cv::Mat&] The image to show
-        @param[in] ms [const int&] How many ms the showing lasts
-        @param[in] keypoints [const std::vector<cv::KeyPoint>&] The keypoints
-        @param[in] bounding_boxes
-        [const std::vector<std::vector<cv::Point2f> >&]
-        The bounding boxes' vertices
-        @param[in] msgs [const std::vector<std::string>] Message to show to each
-        keypoint
-        @param[in] outlineVector [const std::vector<std::vector<cv::Point2f> >&]
-        The valid holes' outlines
-        @param[in] hz [const floa&t] If positive holds the Hz
-        @return [cv::Mat] The drawn image
-       **/
-      static cv::Mat showHoles(
-        const std::string& windowTitle,
-        const cv::Mat& inImage,
-        const int& ms,
-        const std::vector<cv::KeyPoint>& keypoints,
-        const std::vector<std::vector<cv::Point2f> >& bounding_boxes,
-        const std::vector<std::string>& msgs,
-        const std::vector<std::vector<cv::Point2f> >& outlineVector,
-        const float& hz = -1);
-
-      /**
         @brief Depicts the contents of a HolesConveyor on an image
         @param[in] windowTitle [const std::string&] The window title
         @param[in] inImage [const cv::Mat&] The image to show
