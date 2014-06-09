@@ -32,33 +32,51 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <ros/console.h>
+#ifndef SENSOR_PROCESSING_CO2_PROCESSOR_H
+#define SENSOR_PROCESSING_CO2_PROCESSOR_H
 
-#include "alert_handler/alert_handler.h"
+#include <string>
 
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
+#include "pandora_arm_hardware_interface/Co2Msg.h"
+#include "sensor_processing/utils.h"
+#include "sensor_processing/sensor_processor.h"
 
-int main(int argc, char** argv)
+namespace pandora_sensor_processing
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
+
+  class Co2Processor : public SensorProcessor<Co2Processor>
   {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
-    {
-      ros::console::notifyLoggerLevelsChanged();
-    }
-  }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
-  ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
-  return 0;
-}
+    public:
+      /**
+       * @brief Constructor
+       * @param ns [std::string const&] Has the namespace of the node.
+       */
+      explicit Co2Processor(const std::string& ns);
+
+      /* Methods that SensorProcessor needs */
+
+      /**
+       * @brief callback to co2SensorSubscriber_
+       * @param msg [pandora_arm_hardware_interface::Co2MsgConstPtr const&] contains
+       * co2 percentage (v/v) in the air
+       * @return void
+       */
+      void sensorCallback(
+          const pandora_arm_hardware_interface::Co2Msg& msg);
+
+      void dynamicReconfigCallback(
+          const SensorProcessorConfig& config, uint32_t level);
+
+    private:
+      //!< params
+      float PDF_SCALE;
+      float PDF_SHAPE;
+  };
+
+}  // namespace pandora_sensor_processing
+
+#endif  // SENSOR_PROCESSING_CO2_PROCESSOR_H

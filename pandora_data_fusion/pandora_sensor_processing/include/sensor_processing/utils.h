@@ -32,33 +32,71 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <ros/console.h>
+#ifndef SENSOR_PROCESSING_UTILS_H
+#define SENSOR_PROCESSING_UTILS_H
 
-#include "alert_handler/alert_handler.h"
+#ifndef BOOST_NO_DEFAULTED_FUNCTIONS
+#define BOOST_NO_DEFAULTED_FUNCTIONS
+#endif
 
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
+#include <utility>
+#include <vector>
+#include <cmath>
+#include <stdexcept>
 
-int main(int argc, char** argv)
+#include <boost/math/constants/constants.hpp>
+#include <boost/utility.hpp>
+
+#include <Eigen/Dense>
+
+//!< Macro for pi.
+#define PI boost::math::constants::pi<float>()
+
+namespace pandora_sensor_processing
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
+
+  /**
+   * @brief class containing mathematical tools and useful functions.
+   */
+  class Utils : private boost::noncopyable
   {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
-    {
-      ros::console::notifyLoggerLevelsChanged();
-    }
-  }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
-  ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
-  return 0;
-}
+    public:
+      /**
+       * @param vec [Eigen::Vector4f const&] vector to find its mahal. 
+       * distance from a group
+       * @param mean [Eigen::Vector4fi const&] group's mean
+       * @param covariance [Eigen::Matrix4f const&] group's covariance
+       * @return float vec's mahalanobis distance to group
+       */
+      static float
+        getMahalanobisDistance(const Eigen::Vector4f& vec,
+            const Eigen::Vector4f& mean,
+            const Eigen::Matrix4f& covariance);
+
+      /**
+       * @brief normal distribution function
+       * @param x [float] the random variable
+       * @param mean [float] X's mean value (pdf's peak)
+       * @param stdDev [float] X's standard deviation
+       * @return float pdf's corresponding value
+       */
+      static float normalPdf(float x, float mean, float stdDev);
+
+      /**
+       * @brief weibull distribution function
+       * @param x [float] the random variable
+       * @param k [float] pdf's shape value
+       * @param l [float] X's scale
+       * @return float pdf's corresponding value
+       */
+      static float weibullPdf(float x, float k, float l);
+  };
+
+}  // namespace pandora_sensor_processing
+
+#endif  // SENSOR_PROCESSING_UTILS_H
+

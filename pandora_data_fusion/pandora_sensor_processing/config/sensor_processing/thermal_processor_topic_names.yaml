@@ -1,0 +1,4 @@
+subscribed_topic_names:
+  thermal_raw: /sensors/thermal_raw
+published_topic_names:
+  thermal_alert: thermal_direction_alert

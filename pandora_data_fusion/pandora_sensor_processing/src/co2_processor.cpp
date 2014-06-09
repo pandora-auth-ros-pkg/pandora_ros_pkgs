@@ -32,33 +32,41 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <ros/console.h>
+#include <string>
 
-#include "alert_handler/alert_handler.h"
+#include "sensor_processing/co2_processor.h"
 
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
-
-int main(int argc, char** argv)
+namespace pandora_sensor_processing
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
+
+  Co2Processor::Co2Processor(const std::string& ns)
+    : SensorProcessor<Co2Processor>(ns, "co2", true, false) {}
+
+  /**
+   * @details Weibull distribution is used for calculating probability.
+   */
+  void Co2Processor::sensorCallback(
+      const pandora_arm_hardware_interface::Co2Msg& msg)
   {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
-    {
-      ros::console::notifyLoggerLevelsChanged();
-    }
+    ROS_INFO_NAMED("SENSOR_PROCESSING", 
+        "[%s] Incoming co2 raw info.", name_.c_str());
+    alert_.yaw = 0;
+    alert_.pitch = 0;
+    alert_.probability = Utils::weibullPdf(msg.co2_percentage, 
+        PDF_SHAPE, PDF_SCALE);
+    alert_.header = msg.header;
+    publishAlert();
   }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
-  ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
-  return 0;
-}
+
+  void Co2Processor::dynamicReconfigCallback(
+      const SensorProcessorConfig& config, uint32_t level)
+  {
+    PDF_SCALE = config.co2_optimal;
+    PDF_SHAPE = config.co2_pdf_shape;
+  }
+
+}  // namespace pandora_sensor_processing

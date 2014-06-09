@@ -1,0 +1,4 @@
+subscribed_topic_names:
+  co2_raw: /test/raw_input
+published_topic_names:
+  co2_alert: /test/alert_output

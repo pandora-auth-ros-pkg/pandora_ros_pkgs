@@ -32,33 +32,58 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <ros/console.h>
+#include "gtest/gtest.h"
 
-#include "alert_handler/alert_handler.h"
+#include "sensor_processing/utils.h"
 
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
-
-int main(int argc, char** argv)
+namespace pandora_sensor_processing
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
-  {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
+
+    TEST(getMahalanobisDistance, checkResultsOfLegitValues)
     {
-      ros::console::notifyLoggerLevelsChanged();
+      Eigen::Vector4f vec, mean;
+      Eigen::Matrix4f cov;
+
+      vec << 1, 0, 0, 0;
+      mean << 0, 0, 0, 0;
+      cov = Eigen::MatrixXf::Identity(4, 4);
+      EXPECT_NEAR(1, Utils::getMahalanobisDistance(vec, mean, cov), 0.0001);
+
+      vec << 3, 0, 0, 0;
+      mean << 1, 0, 0, 0;
+      cov = Eigen::MatrixXf::Identity(4, 4);
+      EXPECT_NEAR(2, Utils::getMahalanobisDistance(vec, mean, cov), 0.0001);
+
+      vec << 1, 0, 0, 0;
+      mean << 0, 0, 0, 0;
+      cov = 2 * Eigen::MatrixXf::Identity(4, 4);
+      EXPECT_NEAR(sqrt(2)/2, Utils::getMahalanobisDistance(vec, mean, cov), 0.0001);
     }
-  }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
-  ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
-  return 0;
-}
+
+    TEST(normalPdf, checkResultsOfLegitValues)
+    {
+      EXPECT_NEAR(0.39894, Utils::normalPdf(0, 0, 1), 0.0001);
+      EXPECT_NEAR(0.053991, Utils::normalPdf(2, 0, 1), 0.0001);
+      EXPECT_NEAR(0.19947, Utils::normalPdf(0, 0, 2), 0.0001);
+      EXPECT_NEAR(0.21297, Utils::normalPdf(35, 36, 1.5), 0.0001);
+      EXPECT_NEAR(0, Utils::normalPdf(45, 36, 2), 0.0001);
+      EXPECT_NEAR(0.0022159, Utils::normalPdf(30, 36, 2), 0.0001);
+      EXPECT_NEAR(0, Utils::normalPdf(25, 36, 2), 0.0001);
+    }
+
+    TEST(weibullPdf, checkResultsOfLegitValues)
+    {
+      EXPECT_NEAR(0.36788, Utils::weibullPdf(1, 1, 1), 0.0001);
+      EXPECT_NEAR(0.73576, Utils::weibullPdf(1, 2, 1), 0.0001);
+      EXPECT_NEAR(0.18394, Utils::weibullPdf(1, 0.5, 1), 0.0001);
+      EXPECT_NEAR(0.061313, Utils::weibullPdf(3, 0.5, 3), 0.0001);
+      EXPECT_NEAR(0.23352, Utils::weibullPdf(3, 5, 4.3), 0.0001);
+      EXPECT_NEAR(0.50998, Utils::weibullPdf(0.8, 1.8, 0.5), 0.0001);
+    }
+
+}  // namespace pandora_sensor_processing
+

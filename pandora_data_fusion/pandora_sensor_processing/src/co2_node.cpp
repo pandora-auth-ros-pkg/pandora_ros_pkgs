@@ -32,33 +32,29 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include <ros/console.h>
 
-#include "alert_handler/alert_handler.h"
+#include "sensor_processing/co2_processor.h"
 
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
+using pandora_sensor_processing::Co2Processor;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
+  if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
+    if ( ros::console::set_logger_level(
+          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) )
     {
       ros::console::notifyLoggerLevelsChanged();
     }
   }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
+  Co2Processor co2Processor("/sensor_processing/co2_processor");
+  ROS_INFO("[SENSOR_PROCESSING] Beginning Co2 Processor node");
   ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
   return 0;
 }

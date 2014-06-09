@@ -307,7 +307,7 @@ namespace pandora_data_fusion
 
       //!< dynamic reconfigure server
 
-      dynReconfserver_.setCallback(boost::bind(
+      dynReconfServer_.setCallback(boost::bind(
             &AlertHandler::dynamicReconfigCallback, this, _1, _2));
 
       //!< timers

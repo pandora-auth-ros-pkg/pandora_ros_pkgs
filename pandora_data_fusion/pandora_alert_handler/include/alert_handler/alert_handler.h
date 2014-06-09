@@ -221,7 +221,7 @@ namespace pandora_data_fusion
         boost::shared_ptr<ValidateVictimServer> validateVictimServer_;
 
         dynamic_reconfigure::Server< ::pandora_alert_handler::AlertHandlerConfig >
-          dynReconfserver_;
+          dynReconfServer_;
 
         MapPtr map_;
 

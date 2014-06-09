@@ -3,23 +3,21 @@
   <node>
     /data_fusion/alert_handler
     <subscriber>/vision/hole_direction_alert</subscriber>
-    <subscriber>/sensor_processors/thermal_direction_alert</subscriber>
+    <subscriber>/sensor_processing/thermal_direction_alert</subscriber>
     <subscriber>/vision/qr_alert</subscriber>
     <subscriber>/vision/hazmat_alert</subscriber>
     <subscriber>/vision/face_direction_alert</subscriber>
     <subscriber>/vision/motion_alert</subscriber>
-    <subscriber>/sensor_processors/sound_direction_alert</subscriber>
-    <subscriber>/sensor_processors/co2_direction_alert</subscriber>
+    <subscriber>/sensor_processing/sound_direction_alert</subscriber>
+    <subscriber>/sensor_processing/co2_alert</subscriber>
 
     <subscriber>/slam_map/map</subscriber>
     <subscriber>/tf</subscriber>
 
     <publisher>/data_fusion/alert_hander/victims</publisher>
-    <publisher>/data_fusion/alert_hander/valid_victims_counter</publisher>
     <publisher>/data_fusion/alert_hander/qr_notification</publisher>
     <publisher>/data_fusion/alert_hander/robocup_score</publisher>
     
-    <actionServer>/data_fusion/alert_handler/select_victim</actionServer>
     <actionServer>/data_fusion/alert_handler/delete_victim</actionServer>
     <actionServer>/data_fusion/alert_handler/validate_victim</actionServer>
 

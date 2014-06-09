@@ -32,33 +32,40 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors: 
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <ros/console.h>
+#include "sensor_processing/utils.h"
 
-#include "alert_handler/alert_handler.h"
-
-using pandora_data_fusion::pandora_alert_handler::AlertHandler;
-
-int main(int argc, char** argv)
+namespace pandora_sensor_processing
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
-  {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
+
+  /**
+   * @details something like Kalaripayattu...
+   */
+  float Utils::
+    getMahalanobisDistance(const Eigen::Vector4f& vec,
+        const Eigen::Vector4f& mean,
+        const Eigen::Matrix4f& covariance)
     {
-      ros::console::notifyLoggerLevelsChanged();
+      Eigen::Vector4f vec_centered = vec - mean;
+      float res = vec_centered.transpose() * covariance.inverse() * vec_centered;
+      return sqrt(res);
     }
-  }
-  AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
-  ros::spin();
-  // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
-  // spinner.spin(); // spin
-  return 0;
-}
+
+  float Utils::
+    normalPdf(float x, float mean, float stdDev)
+    {
+      float xCenteredScaled = (x - mean) / stdDev;
+      return (1/(stdDev * sqrt(2*PI))) * exp(-0.5 * pow(xCenteredScaled, 2));
+    }
+  
+  float Utils::
+    weibullPdf(float x, float k, float l)
+    {
+      float xScaled = x / l;
+      return (k / l) * pow(xScaled, k - 1) * exp(-pow(xScaled, k));
+    }
+
+}  // namespace pandora_sensor_processing

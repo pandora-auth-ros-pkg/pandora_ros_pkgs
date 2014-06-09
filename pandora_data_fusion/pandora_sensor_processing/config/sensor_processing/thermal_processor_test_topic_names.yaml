@@ -1,0 +1,4 @@
+subscribed_topic_names:
+  thermal_raw: /test/raw_input
+published_topic_names:
+  thermal_alert: /test/alert_output
