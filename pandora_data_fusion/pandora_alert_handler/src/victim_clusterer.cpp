@@ -98,7 +98,8 @@ namespace pandora_data_fusion
               findGroupCenterPoint(groupedObjects[ii]);
 
             double distance = 0;
-            if(currentObj->getType() != Sound::getObjectType())
+            if(currentObj->getType() != Sound::getObjectType() &&
+                currentObj->getType() != Co2::getObjectType())
             {
               distance =
                 Utils::distanceBetweenPoints3D(currentObj->

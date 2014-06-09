@@ -1,14 +1,14 @@
 subscribed_topic_names:
   holeDirection: /vision/hole_direction_alert
-  thermalDirection: /sensor_processors/thermal_direction_alert
+  thermalDirection: /sensor_processing/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
   landoltc: /vision/landoltc_alert
   dataMatrix: /vision/dataMatrix_alert
   faceDirection: /vision/face_direction_alert
-  co2Direction: /sensor_processors/co2_direction_alert
+  co2Direction: /sensor_processing/co2_alert
   motionDirection: /vision/motion_alert
-  soundDirection: /sensor_processors/sound_direction_alert
+  soundDirection: /sensor_processing/sound_direction_alert
   map: /slam/map
 published_topic_names:  
   victims : /data_fusion/victims

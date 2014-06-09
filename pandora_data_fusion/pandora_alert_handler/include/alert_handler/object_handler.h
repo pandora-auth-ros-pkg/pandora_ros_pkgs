@@ -126,48 +126,18 @@ namespace pandora_data_fusion
         while(iter != objectsPtr->end())
         {
           bool valid = false;
-          valid = victimsToGoList_->isObjectPoseInList((*iter), VICTIM_CLUSTER_RADIUS);
+          if(ObjectType::getObjectType() == Sound::getObjectType() ||
+              ObjectType::getObjectType() == Co2::getObjectType())
+          {
+            valid = victimsToGoList_->isObjectPoseInList(
+                (*iter), VICTIM_CLUSTER_RADIUS, true);
+          }
+          else
+            valid = victimsToGoList_->isObjectPoseInList(
+                (*iter), VICTIM_CLUSTER_RADIUS);
           // valid = valid || 
           //   victimsVisitedList_->isObjectPoseInList((*iter), VICTIM_CLUSTER_RADIUS);
           if(!valid)
-          {
-            ROS_DEBUG_NAMED("object_handler",
-                "[OBJECT_HANDLER %d] Deleting not valid object...", __LINE__);
-            iter = objectsPtr->erase(iter);
-          }
-          else
-          {
-            ++iter;
-          }
-        }
-      }
-
-    template<>
-      void ObjectHandler::keepValidVerificationObjects<Sound>(
-          const Sound::PtrVectorPtr& objectsPtr)
-      {
-        SoundPtrVector::iterator iter = objectsPtr->begin();
-
-        while(iter != objectsPtr->end())
-        {
-          bool invalid = false;
-          for(VictimList::const_iterator it = victimsToGoList_->begin();
-              it != victimsToGoList_->end(); it++)
-          {
-            invalid = Utils::distanceBetweenPoints2D((*iter)->getPose().position, 
-                (*it)->getPose().position) >= VICTIM_CLUSTER_RADIUS;
-            if(invalid)
-              break;
-          }
-          for(VictimList::const_iterator it = victimsVisitedList_->begin();
-              it != victimsVisitedList_->end(); it++)
-          {
-            invalid = invalid || Utils::distanceBetweenPoints2D((*iter)->getPose().position, 
-                (*it)->getPose().position) >= VICTIM_CLUSTER_RADIUS;
-            if(invalid)
-              break;
-          }
-          if(invalid)
           {
             ROS_DEBUG_NAMED("object_handler",
                 "[OBJECT_HANDLER %d] Deleting not valid object...", __LINE__);

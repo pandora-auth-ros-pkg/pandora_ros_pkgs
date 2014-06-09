@@ -65,7 +65,7 @@ namespace pandora_data_fusion
         catch (AlertException ex)
         {
           ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER %d] %s", __LINE__, ex.what());
+              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
       }
 
@@ -89,7 +89,7 @@ namespace pandora_data_fusion
         catch (AlertException ex)
         {
           ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER %d] %s", __LINE__, ex.what());
+              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
       }
 
@@ -113,7 +113,7 @@ namespace pandora_data_fusion
         catch (AlertException ex)
         {
           ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER %d] %s", __LINE__, ex.what());
+              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
       }
 
@@ -137,7 +137,7 @@ namespace pandora_data_fusion
         catch (AlertException ex)
         {
           ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER %d] %s", __LINE__, ex.what());
+              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
       }
 
@@ -161,7 +161,7 @@ namespace pandora_data_fusion
         catch (AlertException ex)
         {
           ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER %d] %s", __LINE__, ex.what());
+              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
       }
 

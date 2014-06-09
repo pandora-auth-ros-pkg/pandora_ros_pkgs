@@ -71,7 +71,6 @@ namespace pandora_data_fusion
         static Point vector3ToPoint(tf::Vector3 vector);
         static float probabilityFromStdDev(float boundingRadius, float deviation);
         static float stdDevFromProbability(float boundingRadius, float probability);
-
     };
 
 }  // namespace pandora_alert_handler

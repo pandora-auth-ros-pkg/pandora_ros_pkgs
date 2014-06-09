@@ -46,7 +46,7 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    TEST(probabilityFromStdDevTest, checkResultsOfLegitValues)
+    TEST(probabilityFromStdDev, checkResultsOfLegitValues)
     {
       EXPECT_NEAR(0.019801, Utils::probabilityFromStdDev(0.1, 0.5), 0.0001);
       EXPECT_NEAR(0.39347, Utils::probabilityFromStdDev(0.5, 0.5), 0.0001);

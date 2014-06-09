@@ -41,11 +41,19 @@ catkin_package(
     pandora_common_msgs
     vision_communications
   INCLUDE_DIRS 
+    include
+    ${BFL_INCLUDE_DIRS}
   LIBRARIES 
   )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${BFL_INCLUDE_DIRS})
-link_directories(${BFL_LIBRARY_DIRS})
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${BFL_INCLUDE_DIRS}
+  )
+link_directories(
+  ${BFL_LIBRARY_DIRS}
+  )
           
 ########################  utils  ####################################
 
@@ -71,6 +79,9 @@ add_library(base_object
 target_link_libraries(base_object
   ${catkin_LIBRARIES}
   )
+add_dependencies(base_object 
+  pandora_data_fusion_msgs_gencpp
+  ) 
 
 add_library(objects
   src/hole.cpp

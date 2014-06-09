@@ -45,7 +45,9 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 //!< Set that boost::noncopyable will set private default constructors
+#ifndef BOOST_NO_DEFAULTED_FUNCTIONS
 #define BOOST_NO_DEFAULTED_FUNCTIONS
+#endif
 
 //!< Macro for pi.
 #define PI boost::math::constants::pi<float>()

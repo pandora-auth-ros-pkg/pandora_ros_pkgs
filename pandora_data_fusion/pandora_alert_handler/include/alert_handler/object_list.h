@@ -90,7 +90,8 @@ namespace pandora_data_fusion
           void pop_back();
           void clear();
 
-          bool isObjectPoseInList(const ObjectConstPtr& object, float radius) const;
+          bool isObjectPoseInList(const ObjectConstPtr& object, float radius,
+              bool is3D = true) const;
           void removeInRangeOfObject(const ObjectConstPtr& object, float range);
 
           void getObjectsPosesStamped(PoseStampedVector* poses) const;
@@ -204,14 +205,21 @@ namespace pandora_data_fusion
 
     template <class ObjectType>
       bool ObjectList<ObjectType>::isObjectPoseInList(
-          const ObjectConstPtr& object, float radius) const
+          const ObjectConstPtr& object, float radius, bool is3D) const
       {
         for(const_iterator it = this->begin(); it != this->end(); ++it)
         {
-          float distance =
-            Utils::distanceBetweenPoints3D(object->getPose().position, 
+          float distance = 0;
+          if(is3D)
+          {
+            distance = Utils::distanceBetweenPoints3D(object->getPose().position, 
                 (*it)->getPose().position);
-
+          }
+          else
+          {
+            distance = Utils::distanceBetweenPoints2D(object->getPose().position, 
+                (*it)->getPose().position);
+          }
           if(distance < radius)
           {
             return true;
