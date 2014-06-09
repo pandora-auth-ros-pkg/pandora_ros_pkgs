@@ -2076,10 +2076,9 @@ namespace pandora_vision
     }
     #endif
 
-    // Threshlold the backprojection
+    // Threshold the backprojection
     cv::threshold(backproject, backproject,
-      Parameters::Rgb::backprojection_threshold, 255,
-      cv::THRESH_BINARY);
+      Parameters::Rgb::backprojection_threshold, 255, cv::THRESH_BINARY);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_produce_edges && edges)
@@ -2238,8 +2237,7 @@ namespace pandora_vision
 
       // All non-white pixels turn to black
       cv::threshold(*outImage, *outImage,
-        Parameters::Rgb::backprojection_threshold, 255,
-        cv::THRESH_BINARY);
+        Parameters::Rgb::backprojection_threshold, 255, cv::THRESH_BINARY);
     }
 
     #ifdef DEBUG_SHOW

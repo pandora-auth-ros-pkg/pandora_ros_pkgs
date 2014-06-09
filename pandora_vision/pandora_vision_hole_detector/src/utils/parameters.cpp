@@ -187,11 +187,11 @@ namespace pandora_vision
 
   // Holes validity thresholds
   // Normal : when depth analysis is applicable
-  float Parameters::HoleFusion::holes_validity_threshold_normal = 0.84;
+  float Parameters::HoleFusion::holes_validity_threshold_normal = 0.94;
 
   // Urgent : when depth analysis is not applicable, we can only rely
   // on RGB analysis
-  float Parameters::HoleFusion::holes_validity_threshold_urgent = 0.6;
+  float Parameters::HoleFusion::holes_validity_threshold_urgent = 0.70;
 
   // The depth sensor's horizontal field of view in rads
   float Parameters::HoleFusion::horizontal_field_of_view = 58 / 180 * M_PI;

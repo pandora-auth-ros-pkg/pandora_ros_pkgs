@@ -1346,4 +1346,47 @@ namespace pandora_vision
     ASSERT_EQ ( CV_8UC3, segmented.type() );
   }
 
+
+
+  //! Tests EdgeDetection::watershedViaBackprojection
+  TEST_F ( EdgeDetectionTest, watershedViaBackprojectionTest )
+  {
+    // Convert squares_ into a CV_8UC3 image
+    cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
+    cv::cvtColor( squares_, squares_8UC3, CV_GRAY2BGR );
+
+    // Add an unfinished square to the squares_8UC3 image
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      squares_8UC3.at< cv::Vec3b >( rows, 300 ) = 128;
+    }
+
+    for ( int cols = 300; cols < 400; cols++ )
+    {
+      squares_8UC3.at< cv::Vec3b >( 300, cols ) = 128;
+    }
+
+    // Uncomment for visual inspection
+    //Visualization::show("Before", squares_8UC3, 0);
+
+    // A dummy backprojection image
+    cv::Mat backprojection = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
+
+
+    bool edges = false;
+    for ( int i = 0; i < 2; i++ )
+    {
+      edges = edges ? false : true;
+
+      // The watersheded image
+      cv::Mat watersheded;
+
+      // Run EdgeDetection::watershedViaBackprojection
+      EdgeDetection::watershedViaBackprojection( squares_8UC3,
+        backprojection, edges, &watersheded );
+
+      ASSERT_EQ ( CV_8UC1, watersheded.type() );
+    }
+  }
+
 } // namespace pandora_vision

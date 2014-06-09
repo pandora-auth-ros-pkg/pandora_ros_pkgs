@@ -1268,16 +1268,7 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priority{texture_backproject} = 2
-      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
-
-        exponent++;
-      }
-
-      // Priority{color_homogeneity} = 3
+      // Priority{color_homogeneity} = 2
       if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
@@ -1286,11 +1277,20 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priority{luminosity_diff} = 4
+      // Priority{luminosity_diff} = 3
       if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
           Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+
+        exponent++;
+      }
+
+      // Priority{texture_backproject} = 4
+      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+      {
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
 
         exponent++;
       }
