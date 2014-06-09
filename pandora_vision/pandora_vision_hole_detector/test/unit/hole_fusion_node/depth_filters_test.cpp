@@ -319,7 +319,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::applyFilter
-  TEST_F ( DepthFiltersTest, ApplyFilterTest )
+  TEST_F ( DepthFiltersTest, applyFilterTest )
   {
     // Inflations size : 0
 
@@ -513,7 +513,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHoles
-  TEST_F ( DepthFiltersTest, CheckHolesTest )
+  TEST_F ( DepthFiltersTest, checkHolesTest )
   {
     // Inflations size : 0
 
@@ -704,7 +704,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHolesDepthArea
-  TEST_F ( DepthFiltersTest, CheckHolesDepthAreaTest )
+  TEST_F ( DepthFiltersTest, checkHolesDepthAreaTest )
   {
     // Generate the vector of holes' mask (set)
     std::vector< std::set< unsigned int > > holesMasksSetVector;
@@ -735,7 +735,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHolesDepthDiff
-  TEST_F ( DepthFiltersTest, CheckHolesDepthDiffTest )
+  TEST_F ( DepthFiltersTest, checkHolesDepthDiffTest )
   {
     // Generate the inflated rectangles and corresponding indices vectors
     // for an inflation size of value 0
@@ -883,7 +883,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHolesDepthHomogeneity
-  TEST_F ( DepthFiltersTest, CheckHolesDepthHomogeneityTest)
+  TEST_F ( DepthFiltersTest, checkHolesDepthHomogeneityTest)
   {
     // Generate the vector of holes' mask (set)
     std::vector< std::set< unsigned int > > holesMasksSetVector;
@@ -914,7 +914,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHolesOutlineToRectanglePlaneConstitution
-  TEST_F ( DepthFiltersTest, CheckHolesOutlineToRectanglePlaneConstitutionTest )
+  TEST_F ( DepthFiltersTest, checkHolesOutlineToRectanglePlaneConstitutionTest )
   {
     // Generate the inflated rectangles and corresponding indices vectors
     // for an inflation size of value 0
@@ -1003,7 +1003,7 @@ namespace pandora_vision
 
 
   //! Tests DepthFilters::checkHolesRectangleEdgesPlaneConstitution
-  TEST_F ( DepthFiltersTest, CheckHolesRectangleEdgesPlaneConstitutionTest )
+  TEST_F ( DepthFiltersTest, checkHolesRectangleEdgesPlaneConstitutionTest )
   {
 
 

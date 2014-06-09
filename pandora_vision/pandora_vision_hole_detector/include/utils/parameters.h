@@ -293,7 +293,7 @@ namespace pandora_vision
 
       // The threshold applied to the backprojection of the RGB image
       // captured by the image sensor
-      static int compute_edges_backprojection_threshold;
+      static int backprojection_threshold;
 
       // Parameters specific to the pyrMeanShiftFiltering method
       static int spatial_window_radius;

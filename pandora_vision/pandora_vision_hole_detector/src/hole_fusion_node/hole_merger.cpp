@@ -1292,6 +1292,7 @@ namespace pandora_vision
     if(Parameters::Debug::show_merge_holes)
     {
       msgs.clear();
+
       // Push back the identifier of each keypoint
       for (int i = 0; i < conveyor->size(); i++)
       {

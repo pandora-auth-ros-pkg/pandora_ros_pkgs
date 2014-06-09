@@ -206,7 +206,7 @@ namespace pandora_vision
 
 
   // Tests NoiseElimination::brushfireNear
-  TEST_F ( NoiseEliminationTest, BrushfireNearTest )
+  TEST_F ( NoiseEliminationTest, brushfireNearTest )
   {
     cv::Mat image;
 
@@ -255,7 +255,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::brushfireNearStep
-  TEST_F ( NoiseEliminationTest, BrushfireNearStepTest )
+  TEST_F ( NoiseEliminationTest, brushfireNearStepTest )
   {
     // Uncomment for visual inspection
     /*
@@ -374,7 +374,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::chooseInterpolationMethod
-  TEST_F ( NoiseEliminationTest, ChooseInterpolationMethodTest )
+  TEST_F ( NoiseEliminationTest, chooseInterpolationMethodTest )
   {
     // On interpolationMethod0, Parameters::Depth::interpolation_method
     // should be equal to 0
@@ -404,7 +404,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::interpolateImageBorders
-  TEST_F ( NoiseEliminationTest, InterpolateImageBordersTest )
+  TEST_F ( NoiseEliminationTest, interpolateImageBordersTest )
   {
     // Create an image whose borders are non-zero but the rest of it is
     cv::Mat image = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
@@ -439,7 +439,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::interpolateZeroPixel
-  TEST_F ( NoiseEliminationTest, InterpolateZeroPixelTest )
+  TEST_F ( NoiseEliminationTest, interpolateZeroPixelTest )
   {
     // The return value of NoiseElimination::interpolateZeroPixel
     int ret;
@@ -488,7 +488,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::interpolation
-  TEST_F ( NoiseEliminationTest, InterpolationTest )
+  TEST_F ( NoiseEliminationTest, interpolationTest )
   {
     cv::Mat interpolated = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
 
@@ -513,7 +513,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::interpolationIteration
-  TEST_F ( NoiseEliminationTest, InterpolationIterationTest )
+  TEST_F ( NoiseEliminationTest, interpolationIterationTest )
   {
     // The number of zero pixels before the call to interpolationIteration
     int nonZerosBefore = cv::countNonZero( interpolationMethod2 );
@@ -532,7 +532,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::performeNoiseElimination
-  TEST_F ( NoiseEliminationTest, PerformeNoiseEliminationTest )
+  TEST_F ( NoiseEliminationTest, performeNoiseEliminationTest )
   {
     // Remove the noise in interpolationMethod0
     Parameters::Depth::interpolation_method = 0;
@@ -571,7 +571,7 @@ namespace pandora_vision
 
 
   //! Tests NoiseElimination::transformNoiseToWhite
-  TEST_F ( NoiseEliminationTest, TransformNoiseToWhiteTest )
+  TEST_F ( NoiseEliminationTest, transformNoiseToWhiteTest )
   {
     // Count how many noisy pixels there are on interpolationMethod0
     int numZero = 0;

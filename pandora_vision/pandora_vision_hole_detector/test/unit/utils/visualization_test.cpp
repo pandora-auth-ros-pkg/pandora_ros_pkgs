@@ -128,7 +128,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::multipleShow
-  TEST_F ( VisualizationTest, MultipleShowTest )
+  TEST_F ( VisualizationTest, multipleShowTest )
   {
     // The input vector of images to show
     std::vector< cv::Mat > images;
@@ -156,7 +156,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::scaleImageForVisualization
-  TEST_F ( VisualizationTest, ScaleImageForVisualizationTest )
+  TEST_F ( VisualizationTest, scaleImageForVisualizationTest )
   {
     for ( int m = 0; m < 3; m++ )
     {
@@ -170,7 +170,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::show
-  TEST_F ( VisualizationTest, ShowTest )
+  TEST_F ( VisualizationTest, showTest )
   {
     // Run Visualization::show
     // Uncomment for visual inspection
@@ -182,7 +182,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::showHoles
-  TEST_F ( VisualizationTest, ShowHolesTest )
+  TEST_F ( VisualizationTest, showHolesTest )
   {
     // The msgs vector
     std::vector<std::string> msgs;
@@ -204,7 +204,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::showKeypoints
-  TEST_F ( VisualizationTest, ShowKeypointsTest )
+  TEST_F ( VisualizationTest, showKeypointsTest )
   {
     // The vector of keypoints
     std::vector< cv::KeyPoint > kVector;
@@ -231,7 +231,7 @@ namespace pandora_vision
 
 
   //! Tests Visualization::showScaled
-  TEST_F ( VisualizationTest, ShowScaledTest )
+  TEST_F ( VisualizationTest, showScaledTest )
   {
     // Uncomment for visual inspection
     //Visualization::showScaled( "Title", floats, 0 );

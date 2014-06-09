@@ -606,6 +606,11 @@ namespace pandora_vision
     Parameters::HoleFusion::show_final_holes =
      config.show_final_holes;
 
+
+    // Backprojection parameters
+    Parameters::Rgb::backprojection_threshold =
+      config.backprojection_threshold;
+
     // Hole checkers and their thresholds
     Parameters::HoleFusion::run_checker_depth_diff =
       config.run_checker_depth_diff;
@@ -697,14 +702,6 @@ namespace pandora_vision
     Parameters::HoleFusion::holes_validity_threshold_urgent =
       config.holes_validity_threshold_urgent;
 
-
-    // Depth and RGB image representation method.
-    // 0 if the image used is the one obtained from the sensor,
-    // unadulterated
-    // 1 through wavelet representation
-    Parameters::Image::image_representation_method =
-      config.image_representation_method;
-
     // Method to scale the CV_32FC1 image to CV_8UC1
     Parameters::Image::scale_method =
       config.scale_method;
@@ -729,6 +726,16 @@ namespace pandora_vision
 
     Parameters::Outline::minimum_curve_points =
       config.minimum_curve_points;
+
+    // Watershed-specific parameters
+    Parameters::Rgb::watershed_foreground_dilation_factor =
+      config.watershed_foreground_dilation_factor;
+    Parameters::Rgb::watershed_foreground_erosion_factor =
+      config.watershed_foreground_erosion_factor;
+    Parameters::Rgb::watershed_background_dilation_factor =
+      config.watershed_background_dilation_factor;
+    Parameters::Rgb::watershed_background_erosion_factor =
+      config.watershed_background_erosion_factor;
 
   }
 
@@ -1240,7 +1247,7 @@ namespace pandora_vision
 
       // The depth homogeneity is considered the least confident measure of
       // a potential hole's validity. Hence,
-      // Priotity{depth_homogeneity} = 0
+      // Priority{depth_homogeneity} = 0
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
@@ -1252,7 +1259,7 @@ namespace pandora_vision
         }
       }
 
-      // Priotity{texture_diff} = 1
+      // Priority{texture_diff} = 1
       if (Parameters::HoleFusion::run_checker_texture_diff > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
@@ -1261,7 +1268,7 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priotity{texture_backproject} = 2
+      // Priority{texture_backproject} = 2
       if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
@@ -1270,7 +1277,7 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priotity{color_homogeneity} = 3
+      // Priority{color_homogeneity} = 3
       if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
@@ -1279,7 +1286,7 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priotity{luminosity_diff} = 4
+      // Priority{luminosity_diff} = 4
       if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
       {
         sum += pow(2, exponent) * probabilitiesVector2D[
@@ -1288,7 +1295,7 @@ namespace pandora_vision
         exponent++;
       }
 
-      // Priotity{brushfire_outline_to_rectangle} = 5
+      // Priority{brushfire_outline_to_rectangle} = 5
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
@@ -1300,7 +1307,7 @@ namespace pandora_vision
         }
       }
 
-      // Priotity{outline_of_rectangle} = 6
+      // Priority{outline_of_rectangle} = 6
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
@@ -1312,7 +1319,7 @@ namespace pandora_vision
         }
       }
 
-      // Priotity{depth_diff} = 7
+      // Priority{depth_diff} = 7
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_depth_diff > 0)
@@ -1324,7 +1331,7 @@ namespace pandora_vision
         }
       }
 
-      // Priotity{depth_area} = 8
+      // Priority{depth_area} = 8
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_depth_area > 0)

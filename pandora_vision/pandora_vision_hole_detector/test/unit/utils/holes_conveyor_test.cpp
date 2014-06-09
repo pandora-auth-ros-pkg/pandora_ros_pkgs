@@ -105,8 +105,8 @@ namespace pandora_vision
 
 
 
-//! Tests HolesConveyorUtils::append
-  TEST_F ( HolesConveyorUtilsTest, AppendTest )
+  //! Tests HolesConveyorUtils::append
+  TEST_F ( HolesConveyorUtilsTest, appendTest )
   {
     // Backup the original dst
     HolesConveyor dstBackup;
@@ -171,7 +171,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::appendDummyConveyor
-  TEST_F ( HolesConveyorUtilsTest, AppendDummyConveyorTest )
+  TEST_F ( HolesConveyorUtilsTest, appendDummyConveyorTest )
   {
     // Backup the original dst
     HolesConveyor dstBackup;
@@ -216,7 +216,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::clear
-  TEST_F ( HolesConveyorUtilsTest, ClearTest )
+  TEST_F ( HolesConveyorUtilsTest, clearTest )
   {
     // Run HolesConveyorUtils::clear
     HolesConveyorUtils::clear( &dst );
@@ -228,7 +228,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::copyTo
-  TEST_F ( HolesConveyorUtilsTest, CopyToTest)
+  TEST_F ( HolesConveyorUtilsTest, copyToTest)
   {
     // Run HolesConveyorUtils::copyTo
     HolesConveyorUtils::copyTo( src, &dst );
@@ -261,7 +261,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::generateRectangle
-  TEST_F ( HolesConveyorUtilsTest, GenerateRectangleTest )
+  TEST_F ( HolesConveyorUtilsTest, generateRectangleTest )
   {
     // The rectangle's points that will be returned
     std::vector< cv::Point2f > points_1;
@@ -298,7 +298,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::getHole
-  TEST_F ( HolesConveyorUtilsTest, GetHoleTest )
+  TEST_F ( HolesConveyorUtilsTest, getHoleTest )
   {
     // Run HolesConveyorUtils::getHole
     HolesConveyor hole = HolesConveyorUtils::getHole ( src, 0 );
@@ -331,7 +331,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::merge
-  TEST_F ( HolesConveyorUtilsTest, MergeTest)
+  TEST_F ( HolesConveyorUtilsTest, mergeTest)
   {
     // The merged conveyor
     HolesConveyor merged;
@@ -398,7 +398,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::removeHole
-  TEST_F ( HolesConveyorUtilsTest, RemoveHoleTest )
+  TEST_F ( HolesConveyorUtilsTest, removeHoleTest )
   {
     // Backup dst
     HolesConveyor dstBackup;
@@ -440,7 +440,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::replace
-  TEST_F ( HolesConveyorUtilsTest, ReplaceTest )
+  TEST_F ( HolesConveyorUtilsTest, replaceTest )
   {
     // Run HolesConveyorUtils::replace
     HolesConveyorUtils::replace ( src, &dst );
@@ -470,7 +470,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::replaceHole
-  TEST_F ( HolesConveyorUtilsTest, ReplaceHoleTest )
+  TEST_F ( HolesConveyorUtilsTest, replaceHoleTest )
   {
     // Backup dst
     HolesConveyor dstBackup;
@@ -520,7 +520,7 @@ namespace pandora_vision
 
 
   //! Tests HolesConveyorUtils::shuffle
-  TEST_F ( HolesConveyorUtilsTest, ShuffleTest )
+  TEST_F ( HolesConveyorUtilsTest, shuffleTest )
   {
     // Backup dst
     HolesConveyor dstBackup;

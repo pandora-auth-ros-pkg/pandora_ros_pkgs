@@ -232,7 +232,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::applyCanny
-  TEST_F ( EdgeDetectionTest, ApplyCannyTest )
+  TEST_F ( EdgeDetectionTest, applyCannyTest )
   {
     cv::Mat squares_edges;
     EdgeDetection::applyCanny ( squares_, &squares_edges );
@@ -245,7 +245,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::applyScharr
-  TEST_F ( EdgeDetectionTest, ApplyScharrTest )
+  TEST_F ( EdgeDetectionTest, applyScharrTest )
   {
     cv::Mat squares_edges;
     EdgeDetection::applyScharr ( squares_, &squares_edges );
@@ -258,7 +258,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::applySobel
-  TEST_F ( EdgeDetectionTest, ApplySobelTest )
+  TEST_F ( EdgeDetectionTest, applySobelTest )
   {
     cv::Mat squares_edges;
     EdgeDetection::applySobel ( squares_, &squares_edges );
@@ -271,7 +271,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::applyLaplacian
-  TEST_F ( EdgeDetectionTest, ApplyLaplacianTest )
+  TEST_F ( EdgeDetectionTest, applyLaplacianTest )
   {
     cv::Mat squares_edges;
     EdgeDetection::applyLaplacian ( squares_, &squares_edges );
@@ -284,7 +284,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::applyEdgeContamination
-  TEST_F ( EdgeDetectionTest, ApplyEdgeContaminationTest)
+  TEST_F ( EdgeDetectionTest, applyEdgeContaminationTest)
   {
     // Modify the squares_ image. Add squares adjacent to the corners of it.
 
@@ -336,7 +336,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::computeDepthEdges
-  TEST_F ( EdgeDetectionTest, ComputeDepthEdgesTest )
+  TEST_F ( EdgeDetectionTest, computeDepthEdgesTest )
   {
     // Traverse all available edge detectors
     for ( int p = 0; p < 5; p++ )
@@ -402,7 +402,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::computeRgbEdges
-  TEST_F ( EdgeDetectionTest, ComputeRgbEdgesTest)
+  TEST_F ( EdgeDetectionTest, computeRgbEdgesTest)
   {
     // Convert squares_ into a CV_8UC3 image
     cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
@@ -457,7 +457,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::connectPairs
-  TEST_F ( EdgeDetectionTest, ConnectPairsTest )
+  TEST_F ( EdgeDetectionTest, connectPairsTest )
   {
     // Obtain the edges image for the squares_ image.
     // Here, it does not matter with which operator the edges image is produced,
@@ -1018,7 +1018,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::denoiseEdges
-  TEST_F ( EdgeDetectionTest, DenoiseEdgesTest )
+  TEST_F ( EdgeDetectionTest, denoiseEdgesTest )
   {
     // Obtain the edges image for the squares_ image.
     // Here, it does not matter with which operator the edges image is produced,
@@ -1059,7 +1059,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::findNeighs
-  TEST_F ( EdgeDetectionTest, FindNeighsTest )
+  TEST_F ( EdgeDetectionTest, findNeighsTest )
   {
     // A gamma shape
     cv::Mat gamma = cv::Mat::zeros( squares_.size(), CV_8UC1 );
@@ -1115,7 +1115,7 @@ namespace pandora_vision
 
 
   // Tests EdgeDetection::floodFillPostprocess
-  TEST_F ( EdgeDetectionTest, FloodFillPortprocess )
+  TEST_F ( EdgeDetectionTest, floodFillPortprocess )
   {
     // Convert squares_ into a CV_8UC3 image
     cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
@@ -1141,7 +1141,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::getShapesClearBorder
-  TEST_F ( EdgeDetectionTest, GetShapesClearBorderTest )
+  TEST_F ( EdgeDetectionTest, getShapesClearBorderTest )
   {
     // Construct two squares, one within the other
     cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
@@ -1170,7 +1170,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::getShapesClearBorderSimple
-  TEST_F ( EdgeDetectionTest, GetShapesClearBorderSimpleTest )
+  TEST_F ( EdgeDetectionTest, getShapesClearBorderSimpleTest )
   {
     // Construct two squares, one within the other
     cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
@@ -1202,7 +1202,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::produceEdgesViaBackprojection
-  TEST_F ( EdgeDetectionTest, ProduceEdgesViaBackprojectionTest)
+  TEST_F ( EdgeDetectionTest, produceEdgesViaBackprojectionTest)
   {
     // Convert squares_ into a CV_8UC3 image
     cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );
@@ -1250,7 +1250,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::produceEdgesViaSegmentation
-  TEST_F ( EdgeDetectionTest, ProduceEdgesViaSegmentationTest )
+  TEST_F ( EdgeDetectionTest, produceEdgesViaSegmentationTest )
   {
     // Traverse all available edge detectors
     for ( int p = 0; p < 5; p++ )
@@ -1314,7 +1314,7 @@ namespace pandora_vision
 
 
   //! Tests EdgeDetection::segmentation
-  TEST_F ( EdgeDetectionTest, SegmentationTest )
+  TEST_F ( EdgeDetectionTest, segmentationTest )
   {
     // Convert squares_ into a CV_8UC3 image
     cv::Mat squares_8UC3 = cv::Mat::zeros ( squares_.size(), CV_8UC3 );

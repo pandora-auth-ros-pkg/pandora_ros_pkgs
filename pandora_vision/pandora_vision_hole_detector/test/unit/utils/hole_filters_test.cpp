@@ -221,7 +221,7 @@ namespace pandora_vision
 
 
   //! Tests HoleFilters::validateKeypointsToRectangles
-  TEST_F ( HoleFiltersTest, ValidateKeypointsToRectanglesTest )
+  TEST_F ( HoleFiltersTest, validateKeypointsToRectanglesTest )
   {
     // Test two keypoints VS four rectangles
     cv::KeyPoint upperLeftKeypoint ( 150, 150, 1 );
@@ -290,7 +290,7 @@ namespace pandora_vision
 
 
   //! Tests HoleFilters::validateBlobs
-  TEST_F ( HoleFiltersTest, ValidateBlobsTest )
+  TEST_F ( HoleFiltersTest, validateBlobsTest )
   {
     // The keyPoints argument
     std::vector< cv::KeyPoint > keyPoints;

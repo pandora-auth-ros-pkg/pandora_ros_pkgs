@@ -560,16 +560,13 @@ namespace pandora_vision
     Histogram::getBackprojection(inImage, inHistogram,
       &backProject, Parameters::Histogram::secondary_channel);
 
-    // Because the backproject is often sparcely populated, dilate each
-    // zero pixel with non-zero neighours to obtain a more accurate depiction
-    // of the backproject image
-    Morphology::dilationRelative(&backProject, 3);
+    // Obtain a homogenous backprojection image
+    cv::Mat watersheded;
+    EdgeDetection::watershedViaBackprojection(inImage, backProject, false,
+      &watersheded);
 
-    #ifdef DEBUG_SHOW
-    //Visualization::show("backProject", backProject, 1);
-    #endif
-
-    unsigned char* ptr = backProject.ptr();
+    // Obtain a pointer on watersheded
+    unsigned char* ptr = watersheded.ptr();
 
     // For each inflated rectangle, calculate the probabilities of
     // (1) the points between the blob's outline and the edges of the
@@ -578,30 +575,29 @@ namespace pandora_vision
     // based on the backProjection cv::MatND
     for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
-      float blobSum = 0;
+      float blobSum = 0.0;
       for (std::set<unsigned int>::iterator h_it = holesMasksSetVector[i].begin();
         h_it != holesMasksSetVector[i].end(); h_it++)
       {
-        blobSum += ptr[*h_it];
+        blobSum += static_cast<float>(ptr[*h_it]) / 255;
       }
 
-      float blobToRectangleSum = 0;
+      float blobToRectangleSum = 0.0;
       for (std::set<unsigned int>::iterator i_it =
         intermediatePointsSetVector[i].begin();
         i_it != intermediatePointsSetVector[i].end(); i_it++)
       {
-        blobToRectangleSum += ptr[*i_it];
+        blobToRectangleSum += static_cast<float>(ptr[*i_it]) / 255;
       }
 
       // The average probability of the points consisting the inflated
       // rectangle matching the inHistogram
       float rectangleMatchProbability =
-        blobToRectangleSum / holesMasksSetVector[i].size() / 255;
+        blobToRectangleSum / intermediatePointsSetVector[i].size();
 
       // The average probability of the points inside the blob's outline
       // matching the inHistogram
-      float blobMatchProbability =
-        blobSum / intermediatePointsSetVector[i].size() / 255;
+      float blobMatchProbability = blobSum / holesMasksSetVector[i].size();
 
       // This blob is considered valid, with a non zero validity probability,
       // if the points consisting the inflated rectangle have a greater

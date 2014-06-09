@@ -345,7 +345,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::applyMergeOperation
-  TEST_F ( HoleMergerTest, ApplyMergeOperationTest )
+  TEST_F ( HoleMergerTest, applyMergeOperationTest )
   {
     // Keep a backup of the original conveyor
     HolesConveyor originConveyor;
@@ -619,7 +619,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::applyMergeOperationWithoutValidation
-  TEST_F ( HoleMergerTest, ApplyMergeOperationWithoutValidation )
+  TEST_F ( HoleMergerTest, applyMergeOperationWithoutValidation )
   {
     // Keep a backup of the original conveyor
     HolesConveyor originConveyor;
@@ -865,7 +865,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::isCapableOfAssimilating
-  TEST_F ( HoleMergerTest, IsCapableOfAssimilatingTest )
+  TEST_F ( HoleMergerTest, isCapableOfAssimilatingTest )
   {
     // Construct the hole mask sets for all the holes
     // Here, the main square will be the assimilator, amalgamator and connector
@@ -898,7 +898,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::isCapableOfAmalgamating
-  TEST_F ( HoleMergerTest, IsCapableOfAmalgamatingTest )
+  TEST_F ( HoleMergerTest, isCapableOfAmalgamatingTest )
   {
     // Construct the hole mask sets for all the holes
     // Here, the main square will be the assimilator, amalgamator and connector
@@ -931,7 +931,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::amalgamateOnce
-  TEST_F ( HoleMergerTest, AmalgamateOnceTest )
+  TEST_F ( HoleMergerTest, amalgamateOnceTest )
   {
     // Construct the hole mask sets for all the holes
     // Here, the main square will be the assimilator, amalgamator and connector
@@ -967,7 +967,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::isCapableOfConnecting
-  TEST_F ( HoleMergerTest, IsCapableOfConnectingTest )
+  TEST_F ( HoleMergerTest, isCapableOfConnectingTest )
   {
     // Construct the hole mask sets for all the holes
     // Here, the main square will be the assimilator, amalgamator and connector
@@ -1062,7 +1062,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::connectOnce
-  TEST_F ( HoleMergerTest, ConnectOnceTest )
+  TEST_F ( HoleMergerTest, connectOnceTest )
   {
     // Construct the hole mask sets for all the holes
     // Here, the main square will be the assimilator, amalgamator and connector
@@ -1100,7 +1100,7 @@ namespace pandora_vision
 
 
   //! Tests HoleMerger::mergeHoles
-  TEST_F ( HoleMergerTest, MergeHolesTest )
+  TEST_F ( HoleMergerTest, mergeHolesTest )
   {
     // Keep a backup of the original conveyor
     HolesConveyor originConveyor;

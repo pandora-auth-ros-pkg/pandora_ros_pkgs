@@ -38,6 +38,7 @@
 #define HOLE_FUSION_NODE_RGB_FILTERS_H
 
 #include <math.h>
+#include "utils/edge_detection.h"
 #include "utils/histogram.h"
 #include "utils/holes_conveyor.h"
 #include "utils/morphological_operators.h"

@@ -272,6 +272,18 @@ namespace pandora_vision
        **/
       static void segmentation(const cv::Mat& inImage, cv::Mat* outImage);
 
+      /**
+        @brief Watersheds a RGB image based on its backprojection.
+        @param[in] inImage [cv::Mat&] The input RGB image in CV_8UC3 format
+        @param[in] backproject [cv::Mat&] The backprojection of @param inImage
+        @param[in] edges [const bool&] This parameter determines whether @param
+        outImage will be an image containing the edges of @param inImage (true)
+        or an image containing the homogenous backprojection of it
+        @param[out] outImage [cv::Mat*] The output image in CV_8UC1 format
+       **/
+      static void watershedViaBackprojection(const cv::Mat& inImage,
+        const cv::Mat& backproject, const bool& edges, cv::Mat* outImage);
+
   };
 
 } // namespace pandora_vision

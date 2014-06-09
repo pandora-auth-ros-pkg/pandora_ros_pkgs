@@ -93,7 +93,7 @@ namespace pandora_vision
 
 
   //! Tests Wavelets::getLowLow
-  TEST_F ( WaveletsTest, GetLowLowDepthTest )
+  TEST_F ( WaveletsTest, getLowLowDepthTest )
   {
     // Find the min and max values in image grayscale
     double min;
@@ -125,7 +125,7 @@ namespace pandora_vision
 
 
   //! Tests Wavelets::getLowLow
-  TEST_F ( WaveletsTest, GetLowLowRgbTest )
+  TEST_F ( WaveletsTest, getLowLowRgbTest )
   {
     // The output image
     cv::Mat out;

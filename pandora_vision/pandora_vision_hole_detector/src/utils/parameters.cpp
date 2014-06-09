@@ -137,7 +137,7 @@ namespace pandora_vision
 
   // Hole checkers and their thresholds`
   int Parameters::HoleFusion::run_checker_depth_diff = 1;
-  float Parameters::HoleFusion::checker_depth_diff_threshold = 0.8;
+  float Parameters::HoleFusion::checker_depth_diff_threshold = 0.7;
 
   int Parameters::HoleFusion::run_checker_depth_area = 3;
   float Parameters::HoleFusion::checker_depth_area_threshold = 0.8;
@@ -212,7 +212,7 @@ namespace pandora_vision
   // Depth and RGB images' representation method.
   // 0 if image used is used as obtained from the image sensor
   // 1 through wavelet analysis
-  int Parameters::Image::image_representation_method = 0;
+  int Parameters::Image::image_representation_method = 1;
 
   // Method to scale the CV_32F image to CV_8UC1
   int Parameters::Image::scale_method = 0;
@@ -240,7 +240,6 @@ namespace pandora_vision
   int Parameters::Outline::minimum_curve_points = 100;
 
 
-
   // Parameters specific to the RGB node
 
   // Show the rgb image that arrives in the rgb node
@@ -255,7 +254,7 @@ namespace pandora_vision
 
   // The threshold applied to the backprojection of the RGB image
   // captured by the image sensor
-  int Parameters::Rgb::compute_edges_backprojection_threshold = 128;
+  int Parameters::Rgb::backprojection_threshold = 128;
 
   // Parameters specific to the pyrMeanShiftFiltering method
   int Parameters::Rgb::spatial_window_radius = 13;

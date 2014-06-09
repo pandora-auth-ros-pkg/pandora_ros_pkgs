@@ -176,7 +176,7 @@ namespace pandora_vision
 
 
   //! Tests HoleDetector::findHoles
-  TEST_F ( HoleDetectorTest, FindHolesTest )
+  TEST_F ( HoleDetectorTest, findHolesTest )
   {
     // Run HoleDetector:findHoles
     HolesConveyor conveyor = HoleDetector::findHoles ( squares_ );

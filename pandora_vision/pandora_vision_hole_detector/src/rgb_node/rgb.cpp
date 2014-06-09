@@ -214,7 +214,7 @@ namespace pandora_vision
       config.blob_threshold_step;
 
     // In wavelet mode, the image shrinks by a factor of 4
-    if (config.image_representation_method == 0)
+    if (Parameters::Image::image_representation_method == 0)
     {
       Parameters::Blob::blob_min_area =
         config.blob_min_area;
@@ -222,7 +222,7 @@ namespace pandora_vision
       Parameters::Blob::blob_max_area =
         config.blob_max_area;
     }
-    else if (config.image_representation_method == 1)
+    else if (Parameters::Image::image_representation_method == 1)
     {
       Parameters::Blob::blob_min_area =
         static_cast<int>(config.blob_min_area / 4);
@@ -320,14 +320,6 @@ namespace pandora_vision
     Parameters::Histogram::secondary_channel =
       config.secondary_channel;
 
-
-    // RGB image representation method.
-    // 0 if the depth image used is the one obtained from the depth sensor,
-    // unadulterated
-    // 1 through wavelet representation
-    Parameters::Image::image_representation_method =
-      config.image_representation_method;
-
   // Term criteria for segmentation purposes
     Parameters::Image::term_criteria_max_iterations =
       config.term_criteria_max_iterations;
@@ -352,12 +344,12 @@ namespace pandora_vision
     Parameters::Outline::AB_to_MO_ratio = config.AB_to_MO_ratio;
 
     //!< In wavelet mode, the image shrinks by a factor of 4
-    if (config.image_representation_method == 0)
+    if (Parameters::Image::image_representation_method == 0)
     {
       Parameters::Outline::minimum_curve_points =
         config.minimum_curve_points;
     }
-    else if (config.image_representation_method == 1)
+    else if (Parameters::Image::image_representation_method == 1)
     {
       Parameters::Outline::minimum_curve_points =
         static_cast<int>(config.minimum_curve_points / 4);
@@ -377,8 +369,8 @@ namespace pandora_vision
 
     // The threshold applied to the backprojection of the RGB image
     // captured by the image sensor
-    Parameters::Rgb::compute_edges_backprojection_threshold =
-      config.compute_edges_backprojection_threshold;
+    Parameters::Rgb::backprojection_threshold =
+      config.backprojection_threshold;
 
     // Parameters specific to the pyrMeanShiftFiltering method
     Parameters::Rgb::spatial_window_radius =

@@ -122,7 +122,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::convertImageToMessage
-  TEST_F ( MessageConversionsTest, ConvertImageToMessageTest )
+  TEST_F ( MessageConversionsTest, convertImageToMessageTest )
   {
     // A grayscale image
     cv::Mat image_8UC1 = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
@@ -229,7 +229,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::convertPointCloudMessageToImage
-  TEST_F ( MessageConversionsTest, ConvertPointCloudMessageToImageTest )
+  TEST_F ( MessageConversionsTest, convertPointCloudMessageToImageTest )
   {
     // Create a grayscale image
     cv::Mat image_32FC1 = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
@@ -348,7 +348,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::createCandidateHolesVector
-  TEST_F ( MessageConversionsTest, CreateCandidateHolesVectorTest )
+  TEST_F ( MessageConversionsTest, createCandidateHolesVectorTest )
   {
     // The vector of messages of candidate holes
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
@@ -388,7 +388,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::createCandidateHolesVectorMessage
-  TEST_F ( MessageConversionsTest, CreateCandidateHolesVectorMessageTest )
+  TEST_F ( MessageConversionsTest, createCandidateHolesVectorMessageTest )
   {
     // Create a grayscale image
     cv::Mat image= cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
@@ -478,7 +478,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::extractImageFromMessage
-  TEST_F ( MessageConversionsTest, ExtractImageFromMessageTest )
+  TEST_F ( MessageConversionsTest, extractImageFromMessageTest )
   {
     // Create a grayscale image
     cv::Mat image = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
@@ -526,7 +526,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::extractImageFromMessageContainer
-  TEST_F ( MessageConversionsTest, ExtractImageFromMessageContainerTest )
+  TEST_F ( MessageConversionsTest, extractImageFromMessageContainerTest )
   {
     // Create a grayscale image
     cv::Mat image = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
@@ -576,7 +576,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::fromCandidateHoleMsgToConveyor
-  TEST_F ( MessageConversionsTest, FromCandidateHoleMsgToConveyorTest )
+  TEST_F ( MessageConversionsTest, fromCandidateHoleMsgToConveyorTest )
   {
     // The vector of candidate holes
     std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
@@ -676,7 +676,7 @@ namespace pandora_vision
 
 
   //! Tests MessageConversions::unpackMessage
-  TEST_F ( MessageConversionsTest, UnpackMessageTest )
+  TEST_F ( MessageConversionsTest, unpackMessageTest )
   {
     // The overall message
     vision_communications::CandidateHolesVectorMsg candidateHolesVectorMsg;

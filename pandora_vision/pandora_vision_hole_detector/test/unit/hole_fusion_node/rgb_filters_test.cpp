@@ -359,7 +359,7 @@ namespace pandora_vision
 
 
   //! Tests RgbFilters::applyFilter
-  TEST_F ( RgbFiltersTest, ApplyFilterTest )
+  TEST_F ( RgbFiltersTest, applyFilterTest )
   {
     // Generate the needed resources for an inflation size of value 0
 
@@ -563,7 +563,7 @@ namespace pandora_vision
 
 
   // Tests RgbFilters::checkHoles
-  TEST_F ( RgbFiltersTest, CheckHolesTest )
+  TEST_F ( RgbFiltersTest, checkHolesTest )
   {
     // Generate the needed resources for an inflation size of value 0
 
@@ -770,7 +770,7 @@ namespace pandora_vision
 
 
   // Tests RgbFilters::checkHolesColorHomogeneity
-  TEST_F ( RgbFiltersTest, CheckHolesColorHomogeneityTest )
+  TEST_F ( RgbFiltersTest, checkHolesColorHomogeneityTest )
   {
     // Generate the needed resources
     std::vector<cv::Mat> holesMasksImageVector;
@@ -803,7 +803,7 @@ namespace pandora_vision
 
 
   //! Tests RgbFilters::checkHolesLuminosityDiff
-  TEST_F ( RgbFiltersTest, CheckHolesLuminosityDiffTest )
+  TEST_F ( RgbFiltersTest, checkHolesLuminosityDiffTest )
   {
     // Generate the needed resources for an inflation size of value 0
 
@@ -918,7 +918,7 @@ namespace pandora_vision
 
 
   //! Tests RgbFilters::checkHolesTextureBackProject
-  TEST_F ( RgbFiltersTest, CheckHolesTextureBackProjectTest )
+  TEST_F ( RgbFiltersTest, checkHolesTextureBackProjectTest )
   {
     // Generate the needed resources for an inflation size of value 0
 
@@ -1039,7 +1039,7 @@ namespace pandora_vision
 
 
   //! Tests RgbFilters::checkHolesTextureDiff
-  TEST_F ( RgbFiltersTest, CheckHolesTextureDiffTest )
+  TEST_F ( RgbFiltersTest, checkHolesTextureDiffTest )
   {
     // Histogram generation : secondary channel toggle
     for ( int sec = 1; sec < 3; sec++ )

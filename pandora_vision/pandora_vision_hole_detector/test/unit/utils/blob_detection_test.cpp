@@ -251,7 +251,7 @@ namespace pandora_vision
 
 
   //! Tests BlobDetection::brushfireKeypoint()
-  TEST_F ( BlobDetectionTest, BrushfireKeypointTest )
+  TEST_F ( BlobDetectionTest, brushfireKeypointTest )
   {
     /***************************************************************************
      * Test square_
@@ -331,7 +331,7 @@ namespace pandora_vision
 
 
   //! Tests BlobDetection::brushfireKeypoints()
-  TEST_F ( BlobDetectionTest, BrushfireKeypointsTest )
+  TEST_F ( BlobDetectionTest, brushfireKeypointsTest )
   {
     /***************************************************************************
      * Test squares_
@@ -393,7 +393,7 @@ namespace pandora_vision
 
 
   //! Tests BlobDetection::brushfirePoint()
-  TEST_F ( BlobDetectionTest, BrushfirePointTest )
+  TEST_F ( BlobDetectionTest, brushfirePointTest )
   {
     /***************************************************************************
      * Test squares_
@@ -460,7 +460,7 @@ namespace pandora_vision
 
 
   //! Tests BlobDetection::raycastKeypoint
-  TEST_F ( BlobDetectionTest, RaycastKeypointTest )
+  TEST_F ( BlobDetectionTest, raycastKeypointTest )
   {
     /***************************************************************************
      * Test squares_
@@ -507,7 +507,7 @@ namespace pandora_vision
 
 
   //! Tests BlobDetection::raycastKeypoints
-  TEST_F ( BlobDetectionTest, RaycastKeypointsTest )
+  TEST_F ( BlobDetectionTest, raycastKeypointsTest )
   {
     /***************************************************************************
      * Test squares_

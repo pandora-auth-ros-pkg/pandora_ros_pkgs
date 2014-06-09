@@ -270,7 +270,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::closing()
-  TEST_F ( MorphologyTest, ClosingTest )
+  TEST_F ( MorphologyTest, closingTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -375,7 +375,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::dilation()
-  TEST_F ( MorphologyTest, DilationTest )
+  TEST_F ( MorphologyTest, dilationTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -489,7 +489,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::dilationRelative()
-  TEST_F ( MorphologyTest, DilationRelativeTest )
+  TEST_F ( MorphologyTest, dilationRelativeTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -605,7 +605,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::erosion()
-  TEST_F ( MorphologyTest, ErosionTest )
+  TEST_F ( MorphologyTest, erosionTest )
   {
     /***************************************************************************
      * Test line_
@@ -686,7 +686,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::kernelCheck()
-  TEST_F ( MorphologyTest, KernelCheckTest )
+  TEST_F ( MorphologyTest, kernelCheckTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -746,7 +746,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::opening()
-  TEST_F ( MorphologyTest, OpeningTest )
+  TEST_F ( MorphologyTest, openingTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -810,7 +810,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::pruningStrictIterative()
-  TEST_F ( MorphologyTest, PruningStrictIterativeTest )
+  TEST_F ( MorphologyTest, pruningStrictIterativeTest )
   {
     /***************************************************************************
      * Test pixel_
@@ -894,7 +894,7 @@ namespace pandora_vision
 
 
   //! Tests Morphology::thinning()
-  TEST_F ( MorphologyTest, ThinningTest )
+  TEST_F ( MorphologyTest, thinningTest )
   {
     /***************************************************************************
      * Test thick_line_
