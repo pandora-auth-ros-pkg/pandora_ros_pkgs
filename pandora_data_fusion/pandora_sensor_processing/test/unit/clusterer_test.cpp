@@ -41,6 +41,7 @@
 #include "sensor_processing/clusterer.h"
 
 using Eigen::MatrixXf;
+using Eigen::Matrix4f;
 using Eigen::Vector4f;
 
 namespace pandora_sensor_processing
