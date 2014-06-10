@@ -72,6 +72,25 @@ namespace pandora_vision
       // behaviour
       ros::Subscriber unlockSubscriber_;
 
+      // The subscriber to a topic that the synchronizer is subscribed to,
+      // where it is dictated to him explicitly to subscribe to the input
+      // point cloud.
+      ros::Subscriber subscribeToInputPointCloudSubscriber_;
+
+      // The name of the topic where the Hole Fusion node dictates to the
+      // synchronizer node to subscribe to the input point cloud topic
+      std::string subscribeToInputPointCloudTopic_;
+
+      // The subscriber to a topic that the synchronizer is subscribed to,
+      // where it is dictated to him explicitly to leave the subscription
+      // to the input point cloud
+      ros::Subscriber leaveSubscriptionToInputPointCloudSubscriber_;
+
+      // The name of the topic where the Hole Fusion node dictates to the
+      // synchronizer node to leave its subscription to the input point cloud
+      // topic
+      std::string leaveSubscriptionToInputPointCloudTopic_;
+
       // The name of the topic that the Hole Fusion node publishes messages to
       // in order to unlock the synchronizer node
       std::string unlockTopic_;
@@ -128,7 +147,27 @@ namespace pandora_vision
         The input point cloud
         @return void
        **/
-      void synchronizedCallback(const PointCloudPtr& pointCloudMessage);
+      void inputPointCloudCallback(const PointCloudPtr& pointCloudMessage);
+
+      /**
+        @brief The callback executed when the Hole Fusion node requests
+        from the synchronizer node to leave its subscription to the
+        input point cloud
+        @param[in] msg [const std_msgs::Empty&] An empty message used to
+        trigger the callback
+        @return void
+       **/
+      void leaveSubscriptionToInputPointCloudCallback(const std_msgs::Empty&
+        msg);
+
+      /**
+        @brief The callback executed when the Hole Fusion node requests
+        from the synchronizer node to subscribe to the input point cloud
+        @param[in] msg [const std_msgs::Empty&] An empty message used to
+        trigger the callback
+        @return void
+       **/
+      void subscribeToInputPointCloudCallback(const std_msgs::Empty& msg);
 
       /**
         @brief The callback for the hole_fusion node request for the
@@ -136,7 +175,7 @@ namespace pandora_vision
         @param[in] lockMsg [const std_msgs::Empty] An empty message
         @return void
        **/
-      void holeFusionCallback(const std_msgs::Empty& lockMsg);
+      void unlockCallback(const std_msgs::Empty& lockMsg);
 
 
     public:

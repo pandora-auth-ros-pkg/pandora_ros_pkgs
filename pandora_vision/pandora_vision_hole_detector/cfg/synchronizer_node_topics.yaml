@@ -2,6 +2,8 @@ subscribed_topics:
   #input_topic: /kinect/point_cloud
   input_topic: /camera/depth_registered/points
   unlock_topic: unlock_rgb_depth_synchronizer
+  subscribe_to_input: subscribe_to_input
+  leave_subscription_to_input: leave_subscription_to_input
 
 published_topics:
   point_cloud_internal_topic: synchronized/depth/points

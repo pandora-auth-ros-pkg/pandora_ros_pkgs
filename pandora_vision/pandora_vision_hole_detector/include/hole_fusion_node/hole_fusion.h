@@ -41,6 +41,7 @@
 #include <dirent.h>
 #include <ros/package.h>
 #include <std_msgs/Empty.h>
+#include "state_manager/state_client.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "vision_communications/CandidateHoleMsg.h"
 #include "vision_communications/HolesDirectionsVectorMsg.h"
@@ -69,7 +70,7 @@ namespace pandora_vision
     @brief Provides functionalities and methods for fusing holes obtained
     through Depth and RGB analysis
    **/
-  class HoleFusion
+  class HoleFusion : public StateClient
   {
     private:
 
@@ -101,6 +102,23 @@ namespace pandora_vision
       // additional information, in respect to the valid holes topic,
       // pertaining to the valid holes found by the Hole Detector package
       std::string enhancedHolesTopic_;
+
+      // The publisher that the Hole Fusion node uses to request from the
+      // synchronizer node to subscribe to the input point cloud
+      ros::Publisher synchronizerSubscribeToInputPointCloudPublisher_;
+
+      // The name of the topic that the Hole Fusion node uses to request from
+      // the synchronizer node to subscribe to the input point cloud
+      std::string synchronizerSubscribeToInputPointCloudTopic_;
+
+      // The publisher that the Hole Fusion node uses to request from the
+      // synchronizer node to leave its subscription to the input point cloud
+      ros::Publisher synchronizerLeaveSubscriptionToInputPointCloudPublisher_;
+
+      // The name of the topic that the Hole Fusion node uses to request from
+      // the synchronizer node to leave its subscription to the
+      // input point cloud
+      std::string synchronizerLeaveSubscriptionToInputPointCloudTopic_;
 
       // The ROS subscriber for acquisition of candidate holes originated
       // from the depth node
@@ -155,6 +173,9 @@ namespace pandora_vision
 
       // A histogramm for the texture of walls
       cv::MatND wallsHistogram_;
+
+      // The on/off state of the Hole Detector package
+      bool isOn_;
 
       // The dynamic reconfigure (hole fusion's) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
@@ -217,6 +238,15 @@ namespace pandora_vision
         @return void
        **/
       void getTopicNames();
+
+      /**
+        @brief Computes the on/off state of the Hole Detector package
+        given a state
+        @param[in] state [const int&] The robot's state
+        @return [bool] True if the Hole Fusion is able to unlock the
+        synchronizer node and thus process a new point cloud
+       **/
+      bool isHoleDetectorOn(const int& state);
 
       /**
         @brief With an input a conveyor of holes, this method, depending on
@@ -365,6 +395,20 @@ namespace pandora_vision
         @brief The HoleFusion deconstructor
        **/
       ~HoleFusion(void);
+
+      /**
+        @brief The node's state manager
+        @param[in] newState [const int&] The robot's new state
+        @return void
+       **/
+      void startTransition(int newState);
+
+      /**
+        @brief Completes the transition to a new state
+        @param void
+        @return void
+       **/
+      void completeTransition(void);
 
   };
 
