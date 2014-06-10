@@ -43,8 +43,10 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    AlertHandler::AlertHandler(const std::string& ns): nh_(ns)
+    AlertHandler::AlertHandler(const std::string& ns)
     {
+      nh_.reset( new ros::NodeHandle(ns) );
+      ROS_INFO_STREAM(nh_->getNamespace());
       map_.reset( new Map );
 
       holes_.reset( new ObjectList<Hole> );
@@ -73,9 +75,9 @@ namespace pandora_data_fusion
       victimsVisited_.reset( new VictimList );
 
       std::string mapType;
-      nh_.getParam("map_type", mapType);
+      nh_->getParam("map_type", mapType);
       objectFactory_.reset( new ObjectFactory(map_, mapType) );
-      objectHandler_.reset( new ObjectHandler(victimsToGo_, victimsVisited_) );
+      objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
       victimHandler_.reset( new VictimHandler(victimsToGo_, victimsVisited_) );
 
       initRosInterfaces();
@@ -96,9 +98,9 @@ namespace pandora_data_fusion
 
       //!< alert-concerned subscribers
 
-      if (nh_.getParam("subscribed_topic_names/holeDirection", param))
+      if (nh_->getParam("subscribed_topic_names/holeDirection", param))
       {
-        holeDirectionSubscriber_ = nh_.subscribe(param, 
+        holeDirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::holeDirectionAlertCallback, this);
       }
       else
@@ -107,9 +109,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/thermalDirection", param))
+      if (nh_->getParam("subscribed_topic_names/thermalDirection", param))
       {
-        thermalDirectionSubscriber_ = nh_.subscribe(param, 
+        thermalDirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::objectDirectionAlertCallback< Thermal >, this);
       }
       else
@@ -118,9 +120,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/qr", param))
+      if (nh_->getParam("subscribed_topic_names/qr", param))
       {
-        qrSubscriber_ = nh_.subscribe(param, 1, &AlertHandler::qrAlertCallback, this);
+        qrSubscriber_ = nh_->subscribe(param, 1, &AlertHandler::qrAlertCallback, this);
       }
       else
       {
@@ -128,9 +130,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/hazmat", param))
+      if (nh_->getParam("subscribed_topic_names/hazmat", param))
       {
-        hazmatSubscriber_ = nh_.subscribe(param, 
+        hazmatSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::hazmatAlertCallback, this);
       }
       else
@@ -139,9 +141,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/faceDirection", param))
+      if (nh_->getParam("subscribed_topic_names/faceDirection", param))
       {
-        faceDirectionSubscriber_ = nh_.subscribe(param, 
+        faceDirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::objectDirectionAlertCallback< Face >, this);
       }
       else
@@ -150,9 +152,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/co2Direction", param))
+      if (nh_->getParam("subscribed_topic_names/co2Direction", param))
       {
-        co2DirectionSubscriber_ = nh_.subscribe(param, 
+        co2DirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::objectDirectionAlertCallback< Co2 >, this);
       }
       else
@@ -161,9 +163,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/motionDirection", param))
+      if (nh_->getParam("subscribed_topic_names/motionDirection", param))
       {
-        motionDirectionSubscriber_ = nh_.subscribe(param, 
+        motionDirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::objectDirectionAlertCallback< Motion >, this);
       }
       else
@@ -172,9 +174,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/soundDirection", param))
+      if (nh_->getParam("subscribed_topic_names/soundDirection", param))
       {
-        soundDirectionSubscriber_ = nh_.subscribe(param, 
+        soundDirectionSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::objectDirectionAlertCallback< Sound >, this);
       }
       else
@@ -183,9 +185,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/landoltc", param))
+      if (nh_->getParam("subscribed_topic_names/landoltc", param))
       {
-        landoltcSubscriber_ = nh_.subscribe(param, 
+        landoltcSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::landoltcAlertCallback, this);
       }
       else
@@ -194,9 +196,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("subscribed_topic_names/dataMatrix", param))
+      if (nh_->getParam("subscribed_topic_names/dataMatrix", param))
       {
-        dataMatrixSubscriber_ = nh_.subscribe(param, 
+        dataMatrixSubscriber_ = nh_->subscribe(param, 
             1, &AlertHandler::dataMatrixAlertCallback, this);
       }
       else
@@ -207,9 +209,9 @@ namespace pandora_data_fusion
 
       //!< map subscriber
 
-      if (nh_.getParam("subscribed_topic_names/map", param))
+      if (nh_->getParam("subscribed_topic_names/map", param))
       {
-        mapSubscriber_ = nh_.subscribe(param, 1, &AlertHandler::updateMap, this);
+        mapSubscriber_ = nh_->subscribe(param, 1, &AlertHandler::updateMap, this);
       }
       else
       {
@@ -219,9 +221,9 @@ namespace pandora_data_fusion
 
       //!< publishers
 
-      if (nh_.getParam("published_topic_names/victims", param))
+      if (nh_->getParam("published_topic_names/victims", param))
       {
-        victimsPublisher_ = nh_.
+        victimsPublisher_ = nh_->
           advertise<pandora_data_fusion_msgs::VictimsMsg>(param, 10);
       }
       else
@@ -232,9 +234,9 @@ namespace pandora_data_fusion
 
       //!< action servers
 
-      if (nh_.getParam("action_server_names/delete_victim", param))
+      if (nh_->getParam("action_server_names/delete_victim", param))
       {
-        deleteVictimServer_.reset(new DeleteVictimServer(nh_, param,  false));
+        deleteVictimServer_.reset(new DeleteVictimServer(*nh_, param, false));
       } 
       else
       {
@@ -245,10 +247,10 @@ namespace pandora_data_fusion
           boost::bind( &AlertHandler::deleteVictimCallback, this) );
       deleteVictimServer_->start();
 
-      if (nh_.getParam("action_server_names/validate_victim", param))
+      if (nh_->getParam("action_server_names/validate_victim", param))
       {
         validateVictimServer_.reset(
-            new ValidateVictimServer(nh_, param,  false));
+            new ValidateVictimServer(*nh_, param, false));
       }
       else
       {
@@ -261,9 +263,9 @@ namespace pandora_data_fusion
 
       //!< service servers
 
-      if (nh_.getParam("service_server_names/flush_queues", param))
+      if (nh_->getParam("service_server_names/flush_queues", param))
       {
-        flushService_ = nh_.advertiseService(param, 
+        flushService_ = nh_->advertiseService(param, 
             &AlertHandler::flushQueues, this);
       }
       else
@@ -272,9 +274,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("service_server_names/get_objects", param))
+      if (nh_->getParam("service_server_names/get_objects", param))
       {
-        getObjectsService_ = nh_.advertiseService(param, 
+        getObjectsService_ = nh_->advertiseService(param, 
             &AlertHandler::getObjectsServiceCb, this);
       }
       else 
@@ -283,9 +285,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("service_server_names/get_markers", param))
+      if (nh_->getParam("service_server_names/get_markers", param))
       {
-        getMarkersService_ = nh_.advertiseService(param, 
+        getMarkersService_ = nh_->advertiseService(param, 
             &AlertHandler::getMarkersServiceCb, this);
       }
       else
@@ -294,9 +296,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (nh_.getParam("service_server_names/geotiff", param))
+      if (nh_->getParam("service_server_names/geotiff", param))
       {
-        geotiffService_ = nh_.advertiseService(param, 
+        geotiffService_ = nh_->advertiseService(param, 
             &AlertHandler::geotiffServiceCb, this);
       }
       else
@@ -312,7 +314,7 @@ namespace pandora_data_fusion
 
       //!< timers
 
-      tfPublisherTimer_ = nh_.createTimer(ros::Duration(0.1), 
+      tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1), 
           &AlertHandler::tfPublisherCallback, this);
     }  
 

@@ -43,7 +43,8 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    ObjectHandler::ObjectHandler(const VictimListConstPtr& victimsToGoList,
+    ObjectHandler::ObjectHandler(const NodeHandlePtr& nh,
+        const VictimListConstPtr& victimsToGoList,
         const VictimListConstPtr& victimsVisitedList) : 
       victimsToGoList_(victimsToGoList),
       victimsVisitedList_(victimsVisitedList)
@@ -63,9 +64,9 @@ namespace pandora_data_fusion
 
       std::string param;
 
-      if (ros::param::get("published_topic_names/qr_notification", param))
+      if (nh->getParam("published_topic_names/qr_notification", param))
       {
-        qrPublisher_ = ros::NodeHandle().
+        qrPublisher_ = nh->
           advertise<pandora_data_fusion_msgs::QrNotificationMsg>(param, 10);
       }
       else
@@ -74,10 +75,9 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      if (ros::param::get("published_topic_names/robocup_score", param))
+      if (nh->getParam("published_topic_names/robocup_score", param))
       {
-        scorePublisher_ = ros::NodeHandle().
-          advertise<std_msgs::Int32>(param, 10);
+        scorePublisher_ = nh->advertise<std_msgs::Int32>(param, 10);
       }
       else
       {

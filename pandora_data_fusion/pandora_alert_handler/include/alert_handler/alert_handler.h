@@ -82,6 +82,8 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
+    //!< Type Definitions
+    typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
     typedef actionlib::SimpleActionServer
       <pandora_data_fusion_msgs::DeleteVictimAction> DeleteVictimServer;
     typedef actionlib::SimpleActionServer 
@@ -192,7 +194,7 @@ namespace pandora_data_fusion
 
       private:
 
-        ros::NodeHandle nh_;
+        NodeHandlePtr nh_;
 
         ros::Subscriber holeDirectionSubscriber_;
         ros::Subscriber faceDirectionSubscriber_;

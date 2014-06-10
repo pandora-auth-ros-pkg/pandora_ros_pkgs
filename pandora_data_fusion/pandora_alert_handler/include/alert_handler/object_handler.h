@@ -55,24 +55,63 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
+    //!< Type Definitions
+    typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
+
+    /**
+     * @brief Class which is responsible for keeping or ignoring
+     * alerts, as well as placing them in their appropriate lists.
+     */
     class ObjectHandler : private boost::noncopyable
     {
       public:
 
-        ObjectHandler(const VictimListConstPtr& victimsToGoList,
+        /**
+         * @brief constructor
+         * @param nh [NodeHandlePtr const&] Alert Handler's node to register publishers
+         * @param victimsToGoList [VictimListConstPtr const&] 
+         * list with victims to go - to be used in alert filtering
+         * @param victimsVisited [VictimListConstPtr const&] 
+         * list with victims visited - to be used in alert filtering
+         */
+        ObjectHandler(
+            const NodeHandlePtr& nh,
+            const VictimListConstPtr& victimsToGoList,
             const VictimListConstPtr& victimsVisited);
 
         void handleHoles(const HolePtrVectorPtr& newHoles, 
             const tf::Transform& transform);
         void handleQrs(const QrPtrVectorPtr& newQrs); 
+        /**
+         * @brief methods that handle alerts after their creation.
+         * They try to keep those of interest and ignore the rest.
+         * @param objectsPtr [ObjectType::PtrVectorPtr const&] vector with alerts
+         * @return void
+         */
         template <class ObjectType> 
           void handleObjects( 
               const typename ObjectType::PtrVectorPtr& objectsPtr);
 
+        /**
+         * @brief parameter updating from dynamic reconfiguration
+         * @param sensor_range [float] sensor's range defines maximum distance
+         * one can have from the alert.
+         * @param victim_cluster_radius [float] defines if an alert can be associated
+         * with a victim in question [identification mode]
+         * @return void
+         */
         void updateParams(float sensor_range, float victim_cluster_radius);
 
       private:
 
+        /**
+         * @brief Alert filtering for holes.
+         * @param holesPtr [HolePtrVectorPtr const&] vector with newly 
+         * created hole alerts
+         * @param cameraTransform [tf::Transform const&] camera transform gives
+         * current location
+         * @return void
+         */
         void keepValidHoles(const HolePtrVectorPtr& holesPtr,
             const tf::Transform& cameraTransform);
         template <class ObjectType>
