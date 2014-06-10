@@ -101,19 +101,19 @@ class AlertDeliveryBoy:
         self.dataMatrixDeliveryAddress = '/vision/dataMatrix_alert'
         self.dataMatrix_pub = rospy.Publisher(self.dataMatrixDeliveryAddress, 
                                       DataMatrixAlertsVectorMsg)
-        self.thermalDeliveryAddress = '/sensor_processors/thermal_direction_alert'
+        self.thermalDeliveryAddress = '/sensor_processing/thermal_direction_alert'
         self.thermal_pub = rospy.Publisher(self.thermalDeliveryAddress,
                                        GeneralAlertMsg)
         self.faceDeliveryAddress = '/vision/face_direction_alert'
         self.face_pub = rospy.Publisher(self.faceDeliveryAddress,
                                        GeneralAlertMsg)
-        self.soundDeliveryAddress = '/sensor_processors/sound_direction_alert'
+        self.soundDeliveryAddress = '/sensor_processing/sound_direction_alert'
         self.sound_pub = rospy.Publisher(self.soundDeliveryAddress,
                                        GeneralAlertMsg)
         self.motionDeliveryAddress = '/vision/motion_alert'
         self.motion_pub = rospy.Publisher(self.motionDeliveryAddress,
                                        GeneralAlertMsg)
-        self.co2DeliveryAddress = '/sensor_processors/co2_direction_alert'
+        self.co2DeliveryAddress = '/sensor_processing/co2_alert'
         self.co2_pub = rospy.Publisher(self.co2DeliveryAddress,
                                        GeneralAlertMsg)
 

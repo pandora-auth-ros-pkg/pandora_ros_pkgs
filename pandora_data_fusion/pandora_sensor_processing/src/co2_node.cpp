@@ -44,7 +44,7 @@ using pandora_sensor_processing::Co2Processor;
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "co2_processor", ros::init_options::NoSigintHandler);
   if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
     if ( ros::console::set_logger_level(

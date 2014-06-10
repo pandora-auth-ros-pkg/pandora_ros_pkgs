@@ -12,11 +12,9 @@ subscribed_topic_names:
   map: /slam/map
 published_topic_names:  
   victims : /data_fusion/victims
-  valid_victims_counter : valid_victims_counter
   qr_notification : qr_notification
   robocup_score : robocup_score
 action_server_names:
-  select_victim: select_victim
   delete_victim: delete_victim
   validate_victim: validate_victim
 service_server_names:

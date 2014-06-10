@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     }
   }
   AlertHandler alertHandler("/data_fusion/alert_handler");
-  ROS_INFO_NAMED("DATA_FUSION", "Beginning Alert Handler node");
+  ROS_INFO("[DATA_FUSION] Beginning Alert Handler node");
   ros::spin();
   // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
   // spinner.spin(); // spin

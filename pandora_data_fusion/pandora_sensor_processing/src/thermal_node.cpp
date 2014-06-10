@@ -44,7 +44,7 @@ using pandora_sensor_processing::ThermalProcessor;
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "thermal_processor", ros::init_options::NoSigintHandler);
   if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
     if ( ros::console::set_logger_level(
