@@ -56,7 +56,7 @@
   <xacro:property name="side_joint_max_limit" value="0.785" /> <!--FIXME-->
   <!-- ==================================================================== -->
   <xacro:property name="linear_elevator_joint_min_limit" value="0.0" />
-  <xacro:property name="linear_elevator_joint_max_limit" value="0.23" /> <!--FIXME-->
+  <xacro:property name="linear_elevator_joint_max_limit" value="0.18" /> <!--FIXME-->
   <!-- ==================================================================== -->
   <xacro:property name="linear_head_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
   <xacro:property name="linear_head_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
