@@ -1,8 +1,10 @@
 uint32 CENTER = 0
 uint32 MOVE = 1
+uint32 POINT = 2
 
 # Define the goal
 uint32 command
+string point_of_interest
 ---
 # Define the result
 ---

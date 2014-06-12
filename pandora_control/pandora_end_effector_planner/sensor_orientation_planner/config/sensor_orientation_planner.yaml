@@ -1,0 +1,17 @@
+action_name:
+  - move_kinect_action
+  - move_head_action
+move_kinect_action:
+  max_pitch: 0.4
+  max_yaw: 0.7
+  time_step: 1
+  pitch_command_topic: kinect_pitch_controller/command
+  yaw_command_topic: kinect_yaw_controller/command
+  sensor_frame: kinect_frame
+move_head_action:
+  max_pitch: 0.4
+  max_yaw: 0.5
+  time_step: 1
+  pitch_command_topic: linear_head_pitch_controller/command
+  yaw_command_topic: linear_head_yaw_controller/command
+  sensor_frame: middle_thermal_link

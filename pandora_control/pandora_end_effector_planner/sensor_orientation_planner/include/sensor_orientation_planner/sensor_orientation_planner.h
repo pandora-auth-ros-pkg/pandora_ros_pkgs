@@ -35,55 +35,65 @@
 * Author:  Evangelos Apostolidis
 * Author:  Chris Zalidis
 *********************************************************************/
-#ifndef PANDORA_KINECT_CONTROL_KINECT_CONTROL_H
-#define PANDORA_KINECT_CONTROL_KINECT_CONTROL_H
+#ifndef SENSOR_ORIENTATION_PLANNER_SENSOR_ORIENTATION_PLANNER_H
+#define SENSOR_ORIENTATION_PLANNER_SENSOR_ORIENTATION_PLANNER_H
 
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
-#include <sensor_msgs/Imu.h>
 #include <actionlib/server/simple_action_server.h>
-#include <pandora_kinect_control/MoveKinectAction.h>
+#include <pandora_end_effector_planner/MoveSensorAction.h>
+#include <tf/transform_listener.h>
+
 
 namespace pandora_control
 {
   enum
   {
-    CENTER = 0,
-    HIGH_LEFT = 1,
-    LOW_LEFT = 2,
-    LOW_CENTER = 3,
-    LOW_RIGHT = 4,
-    HIGH_RIGHT = 5,
+    HIGH_START = 0,
+    LOW_START = 1,
+    HIGH_LEFT = 2,
+    LOW_LEFT = 3,
+    HIGH_CENTER = 4,
+    LOW_CENTER = 5,
+    HIGH_RIGHT = 6,
+    LOW_RIGHT = 7,
   };
 
-  class PandoraMoveKinectActionServer
+  class SensorOrientationActionServer
   {
     private:
-    ros::NodeHandle nodeHandle_;
-      actionlib::SimpleActionServer<
-        pandora_kinect_control::MoveKinectAction> actionServer_;
+      ros::NodeHandle nodeHandle_;
       std::string actionName_;
+      actionlib::SimpleActionServer<
+        pandora_end_effector_planner::MoveSensorAction> actionServer_;
 
-      ros::Publisher kinect_pitch_publisher;
-      ros::Publisher kinect_yaw_publisher;
+      ros::Publisher sensorPitchPublisher_;
+      ros::Publisher sensorYawPublisher_;
 
-      ros::Subscriber _compassSubscriber;
-      void compassCallback(
-        const sensor_msgs::ImuConstPtr& msg);
       int position_;
       int command_;
       double maxPitch_;
       double maxYaw_;
       double timeStep_;
+      std::string pitchCommandTopic_;
+      std::string yawCommandTopic_;
+      std::string sensorFrame_;
 
-      void callback(const pandora_kinect_control::MoveKinectGoalConstPtr& goal);
+      tf::TransformListener tfListener_;
+
+      void callback(const pandora_end_effector_planner::MoveSensorGoalConstPtr& goal);
+
+      bool getPlannerParams();
+      void centerSensor();
+      void scan();
+      void pointSensor(std::string pointOfInterest);
 
     public:
-      PandoraMoveKinectActionServer(
+      SensorOrientationActionServer(
         std::string name,
         ros::NodeHandle nodeHandle_);
 
-      ~PandoraMoveKinectActionServer(void);
+      ~SensorOrientationActionServer(void);
   };
 }  // namespace pandora_control
-#endif  // PANDORA_KINECT_CONTROL_KINECT_CONTROL_H
+#endif  // SENSOR_ORIENTATION_PLANNER_SENSOR_ORIENTATION_PLANNER_H

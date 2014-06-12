@@ -33,19 +33,50 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  Chris Zalidis
 *********************************************************************/
+#ifndef LINEAR_MOVEMENT_PLANNER_LINEAR_MOVEMENT_PLANNER_H
+#define LINEAR_MOVEMENT_PLANNER_LINEAR_MOVEMENT_PLANNER_H
 
-#include <pandora_kinect_control/kinect_control.h>
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <actionlib/server/simple_action_server.h>
+#include <pandora_end_effector_planner/MoveLinearAction.h>
+#include <tf/transform_listener.h>
 
 
-int main(int argc, char **argv)
+namespace pandora_control
 {
-  ros::init(argc, argv, "kinect_control_node");
-  ros::NodeHandle nodeHandle;
-  std::string actionName = "move_kinect_action";
-  pandora_control::PandoraMoveKinectActionServer
-    pandoraMoveKinectActionServer(
-      actionName,
-      nodeHandle);
-  ros::spin();
-}
+  class LinearMovementActionServer
+  {
+    private:
+      ros::NodeHandle nodeHandle_;
+      std::string actionName_;
+      actionlib::SimpleActionServer<
+        pandora_end_effector_planner::MoveLinearAction> actionServer_;
+
+      ros::Publisher linearCommandPublisher_;
+
+      int command_;
+      double minElevation_;
+      double maxElevation_;
+      std::string linearCommandTopic_;
+      std::string linearMotorFrame_;
+
+      tf::TransformListener tfListener_;
+
+      void callback(const pandora_end_effector_planner::MoveLinearGoalConstPtr& goal);
+
+      bool getPlannerParams();
+      void lowerLinear();
+      void moveLinear(std::string pointOfInterest, std::string centerPoint);
+
+    public:
+      LinearMovementActionServer(
+        std::string name,
+        ros::NodeHandle nodeHandle_);
+
+      ~LinearMovementActionServer(void);
+  };
+}  // namespace pandora_control
+#endif  // LINEAR_MOVEMENT_PLANNER_LINEAR_MOVEMENT_PLANNER_H

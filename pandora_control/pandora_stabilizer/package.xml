@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>pandora_laser_control</name>
+  <name>pandora_stabilizer</name>
   <version>0.0.0</version>
-  <description>The pandora_laser_control package</description>
+  <description>The pandora_stabilizer package</description>
 
   <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
 

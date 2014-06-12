@@ -1,22 +1,21 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pandora_laser_control)
+project(pandora_stabilizer)
 
-find_package(catkin REQUIRED COMPONENTS 
-  roscpp 
-  tf 
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  tf
   std_msgs
   geometry_msgs
   sensor_msgs
   roslint
 )
 
-
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES rrbot_plugin
-  CATKIN_DEPENDS 
-    roscpp 
-    tf 
+  CATKIN_DEPENDS
+    roscpp
+    tf
     std_msgs
     geometry_msgs
     sensor_msgs

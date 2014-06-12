@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pandora_kinect_control)
+project(pandora_end_effector_planner)
 
 find_package(catkin REQUIRED COMPONENTS 
   roscpp 
@@ -12,9 +12,15 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
 )
 
+set(THIS_PACKAGE_INCLUDE_DIRS
+    sensor_orientation_planner/include
+    linear_movement_planner/include
+)
+
 add_action_files(
   FILES
-  MoveKinect.action
+  MoveSensor.action
+  MoveLinear.action
 )
 
 generate_messages(
@@ -24,7 +30,7 @@ generate_messages(
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
 #  LIBRARIES rrbot_plugin
   CATKIN_DEPENDS 
     roscpp 
@@ -38,30 +44,26 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-include_directories(include
+include_directories(
+  ${THIS_PACKAGE_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
 #~ set(CMAKE_BUILD_TYPE Debug)
   
-add_executable(
-  kinect_control_node
-  src/kinect_control.cpp
-  src/kinect_control_node.cpp)
-add_dependencies(kinect_control_node ${PROJECT_NAME}_gencpp)
-target_link_libraries(
-  kinect_control_node 
-  ${catkin_LIBRARIES} )
+add_subdirectory(sensor_orientation_planner)
+add_subdirectory(linear_movement_planner)
 
-# To check lint : catkin_make roslint_pandora_kinect_control
+# To check lint : catkin_make roslint_pandora_end_effector_planner
 set(ROSLINT_CPP_OPTS
   "--filter=-build/include_what_you_use")
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
 
-  include/pandora_kinect_control/kinect_control.h
-  src/kinect_control.cpp
-  src/kinect_control_node.cpp
+  sensor_orientation_planner/*.h
+  sensor_orientation_planner/*.cpp
+  linear_movement_planner/*.h
+  linear_movement_planner/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

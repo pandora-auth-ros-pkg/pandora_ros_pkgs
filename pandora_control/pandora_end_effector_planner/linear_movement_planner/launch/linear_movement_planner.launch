@@ -1,0 +1,14 @@
+<launch>
+  <!-- load params -->
+  <rosparam
+    command="load"
+    file="$(find pandora_end_effector_planner)/linear_movement_planner/config/linear_movement_planner.yaml"/>
+
+  <node
+    name="linear_movement_planner"
+    pkg="pandora_end_effector_planner"
+    type="linear_movement_planner"
+    respawn="false"
+    output="screen"/>
+
+</launch>
