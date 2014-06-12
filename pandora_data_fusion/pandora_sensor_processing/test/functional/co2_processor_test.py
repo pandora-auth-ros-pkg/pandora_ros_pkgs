@@ -113,7 +113,7 @@ class Co2ProcessorTest(test_base.TestBase):
 
 if __name__ == '__main__':
 
-    rospy.sleep(10)
+    rospy.sleep(20)
     rospy.init_node(NAME, anonymous=True, log_level=rospy.DEBUG)
     Co2ProcessorTest.connect("co2")
     rostest.rosrun(PKG, NAME, Co2ProcessorTest, sys.argv)
