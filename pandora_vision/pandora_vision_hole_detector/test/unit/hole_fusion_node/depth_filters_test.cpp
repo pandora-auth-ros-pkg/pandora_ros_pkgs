@@ -375,7 +375,7 @@ namespace pandora_vision
         // size of value 0
         for ( int i = 0; i < probabilitiesVector_0.size(); i++ )
         {
-          EXPECT_LT ( 0.3, probabilitiesVector_0[i] );
+          EXPECT_EQ ( 0.0, probabilitiesVector_0[i] );
         }
       }
 
@@ -576,7 +576,7 @@ namespace pandora_vision
       {
         if ( f == 0 )
         {
-          EXPECT_LT ( 0.3, probabilitiesVector2D_0[f][h] );
+          EXPECT_EQ ( 0.0, probabilitiesVector2D_0[f][h] );
         }
 
         if ( f == 1 )
@@ -749,26 +749,33 @@ namespace pandora_vision
       &inflatedRectanglesVector_0,
       &inflatedRectanglesIndices_0 );
 
-    // Needed vectors by the DepthFilters::checkHolesDepthDiff method
     std::vector<std::string> msgs;
-    std::vector<float> probabilitiesVector_0( 3, 0.0 );
 
-    // Run DepthFilters::checkHolesDepthDiff
-    DepthFilters::checkHolesDepthDiff(
-      squares_,
-      conveyor,
-      inflatedRectanglesVector_0,
-      inflatedRectanglesIndices_0,
-      &msgs,
-      &probabilitiesVector_0 );
-
-
-
-    for ( int i = 0; i < probabilitiesVector_0.size(); i++ )
+    for ( int p = 0; p < 2; p++ )
     {
-      // All three holes should have an inflated rectangle for inflation
-      // size of value 0
-      EXPECT_LT ( 0.3, probabilitiesVector_0[i] );
+      Parameters::HoleFusion::depth_difference_probability_assignment_method = p;
+
+      // Needed vectors by the DepthFilters::checkHolesDepthDiff method
+      std::vector<float> probabilitiesVector_0( 3, 0.0 );
+
+      // Run DepthFilters::checkHolesDepthDiff
+      DepthFilters::checkHolesDepthDiff(
+        squares_,
+        conveyor,
+        inflatedRectanglesVector_0,
+        inflatedRectanglesIndices_0,
+        &msgs,
+        &probabilitiesVector_0 );
+
+
+      for ( int i = 0; i < probabilitiesVector_0.size(); i++ )
+      {
+        // All three holes should have an inflated rectangle for inflation
+        // size of value 0
+        EXPECT_EQ ( 0.0, probabilitiesVector_0[i] );
+      }
+
+      msgs.clear();
     }
 
 
@@ -787,7 +794,6 @@ namespace pandora_vision
 
     // Needed vectors by the DepthFilters::checkHolesDepthDiff method
     std::vector<float> probabilitiesVector_2( 3, 0.0 );
-    msgs.clear();
 
     // Run DepthFilters::checkHolesDepthDiff
     DepthFilters::checkHolesDepthDiff(
@@ -822,28 +828,32 @@ namespace pandora_vision
       &inflatedRectanglesVector_8,
       &inflatedRectanglesIndices_8 );
 
-    // Needed vectors by the DepthFilters::checkHolesDepthDiff method
-    std::vector< float > probabilitiesVector_8( 3, 0.0 );
-    msgs.clear();
+    for ( int p = 0; p < 2; p++ )
+    {
+      Parameters::HoleFusion::depth_difference_probability_assignment_method = p;
 
-    // Run DepthFilters::checkHolesDepthDiff
-    DepthFilters::checkHolesDepthDiff(
-      squares_,
-      conveyor,
-      inflatedRectanglesVector_8,
-      inflatedRectanglesIndices_8,
-      &msgs,
-      &probabilitiesVector_8);
+      // Needed vectors by the DepthFilters::checkHolesDepthDiff method
+      std::vector< float > probabilitiesVector_8( 3, 0.0 );
+      msgs.clear();
 
-
-    // Only the last two holes should have an inflated rectangle
-    // for inflation size of value 2
-    ASSERT_EQ ( 0.0, probabilitiesVector_8[0] );
-    ASSERT_EQ ( 0.0, probabilitiesVector_8[1] );
-    ASSERT_LT ( 0.0, probabilitiesVector_8[2] );
+      // Run DepthFilters::checkHolesDepthDiff
+      DepthFilters::checkHolesDepthDiff(
+        squares_,
+        conveyor,
+        inflatedRectanglesVector_8,
+        inflatedRectanglesIndices_8,
+        &msgs,
+        &probabilitiesVector_8);
 
 
-    EXPECT_EQ ( 1.0, probabilitiesVector_8[2] );
+      // Only the last two holes should have an inflated rectangle
+      // for inflation size of value 2
+      ASSERT_EQ ( 0.0, probabilitiesVector_8[0] );
+      ASSERT_EQ ( 0.0, probabilitiesVector_8[1] );
+      ASSERT_LT ( 0.0, probabilitiesVector_8[2] );
+
+      EXPECT_EQ ( 1.0, probabilitiesVector_8[2] );
+    }
 
 
     // Generate the inflated rectangles and corresponding indices vectors

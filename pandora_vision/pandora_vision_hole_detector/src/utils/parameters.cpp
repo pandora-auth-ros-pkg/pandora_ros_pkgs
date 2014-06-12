@@ -168,6 +168,10 @@ namespace pandora_vision
   int Parameters::HoleFusion::run_checker_texture_backproject = 4;
   float Parameters::HoleFusion::checker_texture_backproject_threshold = 0.4;
 
+  // 0 for binary probability assignment on positive depth difference
+  // 1 for gaussian probability assignment on positive depth difference
+  int Parameters::HoleFusion::depth_difference_probability_assignment_method = 1;
+
   // Plane detection
   float Parameters::HoleFusion::filter_leaf_size = 0.1;
   int Parameters::HoleFusion::max_iterations = 1000;

@@ -346,7 +346,7 @@ namespace pandora_vision
       // Test the toggle switch
       for ( int t = 1; t < 3; t++ )
       {
-        Parameters::Edge::mixed_edges_toggle_switch == t;
+        Parameters::Edge::mixed_edges_toggle_switch = t;
 
         // Convert squares_ into a CV_32FC1 type image
         cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );

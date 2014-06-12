@@ -726,6 +726,11 @@ namespace pandora_vision
     Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;
 
+    // 0 for binary probability assignment on positive depth difference
+    // 1 for gaussian probability assignment on positive depth difference
+    Parameters::HoleFusion::depth_difference_probability_assignment_method =
+      config.depth_difference_probability_assignment_method;
+
     Parameters::HoleFusion::holes_gaussian_mean=
       config.holes_gaussian_mean;
     Parameters::HoleFusion::holes_gaussian_stddev=

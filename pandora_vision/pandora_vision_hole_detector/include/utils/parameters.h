@@ -197,6 +197,10 @@ namespace pandora_vision
       static int run_checker_texture_backproject;
       static float checker_texture_backproject_threshold;
 
+      // 0 for binary probability assignment on positive depth difference
+      // 1 for gaussian probability assignment on positive depth difference
+      static int depth_difference_probability_assignment_method;
+
       // Plane detection
       static float filter_leaf_size;
       static int max_iterations;
