@@ -7,7 +7,7 @@ laser_roll_controller:
     joint_speed: 1
     motor:
         id: 2
-        init: 500
+        init: 512
         min: 0
         max: 1023
 
@@ -20,7 +20,7 @@ laser_pitch_controller:
     joint_speed: 1
     motor:
         id: 1
-        init: 500
+        init: 512
         min: 0
         max: 1023
 

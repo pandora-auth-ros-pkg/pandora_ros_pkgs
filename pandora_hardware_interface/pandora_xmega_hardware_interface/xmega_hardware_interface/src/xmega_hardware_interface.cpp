@@ -44,7 +44,7 @@ namespace xmega
     ros::NodeHandle nodeHandle)
   :
     nodeHandle_(nodeHandle),
-    serialInterface("/dev/ttyUSB0", 115200, 100)
+    serialInterface("/dev/ttyS0", 115200, 100)
   {
     serialInterface.init();
 

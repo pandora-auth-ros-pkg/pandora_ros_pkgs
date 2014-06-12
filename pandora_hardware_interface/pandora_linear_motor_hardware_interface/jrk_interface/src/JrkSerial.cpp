@@ -5,7 +5,7 @@
 JrkSerial::JrkSerial()
 {
   // Open the Jrk's virtual COM port.
-  const char * device ="/dev/ttyACM0";  // Linux
+  const char * device ="/dev/linear";
   fd = open(device, O_RDWR | O_NOCTTY);
   if (fd == -1)
   {

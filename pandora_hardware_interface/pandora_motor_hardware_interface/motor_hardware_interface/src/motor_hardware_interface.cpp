@@ -45,7 +45,7 @@ namespace motor
   :
     nodeHandle_(nodeHandle)
   {
-    motors_ = new SerialEposHandler("/dev/ttyUSB0", 115200, 500);
+    motors_ = new SerialEposHandler("/dev/ttyS1", 115200, 500);
     readJointNameFromParamServer();
     nodeHandle_.getParam("max_RPM", maxRPM_);
     nodeHandle_.getParam("gearbox_ratio", gearboxRatio_);
