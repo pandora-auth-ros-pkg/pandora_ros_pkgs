@@ -14,7 +14,7 @@
     <xacro:sonar_caster name="left"
                         parent="base_link" >
 
-      <origin xyz="-0.15519 0.11249 0.14305"
+      <origin xyz="-0.15026 0.06429 0.39925"
               rpy="0.0 0.0 ${ 5 * PI_6 }" />
 
     </xacro:sonar_caster>
@@ -26,7 +26,7 @@
     <xacro:sonar_caster name="right"
                         parent="base_link" >
 
-      <origin xyz="-0.15519 -0.11351 0.14305"
+      <origin xyz="-0.15026 -0.06429 0.39925"
               rpy="0.0 0.0 ${ 7 * PI_6 }" />
 
     </xacro:sonar_caster>
