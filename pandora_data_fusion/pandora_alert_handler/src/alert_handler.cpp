@@ -87,9 +87,9 @@ namespace pandora_data_fusion
     {
       if(victimsToGo_->size() == 0)
         return;
-      pandora_data_fusion_msgs::VictimsMsg victimsMsg;
-      victimHandler_->getVictimsInfo(&victimsMsg);
-      victimsPublisher_.publish(victimsMsg);
+      pandora_data_fusion_msgs::WorldModelMsg worldModelMsg;
+      victimHandler_->getVictimsInfo(&worldModelMsg);
+      worldModelPublisher_.publish(worldModelMsg);
     }
 
     void AlertHandler::initRosInterfaces()
@@ -221,10 +221,10 @@ namespace pandora_data_fusion
 
       //!< publishers
 
-      if (nh_->getParam("published_topic_names/victims", param))
+      if (nh_->getParam("published_topic_names/world_model", param))
       {
-        victimsPublisher_ = nh_->
-          advertise<pandora_data_fusion_msgs::VictimsMsg>(param, 10);
+        worldModelPublisher_ = nh_->
+          advertise<pandora_data_fusion_msgs::WorldModelMsg>(param, 10);
       }
       else
       {

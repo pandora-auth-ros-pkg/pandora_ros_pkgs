@@ -116,7 +116,7 @@ namespace pandora_data_fusion
      * @details Delegate to victimList
      */
     void VictimHandler::getVictimsInfo(
-        pandora_data_fusion_msgs::VictimsMsg* victimsMsg)
+        pandora_data_fusion_msgs::WorldModelMsg* victimsMsg)
     {  
       victimsToGoList_->getVictimsInfo(victimsMsg); 
     }

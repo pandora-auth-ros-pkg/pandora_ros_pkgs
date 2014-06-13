@@ -45,7 +45,7 @@
 #include <vector>
 #include <map>
 
-#include "pandora_data_fusion_msgs/VictimsMsg.h"
+#include "pandora_data_fusion_msgs/WorldModelMsg.h"
 #include "pandora_data_fusion_msgs/VictimInfoMsg.h"
 
 #include "alert_handler/object_list.h"
@@ -86,11 +86,11 @@ namespace pandora_data_fusion
 
         /**
          * @brief Returns a vector containing a VictimInfoMsg for each unvisited victim
-         * @param victimsMsg [pandora_data_fusion_msgs::VictimsMsg*] The output vector
+         * @param victimsMsg [pandora_data_fusion_msgs::WorldModelMsg*] The output vector
          * @return void
          */
         void getVictimsInfo(
-            pandora_data_fusion_msgs::VictimsMsg* victimsMsg);
+            pandora_data_fusion_msgs::WorldModelMsg* victimsMsg);
 
         /**
          * @brief Deletes VictimPtr with the corresponding victimId

@@ -105,12 +105,12 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details Fills VictimsMsg with information about current victim list.
+     * @details Fills victimsMsg with information about current victim list.
      * Information given consists of a unique id, victim's pose stamped, probability
      * and sensors.
      */
     void VictimList::getVictimsInfo(
-        pandora_data_fusion_msgs::VictimsMsg* victimsMsg)
+        pandora_data_fusion_msgs::WorldModelMsg* victimsMsg)
     {
       victimsMsg->victims.clear();
 

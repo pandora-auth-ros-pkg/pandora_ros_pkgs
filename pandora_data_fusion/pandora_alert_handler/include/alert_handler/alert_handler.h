@@ -53,7 +53,7 @@
 #include <std_srvs/Empty.h>
 #include <std_msgs/Int16.h>
 
-#include "pandora_data_fusion_msgs/VictimsMsg.h"
+#include "pandora_data_fusion_msgs/WorldModelMsg.h"
 #include "pandora_data_fusion_msgs/VictimInfoMsg.h"
 #include "pandora_data_fusion_msgs/DeleteVictimAction.h"
 #include "pandora_data_fusion_msgs/ValidateVictimAction.h"
@@ -214,7 +214,7 @@ namespace pandora_data_fusion
         ros::ServiceServer geotiffService_;
         ros::ServiceServer getMarkersService_;
 
-        ros::Publisher victimsPublisher_;
+        ros::Publisher worldModelPublisher_;
 
         tf::TransformBroadcaster objectsBroadcaster_;
         ros::Timer tfPublisherTimer_;
