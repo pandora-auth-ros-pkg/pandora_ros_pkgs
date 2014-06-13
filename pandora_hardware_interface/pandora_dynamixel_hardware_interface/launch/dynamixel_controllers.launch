@@ -15,8 +15,8 @@
         laser_roll_controller
         kinect_pitch_controller
         kinect_yaw_controller
-        head_pitch_controller
-        head_yaw_controller"/>
+        linear_head_pitch_controller
+        linear_head_yaw_controller"/>
 
     <!--Start wrapper to sensor_msgs/JointState-->
     <include
