@@ -50,12 +50,12 @@ kinect_yaw_controller:
         min: 0
         max: 1023
 
-head_pitch_controller:
+linear_head_pitch_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
         type: JointPositionController
-    joint_name: head_pitch_joint
+    joint_name: linear_head_pitch_joint
     joint_speed: 2
     motor:
         id: 6
@@ -63,12 +63,12 @@ head_pitch_controller:
         min: 0
         max: 1023
 
-head_yaw_controller:
+linear_head_yaw_controller:
     controller:
         package: dynamixel_controllers
         module: joint_position_controller
         type: JointPositionController
-    joint_name: head_yaw_joint
+    joint_name: linear_head_yaw_joint
     joint_speed: 2
     motor:
         id: 5

@@ -10,14 +10,14 @@ range_sensors:
     field_of_view: 80.0
     min_range: 0.2
     max_range: 4.5
-    i2c_address: 128
+    i2c_address: 130
   - name: '/sensors/right_sonar'
     frame_id: '/right_sonar'
     radiation_type: 0
     field_of_view: 80.0
     min_range: 0.2
     max_range: 4.5
-    i2c_address: 130
+    i2c_address: 134
 differential_joints:
   left_joint: left_side_joint
   right_joint: right_side_joint
