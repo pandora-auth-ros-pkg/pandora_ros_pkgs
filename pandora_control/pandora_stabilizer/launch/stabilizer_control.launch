@@ -2,7 +2,7 @@
 
   <node
     name="stabilizer_control_node"
-    pkg="pandora_laser_control"
+    pkg="pandora_stabilizer"
     type="stabilizer_control_node" 
     respawn="false"
     output="screen"/>
