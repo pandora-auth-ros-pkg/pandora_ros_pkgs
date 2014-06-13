@@ -59,6 +59,10 @@ namespace pandora_control
       std::vector<double> pitchBuffer_;
       int bufferSize_;
       int bufferCounter_;
+      double minRoll_;
+      double maxRoll_;
+      double minPitch_;
+      double maxPitch_;
 
     public:
       StabilizerController(void);

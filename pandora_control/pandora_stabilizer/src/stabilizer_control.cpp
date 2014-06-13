@@ -67,6 +67,12 @@ namespace pandora_control
         "[stabilizer_control_node] : Parameter buffer_size not found. Using Default 5");
       bufferSize_ = 5;
     }
+    nodeHandle_.param("min_roll", minRoll_, -1.57);
+    nodeHandle_.param("min_pitch", minPitch_, -1.57);
+    nodeHandle_.param("max_roll", maxRoll_, 1.57);
+    nodeHandle_.param("max_pitch", maxPitch_, 0.785);
+
+
     compassSubscriber_ = nodeHandle_.subscribe(
       compassTopic,
       1,
@@ -115,13 +121,28 @@ namespace pandora_control
 
     for (int ii = 0; ii < bufferSize_; ii++)
     {
-      command[0] = command[0] + rollBuffer_[ii] / bufferSize_;
-      command[1] = command[1] + pitchBuffer_[ii] / bufferSize_;
+      command[0] = command[0] - rollBuffer_[ii] / bufferSize_;
+      command[1] = command[1] - pitchBuffer_[ii] / bufferSize_;
     }
-
-    str.data = -command[0];
+    if (command[0] < minRoll_)
+    {
+      command[0] = minRoll_;
+    }
+    else if (command[0] > maxRoll_)
+    {
+      command[0] = maxRoll_;
+    }
+    if (command[1] < minPitch_)
+    {
+      command[1] = minPitch_;
+    }
+    else if (command[1] > maxPitch_)
+    {
+      command[1] = maxPitch_;
+    }
+    str.data = command[0];
     laserRollPublisher_.publish(str);
-    str.data = -command[1];
+    str.data = command[1];
     laserPitchPublisher_.publish(str);
   }
 }  // namespace pandora_control

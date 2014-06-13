@@ -72,6 +72,10 @@ namespace pandora_control
 
       int position_;
       int command_;
+      double pitchStep_;
+      double yawStep_;
+      double minPitch_;
+      double minYaw_;
       double maxPitch_;
       double maxYaw_;
       double timeStep_;

@@ -110,8 +110,34 @@ namespace pandora_control
 
   bool SensorOrientationActionServer::getPlannerParams()
   {
-    nodeHandle_.param(actionName_ + "/max_pitch", maxPitch_, 0.4);
-    nodeHandle_.param(actionName_ + "/max_yaw", maxYaw_, 0.7);
+    nodeHandle_.param(actionName_ + "/pitch_step", pitchStep_, 0.4);
+    nodeHandle_.param(actionName_ + "/yaw_step", yawStep_, 0.7);
+    nodeHandle_.param(actionName_ + "/min_pitch", minPitch_, -1.0);
+    nodeHandle_.param(actionName_ + "/min_yaw", minYaw_, -1.0);
+    nodeHandle_.param(actionName_ + "/max_pitch", maxPitch_, 1.0);
+    nodeHandle_.param(actionName_ + "/max_yaw", maxYaw_, 1.0);
+    if (pitchStep_ > maxPitch_ || pitchStep_ < minPitch_)
+    {
+      if (maxPitch_ < fabs(minPitch_))
+      {
+        pitchStep_ = maxPitch_;
+      }
+      else
+      {
+        pitchStep_ = fabs(minPitch_);
+      }
+    }
+    if (yawStep_ > maxYaw_ || yawStep_ < minYaw_)
+    {
+      if (maxYaw_ < fabs(minYaw_))
+      {
+        yawStep_ = maxYaw_;
+      }
+      else
+      {
+        yawStep_ = fabs(minYaw_);
+      }
+    }
     nodeHandle_.param(actionName_ + "/time_step", timeStep_, 1.0);
 
     if (nodeHandle_.getParam(actionName_ + "/pitch_command_topic",
@@ -183,18 +209,18 @@ namespace pandora_control
       switch (position_)
       {
         case HIGH_START:
-          pitchTargetPosition.data = maxPitch_;
+          pitchTargetPosition.data = pitchStep_;
           yawTargetPosition.data = 0;
           position_ = LOW_START;
           break;
         case LOW_START:
           pitchTargetPosition.data = 0;
-          yawTargetPosition.data = maxYaw_;
+          yawTargetPosition.data = yawStep_;
           position_ = HIGH_LEFT;
           break;
         case HIGH_LEFT:
-          pitchTargetPosition.data = maxPitch_;
-          yawTargetPosition.data = maxYaw_;
+          pitchTargetPosition.data = pitchStep_;
+          yawTargetPosition.data = yawStep_;
           position_ = LOW_LEFT;
           break;
         case LOW_LEFT:
@@ -203,18 +229,18 @@ namespace pandora_control
           position_ = HIGH_CENTER;
           break;
         case HIGH_CENTER:
-          pitchTargetPosition.data = maxPitch_;
+          pitchTargetPosition.data = pitchStep_;
           yawTargetPosition.data = 0;
           position_ = LOW_CENTER;
           break;
         case LOW_CENTER:
           pitchTargetPosition.data = 0;
-          yawTargetPosition.data = -maxYaw_;
+          yawTargetPosition.data = -yawStep_;
           position_ = HIGH_RIGHT;
           break;
         case HIGH_RIGHT:
-          pitchTargetPosition.data = maxPitch_;
-          yawTargetPosition.data = -maxYaw_;
+          pitchTargetPosition.data = pitchStep_;
+          yawTargetPosition.data = -yawStep_;
           position_ = LOW_RIGHT;
           break;
         case LOW_RIGHT:
@@ -291,6 +317,22 @@ namespace pandora_control
 
       pitchTargetPosition.data = pitch;
       yawTargetPosition.data = yaw;
+      if (pitchTargetPosition.data < minPitch_)
+      {
+        pitchTargetPosition.data = minPitch_;
+      }
+      else if (pitchTargetPosition.data > maxPitch_)
+      {
+        pitchTargetPosition.data = maxPitch_;
+      }
+      if (yawTargetPosition.data < minYaw_)
+      {
+        yawTargetPosition.data = minYaw_;
+      }
+      else if (yawTargetPosition.data > maxYaw_)
+      {
+        yawTargetPosition.data = maxYaw_;
+      }
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       rate.sleep();
