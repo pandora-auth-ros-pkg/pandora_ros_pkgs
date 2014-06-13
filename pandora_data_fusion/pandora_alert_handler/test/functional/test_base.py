@@ -44,7 +44,7 @@ import rospy
 
 import alert_delivery
 
-from pandora_data_fusion_msgs.msg import VictimsMsg 
+from pandora_data_fusion_msgs.msg import WorldModelMsg 
 from pandora_data_fusion_msgs.msg import VictimInfoMsg 
 from pandora_data_fusion_msgs.srv import GetObjectsSrv
 from pandora_data_fusion_msgs.srv import GetObjectsSrvResponse
@@ -91,7 +91,7 @@ class TestBase(unittest.TestCase):
 
     def setUp(self):
 
-        self.subscriber = rospy.Subscriber("/data_fusion/victims", VictimsMsg, self.mockCallback)
+        self.subscriber = rospy.Subscriber("/data_fusion/world_model", WorldModelMsg, self.mockCallback)
         self.currentVictimList = []
         self.worldModelPublished = 0
         i = 0
