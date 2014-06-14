@@ -8,7 +8,7 @@
 
   <node pkg="rosbag" type="play" name="player" output="screen"
     args="--clock $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag" >
-    <remap from="/vision/hole_direction" to="/vision/hole_direction_alert" />
+    <remap from="/vision/hole_direction" to="/vision/holes_direction" />
   </node>
 
   <test test-name="AlertHandlerTest" pkg="pandora_alert_handler"

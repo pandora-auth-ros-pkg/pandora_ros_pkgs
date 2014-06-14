@@ -39,6 +39,7 @@ __email__ = "tsirif@gmail.com"
 PKG = 'pandora_alert_handler'
 NAME = 'alert_handler_static_test'
 
+import os
 import sys
 import math
 
@@ -48,10 +49,12 @@ import roslib; roslib.load_manifest(PKG)
 import rostest
 import rospy
 
-import alert_delivery
+from pandora_testing_tools.testing_interface import alert_delivery
 from test_base import distance
 from test_base import direction
 import test_base
+
+DIR = os.path.dirname(os.path.realpath(__file__))
 
 class AlertHandlerStaticTest(test_base.TestBase):
 
@@ -72,7 +75,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_objects_coexist(self):
 
-        self.deliveryBoy.getOrderListFromBoss('orders/mixed_order.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/mixed_order.in')
         outs = []
         while(True):
             try:      
@@ -204,7 +207,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_kalman_filter_of_one_object(self):
         
-        self.deliveryBoy.getOrderListFromBoss('orders/one_kalman_order.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/one_kalman_order.in')
         outs = []
         while(True):
             try:      
@@ -262,7 +265,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_robustness_of_conviction(self):
 
-        self.deliveryBoy.getOrderListFromBoss('orders/frequent_order.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/frequent_order.in')
         outs = []
         while(True):
             try:      
@@ -289,7 +292,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertLess(distanceLessConviction, 0.03)
         
         self.setUp()
-        self.deliveryBoy.getOrderListFromBoss('orders/frequent_order.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/frequent_order.in')
         outs = []
         while(True):
             try:      
@@ -311,7 +314,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         
     def test_2_objects_colliding(self):
 
-        self.deliveryBoy.getOrderListFromBoss('orders/but_it_was_the_same_order.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/but_it_was_the_same_order.in')
         outs = []
         while(True):
             try:      
@@ -444,7 +447,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
 
     def test_2_objects_colliding2(self):
 
-        self.deliveryBoy.getOrderListFromBoss('orders/but_it_was_the_same_order2.in')
+        self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/but_it_was_the_same_order2.in')
         outs = []
         while(True):
             try:      

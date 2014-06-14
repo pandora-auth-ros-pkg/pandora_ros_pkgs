@@ -46,7 +46,6 @@ namespace pandora_data_fusion
     AlertHandler::AlertHandler(const std::string& ns)
     {
       nh_.reset( new ros::NodeHandle(ns) );
-      ROS_INFO_STREAM(nh_->getNamespace());
       map_.reset( new Map );
 
       holes_.reset( new ObjectList<Hole> );

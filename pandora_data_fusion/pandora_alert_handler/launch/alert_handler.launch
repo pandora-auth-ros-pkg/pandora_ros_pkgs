@@ -1,8 +1,9 @@
 <launch>
   
-  <!--Alert handler-->
+  <!--  Alert Handler  -->
   <node type="alert_handler_node" name="alert_handler" 
     pkg="pandora_alert_handler" respawn="false" output="screen" ns="data_fusion" />
+
   <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_topics.yaml" 
     command="load" ns="data_fusion/alert_handler" />
 

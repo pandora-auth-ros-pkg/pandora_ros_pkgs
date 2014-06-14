@@ -1,6 +1,6 @@
 <launch>
 
-  <!--Data fusion-->
+  <!--  Alert Handler  -->
   <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
   
   <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_params.yaml" 

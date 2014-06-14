@@ -42,8 +42,7 @@ import unittest
 
 import rospy
 
-import alert_delivery
-
+from pandora_testing_tools.testing_interface import alert_delivery
 from pandora_data_fusion_msgs.msg import WorldModelMsg 
 from pandora_data_fusion_msgs.msg import VictimInfoMsg 
 from pandora_data_fusion_msgs.srv import GetObjectsSrv
