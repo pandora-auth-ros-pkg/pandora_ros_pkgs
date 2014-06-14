@@ -42,6 +42,14 @@
   <run_depend>roslint</run_depend>
   <run_depend>openni2_launch</run_depend>
 
+  <!-- Test Depends -->
+
+  <run_depend>pandora_testing_tools</run_depend>
+
+  <!-- Test Depends -->
+
+  <run_depend>pandora_testing_tools</run_depend>
+
   <export>
   </export>
 

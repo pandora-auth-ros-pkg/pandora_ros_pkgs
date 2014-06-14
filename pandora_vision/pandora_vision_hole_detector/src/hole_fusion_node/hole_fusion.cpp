@@ -48,8 +48,6 @@ namespace pandora_vision
     Timer::start("HoleFusion");
     #endif
 
-    ros::Duration(0.5).sleep();
-
     // Acquire the names of topics which the Hole Fusion node will be having
     // transactionary affairs with
     getTopicNames();
@@ -972,7 +970,7 @@ namespace pandora_vision
     validHolesMap = validateHoles(probabilitiesVector2D);
 
     // If there are valid holes, publish them
-    if (rgbdHolesConveyor.size() > 0)
+    if (validHolesMap.size() > 0)
     {
       publishValidHoles(rgbdHolesConveyor, &validHolesMap);
     }
@@ -980,6 +978,7 @@ namespace pandora_vision
     // Publish the enhanced holes message
     // regardless of the amount of valid holes
     publishEnhancedHoles(rgbdHolesConveyor,
+      &validHolesMap,
       Parameters::Depth::interpolation_method);
 
     #ifdef DEBUG_SHOW
@@ -1042,15 +1041,18 @@ namespace pandora_vision
 
   /**
     @brief Publishes the enhanced holes' information.
-    @param[in] conveyor [const HolesConveyor&] The overall unique holes
+    @param[in] conveyor [const HolesConveyor&] The overall valid holes
     found by the depth and RGB nodes.
+    @param[in] validHolesMap [std::map<int, float>*] A map containing the
+    indices of the valid holes inside the conveyor and their respective
+    validity probabilities
     @param[in] interpolationMethod [const int&] The interpolation method
     used. 0 if depth analysis is applicable, 1 or 2 for special cases,
     where the amount of noise in the depth image is overwhelming
     @return void
    **/
   void HoleFusion::publishEnhancedHoles (const HolesConveyor& conveyor,
-    const int& interpolationMethod)
+    std::map<int, float>* validHolesMap , const int& interpolationMethod)
   {
     // The overall message of enhanced holes that will be published
     vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
@@ -1075,25 +1077,31 @@ namespace pandora_vision
     enhancedHolesMsg.header.stamp = timestamp_;
     enhancedHolesMsg.header.frame_id = frame_id_;
 
-    for (int i = 0; i < conveyor.size(); i++)
+    for (std::map<int, float>::iterator it = validHolesMap->begin();
+      it != validHolesMap->end(); it++)
     {
       // The enhanced hole message. Used for one hole only
       vision_communications::EnhancedHoleMsg enhancedHoleMsg;
 
       // Set the hole's keypoint
-      enhancedHoleMsg.keypointX = conveyor.holes[i].keypoint.pt.x;
-      enhancedHoleMsg.keypointY = conveyor.holes[i].keypoint.pt.y;
+      enhancedHoleMsg.keypointX = conveyor.holes[it->first].keypoint.pt.x;
+      enhancedHoleMsg.keypointY = conveyor.holes[it->first].keypoint.pt.y;
 
       // Set the hole's bounding box vertices
-      for (int r = 0; r < conveyor.holes[i].rectangle.size(); r++)
+      for (int r = 0; r < conveyor.holes[it->first].rectangle.size(); r++)
       {
-        enhancedHoleMsg.verticesX.push_back(conveyor.holes[i].rectangle[r].x);
-        enhancedHoleMsg.verticesY.push_back(conveyor.holes[i].rectangle[r].y);
+        enhancedHoleMsg.verticesX.push_back(
+          conveyor.holes[it->first].rectangle[r].x);
+        enhancedHoleMsg.verticesY.push_back(
+          conveyor.holes[it->first].rectangle[r].y);
       }
 
       // Set the message's header
       enhancedHoleMsg.header.stamp = timestamp_;
       enhancedHoleMsg.header.frame_id = frame_id_;
+
+      // Push back into the enhancedHolesMsg message
+      enhancedHolesMsg.enhancedHoles.push_back(enhancedHoleMsg);
     }
 
     // Publish the overall message
@@ -1113,7 +1121,7 @@ namespace pandora_vision
   void HoleFusion::publishValidHoles(const HolesConveyor& conveyor,
     std::map<int, float>* map)
   {
-    // The depth sensor's horzontal and vertical field of view
+    // The depth sensor's horizontal and vertical field of view
     float hfov = Parameters::HoleFusion::horizontal_field_of_view;
     float vfov = Parameters::HoleFusion::vertical_field_of_view;
 

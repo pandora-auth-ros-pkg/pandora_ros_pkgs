@@ -136,11 +136,9 @@ target_link_libraries(rgb_filters_test ${catkin_LIBRARIES} rgb_filters_lib utils
 
 ############## Functional Tests ###############
 
-#if(TARGET tests)
-#  add_executable(hole_detector_test EXCLUDE_FROM_ALL functional/hole_detector_test.cpp)
-#  target_link_libraries(hole_detector_test ${catkin_LIBRARIES} ${GTEST_LIBRARIES} vision_communications_gencpp)
-#endif()
-#add_rostest_gtest(hole_detector_test functional/hole_detector_test.launch functional/hole_detector_test.cpp)
-#target_link_libraries(hole_detector_test ${catkin_LIBRARIES} ${GTEST_LIBRARIES})
-#add_dependencies(hole_detector_test vision_communications_gencpp node_tests node_tests_msgs_gencpp)
-#add_rostest(functional/hole_detector_test.launch)
+#catkin_download_test_data(
+#    hole_detector_test.bag
+#    https://pandora.ee.auth.gr/rosbags/2014_bags/hole_detector_test.bag
+#    DESTINATION functional
+#    )
+add_rostest(functional/hole_detector_test.launch)

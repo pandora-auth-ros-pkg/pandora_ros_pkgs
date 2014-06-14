@@ -49,8 +49,6 @@ namespace pandora_vision
     Timer::start("Depth");
     #endif
 
-    ros::Duration(0.5).sleep();
-
     // Acquire the names of topics which the depth node will be having
     // transactionary affairs with
     getTopicNames();

@@ -1,18 +1,13 @@
 <launch>
 
-  <param name="/use_sim_time" value="true"/> 
+  <!--<param name="/use_sim_time" value="true"/> -->
 
-  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_standalone.launch" />
 
-  <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_dry.launch" />
+  <node pkg="pandora_testing_tools" type="bag_player_for_tests" name="player" 
+    args="--bags $(find pandora_vision_hole_detector)/test/functional/simple_pcl_frame.bag" /> 
 
-  <node pkg="node_tests" type="bag_player_for_tests" name="player" 
-    args="--bags $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag --clock" /> 
-  
-  <node name="state_changer" type="state_changer" pkg="state_manager" args="2" />
-
-  <param name="test/subscribed_topic_names/holeDirection" type="str" value="/vision/hole_direction_alert" />
   <test test-name="HoleDetectorTest" pkg="pandora_vision_hole_detector"
-    type="hole_detector_test" />
+    type="hole_detector_test.py" />
 
 </launch>

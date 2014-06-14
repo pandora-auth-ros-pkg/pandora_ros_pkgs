@@ -198,10 +198,12 @@ namespace pandora_vision
   float Parameters::HoleFusion::holes_validity_threshold_urgent = 0.70;
 
   // The depth sensor's horizontal field of view in rads
-  float Parameters::HoleFusion::horizontal_field_of_view = 58 / 180 * M_PI;
+  float Parameters::HoleFusion::horizontal_field_of_view =
+    static_cast<float>(58) / 180 * M_PI;
 
   // The depth sensor's vertical field of view in rads
-  float Parameters::HoleFusion::vertical_field_of_view = 45 / 180 * M_PI;
+  float Parameters::HoleFusion::vertical_field_of_view =
+    static_cast<float>(45) / 180 * M_PI;
 
 
 
