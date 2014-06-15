@@ -47,12 +47,12 @@
 #include <boost/algorithm/string.hpp>
 
 #include <ros/ros.h>
-#include "state_manager/state_client.h"
 
 #include <dynamic_reconfigure/server.h>
 
+#include "state_manager/state_client.h"
 #include "pandora_common_msgs/GeneralAlertMsg.h"
-#include "pandora_sensor_processing/SensorProcessorConfig.h"
+#include "pandora_sensor_processing/SensorProcessingConfig.h"
 
 namespace pandora_sensor_processing
 {
@@ -118,7 +118,7 @@ namespace pandora_sensor_processing
         bool open_;
         bool opened_;
 
-        dynamic_reconfigure::Server< SensorProcessorConfig >
+        dynamic_reconfigure::Server< SensorProcessingConfig >
           dynReconfServer_;
     };
 

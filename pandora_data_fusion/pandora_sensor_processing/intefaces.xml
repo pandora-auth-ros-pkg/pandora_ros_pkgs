@@ -12,9 +12,4 @@
     <publisher>/sensor_processing/thermal_direction_alert</publisher>
   </node>
 
-  <node>
-    /sensor_processing/sound_processor
-    <publisher>/sensor_processing/sound_direction_alert</publisher>
-  </node>
-
 </package>

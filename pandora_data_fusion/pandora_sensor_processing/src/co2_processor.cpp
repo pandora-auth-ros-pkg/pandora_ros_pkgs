@@ -63,7 +63,7 @@ namespace pandora_sensor_processing
   }
 
   void Co2Processor::dynamicReconfigCallback(
-      const SensorProcessorConfig& config, uint32_t level)
+      const SensorProcessingConfig& config, uint32_t level)
   {
     PDF_SCALE = config.co2_optimal;
     PDF_SHAPE = config.co2_pdf_shape;

@@ -1,7 +1,7 @@
 <package>
   <name>pandora_alert_handler</name>
   <version>0.0.0</version>
-  <description>data_fusion</description>
+  <description>Data Fusion Alert Handler</description>
    <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
 
   <license>BSD</license>

@@ -72,7 +72,7 @@ namespace pandora_sensor_processing
       void sensorCallback(const sensor_msgs::Image& msg);
 
       void dynamicReconfigCallback(
-          const SensorProcessorConfig& config, uint32_t level);
+          const SensorProcessingConfig& config, uint32_t level);
 
     private:
       /**

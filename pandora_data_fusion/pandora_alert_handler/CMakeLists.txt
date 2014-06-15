@@ -16,7 +16,7 @@ find_package(PkgConfig)
 pkg_check_modules(BFL REQUIRED orocos-bfl)
 
 generate_dynamic_reconfigure_options(
-  config/alert_handler/alert_handler_dynamic.cfg
+  config/alert_handler/AlertHandler.cfg
   config/alert_handler/mass_alert_publisher_dymamic.cfg
   )
 

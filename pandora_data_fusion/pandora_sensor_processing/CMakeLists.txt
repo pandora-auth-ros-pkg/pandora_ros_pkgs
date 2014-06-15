@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Eigen REQUIRED)
 
 generate_dynamic_reconfigure_options(
-  config/sensor_processing/sensor_processing_dynamic.cfg
+  config/sensor_processing/SensorProcessing.cfg
   )
 
 catkin_package(

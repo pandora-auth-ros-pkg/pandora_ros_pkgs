@@ -69,7 +69,7 @@ namespace pandora_sensor_processing
           const pandora_arm_hardware_interface::Co2Msg& msg);
 
       void dynamicReconfigCallback(
-          const SensorProcessorConfig& config, uint32_t level);
+          const SensorProcessingConfig& config, uint32_t level);
 
     private:
       //!< params
