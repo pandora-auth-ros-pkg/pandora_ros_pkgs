@@ -463,8 +463,10 @@ namespace pandora_vision
       if (value > 0)
       {
         // The probability is binary. If there is a valid depth difference,
-        // this hole is marked as valid
-        if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 0 )
+        // this hole is marked as valid. A tolerance level of 3cm is employed
+        // because of the noise in depth measurements
+        if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 0
+          && value > 0.03)
         {
           probabilitiesVector->at(inflatedRectanglesIndices[i]) = 1;
         }

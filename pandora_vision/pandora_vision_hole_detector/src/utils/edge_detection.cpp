@@ -500,7 +500,7 @@ namespace pandora_vision
     cv::threshold(*edges, *edges, 0, 255, 0);
 
     // Denoise the edges image
-    EdgeDetection::denoiseEdges(edges);
+    denoiseEdges(edges);
 
     #ifdef DEBUG_TIME
     Timer::tick("computeRgbEdges");

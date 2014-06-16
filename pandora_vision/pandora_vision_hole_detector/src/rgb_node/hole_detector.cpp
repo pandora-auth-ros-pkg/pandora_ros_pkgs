@@ -40,15 +40,19 @@
 namespace pandora_vision
 {
   /**
-    @brief Function that locates the position of potentional holes
-    in the current frame.
-    @param[in] holeFrame [const cv::Mat&] current frame to be processed
-    @param[in] histogram [const cv::MatND&] A histogram made of pictures
-    of walls where holes reside
-    @return [HolesConveyor] A collection of holes and found information
-    about them
-    */
-  HolesConveyor HoleDetector::findHoles(const cv::Mat& holeFrame,
+    @brief Finds holes, provided a RGB image in CV_8UC3 format.
+
+    First, the edges of the RGB image are detected.
+    Then, keypoints of blobs are detected in the above image.
+    Finally, the potential holes' outline is found, along with the bounding
+    boxes of those outlines.
+    @param[in] rgbImage [const cv::Mat&] The RGB image to be processed,
+    in CV_8UC3 format
+    @param[in] histogram [const cv::MatND&] The collective histogram of
+    images of wooden walls
+    @return HolesConveyor The struct that contains the holes found
+   **/
+  HolesConveyor HoleDetector::findHoles(const cv::Mat& rgbImage,
     const cv::MatND& histogram)
   {
     #ifdef DEBUG_TIME
@@ -65,7 +69,7 @@ namespace pandora_vision
     if(Parameters::Debug::show_find_holes) // Debug
     {
       cv::Mat tmp;
-      holeFrame.copyTo(tmp);
+      rgbImage.copyTo(tmp);
       std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Initial RGB image";
       msgs.push_back(msg);
@@ -73,10 +77,10 @@ namespace pandora_vision
     }
     #endif
 
-    // Locate the edges of the RGB image
+    // Detect edges in rgbImage
     cv::Mat edges;
     EdgeDetection::computeRgbEdges(
-      holeFrame,
+      rgbImage,
       Parameters::Rgb::edges_extraction_method,
       histogram,
       &edges);
@@ -93,8 +97,8 @@ namespace pandora_vision
     }
     #endif
 
-    // Find pixels in current frame where there is the same texture
-    // according to the given histogram and calculate
+    // Find blobs in the edges image. Each blob is represented as
+    // a keypoint which is the center of the blob found
     std::vector<cv::KeyPoint> keyPoints;
     BlobDetection::detectBlobs(edges, &keyPoints);
 
@@ -111,6 +115,15 @@ namespace pandora_vision
     // The final vectors of keypoints, rectangles and blobs' outlines.
     HolesConveyor conveyor;
 
+    /**
+      Get me blobs that their center point is inside the image,
+      their bounding box is also entirely inside the image, and their area is
+      greater than Parameters::bounding_box_min_area_threshold.
+      Each keypoint is associated with exactly one rectangle.
+      The end product here is a set of keypoints, a set of rectangles that
+      enclose them and a set of the outlines of the blobs found, all tightly
+      packed in the conveyor struct.
+     **/
     HoleFilters::validateBlobs(
       keyPoints,
       &edges,
@@ -126,7 +139,7 @@ namespace pandora_vision
       imgs.push_back(
         Visualization::showHoles(
           msg,
-          holeFrame,
+          rgbImage,
           conveyor,
           -1,
           std::vector<std::string>())

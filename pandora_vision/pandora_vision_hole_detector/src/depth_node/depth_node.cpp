@@ -38,7 +38,7 @@
 #include "depth_node/depth.h"
 
 /**
-  @brief Main function of the kinect node
+  @brief Main function of the depth node
   @param argc [int] Number of input arguments
   @param argv [char**] The input arguments
   @return int : 0 for success

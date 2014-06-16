@@ -32,6 +32,10 @@
     output="screen"
     ns="$(arg namespace)">
 
+    <!-- The width and height variables needed when in simulation mode -->
+    <param name="width" value="640" />
+    <param name="height" value="480" />
+
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/synchronizer_node_topics.yaml"
               command="load" />
  </node>

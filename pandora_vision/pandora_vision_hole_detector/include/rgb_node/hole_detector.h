@@ -55,15 +55,19 @@ namespace pandora_vision
     public:
 
       /**
-        @brief Function that locates the position of potentional holes
-        in the current frame.
-        @param[in] holeFrame [const cv::Mat&] The current frame to be processed
-        @param[in] histogram [const cv::MatND&] A histogram made of pictures
-        of walls where holes reside
-        @return [HolesConveyor] A collection of holes and found information
-        about them
+        @brief Finds holes, provided a RGB image in CV_8UC3 format.
+
+        First, the edges of the RGB image are detected.
+        Then, keypoints of blobs are detected in the above image.
+        Finally, the potential holes' outline is found, along with the bounding
+        boxes of those outlines.
+        @param[in] rgbImage [const cv::Mat&] The RGB image to be processed,
+        in CV_8UC3 format
+        @param[in] histogram [const cv::MatND&] The collective histogram of
+        images of wooden walls
+        @return HolesConveyor The struct that contains the holes found
        **/
-      static HolesConveyor findHoles(const cv::Mat& holeFrame,
+      static HolesConveyor findHoles(const cv::Mat& rgbImage,
         const cv::MatND& histogram);
 
   };

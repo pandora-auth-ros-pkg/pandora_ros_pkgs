@@ -44,19 +44,19 @@ namespace pandora_vision
    **/
   HoleFusion::HoleFusion(void) : pointCloud_(new PointCloud)
   {
-    #ifdef DEBUG_TIME
-    Timer::start("HoleFusion");
-    #endif
-
     // Acquire the names of topics which the Hole Fusion node will be having
     // transactionary affairs with
     getTopicNames();
 
-    // Calculate the histogram cv::MatND needed for texture comparing
+    // Calculate the collective histogram of images of walls needed
+    // for comparing against the one of images of the material surrounding
+    // candidate holes
     Histogram::getHistogram(&wallsHistogram_,
       Parameters::Histogram::secondary_channel);
 
-    // Initialize the numNodesReady variable
+    // Initialize the numNodesReady variable.
+    // It acts as a counter of nodes that have published their output to the
+    // hole fusion node in each execution cycle.
     numNodesReady_ = 0;
 
     // Advertise the topic that the rgb_depth_synchronizer will be
@@ -117,10 +117,6 @@ namespace pandora_vision
     clientInitialize();
 
     ROS_INFO_NAMED("hole_detector", "[Hole Fusion node] Initiated");
-
-    #ifdef DEBUG_TIME
-    Timer::tick("HoleFusion");
-    #endif
   }
 
 
@@ -141,8 +137,10 @@ namespace pandora_vision
     are printed in the console, with an order specified by the
     hole_fusion_cfg of the dynamic reconfigure utility
     @param[in] conveyor [const HolesConveyor&] The conveyor
-    containing candidate holes
-    @return A two dimensional vector containing the probabilities of
+    containing candidate holes that are to be checked against selected
+    filters
+    @return [std::vector<std::vector<float> >]
+    A two dimensional vector containing the probabilities of
     validity of each candidate hole. Each row of it pertains to a specific
     filter applied, each column to a particular hole
    **/
@@ -178,7 +176,7 @@ namespace pandora_vision
     std::vector<cv::Mat> intermediatePointsImageVector;
 
     // Construct the necessary vectors, depending on which filters
-    // are to run in runtime and on the interpolation method used
+    // are to run in runtime and on the interpolation method
     FiltersResources::createCheckerRequiredVectors(
       conveyor,
       interpolatedDepthImage_,
@@ -195,12 +193,14 @@ namespace pandora_vision
     // The overall 2D vector that contains the probabilities from
     // both the depth and rgb filtering regimes
     // Each column is a specific hole.
-    // In each row there are values of probabilities of a specific filter
+    // In each row there are values of probabilities by a specific filter
     std::vector<std::vector<float> > probabilitiesVector2D;
 
 
     // Initialize the rgb probabilities 2D vector. But first we need to know
-    // how many rows the vector will accomodate
+    // how many rows the vector will accomodate.
+    // If a Parameters::HoleFusion::run_checker_* variable is greater than zero,
+    // the respective filter is set to run
     int rgbActiveFilters = 0;
 
     if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
@@ -222,11 +222,15 @@ namespace pandora_vision
 
     if (rgbActiveFilters > 0)
     {
+      // The 2D vector that contains the probabilities from the rgb filtering
+      // regime.
+      // Each column is a specific hole.
+      // In each row there are values of probabilities by a specific filter
       std::vector<std::vector<float> > rgbProbabilitiesVector2D(
         rgbActiveFilters,
         std::vector<float>(conveyor.size(), 0.0));
 
-      // check holes for debugging purposes
+      // Check holes against rgb-based filters
       RgbFilters::checkHoles(
         conveyor,
         rgbImage_,
@@ -238,14 +242,13 @@ namespace pandora_vision
         intermediatePointsSetVector,
         &rgbProbabilitiesVector2D);
 
-      // If there are holes found
+      // If holes have been found in the first place
       if (conveyor.size() > 0)
       {
         ROS_INFO_NAMED ("hole_detector",
           "-------------------------------------------");
 
-        ROS_INFO_NAMED ("hole_detector",
-          "RGB: Candidate Holes' probabilities");
+        ROS_INFO_NAMED ("hole_detector", "RGB: Candidate Holes' probabilities");
 
         for (int j = 0; j < conveyor.size(); j++)
         {
@@ -255,14 +258,15 @@ namespace pandora_vision
             probsString += TOSTR(rgbProbabilitiesVector2D[i][j]) + " | ";
           }
 
-          ROS_INFO_NAMED ("hole_detector",
-            "P_%d [%f %f] : %s", j,
-            conveyor.holes[j].keypoint.pt.x, conveyor.holes[j].keypoint.pt.y,
+          ROS_INFO_NAMED ("hole_detector", "P_%d [%f %f] : %s",
+            j,
+            conveyor.holes[j].keypoint.pt.x,
+            conveyor.holes[j].keypoint.pt.y,
             probsString.c_str());
         }
       }
 
-      // Fill the probabilitiesVector2D with the rgb one
+      // Fill the probabilitiesVector2D with the rgb vector of probabilities
       for (int i = 0; i < rgbProbabilitiesVector2D.size(); i++)
       {
         std::vector<float> row;
@@ -276,12 +280,13 @@ namespace pandora_vision
 
     // If depth analysis is applicable,
     // determine the probabilities of validity of the candidate holes
-    // by running the depth-based filters and append the respective 2D output
-    // probabilities vector to the overall probabilities vector
+    // by running the depth-based filters
     if (Parameters::Depth::interpolation_method == 0)
     {
       // Initialize the depth probabilities 2D vector.
       // But first we need to know how many rows the vector will accomodate
+      // If a Parameters::HoleFusion::run_checker_* variable is greater than
+      // zero, the respective filter is set to run
       int depthActiveFilters = 0;
 
       if (Parameters::HoleFusion::run_checker_depth_diff > 0)
@@ -307,11 +312,15 @@ namespace pandora_vision
 
       if (depthActiveFilters > 0)
       {
+        // The 2D vector that contains the probabilities from the
+        // depth filtering regime.
+        // Each column is a specific hole.
+        // In each row there are values of probabilities by a specific filter
         std::vector<std::vector<float> > depthProbabilitiesVector2D(
           depthActiveFilters,
           std::vector<float>(conveyor.size(), 0.0));
 
-        // check holes for debugging purposes
+        // check holes against depth-based filters
         DepthFilters::checkHoles(
           conveyor,
           interpolatedDepthImage_,
@@ -322,7 +331,7 @@ namespace pandora_vision
           intermediatePointsSetVector,
           &depthProbabilitiesVector2D);
 
-        // If there are holes found
+        // If holes have been found in the first place
         if (conveyor.size() > 0)
         {
           ROS_INFO_NAMED ("hole_detector",
@@ -338,16 +347,18 @@ namespace pandora_vision
               probsString += TOSTR(depthProbabilitiesVector2D[i][j]) + " | ";
             }
 
-            ROS_INFO_NAMED ("hole_detector",
-              "P_%d [%f %f] : %s", j, conveyor.holes[j].keypoint.pt.x,
-              conveyor.holes[j].keypoint.pt.y, probsString.c_str());
+            ROS_INFO_NAMED ("hole_detector", "P_%d [%f %f] : %s",
+              j,
+              conveyor.holes[j].keypoint.pt.x,
+              conveyor.holes[j].keypoint.pt.y,
+              probsString.c_str());
           }
 
           ROS_INFO_NAMED ("hole_detector",
             "-------------------------------------------");
         }
 
-        // Fill the probabilitiesVector2D with the depth one
+        // Fill the probabilitiesVector2D with the depth vector of probabilities
         for (int i = 0; i < depthProbabilitiesVector2D.size(); i++)
         {
           std::vector<float> row;
@@ -377,17 +388,24 @@ namespace pandora_vision
    **/
   void HoleFusion::completeTransition(void)
   {
-    ROS_INFO_NAMED("hole_detector", "[Hole Detector] : Transision Complete");
+    ROS_INFO_NAMED("hole_detector", "[Hole Detector] : Transition Complete");
   }
 
 
 
   /**
-    @brief Callback for the candidate holes via the depth node
+    @brief Callback for the candidate holes via the depth node.
+
+    This method sets the interpolated depth image and the
+    candidate holes acquired from the depth node.
+    If the rgb and point cloud callback counterparts have done
+    what must be, it resets the number of ready nodes, unlocks
+    the synchronizer and calls for processing of the candidate
+    holes.
     @param[in] depthCandidateHolesVector
     [const vision_communications::CandidateHolesVectorMsg&]
-    The message containing the necessary information to filter hole
-    candidates acquired through the depth node
+    The message containing the necessary information acquired through
+    the depth node
     @return void
    **/
   void HoleFusion::depthCandidateHolesCallback(
@@ -412,12 +430,13 @@ namespace pandora_vision
       sensor_msgs::image_encodings::TYPE_32FC1,
       Parameters::Outline::raycast_keypoint_partitions);
 
+    // The candidate holes acquired from the depth node and the interpolated
+    // depth image are set
     numNodesReady_++;
 
-    // If the RGB and the depth nodes are ready
+    // If the RGB candidate holes and the RGB image are set
     // and the point cloud has been delivered and interpolated,
-    // unlock the rgb_depth_synchronizer and process the candidate holes
-    // from both sources
+    // unlock the synchronizer and process the candidate holes from both sources
     if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
@@ -593,8 +612,7 @@ namespace pandora_vision
     @brief Computes the on/off state of the Hole Detector package
     given a state
     @param[in] state [const int&] The robot's state
-    @return [bool] True if the Hole Fusion is able to unlock the
-    synchronizer node and thus process a new point cloud
+    @return [bool] True if the hole fusion node's state is set to "on"
    **/
   bool HoleFusion::isHoleDetectorOn(const int& state)
   {
@@ -616,7 +634,7 @@ namespace pandora_vision
     @brief The function called when a parameter is changed
     @param[in] config
     [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
-    @param[in] level [const uint32_t] The level (?)
+    @param[in] level [const uint32_t]
     @return void
    **/
   void HoleFusion::parametersCallback(
@@ -626,7 +644,8 @@ namespace pandora_vision
     ROS_INFO_NAMED("hole_detector",
       "[Hole Fusion node] Parameters callback called");
 
-    // Debug
+    ////////////////////////////// Debug parameters ////////////////////////////
+
     Parameters::Debug::show_find_holes =
       config.show_find_holes;
     Parameters::Debug::show_find_holes_size =
@@ -655,6 +674,15 @@ namespace pandora_vision
     Parameters::Debug::show_merge_holes_size =
       config.show_merge_holes_size;
 
+    // Show the holes that each of the depth and RGB nodes transmit to the
+    // hole fusion node, on top of their respective origin images
+    Parameters::HoleFusion::show_respective_holes =
+      config.show_respective_holes;
+
+    // The product of this package: valid holes
+    Parameters::HoleFusion::show_final_holes =
+     config.show_final_holes;
+
 
     // The interpolation method for noise removal
     // 0 for averaging the pixel's neighbor values
@@ -663,11 +691,9 @@ namespace pandora_vision
     Parameters::Depth::interpolation_method =
       config.interpolation_method;
 
-
     // Threshold parameters
     Parameters::Edge::denoised_edges_threshold =
       config.denoised_edges_threshold;
-
 
     // Histogram parameters
     Parameters::Histogram::number_of_hue_bins =
@@ -680,47 +706,68 @@ namespace pandora_vision
       config.secondary_channel;
 
 
-
-    // Show the holes that each of the depth and RGB nodes transmit to the
-    // hole fusion node, on top of their respective origin images
-    Parameters::HoleFusion::show_respective_holes =
-      config.show_respective_holes;
-
-    // The product of this package: valid holes
-    Parameters::HoleFusion::show_final_holes =
-     config.show_final_holes;
-
-
     // Backprojection parameters
     Parameters::Rgb::backprojection_threshold =
       config.backprojection_threshold;
 
-    // Hole checkers and their thresholds
-    Parameters::HoleFusion::run_checker_depth_diff =
-      config.run_checker_depth_diff;
-    Parameters::HoleFusion::checker_depth_diff_threshold =
-      config.checker_depth_diff_threshold;
 
-    Parameters::HoleFusion::run_checker_outline_of_rectangle =
-      config.run_checker_outline_of_rectangle;
-    Parameters::HoleFusion::checker_outline_of_rectangle_threshold =
-      config.checker_outline_of_rectangle_threshold;
+    //////////////////// Hole checkers and their thresholds/////////////////////
 
+    // Depth / Area
     Parameters::HoleFusion::run_checker_depth_area =
       config.run_checker_depth_area;
     Parameters::HoleFusion::checker_depth_area_threshold =
       config.checker_depth_area_threshold;
 
+    // Depth diff
+    Parameters::HoleFusion::run_checker_depth_diff =
+      config.run_checker_depth_diff;
+    Parameters::HoleFusion::checker_depth_diff_threshold =
+      config.checker_depth_diff_threshold;
+
+    // Outline of rectangle plane constitution
+    Parameters::HoleFusion::run_checker_outline_of_rectangle =
+      config.run_checker_outline_of_rectangle;
+    Parameters::HoleFusion::checker_outline_of_rectangle_threshold =
+      config.checker_outline_of_rectangle_threshold;
+
+    // Intermediate points plane constitution
     Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle =
       config.run_checker_brushfire_outline_to_rectangle;
     Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold =
       config.checker_brushfire_outline_to_rectangle_threshold;
 
+    // Depth homogeneity
     Parameters::HoleFusion::run_checker_depth_homogeneity =
       config.run_checker_depth_homogeneity;
     Parameters::HoleFusion::checker_depth_homogeneity_threshold =
       config.checker_depth_homogeneity_threshold;
 
+    // Color homogeneity
+    Parameters::HoleFusion::run_checker_color_homogeneity =
+      config.run_checker_color_homogeneity;
+    Parameters::HoleFusion::checker_color_homogeneity_threshold =
+      config.checker_color_homogeneity_threshold;
+
+    // Luminosity diff
+    Parameters::HoleFusion::run_checker_luminosity_diff =
+      config.run_checker_luminosity_diff;
+    Parameters::HoleFusion::checker_luminosity_diff_threshold =
+      config.checker_luminosity_diff_threshold;
+
+    // Texture diff
+    Parameters::HoleFusion::run_checker_texture_diff =
+      config.run_checker_texture_diff;
+    Parameters::HoleFusion::checker_texture_diff_threshold =
+      config.checker_texture_diff_threshold;
+
+    // Texture backproject
+    Parameters::HoleFusion::run_checker_texture_backproject =
+      config.run_checker_texture_backproject;
+    Parameters::HoleFusion::checker_texture_backproject_threshold =
+      config.checker_texture_backproject_threshold;
+
+    // The inflation size of the bounding box's vertices
     Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;
 
@@ -729,30 +776,16 @@ namespace pandora_vision
     Parameters::HoleFusion::depth_difference_probability_assignment_method =
       config.depth_difference_probability_assignment_method;
 
+    // The mean expected difference in distance between a hole's keypoint
+    // and the mean distance of its bounding box's vertices
+    // from the depth sensor
     Parameters::HoleFusion::holes_gaussian_mean=
       config.holes_gaussian_mean;
+
+    // The standard deviation expected
     Parameters::HoleFusion::holes_gaussian_stddev=
       config.holes_gaussian_stddev;
 
-    Parameters::HoleFusion::run_checker_color_homogeneity =
-      config.run_checker_color_homogeneity;
-    Parameters::HoleFusion::checker_color_homogeneity_threshold =
-      config.checker_color_homogeneity_threshold;
-
-    Parameters::HoleFusion::run_checker_luminosity_diff =
-      config.run_checker_luminosity_diff;
-    Parameters::HoleFusion::checker_luminosity_diff_threshold =
-      config.checker_luminosity_diff_threshold;
-
-    Parameters::HoleFusion::run_checker_texture_diff =
-      config.run_checker_texture_diff;
-    Parameters::HoleFusion::checker_texture_diff_threshold =
-      config.checker_texture_diff_threshold;
-
-    Parameters::HoleFusion::run_checker_texture_backproject =
-      config.run_checker_texture_backproject;
-    Parameters::HoleFusion::checker_texture_backproject_threshold =
-      config.checker_texture_backproject_threshold;
 
     // Plane detection
     Parameters::HoleFusion::filter_leaf_size =
@@ -770,31 +803,24 @@ namespace pandora_vision
     Parameters::HoleFusion::connect_holes_max_distance =
       config.connect_holes_max_distance;
 
-    // Texture parameters
+    //--------------------------- Texture parameters ---------------------------
+
     // The threshold for texture matching
     Parameters::HoleFusion::match_texture_threshold =
       config.match_texture_threshold;
 
-    //Color homogeneity parameters
+    // Color homogeneity parameters
     Parameters::HoleFusion::num_bins_threshold =
       config.num_bins_threshold;
     Parameters::HoleFusion::non_zero_points_in_box_blob_histogram =
       config.non_zero_points_in_box_blob_histogram;
 
-    // Holes validity thresholds
-    // Normal : when depth analysis is applicable
-    Parameters::HoleFusion::holes_validity_threshold_normal =
-      config.holes_validity_threshold_normal;
-
-    // Urgent : when depth analysis is not applicable, we can only rely
-    // on RGB analysis
-    Parameters::HoleFusion::holes_validity_threshold_urgent =
-      config.holes_validity_threshold_urgent;
-
     // Method to scale the CV_32FC1 image to CV_8UC1
     Parameters::Image::scale_method =
       config.scale_method;
 
+
+    //----------------- Outline discovery specific parameters ------------------
 
     // The detection method used to obtain the outline of a blob
     // 0 for detecting by means of brushfire
@@ -809,12 +835,12 @@ namespace pandora_vision
     Parameters::Outline::raycast_keypoint_partitions =
       config.raycast_keypoint_partitions;
 
-    // Loose ends connection parameters
-    Parameters::Outline::AB_to_MO_ratio =
-      config.AB_to_MO_ratio;
 
-    Parameters::Outline::minimum_curve_points =
-      config.minimum_curve_points;
+    //------------ RGB image edges via backprojection parameters ---------------
+
+    // Backprojection parameters
+    Parameters::Rgb::backprojection_threshold =
+      config.backprojection_threshold;
 
     // Watershed-specific parameters
     Parameters::Rgb::watershed_foreground_dilation_factor =
@@ -826,15 +852,35 @@ namespace pandora_vision
     Parameters::Rgb::watershed_background_erosion_factor =
       config.watershed_background_erosion_factor;
 
+
+    //////////////////////// Holes validity thresholds /////////////////////////
+
+    // Normal : when depth analysis is applicable
+    Parameters::HoleFusion::holes_validity_threshold_normal =
+      config.holes_validity_threshold_normal;
+
+    // Urgent : when depth analysis is not applicable, we can only rely
+    // on RGB analysis
+    Parameters::HoleFusion::holes_validity_threshold_urgent =
+      config.holes_validity_threshold_urgent;
+
   }
 
 
 
   /**
     @brief Callback for the point cloud that the synchronizer node
-    publishes
-    @param[in] msg [const PointCloudPtr&] The message
-    containing the point cloud
+    publishes.
+
+    This method interpolates the input point cloud so that depth-based
+    filters using it have an integral input and sets it and header-related
+    variables.
+    If the depth and RGB callback counterparts have done
+    what must be, it resets the number of ready nodes, unlocks
+    the synchronizer and calls for processing of the candidate
+    holes.
+    @param[in] msg [const PointCloudPtr&] The message containing
+    the point cloud
     @return void
    **/
   void HoleFusion::pointCloudCallback(const PointCloudPtr& msg)
@@ -873,12 +919,12 @@ namespace pandora_vision
     // of the point cloud
     setDepthValuesInPointCloud(interpolatedDepthImage, &pointCloud_);
 
+    // The interpolated point cloud, frame_id and timestamp are set
     numNodesReady_++;
 
-    // If the RGB and the depth nodes are ready
-    // and the point cloud has been delivered and interpolated,
-    // unlock the rgb_depth_synchronizer and process the candidate holes
-    // from both sources
+    // If the depth and RGB candidate holes, the interpolated depth image
+    // and the RGB image are set,
+    // unlock the synchronizer and process the candidate holes from both sources
     if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
@@ -897,8 +943,22 @@ namespace pandora_vision
 
 
   /**
-    @brief Implements a strategy to combine
-    information from both sources in order to accurately find valid holes
+    @brief Implements a strategy to combine information from both
+    the depth and rgb image and holes sources in order to accurately
+    find valid holes.
+
+    It first assimilates all the holes that can be assimilated into other
+    ones, amalgamates holes that can be amalgamated with others and
+    connectes nearby holes with each other. Then, it passes each of the
+    resulting holes through a series of depth-based (if depth analysis
+    is possible) filters and rgb-based filters in order to extract a series
+    of probabilities for each hole. Each probability is a measure of each
+    candidate hole's validity: the more a value of a probability, the more
+    a candidate hole is indeed a hole in space. Next, a selection regime
+    is implemented in order to assess a hole's validity in the totality
+    of the filters it has been through. Finally, information about the
+    valid holes is published, along with enhanced information about them.
+    @param void
     @return void
    **/
   void HoleFusion::processCandidateHoles()
@@ -945,7 +1005,6 @@ namespace pandora_vision
       Visualization::multipleShow("Respective keypoints", imgs, titles, 1280, 1);
     }
     #endif
-
 
     // Merge the conveyors from the RGB and Depth sources
     HolesConveyor rgbdHolesConveyor;
@@ -1175,7 +1234,14 @@ namespace pandora_vision
 
   /**
     @brief Callback for the candidate holes via the rgb node
-    @param[in] depthCandidateHolesVector
+
+    This method sets the RGB image and the candidate holes acquired
+    from the rgb node.
+    If the depth and point cloud callback counterparts have done
+    what must be, it resets the number of ready nodes, unlocks
+    the synchronizer and calls for processing of the candidate
+    holes.
+    @param[in] rgbCandidateHolesVector
     [const vision_communications::CandidateHolesVectorMsg&]
     The message containing the necessary information to filter hole
     candidates acquired through the rgb node
@@ -1203,12 +1269,12 @@ namespace pandora_vision
       sensor_msgs::image_encodings::TYPE_8UC3,
       Parameters::Outline::raycast_keypoint_partitions);
 
+    // The candidate holes acquired from the rgb node and the rgb image are set
     numNodesReady_++;
 
-    // If the RGB and the depth nodes are ready
+    // If the depth candidate holes and the interpolated depth image are set
     // and the point cloud has been delivered and interpolated,
-    // unlock the rgb_depth_synchronizer and process the candidate holes
-    // from both sources
+    // unlock the synchronizer and process the candidate holes from both sources
     if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
@@ -1228,7 +1294,15 @@ namespace pandora_vision
 
   /**
     @brief Sets the depth values of a point cloud according to the
-    values of a depth image
+    values of a depth image.
+
+    Needed by the depth-based filters that employ a point cloud analysis.
+    The values of the point cloud published by the synchronizer node to
+    the hole fusion node contain the unadulterated values of the point
+    cloud directly obtained by the depth sensor,
+    hence they contain NaNs and zero-value pixels that
+    would otherwise, if not for this method, obstruct the function of the
+    above filters.
     @param[in] inImage [const cv::Mat&] The depth image in CV_32FC1 format
     @param[out] pointCloudPtr [PointCloudPtr*] The point cloud
     @return void
@@ -1263,7 +1337,16 @@ namespace pandora_vision
 
 
   /**
-    @brief The node's state manager
+    @brief The node's state manager.
+
+    If the current state is set to off, the synchronizer node is not
+    subscribed to the input point cloud. Otherwise, it is. In the event
+    of an "off" state instruction while "on", this method instructs the
+    synchronizer to leave its subscription from the input point cloud.
+    In the event of an "on" state instruction while "off", the this method
+    instructs the synchronizer node to subscribe to the input point cloud
+    and, if no callback of the three is called on the hole fusion node,
+    unlocks the synchronizer, so that normal processing can start/continue.
     @param[in] newState [const int&] The robot's new state
     @return void
    **/
@@ -1403,10 +1486,11 @@ namespace pandora_vision
       }
 
       // Commence setting of priorities given to hole checkers.
-      // Each priority given is not fixed, but there is an apparent hierarchy
-      // witnessed here.
+      // Each priority given is not fixed,
+      // but there is an apparent hierarchy witnessed here.
       // In order to reach a valid conclusion, an analytical method had to be
-      // used, which is one analogous to the one presented in {insert link}
+      // used, which is one analogous to the one presented in
+      // {insert link of Manos Tsardoulias's PHD thesis}
 
       // The depth homogeneity is considered the least confident measure of
       // a potential hole's validity. Hence,

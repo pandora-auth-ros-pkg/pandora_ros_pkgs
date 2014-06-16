@@ -128,6 +128,12 @@ namespace pandora_vision
       static float contrast_enhance_alpha;
       static float contrast_enhance_beta;
 
+      // The opencv edge detection method:
+      // 0 for the Canny edge detector
+      // 1 for the Scharr edge detector
+      // 2 for the Sobel edge detector
+      // 3 for the Laplacian edge detector
+      // 4 for mixed Scharr / Sobel edge detection
       static int edge_detection_method;
 
       // Threshold parameters
@@ -246,7 +252,6 @@ namespace pandora_vision
       // synchronizer node
       static int HEIGHT;
       static int WIDTH;
-      static int POINT_STEP;
 
       // Depth and RGB images' representation method.
       // 0 if image used is used as obtained from the image sensor

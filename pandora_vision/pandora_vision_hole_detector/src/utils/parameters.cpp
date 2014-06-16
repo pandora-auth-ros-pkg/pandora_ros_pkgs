@@ -104,6 +104,12 @@ namespace pandora_vision
   float Parameters::Edge::contrast_enhance_alpha = 2;
   float Parameters::Edge::contrast_enhance_beta = 2;
 
+  // The opencv edge detection method:
+  // 0 for the Canny edge detector
+  // 1 for the Scharr edge detector
+  // 2 for the Sobel edge detector
+  // 3 for the Laplacian edge detector
+  // 4 for mixed Scharr / Sobel edge detection
   int Parameters::Edge::edge_detection_method = 2;
 
   // Threshold parameters
@@ -213,7 +219,6 @@ namespace pandora_vision
   // synchronizer node
   int Parameters::Image::HEIGHT = 480;
   int Parameters::Image::WIDTH = 640;
-  int Parameters::Image::POINT_STEP = 32;
 
   // Depth and RGB images' representation method.
   // 0 if image used is used as obtained from the image sensor
@@ -243,7 +248,7 @@ namespace pandora_vision
 
   // Loose ends connection parameters
   int Parameters::Outline::AB_to_MO_ratio = 4;
-  int Parameters::Outline::minimum_curve_points = 100;
+  int Parameters::Outline::minimum_curve_points = 50;
 
 
   // Parameters specific to the RGB node

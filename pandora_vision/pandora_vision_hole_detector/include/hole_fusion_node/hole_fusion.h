@@ -191,8 +191,10 @@ namespace pandora_vision
         are printed in the console, with an order specified by the
         hole_fusion_cfg of the dynamic reconfigure utility
         @param[in] conveyor [const HolesConveyor&] The conveyor
-        containing candidate holes
-        @return A two dimensional vector containing the probabilities of
+        containing candidate holes that are to be checked against selected
+        filters
+        @return [std::vector<std::vector<float> >]
+        A two dimensional vector containing the probabilities of
         validity of each candidate hole. Each row of it pertains to a specific
         filter applied, each column to a particular hole
        **/
@@ -200,11 +202,18 @@ namespace pandora_vision
         const HolesConveyor& conveyor);
 
       /**
-        @brief Callback for the candidate holes via the depth node
+        @brief Callback for the candidate holes via the depth node.
+
+        This method sets the interpolated depth image and the
+        candidate holes acquired from the depth node.
+        If the rgb and point cloud callback counterparts have done
+        what must be, it resets the number of ready nodes, unlocks
+        the synchronizer and calls for processing of the candidate
+        holes.
         @param[in] depthCandidateHolesVector
         [const vision_communications::CandidateHolesVectorMsg&]
-        The message containing the necessary information to filter hole
-        candidates acquired through the depth node
+        The message containing the necessary information acquired through
+        the depth node
         @return void
        **/
       void depthCandidateHolesCallback(
@@ -243,34 +252,15 @@ namespace pandora_vision
         @brief Computes the on/off state of the Hole Detector package
         given a state
         @param[in] state [const int&] The robot's state
-        @return [bool] True if the Hole Fusion is able to unlock the
-        synchronizer node and thus process a new point cloud
+        @return [bool] True if the hole fusion node's state is set to "on"
        **/
       bool isHoleDetectorOn(const int& state);
-
-      /**
-        @brief With an input a conveyor of holes, this method, depending on
-        the depth image's interpolation method, has holes assimilating,
-        amalgamating or being connected with holes that can be assimilated,
-        amalgamated or connected with or by them. The interpolation method is
-        a basic criterion for the mode of merging holes because the two
-        filters that verify the validity of each merger are depth-based ones.
-        If there is no valid depth image on which to run these filters, it is
-        sure that the depth sensor is closer to the scene it is witnessing
-        than 0.5-0.6m. In this way of operation, the merging of holes does not
-        consider employing validator filters and simply merges holes that can
-        be merged with each other (assimilated, amalgamated, or connected).
-        @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
-        merged with one another, where applicable.
-        @return void
-       **/
-      void mergeHoles(HolesConveyor* conveyor);
 
       /**
         @brief The function called when a parameter is changed
         @param[in] config
         [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
-        @param[in] level [const uint32_t] The level (?)
+        @param[in] level [const uint32_t]
         @return void
        **/
       void parametersCallback(
@@ -279,16 +269,38 @@ namespace pandora_vision
 
       /**
         @brief Callback for the point cloud that the synchronizer node
-        publishes
-        @param[in] msg [const PointCloudPtr&] The message
-        containing the point cloud
+        publishes.
+
+        This method interpolates the input point cloud so that depth-based
+        filters using it have an integral input and sets it and header-related
+        variables.
+        If the depth and RGB callback counterparts have done
+        what must be, it resets the number of ready nodes, unlocks
+        the synchronizer and calls for processing of the candidate
+        holes.
+        @param[in] msg [const PointCloudPtr&] The message containing
+        the point cloud
         @return void
        **/
       void pointCloudCallback(const PointCloudPtr& msg);
 
       /**
-        @brief Implements a strategy to combine
-        information from both sources in order to accurately find valid holes
+        @brief Implements a strategy to combine information from both
+        the depth and rgb image and holes sources in order to accurately
+        find valid holes.
+
+        It first assimilates all the holes that can be assimilated into other
+        ones, amalgamates holes that can be amalgamated with others and
+        connectes nearby holes with each other. Then, it passes each of the
+        resulting holes through a series of depth-based (if depth analysis
+        is possible) filters and rgb-based filters in order to extract a series
+        of probabilities for each hole. Each probability is a measure of each
+        candidate hole's validity: the more a value of a probability, the more
+        a candidate hole is indeed a hole in space. Next, a selection regime
+        is implemented in order to assess a hole's validity in the totality
+        of the filters it has been through. Finally, information about the
+        valid holes is published, along with enhanced information about them.
+        @param void
         @return void
        **/
       void processCandidateHoles();
@@ -321,7 +333,14 @@ namespace pandora_vision
 
       /**
         @brief Callback for the candidate holes via the rgb node
-        @param[in] depthCandidateHolesVector
+
+        This method sets the RGB image and the candidate holes acquired
+        from the rgb node.
+        If the depth and point cloud callback counterparts have done
+        what must be, it resets the number of ready nodes, unlocks
+        the synchronizer and calls for processing of the candidate
+        holes.
+        @param[in] rgbCandidateHolesVector
         [const vision_communications::CandidateHolesVectorMsg&]
         The message containing the necessary information to filter hole
         candidates acquired through the rgb node
@@ -333,9 +352,17 @@ namespace pandora_vision
 
       /**
         @brief Sets the depth values of a point cloud according to the
-        values of a depth image
+        values of a depth image.
+
+        Needed by the depth-based filters that employ a point cloud analysis.
+        The values of the point cloud published by the synchronizer node to
+        the hole fusion node contain the unadulterated values of the point
+        cloud directly obtained by the depth sensor,
+        hence they contain NaNs and zero-value pixels that
+        would otherwise, if not for this method, obstruct the function of the
+        above filters.
         @param[in] inImage [const cv::Mat&] The depth image in CV_32FC1 format
-        @param[out] pointCloudXYZPtr [PointCloudXYZPtr*] The point cloud
+        @param[out] pointCloudPtr [PointCloudPtr*] The point cloud
         @return void
        **/
       void setDepthValuesInPointCloud(const cv::Mat& inImage,
@@ -400,7 +427,16 @@ namespace pandora_vision
       ~HoleFusion(void);
 
       /**
-        @brief The node's state manager
+        @brief The node's state manager.
+
+        If the current state is set to off, the synchronizer node is not
+        subscribed to the input point cloud. Otherwise, it is. In the event
+        of an "off" state instruction while "on", this method instructs the
+        synchronizer to leave its subscription from the input point cloud.
+        In the event of an "on" state instruction while "off", the this method
+        instructs the synchronizer node to subscribe to the input point cloud
+        and, if no callback of the three is called on the hole fusion node,
+        unlocks the synchronizer, so that normal processing can start/continue.
         @param[in] newState [const int&] The robot's new state
         @return void
        **/
