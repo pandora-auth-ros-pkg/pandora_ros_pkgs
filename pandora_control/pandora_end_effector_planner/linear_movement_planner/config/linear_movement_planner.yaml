@@ -1,4 +1,5 @@
 min_elevation: 0.24
 max_elevation: 0.42
+movement_threshold: 0.005
 linear_command_topic: /linear/linear_elevator_controller/command
 linear_motor_frame: linear_elevator_link

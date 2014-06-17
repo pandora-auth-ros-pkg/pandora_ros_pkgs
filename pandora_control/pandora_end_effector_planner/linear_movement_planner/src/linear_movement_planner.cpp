@@ -60,9 +60,8 @@ namespace pandora_control
           5, true);
 
       std_msgs::Float64 targetPosition;
-      targetPosition.data = 0;
+      targetPosition.data = previousTarget_ = 0;
       linearCommandPublisher_.publish(targetPosition);
-
       actionServer_.start();
     }
   }
@@ -95,6 +94,8 @@ namespace pandora_control
   {
     nodeHandle_.param("min_elevation", minElevation_, 0.0);
     nodeHandle_.param("max_elevation", maxElevation_, 0.18);
+    nodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
+    movementThreshold_ = fabs(movementThreshold_);
 
     if (nodeHandle_.getParam("linear_command_topic", linearCommandTopic_))
     {
@@ -122,7 +123,7 @@ namespace pandora_control
   void LinearMovementActionServer::lowerLinear()
   {
     std_msgs::Float64 targetPosition;
-    targetPosition.data = 0;
+    targetPosition.data = previousTarget_ = 0;
     linearCommandPublisher_.publish(targetPosition);
 
     ROS_DEBUG("%s: Succeeded", actionName_.c_str());
@@ -167,7 +168,7 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_WARN_STREAM("Is " << pointOfInterest << " broadcasted?");
+        ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
         continue;
       }
 
@@ -200,7 +201,11 @@ namespace pandora_control
       {
         targetPosition.data = 0.18;
       }
-      linearCommandPublisher_.publish(targetPosition);
+      if (fabs(previousTarget_ - targetPosition.data) > movementThreshold_)
+      {
+        linearCommandPublisher_.publish(targetPosition);
+        previousTarget_ = targetPosition.data;
+      }
     }
   }
 }  // namespace pandora_control

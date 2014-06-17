@@ -60,6 +60,8 @@ namespace pandora_control
       int command_;
       double minElevation_;
       double maxElevation_;
+      double movementThreshold_;
+      double previousTarget_;
       std::string linearCommandTopic_;
       std::string linearMotorFrame_;
 

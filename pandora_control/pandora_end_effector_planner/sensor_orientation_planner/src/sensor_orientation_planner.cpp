@@ -290,7 +290,7 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_WARN_STREAM("Is " << pointOfInterest << " broadcasted?");
+        ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
         continue;
       }
 

@@ -75,4 +75,4 @@ class Joystick:
 
 if __name__ == '__main__':
   rospy.init_node('set_vehicle_speed_wrapper')
-  joy = Joystick(linear_coeff=0.6, angular_coeff=0.8)
+  joy = Joystick(linear_coeff=0.55, angular_coeff=1.2)

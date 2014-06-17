@@ -4,9 +4,9 @@ action_name:
 move_kinect_action:
   pitch_step: 0.4
   yaw_step: 0.7
-  min_pitch: -1
+  min_pitch: -0.7
   min_yaw: -1
-  max_pitch: 1
+  max_pitch: 0.75
   max_yaw: 1
   time_step: 1
   pitch_command_topic: kinect_pitch_controller/command
