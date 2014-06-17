@@ -1,57 +1,49 @@
 #!/usr/bin/env python
 
 ''' 
-File Description	Battery monitor node. Beeps when battery under 21 Volts.
-Contents		callback
-Author			Chris Zalidis
-Date			16/4/2013
-Change History		
+File Description    Battery monitor node. Beeps when battery under 21 Volts.
+Author            Chris Zalidis
 '''
 
-import roslib; roslib.load_manifest('pandora_hardware_tools')
 import rospy
 import subprocess
 import sys
-from controllers_and_sensors_communications.msg import butterflyMsg
+from pandora_xmega_hardware_interface.msg import BatteryMsg
 
 
 class BatteryMonitor:
-	
-	highestVoltageMotors = 0
-	highestVoltagePSU = 0
-	previousMotors = 0
-	previousPSU = 0
-	okMotor = True
-	okPSU = True
-	
-	def __init__(self):
-		rospy.Subscriber('/sensors/butterfly', butterflyMsg, self.callback)
-		
-	def callback(self, data):
-		beeper = ['beep','-f','3000','-r','100']
-		
-		if data.voltage[0] > 20 and self.previousMotors < 20:
-			self.okMotor = True
-		if data.voltage[1] > 20 and self.previousPSU < 20:
-			self.okPSU = True
-		
-		self.highestVoltageMotors = max(data.voltage[0], self.highestVoltageMotors)
-		self.highestVoltagePSU = max(data.voltage[1], self.highestVoltagePSU)
-		
-		if self.highestVoltageMotors > 20 and data.voltage[0] < 21:
-			rospy.logerr('Motor battery '+ str(data.voltage[0]) + 'V !!')
-			if self.okMotor:
-				subprocess.Popen(beeper)
-			self.okMotor = False
-			
-		if self.highestVoltagePSU > 20 and data.voltage[1] < 21:
-			rospy.logerr('PSU battery ' + str(data.voltage[1]) + 'V !!')
-			if self.okPSU:
-				subprocess.Popen(beeper)
-			self.okPSU = False
-			
-		self.previousMotors = data.voltage[0]
-		self.previousPSU = data.voltage[1]
+
+    beeper = ['beep','-f','3000','-r','100']
+    highest_voltage = []
+    previous_voltage = []
+    ok = []
+    init = False
+    
+    def __init__(self):
+        rospy.Subscriber('/sensors/battery', BatteryMsg, self.callback)
+        
+    def callback(self, data):
+
+        if not self.init:
+            self.highest_voltage = len(data.name) * [0]
+            self.previous_voltage = len(data.name) * [0]
+            self.ok = len(data.name) * [True]
+            self.init = True
+
+        for i in range(len(data.name)):
+
+            if data.voltage[i] > 20 and self.previous_voltage[i] < 20:
+                self.ok[i] = True
+
+            self.highest_voltage[i] = max(data.voltage[i], self.highest_voltage[i])
+
+            if self.highest_voltage[i] > 20 and data.voltage[i] < 21:
+                rospy.logerr(str(data.name[i]) + ' battery '+ str(data.voltage[i]) + 'V !!')
+                if self.ok[i]:
+                    subprocess.Popen(self.beeper)
+                self.ok[i] = False
+
+            self.highest_voltage[i] = data.voltage[i]
 
 
 if __name__ == '__main__':
