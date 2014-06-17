@@ -21,6 +21,7 @@ add_action_files(
   FILES
   MoveSensor.action
   MoveLinear.action
+  MoveEndEffector.action
 )
 
 generate_messages(
@@ -67,3 +68,11 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   linear_movement_planner/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
+     ${PROJECT_SOURCE_DIR}
+     end_effector_planner/src/end_effector_planner_smach.py
+     end_effector_planner/src/states.py
+     end_effector_planner/src/topics.py
+    )
+roslint_python(${${PROJECT_NAME}_LINT_PYTHON})

@@ -1,11 +1,12 @@
 uint32 TEST = 0
-uint32 CENTER = 1
-uint32 POINT = 2
-uint32 MOVE = 3
+uint32 PARK = 1
+uint32 TRACK = 2
+uint32 SCAN = 3
 
 # Define the goal
 uint32 command
 string point_of_interest
+string center_point
 ---
 # Define the result
 ---

@@ -1,5 +1,6 @@
-uint32 LOWER = 0
-uint32 MOVE = 1
+uint32 TEST = 0
+uint32 LOWER = 1
+uint32 MOVE = 2
 
 # Define the goal
 uint32 command
