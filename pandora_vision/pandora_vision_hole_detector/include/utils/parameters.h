@@ -45,6 +45,10 @@
 #include <pandora_vision_hole_detector/hole_fusion_cfgConfig.h>
 #include <pandora_vision_hole_detector/rgb_cfgConfig.h>
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**

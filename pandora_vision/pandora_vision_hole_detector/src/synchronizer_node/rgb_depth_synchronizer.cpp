@@ -37,6 +37,10 @@
 
 #include "synchronizer_node/rgb_depth_synchronizer.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**

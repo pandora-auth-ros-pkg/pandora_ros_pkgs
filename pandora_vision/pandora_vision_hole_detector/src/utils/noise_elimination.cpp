@@ -37,6 +37,10 @@
 
 #include "utils/noise_elimination.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**
@@ -161,7 +165,7 @@ namespace pandora_vision
 
     // Find the lowest non-zero value outside this concentration of
     // zero-value pixels
-    const float lowest = 10000.0;
+    const float lowest = std::numeric_limits<float>::max();
     float lower = lowest;
     float val = 0.0;
     const float noise = 0.0;
@@ -237,10 +241,11 @@ namespace pandora_vision
     Timer::start("chooseInterpolationMethod");
     #endif
 
+    // The number of zero value pixels
     unsigned int blacks = 0;
+
+    // The mean distance of the non-noisy points from the depth sensor
     float mean = 0.0;
-    float std = 0.0;
-    float bper = 0.0;
 
     for(unsigned int i = 0 ; i < image.rows ; i++)
     {
@@ -260,23 +265,9 @@ namespace pandora_vision
 
     mean /= image.rows * image.cols - blacks + 1;
 
-    for(unsigned int i = 0 ; i < image.rows ; i++)
-    {
-      for(unsigned int j = 0 ; j < image.cols ; j++)
-      {
-        float d = image.at<float>(i, j);
-        if(d != 0.0)
-        {
-          std += pow(d - mean, 2);
-        }
-      }
-    }
+    // The percentage of noise in the depth image
+    float bper = static_cast<float>(blacks) / (image.rows * image.cols);
 
-    std /= image.rows * image.cols - blacks + 1;
-    std = sqrt(std);
-    bper = static_cast<float>(blacks) / (image.rows * image.cols);
-
-    Parameters::Depth::interpolation_method = 15;
     if(bper > 0.7)  // Choose close
     {
       Parameters::Depth::interpolation_method = 2;
@@ -289,6 +280,7 @@ namespace pandora_vision
     {
       Parameters::Depth::interpolation_method = 0;
     }
+
     #ifdef DEBUG_TIME
     Timer::tick("chooseInterpolationMethod");
     #endif
@@ -392,16 +384,34 @@ namespace pandora_vision
       return 0.0;
     }
 
+    // The non-zero value neighbors' sum of values
     float sumValueOfNonZeroPixels = 0.0;
+
+    // The number of non-zero value neighbors
     int countOfNonZeroPixels = 0;
 
+    // Up
     float p2 = inImage.at<float>(row - 1, col);
+
+    // Upper right
     float p3 = inImage.at<float>(row - 1, col + 1);
+
+    // Right
     float p4 = inImage.at<float>(row, col + 1);
+
+    // Lower right
     float p5 = inImage.at<float>(row + 1, col + 1);
+
+    // Down
     float p6 = inImage.at<float>(row + 1, col);
+
+    // Lower left
     float p7 = inImage.at<float>(row + 1, col - 1);
+
+    // Left
     float p8 = inImage.at<float>(row, col - 1);
+
+    // Upper left
     float p9 = inImage.at<float>(row - 1, col - 1);
 
     if (p2 != 0.0)
@@ -410,42 +420,49 @@ namespace pandora_vision
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p3 != 0.0)
     {
       sumValueOfNonZeroPixels += p3;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p4 != 0.0)
     {
       sumValueOfNonZeroPixels += p4;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p5 != 0.0)
     {
       sumValueOfNonZeroPixels += p5;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p6 != 0.0)
     {
       sumValueOfNonZeroPixels += p6;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p7 != 0.0)
     {
       sumValueOfNonZeroPixels += p7;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p8 != 0.0)
     {
       sumValueOfNonZeroPixels += p8;
       countOfNonZeroPixels++;
       *endFlag = true;
     }
+
     if (p9 != 0.0)
     {
       sumValueOfNonZeroPixels += p9;

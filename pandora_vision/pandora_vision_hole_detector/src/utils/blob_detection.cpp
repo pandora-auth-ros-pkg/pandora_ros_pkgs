@@ -37,11 +37,15 @@
 
 #include "utils/blob_detection.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**
-    @brief Implements the brushfire algorithm for one blob keypoint in order to
-    find its outline points
+    @brief Implements the brushfire algorithm for one blob keypoint
+    in order to find its outline points
     @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
     @param[in] edgesImage [cv::Mat*] The input image
     @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
@@ -62,6 +66,7 @@ namespace pandora_vision
     // Get a pointer on the edges image
     unsigned char* ptr = edgesImage->ptr();
 
+    // The sets needed by the brushfire implementation
     std::set<unsigned int> current, next, visited;
 
     // The indices of the blob's outline points stored in a set.
@@ -89,23 +94,34 @@ namespace pandora_vision
           {
             // This check is needed because it is possible to access
             // a point diagonal to the current one
-            // that goes out of the border's of interest bounds
-            // (value == 0) while it shouldn't.
-            // This happens when there are "cracks" to the border of a
+            // that goes out of the image's borders (value == 0),
+            // while it shouldn't.
+            // E.g. this happens when there are "cracks" to the border of a
             // 1-pixel border
             if (abs(m) + abs(n) < 2)
             {
+              // Column-wise coordinate
               int x = static_cast<int>(*it) % edgesImage->cols + m;
+
+              // Row-wise coordinate
               int y = static_cast<int>(*it) / edgesImage->cols + n;
+
+              // The index of this neighbor inside image edgesImage
               int ind = y * edgesImage->cols + x;
 
+              // If this neighbor is not within the image's borders,
+              // discard it and move on
               if (x < 0 || y < 0 ||
                 x > edgesImage->cols - 1 || y > edgesImage->rows - 1)
               {
                 continue;
               }
 
+              // The value of the point with index ind in edgesImage
               char v = ptr[ind];
+
+              // If this neighbor is a blank pixel and
+              // it has not been visited, put it in set "next"
               if ((v == 0) && visited.find(ind) == visited.end())
               {
                 next.insert(ind);
@@ -117,12 +133,18 @@ namespace pandora_vision
                 blobOutlineSet.insert(ind);
               }
 
+              // Whatever the condition, this neighbor has been visited
               visited.insert(ind);
             }
           }
         }
       }
+
+      // The set of all future points becomes the one with which the
+      // brushfire will begin
       current.swap(next);
+
+      // Clear set "next" for the next iteration
       next.clear();
     }
 
@@ -132,10 +154,13 @@ namespace pandora_vision
       it != blobOutlineSet.end(); it++)
     {
       blobOutlineVector->push_back(
-        cv::Point2f(static_cast<int>(*it) % edgesImage->cols,
-        static_cast<int>(*it) / edgesImage->cols));
+        cv::Point2f(
+          static_cast<int>(*it) % edgesImage->cols,
+          static_cast<int>(*it) / edgesImage->cols)
+        );
     }
 
+    // The area of the blob is essentialy the number of points visited
     *blobArea = static_cast<float>(visited.size());
 
     #ifdef DEBUG_TIME
@@ -146,8 +171,8 @@ namespace pandora_vision
 
 
   /**
-    @brief Implements the brushfire algorithm for all blob keypoints in order to
-    find blobs' outlines
+    @brief Implements the brushfire algorithm for all blob keypoints
+    in order to find blobs' outlines
     @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
     @param[in] edgesImage [cv::Mat*] The input image
     @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]
@@ -180,6 +205,7 @@ namespace pandora_vision
       // Push back the blobOutlineVector to the overall outline points vector
       blobsOutlineVector->push_back(blobOutlineVector);
 
+      // Push back the area of the blob to the overall areas vector
       blobsArea->push_back(blobArea);
     }
 
@@ -209,8 +235,10 @@ namespace pandora_vision
     Timer::start("brushfirePoint");
     #endif
 
+    // Get a pointer on the input image
     unsigned char* ptr = inImage->ptr();
 
+    // The sets needed by the brushfire implementation
     std::set<unsigned int> current, next;
 
     current.insert(static_cast<int>(round(inPoint.y) * inImage->cols)
@@ -230,35 +258,51 @@ namespace pandora_vision
           {
             // This check is needed because it is possible to access
             // a point diagonal to the current one
-            // that goes out of the border's of interest bounds
-            // (value == 0) while it shouldn't.
-            // This happens when there are "cracks" to the border of a
+            // that goes out of the image's borders (value == 0),
+            // while it shouldn't.
+            // E.g. this happens when there are "cracks" to the border of a
             // 1-pixel border
             if (abs(m) + abs(n) < 2)
             {
+              // Column-wise coordinate
               int x = static_cast<int>(*it) % inImage->cols + m;
+
+              // Row-wise coordinate
               int y = static_cast<int>(*it) / inImage->cols + n;
 
+              // The index of this neighbor inside image inImage
               int ind = y * inImage->cols + x;
 
+              // If this neighbor is not within the image's borders,
+              // discard it and move on
               if (x < 0 || y < 0 ||
                 x > inImage->cols - 1 || y > inImage->rows - 1)
               {
                 continue;
               }
 
+              // The value of the point with index ind in edgesImage
               char v = ptr[ind];
+
+              // If this neighbor is a blank pixel and
+              // it has not been visited, put it in set "next"
               if ((v == 0) && visited->find(ind) == visited->end())
               {
                 next.insert(ind);
               }
 
+              // Whatever the condition, this neighbor has been visited
               visited->insert(ind);
             }
           }
         }
       }
+
+      // The set of all future points becomes the one with which the
+      // brushfire will begin
       current.swap(next);
+
+      // Clear set "next" for the next iteration
       next.clear();
     }
 
@@ -358,26 +402,36 @@ namespace pandora_vision
     Timer::start("raycastKeypoint");
     #endif
 
+    // Get a pointer on edgesImage
     unsigned char* ptr = edgesImage->ptr();
 
     // A vector storing the non-zero pixels surrounding the keypoint
     std::vector<cv::Point2f> keypointOutline;
 
+    // The angle of a ray relative to the horizontal axis
     float theta = 0;
-    float thetaIncrement = 2 * 3.1415926535897 / partitions;
 
+    // The increment of a ray's angle
+    float thetaIncrement = 2 * M_PI / partitions;
+
+    // Make a complete revolution
     for (unsigned int angleId = 0; angleId < partitions; angleId++)
     {
+      // Indicates whether this ray has hit a non-zero value point
       bool outlineFound = false;
+
+      // Variable responsible for advancing the tip of the ray until it
+      // finds a non-zero value point
       int counter = 0;
 
       // A ray can hit up to 5 outline points, but only one must be chosen.
       // Store these points as potential outline points.
-      // We will select only the first found
+      // We will select only the first one found
       std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
 
       while(!outlineFound)
       {
+        // Advance the tip of the ray forwards
         counter++;
 
         for (int m = -1; m < 2; m++)
@@ -415,7 +469,7 @@ namespace pandora_vision
               outOfBounds = true;
             }
 
-            // The index of the neighbor of the ray's end point
+            // The index of the neighbor of the ray's tip
             int ind = y * edgesImage->cols + x;
 
 
@@ -441,9 +495,11 @@ namespace pandora_vision
       // (Needed to approximate fairly accurately the blob's area)
       keypointOutline.push_back(singleRayPotentialOutlinePoints[0]);
 
+      // Increase the angle of the ray
       theta += thetaIncrement;
     }
 
+    // If the area of the blob needs to be returned
     if (findArea)
     {
       // Calculate each blob's approximate area by heron's formula
@@ -509,6 +565,7 @@ namespace pandora_vision
       }
     }
 
+    // The final outline points vector
     *blobOutlineVector = keypointOutline;
 
     #ifdef DEBUG_TIME
@@ -552,7 +609,7 @@ namespace pandora_vision
       // The current blob's area
       float area = 0.0;
 
-      // Find the outline and area of the current keypoint
+      // Find the outline and the area of the current keypoint
       raycastKeypoint(inKeyPoints[i],
         edgesImage,
         partitions,
@@ -560,10 +617,10 @@ namespace pandora_vision
         &keypointOutline,
         &area);
 
-      // Push back the blob's area
+      // Push the blob's area back into the vector of areas
       blobsArea->push_back(area);
 
-      // Push back the blob's outline
+      // Push the blob's outline back into the vector of blobs' outline points
       blobsOutlineVector->push_back(keypointOutline);
     }
 

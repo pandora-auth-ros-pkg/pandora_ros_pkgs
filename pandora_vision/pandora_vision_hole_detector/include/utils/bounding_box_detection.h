@@ -41,7 +41,7 @@
 #include "utils/morphological_operators.h"
 
 /**
-  @namespace vision
+  @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
@@ -55,8 +55,9 @@ namespace pandora_vision
     public:
 
       /**
-        @brief Finds rotated bounding boxes from blob outlines. The blob's area
-        must be larger than Parameters::bounding_box_min_area_threshold.
+        @brief Finds rotated bounding boxes from blob outlines.
+        The blob's area must be larger than
+        Parameters::bounding_box_min_area_threshold.
         The blob and its bounding rectangle must be inside the image's limits.
         @param[in] inImage [const cv::Mat&] The input image
         @param[in] blobsOutlineVector

@@ -43,6 +43,10 @@
 #include "utils/defines.h"
 #include "utils/hole_filters.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**

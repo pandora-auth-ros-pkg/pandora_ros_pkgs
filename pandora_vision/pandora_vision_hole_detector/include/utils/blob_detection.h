@@ -41,7 +41,7 @@
 #include "utils/morphological_operators.h"
 
 /**
-  @namespace vision
+  @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
@@ -55,8 +55,8 @@ namespace pandora_vision
     public:
 
       /**
-        @brief Implements the brushfire algorithm for one blob keypoint in
-        order to find its outline points
+        @brief Implements the brushfire algorithm for one blob keypoint
+        in order to find its outline points
         @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
         @param[in] edgesImage [cv::Mat*] The input image
         @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
@@ -71,8 +71,8 @@ namespace pandora_vision
         float* blobArea);
 
       /**
-        @brief Implements the brushfire algorithm for all blob keypoints in
-        order to find blobs' outlines
+        @brief Implements the brushfire algorithm for all blob keypoints
+        in order to find blobs' outlines
         @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
         @param[in] edgesImage [cv::Mat*] The input image
         @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]

@@ -37,18 +37,24 @@
 
 #include "utils/bounding_box_detection.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**
-    @brief Finds rotated bounding boxes from blob outlines. The blob's area
-    must be larger than Parameters::bounding_box_min_area_threshold.
+    @brief Finds rotated bounding boxes from blob outlines.
+    The blob's area must be larger than
+    Parameters::bounding_box_min_area_threshold.
     The blob and its bounding rectangle must be inside the image's limits.
     @param[in] inImage [const cv::Mat&] The input image
-    @param[in] blobsOutlineVector [const std::vector<std::vector<cv::Point2f> >&]
+    @param[in] blobsOutlineVector
+    [const std::vector<std::vector<cv::Point2f> >&]
     The outline points of the blobs
     @param[in] blobsArea [const std::vector<float>&] The blobs' area
-    @param[out] outRectangles [std::vector< std::vector<cv::Point2f> >*] The
-    rectangles of the bounding boxes
+    @param[out] outRectangles [std::vector< std::vector<cv::Point2f> >*]
+    The rectangles of the bounding boxes
     @return void
    **/
   void BoundingBoxDetection::findRotatedBoundingBoxesFromOutline(
@@ -65,6 +71,8 @@ namespace pandora_vision
     std::vector<cv::RotatedRect> minRect;
     for(unsigned int i = 0; i < blobsOutlineVector.size(); i++)
     {
+      // The area of the blob should be greater than a threshold,
+      // so that tiny formations of pixels are not identified as blobs
       if(blobsArea[i] >= Parameters::Blob::blob_min_area)
       {
         minRect.push_back(minAreaRect(cv::Mat(blobsOutlineVector[i])));
@@ -73,8 +81,8 @@ namespace pandora_vision
 
 
     // For each rotated rectangle whose corresponding blob exceeds the minimum
-    // area threshold, if its vertices reside inside the image's boundaries,
-    // store these vertices
+    // area threshold, if its vertices reside within the image's boundaries,
+    // store its vertices
     for(unsigned int i = 0; i < minRect.size(); i++)
     {
       // The for vertices of the rotated rectangle
@@ -83,6 +91,7 @@ namespace pandora_vision
 
       // Check if the vertices reside in the image's boundaries
       int numVerticesWithinImageLimits = 0;
+
       for (int j = 0; j < 4; j++)
       {
         if (rect_points[j].x < inImage.cols &&
@@ -101,7 +110,7 @@ namespace pandora_vision
         continue;
       }
 
-      // If all four vertices reside inside the image's boundaries,
+      // If all four vertices reside within the image's boundaries,
       // store them in their respective position
 
       // Same as rect_points array, but vector

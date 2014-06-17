@@ -37,6 +37,10 @@
 
 #include "utils/wavelets.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   cv::Mat Wavelets::convCols(const cv::Mat& in,
@@ -47,8 +51,6 @@ namespace pandora_vision
     #endif
 
     int length = in.rows + kernel.size() - 1;
-
-    //std::cout<<"Length is : "<<length<<std::endl;
 
     cv::Mat temp = cv::Mat::zeros(length, in.cols, CV_32FC1);
 
@@ -63,14 +65,11 @@ namespace pandora_vision
           if((i - j) >= 0 && (i - j) < in.rows)
           {
             y += in.at<float>(i - j, k) * kernel.at(j);
-
           }
-
         }
+
         temp.at<float>(i, k)=y;
       }
-
-      //out.push_back(y);
     }
 
     #ifdef DEBUG_TIME
@@ -105,7 +104,6 @@ namespace pandora_vision
           {
             y += in.at<float>(k, i - j) * kernel.at(j);
           }
-
         }
 
         temp.at<float>(k, i)=y;
@@ -148,7 +146,6 @@ namespace pandora_vision
 
     double minVal;
     double maxVal;
-
 
     cv::minMaxLoc(tempy000, &minVal, &maxVal);
 

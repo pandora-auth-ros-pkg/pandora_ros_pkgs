@@ -46,7 +46,7 @@
 #include <math.h>
 
 /**
-  @namespace vision
+  @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
@@ -62,16 +62,17 @@ namespace pandora_vision
       /**
         @brief Given a set of keypoints and an edges image, this function
         returns the valid keypoints and for each one, its respective, least
-        area, rotated bounding box and the points of its outline.
-        @param[int] keyPoints [const std::vector<cv::KeyPoint>&]
+        area rotated bounding box and the points of its outline.
+        @param[in] keyPoints [const std::vector<cv::KeyPoint>&]
         The original keypoints found.
         @param[in] denoisedDepthImageEdges [cv::Mat*] The original denoised
         depth edges image
-        @param[in] detectionMethod [const int&] The method by which the outline
-        of a blob is obtained. 0 means by means of brushfire, 1 by means of
-        raycasting
-        @param[in,out] conveyor [HolesConveyor*] A struct that contains the
-        final valid holes
+        @param[in] detectionMethod [const int&] The method by which the
+        outline of a blob is obtained.
+        0 means by means of brushfire,
+        1 by means of raycasting
+        @param[in,out] conveyor [HolesConveyor*] A struct that contains
+        the final valid candidate holes
         @return void
        **/
       static void validateBlobs(

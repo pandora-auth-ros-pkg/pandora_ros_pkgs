@@ -60,7 +60,7 @@
 #include "hole_fusion_node/hole_merger.h"
 
 /**
-  @namespace vision
+  @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision

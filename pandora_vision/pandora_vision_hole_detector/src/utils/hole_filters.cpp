@@ -37,20 +37,26 @@
 
 #include "utils/hole_filters.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**
     @brief Given a set of keypoints and an edges image, this function
     returns the valid keypoints and for each one, its respective, least
-    area, rotated bounding box and the points of its outline.
+    area rotated bounding box and the points of its outline.
     @param[in] keyPoints [const std::vector<cv::KeyPoint>&]
     The original keypoints found.
     @param[in] denoisedDepthImageEdges [cv::Mat*] The original denoised
     depth edges image
-    @param[in] detectionMethod [const int&] The method by which the outline of a
-    blob is obtained. 0 means by means of brushfire, 1 by means of raycasting
-    @param[in,out] conveyor [HolesConveyor*] A struct that contains the final
-    valid holes
+    @param[in] detectionMethod [const int&] The method by which the
+    outline of a blob is obtained.
+    0 means by means of brushfire,
+    1 by means of raycasting
+    @param[in,out] conveyor [HolesConveyor*] A struct that contains
+    the final valid candidate holes
     @return void
    **/
   void HoleFilters::validateBlobs(
@@ -65,6 +71,7 @@ namespace pandora_vision
 
     switch(detectionMethod)
     {
+      // Locate the outline of blobs via brushfiring
       case 0:
         {
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
@@ -103,6 +110,7 @@ namespace pandora_vision
 
           break;
         }
+      // Locate the outline of blobs via raycasting
       case 1:
         {
           std::vector<std::vector<cv::Point2f> > blobsOutlineVector;
@@ -143,10 +151,11 @@ namespace pandora_vision
           break;
         }
     }
-    /* The end product here is a struct (conveyor) of keypoints,
-     * a set of rectangles that enclose them  and the outline of
-     * each blob found.
-     */
+
+    // The end product here is a struct (conveyor) of keypoints,
+    // a set of rectangles that enclose them  and the outline of
+    // each blob found.
+
     #ifdef DEBUG_TIME
     Timer::tick("validateBlobs");
     #endif
@@ -200,9 +209,8 @@ namespace pandora_vision
         }
       }
 
-      /*
-       * If the keypoint resides in exactly one rectangle.
-       */
+
+      // If the keypoint resides in exactly one rectangle.
       if (keypointResidesInRectIds.size() == 1)
       {
         // A single hole
@@ -217,13 +225,16 @@ namespace pandora_vision
         conveyor->holes.push_back(hole);
       }
 
-
       // If the keypoint resides in multiple rectangles,
       // choose the one with the least area.
       if (keypointResidesInRectIds.size() > 1)
       {
-        float minRectArea = 1000000.0;
+        // The minimum area of all rectangles
+        float minRectArea = std::numeric_limits<float>::max();
+
+        // The index of the rectangle with the least area
         int minAreaRectId;
+
         for (unsigned int i = 0; i < keypointResidesInRectIds.size(); i++)
         {
           if (inRectanglesArea[keypointResidesInRectIds[i]] < minRectArea)
@@ -245,10 +256,8 @@ namespace pandora_vision
         conveyor->holes.push_back(hole);
       }
 
-      /*
-       * If the keypoint has no rectangle attached to it,
-       * do not insert the keypoint in the valid keypoints vector, etc.
-       */
+      // If the keypoint has no rectangle attached to it,
+      // do not insert the hole it corresponds to in struct hole
     }
 
     #ifdef DEBUG_TIME

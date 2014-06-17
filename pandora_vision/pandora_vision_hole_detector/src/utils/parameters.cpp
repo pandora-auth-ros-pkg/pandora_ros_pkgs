@@ -37,6 +37,10 @@
 
 #include "utils/parameters.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   // Blob detection - specific parameters

@@ -385,15 +385,7 @@ namespace pandora_vision
 
         ASSERT_EQ ( CV_8UC1, denoisedEdges.type() );
 
-        // Canny cannot locate any edges in the squares_32FC1 image
-        if ( p == 0 )
-        {
-          EXPECT_EQ ( 0, cv::countNonZero( denoisedEdges ) );
-        }
-        else
-        {
-          EXPECT_LT ( 0, cv::countNonZero( denoisedEdges ) );
-        }
+        EXPECT_LT ( 0, cv::countNonZero( denoisedEdges ) );
       }
     }
 

@@ -37,6 +37,10 @@
 
 #include "hole_fusion_node/filters_resources.h"
 
+/**
+  @namespace pandora_vision
+  @brief The main namespace for PANDORA vision
+ **/
 namespace pandora_vision
 {
   /**

@@ -38,7 +38,7 @@
 #include "utils/message_conversions.h"
 
 /**
-  @namespace vision
+  @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
@@ -71,7 +71,7 @@ namespace pandora_vision
     @param pointCloud[in] [const PointCloudPtr&]
     The input point cloud message
     @param[in] id [const int&] The enconding of the converted image.
-    CV_32FC1 for depth image, CV_8UC3 for rgb image
+    CV_32FC1 for a depth image, CV_8UC3 for a rgb image
     @return cv::Mat The output image
    **/
   cv::Mat MessageConversions::convertPointCloudMessageToImage(
