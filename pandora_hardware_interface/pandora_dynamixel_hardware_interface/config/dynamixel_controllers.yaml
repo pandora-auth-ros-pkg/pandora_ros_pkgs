@@ -4,10 +4,10 @@ laser_roll_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: laser_roll_joint
-    joint_speed: 1
+    joint_speed: 0.5
     motor:
         id: 2
-        init: 512
+        init: 500
         min: 0
         max: 1023
 
@@ -17,10 +17,10 @@ laser_pitch_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: laser_pitch_joint
-    joint_speed: 1
+    joint_speed: 0.5
     motor:
         id: 1
-        init: 512
+        init: 506
         min: 0
         max: 1023
 
@@ -30,7 +30,7 @@ kinect_pitch_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: kinect_pitch_joint
-    joint_speed: 2
+    joint_speed: 0.5
     motor:
         id: 3
         init: 512
@@ -43,7 +43,7 @@ kinect_yaw_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: kinect_yaw_joint
-    joint_speed: 2
+    joint_speed: 0.5
     motor:
         id: 4
         init: 512
@@ -56,7 +56,7 @@ linear_head_pitch_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: linear_head_pitch_joint
-    joint_speed: 2
+    joint_speed: 0.5
     motor:
         id: 6
         init: 512
@@ -69,7 +69,7 @@ linear_head_yaw_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: linear_head_yaw_joint
-    joint_speed: 2
+    joint_speed: 0.5
     motor:
         id: 5
         init: 512

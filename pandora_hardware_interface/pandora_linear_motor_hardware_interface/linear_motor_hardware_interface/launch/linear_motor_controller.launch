@@ -13,5 +13,5 @@
     ns="/linear"
     args="
       joint_state_controller
-      linear_motor_controller" />
+      linear_elevator_controller" />
 </launch>

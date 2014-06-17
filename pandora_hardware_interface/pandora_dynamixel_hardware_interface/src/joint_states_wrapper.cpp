@@ -56,6 +56,8 @@ namespace dynamixel
       ros::Subscriber laserPitchSubscriber_;
       ros::Subscriber kinectPitchSubscriber_;
       ros::Subscriber kinectYawSubscriber_;
+      ros::Subscriber headPitchSubscriber_;
+      ros::Subscriber headYawSubscriber_;
       ros::Publisher publisher_;
 
       ros::Timer timer;
@@ -64,6 +66,8 @@ namespace dynamixel
       void laserPitchCallback(const dynamixel_msgs::JointState& msg);
       void kinectPitchCallback(const dynamixel_msgs::JointState& msg);
       void kinectYawCallback(const dynamixel_msgs::JointState& msg);
+      void headPitchCallback(const dynamixel_msgs::JointState& msg);
+      void headYawCallback(const dynamixel_msgs::JointState& msg);
       void jointStatesCallback(const ros::TimerEvent&);
     public:
     JointStatesWrapper();
@@ -79,6 +83,10 @@ namespace dynamixel
     jointStatesMsg_.name.push_back("kinect_pitch_joint");
     jointStatesMsg_.position.push_back(0);
     jointStatesMsg_.name.push_back("kinect_yaw_joint");
+    jointStatesMsg_.position.push_back(0);
+    jointStatesMsg_.name.push_back("linear_head_pitch_joint");
+    jointStatesMsg_.position.push_back(0);
+    jointStatesMsg_.name.push_back("linear_head_yaw_joint");
     jointStatesMsg_.position.push_back(0);
 
     laserRollSubscriber_ = nodeHandle_.subscribe(
@@ -103,6 +111,18 @@ namespace dynamixel
       "/kinect_yaw_controller/state",
       1,
       &JointStatesWrapper::kinectYawCallback,
+      this);
+
+    headPitchSubscriber_ = nodeHandle_.subscribe(
+      "/linear_head_pitch_controller/state",
+      1,
+      &JointStatesWrapper::headPitchCallback,
+      this);
+
+    headYawSubscriber_ = nodeHandle_.subscribe(
+      "/linear_head_yaw_controller/state",
+      1,
+      &JointStatesWrapper::headYawCallback,
       this);
 
     publisher_ = nodeHandle_.advertise<sensor_msgs::JointState>(
@@ -137,6 +157,16 @@ namespace dynamixel
   void JointStatesWrapper::kinectYawCallback(const dynamixel_msgs::JointState& msg)
   {
     jointStatesMsg_.position[3] = msg.current_pos;
+  }
+
+  void JointStatesWrapper::headPitchCallback(const dynamixel_msgs::JointState& msg)
+  {
+    jointStatesMsg_.position[4] = msg.current_pos;
+  }
+
+  void JointStatesWrapper::headYawCallback(const dynamixel_msgs::JointState& msg)
+  {
+    jointStatesMsg_.position[5] = msg.current_pos;
   }
 
   void JointStatesWrapper::jointStatesCallback(const ros::TimerEvent&)

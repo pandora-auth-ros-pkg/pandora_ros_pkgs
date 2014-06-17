@@ -1,9 +1,9 @@
-linear_motor_joint: &linear_motor_joint linear_joint
+linear_motor_joint: &linear_motor_joint linear_elevator_joint
 
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
   
-linear_motor_controller:
+linear_elevator_controller:
   type: position_controllers/JointPositionController
   joint: *linear_motor_joint

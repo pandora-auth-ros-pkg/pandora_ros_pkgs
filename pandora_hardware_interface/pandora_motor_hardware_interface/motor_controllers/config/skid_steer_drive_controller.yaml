@@ -5,14 +5,14 @@ skid_steer_drive_controller:
   left_rear_wheel: left_rear_wheel_joint
   right_rear_wheel: right_rear_wheel_joint
   publish_rate: 50
-  wheel_separation_multiplier: 1
+  wheel_separation_multiplier: 2.2
   wheel_radius_multiplier: 1
   wheel_radius: 0.0975
   cmd_vel_timeout: 3
   base_frame_id: base_link
   linear:
     x:
-      has_velocity_limits: true
+      has_velocity_limits: false
       has_acceleration_limits: false
       max_velocity: 0.5
       min_velocity: -0.5
@@ -20,7 +20,7 @@ skid_steer_drive_controller:
       min_acceleration: 1
   angular:
     z:
-      has_velocity_limits: true
+      has_velocity_limits: false
       has_acceleration_limits: false
       max_velocity: 0.8
       min_velocity: -0.8
