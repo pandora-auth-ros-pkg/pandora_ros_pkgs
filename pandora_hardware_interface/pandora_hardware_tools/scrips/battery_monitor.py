@@ -38,7 +38,7 @@ class BatteryMonitor:
             self.highest_voltage[i] = max(data.voltage[i], self.highest_voltage[i])
 
             if self.highest_voltage[i] > 20 and data.voltage[i] < 21:
-                rospy.logerr(str(data.name[i]) + ' battery '+ str(data.voltage[i]) + 'V !!')
+                rospy.logerr(str(data.name[i]) + ' '+ str(data.voltage[i]) + 'V !!')
                 if self.ok[i]:
                     subprocess.Popen(self.beeper)
                 self.ok[i] = False
