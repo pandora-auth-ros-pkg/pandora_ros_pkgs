@@ -1,0 +1,8 @@
+topic_names: [ 
+              [ /data_fusion/victim_fusion/hole_direction_alert , vision_communications , HolesDirectionsVectorMsg ] ,
+              [ /vision/hazmat_alert , vision_communications , HazmatAlertsVectorMsg ] ,
+             ]
+
+  
+
+

@@ -1,0 +1,20 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/> 
+
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> 
+  <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_standalone.launch" />
+  <rosparam command="load" ns="/pandora_vision/hole_detector/synchronizer_node" param="subscribed_topics/input_topic">
+    /kinect/depth_registered/points
+  </rosparam>
+
+  <node name="state_changer" type="state_changer" pkg="state_manager" args="2" />
+
+  <node pkg="pandora_testing_tools" type="bag_player_for_tests" name="player" 
+    args="--bags $(find pandora_integration_testing)/bags/moving_kinect_backstage.bag --clock" /> 
+
+  <test test-name="HoleDataFusionTest" pkg="pandora_integration_testing"
+    type="hole_data_fusion_test.py" />
+
+</launch>
+
