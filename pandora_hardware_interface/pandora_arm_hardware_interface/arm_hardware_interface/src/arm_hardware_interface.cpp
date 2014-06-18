@@ -45,6 +45,13 @@ namespace arm
   :
     nodeHandle_(nodeHandle)
   {
+    try {
+      arm_ = new ArmUSBInterface();
+    }
+    catch(std::exception& ex) {
+      ROS_ERROR("%s", ex.what());
+      exit(-1);
+    }
     // connect and register co2 sensor interface
     registerCo2SensorInterface();
 
@@ -54,18 +61,19 @@ namespace arm
 
   ArmHardwareInterface::~ArmHardwareInterface()
   {
+    delete arm_;
   }
 
   void ArmHardwareInterface::read()
   {
     for (int ii = 0; ii < co2SensorName_.size(); ii++)
     {
-      co2Percentage_[ii] = arm_.co2ValueGet();
+      co2Percentage_[ii] = arm_->co2ValueGet();
     }
 
     for (int ii = 0; ii < thermalSensorName_.size(); ii++)
     {
-      arm_.grideyeValuesGet(*address_[ii].c_str(), thermalData_[ii]);
+      arm_->grideyeValuesGet(*address_[ii].c_str(), thermalData_[ii]);
     }
   }
 

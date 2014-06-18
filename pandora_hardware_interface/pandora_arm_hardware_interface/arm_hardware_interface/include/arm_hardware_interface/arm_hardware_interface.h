@@ -53,7 +53,7 @@ namespace arm
   {
     private:
       ros::NodeHandle nodeHandle_;
-      ArmUSBInterface arm_;
+      ArmUSBInterface* arm_;
 
       Co2SensorInterface co2SensorInterface_;
       ThermalSensorInterface thermalSensorInterface_;

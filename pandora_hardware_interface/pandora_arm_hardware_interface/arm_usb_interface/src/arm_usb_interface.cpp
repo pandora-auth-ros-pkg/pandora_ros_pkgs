@@ -47,14 +47,18 @@ namespace arm
 
 ArmUSBInterface::ArmUSBInterface()
 {
-//To make read non-blocking use the following
-//  fd = open("/dev/head", O_RDWR | O_NOCTTY | O_NDELAY);
+  int timeout = 0;
+  //To make read non-blocking use the following
+  //  fd = open("/dev/head", O_RDWR | O_NOCTTY | O_NDELAY);
   while ((fd = open("/dev/head", O_RDWR | O_NOCTTY)) == -1)
   {
     ROS_ERROR("[Head]: cannot open usb port\n");
     ROS_ERROR("[Head]: open() failed with error [%s]\n", strerror(errno));
 
     ros::Duration(0.5).sleep();
+    timeout++;
+    if (timeout > 10)
+      throw std::runtime_error("[Head]: cannot open usb port");
   }
 
   ROS_INFO("[Head]: usb port successfully opened\n");
@@ -70,14 +74,12 @@ ArmUSBInterface::ArmUSBInterface()
 
   if (tcgetattr(fd, &tios) < 0) {
     ROS_ERROR("init_serialport: Couldn't get term attributes\n");
-    return -1;
   }
 
-  tios.c_lflag &= ~(ICANON | ISIG);
+  tios.c_lflag &= ~(ICANON | ISIG | ECHO);
 
   if( tcsetattr(fd, TCSANOW, &tios) < 0) {
     ROS_ERROR("init_serialport: Couldn't set term attributes\n");
-    return -1;
   }
 
 }
