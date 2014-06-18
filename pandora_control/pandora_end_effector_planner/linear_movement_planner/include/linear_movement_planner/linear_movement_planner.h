@@ -61,6 +61,7 @@ namespace pandora_control
       double minElevation_;
       double maxElevation_;
       double movementThreshold_;
+      double commandTimeout_;
       double previousTarget_;
       std::string linearCommandTopic_;
       std::string linearMotorFrame_;
@@ -70,6 +71,7 @@ namespace pandora_control
       void callback(const pandora_end_effector_planner::MoveLinearGoalConstPtr& goal);
 
       bool getPlannerParams();
+      void testLinear();
       void lowerLinear();
       void moveLinear(std::string pointOfInterest, std::string centerPoint);
 

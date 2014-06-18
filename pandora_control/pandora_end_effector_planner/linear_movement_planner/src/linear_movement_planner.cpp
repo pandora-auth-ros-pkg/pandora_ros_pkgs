@@ -74,7 +74,11 @@ namespace pandora_control
       const pandora_end_effector_planner::MoveLinearGoalConstPtr& goal)
   {
     command_ = goal->command;
-    if (command_ == pandora_end_effector_planner::MoveLinearGoal::LOWER )
+    if (command_ == pandora_end_effector_planner::MoveLinearGoal::TEST)
+    {
+      testLinear();
+    }
+    else if (command_ == pandora_end_effector_planner::MoveLinearGoal::LOWER)
     {
       lowerLinear();
     }
@@ -96,6 +100,7 @@ namespace pandora_control
     nodeHandle_.param("max_elevation", maxElevation_, 0.18);
     nodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
     movementThreshold_ = fabs(movementThreshold_);
+    nodeHandle_.param("command_timeout", commandTimeout_, 15.0);
 
     if (nodeHandle_.getParam("linear_command_topic", linearCommandTopic_))
     {
@@ -120,12 +125,106 @@ namespace pandora_control
     return true;
   }
 
+  void LinearMovementActionServer::testLinear()
+  {
+    tf::StampedTransform linearTransform;
+    try
+    {
+      tfListener_.lookupTransform(
+        "/base_link", linearMotorFrame_,
+        ros::Time(0), linearTransform);
+    }
+    catch (tf::TransformException ex)
+    {
+      ROS_ERROR("%s", ex.what());
+    }
+    double startX = linearTransform.getOrigin()[2];
+    double step = -0.03;
+    if (startX + step < minElevation_)
+    {
+      step = - step;
+    }
+    std_msgs::Float64 targetPosition;
+    targetPosition.data = previousTarget_ = startX + step - minElevation_;
+    // Step could be a param
+    linearCommandPublisher_.publish(targetPosition);
+
+    ros::Time begin = ros::Time::now();
+
+    double linearZ = -1;
+    while (ros::ok() &&
+      fabs(linearZ - (startX + step)) >= movementThreshold_)
+    {
+      try
+      {
+        tfListener_.lookupTransform(
+          "/base_link", linearMotorFrame_,
+          ros::Time(0), linearTransform);
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s", ex.what());
+      }
+      linearZ = linearTransform.getOrigin()[2];
+      if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
+      {
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
+      }
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_WARN("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
+    }
+    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+    // set the action state to succeeded
+    actionServer_.setSucceeded();
+  }
+
   void LinearMovementActionServer::lowerLinear()
   {
     std_msgs::Float64 targetPosition;
     targetPosition.data = previousTarget_ = 0;
     linearCommandPublisher_.publish(targetPosition);
 
+    ros::Time begin = ros::Time::now();
+
+    tf::StampedTransform linearTransform;
+    double linearZ = -1;
+    while (ros::ok() &&
+      fabs(linearZ - minElevation_) >= movementThreshold_)
+    {
+      try
+      {
+        tfListener_.lookupTransform(
+          "/base_link", linearMotorFrame_,
+          ros::Time(0), linearTransform);
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s", ex.what());
+      }
+      linearZ = linearTransform.getOrigin()[2];
+      if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
+      {
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
+      }
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_WARN("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
+    }
     ROS_DEBUG("%s: Succeeded", actionName_.c_str());
     // set the action state to succeeded
     actionServer_.setSucceeded();
@@ -169,7 +268,10 @@ namespace pandora_control
       catch (tf::TransformException ex)
       {
         ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-        continue;
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
       }
 
       tf::StampedTransform linearToCenterTransform;
@@ -181,7 +283,10 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_ERROR("%s", ex.what());
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
       }
       rate.sleep();
 

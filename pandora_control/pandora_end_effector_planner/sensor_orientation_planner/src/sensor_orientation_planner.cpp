@@ -55,7 +55,7 @@ namespace pandora_control
     if (getPlannerParams())
     {
       if (timeStep_ <= 0) {
-        ROS_WARN_STREAM("[" << actionName_ << "] Wrong time step value: "
+        ROS_DEBUG_STREAM("[" << actionName_ << "] Wrong time step value: "
           << timeStep_ << ", updating as fast as possible!");
         timeStep_ = 0.01;
       }
@@ -88,7 +88,11 @@ namespace pandora_control
       const pandora_end_effector_planner::MoveSensorGoalConstPtr& goal)
   {
     command_ = goal->command;
-    if (command_ == pandora_end_effector_planner::MoveSensorGoal::CENTER )
+    if (command_ == pandora_end_effector_planner::MoveSensorGoal::TEST)
+    {
+      testSensor();
+    }
+    else if (command_ == pandora_end_effector_planner::MoveSensorGoal::CENTER)
     {
       centerSensor();
     }
@@ -116,6 +120,8 @@ namespace pandora_control
     nodeHandle_.param(actionName_ + "/min_yaw", minYaw_, -1.0);
     nodeHandle_.param(actionName_ + "/max_pitch", maxPitch_, 1.0);
     nodeHandle_.param(actionName_ + "/max_yaw", maxYaw_, 1.0);
+    nodeHandle_.param(actionName_ + "/command_timeout", commandTimeout_, 3.0);
+    nodeHandle_.param(actionName_ + "/movement_threshold", movementThreshold_, 0.017);
     if (pitchStep_ > maxPitch_ || pitchStep_ < minPitch_)
     {
       if (maxPitch_ < fabs(minPitch_))
@@ -172,7 +178,63 @@ namespace pandora_control
       ROS_FATAL("Failed to get param sensor_frame shuting down");
       return false;
     }
+
+    if (nodeHandle_.getParam(actionName_ + "/pitch_joint_parent",
+      pitchJointParent_))
+    {
+      ROS_INFO_STREAM("Got param pitch_joint_parent: " << pitchJointParent_);
+    }
+    else
+    {
+      ROS_FATAL("Failed to get param pitch_joint_parent shuting down");
+      return false;
+    }
+
+    if (nodeHandle_.getParam(actionName_ + "/pitch_joint_child",
+      pitchJointChild_))
+    {
+      ROS_INFO_STREAM("Got param pitch_joint_child: " << pitchJointChild_);
+    }
+    else
+    {
+      ROS_FATAL("Failed to get param pitch_joint_child shuting down");
+      return false;
+    }
+
+    if (nodeHandle_.getParam(actionName_ + "/yaw_joint_parent",
+      yawJointParent_))
+    {
+      ROS_INFO_STREAM("Got param yaw_joint_parent: " << yawJointParent_);
+    }
+    else
+    {
+      ROS_FATAL("Failed to get param yaw_joint_parent shuting down");
+      return false;
+    }
+
+    if (nodeHandle_.getParam(actionName_ + "/yaw_joint_child",
+      yawJointChild_))
+    {
+      ROS_INFO_STREAM("Got param yaw_joint_child: " << yawJointChild_);
+    }
+    else
+    {
+      ROS_FATAL("Failed to get param yaw_joint_child shuting down");
+      return false;
+    }
     return true;
+  }
+
+  void SensorOrientationActionServer::testSensor()
+  {
+    std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
+    pitchTargetPosition.data = pitchStep_;
+    yawTargetPosition.data = yawStep_;
+    position_ = LOW_LEFT;
+    sensorPitchPublisher_.publish(pitchTargetPosition);
+    sensorYawPublisher_.publish(yawTargetPosition);
+
+    checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data);
   }
 
   void SensorOrientationActionServer::centerSensor()
@@ -185,10 +247,14 @@ namespace pandora_control
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       position_ = HIGH_CENTER;
+      checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data);
     }
-    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
-    // set the action state to succeeded
-    actionServer_.setSucceeded();
+    else
+    {
+      ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+      // set the action state to succeeded
+      actionServer_.setSucceeded();
+    }
   }
 
   void SensorOrientationActionServer::scan()
@@ -248,6 +314,11 @@ namespace pandora_control
           yawTargetPosition.data = 0;
           position_ = HIGH_START;
           break;
+        case UNKNOWN:
+          pitchTargetPosition.data = 0;
+          yawTargetPosition.data = 0;
+          position_ = HIGH_START;
+          break;
       }
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
@@ -291,7 +362,10 @@ namespace pandora_control
       catch (tf::TransformException ex)
       {
         ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-        continue;
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
       }
 
       tf::Vector3 desiredVectorX;
@@ -335,8 +409,66 @@ namespace pandora_control
       }
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
+      position_ = UNKNOWN;
       rate.sleep();
     }
+  }
+  void SensorOrientationActionServer::checkGoalCompletion(
+    double pitchCommand, double yawCommand)
+  {
+    ros::Time begin = ros::Time::now();
+    tf::StampedTransform pitchTransform;
+    tf::StampedTransform yawTransform;
+    double roll, pitch, yaw, tempPitch;
+    pitch = 3.14;
+    yaw = 3.14;
+
+    while (ros::ok() && (
+      fabs(pitch - pitchCommand) >= movementThreshold_ ||
+      fabs(yaw - yawCommand) >= movementThreshold_))
+    {
+      try
+      {
+        tfListener_.lookupTransform(
+          pitchJointParent_, pitchJointChild_,
+          ros::Time(0), pitchTransform);
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s", ex.what());
+      }
+      pitchTransform.getBasis().getRPY(roll, pitch, yaw);
+
+      try
+      {
+        tfListener_.lookupTransform(
+          yawJointParent_, yawJointChild_,
+          ros::Time(0), yawTransform);
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s", ex.what());
+      }
+      yawTransform.getBasis().getRPY(roll, tempPitch, yaw);
+
+      if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
+      {
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        return;
+      }
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_DEBUG("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
+    }
+    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+    // set the action state to succeeded
+    actionServer_.setSucceeded();
   }
 }  // namespace pandora_control
 

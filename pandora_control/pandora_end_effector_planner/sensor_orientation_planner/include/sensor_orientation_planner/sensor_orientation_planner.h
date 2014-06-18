@@ -57,6 +57,7 @@ namespace pandora_control
     LOW_CENTER = 5,
     HIGH_RIGHT = 6,
     LOW_RIGHT = 7,
+    UNKNOWN = 8
   };
 
   class SensorOrientationActionServer
@@ -79,6 +80,12 @@ namespace pandora_control
       double maxPitch_;
       double maxYaw_;
       double timeStep_;
+      double commandTimeout_;
+      double movementThreshold_;
+      std::string pitchJointParent_;
+      std::string pitchJointChild_;
+      std::string yawJointParent_;
+      std::string yawJointChild_;
       std::string pitchCommandTopic_;
       std::string yawCommandTopic_;
       std::string sensorFrame_;
@@ -88,9 +95,11 @@ namespace pandora_control
       void callback(const pandora_end_effector_planner::MoveSensorGoalConstPtr& goal);
 
       bool getPlannerParams();
+      void testSensor();
       void centerSensor();
       void scan();
       void pointSensor(std::string pointOfInterest);
+      void checkGoalCompletion(double pitchCommand, double yawCommand);
 
     public:
       SensorOrientationActionServer(
