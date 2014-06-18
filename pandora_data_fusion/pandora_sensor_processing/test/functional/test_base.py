@@ -75,7 +75,7 @@ class TestBase(unittest.TestCase):
         cls.state_changer = StateClient(False)
         rospy.sleep(0.1)
         cls.state_changer.transition_to_state(2)
-        rospy.sleep(2)
+        rospy.sleep(2.)
         
         if processor is "co2":
             cls.mock_publisher = rospy.Publisher("/test/raw_input", Co2Msg)

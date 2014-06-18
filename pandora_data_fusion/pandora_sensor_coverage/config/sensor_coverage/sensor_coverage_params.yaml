@@ -1,0 +1,17 @@
+subscribed_topic_names:
+  map: /map
+frames_to_track: [kinect]
+published_topic_names:
+  kinect: kinect
+sensor_range:
+  kinect: 10
+sensor_hfov:
+  kinect: 60
+sensor_vfov:
+  kinect: 40
+exploration_state:
+  kinect: true
+identification_state:
+  kinect: true
+hold_state:
+  kinect: true

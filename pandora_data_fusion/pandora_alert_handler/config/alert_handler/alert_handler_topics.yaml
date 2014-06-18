@@ -12,11 +12,11 @@ subscribed_topic_names:
   map: /slam/map
 published_topic_names:  
   world_model : /data_fusion/world_model
-  qr_notification : qr_notification
-  robocup_score : robocup_score
+  qr_notification : /data_fusion/qr_notification
+  robocup_score : /data_fusion/robocup_score
 action_server_names:
-  delete_victim: delete_victim
-  validate_victim: validate_victim
+  delete_victim: /data_fusion/delete_victim
+  validate_victim: /data_fusion/validate_victim
 service_server_names:
   get_objects: /data_fusion/get_objects
   get_markers: /data_fusion/get_markers

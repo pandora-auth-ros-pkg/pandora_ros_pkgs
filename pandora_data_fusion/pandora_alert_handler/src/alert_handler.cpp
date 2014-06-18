@@ -84,8 +84,6 @@ namespace pandora_data_fusion
 
     void AlertHandler::publishVictims()
     {
-      if(victimsToGo_->size() == 0)
-        return;
       pandora_data_fusion_msgs::WorldModelMsg worldModelMsg;
       victimHandler_->getVictimsInfo(&worldModelMsg);
       worldModelPublisher_.publish(worldModelMsg);
@@ -330,7 +328,7 @@ namespace pandora_data_fusion
       {
         holesVectorPtr = objectFactory_->makeHoles(msg);
       }
-      catch (AlertException ex)
+      catch (TfException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
         return;
@@ -354,7 +352,7 @@ namespace pandora_data_fusion
       {
         hazmatsVectorPtr = objectFactory_->makeHazmats(msg);
       }
-      catch (AlertException ex)
+      catch (TfException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
         return;
@@ -374,7 +372,7 @@ namespace pandora_data_fusion
       {
         qrsVectorPtr = objectFactory_->makeQrs(msg);
       }
-      catch (AlertException ex)
+      catch (TfException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
         return;
@@ -393,7 +391,7 @@ namespace pandora_data_fusion
       {
         landoltcsVectorPtr = objectFactory_->makeLandoltcs(msg);
       }
-      catch (AlertException ex)
+      catch (TfException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
         return;
@@ -412,7 +410,7 @@ namespace pandora_data_fusion
       {
         dataMatricesVectorPtr = objectFactory_->makeDataMatrices(msg);
       }
-      catch (AlertException ex)
+      catch (TfException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
         return;
@@ -468,6 +466,7 @@ namespace pandora_data_fusion
     {
       int victimId = deleteVictimServer_->acceptNewGoal()->victimId;
       bool deleted = victimHandler_->deleteVictim(victimId);
+      publishVictims();
       if(!deleted)
         deleteVictimServer_->setAborted();
       deleteVictimServer_->setSucceeded();
@@ -477,6 +476,7 @@ namespace pandora_data_fusion
     {
       GoalConstPtr goal = validateVictimServer_->acceptNewGoal();
       bool validated = victimHandler_->validateVictim(goal->victimId, goal->victimValid);
+      publishVictims();
       if(!validated)
         validateVictimServer_->setAborted();
       validateVictimServer_->setSucceeded();

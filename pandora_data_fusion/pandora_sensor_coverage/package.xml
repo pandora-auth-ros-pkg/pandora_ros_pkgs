@@ -1,0 +1,44 @@
+<package>
+  <name>pandora_sensor_coverage</name>
+  <version>0.0.0</version>
+  <description>Data Fusion Sensor Coverage</description>
+   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion</url>
+
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+   <build_depend>roscpp</build_depend> 
+   <build_depend>tf</build_depend> 
+   <build_depend>roslint</build_depend> 
+   <build_depend>pandora_alert_handler</build_depend>
+   <build_depend>state_manager</build_depend>
+   <build_depend>state_manager_communications</build_depend>
+   
+   <run_depend>roscpp</run_depend>
+   <run_depend>tf</run_depend>
+   <run_depend>roslint</run_depend> 
+   <run_depend>pandora_alert_handler</run_depend>
+   <run_depend>state_manager</run_depend>
+   <run_depend>state_manager_communications</run_depend>
+
+   <!--  Test Dependencies  -->
+
+   <build_depend>rostest</build_depend>
+   <build_depend>roslib</build_depend>
+   <build_depend>pandora_testing_tools</build_depend>
+
+   <run_depend>rostest</run_depend>
+   <run_depend>roslib</run_depend>
+   <run_depend>pandora_testing_tools</run_depend>
+
+  <export>
+
+  </export>
+</package>
+

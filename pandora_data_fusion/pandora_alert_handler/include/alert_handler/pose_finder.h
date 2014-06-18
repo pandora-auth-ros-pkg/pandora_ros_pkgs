@@ -62,7 +62,6 @@ namespace pandora_data_fusion
     class PoseFinder : private boost::noncopyable
     {
       public:
-
         PoseFinder(const MapPtr& map, const std::string& mapType);
         Pose findAlertPose(float alertYaw, float alertPitch,
             tf::Transform tfTransform);
@@ -73,7 +72,6 @@ namespace pandora_data_fusion
             float orientationDist, float orientationCircle);
 
       private:
-
         Point positionOnWall(Point startPoint, float angle);
         float calcHeight(float alertPitch, float height, float distFromAlert);
         geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
@@ -85,15 +83,9 @@ namespace pandora_data_fusion
             tf::Transform worldHeadCameraTransform);
 
       private:
-
-        friend class PoseFinderTest;
-
-      private:
-
-        const MapPtr& map_;
+        MapPtr map_;
 
         TfListenerPtr listener_;
-        // tf::TransformBroadcaster victimFrameBroadcaster;
 
         //!< params
         float ORIENTATION_CIRCLE;
@@ -102,6 +94,8 @@ namespace pandora_data_fusion
         float HEIGHT_LOW_THRES;
         float OCCUPIED_CELL_THRES;
 
+      private:
+        friend class PoseFinderTest;
     };
 
     typedef boost::scoped_ptr< PoseFinder > PoseFinderPtr;

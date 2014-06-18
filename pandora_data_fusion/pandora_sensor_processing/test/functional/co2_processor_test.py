@@ -81,39 +81,39 @@ class Co2ProcessorTest(test_base.TestBase):
     def test_mode_exploration(self):
 
         self.state_changer.transition_to_state(2)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_fail()
 
     def test_mode_identification(self):
 
         self.state_changer.transition_to_state(3)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_success(1)
 
     def test_toggle(self):
 
         self.state_changer.transition_to_state(2)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_fail()
         self.state_changer.transition_to_state(2)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_fail()
         self.state_changer.transition_to_state(3)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_success(1)
         self.state_changer.transition_to_state(3)
-        rospy.sleep(1)
+        rospy.sleep(1.)
         self.publish_raw()
         self.expect_success(2)
 
 if __name__ == '__main__':
 
-    rospy.sleep(20)
+    rospy.sleep(10.)
     rospy.init_node(NAME, anonymous=True, log_level=rospy.DEBUG)
     Co2ProcessorTest.connect("co2")
     rostest.rosrun(PKG, NAME, Co2ProcessorTest, sys.argv)

@@ -2,8 +2,8 @@
 
   <!--  Alert Handler  -->
   <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
-  
-  <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_params.yaml" 
-    command="load" ns="data_fusion/alert_handler"/>
+
+  <!--  Sensor Coverage  -->
+  <!--<include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" /> -->
   
 </launch>

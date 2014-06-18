@@ -116,9 +116,10 @@ namespace pandora_data_fusion
      * @details Delegate to victimList
      */
     void VictimHandler::getVictimsInfo(
-        pandora_data_fusion_msgs::WorldModelMsg* victimsMsg)
+        pandora_data_fusion_msgs::WorldModelMsg* worldModelMsg)
     {  
-      victimsToGoList_->getVictimsInfo(victimsMsg); 
+      victimsToGoList_->getVictimsInfo(&(worldModelMsg->victims));
+      victimsVisitedList_->getVictimsInfo(&(worldModelMsg->visitedVictims));
     }
 
     /**
@@ -126,7 +127,7 @@ namespace pandora_data_fusion
      */
     bool VictimHandler::deleteVictim(int victimId)
     {
-      VictimPtr deletedVictim;
+      VictimPtr deletedVictim( new Victim );
       bool deleted = victimsToGoList_->deleteVictim(victimId, deletedVictim);
       if(deleted)
       {

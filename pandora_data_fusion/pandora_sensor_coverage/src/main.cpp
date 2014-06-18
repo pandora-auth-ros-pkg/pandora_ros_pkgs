@@ -32,38 +32,30 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
+#include <ros/console.h>
 
-#include <stdexcept>
-#include <string>
+#include "sensor_coverage/sensor_coverage.h"
 
-namespace pandora_data_fusion
+using pandora_data_fusion::pandora_sensor_coverage::SensorCoverage;
+
+int main(int argc, char** argv)
 {
-  namespace pandora_alert_handler
+  ros::init(argc, argv, "sensor_coverage", ros::init_options::NoSigintHandler);
+  if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
-
-    class TfException : public std::runtime_error
+    if (ros::console::set_logger_level(
+          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
     {
-      public:
-        explicit TfException(const std::string errorDescription) :
-          std::runtime_error(errorDescription) {}
-    };
+      ros::console::notifyLoggerLevelsChanged();
+    }
+  }
+  SensorCoverage sensorCoverage("/data_fusion/sensor_coverage");
+  ROS_INFO("[DATA_FUSION] Beginning Sensor Coverage node");
+  ros::spin();
+  return 0;
+}
 
-    class AlertException : public std::runtime_error
-    {
-      public:
-        explicit AlertException(const std::string errorDescription) :
-          std::runtime_error(errorDescription) {}
-    };
-
-}  // namespace pandora_alert_handler
-}  // namespace pandora_data_fusion
-
-#endif  // ALERT_HANDLER_EXCEPTIONS_H

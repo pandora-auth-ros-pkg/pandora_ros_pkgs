@@ -74,9 +74,6 @@ namespace pandora_data_fusion
       tf::Quaternion rotation;
       rotation.setRPY(0, cameraPitch - alertPitch, cameraYaw - alertYaw);
       transVision.setRotation(rotation);
-
-      // victimFrameBroadcaster.sendTransform(
-      // tf::StampedTransform( transVision , ros::Time::now(), "world", "vision")  );
     }
 
     Pose PoseFinder::findAlertPose(float alertYaw, float alertPitch,
@@ -261,7 +258,7 @@ namespace pandora_data_fusion
       listener_->waitForTransform("/map", header.frame_id,
           header.stamp, ros::Duration(1));
 
-      listener_->lookupTransform( "/map", header.frame_id, 
+      listener_->lookupTransform("/map", header.frame_id, 
           header.stamp, tfTransform);
 
       return tfTransform;

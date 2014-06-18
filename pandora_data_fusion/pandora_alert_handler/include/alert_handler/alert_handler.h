@@ -265,7 +265,7 @@ namespace pandora_data_fusion
         {
           objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
         }
-        catch (AlertException ex)
+        catch (TfException ex)
         {
           ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
           return;

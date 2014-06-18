@@ -127,7 +127,7 @@ namespace pandora_data_fusion
          * @param victimsMsg [pandora_data_fusion_msgs::VictimsMsg*] msg to be filled
          * @return void
          */
-        void getVictimsInfo(pandora_data_fusion_msgs::WorldModelMsg* victimsMsg);
+        void getVictimsInfo(pandora_data_fusion_msgs::WorldModelMsg* worldModelMsg);
 
         /**
          * @brief Get Poses Stamped of all victims in victimsToGo, victimsVisited and

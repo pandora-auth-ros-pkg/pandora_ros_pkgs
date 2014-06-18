@@ -68,7 +68,7 @@ namespace pandora_data_fusion
       catch (tf::TransformException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s", __LINE__, ex.what());
-        throw AlertException(
+        throw TfException(
             "Something went wrong with tf, ignoring current message");
       }
       return flag;
@@ -85,7 +85,7 @@ namespace pandora_data_fusion
       catch (tf::TransformException ex)
       {
         ROS_ERROR("[ALERT_HANDLER %d]%s", __LINE__, ex.what());
-        throw AlertException(
+        throw TfException(
             "Something went wrong with tf, ignoring current message");
       }
     }

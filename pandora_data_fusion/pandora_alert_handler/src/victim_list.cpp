@@ -110,13 +110,12 @@ namespace pandora_data_fusion
      * and sensors.
      */
     void VictimList::getVictimsInfo(
-        pandora_data_fusion_msgs::WorldModelMsg* victimsMsg)
+        std::vector<pandora_data_fusion_msgs::VictimInfoMsg>* victimsMsg)
     {
-      victimsMsg->victims.clear();
+      victimsMsg->clear();
 
       ros::Time now = ros::Time::now();
 
-      int ii = 0;
       for (const_iterator it = this->begin(); it != this->end(); ++it)
       {
         pandora_data_fusion_msgs::VictimInfoMsg victimInfo;
@@ -134,8 +133,9 @@ namespace pandora_data_fusion
             victimInfo.sensors.push_back((*iter)->getType());
           }
         }
+        victimInfo.valid = (*it)->getValid();
 
-        victimsMsg->victims.push_back(victimInfo);
+        victimsMsg->push_back(victimInfo);
       }
     }
 
@@ -144,14 +144,14 @@ namespace pandora_data_fusion
      * from victim list. Deleted victim is returned to search and delete
      * its associated objects from their respective lists.
      */
-    bool VictimList::deleteVictim(int victimId, VictimPtr deletedVictim)
+    bool VictimList::deleteVictim(int victimId, const VictimPtr& deletedVictim)
     {
       for(VictimList::iterator it = objects_.begin();
           it != objects_.end(); ++it)
       {
         if((*it)->getId() == victimId)
         {
-          deletedVictim = *it;
+          deletedVictim->setPose((*it)->getPose());
           objects_.erase(it);
           return true;
         }

@@ -4,7 +4,7 @@
 
   <!--<env name="ROSCONSOLE_CONFIG_FILE"                                             -->
   <!--  value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
-  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> 
+  <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
 
   <node pkg="rosbag" type="play" name="player" output="screen"
     args="--clock $(find pandora_alert_handler)/test/functional/saloon_2014-04-27-20-30-41.bag" >

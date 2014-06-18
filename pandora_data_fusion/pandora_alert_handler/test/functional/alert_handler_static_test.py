@@ -543,13 +543,13 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertEqual(self.worldModelPublished, 0)
         self.deliveryBoy.deliverHoleOrder(0, 0, 1, 0.8)
         self.deliveryBoy.deliverHoleOrder(0, 0, 1, 0.6)
-        self.assertEqual(self.worldModelPublished, 1)
+        self.assertEqual(self.worldModelPublished, 2)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 0)
         self.assertEqual(self.currentVictimList[0].probability, 0)
         self.deliveryBoy.deliverThermalOrder(0, 0, 0.6)
         self.deliveryBoy.deliverThermalOrder(0, 0, 0.6)
-        self.assertEqual(self.worldModelPublished, 3)
+        self.assertEqual(self.worldModelPublished, 4)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 1)
         self.assertEqual(set(self.currentVictimList[0].sensors), 
@@ -557,7 +557,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertGreater(self.currentVictimList[0].probability, 0.6/2)
         self.deliveryBoy.deliverCo2Order(0, 0, 0.8)
         self.deliveryBoy.deliverCo2Order(0, 0, 0.8)
-        self.assertEqual(self.worldModelPublished, 5)
+        self.assertEqual(self.worldModelPublished, 6)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 2)
         self.assertEqual(set(self.currentVictimList[0].sensors), 
@@ -565,7 +565,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertGreater(self.currentVictimList[0].probability, (0.6+0.8)/2)
         self.deliveryBoy.deliverFaceOrder(0, 0, 0.9)
         self.deliveryBoy.deliverFaceOrder(0, 0, 0.93)
-        self.assertEqual(self.worldModelPublished, 7)
+        self.assertEqual(self.worldModelPublished, 8)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 3)
         self.assertEqual(set(self.currentVictimList[0].sensors), 

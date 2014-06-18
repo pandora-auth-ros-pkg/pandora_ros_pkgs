@@ -1,1 +1,2 @@
 pandora_data_fusion_msgs/VictimInfoMsg[] victims
+pandora_data_fusion_msgs/VictimInfoMsg[] visitedVictims

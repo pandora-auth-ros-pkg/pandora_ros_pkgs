@@ -90,14 +90,16 @@ namespace pandora_data_fusion
          * @return void
          */
         void getVictimsInfo(
-            pandora_data_fusion_msgs::WorldModelMsg* victimsMsg);
+            std::vector<pandora_data_fusion_msgs::VictimInfoMsg>* victimsMsg);
 
         /**
          * @brief Deletes VictimPtr with the corresponding victimId
          * @param victimId [int] id that will be used to search for the victim
+         * @param deletedVictim [VictimPtr const&] victim whose objects are
+         * to be deleted
          * @return bool true, if deleted, false, if not found.
          */
-        bool deleteVictim(int victimId, VictimPtr deletedVictim);
+        bool deleteVictim(int victimId, const VictimPtr& deletedVictim);
 
         /**
          * @brief Validates victim with victimId.
