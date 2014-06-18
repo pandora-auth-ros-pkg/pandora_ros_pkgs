@@ -38,7 +38,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_utm_30lx/laser_pitch_servo.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_urg_04lx/laser_pitch_servo.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
@@ -81,18 +81,18 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_utm_30lx/hokuyo_utm_30lx.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_urg_04lx/hokuyo_urg_04lx.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
 
       <collision>
         <!-- ============================================================== -->
-        <origin xyz="0 0 0.05299"
+        <origin xyz="0 0 0.05099"
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <box size="0.062 0.063 0.116" />
+          <box size="0.062 0.063 0.12" />
         </geometry>
         <!-- ============================================================== -->
       </collision>
@@ -183,7 +183,7 @@
         <parent link="laser_servo_link" />
         <child link="laser_main_link" />
         <!-- ============================================================== -->
-        <origin xyz="0.013 0 0.02301" 
+        <origin xyz="0.013 0.0 0.02301" 
                 rpy="0 0 0" />
         <!-- ============================================================== -->
 

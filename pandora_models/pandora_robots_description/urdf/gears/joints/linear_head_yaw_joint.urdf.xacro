@@ -12,12 +12,12 @@
     
       <joint name="linear_head_yaw_joint"
              type="fixed" >
-
+             
         <!-- ============================================================== -->
-        <parent link="linear_head_base_link" />
-        <child link="linear_head_main_link" />
+        <parent link="linear_elevator_link" />
+        <child link="linear_head_base_link" />
         <!-- ============================================================== -->
-        <origin xyz="0.0 0.037 0.021"
+        <origin xyz="-0.0035 0.06177 0.36617"
                 rpy="${zero}" />
         <!-- ============================================================== -->
 
@@ -31,10 +31,10 @@
              type="${linear_head_yaw_joint_type}" >
 
         <!-- ============================================================== -->
-        <parent link="linear_head_base_link" />
-        <child link="linear_head_main_link" />
+        <parent link="linear_elevator_link" />
+        <child link="linear_head_base_link" />
         <!-- ============================================================== -->
-        <origin xyz="0.0 0.037 0.021"
+        <origin xyz="-0.0035 0.06177 0.36617"
                 rpy="${zero}" />
         <!-- ============================================================== -->
         <axis xyz="0 0 1" />
