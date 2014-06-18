@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
     vision_communications
     state_manager
     state_manager_communications
-    vision_communications
     cv_bridge
     image_transport
     sensor_msgs
@@ -19,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 generate_dynamic_reconfigure_options(
   cfg/landoltc_cfg.cfg
+  cfg/landoltc3d_cfg.cfg
 )
 
 
@@ -29,7 +29,6 @@ catkin_package(
       vision_communications
       state_manager
       state_manager_communications
-      vision_communications
       cv_bridge
       image_transport
       sensor_msgs
@@ -62,16 +61,19 @@ add_dependencies(landoltc_node
 
 ########################### landoltc3dNode ############################
 add_executable(landoltc3d_node 
+              src/landoltc3d_parameters.cpp
               src/landoltc3d_node.cpp
               src/landoltc3d_detection.cpp
               src/landoltc3d_detector.cpp
               
+              
 )
 target_link_libraries(landoltc3d_node ${catkin_LIBRARIES} )
 
-add_dependencies(landoltc3d_node 
-    ${catkin_EXPORTED_TARGETS}
+add_dependencies(landoltc3d_node
+    pandora_vision_landoltc_gencfg     
     vision_communications_gencpp
+    ${catkin_EXPORTED_TARGETS}
 )
 
 
@@ -87,6 +89,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/landoltc_detector.h
   include/landoltc_detection.h
   include/landoltc_parameters.h
+  include/landoltc3d_parameters.h
   src/landoltc_detector.cpp
   src/landoltc3d_detector.cpp
   src/landoltc3d_detection.cpp
@@ -94,6 +97,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/landoltc_detection.cpp
   src/landoltc_node.cpp
   src/landoltc_parameters.cpp
+  src/landoltc3d_parameters.cpp
   
             
 )

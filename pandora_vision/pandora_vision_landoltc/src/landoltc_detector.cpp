@@ -65,12 +65,12 @@ void LandoltCDetector::initializeReferenceImage(std::string path)
 {
   //!<Loading reference image passed as argument to main
   cv::Mat ref;
-  //std::cout << path << std::endl;
   ROS_DEBUG_STREAM("path: " << path);
   ref = cv::imread(path);
   if (!ref.data)
-    //std::cout << "Pattern image not loaded" << std::endl;
+  {
     ROS_DEBUG("Pattern image not loaded");
+  }
 
   //!< Turning to gray and binarizing ref image
 
@@ -129,8 +129,6 @@ void LandoltCDetector::findRotationA(const cv::Mat& in, LandoltC* temp)
     }
   }
   
-  //cv::imshow("left", left);
-       
   cv::findContours(left, left_contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
   
   if(left_contours.size() == 2) angle+=3.14159265359;
@@ -205,8 +203,6 @@ void LandoltCDetector::findRotationB(const cv::Mat& in, LandoltC* temp)
     //ROS_INFO("Angle of %d is %lf \n", i, angle*(180/3.14159265359));
     (*temp).angles.push_back(angle);
   }
-  
-  
   
   #ifdef SHOW_DEBUG_IMAGE
     cv::imshow("paddedptr", paddedptr); 
@@ -407,16 +403,12 @@ void LandoltCDetector::applyMask()
     
       cv::copyMakeBorder(out, padded, 8, 8, 8, 8, cv::BORDER_CONSTANT, cv::Scalar(0));
     
+      #ifdef SHOW_DEBUG_IMAGE
       cv::imshow("padded", padded); 
-    
-      //findRotationA(padded, temp);
+      cv::waitKey(30); 
+      #endif
     
       findRotationB(padded, temp);
-    
-      #ifdef SHOW_DEBUG_IMAGE
-      //cv::imshow("padded", padded);
-      //cv::waitKey(200);
-      #endif
     }
   }
 }
@@ -595,15 +587,11 @@ void LandoltCDetector::begin(cv::Mat* input)
   applyMask();
   
   #ifdef SHOW_DEBUG_IMAGE
-    cv::imshow("Raw", *input);
-    //cv::imshow("Adaptive Threshold", binary);
-    cv::waitKey(20);
+  cv::imshow("Raw", *input);
+  cv::waitKey(20);
   #endif
   
   fusion();
-  
-  //~ for(int i = 0; i< _landoltc.size(); i++)
-    //~ ROS_INFO_STREAM("x" << _landoltc.at(i).center.x);
 }
 
 /**
@@ -729,8 +717,16 @@ void LandoltCDetector::thinningIter(cv::Mat* in, int iter)
   cv::bitwise_and(*in, temp, *in);
 }
 
+
+/**
+  @brief Returns detected landoltc, for publishing them later
+  @param void
+  @return [std::vector<LandoltC>] Vector of detected Landolts
+**/
+
 std::vector<LandoltC> LandoltCDetector::getDetectedLandolt()
 {
   return _landoltc;
 }
+
 } // namespace pandora_vision

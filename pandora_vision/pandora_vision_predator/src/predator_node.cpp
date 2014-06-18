@@ -18,6 +18,7 @@
  */
 
 #include "pandora_vision_predator/predator_node.h"
+#define SHOW_DEBUG_IMAGE true
 
 namespace pandora_vision
 {
@@ -129,8 +130,11 @@ static void mouseHandler(int event, int x, int y, int flags, void *param)
     imgCopy = img->clone();
 
     cv::rectangle(imgCopy, point, cv::Point(x, y), CV_RGB(255, 0, 0), 3, 8, 0);
+    
+    #ifdef SHOW_DEBUG_IMAGE
     cv::imshow("tld", imgCopy);
     cv::waitKey(20);
+    #endif
 
   }
 
@@ -212,7 +216,9 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv::rectangle(PredatorFrame, cv::Point(0, 0), cv::Point(PredatorFrame.cols, 50), CV_RGB(0, 0, 0), CV_FILLED, 8, 0);
   cv::putText(PredatorFrame, mystring, cv::Point(25, 25), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
   
+  #ifdef SHOW_DEBUG_IMAGE
   cv::imshow("tld", PredatorFrame);
+  #endif
   
   int keyCode = cv::waitKey(5)&255;
   

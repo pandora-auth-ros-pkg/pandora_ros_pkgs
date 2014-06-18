@@ -211,8 +211,12 @@ public:
   **/
   void fusion();
   
+  /**
+  @brief Returns detected landoltc, for publishing them later
+  @param void
+  @return [std::vector<LandoltC>] Vector of detected Landolts
+  **/
   std::vector<LandoltC> getDetectedLandolt();
-  
   
 
 };

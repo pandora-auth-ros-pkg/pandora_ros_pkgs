@@ -65,6 +65,12 @@ LandoltCDetection::LandoltCDetection(const std::string& ns) : _nh(ns), landoltcN
   
   //!< The dynamic reconfigure parameter's callback
   server.setCallback(boost::bind(&LandoltCDetection::parametersCallback, this, _1, _2));
+  
+  //!< initialize states - robot starts in STATE_OFF
+  curState = state_manager_communications::robotModeMsg::MODE_OFF;
+  prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+
+  clientInitialize();
       
       
   ROS_INFO("[landoltc_node] : Created LandoltC Detection instance");

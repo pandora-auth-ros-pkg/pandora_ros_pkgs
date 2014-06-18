@@ -42,6 +42,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include "pandora_vision_landoltc/landoltc3d_parameters.h"
 
 namespace pandora_vision
 {
@@ -52,7 +53,7 @@ struct LandoltC3D{
   std::vector<float> angles;
   std::vector<cv::Scalar> color;
   std::vector<cv::Rect> bbox;
-  int probability;
+  float probability;
   LandoltC3D() {}
 };
 
@@ -88,8 +89,12 @@ class LandoltC3dDetector
   int _edges;
   //!<Vector containing LandoltC3D structs
   std::vector<LandoltC3D> _landoltc3d;
-  //!<Boolean value for alternating thresholding value
-  bool _bradley;
+  //!<Predator Bounding Box
+  cv::Rect predator_bbox;
+  //!<Predator Probability
+  float confidence;
+  //!<Boolean value used for fusion decision
+  bool PredatorOn;
   
   public:
   
@@ -193,7 +198,7 @@ class LandoltC3dDetector
   /**
   @brief Function for calculating perspective transform, in
   order to get better angle calculation precision
-  @param rec [cv::rec] Rectangle enclosing a 'C'
+  @param rec [cv::Rect] Rectangle enclosing a 'C'
   @param in [cv::Mat&] Input Image
   @return [cv::Mat] Output Image 
   **/    
@@ -213,6 +218,29 @@ class LandoltC3dDetector
   **/
     
   void fusion();
+  
+  /**
+  @brief Function for storing bounding box and probability sent
+  from Predator
+  @param bbox [cv::Rect] Predator bounding box
+  @param posterior [float] Predator Probability
+  @return void
+  **/
+  void setPredatorValues(cv::Rect bbox, float posterior);
+  
+  /**
+  @brief Function used for fusion, in order to decide whether Predator
+  is ON or OFF
+  @return void
+  **/
+  void setPredatorOn(bool flag);
+  
+  /**
+  @brief Returns detected landoltc3d, for publishing them later
+  @param void
+  @return [std::vector<LandoltC3D>] Vector of detected Landolts
+  **/
+  std::vector<LandoltC3D> getDetectedLandolt();
     
 };
 } // namespace pandora_vision

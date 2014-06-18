@@ -49,8 +49,6 @@ LandoltC3dDetector::LandoltC3dDetector()
   
   _edges = 0;
   
-  _bradley = false;
-  
 }
 
 //!< Destructor
@@ -80,7 +78,7 @@ void LandoltC3dDetector::initializeReferenceImage(std::string path)
   cv::cvtColor(ref, ref, CV_BGR2GRAY);
   cv::threshold(ref, ref, 0, 255, cv::THRESH_BINARY_INV | CV_THRESH_OTSU);
 
-  cv::findContours(ref, _refContours, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+  cv::findContours(ref, _refContours, cv::RETR_LIST, cv::CHAIN_APPROX_NONE);
   
   clahe = cv::createCLAHE(4, cv::Size(8, 8));
 }
@@ -109,13 +107,11 @@ void LandoltC3dDetector::applyMask()
     
       cv::copyMakeBorder(out, padded, 8, 8, 8, 8, cv::BORDER_CONSTANT, cv::Scalar(0));
     
-      //~ cv::imshow("padded", padded); 
-    
       findRotation(padded, temp);
     
       #ifdef SHOW_DEBUG_IMAGE
-      //~ //cv::imshow("padded", padded);
-      //~ //cv::waitKey(200);
+      cv::imshow("padded", padded);
+      cv::waitKey(20);
       #endif
     }
   }
@@ -344,8 +340,8 @@ void LandoltC3dDetector::findRotation(const cv::Mat&in, LandoltC3D* temp)
   }
   
   #ifdef SHOW_DEBUG_IMAGE
-    //~ cv::imshow("paddedptr", paddedptr); 
-    //~ cv::waitKey(5); 
+  cv::imshow("paddedptr", paddedptr); 
+  cv::waitKey(5); 
   #endif
     
   _edges = 0;
@@ -417,7 +413,7 @@ void LandoltC3dDetector::applyBradleyThresholding(const cv::Mat& input, cv::Mat*
       sum = integralImg[y2*input.cols+x2]-integralImg[y1*input.cols+x2]-
       integralImg[y2*input.cols+x1]+integralImg[y1*input.cols+x1];
           
-      if((int64_t)(in[index]*count) < (int64_t)(sum*(1.0-0.15)))
+      if((int64_t)(in[index]*count) < (int64_t)(sum*(1.0-Landoltc3DParameters::bradleyPerc)))
       {
         out[index]=0;
       }
@@ -427,8 +423,6 @@ void LandoltC3dDetector::applyBradleyThresholding(const cv::Mat& input, cv::Mat*
       }
     }
   }
-  
-  //cv::imshow("bradley",*output);
   
   //~ delete[] integralImg;
 }
@@ -510,7 +504,8 @@ void LandoltC3dDetector::findCenters(int rows, int cols, float* grX, float* grY)
       float dx = grX[i];
       float dy = grY[i];
       float mag = dx * dx + dy * dy;
-      if (mag > (_minDiff * _minDiff))
+      if (mag > (Landoltc3DParameters::gradientThreshold 
+      * Landoltc3DParameters::gradientThreshold))
       {
         mag = sqrt(mag);
         float s = 20 / mag;
@@ -531,7 +526,7 @@ void LandoltC3dDetector::findCenters(int rows, int cols, float* grX, float* grY)
     {
       int i = y * cols + x;
       int cur = readvoting[i];
-      if (cur >= _threshold)
+      if (cur >= Landoltc3DParameters::centerThreshold)
       {
         bool biggest = true;
 
@@ -579,7 +574,7 @@ void LandoltC3dDetector::findLandoltContours(const cv::Mat& inImage, int rows, i
   //!<find contours and moments in frame used for shape matching later
 
   static std::vector<std::vector<cv::Point> > contours;
-  cv::findContours(inImage, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+  cv::findContours(inImage, contours, cv::RETR_TREE, cv::CHAIN_APPROX_NONE);
   std::vector<cv::Moments> mu(contours.size());
   for(int i = 0; i < contours.size(); i++)
   {
@@ -611,7 +606,7 @@ void LandoltC3dDetector::findLandoltContours(const cv::Mat& inImage, int rows, i
       std::vector<cv::Point> cnt = contours[i];
       double prec = cv::matchShapes(cv::Mat(ref), cv::Mat(cnt), CV_CONTOURS_MATCH_I3, 0);
       if (!isContourConvex(cv::Mat(cnt)) && fabs(mc[i].x - (*it).x) < 7 && fabs(mc[i].y - (*it).y) < 7 
-      && prec < 0.3)
+      && prec < Landoltc3DParameters::huMomentsPrec)
       {
         flag = true;
         cv::Rect bounding_rect = boundingRect((contours[i]));
@@ -632,7 +627,6 @@ void LandoltC3dDetector::findLandoltContours(const cv::Mat& inImage, int rows, i
       temp.color = _fillColors;
       temp.bbox = _rectangles;
       _landoltc3d.push_back(temp);      
-      //do stuff
       flag = false;
     } 
     
@@ -651,9 +645,6 @@ void LandoltC3dDetector::begin(cv::Mat* input)
   static cv::Mat gray, gradX, gradY, dst, abs_grad_x, abs_grad_y, thresholded, grad_x, grad_y;
   static  cv::Mat erodeKernel(cv::Size(1, 1), CV_8UC1, cv::Scalar(1));
   
-  double start = static_cast<double>(cv::getTickCount());
-  double fps;
-
   cv::cvtColor(*input, gray, CV_BGR2GRAY);
 
   _voting = cv::Mat::zeros(input->rows, input->cols, CV_16U);
@@ -661,12 +652,10 @@ void LandoltC3dDetector::begin(cv::Mat* input)
   thresholded = cv::Mat::zeros(input->rows, input->cols, CV_8UC1);
   
   bilateralFilter(gray, dst, 2, 4, 1);
-  //medianBlur(gray, dst, 3);
-  
+    
   gray = dst.clone();
   
   clahe->apply(gray, dst);
-  //equalizeHist( gray, dst );
   
   cv::Sobel(dst, gradX, CV_32F, 1, 0, 3);
   cv::Sobel(dst, gradY, CV_32F, 0, 1, 3);
@@ -676,37 +665,30 @@ void LandoltC3dDetector::begin(cv::Mat* input)
 
   findCenters(dst.rows, dst.cols, gradXF, gradYF);
   
+  #ifdef SHOW_DEBUG_IMAGE
   for(std::size_t i = 0; i < _centers.size(); i++)
   {
     cv::circle(*input, _centers.at(i), 2, (0, 0, 255), -1);
   }
+  #endif
   
-  //Scharr(dst, grad_x, CV_32F, 1, 0, 1, 0);
-  //Sobel( dst, grad_x, CV_32F, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT );
   convertScaleAbs( gradX, abs_grad_x );
   
-  //Scharr(dst, grad_y, CV_32F, 0, 1, 1, 0);
-  //Sobel( dst, grad_y, CV_32F, 0, 1, 3, 1, 0, cv::BORDER_DEFAULT );
   convertScaleAbs( gradY, abs_grad_y );
       
   addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, dst ); 
   
-  //cv::imshow("dst", dst);
+  //~ cv::adaptiveThreshold(dst, thresholded, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+  //~ cv::THRESH_BINARY_INV, 7, Landoltc3DParameters::adaptiveThresholdSubtractSize);
   
-  //~ if(_bradley)
-  //~ {
-    //~ applyBradleyThresholding(dst, &thresholded);
-    //~ _bradley = false;
-  //~ }
-  //~ else
-  //~ {
-    cv::adaptiveThreshold(dst, thresholded, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 7, 2);
-    //~ _bradley = true;
-  //~ }
-  
+  applyBradleyThresholding(dst, &thresholded);
+
   cv::erode(thresholded, thresholded, erodeKernel);
   
-  //cv::imshow("thresholded", thresholded);
+  #ifdef SHOW_DEBUG_IMAGE
+  cv::imshow("thresholded", thresholded);
+  cv::waitKey(10);
+  #endif
   
   findLandoltContours(thresholded, thresholded.rows, thresholded.cols, _refContours[0]);
 
@@ -717,22 +699,12 @@ void LandoltC3dDetector::begin(cv::Mat* input)
   
   applyMask();
   
-  //fuse();
-  
   #ifdef SHOW_DEBUG_IMAGE
     cv::imshow("Raw", *input);
-    cv::waitKey(1);
+    cv::waitKey(10);
   #endif
-
-  clear();
   
-  double end = (cvGetTickCount() - start) / cvGetTickFrequency();
-
-  end = end / 1000000;
-
-  fps = 1 / end;
-    
-  ROS_INFO("FPS %lf", fps);
+  fusion();
 
 }
 
@@ -743,8 +715,75 @@ void LandoltC3dDetector::begin(cv::Mat* input)
 **/
 void LandoltC3dDetector::fusion()
 {
+  if(!PredatorOn)
+  {
+    
+    for(int i = 0; i < _landoltc3d.size(); i++)
+    {
+      LandoltC3D* temp = &(_landoltc3d.at(i));
+      if((*temp).count == 1)
+      {
+        _landoltc3d.at(i).probability = 0.2;
+      }
+      else if((*temp).count == 2)
+      {
+        _landoltc3d.at(i).probability = 0.4;
+      }
+      else if((*temp).count == 3)
+      {
+        _landoltc3d.at(i).probability = 0.6;
+      }
+      else if((*temp).count == 4)
+      {
+        _landoltc3d.at(i).probability = 0.8;
+      }
+      else if((*temp).count == 5)
+      {
+        _landoltc3d.at(i).probability = 1;
+      }
+      ROS_INFO("Probability is %f", _landoltc3d.at(i).probability);    
+   
+    }
+    
+  }
+  else
+  {
+    for(int i = 0; i< _landoltc3d.size(); i++)
+    {
+      if(predator_bbox.contains(_landoltc3d.at(i).center))
+      {
+        
+        _landoltc3d.at(i).probability = confidence;
+        //ROS_INFO("Probability is %f", confidence);
+      }
+    }
   
+  }
 }
+
+/**
+  @brief Function for storing bounding box and probability sent
+  from Predator
+  @param bbox [cv::Rect] Predator bounding box
+  @param posterior [float] Predator Probability
+  @return void
+**/
+void LandoltC3dDetector::setPredatorValues(cv::Rect bbox, float posterior)
+{
+  predator_bbox = bbox;
+  confidence = posterior;
+}
+
+/**
+  @brief Function used for fusion, in order to decide whether Predator
+  is ON or OFF
+  @return void
+**/
+void LandoltC3dDetector::setPredatorOn(bool flag)
+{
+  PredatorOn = flag;
+}
+  
 
 /**
   @brief Clearing vector values
@@ -758,6 +797,17 @@ void LandoltC3dDetector::clear()
   _rectangles.clear();
   _fillColors.clear();
   _landoltc3d.clear();
+}
+
+/**
+  @brief Returns detected landoltc3d, for publishing them later
+  @param void
+  @return [std::vector<LandoltC3D>] Vector of detected Landolts
+**/
+
+std::vector<LandoltC3D> LandoltC3dDetector::getDetectedLandolt()
+{
+  return _landoltc3d;
 }
 
 

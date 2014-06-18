@@ -67,22 +67,26 @@
 
 namespace pandora_vision
 {
-class LandoltCDetection
-{
+class LandoltCDetection : public StateClient {
+  
 private:
   //!<Subscriber of RGB Image
   ros::Subscriber _inputImageSubscriber;
+  
   //!<Node Handler
   ros::NodeHandle _nh;
+  
   //!< Current frame to be processed
   cv::Mat landoltCFrame;
-
+  
+  //!<Landoltc Detector object
   LandoltCDetector _landoltcDetector;
   
+  //!<Current package path
   std::string packagePath;
-
-  std::string patternPath;
   
+  //!<Current pattern path
+  std::string patternPath;
   
   /// Frame height
   int frameHeight;
@@ -90,7 +94,10 @@ private:
   /// Frame width
   int frameWidth;
   
+  //!<RatioX
   float ratioX;
+  
+  //!<RatioY
   float ratioY;
 
   //!< Horizontal Field Of View (rad)
