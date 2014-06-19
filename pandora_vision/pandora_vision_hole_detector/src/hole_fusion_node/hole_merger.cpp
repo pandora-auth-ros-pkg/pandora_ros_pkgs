@@ -276,11 +276,12 @@ namespace pandora_vision
         dd = probabilitiesVector[0][0];
         da = probabilitiesVector[1][0];
 
+
         // Probabilities threshold for merge acceptance.
         // In the assimilation operation, the temp conveyor unconditionally
         // replaces the original conveyor
-        if ((dd >= Parameters::HoleFusion::checker_depth_diff_threshold
-          && da >= Parameters::HoleFusion::checker_depth_area_threshold))
+        if ((dd >= Parameters::HoleFusion::merger_depth_diff_threshold
+          && da >= Parameters::HoleFusion::merger_depth_area_threshold))
         {
           // Since the tempHolesConveyor's ithHole has been positively tested,
           // the tempHolesConveyor is now the new rgbdHolesConveyor

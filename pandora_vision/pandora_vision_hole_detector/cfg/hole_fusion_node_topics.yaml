@@ -9,3 +9,4 @@ published_topics:
   enhanced_holes_topic: /vision/enhanced_holes
   make_synchronizer_subscribe_to_input: subscribe_to_input
   make_synchronizer_leave_subscription_to_input: leave_subscription_to_input
+  debug_valid_holes_image: debug_valid_holes_image

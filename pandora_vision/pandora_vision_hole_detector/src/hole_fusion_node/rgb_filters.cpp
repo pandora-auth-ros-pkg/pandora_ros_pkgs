@@ -314,9 +314,10 @@ namespace pandora_vision
 
 
   /**
-    @brief Checks for color homogenity in a region where points are
-    constrained inside each hole. A candidate hole is considered valid
-    if its H-V histogram has above a certain number of bins occupied.
+    @brief Checks for colour homogeneity in a region where points are
+    constrained inside each hole. The colors of the image are reduced
+    and their different values inside each candidate hole are counted
+    and averaged against the maximum number of colours possible.
     @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
     containing the masks needed to produce the histograms of the points
@@ -350,15 +351,16 @@ namespace pandora_vision
     // is 2^12. For every duplication of div, the number of possible colours
     // is divided by a factor of 2^3
     int div = 16;
-    for (int j = 0; j < inImage_.rows; j++)
-    {
-      // Get the address of row j
-      unsigned char* data = inImage_.ptr<unsigned char>(j);
 
-      for (int i = 0; i < inImage_.cols * inImage_.channels(); i++)
+    for (int i = 0; i < inImage_.rows; i++)
+    {
+      // Get the address of row i
+      unsigned char* data = inImage_.ptr<unsigned char>(i);
+
+      for (int j = 0; j < inImage_.cols * inImage_.channels(); j++)
       {
         // Process each pixel
-        data[i] = data[i] / div * div + div / 2;
+        data[j] = data[j] / div * div + div / 2;
       }
     }
 
@@ -395,7 +397,7 @@ namespace pandora_vision
         numberOfColours = 0;
       }
 
-      probabilitiesVector->at(i) = static_cast<float> (numberOfColours) / 4096;
+      probabilitiesVector->at(i) = static_cast<float>(numberOfColours) / 4096;
 
       msgs->push_back(TOSTR(probabilitiesVector->at(i)));
 

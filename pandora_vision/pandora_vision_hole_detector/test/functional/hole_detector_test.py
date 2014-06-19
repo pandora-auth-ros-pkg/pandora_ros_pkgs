@@ -76,8 +76,8 @@ class HoleDetectorTest(test_base.TestBase):
         hole_1 = holesDirectionsMsgs[0].holesDirections[1]
 
         # the coordinates of the first valid hole's keypoint
-        x = 399
-        y = 360
+        x = 352.9
+        y = 238.2
 
         # the coordinates of the first valid hole's keypoint relative to the
         # center of the image
@@ -95,8 +95,9 @@ class HoleDetectorTest(test_base.TestBase):
         self.assertGreater(hole_0.probability, 0.9)
 
         # the coordinates of the second valid hole's keypoint
-        x = 407.5
-        y = 164
+        x = 328
+        y = 106
+
 
         # the coordinates of the first valid hole's keypoint relative to the
         # center of the image
@@ -135,12 +136,12 @@ class HoleDetectorTest(test_base.TestBase):
 
         # The first hole's keypoint
         x = hole_0.keypointX * 2
-        self.assertLess(400, x);
-        self.assertGreater(402, x);
+        self.assertLess(346, x);
+        self.assertGreater(348, x);
 
         y = hole_0.keypointY * 2
-        self.assertLess(360, y);
-        self.assertGreater(361, y);
+        self.assertLess(237, y);
+        self.assertGreater(239, y);
 
         # There should be equal number of elements in both vertices vectors
         self.assertEqual(len(hole_0.verticesX), len(hole_0.verticesY))
@@ -184,12 +185,12 @@ class HoleDetectorTest(test_base.TestBase):
 
         # The second hole's keypoint
         x = hole_1.keypointX * 2
-        self.assertLess(407, x);
-        self.assertGreater(408, x);
+        self.assertLess(330, x);
+        self.assertGreater(328, x);
 
         y = hole_1.keypointY * 2
-        self.assertLess(164, y);
-        self.assertGreater(165, y);
+        self.assertLess(108, y);
+        self.assertGreater(106, y);
 
         # There should be equal number of elements in both vertices vectors
         self.assertEqual(len(hole_1.verticesX), len(hole_1.verticesY))

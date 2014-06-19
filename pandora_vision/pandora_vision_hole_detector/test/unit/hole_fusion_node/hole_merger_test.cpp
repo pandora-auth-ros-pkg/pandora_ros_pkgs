@@ -596,8 +596,8 @@ namespace pandora_vision
 
 
     // Apply preposterous thresholds
-    Parameters::HoleFusion::checker_depth_diff_threshold = 1;
-    Parameters::HoleFusion::checker_depth_area_threshold = 1;
+    Parameters::HoleFusion::merger_depth_diff_threshold = 1.0;
+    Parameters::HoleFusion::merger_depth_area_threshold = 1.0;
 
     // Restore conveyor to its original state
     HolesConveyorUtils::replace( originConveyor, &conveyor );
@@ -1110,8 +1110,8 @@ namespace pandora_vision
     int interpolationMethod = 0;
 
     // Apply reasonable thresholds
-    Parameters::HoleFusion::checker_depth_diff_threshold = 0.8;
-    Parameters::HoleFusion::checker_depth_area_threshold = 0.8;
+    Parameters::HoleFusion::merger_depth_diff_threshold = 0.8;
+    Parameters::HoleFusion::merger_depth_area_threshold = 0.8;
 
     // Restore conveyor to its original state
     //HolesConveyorUtils::replace( originConveyor, &conveyor );

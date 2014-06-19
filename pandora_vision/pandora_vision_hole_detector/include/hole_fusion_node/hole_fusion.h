@@ -103,6 +103,9 @@ namespace pandora_vision
       // pertaining to the valid holes found by the Hole Detector package
       std::string enhancedHolesTopic_;
 
+      ros::Publisher debugValidHolesPublisher_;
+      std::string debugValidHolesTopic_;
+
       // The publisher that the Hole Fusion node uses to request from the
       // synchronizer node to subscribe to the input point cloud
       ros::Publisher synchronizerSubscribeToInputPointCloudPublisher_;
@@ -304,6 +307,10 @@ namespace pandora_vision
         @return void
        **/
       void processCandidateHoles();
+
+      void produceDataset(
+        const HolesConveyor& conveyor,
+        const std::vector<std::vector<float> >& probabilities);
 
       /**
         @brief Publishes the enhanced holes' information.

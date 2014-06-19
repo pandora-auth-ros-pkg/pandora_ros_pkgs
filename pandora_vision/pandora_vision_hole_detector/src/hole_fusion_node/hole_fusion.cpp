@@ -76,6 +76,11 @@ namespace pandora_vision
 
     // Advertise the topic that information about the final holes,
     // will be published to
+    debugValidHolesPublisher_ = nodeHandle_.advertise
+      <sensor_msgs::Image>(debugValidHolesTopic_, 1000, true);
+
+    // Advertise the topic that the image of the final holes,
+    // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::EnhancedHolesVectorMsg>(
         enhancedHolesTopic_, 1000, true);
@@ -608,6 +613,22 @@ namespace pandora_vision
         "[Hole Fusion Node] Could not find topic"
         " make_synchronizer_leave_subscription_to_input");
     }
+
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // an image of the valid holes found
+    if (nodeHandle_.getParam(ns +
+        "/hole_fusion_node/published_topics/debug_valid_holes_image",
+        debugValidHolesTopic_))
+    {
+      ROS_INFO_NAMED("hole_detector",
+        "[Hole Fusion Node] Advertising to topic where an image of the"
+        " valid holes is published");
+    }
+    else
+    {
+      ROS_INFO_NAMED ("hole_detector",
+        "[Hole Fusion Node] Could not find topic debug_valid_holes_image");
+    }
   }
 
 
@@ -806,6 +827,14 @@ namespace pandora_vision
       config.connect_holes_min_distance;
     Parameters::HoleFusion::connect_holes_max_distance =
       config.connect_holes_max_distance;
+
+    //--------------------------- Merger parameters ----------------------------
+
+    Parameters::HoleFusion::merger_depth_diff_threshold =
+      config.merger_depth_diff_threshold;
+    Parameters::HoleFusion::merger_depth_area_threshold =
+      config.merger_depth_area_threshold;
+
 
     //--------------------------- Texture parameters ---------------------------
 
@@ -1027,6 +1056,11 @@ namespace pandora_vision
     std::vector<std::vector<float> > probabilitiesVector2D;
     probabilitiesVector2D = checkHoles(rgbdHolesConveyor);
 
+    // Write the extracted probabilities to a file. These will be used to
+    // produce a dataset of values that need to be minimized in order for a
+    // sound validation procedure to be employed
+    produceDataset(rgbdHolesConveyor, probabilitiesVector2D);
+
     // Which candidate holes are actually holes?
     // The probabilities obtained above need to be evaluated
     std::map<int, float> validHolesMap;
@@ -1098,6 +1132,49 @@ namespace pandora_vision
     Timer::tick("processCandidateHoles");
     Timer::printAllMeansTree();
     #endif
+  }
+
+
+
+  void HoleFusion::produceDataset(
+    const HolesConveyor& conveyor,
+    const std::vector<std::vector<float> >& probabilities)
+  {
+    // Open the dataset
+    std::ofstream dataset;
+    dataset.open ("dataset.csv", std::ios_base::app | std::ios_base::out);
+
+    for (int i = 0; i < conveyor.size(); i++)
+    {
+      // True holes
+      if (conveyor.holes[i].keypoint.pt.x > 200.0
+        && conveyor.holes[i].keypoint.pt.x < 210.0
+        && conveyor.holes[i].keypoint.pt.y > 265.0
+        && conveyor.holes[i].keypoint.pt.y < 275.0)
+      {
+        dataset << probabilities[0][i] << ", "
+          << probabilities[1][i] << ", "
+          << probabilities[2][i] << ", "
+          << probabilities[3][i] << ", "
+          << probabilities[4][i] << ", "
+          << probabilities[5][i] << ", "
+          << probabilities[6][i] << ", "
+          << probabilities[7][i] << ", "
+          << 1 << "\n";
+      }
+      else
+      {
+        dataset << probabilities[0][i] << ", "
+          << probabilities[1][i] << ", "
+          << probabilities[2][i] << ", "
+          << probabilities[3][i] << ", "
+          << probabilities[4][i] << ", "
+          << probabilities[5][i] << ", "
+          << probabilities[6][i] << ", "
+          << probabilities[7][i] << ", "
+          << 0 << "\n";
+      }
+    }
   }
 
 
@@ -1232,6 +1309,41 @@ namespace pandora_vision
     //holesVectorMsg.header.frame_id = frame_id_;
 
     validHolesPublisher_.publish(holesVectorMsg);
+
+
+    // The holes conveyor containing only the valid holes
+    HolesConveyor validHolesConveyor;
+
+    // Contains the validity probability for each hole considered valid
+    std::vector<std::string> msgs;
+
+    for (std::map<int, float>::iterator it = map->begin();
+      it != map->end(); it++)
+    {
+      HolesConveyorUtils::append(
+        HolesConveyorUtils::getHole(conveyor, it->first),
+        &validHolesConveyor);
+
+      msgs.push_back(TOSTR(it->second));
+    }
+
+    // Valid holes on top of the RGB image
+    cv::Mat rgbValidHolesImage =
+      Visualization::showHoles("ValidHoles",
+        rgbImage_,
+        validHolesConveyor,
+        -1,
+        msgs);
+
+
+    // Convert the image into a message
+    cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
+
+    msgPtr->header = holesVectorMsg.header;
+    msgPtr->encoding = sensor_msgs::image_encodings::BGR8;
+    msgPtr->image = rgbValidHolesImage;
+
+    debugValidHolesPublisher_.publish(*msgPtr->toImageMsg());
   }
 
 
@@ -1496,6 +1608,48 @@ namespace pandora_vision
       // used, which is one analogous to the one presented in
       // {insert link of Manos Tsardoulias's PHD thesis}
 
+      // Priority{color_homogeneity} = 0
+      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+      {
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+
+        exponent++;
+      }
+
+      // Priority{depth_area} = 1
+      if (Parameters::Depth::interpolation_method == 0)
+      {
+        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        {
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
+            + Parameters::HoleFusion::run_checker_depth_area - 1][i];
+
+          exponent++;
+        }
+      }
+
+      // Priority{luminosity_diff} = 2
+      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+      {
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+
+        exponent++;
+      }
+
+      // Priority{outline_of_rectangle} = 3
+      if (Parameters::Depth::interpolation_method == 0)
+      {
+        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        {
+          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
+            + Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+
+          exponent++;
+        }
+      }
+
       // The depth homogeneity is considered the least confident measure of
       // a potential hole's validity. Hence,
       // Priority{depth_homogeneity} = 0
@@ -1508,33 +1662,6 @@ namespace pandora_vision
 
           exponent++;
         }
-      }
-
-      // Priority{texture_diff} = 1
-      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_texture_diff - 1][i];
-
-        exponent++;
-      }
-
-      // Priority{color_homogeneity} = 2
-      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
-
-        exponent++;
-      }
-
-      // Priority{luminosity_diff} = 3
-      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
-
-        exponent++;
       }
 
       // Priority{texture_backproject} = 4
@@ -1558,19 +1685,7 @@ namespace pandora_vision
         }
       }
 
-      // Priority{outline_of_rectangle} = 6
-      if (Parameters::Depth::interpolation_method == 0)
-      {
-        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
-        {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
-
-          exponent++;
-        }
-      }
-
-      // Priority{depth_diff} = 7
+      // Priority{depth_diff} = 6
       if (Parameters::Depth::interpolation_method == 0)
       {
         if (Parameters::HoleFusion::run_checker_depth_diff > 0)
@@ -1582,17 +1697,15 @@ namespace pandora_vision
         }
       }
 
-      // Priority{depth_area} = 8
-      if (Parameters::Depth::interpolation_method == 0)
+      // Priority{texture_diff} = 7
+      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
       {
-        if (Parameters::HoleFusion::run_checker_depth_area > 0)
-        {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_depth_area - 1][i];
+        sum += pow(2, exponent) * probabilitiesVector2D[
+          Parameters::HoleFusion::run_checker_texture_diff - 1][i];
 
-          exponent++;
-        }
+        exponent++;
       }
+
 
       sum /= (pow(2, exponent) - 1);
 

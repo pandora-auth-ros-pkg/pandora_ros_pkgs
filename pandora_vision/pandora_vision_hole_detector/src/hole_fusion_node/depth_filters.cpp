@@ -542,9 +542,9 @@ namespace pandora_vision
     EdgeDetection::applySobel(visualizableDenoisedImage,
       &interpolatedDepthImageEdges);
 
-    // Make all non zero pixels have a value of 255
+    // Apply a threshold and make all non zero pixels have a value of 255
     cv::threshold(interpolatedDepthImageEdges, interpolatedDepthImageEdges,
-      0, 255, 0);
+      Parameters::Edge::denoised_edges_threshold, 255, 0);
 
     // Take a pointer on the interpolatedDepthImageEdges image
     unsigned char* ptr = interpolatedDepthImageEdges.ptr();

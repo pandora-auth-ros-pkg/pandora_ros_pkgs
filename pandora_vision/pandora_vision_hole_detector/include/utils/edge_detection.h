@@ -112,8 +112,9 @@ namespace pandora_vision
       static void applyLaplacian (const cv::Mat& inImage, cv::Mat* outImage);
 
       /**
-        @brief Applies contamination to the edges image. It keeps only the edges
-        that are not iteratively neighbors to the image's limits
+        @brief Applies contamination to an image of edges.
+        It keeps only the edges that are not iteratively neighbors
+        to the image's limits
         @param[in,out] inImage [cv::Mat*] Input image in CV_8UC1 format
         @return void
        **/
@@ -238,11 +239,11 @@ namespace pandora_vision
         this function fills closed regions, at first, and then extracts
         the outline of each region. Used when there is a closed region
         with garbage pixels with a value of 255 within it.
-        Caution: The outline of ALL shapes is computed: if there are
-        closed shapes inside other closed shapes, their outline is detected
-        and included in the output image.
-        @param[in,out] inImage [cv::Mat*] The input image
-        @return void
+Caution: The outline of ALL shapes is computed: if there are
+closed shapes inside other closed shapes, their outline is detected
+and included in the output image.
+@param[in,out] inImage [cv::Mat*] The input image
+@return void
        **/
       static void getShapesClearBorder (cv::Mat* inImage);
 
@@ -252,11 +253,11 @@ namespace pandora_vision
         outermost outline of each region.
         Used when there is a closed region with garbage pixels with
         a value of 255 within it.
-        Caution: Only the outermost outline of shapes is computed. If there are
-        closed shapes inside of other closed shapes, only the latter's outline
-        will be computed, as opposed to the getShapesClearBorder function
-        @param[in,out] inImage [cv::Mat*] The input image
-        @return void
+Caution: Only the outermost outline of shapes is computed. If there are
+closed shapes inside of other closed shapes, only the latter's outline
+will be computed, as opposed to the getShapesClearBorder function
+@param[in,out] inImage [cv::Mat*] The input image
+@return void
        **/
       static void getShapesClearBorderSimple (cv::Mat* inImage);
 

@@ -229,6 +229,9 @@ namespace pandora_vision
       static int num_bins_threshold;
       static int non_zero_points_in_box_blob_histogram;
 
+      // Merger parameters
+      static float merger_depth_diff_threshold;
+      static float merger_depth_area_threshold;
 
       // Holes validity thresholds
 

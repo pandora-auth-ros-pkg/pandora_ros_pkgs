@@ -161,9 +161,10 @@ namespace pandora_vision
         std::vector<std::vector<float> >* probabilitiesVector);
 
       /**
-        @brief Checks for color homogenity in a region where points are
-        constrained inside each hole. A candidate hole is considered valid
-        if its H-V histogram has above a certain number of bins occupied.
+        @brief Checks for colour homogeneity in a region where points are
+        constrained inside each hole. The colors of the image are reduced
+        and their different values inside each candidate hole are counted
+        and averaged against the maximum number of colours possible.
         @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
         @param[in] holesMasksImageVector [const std::vector<cv::Mat>&] A vector
         containing the masks needed to produce the histograms of the points

@@ -102,7 +102,7 @@ namespace pandora_vision
   /**
     @brief Iteration for the interpolateNoise_brushNear function
     @param[in,out] image [cv::Mat&] The input image
-    @param index [const int&] Where to start the brushfire algorithm
+    @param[in] index [const int&] Where to start the brushfire algorithm
     (index = y * cols + x)
     @return void
    **/
