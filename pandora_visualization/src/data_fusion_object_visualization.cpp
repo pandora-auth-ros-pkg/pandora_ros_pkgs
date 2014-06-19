@@ -37,9 +37,9 @@ ObjectVisualization::ObjectVisualization()
 {
   _broadcastTimer = _nh.createTimer(ros::Duration(0.1), &ObjectVisualization::broadcastTimerCb, this);
 
-  while(!ros::service::waitForService("/data_fusion/get_markers", ros::Duration(.1)) && ros::ok()) 
+  while(!ros::service::waitForService("/data_fusion/get_markers", ros::Duration(1)) && ros::ok()) 
   {
-    ROS_ERROR("[ ObjectVisualization ] Couldn't find service /data_fusion/get_markers");
+    ROS_ERROR_THROTTLE(3, "[ ObjectVisualization ] Couldn't find service /data_fusion/get_markers");
   }
 
   //~ ros::Duration(15).sleep();
@@ -67,7 +67,7 @@ void ObjectVisualization::broadcastTimerCb(const ros::TimerEvent& event)
 {
   while (!_getMarkersClient.call(_markersSrv) && ros::ok())
   {
-    ROS_ERROR("[ ObjectVisualization ] Failed to get objects for visualization. Retrying...");
+    ROS_ERROR_THROTTLE(3, "[ ObjectVisualization ] Failed to get objects for visualization. Retrying...");
     ros::Duration(0.5).sleep();
   }
 
