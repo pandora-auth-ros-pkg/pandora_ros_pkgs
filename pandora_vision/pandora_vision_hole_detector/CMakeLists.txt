@@ -146,6 +146,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/hole_fusion_node/depth_filters.h
   include/hole_fusion_node/hole_merger.h
   include/hole_fusion_node/hole_fusion.h
+  include/hole_fusion_node/filters.h
   include/hole_fusion_node/filters_resources.h
   include/hole_fusion_node/planes_detection.h
   include/hole_fusion_node/rgb_filters.h
@@ -154,6 +155,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/hole_fusion_node/hole_merger.cpp
   src/hole_fusion_node/hole_fusion.cpp
   src/hole_fusion_node/hole_fusion_node.cpp
+  src/hole_fusion_node/filters.cpp
   src/hole_fusion_node/filters_resources.cpp
   src/hole_fusion_node/planes_detection.cpp
   src/hole_fusion_node/rgb_filters.cpp
@@ -208,6 +210,6 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 
 ##################################### Testing ##################################
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
-endif()
+#if(CATKIN_ENABLE_TESTING)
+  #add_subdirectory(test)
+#endif()

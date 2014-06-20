@@ -2,6 +2,7 @@ add_executable(hole_fusion_node
   hole_fusion.cpp
   hole_fusion_node.cpp
   hole_merger.cpp
+  filters.cpp
   filters_resources.cpp
   rgb_filters.cpp
   depth_filters.cpp

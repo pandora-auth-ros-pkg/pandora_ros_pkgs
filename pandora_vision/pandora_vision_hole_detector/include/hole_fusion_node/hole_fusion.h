@@ -55,6 +55,7 @@
 #include "utils/parameters.h"
 #include "utils/visualization.h"
 #include "hole_fusion_node/depth_filters.h"
+#include "hole_fusion_node/filters.h"
 #include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/rgb_filters.h"
 #include "hole_fusion_node/hole_merger.h"
@@ -208,7 +209,7 @@ namespace pandora_vision
         validity of each candidate hole. Each row of it pertains to a specific
         filter applied, each column to a particular hole
        **/
-      std::vector<std::vector<float> > checkHoles(
+      std::vector<std::vector<float> > filterHoles(
         const HolesConveyor& conveyor);
 
       /**

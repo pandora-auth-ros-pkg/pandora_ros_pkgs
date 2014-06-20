@@ -141,256 +141,6 @@ namespace pandora_vision
 
 
   /**
-    @brief Runs candidate holes through selected filters.
-    Probabilities for each candidate hole and filter
-    are printed in the console, with an order specified by the
-    hole_fusion_cfg of the dynamic reconfigure utility
-    @param[in] conveyor [const HolesConveyor&] The conveyor
-    containing candidate holes that are to be checked against selected
-    filters
-    @return [std::vector<std::vector<float> >]
-    A two dimensional vector containing the probabilities of
-    validity of each candidate hole. Each row of it pertains to a specific
-    filter applied, each column to a particular hole
-   **/
-  std::vector<std::vector<float> > HoleFusion::checkHoles(
-    const HolesConveyor& conveyor)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("checkHoles", "processCandidateHoles");
-    #endif
-
-    // A vector of images that each one of them represents the corresponding
-    // hole's mask: non-zero value pixels are within a hole's outline points
-    std::vector<cv::Mat> holesMasksImageVector;
-
-    // A vector of sets that each one of them contains indices of points
-    // inside the hole's outline
-    std::vector<std::set<unsigned int> > holesMasksSetVector;
-
-    // A vector of vertices of each inflated bounding rectangle.
-    std::vector<std::vector<cv::Point2f> > inflatedRectanglesVector;
-
-    // Since inflated rectangle's vertices may go outside the image's bounds,
-    // this vector stores the indices of the keypoints whose corresponding
-    // inflated rectangle is in totality within the image's bounds
-    std::vector<int> inflatedRectanglesIndices;
-
-    // A vector of sets that each one of them contains indices of points
-    // between the hole's outline and its respective bounding box
-    std::vector<std::set<unsigned int> > intermediatePointsSetVector;
-
-    // A vector of images that each one of them contains points
-    // between the hole's outline and its respective bounding box
-    std::vector<cv::Mat> intermediatePointsImageVector;
-
-    // Construct the necessary vectors, depending on which filters
-    // are to run in runtime and on the interpolation method
-    FiltersResources::createCheckerRequiredVectors(
-      conveyor,
-      interpolatedDepthImage_,
-      Parameters::HoleFusion::rectangle_inflation_size,
-      Parameters::Depth::interpolation_method,
-      &holesMasksImageVector,
-      &holesMasksSetVector,
-      &inflatedRectanglesVector,
-      &inflatedRectanglesIndices,
-      &intermediatePointsImageVector,
-      &intermediatePointsSetVector);
-
-
-    // The overall 2D vector that contains the probabilities from
-    // both the depth and rgb filtering regimes
-    // Each column is a specific hole.
-    // In each row there are values of probabilities by a specific filter
-    std::vector<std::vector<float> > probabilitiesVector2D;
-
-
-    // Initialize the rgb probabilities 2D vector. But first we need to know
-    // how many rows the vector will accomodate.
-    // If a Parameters::HoleFusion::run_checker_* variable is greater than zero,
-    // the respective filter is set to run
-    int rgbActiveFilters = 0;
-
-    if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::HoleFusion::run_checker_texture_diff > 0)
-    {
-      rgbActiveFilters++;
-    }
-    if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
-    {
-      rgbActiveFilters++;
-    }
-
-    if (rgbActiveFilters > 0)
-    {
-      // The 2D vector that contains the probabilities from the rgb filtering
-      // regime.
-      // Each column is a specific hole.
-      // In each row there are values of probabilities by a specific filter
-      std::vector<std::vector<float> > rgbProbabilitiesVector2D(
-        rgbActiveFilters,
-        std::vector<float>(conveyor.size(), 0.0));
-
-      // Check holes against rgb-based filters
-      RgbFilters::checkHoles(
-        conveyor,
-        rgbImage_,
-        wallsHistogram_,
-        inflatedRectanglesIndices,
-        holesMasksImageVector,
-        holesMasksSetVector,
-        intermediatePointsImageVector,
-        intermediatePointsSetVector,
-        &rgbProbabilitiesVector2D);
-
-      // If holes have been found in the first place
-      if (conveyor.size() > 0)
-      {
-        ROS_INFO_NAMED ("hole_detector",
-          "-------------------------------------------");
-
-        ROS_INFO_NAMED ("hole_detector", "RGB: Candidate Holes' probabilities");
-
-        for (int j = 0; j < conveyor.size(); j++)
-        {
-          std::string probsString;
-          for (int i = 0; i < rgbActiveFilters; i++)
-          {
-            probsString += TOSTR(rgbProbabilitiesVector2D[i][j]) + " | ";
-          }
-
-          ROS_INFO_NAMED ("hole_detector", "P_%d [%f %f] : %s",
-            j,
-            conveyor.holes[j].keypoint.pt.x,
-            conveyor.holes[j].keypoint.pt.y,
-            probsString.c_str());
-        }
-      }
-
-      // Fill the probabilitiesVector2D with the rgb vector of probabilities
-      for (int i = 0; i < rgbProbabilitiesVector2D.size(); i++)
-      {
-        std::vector<float> row;
-        for (int j = 0; j < rgbProbabilitiesVector2D[i].size(); j++)
-        {
-          row.push_back(rgbProbabilitiesVector2D[i][j]);
-        }
-        probabilitiesVector2D.push_back(row);
-      }
-    }
-
-    // If depth analysis is applicable,
-    // determine the probabilities of validity of the candidate holes
-    // by running the depth-based filters
-    if (Parameters::Depth::interpolation_method == 0)
-    {
-      // Initialize the depth probabilities 2D vector.
-      // But first we need to know how many rows the vector will accomodate
-      // If a Parameters::HoleFusion::run_checker_* variable is greater than
-      // zero, the respective filter is set to run
-      int depthActiveFilters = 0;
-
-      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
-      {
-        depthActiveFilters++;
-      }
-      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
-      {
-        depthActiveFilters++;
-      }
-      if (Parameters::HoleFusion::run_checker_depth_area > 0)
-      {
-        depthActiveFilters++;
-      }
-      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
-      {
-        depthActiveFilters++;
-      }
-      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
-      {
-        depthActiveFilters++;
-      }
-
-      if (depthActiveFilters > 0)
-      {
-        // The 2D vector that contains the probabilities from the
-        // depth filtering regime.
-        // Each column is a specific hole.
-        // In each row there are values of probabilities by a specific filter
-        std::vector<std::vector<float> > depthProbabilitiesVector2D(
-          depthActiveFilters,
-          std::vector<float>(conveyor.size(), 0.0));
-
-        // check holes against depth-based filters
-        DepthFilters::checkHoles(
-          conveyor,
-          interpolatedDepthImage_,
-          pointCloud_,
-          holesMasksSetVector,
-          inflatedRectanglesVector,
-          inflatedRectanglesIndices,
-          intermediatePointsSetVector,
-          &depthProbabilitiesVector2D);
-
-        // If holes have been found in the first place
-        if (conveyor.size() > 0)
-        {
-          ROS_INFO_NAMED ("hole_detector",
-            "-------------------------------------------");
-
-          ROS_INFO_NAMED ("hole_detector",
-            "Depth : Candidate Holes' probabilities");
-          for (int j = 0; j < conveyor.size(); j++)
-          {
-            std::string probsString;
-            for (int i = 0; i < depthActiveFilters; i++)
-            {
-              probsString += TOSTR(depthProbabilitiesVector2D[i][j]) + " | ";
-            }
-
-            ROS_INFO_NAMED ("hole_detector", "P_%d [%f %f] : %s",
-              j,
-              conveyor.holes[j].keypoint.pt.x,
-              conveyor.holes[j].keypoint.pt.y,
-              probsString.c_str());
-          }
-
-          ROS_INFO_NAMED ("hole_detector",
-            "-------------------------------------------");
-        }
-
-        // Fill the probabilitiesVector2D with the depth vector of probabilities
-        for (int i = 0; i < depthProbabilitiesVector2D.size(); i++)
-        {
-          std::vector<float> row;
-          for (int j = 0; j < depthProbabilitiesVector2D[i].size(); j++)
-          {
-            row.push_back(depthProbabilitiesVector2D[i][j]);
-          }
-          probabilitiesVector2D.push_back(row);
-        }
-      }
-    }
-
-    // All filters have been applied, all probabilities produced
-    return probabilitiesVector2D;
-
-    #ifdef DEBUG_TIME
-    Timer::tick("checkHoles");
-    #endif
-  }
-
-
-
-  /**
     @brief Completes the transition to a new state
     @param void
     @return void
@@ -458,6 +208,185 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("depthCandidateHolesCallback");
     Timer::printAllMeansTree();
+    #endif
+  }
+
+
+
+  /**
+    @brief Runs candidate holes through selected filters.
+    Probabilities for each candidate hole and filter
+    are printed in the console, with an order specified by the
+    hole_fusion_cfg of the dynamic reconfigure utility
+    @param[in] conveyor [const HolesConveyor&] The conveyor
+    containing candidate holes that are to be checked against selected
+    filters
+    @return [std::vector<std::vector<float> >]
+    A two dimensional vector containing the probabilities of
+    validity of each candidate hole. Each row of it pertains to a specific
+    filter applied, each column to a particular hole
+   **/
+  std::vector<std::vector<float> > HoleFusion::filterHoles(
+    const HolesConveyor& conveyor)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("filterHoles", "processCandidateHoles");
+    #endif
+
+    // A vector of images that each one of them represents the corresponding
+    // hole's mask: non-zero value pixels are within a hole's outline points
+    std::vector<cv::Mat> holesMasksImageVector;
+
+    // A vector of sets that each one of them contains indices of points
+    // inside the hole's outline
+    std::vector<std::set<unsigned int> > holesMasksSetVector;
+
+    // A vector of vertices of each inflated bounding rectangle.
+    std::vector<std::vector<cv::Point2f> > inflatedRectanglesVector;
+
+    // Since inflated rectangle's vertices may go outside the image's bounds,
+    // this vector stores the indices of the keypoints whose corresponding
+    // inflated rectangle is in totality within the image's bounds
+    std::vector<int> inflatedRectanglesIndices;
+
+    // A vector of sets that each one of them contains indices of points
+    // between the hole's outline and its respective bounding box
+    std::vector<std::set<unsigned int> > intermediatePointsSetVector;
+
+    // A vector of images that each one of them contains points
+    // between the hole's outline and its respective bounding box
+    std::vector<cv::Mat> intermediatePointsImageVector;
+
+    // Construct the necessary vectors, depending on which filters
+    // are to run in runtime and on the interpolation method
+    FiltersResources::createCheckerRequiredVectors(
+      conveyor,
+      interpolatedDepthImage_,
+      Parameters::HoleFusion::rectangle_inflation_size,
+      Parameters::Depth::interpolation_method,
+      &holesMasksImageVector,
+      &holesMasksSetVector,
+      &inflatedRectanglesVector,
+      &inflatedRectanglesIndices,
+      &intermediatePointsImageVector,
+      &intermediatePointsSetVector);
+
+
+    // Initialize the probabilities 2D vector.
+
+    // But first we need to know how many rows the vector will accomodate.
+    // If a Parameters::HoleFusion::run_checker_* variable is greater than zero,
+    // the respective filter is set to run
+
+    // The number of active RGB filters, regardless of the interpolation method
+    int rgbActiveFilters = 0;
+
+    // The number of active depth filters
+    int depthActiveFilters = 0;
+
+    // If depth analysis is possible
+    if (Parameters::Depth::interpolation_method == 0)
+    {
+      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+      {
+        depthActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+      {
+        depthActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_depth_area > 0)
+      {
+        depthActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+      {
+        depthActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+      {
+        depthActiveFilters++;
+      }
+    }
+    // Depth analysis is not possible. Reserve positions in the probabilities
+    // vector only for the amount of RGB filters active.
+    else
+    {
+      if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+      {
+        rgbActiveFilters++;
+      }
+
+      if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+      {
+        rgbActiveFilters++;
+      }
+    }
+
+
+    // The 2D vector that contains the probabilities from the rgb filtering
+    // regime.
+    // Each column is a specific hole.
+    // In each row there are values of probabilities by a specific filter
+    std::vector<std::vector<float> > probabilitiesVector2D(
+      depthActiveFilters + rgbActiveFilters,
+      std::vector<float>(conveyor.size(), 0.0));
+
+    // Apply all active filters, depending on the interpolation method
+    Filters::applyFilters(
+      conveyor,
+      Parameters::Depth::interpolation_method,
+      interpolatedDepthImage_,
+      rgbImage_,
+      wallsHistogram_,
+      pointCloud_,
+      holesMasksSetVector,
+      holesMasksImageVector,
+      inflatedRectanglesVector,
+      inflatedRectanglesIndices,
+      intermediatePointsSetVector,
+      intermediatePointsImageVector,
+      &probabilitiesVector2D);
+
+    // All filters have been applied, all probabilities produced
+    return probabilitiesVector2D;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("filterHoles");
     #endif
   }
 
@@ -771,24 +700,32 @@ namespace pandora_vision
     // Color homogeneity
     Parameters::HoleFusion::run_checker_color_homogeneity =
       config.run_checker_color_homogeneity;
+    Parameters::HoleFusion::run_checker_color_homogeneity_urgent =
+      config.run_checker_color_homogeneity_urgent;
     Parameters::HoleFusion::checker_color_homogeneity_threshold =
       config.checker_color_homogeneity_threshold;
 
     // Luminosity diff
     Parameters::HoleFusion::run_checker_luminosity_diff =
       config.run_checker_luminosity_diff;
+    Parameters::HoleFusion::run_checker_luminosity_diff_urgent =
+      config.run_checker_luminosity_diff_urgent;
     Parameters::HoleFusion::checker_luminosity_diff_threshold =
       config.checker_luminosity_diff_threshold;
 
     // Texture diff
     Parameters::HoleFusion::run_checker_texture_diff =
       config.run_checker_texture_diff;
+    Parameters::HoleFusion::run_checker_texture_diff_urgent =
+      config.run_checker_texture_diff_urgent;
     Parameters::HoleFusion::checker_texture_diff_threshold =
       config.checker_texture_diff_threshold;
 
     // Texture backproject
     Parameters::HoleFusion::run_checker_texture_backproject =
       config.run_checker_texture_backproject;
+    Parameters::HoleFusion::run_checker_texture_backproject_urgent =
+      config.run_checker_texture_backproject_urgent;
     Parameters::HoleFusion::checker_texture_backproject_threshold =
       config.checker_texture_backproject_threshold;
 
@@ -1054,7 +991,7 @@ namespace pandora_vision
     // probabilities of validity of each candidate hole, produced by all
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D;
-    probabilitiesVector2D = checkHoles(rgbdHolesConveyor);
+    probabilitiesVector2D = filterHoles(rgbdHolesConveyor);
 
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
@@ -1142,24 +1079,24 @@ namespace pandora_vision
   {
     // Open the dataset
     std::ofstream dataset;
-    dataset.open ("dataset.csv", std::ios_base::app | std::ios_base::out);
+    dataset.open ("dataset_urgent.csv", std::ios_base::app | std::ios_base::out);
 
     for (int i = 0; i < conveyor.size(); i++)
     {
       // True holes
-      if (conveyor.holes[i].keypoint.pt.x > 200.0
-        && conveyor.holes[i].keypoint.pt.x < 210.0
-        && conveyor.holes[i].keypoint.pt.y > 265.0
-        && conveyor.holes[i].keypoint.pt.y < 275.0)
+      if (conveyor.holes[i].keypoint.pt.x >  0
+        && conveyor.holes[i].keypoint.pt.x < 1
+        && conveyor.holes[i].keypoint.pt.y > 0
+        && conveyor.holes[i].keypoint.pt.y < 1)
       {
         dataset << probabilities[0][i] << ", "
           << probabilities[1][i] << ", "
           << probabilities[2][i] << ", "
           << probabilities[3][i] << ", "
-          << probabilities[4][i] << ", "
-          << probabilities[5][i] << ", "
-          << probabilities[6][i] << ", "
-          << probabilities[7][i] << ", "
+          //<< probabilities[4][i] << ", "
+          //<< probabilities[5][i] << ", "
+          //<< probabilities[6][i] << ", "
+          //<< probabilities[7][i] << ", "
           << 1 << "\n";
       }
       else
@@ -1168,10 +1105,10 @@ namespace pandora_vision
           << probabilities[1][i] << ", "
           << probabilities[2][i] << ", "
           << probabilities[3][i] << ", "
-          << probabilities[4][i] << ", "
-          << probabilities[5][i] << ", "
-          << probabilities[6][i] << ", "
-          << probabilities[7][i] << ", "
+          //<< probabilities[4][i] << ", "
+          //<< probabilities[5][i] << ", "
+          //<< probabilities[6][i] << ", "
+          //<< probabilities[7][i] << ", "
           << 0 << "\n";
       }
     }
@@ -1574,35 +1511,6 @@ namespace pandora_vision
       int exponent = 0;
       float sum = 0.0;
 
-      // The number of RGB-based checkers that are active.
-      // This is needed as an offset for the location of the row in which a
-      // depth filter is located inside the probabilitiesVector2D,
-      // because, due to the fact that the depth sensor has a limited minimum
-      // operational range, it may not be always possible to run depth-based
-      // checkers. Depth-based checkers are hence run conditionally,
-      // depending on the interpolation method used for the input depth image
-      // and their presence is not always certain in the probabilitiesVector2D
-      int rgbActiveFilters = 0;
-      if (Parameters::Depth::interpolation_method == 0)
-      {
-        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
-        {
-          rgbActiveFilters++;
-        }
-        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
-        {
-          rgbActiveFilters++;
-        }
-        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
-        {
-          rgbActiveFilters++;
-        }
-        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
-        {
-          rgbActiveFilters++;
-        }
-      }
-
       // Commence setting of priorities given to hole checkers.
       // Each priority given is not fixed,
       // but there is an apparent hierarchy witnessed here.
@@ -1610,109 +1518,133 @@ namespace pandora_vision
       // used, which is one analogous to the one presented in
       // {insert link of Manos Tsardoulias's PHD thesis}
 
-      // Priority{color_homogeneity} = 0
-      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
-
-        exponent++;
-      }
-
-      // Priority{depth_area} = 1
+      // Apply a weight to each probability according to its weight order.
+      // If depth analysis was not possible, use the urgent weight order.
       if (Parameters::Depth::interpolation_method == 0)
       {
+        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+
+          exponent++;
+        }
+
         if (Parameters::HoleFusion::run_checker_depth_area > 0)
         {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_depth_area - 1][i];
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_area - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_area - 1][i];
 
           exponent++;
         }
-      }
 
-      // Priority{luminosity_diff} = 2
-      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
 
-        exponent++;
-      }
+          exponent++;
+        }
 
-      // Priority{outline_of_rectangle} = 3
-      if (Parameters::Depth::interpolation_method == 0)
-      {
         if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
         {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+          sum += pow(2, Parameters::HoleFusion::run_checker_outline_of_rectangle - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
 
           exponent++;
         }
-      }
 
-      // The depth homogeneity is considered the least confident measure of
-      // a potential hole's validity. Hence,
-      // Priority{depth_homogeneity} = 0
-      if (Parameters::Depth::interpolation_method == 0)
-      {
         if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
         {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
 
           exponent++;
         }
-      }
 
-      // Priority{texture_backproject} = 4
-      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
 
-        exponent++;
-      }
+          exponent++;
+        }
 
-      // Priority{brushfire_outline_to_rectangle} = 5
-      if (Parameters::Depth::interpolation_method == 0)
-      {
         if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
         {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+          sum += pow(2, Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
 
           exponent++;
         }
-      }
 
-      // Priority{depth_diff} = 6
-      if (Parameters::Depth::interpolation_method == 0)
-      {
         if (Parameters::HoleFusion::run_checker_depth_diff > 0)
         {
-          sum += pow(2, exponent) * probabilitiesVector2D[rgbActiveFilters
-            + Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_diff - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+
+          exponent++;
+        }
+
+        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+
+          exponent++;
+        }
+      }
+      else
+      {
+        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+
+          exponent++;
+        }
+
+        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+
+          exponent++;
+        }
+
+        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+
+          exponent++;
+        }
+
+        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        {
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff_urgent - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
 
           exponent++;
         }
       }
 
-      // Priority{texture_diff} = 7
-      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
-      {
-        sum += pow(2, exponent) * probabilitiesVector2D[
-          Parameters::HoleFusion::run_checker_texture_diff - 1][i];
-
-        exponent++;
-      }
-
-
+      // The total validity probability of the i-th hole
       sum /= (pow(2, exponent) - 1);
 
       // The validity acceptance threshold
       float threshold = 0.0;
+
       if (Parameters::Depth::interpolation_method == 0)
       {
         threshold = Parameters::HoleFusion::holes_validity_threshold_normal;

@@ -221,10 +221,10 @@ namespace pandora_vision
         std::map<int, int> filtersOrder;
 
         // Depth diff runs first
-        filtersOrder[1] = 1;
+        filtersOrder[1] = 5;
 
         // Depth / Area runs second
-        filtersOrder[2] = 3;
+        filtersOrder[2] = 7;
 
         // Create the necessary vectors for each hole checker and
         // merger used
@@ -244,36 +244,34 @@ namespace pandora_vision
           &rectanglesVector,
           &rectanglesIndices);
 
-        // The 2D vector with rows = 2 and cols = 1.
-        // The value of the element in row 0 and col 0 is the probability
-        // that the ithHole has, passing through the depth diff checker,
-        // while the value of the element in row 1 and col 0 is the
-        // probability that the ithHole has, passing through the
-        // depth / area filter.
+        // The vector of depth-filters-derived probabilities
         std::vector<std::vector<float> >probabilitiesVector(2,
           std::vector<float>(1, 0.0));
 
-        int counter = 0;
-        for (std::map<int, int>::iterator o_it = filtersOrder.begin();
-          o_it != filtersOrder.end(); ++o_it)
-        {
-          DepthFilters::applyFilter(
-            o_it->second,
-            image,
-            pointCloud,
-            ithHole,
-            tempHolesMasksSetVector,
-            rectanglesVector,
-            rectanglesIndices,
-            intermediatePointsSetVector,
-            &probabilitiesVector.at(counter),
-            &imgs,
-            &msgs);
+        // Check the difference between the mean depth of the
+        // vertices of the merged hole's bounding box and the depth of the
+        // merged hole's keypoint
+        DepthFilters::checkHolesDepthDiff(
+          image,
+          ithHole,
+          rectanglesVector,
+          rectanglesIndices,
+          &msgs,
+          &probabilitiesVector.at(0));
 
-          counter++;
-        } // o_it iterator ends
-
+        // The probability that the merged hole is valid by the above filter
         dd = probabilitiesVector[0][0];
+
+
+        // Check the depth / area proportion for the ithHole
+        DepthFilters::checkHolesDepthArea(
+          ithHole,
+          image,
+          tempHolesMasksSetVector,
+          &msgs,
+          &probabilitiesVector.at(1));
+
+        // The probability that the merged hole is valid by the above filter
         da = probabilitiesVector[1][0];
 
 
