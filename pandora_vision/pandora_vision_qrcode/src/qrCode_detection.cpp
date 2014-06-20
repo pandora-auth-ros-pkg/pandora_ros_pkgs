@@ -100,7 +100,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_FATAL("Qr alert topic name param not found");
+      ROS_FATAL("[QrCode_node]: Qr alert topic name param not found");
       ROS_BREAK();
     }
   
@@ -126,7 +126,7 @@ namespace pandora_vision
       }
       else
       {
-        ROS_WARN(" Cannot find qrcode debug show topic");
+        ROS_WARN("Cannot find qrcode debug show topic");
       }    
     }
              
@@ -137,16 +137,16 @@ namespace pandora_vision
       for(int ii = 0; ii < cameras_list.size(); ii++){
         ROS_ASSERT(cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
         cameraName = static_cast<std::string>(cameras_list[ii]);
-        ROS_INFO_STREAM("camera_name : " << cameraName);
+        ROS_INFO_STREAM("[QrCode_node]: camera_name : " << cameraName);
         
         //!< Get the listener's topic for camera
         if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
         {
-          ROS_INFO_STREAM("imageTopic for camera : " << imageTopic);
+          ROS_INFO_STREAM("[QrCode_node]: imageTopic for camera : " << imageTopic);
         }
         else
         {
-         ROS_FATAL("Image topic name not found");
+         ROS_FATAL("[QrCode_node]: Image topic name not found");
          ROS_BREAK(); 
         }
         _imageTopics.push_back("/"+imageTopic);
@@ -154,7 +154,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_FATAL("Camera_name not found");
+      ROS_FATAL("[QrCode_node]: Camera_name not found");
       ROS_BREAK(); 
     }
 

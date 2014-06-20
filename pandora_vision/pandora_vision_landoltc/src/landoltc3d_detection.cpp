@@ -120,7 +120,7 @@ void LandoltC3dDetection::getGeneralParams()
   }
   else
   {
-    ROS_FATAL("Landoltc alert topic name not found");
+    ROS_FATAL("[landoltc3d_node] : Landoltc alert topic name not found");
     ROS_BREAK();
   }
   
@@ -128,11 +128,11 @@ void LandoltC3dDetection::getGeneralParams()
   //! where algorithm results are posted if it works with predator
   if (_nh.getParam("subscribed_topic_names/predator_topic_name", predator_topic_name))
   {
-    ROS_DEBUG("Loaded topic name to use with predator");
+    ROS_DEBUG("[landoltc3d_node] : Loaded topic name to use with predator");
   }
   else
   {
-    ROS_FATAL("Landoltc image topic name not found");
+    ROS_FATAL("[landoltc3d_node] : Landoltc image topic name not found");
     ROS_BREAK();
   }
   

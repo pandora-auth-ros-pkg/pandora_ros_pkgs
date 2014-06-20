@@ -104,7 +104,7 @@ void LandoltCDetection::getGeneralParams()
   }
   else
   {
-    ROS_FATAL("Landoltc alert topic name not found");
+    ROS_FATAL("[landoltc_node]: Landoltc alert topic name not found");
     ROS_BREAK();
   }
   

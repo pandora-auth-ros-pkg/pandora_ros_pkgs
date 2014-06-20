@@ -118,7 +118,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_FATAL("Hazmat alert topic name param not found");
+      ROS_FATAL("[Hazmat_node]: Hazmat alert topic name param not found");
       ROS_BREAK();
     }
     
@@ -134,11 +134,11 @@ namespace pandora_vision
         //!< Get the listener's topic for camera
         if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
         {
-          ROS_INFO_STREAM("imageTopic for camera : " << imageTopic);
+          ROS_INFO_STREAM("[Hazmat_node]: imageTopic for camera : " << imageTopic);
         }
         else
         {
-         ROS_FATAL("Image topic name not found");
+         ROS_FATAL("[Hazmat_node]: Image topic name not found");
          ROS_BREAK(); 
         }
         _imageTopics.push_back("/"+imageTopic);
@@ -147,7 +147,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_FATAL("Camera_name not found");
+      ROS_FATAL("[Hazmat_node]: Camera_name not found");
       ROS_BREAK(); 
     }  
     
@@ -158,7 +158,7 @@ namespace pandora_vision
     }
     else 
     {
-      ROS_DEBUG("[motion_node] : Parameter frameHeight not found. Using Default");
+      ROS_DEBUG("[Hazmat_node]: : Parameter frameHeight not found. Using Default");
       frameHeight_ = DEFAULT_HEIGHT;
     }
     
@@ -169,7 +169,7 @@ namespace pandora_vision
     }
     else 
     {
-      ROS_DEBUG("[motion_node] : Parameter frameWidth not found. Using Default");
+      ROS_DEBUG("[Hazmat_node]: : Parameter frameWidth not found. Using Default");
       frameWidth_ = DEFAULT_WIDTH;
     }
     //!< Get the HFOV parameter if available;

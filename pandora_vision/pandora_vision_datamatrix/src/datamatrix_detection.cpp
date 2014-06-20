@@ -114,16 +114,16 @@ namespace pandora_vision
       for(int ii = 0; ii < cameras_list.size(); ii++){
         ROS_ASSERT(cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
         cameraName = static_cast<std::string>(cameras_list[ii]);
-        ROS_INFO_STREAM("camera_name : " << cameraName);
+        ROS_INFO_STREAM("[Datamatrix_node]: Camera_name : " << cameraName);
         
         //!< Get the listener's topic for camera
         if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
         {
-          ROS_INFO_STREAM("imageTopic for camera : " << imageTopic);
+          ROS_INFO_STREAM("[Datamatrix_node]: ImageTopic for camera : " << imageTopic);
         }
         else
         {
-         ROS_FATAL("Image topic name not found");
+         ROS_FATAL("[Datamatrix_node]: Image topic name not found");
          ROS_BREAK(); 
         }
         _imageTopics.push_back("/"+imageTopic);
@@ -143,7 +143,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[face_node] : Parameter frameHeight not found. Using Default");
+      ROS_DEBUG("[Datamatrix_node] : Parameter frameHeight not found. Using Default");
       frameHeight = DEFAULT_HEIGHT;
     }
 
@@ -154,7 +154,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
+      ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
       frameWidth = DEFAULT_WIDTH;
     }
     
@@ -165,7 +165,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
+      ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
       hfov = HFOV;
     }
 
@@ -176,7 +176,7 @@ namespace pandora_vision
     }
     else
     {
-      ROS_DEBUG("[face_node] : Parameter frameWidth not found. Using Default");
+      ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
       vfov = VFOV;
     }
   }
