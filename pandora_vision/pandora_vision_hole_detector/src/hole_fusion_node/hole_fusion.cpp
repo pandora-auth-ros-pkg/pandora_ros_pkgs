@@ -1305,7 +1305,7 @@ namespace pandora_vision
 
     // Publish the message containing the information about all holes found
     holesVectorMsg.header.stamp = timestamp_;
-    holesVectorMsg.header.frame_id = "kinect_link";
+    holesVectorMsg.header.frame_id = "kinect_frame";
     //holesVectorMsg.header.frame_id = frame_id_;
 
     validHolesPublisher_.publish(holesVectorMsg);
