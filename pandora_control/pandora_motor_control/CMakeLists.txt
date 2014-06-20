@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
 )
 
+find_package(Boost REQUIRED COMPONENTS thread)
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -20,13 +21,9 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-#~ include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-# To check lint : catkin_make roslint_pandora_control
-#~ set(ROSLINT_CPP_OPTS
-  #~ "--filter=-build/include_what_you_use")
-#~ 
-#~ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
-  #~ RELATIVE ${PROJECT_SOURCE_DIR}
-#~ )
-#~ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+add_executable(pandora_teleop_key src/pandora_teleop_key.cpp )
+target_link_libraries(pandora_teleop_key ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+
