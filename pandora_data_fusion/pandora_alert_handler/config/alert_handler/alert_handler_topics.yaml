@@ -1,5 +1,5 @@
 subscribed_topic_names:
-  holeDirection: /vision/holes_direction
+  holeDirection: /vision/holes_direction_alert
   thermalDirection: /sensor_processing/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
