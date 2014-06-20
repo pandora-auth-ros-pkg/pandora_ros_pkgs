@@ -138,3 +138,9 @@ void JrkSerial::printErrors(int errors)
       ROS_ERROR("No errors");
   }
 }
+
+void JrkSerial::clearErrors()
+{
+  unsigned char command[] = {ERRORS_HALTING_VARIABLE};   //Gets error flags halting and clears any latched errors
+  write(fd, command, sizeof(command));
+}

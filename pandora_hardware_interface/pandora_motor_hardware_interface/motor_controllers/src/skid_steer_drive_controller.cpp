@@ -217,6 +217,37 @@ namespace motor
 
     sub_command_ = controller_nh.subscribe("/cmd_vel", 1, &SkidSteerDriveController::cmdVelCallback, this);
 
+    XmlRpc::XmlRpcValue slippageList;
+    res = controller_nh.hasParam("angular_slippage");
+    if(res && controller_nh.getParam("angular_slippage", slippageList))
+    {
+      hasSlippage_ = true;
+      ROS_ASSERT(
+        slippageList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+      std::string key;
+      for (int ii = 0; ii < slippageList.size(); ii++)
+      {
+        ROS_ASSERT(
+          slippageList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+
+        key = "expected";
+        ROS_ASSERT(
+          slippageList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        expectedAngular_.push_back(
+          static_cast<double>(slippageList[ii][key]));
+
+        key = "actual";
+        ROS_ASSERT(
+          slippageList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        actualAngular_.push_back(
+          static_cast<double>(slippageList[ii][key]));
+      }
+    }
+    else
+    {
+      hasSlippage_ = false;
+    }
     return true;
   }
 
@@ -277,8 +308,10 @@ namespace motor
     last_cmd_ = curr_cmd;
 
     // Apply multipliers:
-    const double ws = wheel_separation_multiplier_ * wheel_separation_;
+    double ws = wheel_separation_multiplier_ * wheel_separation_;
     const double wr = wheel_radius_multiplier_     * wheel_radius_;
+
+    ws = ws * getAngularMultiplier(curr_cmd.ang);
 
     // Compute wheels velocities:
     const double vel_left  = (curr_cmd.lin - curr_cmd.ang * ws / 2.0)/wr;
@@ -478,6 +511,30 @@ namespace motor
     odom_frame_.transform.translation.z = 0.0;
     odom_frame_.child_frame_id = base_frame_id_;
     odom_frame_.header.frame_id = "odom";
+  }
+
+  double SkidSteerDriveController::getAngularMultiplier(double velocity)
+  {
+    if (hasSlippage_)
+    {
+      for (int ii = 0; ii < expectedAngular_.size() - 1; ii++)
+      {
+        if (fabs(velocity) == actualAngular_[ii])
+        {
+          return  expectedAngular_[ii] / actualAngular_[ii];
+        }
+        else if (fabs(velocity) < actualAngular_[ii] &&
+          fabs(velocity) > actualAngular_[ii + 1])
+        {
+          double target;
+          target = (expectedAngular_[ii] - expectedAngular_[ii + 1]) *
+            (fabs(velocity) - actualAngular_[ii + 1]) /
+            (actualAngular_[ii] - actualAngular_[ii + 1]) + expectedAngular_[ii + 1];
+          return target / fabs(velocity);
+        }
+      }
+    }
+    return 1;
   }
 }  // namespace motor
 }  // namespace pandora_hardware_interface

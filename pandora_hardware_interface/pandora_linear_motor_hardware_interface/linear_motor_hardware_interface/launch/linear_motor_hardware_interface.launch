@@ -11,5 +11,10 @@
     pkg="pandora_linear_motor_hardware_interface"
     type="linear_motor_hardware_interface_node"
     output="screen"
-    ns="/linear"/>
+    ns="/linear">
+    <remap
+      from="/linear_elevator_controller/command"
+      to="/linear/linear_elevator_controller/command"/>
+  </node>
+    
 </launch>

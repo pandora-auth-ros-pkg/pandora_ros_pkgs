@@ -152,6 +152,10 @@ namespace motor
     SpeedLimiter limiter_lin_;
     SpeedLimiter limiter_ang_;
 
+    bool hasSlippage_;
+    std::vector<double> expectedAngular_;
+    std::vector<double> actualAngular_;
+
   private:
     /**
      * \brief Brakes the wheels, i.e. sets the velocity to 0
@@ -180,6 +184,8 @@ namespace motor
      * \param controller_nh Node handle inside the controller namespace
      */
     void setOdomPubFields(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh);
+
+    double getAngularMultiplier(double velocity);
 
   };
 

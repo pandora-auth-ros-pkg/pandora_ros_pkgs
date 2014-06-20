@@ -26,6 +26,7 @@ class JrkSerial
     int setTarget(unsigned short target);
     int getErrors();
     void printErrors(int errors);
+    void clearErrors();
     void closeDevice();
 };
 #endif  // JRK_INTERFACE_JRKSERIAL_H
