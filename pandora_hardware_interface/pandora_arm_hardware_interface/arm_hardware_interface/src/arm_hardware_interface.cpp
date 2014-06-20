@@ -45,10 +45,12 @@ namespace arm
   :
     nodeHandle_(nodeHandle)
   {
-    try {
+    try
+    {
       arm_ = new ArmUSBInterface();
     }
-    catch(std::exception& ex) {
+    catch(std::exception& ex)
+    {
       ROS_ERROR("%s", ex.what());
       exit(-1);
     }

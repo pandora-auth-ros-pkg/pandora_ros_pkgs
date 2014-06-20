@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
     armHardwareInterface.read();
     controllerManager.update(now, period);
-    ros::Duration(0.).sleep();
+    ros::Duration(0.1).sleep();
   }
   spinner.stop();
   return 0;

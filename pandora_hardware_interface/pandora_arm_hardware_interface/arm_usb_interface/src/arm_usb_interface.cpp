@@ -66,22 +66,23 @@ ArmUSBInterface::ArmUSBInterface()
   /*Needs some time to initialize, even though it opens succesfully.
    tcflush() didn't work without waiting at least 8 ms*/
   ros::Duration(0.03).sleep();
-  
+
   //To save time you can see and change terminal settings in command line with stty command,
   //before implementing in software. Note: stty prefixes disabled flags with a dash.
   //See:  http://man7.org/linux/man-pages/man3/termios.3.html
   struct termios tios;
 
-  if (tcgetattr(fd, &tios) < 0) {
+  if (tcgetattr(fd, &tios) < 0)
+  {
     ROS_ERROR("init_serialport: Couldn't get term attributes\n");
   }
 
   tios.c_lflag &= ~(ICANON | ISIG | ECHO);
 
-  if( tcsetattr(fd, TCSANOW, &tios) < 0) {
+  if (tcsetattr(fd, TCSANOW, &tios) < 0)
+  {
     ROS_ERROR("init_serialport: Couldn't set term attributes\n");
   }
-
 }
 
 ArmUSBInterface::~ArmUSBInterface()

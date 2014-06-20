@@ -125,9 +125,12 @@ namespace arm
 
           imagePublishers_[ii]->msg_.data.clear();
           uint8_t* data = sensorHandles_[ii].getData();
-          for (int jj = 0; jj < height * width; jj++)
+          int size = height * width;
+          for (int jj = 0; jj < size; jj++)
           {
-            imagePublishers_[ii]->msg_.data.push_back(data[jj]);
+            int mod = (size-1-jj) % width;
+            imagePublishers_[ii]->msg_.data.push_back(
+              data[((size-1-jj) - mod + width-1-mod)]);
           }
 
           imagePublishers_[ii]->unlockAndPublish();
