@@ -1059,7 +1059,7 @@ namespace pandora_vision
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
     // sound validation procedure to be employed
-    produceDataset(rgbdHolesConveyor, probabilitiesVector2D);
+    //produceDataset(rgbdHolesConveyor, probabilitiesVector2D);
 
     // Which candidate holes are actually holes?
     // The probabilities obtained above need to be evaluated
@@ -1310,6 +1310,7 @@ namespace pandora_vision
 
     validHolesPublisher_.publish(holesVectorMsg);
 
+    // Publish an image with the valid holes found
 
     // The holes conveyor containing only the valid holes
     HolesConveyor validHolesConveyor;
@@ -1343,6 +1344,7 @@ namespace pandora_vision
     msgPtr->encoding = sensor_msgs::image_encodings::BGR8;
     msgPtr->image = rgbValidHolesImage;
 
+    // Publish the image message
     debugValidHolesPublisher_.publish(*msgPtr->toImageMsg());
   }
 

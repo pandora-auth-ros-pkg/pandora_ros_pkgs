@@ -103,7 +103,14 @@ namespace pandora_vision
       // pertaining to the valid holes found by the Hole Detector package
       std::string enhancedHolesTopic_;
 
+      // The ROS publisher that will be used to publish an image depicting
+      // the keypoint, outline points and bounding rectangle for all
+      // valid holes found
       ros::Publisher debugValidHolesPublisher_;
+
+      // The name of the topic where the Hole Fusion node puplishes
+      // an image depicting the keypoint, outline points and
+      // bounding rectangle for all valid holes found
       std::string debugValidHolesTopic_;
 
       // The publisher that the Hole Fusion node uses to request from the
