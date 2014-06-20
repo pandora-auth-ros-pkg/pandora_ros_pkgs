@@ -1,0 +1,9 @@
+<launch>
+  <!--Smach -->
+  <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner_smach.launch" />
+  <!--Linear -->
+  <include file="$(find pandora_end_effector_planner)/linear_movement_planner/launch/linear_movement_planner.launch" />
+  <!--Sensors -->
+  <include file="$(find pandora_end_effector_planner)/sensor_orientation_planner/launch/sensor_orientation_planner.launch" />
+
+</launch>

@@ -8,7 +8,7 @@ from pandora_end_effector_planner.msg import *
 
 if __name__ == '__main__':
   rospy.init_node('move_linear_client_py')
-  client = actionlib.SimpleActionClient('linear_movement_action', MoveLinearAction)
+  client = actionlib.SimpleActionClient('control/linear_movement_action', MoveLinearAction)
   client.wait_for_server()
   goal = MoveLinearGoal()
   goal.command = int(sys.argv[1])

@@ -2,6 +2,7 @@
   <!-- load params -->
   <rosparam
     command="load"
+    ns="control"
     file="$(find pandora_end_effector_planner)/linear_movement_planner/config/linear_movement_planner.yaml"/>
 
   <node
@@ -9,6 +10,7 @@
     pkg="pandora_end_effector_planner"
     type="linear_movement_planner"
     respawn="false"
-    output="screen"/>
+    output="screen"
+    ns="control"/>
 
 </launch>

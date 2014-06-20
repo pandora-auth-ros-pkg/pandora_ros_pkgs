@@ -40,7 +40,7 @@ import rospy
 from smach import State
 from smach_ros import SimpleActionState
 from pandora_end_effector_planner.msg import MoveSensorAction, MoveSensorGoal, \
-    MoveLinearAction, MoveLinearGoal, MoveEndEffectorAction
+    MoveLinearAction, MoveLinearGoal, MoveEndEffectorAction, MoveEndEffectorGoal
 from topics import move_end_effector_planner_topic, move_kinect_topic, \
     move_head_topic, linear_movement_topic
 
@@ -53,11 +53,11 @@ class EndEffectorPlannerState(State):
                        output_keys=['move_end_effector_msg'])
 
     def execute(self, userdata):
-        if userdata[0].move_end_effector_msg.command == \
-                MoveEndEffectorAction.SCAN:
+        if userdata.move_end_effector_msg.command == \
+                MoveEndEffectorGoal.SCAN:
             return 'SCAN'
         else:
-            return 'TEST_PART_TRACK'
+            return 'TEST_PARK_TRACK'
 
 
 class KinectOrientationState(SimpleActionState):
