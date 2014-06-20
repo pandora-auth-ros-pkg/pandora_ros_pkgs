@@ -147,7 +147,7 @@ def main():
     sis = smach_ros.IntrospectionServer('eef_fsm_introspection', sm, '/EEF_FSM')
     sis.start()
 
-    smach_thread = threading.Thread(target = asw.run_server)
+    smach_thread = threading.Thread(target=asw.run_server)
     smach_thread.start()
 
     rospy.spin()
