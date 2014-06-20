@@ -1,0 +1,4 @@
+error_threshold: 0.012
+image_topic: /kinect/rgb/image_raw
+depth_topic: /kinect/depth/image
+point_cloud_topic: /kinect/depth_registered/points

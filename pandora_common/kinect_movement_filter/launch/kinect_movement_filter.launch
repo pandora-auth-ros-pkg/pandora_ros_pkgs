@@ -1,0 +1,11 @@
+<launch>
+  <node
+    name="kinect_movement_filter"
+    pkg="kinect_movement_filter"
+    type="kinect_movement_filter"
+    output="screen">
+    <rosparam
+      command="load"
+      file="$(find kinect_movement_filter)/config/kinect_movement_filter.yaml" />
+  </node>
+</launch>
