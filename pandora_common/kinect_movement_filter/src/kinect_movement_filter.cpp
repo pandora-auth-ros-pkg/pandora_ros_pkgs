@@ -39,6 +39,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "ros/ros.h"
+#include <image_transport/image_transport.h>
 
 namespace pandora_common
 {
@@ -46,15 +47,16 @@ namespace pandora_common
   {
     private:
       ros::NodeHandle nodeHandle_;
+      image_transport::ImageTransport imageTransport_;
       ros::Subscriber jointStateSubscriber_;
-      ros::Subscriber imageSubscriber_;
-      ros::Subscriber depthImageSubscriber_;
-      ros::Subscriber pointCloudSubscriber_;
       ros::Subscriber pitchCommandSubscriber_;
       ros::Subscriber yawCommandSubscriber_;
+      image_transport::Subscriber imageSubscriber_;
+      image_transport::Subscriber depthImageSubscriber_;
+      ros::Subscriber pointCloudSubscriber_;
 
-      ros::Publisher imagePublisher_;
-      ros::Publisher depthImagePublisher_;
+      image_transport::Publisher imagePublisher_;
+      image_transport::Publisher depthImagePublisher_;
       ros::Publisher pointCloudPublisher_;
 
       double pitchCommand_;
@@ -78,7 +80,8 @@ namespace pandora_common
       ~KinectMovementFilter();
   };
 
-  KinectMovementFilter::KinectMovementFilter()
+  KinectMovementFilter::KinectMovementFilter() :
+    imageTransport_(nodeHandle_)
   {
     if ( nodeHandle_.hasParam("/kinect_movement_filter/error_threshold") )
     {
@@ -164,13 +167,13 @@ namespace pandora_common
       &KinectMovementFilter::jointStatesCallback,
       this);
 
-    imageSubscriber_ = nodeHandle_.subscribe(
+    imageSubscriber_ = imageTransport_.subscribe(
       imageTopic_,
       1,
       &KinectMovementFilter::imageCallback,
       this);
 
-    depthImageSubscriber_ = nodeHandle_.subscribe(
+    depthImageSubscriber_ = imageTransport_.subscribe(
       depthTopic_,
       1,
       &KinectMovementFilter::depthImageCallback,
@@ -182,11 +185,11 @@ namespace pandora_common
       &KinectMovementFilter::pointCloudCallback,
       this);
 
-    imagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(
+    imagePublisher_ = imageTransport_.advertise(
       imageTopic_ + "/still",
       1);
 
-    depthImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(
+    depthImagePublisher_ = imageTransport_.advertise(
       depthTopic_ + "/still",
       1);
 

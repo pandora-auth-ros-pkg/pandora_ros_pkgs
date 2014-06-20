@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf 
   sensor_msgs
   std_msgs
+  image_transport
   roslint
 )
 
@@ -16,6 +17,7 @@ catkin_package(
     roscpp 
     sensor_msgs
     std_msgs
+    image_transport
     roslint
 #  DEPENDS
 )
