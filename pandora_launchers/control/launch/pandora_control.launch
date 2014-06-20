@@ -2,28 +2,13 @@
   <!--Stabilizer -->
   <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
 
-  <!--Kinect and Head-->
-  <include file="$(find pandora_end_effector_planner)/sensor_orientation_planner/launch/sensor_orientation_planner.launch" />
-
-  <!--Linear -->
-  <include file="$(find pandora_end_effector_planner)/linear_movement_planner/launch/linear_movement_planner.launch" />
+  <!--Linear Kinect and Head-->
+  <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
 
   <!--Center motors -->
   <node
-    name="move_kinect_script"
+    name="move_eef_script"
     pkg="pandora_end_effector_planner"
-    type="move_kinect_script.py"
-    args="0" />
-
-  <node
-    name="move_head_script"
-    pkg="pandora_end_effector_planner"
-    type="move_head_script.py"
-    args="0" />
-
-  <node
-    name="move_linear_script"
-    pkg="pandora_end_effector_planner"
-    type="move_linear_script.py"
-    args="0" />
+    type="move_eef_script.py"
+    args="1" />
 </launch>

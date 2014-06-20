@@ -2,6 +2,7 @@
 
   <arg name="bag" default="false"/>
   <arg name="control" default="true"/>
+  <arg name="xtion" default="true"/>
 
   <!--State Manager -->
   <include file="$(find state_manager)/launch/stateManager.launch" />
@@ -31,13 +32,13 @@
 -->
 
   <!--Data fusion -->
-  <!--<include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />-->
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+
+  <!-- Kinect filter -->
+  <include file="$(find kinect_movement_filter)/launch/kinect_movement_filter.launch" />
 
   <!-- Vision -->
-  <!--<include file="$(find pandora_vision_hole)/launch/hole_find_node.launch" />-->
-  <!--<include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />-->
-  <!--<rosparam file="$(find pandora_launchers)/simulation/config/kinect_params.yaml" command="load" />-->
-  <include file="$(find openni2_launch)/launch/openni2.launch">
+  <include if="$(arg xtion)" file="$(find openni2_launch)/launch/openni2.launch">
     <arg name="camera" value="kinect" />
     <arg name="depth_registration" value="true" />
     <arg name="publish_tf" value="false" />

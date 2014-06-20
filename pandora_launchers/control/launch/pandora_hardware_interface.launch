@@ -23,4 +23,7 @@
   <!-- Arm -->
   <include
     file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface.launch" />
+
+  <!-- Battery monitor node -->
+  <node pkg="pandora_hardware_tools" type="battery_monitor.py" name="battery_monitor" />
 </launch>

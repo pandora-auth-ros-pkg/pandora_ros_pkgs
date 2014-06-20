@@ -1,5 +1,5 @@
 <launch>
   <node name="bag" type="record" pkg="rosbag"
-      args="-b 0 --size=1500 /kinect/rgb/image_raw/compressed /kinect/depth_registered/points /sensors/imu /tf /laser/scan /slam/map" />
+    args="-b 0 /sensors/imu /tf /laser/scan /slam/map /sensors/thermal" />
 </launch>
 
