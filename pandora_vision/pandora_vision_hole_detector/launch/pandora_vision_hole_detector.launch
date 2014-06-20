@@ -1,7 +1,7 @@
 <launch>
 
   <!-- Namespace of the hole detector package -->
-  <arg name="namespace" default="pandora_vision/hole_detector" />
+  <arg name="namespace" default="vision/hole_detector" />
 
   <!-- The synchronizer node -->
   <node name="synchronizer_node"
