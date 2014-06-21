@@ -41,6 +41,7 @@
 #include <dirent.h>
 #include <ros/package.h>
 #include <std_msgs/Empty.h>
+#include <image_transport/image_transport.h>
 #include "state_manager/state_client.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
 #include "vision_communications/CandidateHoleMsg.h"
@@ -78,6 +79,9 @@ namespace pandora_vision
       // The ROS node handle
       ros::NodeHandle nodeHandle_;
 
+      // The image_transport nodehandle
+      image_transport::ImageTransport imageTransport_;
+
       // The ROS publisher that will be used for unlocking the
       // synchronizer_node
       ros::Publisher unlockPublisher_;
@@ -107,7 +111,7 @@ namespace pandora_vision
       // The ROS publisher that will be used to publish an image depicting
       // the keypoint, outline points and bounding rectangle for all
       // valid holes found
-      ros::Publisher debugValidHolesPublisher_;
+      image_transport::Publisher debugValidHolesPublisher_;
 
       // The name of the topic where the Hole Fusion node puplishes
       // an image depicting the keypoint, outline points and

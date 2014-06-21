@@ -9,4 +9,6 @@ published_topics:
   enhanced_holes_topic: /vision/enhanced_holes
   make_synchronizer_subscribe_to_input: subscribe_to_input
   make_synchronizer_leave_subscription_to_input: leave_subscription_to_input
+
+  #Command line usage: image_view {namespace}/debug_valid_holes_image _image_transport:=compressed
   debug_valid_holes_image: debug_valid_holes_image

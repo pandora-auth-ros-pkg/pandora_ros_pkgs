@@ -46,7 +46,8 @@ namespace pandora_vision
   /**
     @brief The HoleFusion constructor
    **/
-  HoleFusion::HoleFusion(void) : pointCloud_(new PointCloud)
+  HoleFusion::HoleFusion(void) :
+    pointCloud_(new PointCloud), imageTransport_(nodeHandle_)
   {
     // Acquire the names of topics which the Hole Fusion node will be having
     // transactionary affairs with
@@ -76,8 +77,11 @@ namespace pandora_vision
 
     // Advertise the topic that information about the final holes,
     // will be published to
-    debugValidHolesPublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(debugValidHolesTopic_, 1000, true);
+    // Command line usage:
+    // image_view /pandora_vision/hole_detector/debug_valid_holes_image
+    // _image_transport:=compressed
+    debugValidHolesPublisher_ = imageTransport_.advertise
+      (debugValidHolesTopic_, 1000, true);
 
     // Advertise the topic that the image of the final holes,
     // will be published to
