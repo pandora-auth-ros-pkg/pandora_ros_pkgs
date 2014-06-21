@@ -131,7 +131,7 @@ namespace dummy_motor_controller
       this);
 
     linearSubscriber_ = nodeHandle_.subscribe(
-      "/linear/linear_elevator_controller/command",
+      "/linear_elevator_controller/command",
       1,
       &DummyMotorController::linearCallback,
       this);

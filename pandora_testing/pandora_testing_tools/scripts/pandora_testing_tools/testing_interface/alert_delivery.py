@@ -95,7 +95,7 @@ class AlertDeliveryBoy:
         self.qrDeliveryAddress = '/vision/qr_alert'
         self.qr_pub = rospy.Publisher(self.qrDeliveryAddress, 
                                       QRAlertsVectorMsg)
-        self.holeDeliveryAddress = '/vision/holes_direction'
+        self.holeDeliveryAddress = '/vision/holes_direction_alert'
         self.hole_pub = rospy.Publisher(self.holeDeliveryAddress, 
                                         HolesDirectionsVectorMsg)
         self.dataMatrixDeliveryAddress = '/vision/dataMatrix_alert'

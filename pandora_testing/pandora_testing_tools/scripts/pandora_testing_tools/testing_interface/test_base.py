@@ -114,7 +114,7 @@ class TestBase(unittest.TestCase):
             cls.bag_client.wait_for_server()
             cls.goal = ReplayBagsGoal()
             cls.goal.start = True
-        rospy.sleep(10.)
+        rospy.sleep(2.)
 
     @classmethod
     def disconnect(cls):
@@ -123,6 +123,7 @@ class TestBase(unittest.TestCase):
             mock_subscriber.unregister()
         for mock_publisher in cls.publishers:
             mock_publisher.unregister()
+        rospy.signal_shutdown("[TestBase.disconnect] Disconnecting and terminating.")
 
     @classmethod
     def playFromBag(cls, block = True):
