@@ -200,6 +200,7 @@ namespace pandora_data_fusion
         void setId(int id)
         {
           id_ = id;
+          frame_id_ = type_ + "_" + boost::to_string(id_);
         }
 
         /**
@@ -287,6 +288,8 @@ namespace pandora_data_fusion
 
         //!< The object's id
         int id_;
+        //!< The reference frame for object.
+        std::string frame_id_;
         //!< True if we have confidence that this object is eligible for use
         bool legit_;
         //!< The Objects's probability
@@ -335,7 +338,7 @@ namespace pandora_data_fusion
       {
         PoseStamped objPoseStamped;
         objPoseStamped.pose = pose_;
-        objPoseStamped.header.frame_id = type_ + "_" + boost::to_string(id_);
+        objPoseStamped.header.frame_id = frame_id_;
         objPoseStamped.header.stamp = ros::Time::now();
         return objPoseStamped;
       }

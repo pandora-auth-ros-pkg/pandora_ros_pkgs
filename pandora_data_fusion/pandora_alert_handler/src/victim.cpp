@@ -73,7 +73,7 @@ namespace pandora_data_fusion
       victimDescription.pose.position.z = pose_.position.z + 0.1;
       victimMarker.type = visualization_msgs::Marker::SPHERE;
       victimDescription.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-      victimDescription.text = type_ + "_" + boost::to_string(id_); 
+      victimDescription.text = getFrameId(); 
       victimMarker.scale.x = 0.1;
       victimMarker.scale.y = 0.1;
       victimMarker.scale.z = 0.1;

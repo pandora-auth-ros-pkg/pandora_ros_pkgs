@@ -67,13 +67,11 @@ namespace pandora_data_fusion
     class BaseObject
     {
       public:
-
         //!< Type definitions
         typedef boost::shared_ptr<BaseObject> Ptr;
         typedef boost::shared_ptr<BaseObject const> ConstPtr;
 
       public:
-
         virtual void update(const ConstPtr& measurement) = 0;
         virtual bool isSameObject(const ConstPtr& object) const = 0;
         virtual PoseStamped getPoseStamped() const = 0;
@@ -90,13 +88,7 @@ namespace pandora_data_fusion
         virtual void setProbability(float probability) = 0;
         virtual void setPose(const Pose& pose) = 0;
 
-      protected:
-
-        //!< The reference frame for the pose. Should normally be "/world"
-        static std::string frame_id_;
-
       private:
-
         friend class ObjectListTest;
     };
 

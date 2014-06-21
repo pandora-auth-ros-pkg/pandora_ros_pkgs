@@ -92,7 +92,7 @@ class MassPublisher:
         self.hazmat_pub = rospy.Publisher('/vision/hazmat_alert', HazmatAlertsVectorMsg)
         self.landoltc_pub = rospy.Publisher('/vision/landoltc_alert', LandoltcAlertsVectorMsg)
         self.qr_pub = rospy.Publisher('/vision/qr_alert', QRAlertsVectorMsg)
-        self.hole_pub = rospy.Publisher('/vision/holes_direction', HolesDirectionsVectorMsg)
+        self.hole_pub = rospy.Publisher('/vision/holes_direction_alert', HolesDirectionsVectorMsg)
         self.thermal_pub = rospy.Publisher('/sensor_processing/thermal_direction_alert', GeneralAlertMsg)
         self.face_pub = rospy.Publisher('/vision/face_direction_alert', GeneralAlertMsg)
         self.motion_pub = rospy.Publisher('/vision/motion_alert', GeneralAlertMsg)
