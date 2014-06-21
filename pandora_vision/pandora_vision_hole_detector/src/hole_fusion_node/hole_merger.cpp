@@ -1216,16 +1216,20 @@ namespace pandora_vision
     than 0.5-0.6m. In this way of operation, the merging of holes does not
     consider employing validator filters and simply merges holes that can
     be merged with each other (assimilated, amalgamated, or connected).
-    @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
-    merged with one another, where applicable.
-    @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
-    depth image
-    @param[in] pointCloud [const PointCloudPtr&] The interpolated point
-    cloud. Needed in the connection process.
+    @param[in,out] conveyor [HolesConveyor*]
+    The conveyor of holes to be merged with one another, where applicable.
+    @param[in] filteringMethod [const int&]
+    Indicates whether candidate holes can be merged on conditions
+    dictated by Depth filters, or depth analysis is altogether
+    not possible, and so merges will happen unconditionally.
+    @param[in] interpolatedDepthImage [const cv::Mat&]
+    The interpolated depth image
+    @param[in] pointCloud [const PointCloudPtr&]
+    The interpolated point cloud. Needed in the connection process.
     @return void
    **/
   void HoleMerger::mergeHoles(HolesConveyor* conveyor,
-    const int& interpolationMethod,
+    const int& filteringMethod,
     const cv::Mat& interpolatedDepthImage,
     const PointCloudPtr& pointCloud)
   {
@@ -1265,9 +1269,11 @@ namespace pandora_vision
     }
     #endif
 
-
-    // Try to merge holes that can be assimilated, amalgamated or connected
-    if (interpolationMethod == 0)
+    // Try to merge holes that can be assimilated, amalgamated or connected.
+    // If Depth analysis is applicable, {assimilate, amalgamate, connect}
+    // conditionally, based on depth filters. In the opposite case,
+    // {assimilate, amalgamate, connect} unconditionally.
+    if (filteringMethod == RGBD_MODE)
     {
       for (int i = 0; i < 3; i++)
       {
@@ -1278,7 +1284,7 @@ namespace pandora_vision
           i);
       }
     }
-    else
+    else if (filteringMethod == RGB_ONLY_MODE)
     {
       for (int i = 0; i < 3; i++)
       {
@@ -1289,7 +1295,10 @@ namespace pandora_vision
           i);
       }
     }
-
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME, "[Hole Fusion node] Merging process failure");
+    }
 
     #ifdef DEBUG_SHOW
     if(Parameters::Debug::show_merge_holes)

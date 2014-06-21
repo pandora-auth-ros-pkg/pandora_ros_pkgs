@@ -186,6 +186,10 @@ namespace pandora_vision
       // The conveyor of hole candidates received by the rgb node
       HolesConveyor rgbHolesConveyor_;
 
+      // Indicates whether RGB-based only
+      // or both the RGB and Depth based filtering is applicable
+      int filteringMode_;
+
       // A histogramm for the texture of walls
       cv::MatND wallsHistogram_;
 
@@ -325,19 +329,16 @@ namespace pandora_vision
         const std::vector<std::vector<float> >& probabilities);
 
       /**
-        @brief Publishes the enhanced holes' information.
-        @param[in] conveyor [const HolesConveyor&] The overall unique holes
-        found by the depth and RGB nodes.
-        @param[in] validHolesMap [std::map<int, float>*] A map containing the
-        indices of the valid holes inside the conveyor and their respective
-        validity probabilities
-        @param[in] interpolationMethod [const int&] The interpolation method
-        used. 0 if depth analysis is applicable, 1 or 2 for special cases,
-        where the amount of noise in the depth image is overwhelming
+        @brief Publishes the holes' enhanced information.
+        @param[in] conveyor [const HolesConveyor&]
+        The overall valid holes found by the depth and RGB nodes.
+        @param[in] validHolesMap [std::map<int, float>*]
+        A map containing the indices of the valid holes inside the conveyor
+        and their respective validity probabilities
         @return void
        **/
       void publishEnhancedHoles (const HolesConveyor& conveyor,
-        std::map<int, float>* validHolesMap, const int& interpolationMethod);
+        std::map<int, float>* validHolesMap);
 
       /**
         @brief Publishes the valid holes' information.

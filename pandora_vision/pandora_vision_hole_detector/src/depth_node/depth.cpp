@@ -66,7 +66,7 @@ namespace pandora_vision
     // The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&Depth::parametersCallback, this, _1, _2));
 
-    ROS_INFO_NAMED("hole_detector", "[Depth node] Initiated");
+    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Initiated");
   }
 
 
@@ -77,7 +77,7 @@ namespace pandora_vision
    **/
   Depth::~Depth(void)
   {
-    ROS_INFO_NAMED("hole_detector", "[Depth node] Terminated");
+    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Terminated");
   }
 
 
@@ -98,7 +98,7 @@ namespace pandora_vision
     Timer::start("inputDepthImageCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED("hole_detector", "Depth node callback");
+    ROS_INFO_NAMED(PKG_NAME, "Depth node callback");
 
     // Obtain the depth image. Since the image is in a format of
     // sensor_msgs::Image, it has to be transformed into a cv format in order
@@ -192,12 +192,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       depthImageTopic_ = ns + "/" + depthImageTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Depth Node] Subscribed to the input depth image");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Depth Node] Could not find topic depth_image_topic");
     }
 
@@ -211,12 +211,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Depth Node] Advertising to the candidate holes topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Depth Node] Could not find topic candidate_holes_topic");
     }
   }
@@ -233,7 +233,7 @@ namespace pandora_vision
     const pandora_vision_hole_detector::depth_cfgConfig& config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED("hole_detector", "[Depth node] Parameters callback called");
+    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Parameters callback called");
 
     //////////////////// Blob detection - specific parameters //////////////////
 
@@ -304,12 +304,6 @@ namespace pandora_vision
     // Show the depth image that arrives in the depth node
     Parameters::Depth::show_depth_image =
      config.show_depth_image;
-
-    // The interpolation method for noise removal
-    // 0 for averaging the pixel's neighbor values
-    // 1 for brushfire near
-    // 2 for brushfire far
-    Parameters::Depth::interpolation_method = config.interpolation_method;
 
 
     //------------------- Edge detection specific parameters -------------------

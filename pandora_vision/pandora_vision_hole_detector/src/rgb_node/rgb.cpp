@@ -71,7 +71,7 @@ namespace pandora_vision
     // The dynamic reconfigure (RGB) parameter's callback
     server.setCallback(boost::bind(&Rgb::parametersCallback, this, _1, _2));
 
-    ROS_INFO_NAMED("hole_detector", "[RGB node] Initiated");
+    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Initiated");
   }
 
 
@@ -81,7 +81,7 @@ namespace pandora_vision
    **/
   Rgb::~Rgb()
   {
-    ROS_INFO_NAMED("hole_detector", "[RGB node] Terminated");
+    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Terminated");
   }
 
 
@@ -98,7 +98,7 @@ namespace pandora_vision
   **/
   void Rgb::inputRgbImageCallback(const sensor_msgs::Image& msg)
   {
-    ROS_INFO_NAMED("hole_detector", "RGB node callback");
+    ROS_INFO_NAMED(PKG_NAME, "RGB node callback");
 
     #ifdef DEBUG_TIME
     Timer::start("inputRgbImageCallback", "", true);
@@ -175,12 +175,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       rgbImageTopic_ = ns + "/" + rgbImageTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[RGB Node] Subscribed to the input RGB image");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[RGB Node] Could not find topic rgb_image_topic");
     }
 
@@ -194,12 +194,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[RGB Node] Advertising to the candidate holes topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[RGB Node] Could not find topic candidate_holes_topic");
     }
   }
@@ -216,7 +216,7 @@ namespace pandora_vision
     const pandora_vision_hole_detector::rgb_cfgConfig& config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED("hole_detector", "[RGB node] Parameters callback called");
+    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Parameters callback called");
 
     //////////////////// Blob detection - specific parameters //////////////////
 

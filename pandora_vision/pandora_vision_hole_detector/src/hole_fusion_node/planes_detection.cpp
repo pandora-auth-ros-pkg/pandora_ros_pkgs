@@ -195,7 +195,7 @@ namespace pandora_vision
 
       if (inliers->indices.size () == 0)
       {
-        ROS_ERROR_NAMED("hole_detector",
+        ROS_ERROR_NAMED(PKG_NAMED,
           "Could not estimate a planar model for the given dataset.");
 
         break;

@@ -136,9 +136,12 @@ namespace pandora_vision
         facility.
         @param[in] conveyor [const HolesConveyor&]
         The conveyor of candidateholes
-        @param[in] interpolationMethod [const int&]
-        The interpolation method for the depth image.
-        If other than 0, depth analysis is not possible.
+        @param[in] filteringMode [const int&]
+        The filtering mode used: If RGBD_MODE, depth analysis is possible,
+        and depth-based filters will be utilized.
+        If RGB_ONLY_MODE, depth-based filters cannot be utilized,
+        so validation of candidate holes can only be made using
+        RGB-based filters.
         @param[in] depthImage [const cv::Mat&]
         The interpolated depth image
         @param[in] rgbImage [const cv::Mat&]

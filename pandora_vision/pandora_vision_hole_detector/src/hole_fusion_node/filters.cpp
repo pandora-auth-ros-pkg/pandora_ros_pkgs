@@ -311,9 +311,12 @@ namespace pandora_vision
     facility.
     @param[in] conveyor [const HolesConveyor&]
     The conveyor of candidateholes
-    @param[in] interpolationMethod [const int&]
-    The interpolation method for the depth image.
-    If other than 0, depth analysis is not possible.
+    @param[in] filteringMode [const int&]
+    The filtering mode used: If RGBD_MODE, depth analysis is possible,
+    and depth-based filters will be utilized.
+    If RGB_ONLY_MODE, depth-based filters cannot be utilized,
+    so validation of candidate holes can only be made using
+    RGB-based filters.
     @param[in] depthImage [const cv::Mat&]
     The interpolated depth image
     @param[in] rgbImage [const cv::Mat&]
@@ -352,7 +355,7 @@ namespace pandora_vision
    **/
   void Filters::applyFilters(
     const HolesConveyor& conveyor,
-    const int& interpolationMethod,
+    const int& filteringMode,
     const cv::Mat& depthImage,
     const cv::Mat& rgbImage,
     const cv::MatND& inHistogram,
@@ -373,10 +376,10 @@ namespace pandora_vision
     // filter
     std::map<int, int> filtersOrder;
 
-    // The interpolation method permission to application of depth analysis
-    // condition
+    // The filtering mode permission to application of depth analysis
+    // condition.
     // Active Depth and RGB filters will both be applied
-    if (interpolationMethod == 0)
+    if (filteringMode == RGBD_MODE)
     {
       if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
       {
@@ -434,7 +437,7 @@ namespace pandora_vision
     }
     // Depth filtering cannot be applied, hence only RGB filters will
     // be utilized
-    else
+    else if (filteringMode == RGB_ONLY_MODE)
     {
       if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
       {
@@ -459,6 +462,10 @@ namespace pandora_vision
         filtersOrder[
           Parameters::HoleFusion::run_checker_texture_backproject_urgent] = 4;
       }
+    }
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME, "[Hole Fusion node] Filtering process failure");
     }
 
     // Debugging images and messages of validity probabilities

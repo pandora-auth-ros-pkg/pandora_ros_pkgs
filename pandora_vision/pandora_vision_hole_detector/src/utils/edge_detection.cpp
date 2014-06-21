@@ -53,7 +53,7 @@ namespace pandora_vision
   {
     if (inImage.depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::applyCanny : Inappropriate image depth.");
 
       return;
@@ -95,7 +95,7 @@ namespace pandora_vision
   {
     if (inImage.depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::applyScharr : Inappropriate image depth.");
 
       return;
@@ -151,7 +151,7 @@ namespace pandora_vision
   {
     if (inImage.depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::applySobel : Inappropriate image depth.");
 
       return;
@@ -207,7 +207,7 @@ namespace pandora_vision
   {
     if (inImage.depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::applyLaplacian : Inappropriate image depth.");
 
       return;
@@ -390,7 +390,7 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_32FC1)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::computeEdges : Inappropriate image type.");
 
       return;
@@ -486,7 +486,7 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_8UC3)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::computeRgbEdges: Inappropriate image type.");
 
       return;
@@ -543,7 +543,7 @@ namespace pandora_vision
   {
     if (inImage->depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::connectPairs: Inappropriate image depth.");
 
       return;
@@ -920,7 +920,7 @@ namespace pandora_vision
   {
     if (img->depth() != CV_8U)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::denoiseEdges: Inappropriate image depth.");
 
       return;
@@ -1474,7 +1474,7 @@ namespace pandora_vision
   {
     if (image->type() != CV_8UC3)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::floodFillPostprocess Inappropriate image type.");
 
       return;
@@ -1529,7 +1529,7 @@ namespace pandora_vision
   {
     if (inImage->type() != CV_8UC1)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::getShapesClearBorder : Inappropriate image type.");
 
       return;
@@ -1757,7 +1757,7 @@ namespace pandora_vision
   {
     if (inImage->type() != CV_8UC1)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::getShapesClearBorderSimple : Inappropriate image type.");
 
       return;
@@ -1908,7 +1908,7 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_8UC3)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::produceEdgesViaBackprojection: Inappropriate image type.");
 
       return;
@@ -1951,7 +1951,7 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_8UC3)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::produceEdgesViaSegmentation : Inappropriate image type.");
 
       return;
@@ -2105,7 +2105,7 @@ namespace pandora_vision
   {
     if (inImage.type() != CV_8UC3)
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "EdgeDetection::segmentation: Inappropriate image type.");
 
       return;

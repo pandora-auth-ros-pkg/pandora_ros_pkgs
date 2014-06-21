@@ -127,9 +127,12 @@ namespace pandora_vision
     // Set the initial on/off state of the Hole Detector package to off
     isOn_ = false;
 
+    // Initialize the filtering mode variable to an invalid value
+    filteringMode_ = -1;
+
     clientInitialize();
 
-    ROS_INFO_NAMED("hole_detector", "[Hole Fusion node] Initiated");
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Initiated");
   }
 
 
@@ -139,7 +142,7 @@ namespace pandora_vision
    **/
   HoleFusion::~HoleFusion(void)
   {
-    ROS_INFO_NAMED("hole_detector", "[Hole Fusion node] Terminated");
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Terminated");
   }
 
 
@@ -151,7 +154,7 @@ namespace pandora_vision
    **/
   void HoleFusion::completeTransition(void)
   {
-    ROS_INFO_NAMED("hole_detector", "[Hole Detector] : Transition Complete");
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Detector] : Transition Complete");
   }
 
 
@@ -179,7 +182,7 @@ namespace pandora_vision
     Timer::start("depthCandidateHolesCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED("hole_detector", "Hole Fusion Depth callback");
+    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Depth callback");
 
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
@@ -267,7 +270,7 @@ namespace pandora_vision
       conveyor,
       interpolatedDepthImage_,
       Parameters::HoleFusion::rectangle_inflation_size,
-      Parameters::Depth::interpolation_method,
+      filteringMode_,
       &holesMasksImageVector,
       &holesMasksSetVector,
       &inflatedRectanglesVector,
@@ -289,7 +292,7 @@ namespace pandora_vision
     int depthActiveFilters = 0;
 
     // If depth analysis is possible
-    if (Parameters::Depth::interpolation_method == 0)
+    if (filteringMode_ == RGBD_MODE)
     {
       if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
       {
@@ -338,7 +341,7 @@ namespace pandora_vision
     }
     // Depth analysis is not possible. Reserve positions in the probabilities
     // vector only for the amount of RGB filters active.
-    else
+    else if (filteringMode_ == RGB_ONLY_MODE)
     {
       if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
       {
@@ -360,6 +363,11 @@ namespace pandora_vision
         rgbActiveFilters++;
       }
     }
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME,
+        "[Hole Fusion node] Pre filtering process failure");
+    }
 
 
     // The 2D vector that contains the probabilities from the rgb filtering
@@ -373,7 +381,7 @@ namespace pandora_vision
     // Apply all active filters, depending on the interpolation method
     Filters::applyFilters(
       conveyor,
-      Parameters::Depth::interpolation_method,
+      filteringMode_,
       interpolatedDepthImage_,
       rgbImage_,
       wallsHistogram_,
@@ -416,12 +424,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       pointCloudTopic_ = ns + "/" + pointCloudTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Subscribed to the internal point cloud topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic point_cloud_internal_topic");
     }
 
@@ -434,12 +442,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       depthCandidateHolesTopic_ = ns + "/" + depthCandidateHolesTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Subscribed to the Depth candidate holes topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic depth_candidate_holes_topic");
     }
 
@@ -452,12 +460,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       rgbCandidateHolesTopic_ = ns + "/" + rgbCandidateHolesTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Subscribed to the Rgb candidate holes topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic rgb_candidate_holes_topic");
     }
 
@@ -470,12 +478,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       unlockTopic_ = ns + "/" + unlockTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to the unlock topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic synchronizer_unlock_topic");
     }
 
@@ -485,12 +493,12 @@ namespace pandora_vision
         ns + "/hole_fusion_node/published_topics/hole_detector_output_topic",
         validHolesTopic_))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to the valid holes topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic hole_detector_output_topic");
     }
 
@@ -501,12 +509,12 @@ namespace pandora_vision
         ns + "/hole_fusion_node/published_topics/enhanced_holes_topic",
         enhancedHolesTopic_))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to the enhanced holes topic");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic enhanced_holes_topic");
     }
 
@@ -517,14 +525,13 @@ namespace pandora_vision
         "/hole_fusion_node/published_topics/make_synchronizer_subscribe_to_input",
         synchronizerSubscribeToInputPointCloudTopic_))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to topic where the synchronizer"
         " expects messages dictating its subscription to the input point cloud");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
-        "[Hole Fusion Node] Could not find topic"
+      ROS_INFO_NAMED (PKG_NAME, "[Hole Fusion Node] Could not find topic"
         " make_synchronizer_subscribe_to_input");
     }
 
@@ -535,15 +542,14 @@ namespace pandora_vision
         "/hole_fusion_node/published_topics/make_synchronizer_leave_subscription_to_input",
         synchronizerLeaveSubscriptionToInputPointCloudTopic_))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to topic where the synchronizer"
         " expects messages dictating its leave of subscription to the"
         " input point cloud");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
-        "[Hole Fusion Node] Could not find topic"
+      ROS_INFO_NAMED (PKG_NAME, "[Hole Fusion Node] Could not find topic"
         " make_synchronizer_leave_subscription_to_input");
     }
 
@@ -553,13 +559,13 @@ namespace pandora_vision
         "/hole_fusion_node/published_topics/debug_valid_holes_image",
         debugValidHolesTopic_))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Hole Fusion Node] Advertising to topic where an image of the"
         " valid holes is published");
     }
     else
     {
-      ROS_INFO_NAMED ("hole_detector",
+      ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic debug_valid_holes_image");
     }
   }
@@ -599,8 +605,7 @@ namespace pandora_vision
     const pandora_vision_hole_detector::hole_fusion_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED("hole_detector",
-      "[Hole Fusion node] Parameters callback called");
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
 
     ////////////////////////////// Debug parameters ////////////////////////////
 
@@ -641,13 +646,6 @@ namespace pandora_vision
     Parameters::HoleFusion::show_final_holes =
      config.show_final_holes;
 
-
-    // The interpolation method for noise removal
-    // 0 for averaging the pixel's neighbor values
-    // 1 for brushfire near
-    // 2 for brushfire far
-    Parameters::Depth::interpolation_method =
-      config.interpolation_method;
 
     // Threshold parameters
     Parameters::Edge::denoised_edges_threshold =
@@ -863,7 +861,7 @@ namespace pandora_vision
     Timer::start("pointCloudCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED("hole_detector", "Hole Fusion Point Cloud callback");
+    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Point Cloud callback");
 
     // Convert the header of the point cloud message
     std_msgs::Header header;
@@ -888,6 +886,20 @@ namespace pandora_vision
     cv::Mat interpolatedDepthImage;
     NoiseElimination::performNoiseElimination(depthImage,
       &interpolatedDepthImage);
+
+    // The noise elimination method above defines the interpolation method.
+    // Only in interpolation_method of zero can the depth filters through which
+    // each candidate hole is passed be utilized: there is no valid depth
+    // information available if the value of interpolation_method is set to
+    // other than zero.
+    if (Parameters::Depth::interpolation_method == 0)
+    {
+      filteringMode_ = RGBD_MODE;
+    }
+    else
+    {
+      filteringMode_ = RGB_ONLY_MODE;
+    }
 
     // Set the interpolatedDepthImage's values as the depth values
     // of the point cloud
@@ -937,7 +949,7 @@ namespace pandora_vision
    **/
   void HoleFusion::processCandidateHoles()
   {
-    ROS_INFO_NAMED("hole_detector", "Processing candidate holes");
+    ROS_INFO_NAMED(PKG_NAME, "Processing candidate holes");
 
     #ifdef DEBUG_TIME
     Timer::start("processCandidateHoles", "", true);
@@ -987,7 +999,7 @@ namespace pandora_vision
 
     // Apply the {assimilation, amalgamation, connection} processes
     HoleMerger::mergeHoles(&rgbdHolesConveyor,
-      Parameters::Depth::interpolation_method,
+      filteringMode_,
       interpolatedDepthImage_,
       pointCloud_);
 
@@ -1015,9 +1027,7 @@ namespace pandora_vision
 
     // Publish the enhanced holes message
     // regardless of the amount of valid holes
-    publishEnhancedHoles(rgbdHolesConveyor,
-      &validHolesMap,
-      Parameters::Depth::interpolation_method);
+    publishEnhancedHoles(rgbdHolesConveyor, &validHolesMap);
 
     #ifdef DEBUG_SHOW
     if (Parameters::HoleFusion::show_final_holes)
@@ -1121,19 +1131,16 @@ namespace pandora_vision
 
 
   /**
-    @brief Publishes the enhanced holes' information.
-    @param[in] conveyor [const HolesConveyor&] The overall valid holes
-    found by the depth and RGB nodes.
-    @param[in] validHolesMap [std::map<int, float>*] A map containing the
-    indices of the valid holes inside the conveyor and their respective
-    validity probabilities
-    @param[in] interpolationMethod [const int&] The interpolation method
-    used. 0 if depth analysis is applicable, 1 or 2 for special cases,
-    where the amount of noise in the depth image is overwhelming
+    @brief Publishes the holes' enhanced information.
+    @param[in] conveyor [const HolesConveyor&]
+    The overall valid holes found by the depth and RGB nodes.
+    @param[in] validHolesMap [std::map<int, float>*]
+    A map containing the indices of the valid holes inside the conveyor
+    and their respective validity probabilities
     @return void
    **/
   void HoleFusion::publishEnhancedHoles (const HolesConveyor& conveyor,
-    std::map<int, float>* validHolesMap , const int& interpolationMethod)
+    std::map<int, float>* validHolesMap)
   {
     // The overall message of enhanced holes that will be published
     vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
@@ -1152,7 +1159,7 @@ namespace pandora_vision
       enhancedHolesMsg.depthImage);
 
     // Set whether depth analysis is applicable
-    enhancedHolesMsg.isDepth = (interpolationMethod == 0);
+    enhancedHolesMsg.isDepth = (filteringMode_ == RGBD_MODE);
 
     // Set the message's header
     enhancedHolesMsg.header.stamp = timestamp_;
@@ -1314,7 +1321,7 @@ namespace pandora_vision
     Timer::start("rgbCandidateHolesCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED("hole_detector", "Hole Fusion RGB callback");
+    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion RGB callback");
 
     // Clear the current rgbHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
@@ -1473,7 +1480,7 @@ namespace pandora_vision
     // is set to on
     if (isOn_)
     {
-      ROS_INFO_NAMED("hole_detector", "Sending unlock message");
+      ROS_INFO_NAMED(PKG_NAME, "Sending unlock message");
 
       std_msgs::Empty unlockMsg;
       unlockPublisher_.publish(unlockMsg);
@@ -1524,7 +1531,7 @@ namespace pandora_vision
 
       // Apply a weight to each probability according to its weight order.
       // If depth analysis was not possible, use the urgent weight order.
-      if (Parameters::Depth::interpolation_method == 0)
+      if (filteringMode_ == RGBD_MODE)
       {
         if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
         {
@@ -1605,7 +1612,7 @@ namespace pandora_vision
           exponent++;
         }
       }
-      else
+      else if (filteringMode_ == RGB_ONLY_MODE)
       {
         if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
         {
@@ -1642,6 +1649,11 @@ namespace pandora_vision
           exponent++;
         }
       }
+      else
+      {
+        ROS_ERROR_NAMED(PKG_NAME,
+          "[Hole Fusion node] Validation process failure");
+      }
 
       // The total validity probability of the i-th hole
       sum /= (pow(2, exponent) - 1);
@@ -1649,13 +1661,18 @@ namespace pandora_vision
       // The validity acceptance threshold
       float threshold = 0.0;
 
-      if (Parameters::Depth::interpolation_method == 0)
+      if (filteringMode_ == RGBD_MODE)
       {
         threshold = Parameters::HoleFusion::holes_validity_threshold_normal;
       }
-      else
+      else if (filteringMode_ == RGB_ONLY_MODE)
       {
         threshold = Parameters::HoleFusion::holes_validity_threshold_urgent;
+      }
+      else
+      {
+        ROS_ERROR_NAMED(PKG_NAME,
+          "[Hole Fusion node] Validation process failure");
       }
 
       if (sum > threshold)

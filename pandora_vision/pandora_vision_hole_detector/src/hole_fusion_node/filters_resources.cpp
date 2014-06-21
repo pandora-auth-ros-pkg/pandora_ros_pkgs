@@ -54,9 +54,13 @@ namespace pandora_vision
     @param[in] image [const cv::Mat&] An image needed for its size
     @param[in] inflationSize [const int&] The bounding rectangles
     inflation size
-    @param[in] interpolationMethod [const int&] The interpolation method
-    of the depth image. If its value is other than zero, the depth filters
-    cannot be applied.
+    @param[in] filteringMode [const int&]
+    The filtering mode used: If RGBD_MODE, depth analysis is possible,
+    and depth-based filters' resources will be utilized.
+    If RGB_ONLY_MODE, depth-based filters cannot be utilized,
+    so validation of candidate holes can only be made using
+    RGB-based filters, so only resources needed by those will be
+    needed to be constructed.
     @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
     A vector containing an image (the mask) for each hole
     @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
@@ -82,7 +86,7 @@ namespace pandora_vision
     const HolesConveyor& conveyor,
     const cv::Mat& image,
     const int& inflationSize,
-    const int& interpolationMethod,
+    const int& filteringMode,
     std::vector<cv::Mat>* holesMasksImageVector,
     std::vector<std::set<unsigned int> >* holesMasksSetVector,
     std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
@@ -94,6 +98,7 @@ namespace pandora_vision
     Timer::start("createCheckerRequiredVectors", "checkHoles");
     #endif
 
+    // Indicate the necessity of creating particular resources
     bool enable_holesMasksImageVector = false;
     bool enable_holesMasksSetVector = false;
     bool enable_inflatedRectanglesVectorAndIndices = false;
@@ -147,7 +152,7 @@ namespace pandora_vision
 
     // If the conditions permit for the depth filters to be run,
     // create their resources
-    if (interpolationMethod == 0)
+    if (filteringMode == RGBD_MODE)
     {
       // The depth diff filter requires only the contruction of the vectors
       // that have to do with the inflation of holes' rectangles

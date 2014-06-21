@@ -92,7 +92,7 @@ namespace pandora_vision
     synchronizedRGBImagePublisher_ = nodeHandle_.advertise
       <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1000);
 
-    ROS_INFO_NAMED("hole_detector", "[Synchronizer node] Initiated");
+    ROS_INFO_NAMED(PKG_NAME, "[Synchronizer node] Initiated");
   }
 
 
@@ -103,7 +103,7 @@ namespace pandora_vision
    **/
   RgbDepthSynchronizer::~RgbDepthSynchronizer(void)
   {
-    ROS_INFO_NAMED("hole_detector", "[Synchronizer node] Terminated");
+    ROS_INFO_NAMED(PKG_NAME, "[Synchronizer node] Terminated");
   }
 
 
@@ -126,12 +126,12 @@ namespace pandora_vision
       if (nodeHandle_.getParam(ns + "/synchronizer_node/height",
           Parameters::Image::HEIGHT))
       {
-        ROS_INFO_NAMED("hole_detector",
+        ROS_INFO_NAMED(PKG_NAME,
           "[Synchronizer Node] Input dimension height read");
       }
       else
       {
-        ROS_ERROR_NAMED("hole_detector",
+        ROS_ERROR_NAMED(PKG_NAME,
           "[Synchronizer Node] Input dimension height failed to be read");
       }
     }
@@ -142,12 +142,12 @@ namespace pandora_vision
       if (nodeHandle_.getParam(ns + "/synchronizer_node/width",
           Parameters::Image::WIDTH))
       {
-        ROS_INFO_NAMED("hole_detector",
+        ROS_INFO_NAMED(PKG_NAME,
           "[Synchronizer Node] Input dimension width read");
       }
       else
       {
-        ROS_ERROR_NAMED("hole_detector",
+        ROS_ERROR_NAMED(PKG_NAME,
           "[Synchronizer Node] Input dimension width failed to be read");
       }
     }
@@ -172,12 +172,12 @@ namespace pandora_vision
         ns + "/synchronizer_node/subscribed_topics/input_topic",
         inputPointCloudTopic_ ))
     {
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Subscribed to the input point cloud");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic input_topic");
     }
 
@@ -190,12 +190,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       unlockTopic_ = ns + "/" + unlockTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Subscribed to the unlock topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic unlock_topic");
     }
 
@@ -209,13 +209,13 @@ namespace pandora_vision
       subscribeToInputPointCloudTopic_ =
         ns + "/" + subscribeToInputPointCloudTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Subscribed to the Hole Fusion input cloud"
         "subscription request topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic ");
     }
 
@@ -229,13 +229,13 @@ namespace pandora_vision
       leaveSubscriptionToInputPointCloudTopic_ =
         ns + "/" + leaveSubscriptionToInputPointCloudTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Subscribed to the Hole Fusion input cloud"
         "subscription leave request topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic ");
     }
 
@@ -248,12 +248,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       synchronizedPointCloudTopic_ = ns + "/" + synchronizedPointCloudTopic_;
 
-      ROS_INFO_NAMED("hole_detector", "[Synchronizer Node] "
+      ROS_INFO_NAMED(PKG_NAME, "[Synchronizer Node] "
         "Advertising to the internal point cloud topic");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector", "[Synchronizer Node] "
+      ROS_ERROR_NAMED(PKG_NAME, "[Synchronizer Node] "
         "Could not find topic point_cloud_internal_topic");
     }
 
@@ -266,12 +266,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       synchronizedDepthImageTopic_ = ns + "/" + synchronizedDepthImageTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Advertising to the internal depth image");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic depth_image_topic");
     }
 
@@ -284,12 +284,12 @@ namespace pandora_vision
       // Make the topic's name absolute
       synchronizedRgbImageTopic_ = ns + "/" + synchronizedRgbImageTopic_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "[Synchronizer Node] Advertising to the internal rgb image");
     }
     else
     {
-      ROS_ERROR_NAMED("hole_detector",
+      ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic rgb_image_topic");
     }
   }
@@ -319,14 +319,14 @@ namespace pandora_vision
       isLocked_ = true;
 
       #ifdef DEBUG_TIME
-      ROS_INFO_NAMED("hole_detector", "Synchronizer unlocked");
+      ROS_INFO_NAMED(PKG_NAME, "Synchronizer unlocked");
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "=================================================");
 
       double t = ros::Time::now().toSec() - invocationTime_;
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "Previous synchronizer invocation before %fs", t);
 
       // Increment the number of this node's invocations
@@ -337,11 +337,11 @@ namespace pandora_vision
         meanProcessingTime_ += t;
       }
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "Mean processing time :                  %fs",
         (meanProcessingTime_ / (ticks_ - 1)));
 
-      ROS_INFO_NAMED("hole_detector",
+      ROS_INFO_NAMED(PKG_NAME,
         "=================================================");
 
       invocationTime_ = ros::Time::now().toSec();

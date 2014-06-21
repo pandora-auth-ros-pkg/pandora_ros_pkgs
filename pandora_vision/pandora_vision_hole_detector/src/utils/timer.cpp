@@ -18,22 +18,22 @@ struct timeval Timer::msTime = timeval();
 
 void Timer::printMsInternal(double t)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", t << " ms");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, t << " ms");
 }
 
 void Timer::printSecInternal(double t)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 << " sec");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, t / 1000.0 << " sec");
 }
 
 void Timer::printMinInternal(double t)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 / 60.0 << " minutes");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, t / 1000.0 / 60.0 << " minutes");
 }
 
 void Timer::printHoursInternal(double t)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", t / 1000.0 / 60.0 / 60.0 << " hours");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, t / 1000.0 / 60.0 / 60.0 << " hours");
 }
 
 void Timer::printLiteralInternal(double t)
@@ -50,22 +50,24 @@ void Timer::printLiteralInternal(double t)
       if(hours >= 1)
       {
         min -= hours * 60;
-        ROS_INFO_STREAM_NAMED("hole_detector", min << " hours " <<hours << " minutes " << sec
-          << " sec " << t << " ms");
+        ROS_INFO_STREAM_NAMED(PKG_NAME,
+          min << " hours " <<hours << " minutes "
+          << sec << " sec " << t << " ms");
       }
       else
       {	// Mins
-        ROS_INFO_STREAM_NAMED("hole_detector", min << " minutes " << sec << " sec " << t << " ms\n");
+        ROS_INFO_STREAM_NAMED(PKG_NAME,
+          min << " minutes " << sec << " sec " << t << " ms\n");
       }
     }
     else
     {	// Sec
-      ROS_INFO_STREAM_NAMED("hole_detector", sec << " sec " << t << " ms");
+      ROS_INFO_STREAM_NAMED(PKG_NAME, sec << " sec " << t << " ms");
     }
   }
   else
   {	// Ms
-    ROS_INFO_STREAM_NAMED("hole_detector", t << " ms");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, t << " ms");
   }
 }
 
@@ -110,7 +112,7 @@ double Timer::stop(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
     return -1;
   }
   else
@@ -126,7 +128,7 @@ double Timer::mean(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
     return -1;
   }
   else
@@ -140,7 +142,7 @@ void Timer::tick(std::string timerId)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
   }
   else
   {
@@ -160,31 +162,31 @@ void Timer::tick(std::string timerId)
 
 void Timer::printMs(std::string timerId)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timer " << timerId << " : ");
   printMsInternal(stop(timerId));
 }
 
 void Timer::printSec(std::string timerId)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timer " << timerId << " : ");
   printSecInternal(stop(timerId));
 }
 
 void Timer::printMin(std::string timerId)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timer " << timerId << " : ");
   printMinInternal(stop(timerId));
 }
 
 void Timer::printHours(std::string timerId)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timer " << timerId << " : ");
   printHoursInternal(stop(timerId));
 }
 
 void Timer::printLiteral(std::string timerId)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timer " << timerId << " : ");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timer " << timerId << " : ");
   printLiteralInternal(stop(timerId));
 }
 
@@ -193,11 +195,11 @@ void Timer::printLiteralMean(std::string timerId, std::string identation)
   MsdIt it = times.find(timerId);
   if(it == times.end())
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "Invalid timer id : " << timerId << "\n");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
   }
   else
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", identation << timerId <<
+    ROS_INFO_STREAM_NAMED(PKG_NAME, identation << timerId <<
       "' [" << times[timerId] << " - " <<
       min_time[timerId] << " , " << mean_time[timerId] << " , " <<
       max_time[timerId] << " - " << count[timerId] << "]");
@@ -206,16 +208,16 @@ void Timer::printLiteralMean(std::string timerId, std::string identation)
 
 void Timer::printAll(void)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available :");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timers available :");
   for(MsdCIt it = times.begin() ; it != times.end() ; it++)
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "\t");
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "\t");
     printLiteral(it->first);
   }
 }
 void Timer::printAllMeans(void)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available :");
+  ROS_INFO_STREAM_NAMED(PKG_NAME, "Timers available :");
   Mfs tms;
   for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {
@@ -223,13 +225,14 @@ void Timer::printAllMeans(void)
   }
   for(MfsIt it = tms.begin() ; it != tms.end() ; it++)
   {
-    ROS_INFO_STREAM_NAMED("hole_detector", "\t"; printLiteralMean(it->second));
+    ROS_INFO_STREAM_NAMED(PKG_NAME, "\t"; printLiteralMean(it->second));
   }
 }
 
 void Timer::printAllMeansTree(void)
 {
-  ROS_INFO_STREAM_NAMED("hole_detector", "Timers available : [curr - min , mean , max - ticks]\n");
+  ROS_INFO_STREAM_NAMED(PKG_NAME,
+    "Timers available : [curr - min , mean , max - ticks]\n");
   Mfs tms;
   for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {

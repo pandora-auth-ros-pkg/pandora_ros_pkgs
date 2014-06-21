@@ -250,16 +250,20 @@ namespace pandora_vision
         than 0.5-0.6m. In this way of operation, the merging of holes does not
         consider employing validator filters and simply merges holes that can
         be merged with each other (assimilated, amalgamated, or connected).
-        @param[in,out] conveyor [HolesConveyor*] The conveyor of holes to be
-        merged with one another, where applicable.
-        @param[in] interpolatedDepthImage [const cv::Mat&] The interpolated
-        depth image
-        @param[in] pointCloud [const PointCloudPtr&] The interpolated point
-        cloud. Needed in the connection process.
+        @param[in,out] conveyor [HolesConveyor*]
+        The conveyor of holes to be merged with one another, where applicable.
+        @param[in] filteringMethod [const int&]
+        Indicates whether candidate holes can be merged on conditions
+        dictated by Depth filters, or depth analysis is altogether
+        not possible, and so merges will happen unconditionally.
+        @param[in] interpolatedDepthImage [const cv::Mat&]
+        The interpolated depth image
+        @param[in] pointCloud [const PointCloudPtr&]
+        The interpolated point cloud. Needed in the connection process.
         @return void
        **/
       static void mergeHoles(HolesConveyor* conveyor,
-        const int& interpolationMethod,
+        const int& filteringMethod,
         const cv::Mat& interpolatedDepthImage,
         const PointCloudPtr& pointCloud);
 

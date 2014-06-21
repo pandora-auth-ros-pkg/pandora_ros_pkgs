@@ -68,9 +68,13 @@ namespace pandora_vision
         @param[in] image [const cv::Mat&] An image needed for its size
         @param[in] inflationSize [const int&] The bounding rectangles
         inflation size
-        @param[in] interpolationMethod [const int&] The interpolation method
-        of the depth image. If its value is other than zero, the depth filters
-        cannot be applied.
+        @param[in] filteringMode [const int&]
+        The filtering mode used: If RGBD_MODE, depth analysis is possible,
+        and depth-based filters' resources will be utilized.
+        If RGB_ONLY_MODE, depth-based filters cannot be utilized,
+        so validation of candidate holes can only be made using
+        RGB-based filters, so only resources needed by those will be
+        needed to be constructed.
         @param[out] holesMasksImageVector [std::vector<cv::Mat>*]
         A vector containing an image (the mask) for each hole
         @param[out] holesMasksSetVector [std::vector<std::set<unsigned int> >*]
@@ -87,8 +91,8 @@ namespace pandora_vision
         a hole's outline and its bounding box, for each hole whose identifier
         exists in the @param inflatedRectanglesIndices vector
         @param[out] intermediatePointsSetVector [std::vector<std::set<int> >*]
-        A vector that holds the intermediate points' indices between a hole's
-        outline and its bounding box, for each hole whose identifier
+        A vector that holds the intermediate points' between a hole's outline
+        and its bounding box, for each hole whose identifier
         exists in the @param inflatedRectanglesIndices vector
         @return void
        **/
@@ -96,7 +100,7 @@ namespace pandora_vision
         const HolesConveyor& conveyor,
         const cv::Mat& image,
         const int& inflationSize,
-        const int& interpolationMethod,
+        const int& filteringMode,
         std::vector<cv::Mat>* holesMasksImageVector,
         std::vector<std::set<unsigned int> >* holesMasksSetVector,
         std::vector<std::vector<cv::Point2f> >* inflatedRectanglesVector,
