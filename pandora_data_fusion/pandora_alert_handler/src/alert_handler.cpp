@@ -319,7 +319,10 @@ namespace pandora_data_fusion
 
     void AlertHandler::holeDirectionAlertCallback(
         const vision_communications::HolesDirectionsVectorMsg& msg)
-    {    
+    {
+      if (map_->data.size() == 0)
+        return;
+
       ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Hole::getObjectType() << " ALERT ARRIVED!");
 
@@ -344,6 +347,9 @@ namespace pandora_data_fusion
     void AlertHandler::hazmatAlertCallback(
         const vision_communications::HazmatAlertsVectorMsg& msg)
     {
+      if (map_->data.size() == 0)
+        return;
+
       ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Hazmat::getObjectType() << " ALERT ARRIVED!");
 
@@ -364,6 +370,9 @@ namespace pandora_data_fusion
     void AlertHandler::qrAlertCallback(
         const vision_communications::QRAlertsVectorMsg& msg)
     {
+      if (map_->data.size() == 0)
+        return;
+
       ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Qr::getObjectType() << " ALERT ARRIVED!");  
 
@@ -384,6 +393,9 @@ namespace pandora_data_fusion
     void AlertHandler::landoltcAlertCallback(
         const vision_communications::LandoltcAlertsVectorMsg& msg)
     {
+      if (map_->data.size() == 0)
+        return;
+
       ROS_DEBUG_NAMED("ALERT_HANDLER_ALERT_CALLBACK", "LANDOLTC ALERT ARRIVED!");
 
       LandoltcPtrVectorPtr landoltcsVectorPtr;
@@ -403,6 +415,9 @@ namespace pandora_data_fusion
     void AlertHandler::dataMatrixAlertCallback(
         const vision_communications::DataMatrixAlertsVectorMsg& msg)
     {
+      if (map_->data.size() == 0)
+        return;
+
       ROS_DEBUG_NAMED("ALERT_HANDLER_ALERT_CALLBACK", "DATA MATRIX ALERT ARRIVED!");
 
       DataMatrixPtrVectorPtr dataMatricesVectorPtr;

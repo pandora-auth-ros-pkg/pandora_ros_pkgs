@@ -256,7 +256,10 @@ namespace pandora_data_fusion
     template <class ObjectType> 
       void AlertHandler::objectDirectionAlertCallback(
           const pandora_common_msgs::GeneralAlertMsg& msg)
-      {    
+      {
+        if (map_->data.size() == 0)
+          return;
+
         ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",  
             ObjectType::getObjectType() << " ALERT ARRIVED!");
 
