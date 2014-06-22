@@ -32,6 +32,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   message_filters
   roslint
+  urdf
   )
 
 generate_dynamic_reconfigure_options(
@@ -53,6 +54,7 @@ catkin_package(
   pcl_ros
   message_filters
   roslint
+  urdf
   INCLUDE_DIRS
   include
   )

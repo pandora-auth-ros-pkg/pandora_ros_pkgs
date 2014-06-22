@@ -41,6 +41,7 @@
 #include <dirent.h>
 #include <ros/package.h>
 #include <std_msgs/Empty.h>
+#include <urdf_parser/urdf_parser.h>
 #include <image_transport/image_transport.h>
 #include "state_manager/state_client.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
@@ -167,6 +168,9 @@ namespace pandora_vision
       // The frame_id of the point cloud
       std::string frame_id_;
 
+      // The parent frame_id of the point cloud
+      std::string parent_frame_id_;
+
       // Indicates how many of the depth_node and rgb_node nodes have
       // received hole candidates and are ready to send them for processing
       int numNodesReady_;
@@ -204,21 +208,6 @@ namespace pandora_vision
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
         hole_fusion_cfgConfig>:: CallbackType f;
 
-      /**
-        @brief Runs candidate holes through selected filters.
-        Probabilities for each candidate hole and filter
-        are printed in the console, with an order specified by the
-        hole_fusion_cfg of the dynamic reconfigure utility
-        @param[in] conveyor [const HolesConveyor&] The conveyor
-        containing candidate holes that are to be checked against selected
-        filters
-        @return [std::vector<std::vector<float> >]
-        A two dimensional vector containing the probabilities of
-        validity of each candidate hole. Each row of it pertains to a specific
-        filter applied, each column to a particular hole
-       **/
-      std::vector<std::vector<float> > filterHoles(
-        const HolesConveyor& conveyor);
 
       /**
         @brief Callback for the candidate holes via the depth node.
@@ -240,6 +229,22 @@ namespace pandora_vision
         depthCandidateHolesVector);
 
       /**
+        @brief Runs candidate holes through selected filters.
+        Probabilities for each candidate hole and filter
+        are printed in the console, with an order specified by the
+        hole_fusion_cfg of the dynamic reconfigure utility
+        @param[in] conveyor [const HolesConveyor&] The conveyor
+        containing candidate holes that are to be checked against selected
+        filters
+        @return [std::vector<std::vector<float> >]
+        A two dimensional vector containing the probabilities of
+        validity of each candidate hole. Each row of it pertains to a specific
+        filter applied, each column to a particular hole
+       **/
+      std::vector<std::vector<float> > filterHoles(
+        const HolesConveyor& conveyor);
+
+      /**
         @brief Recreates the HolesConveyor struct for the
         candidate holes from the
         vision_communications::CandidateHolerMsg message
@@ -253,11 +258,19 @@ namespace pandora_vision
         in order to obtain the coherent shape of holes' outline points
         @return void
        **/
-      static void fromCandidateHoleMsgToConveyor(
+      void fromCandidateHoleMsgToConveyor(
         const std::vector<vision_communications::CandidateHoleMsg>&
         candidateHolesVector,
         HolesConveyor* conveyor,
         const cv::Mat& inImage);
+
+      /**
+        @brief Retrieves the parent to the frame_id of the input point cloud,
+        so as to set the frame_id of the output messages of valid holes.
+        @param void
+        @return void
+       **/
+      void getParentFrameId();
 
       /**
         @brief Acquires topics' names needed to be subscribed to and advertise
@@ -407,7 +420,7 @@ namespace pandora_vision
         depth image
         @return void
        **/
-      static void unpackMessage(
+      void unpackMessage(
         const vision_communications::CandidateHolesVectorMsg& holesMsg,
         HolesConveyor* conveyor,
         cv::Mat* image,

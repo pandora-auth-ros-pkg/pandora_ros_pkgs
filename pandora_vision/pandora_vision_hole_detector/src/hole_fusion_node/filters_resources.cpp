@@ -105,52 +105,8 @@ namespace pandora_vision
     bool enable_intermediatePointsImageVector = false;
     bool enable_intermediatePointsSetVector = false;
 
-    // The color homogeneity filter requires a vector of holes' masks
-    // that will be used to extract their histograms
-    if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
-    {
-      enable_holesMasksImageVector = true;
-    }
 
-    // The luminosity diff filter requires the set of points' indices
-    // that are inside a hole's outline,
-    // the set of points' indices that are outside a hole's outline
-    // but inside its (inflated) bounding rectangle
-    // and the inflated rectangles and indices of the respective
-    // valid keypoints
-    if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
-    {
-      enable_holesMasksSetVector = true;
-      enable_intermediatePointsSetVector = true;
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
-
-    // The texture diff filter requires the construction of an image mask
-    // vector for the points inside holes' outline and of image and set
-    // masks for the points outside holes' outline but inside their (inflated)
-    // bounding box
-    // as it checks for texture metrics difference between the
-    // histograms of the points inside a hole's outline and outside
-    // the hole's outline but inside its (inflated) bounding rectangle
-    if (Parameters::HoleFusion::run_checker_texture_diff > 0)
-    {
-      enable_holesMasksImageVector = true;
-      enable_intermediatePointsImageVector = true;
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
-
-    // The texture backproject filter uses two sets: they respectively contain
-    // the indices of points inside holes' outlines and the indices of points
-    // outside holes' outlines but inside their (inflated) bounding rectangle.
-    // Hence, we also need the construction of inflated rectangles' vectors
-    if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
-    {
-      enable_holesMasksSetVector = true;
-      enable_intermediatePointsSetVector = true;
-      enable_inflatedRectanglesVectorAndIndices = true;
-    }
-
-    // If the conditions permit for the depth filters to be run,
+    // If the conditions permit for the depth filters to be applied,
     // create their resources
     if (filteringMode == RGBD_MODE)
     {
@@ -191,6 +147,105 @@ namespace pandora_vision
       {
         enable_holesMasksSetVector = true;
       }
+
+      // The color homogeneity filter requires a vector of holes' masks
+      // that will be used to extract their histograms
+      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+      {
+        enable_holesMasksImageVector = true;
+      }
+
+      // The luminosity diff filter requires the set of points' indices
+      // that are inside a hole's outline,
+      // the set of points' indices that are outside a hole's outline
+      // but inside its (inflated) bounding rectangle
+      // and the inflated rectangles and indices of the respective
+      // valid keypoints
+      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+      {
+        enable_holesMasksSetVector = true;
+        enable_intermediatePointsSetVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+
+      // The texture diff filter requires the construction of an image mask
+      // vector for the points inside holes' outline and of image and set
+      // masks for the points outside holes' outline but inside their (inflated)
+      // bounding box
+      // as it checks for texture metrics difference between the
+      // histograms of the points inside a hole's outline and outside
+      // the hole's outline but inside its (inflated) bounding rectangle
+      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+      {
+        enable_holesMasksImageVector = true;
+        enable_intermediatePointsImageVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+
+      // The texture backproject filter uses two sets: they respectively contain
+      // the indices of points inside holes' outlines and the indices of points
+      // outside holes' outlines but inside their (inflated) bounding rectangle.
+      // Hence, we also need the construction of inflated rectangles' vectors
+      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+      {
+        enable_holesMasksSetVector = true;
+        enable_intermediatePointsSetVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+    }
+    // Depth-based filters cannot be applied. Create only the necessary
+    // resources needed by the RGB-based filters, according to the *_urgent
+    // order
+    else if (filteringMode == RGB_ONLY_MODE)
+    {
+      // The color homogeneity filter requires a vector of holes' masks
+      // that will be used to extract their histograms
+      if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+      {
+        enable_holesMasksImageVector = true;
+      }
+
+      // The luminosity diff filter requires the set of points' indices
+      // that are inside a hole's outline,
+      // the set of points' indices that are outside a hole's outline
+      // but inside its (inflated) bounding rectangle
+      // and the inflated rectangles and indices of the respective
+      // valid keypoints
+      if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+      {
+        enable_holesMasksSetVector = true;
+        enable_intermediatePointsSetVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+
+      // The texture diff filter requires the construction of an image mask
+      // vector for the points inside holes' outline and of image and set
+      // masks for the points outside holes' outline but inside their (inflated)
+      // bounding box
+      // as it checks for texture metrics difference between the
+      // histograms of the points inside a hole's outline and outside
+      // the hole's outline but inside its (inflated) bounding rectangle
+      if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+      {
+        enable_holesMasksImageVector = true;
+        enable_intermediatePointsImageVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+
+      // The texture backproject filter uses two sets: they respectively contain
+      // the indices of points inside holes' outlines and the indices of points
+      // outside holes' outlines but inside their (inflated) bounding rectangle.
+      // Hence, we also need the construction of inflated rectangles' vectors
+      if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+      {
+        enable_holesMasksSetVector = true;
+        enable_intermediatePointsSetVector = true;
+        enable_inflatedRectanglesVectorAndIndices = true;
+      }
+    }
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME, "[Hole Fusion node] Resource creation failure");
     }
 
     // Create the necessary resources

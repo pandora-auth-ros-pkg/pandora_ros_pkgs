@@ -43,6 +43,7 @@
     <publisher>/vision/holes_direction</publisher>
     <publisher>/vision/enhanced_holes</publisher>
     <publisher>/unlock_rgb_depth_synchronizer</publisher>
+    <publisher>/vision/hole_detector/debug_valid_holes_found</publisher>
 
   </node>
 

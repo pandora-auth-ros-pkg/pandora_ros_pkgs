@@ -1,9 +1,12 @@
 <launch>
 
-  <!-- Namespace of the hole detector package -->
+  <!-- ============ The namespace of the hole detector package ============= -->
+
   <arg name="namespace" default="vision/hole_detector" />
 
-  <!-- The synchronizer node -->
+
+  <!-- ========================= Synchronizer node ========================= -->
+
   <node name="synchronizer_node"
         type="synchronizer_node"
         pkg="pandora_vision_hole_detector"
@@ -20,7 +23,8 @@
   </node>
 
 
-  <!-- The depth node -->
+  <!-- ============================ Depth node ============================= -->
+
   <node name="depth_node"
         type="depth_node"
         pkg="pandora_vision_hole_detector"
@@ -33,7 +37,8 @@
   </node>
 
 
-  <!-- The RGB node -->
+  <!-- ============================= RGB node ============================== -->
+
   <node name="rgb_node"
         type="rgb_node"
         pkg="pandora_vision_hole_detector"
@@ -46,7 +51,8 @@
   </node>
 
 
-  <!-- The hole fusion node -->
+  <!-- ========================= Hole Fusion node ========================== -->
+
   <node name="hole_fusion_node"
         type="hole_fusion_node"
         pkg="pandora_vision_hole_detector"
