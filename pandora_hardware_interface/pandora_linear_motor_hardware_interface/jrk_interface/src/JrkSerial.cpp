@@ -9,7 +9,7 @@ JrkSerial::JrkSerial()
   fd = open(device, O_RDWR | O_NOCTTY);
   if (fd == -1)
   {
-    perror(device);
+    ROS_FATAL_STREAM(device << strerror(errno));
     ROS_FATAL("Failed to open the serial port!!!");
     ROS_BREAK();
   }
@@ -32,13 +32,13 @@ int JrkSerial::readVariable(unsigned char command)
 {
   if (write(fd, &command, 1) == -1)
   {
-    perror("error writing");
+    ROS_ERROR_STREAM("error writing" << strerror(errno));
     return -1;
   }
   unsigned char response[2];
   if (read(fd, response, 2) != 2)
   {
-    perror("error reading");
+    ROS_ERROR_STREAM("error reading" << strerror(errno));
     return -1;
   }
   return response[0] + 256*response[1];
@@ -69,7 +69,7 @@ int JrkSerial::setTarget(unsigned short target)
   unsigned char command[] = {0xC0 + (target & 0x1F), (target >> 5) & 0x7F};
   if (write(fd, command, sizeof(command)) == -1)
   {
-    perror("error writing");
+    ROS_ERROR_STREAM("error writing" << strerror(errno));
     return -1;
   }
   return 0;
@@ -86,13 +86,13 @@ int JrkSerial::readErrors(unsigned char command)
 {
   if (write(fd, &command, 1) == -1)
   {
-    perror("error writing");
+    ROS_ERROR_STREAM("error writing" << strerror(errno));
     return -1;
   }
   unsigned char response[2];
   if (read(fd, response, 2) != 2)
   {
-    perror("error reading");
+    ROS_ERROR_STREAM("error reading" << strerror(errno));
     return -1;
   }
   return response[0];

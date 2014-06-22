@@ -52,12 +52,15 @@ namespace imu
   {
     imuSerialInterface.init();
 
+    nodeHandle_.param("roll_offset", rollOffset_, 0.0);
+    nodeHandle_.param("pitch_offset", pitchOffset_, 0.0);
+
     // connect and register imu sensor interface
-    imuOrientation[0] = 0;
-    imuOrientation[1] = 0;
-    imuOrientation[2] = 0;
-    imuOrientation[3] = 1;
-    imuData_.orientation = imuOrientation;
+    imuOrientation_[0] = 0;
+    imuOrientation_[1] = 0;
+    imuOrientation_[2] = 0;
+    imuOrientation_[3] = 1;
+    imuData_.orientation = imuOrientation_;
     imuData_.name="/sensors/imu";  // /sensors might become namespace
     imuData_.frame_id="base_link";
     hardware_interface::ImuSensorHandle imuSensorHandle(imuData_);
@@ -80,11 +83,12 @@ namespace imu
     roll = roll * (2*boost::math::constants::pi<double>()) / 360;
     geometry_msgs::Quaternion orientation;
 
-    orientation = tf::createQuaternionMsgFromRollPitchYaw(roll, pitch, yaw);
-    imuOrientation[0] = orientation.x;
-    imuOrientation[1] = orientation.y;
-    imuOrientation[2] = orientation.z;
-    imuOrientation[3] = orientation.w;
+    orientation = tf::createQuaternionMsgFromRollPitchYaw(
+      roll - rollOffset_, pitch -pitchOffset_, yaw);
+    imuOrientation_[0] = orientation.x;
+    imuOrientation_[1] = orientation.y;
+    imuOrientation_[2] = orientation.z;
+    imuOrientation_[3] = orientation.w;
   }
 }  // namespace imu
 }  // namespace pandora_hardware_interface

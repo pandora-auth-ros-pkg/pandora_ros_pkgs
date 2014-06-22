@@ -57,7 +57,9 @@ namespace imu
       ImuSerialInterface imuSerialInterface;
       hardware_interface::ImuSensorInterface imuSensorInterface_;
       hardware_interface::ImuSensorHandle::Data imuData_;
-      double imuOrientation[4];
+      double imuOrientation_[4];
+      double rollOffset_;
+      double pitchOffset_;
 
     public:
       explicit ImuHardwareInterface(

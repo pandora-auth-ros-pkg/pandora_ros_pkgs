@@ -1,4 +1,10 @@
 <launch>
+    <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_imu_hardware_interface)/config/imu_hardware_interface.yaml"
+    ns="/imu"/>
+
   <!-- Launch controller manager with pandora hardware interface-->
   <node
     name="imu_hardware_interface_node"

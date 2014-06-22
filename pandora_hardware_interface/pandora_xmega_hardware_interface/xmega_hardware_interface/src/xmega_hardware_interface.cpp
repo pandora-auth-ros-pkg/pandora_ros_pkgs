@@ -65,7 +65,15 @@ namespace xmega
   void XmegaHardwareInterface::read()
   {
     serialInterface.read();
-    serialInterface.getBatteryData(&voltage_[0], &voltage_[1]);
+    double measurement[2];
+    serialInterface.getBatteryData(&measurement[0], &measurement[1]);
+    for (int ii = 0; ii < 2; ii++)
+    {
+      if (measurement[ii] > 0)
+      {
+        voltage_[ii] = measurement[ii];
+      }
+    }
 
     RangeMap sensorMap;
     sensorMap = serialInterface.getRangeData();

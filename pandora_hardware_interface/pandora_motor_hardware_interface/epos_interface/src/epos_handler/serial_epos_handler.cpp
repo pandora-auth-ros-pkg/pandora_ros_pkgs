@@ -86,7 +86,7 @@ Error SerialEposHandler::getError()
 epos::CommandStatus SerialEposHandler::writeRPM(
   const int& leftRpm, const int& rightRpm)
 {
-  ROS_INFO("setting speed %d, %d", leftRpm, rightRpm);
+  ROS_DEBUG("setting speed %d, %d", leftRpm, rightRpm);
   //Right motor rpm speed needs to be reversed because of its placement in the vehicle
   uint32_t controlWord = encodeToControlWord(leftRpm, -rightRpm);
   epos::CommandStatus error = gatewayImpl_->writeObject(2, 0x200C, 1, controlWord);
