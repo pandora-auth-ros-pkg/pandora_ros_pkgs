@@ -74,7 +74,7 @@ namespace pandora_control
       targetPosition.data = 0;
       sensorPitchPublisher_.publish(targetPosition);
       sensorYawPublisher_.publish(targetPosition);
-      position_ = HIGH_START;
+      position_ = HIGH_CENTER;
 
       actionServer_.start();
     }
@@ -234,12 +234,13 @@ namespace pandora_control
     sensorPitchPublisher_.publish(pitchTargetPosition);
     sensorYawPublisher_.publish(yawTargetPosition);
 
-    checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data);
+    setGoalState(
+      checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data));
   }
 
   void SensorOrientationActionServer::centerSensor()
   {
-    if (position_ != HIGH_START || position_ != HIGH_CENTER)
+    if (position_ != HIGH_CENTER)
     {
       std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
       pitchTargetPosition.data = 0;
@@ -247,19 +248,19 @@ namespace pandora_control
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       position_ = HIGH_CENTER;
-      checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data);
+      setGoalState(
+        checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data));
     }
     else
     {
       ROS_DEBUG("%s: Succeeded", actionName_.c_str());
-      // set the action state to succeeded
       actionServer_.setSucceeded();
     }
   }
 
   void SensorOrientationActionServer::scan()
   {
-    ros::Rate rate(1/timeStep_);
+    ros::Rate rate(1.1);
     std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
 
     while (ros::ok())
@@ -267,19 +268,13 @@ namespace pandora_control
       if (actionServer_.isPreemptRequested() || !ros::ok())
       {
         ROS_DEBUG("%s: Preempted", actionName_.c_str());
-        // set the action state to preempted
         actionServer_.setPreempted();
         return;
       }
 
       switch (position_)
       {
-        case HIGH_START:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = 0;
-          position_ = LOW_START;
-          break;
-        case LOW_START:
+        case HIGH_CENTER:
           pitchTargetPosition.data = 0;
           yawTargetPosition.data = yawStep_;
           position_ = HIGH_LEFT;
@@ -290,34 +285,29 @@ namespace pandora_control
           position_ = LOW_LEFT;
           break;
         case LOW_LEFT:
-          pitchTargetPosition.data = 0;
-          yawTargetPosition.data = 0;
-          position_ = HIGH_CENTER;
-          break;
-        case HIGH_CENTER:
           pitchTargetPosition.data = pitchStep_;
           yawTargetPosition.data = 0;
           position_ = LOW_CENTER;
           break;
         case LOW_CENTER:
-          pitchTargetPosition.data = 0;
-          yawTargetPosition.data = -yawStep_;
-          position_ = HIGH_RIGHT;
-          break;
-        case HIGH_RIGHT:
           pitchTargetPosition.data = pitchStep_;
           yawTargetPosition.data = -yawStep_;
           position_ = LOW_RIGHT;
           break;
         case LOW_RIGHT:
           pitchTargetPosition.data = 0;
+          yawTargetPosition.data = -yawStep_;
+          position_ = HIGH_RIGHT;
+          break;
+        case HIGH_RIGHT:
+          pitchTargetPosition.data = 0;
           yawTargetPosition.data = 0;
-          position_ = HIGH_START;
+          position_ = HIGH_CENTER;
           break;
         case UNKNOWN:
           pitchTargetPosition.data = 0;
           yawTargetPosition.data = 0;
-          position_ = HIGH_START;
+          position_ = HIGH_CENTER;
           break;
       }
       sensorPitchPublisher_.publish(pitchTargetPosition);
@@ -413,7 +403,7 @@ namespace pandora_control
       rate.sleep();
     }
   }
-  void SensorOrientationActionServer::checkGoalCompletion(
+  int SensorOrientationActionServer::checkGoalCompletion(
     double pitchCommand, double yawCommand)
   {
     ros::Time begin = ros::Time::now();
@@ -453,22 +443,33 @@ namespace pandora_control
 
       if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
       {
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
-        // set the action state to succeeded
-        actionServer_.setAborted();
-        return;
+        return 1;
       }
       if (actionServer_.isPreemptRequested() || !ros::ok())
       {
-        ROS_DEBUG("%s: Preempted", actionName_.c_str());
-        // set the action state to preempted
-        actionServer_.setPreempted();
-        return;
+        return 2;
       }
     }
-    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
-    // set the action state to succeeded
-    actionServer_.setSucceeded();
+    return 0;
+  }
+
+  void SensorOrientationActionServer::setGoalState(int state)
+  {
+    switch (state)
+    {
+      case 0:
+        ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+        actionServer_.setSucceeded();
+        break;
+      case 1:
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        actionServer_.setAborted();
+        break;
+      case 2:
+        ROS_DEBUG("%s: Preempted", actionName_.c_str());
+        actionServer_.setPreempted();
+        break;
+    }
   }
 }  // namespace pandora_control
 

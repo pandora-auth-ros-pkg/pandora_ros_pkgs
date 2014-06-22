@@ -1,5 +1,5 @@
-min_elevation: 0.18797
-max_elevation: 0.36797
+min_elevation: 0.13797
+max_elevation: 0.31797
 movement_threshold: 0.005
 command_timeout: 15.0
 linear_command_topic: /linear_elevator_controller/command

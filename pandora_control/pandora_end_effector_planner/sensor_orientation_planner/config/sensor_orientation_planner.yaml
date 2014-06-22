@@ -10,7 +10,7 @@ move_kinect_action:
   max_yaw: 1
   time_step: 1
   command_timeout: 3.0
-  movement_threshold: 0.005
+  movement_threshold: 0.05
   pitch_command_topic: /kinect_pitch_controller/command
   yaw_command_topic: /kinect_yaw_controller/command
   pitch_joint_parent: linear_elevator_link
@@ -27,7 +27,7 @@ move_head_action:
   max_yaw: 1
   time_step: 1
   command_timeout: 3.0
-  movement_threshold: 0.005
+  movement_threshold: 0.05
   pitch_command_topic: /linear_head_pitch_controller/command
   yaw_command_topic: /linear_head_yaw_controller/command
   pitch_joint_parent: linear_head_base_link

@@ -49,15 +49,13 @@ namespace pandora_control
 {
   enum
   {
-    HIGH_START = 0,
-    LOW_START = 1,
-    HIGH_LEFT = 2,
-    LOW_LEFT = 3,
-    HIGH_CENTER = 4,
-    LOW_CENTER = 5,
-    HIGH_RIGHT = 6,
-    LOW_RIGHT = 7,
-    UNKNOWN = 8
+    HIGH_CENTER = 0,
+    HIGH_LEFT = 1,
+    LOW_LEFT = 2,
+    LOW_CENTER = 3,
+    LOW_RIGHT = 4,
+    HIGH_RIGHT = 5,
+    UNKNOWN = 6
   };
 
   class SensorOrientationActionServer
@@ -99,8 +97,8 @@ namespace pandora_control
       void centerSensor();
       void scan();
       void pointSensor(std::string pointOfInterest);
-      void checkGoalCompletion(double pitchCommand, double yawCommand);
-
+      int checkGoalCompletion(double pitchCommand, double yawCommand);
+      void setGoalState(int state);
     public:
       SensorOrientationActionServer(
         std::string name,
