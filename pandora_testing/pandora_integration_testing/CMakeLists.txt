@@ -31,5 +31,5 @@ catkin_package(
 
 ########################  Integration Tests  ########################
 
-add_rostest(launch/data_fusion_agent_test.launch)
+#add_rostest(launch/data_fusion_agent_test.launch)
 

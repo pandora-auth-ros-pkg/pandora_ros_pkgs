@@ -325,6 +325,8 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertTrue(self.mockEndEffectorPlanner.moves_end_effector)
         self.assertEqual(self.mockEndEffectorPlanner.command, MoveEndEffectorGoal.SCAN)
         self.assertTrue(self.mockNavigation.entered_exploration)
+        
+        rospy.signal_shutdown("[TestBase.disconnect] Disconnecting and terminating.")
 
 if __name__ == '__main__':
 
