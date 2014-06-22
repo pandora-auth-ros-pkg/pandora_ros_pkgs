@@ -17,7 +17,8 @@ class StateIndicator:
     def __init__(self):
         rospy.Subscriber('/sensors/battery', BatteryMsg, self.butterfly_callback)
         rospy.Subscriber('/robot/state/clients', robotModeMsg, self.state_callback)
-        self.ser = serial.Serial("/dev/ttyS3", 38400)
+        self.ser = serial.Serial("/dev/state_indicator", 38400)
+
         
     def butterfly_callback(self, msg):
         
