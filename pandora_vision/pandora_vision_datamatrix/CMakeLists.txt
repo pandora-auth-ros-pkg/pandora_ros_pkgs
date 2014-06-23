@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
     image_transport
     sensor_msgs
     roslint
+    urdf
 )
 
 message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -30,6 +31,7 @@ catkin_package(
       image_transport
       sensor_msgs
       roslint
+      urdf
     INCLUDE_DIRS
       include
     LIBRARIES 

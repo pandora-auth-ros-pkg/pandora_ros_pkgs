@@ -64,6 +64,8 @@
 #include <sensor_msgs/image_encodings.h>
 #include "state_manager/state_client.h"
 #include "vision_communications/HazmatAlertsVectorMsg.h"
+#include <urdf_parser/urdf_parser.h>
+#include <map>
 
 //the maximum number of keypoint NN candidates to check during BBF search
 #define KDTREE_BBF_MAX_NN_CHKS 200

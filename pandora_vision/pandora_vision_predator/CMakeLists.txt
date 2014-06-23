@@ -12,6 +12,7 @@ roscpp
 image_transport
 sensor_msgs
 roslint
+urdf
 )
 
 
@@ -37,6 +38,7 @@ catkin_package(
  pandora_common_msgs
  sensor_msgs
  roslint
+ urdf
  DEPENDS system_lib
 )
 

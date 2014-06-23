@@ -73,6 +73,10 @@ namespace pandora_vision
       std::string packagePath_;
       std::string imageTopic;
       std::string cameraName;
+      
+         
+      std::string _parent_frame_id; 
+      std::string _frame_id;
           
       //publisher
       ros::Publisher hazmatPublisher_;
@@ -104,7 +108,7 @@ namespace pandora_vision
         @brief Method called only when a new image message is present
         @return void
       **/
-      void hazmatDetect(std::string frame_id);
+      void hazmatDetect();
       
       /**
         @brief Callback for a new image
@@ -122,6 +126,14 @@ namespace pandora_vision
       void parametersCallback(
         const pandora_vision_hazmat::hazmat_cfgConfig& config,
         const uint32_t& level);
+      
+      /**
+        @brief Function that retrieves the parent to the frame_id
+        @return bool Returns true is frame_id found or false if not 
+      */ 
+      bool getParentFrameId();
+        
+      std::map<std::string, std::string> _frame_ids_map;  
     public:
           
       /**

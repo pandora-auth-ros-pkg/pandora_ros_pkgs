@@ -55,10 +55,19 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <urdf_parser/urdf_parser.h>
+#include <map>
 
-//!< Default frame height
+//!< Horizontal field of view in degrees
+#define HFOV 61.14  
+
+//!< vertical field of view in degrees 
+#define VFOV 48
+
+//!< default frame height
 #define DEFAULT_HEIGHT 480
-//!< Default frame width
+
+//!< default frame width
 #define DEFAULT_WIDTH 640
 
 namespace pandora_vision
@@ -71,6 +80,12 @@ namespace pandora_vision
       /// Instance of class MotionDetector
       MotionDetector _motionDetector;
       
+      /// Horizontal Field Of View (rad)
+      double hfov;
+
+      /// Vertical Field Of View (rad)
+      double vfov;
+      
       /// Frame width
       int frameWidth; 
       /// Frame height
@@ -82,7 +97,9 @@ namespace pandora_vision
 
       std::string imageTopic;
       std::string cameraName;
-      std::string cameraFrameId;
+      
+      std::string _parent_frame_id; 
+      std::string _frame_id;
       
       /// Publishers for MotionDetector result messages
       ros::Publisher _motionPublisher;
@@ -123,7 +140,22 @@ namespace pandora_vision
       void parametersCallback(
         const pandora_vision_motion::motion_cfgConfig& config,
         const uint32_t& level);
-         
+      
+      /**
+        @brief Get parameters referring to view and frame characteristics from
+        launch file
+        @return void
+      */
+      void getGeneralParams();
+      
+      /**
+        @brief Function that retrieves the parent to the frame_id
+        @return bool Returns true is frame_id found or false if not 
+      */ 
+      bool getParentFrameId();
+      
+      std::map<std::string, std::string> _frame_ids_map;
+           
     public:
           
       /**
@@ -135,13 +167,6 @@ namespace pandora_vision
         @brief Destructor
       */
       ~MotionDetection();
-      
-       /**
-        @brief Get parameters referring to view and frame characteristics from
-        launch file
-        @return void
-      */
-      void getGeneralParams();
       
       /**
         @brief Node's state manager

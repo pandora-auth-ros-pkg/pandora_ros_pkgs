@@ -52,6 +52,8 @@
 #include "state_manager/state_client.h"
 #include "vision_communications/LandoltcAlertsVectorMsg.h"
 #include "pandora_vision_landoltc/landoltc_detector.h"
+#include <urdf_parser/urdf_parser.h>
+#include <map>
 
 //!< default frame height
 #define DEFAULT_HEIGHT 480
@@ -107,7 +109,9 @@ private:
   double vfov;
   
   std::string cameraName;
-  std::string cameraFrameId;
+  
+  std::string _frame_id;
+  std::string _parent_frame_id;
 
   //!< The topic subscribed to for the front camera
   std::string imageTopic;
@@ -150,6 +154,14 @@ private:
   const pandora_vision_landoltc::landoltc_cfgConfig& config,
   const uint32_t& level);
   
+  /**
+    @brief Function that retrieves the parent to the frame_id
+    @return bool Returns true is frame_id found or false if not 
+  */ 
+  bool getParentFrameId();
+  
+  std::map<std::string, std::string> _frame_ids_map;
+      
 public:
 
   /**

@@ -45,6 +45,9 @@ namespace pandora_vision
   **/
   HazmatDetection::HazmatDetection(const std::string& ns) :_nh(ns)
   {
+    //!< Set initial value of parent frame id to null
+    _parent_frame_id = "";
+    _frame_id = "";
     
     //!< The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&HazmatDetection::parametersCallback,
@@ -153,9 +156,7 @@ namespace pandora_vision
     
     //! Get the Height parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_height", frameHeight_)) 
-    {
       ROS_DEBUG_STREAM("height : " << frameHeight_);
-    }
     else 
     {
       ROS_DEBUG("[Hazmat_node]: : Parameter frameHeight not found. Using Default");
@@ -164,9 +165,7 @@ namespace pandora_vision
     
     //! Get the Width parameter if available;
     if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth_)) 
-    {
       ROS_DEBUG_STREAM("width : " << frameWidth_);
-    }
     else 
     {
       ROS_DEBUG("[Hazmat_node]: : Parameter frameWidth not found. Using Default");
@@ -174,9 +173,7 @@ namespace pandora_vision
     }
     //!< Get the HFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/hfov", hfov_)) 
-    {
       ROS_DEBUG_STREAM("HFOV : " << hfov_);
-    }
     else 
     {
       hfov_ = HFOV;
@@ -185,16 +182,50 @@ namespace pandora_vision
     
     //!< Get the VFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/vfov", vfov_)) 
-    {
       ROS_DEBUG_STREAM("VFOV : " << vfov_);
-    }
     else 
     {
       vfov_ = VFOV;
       ROS_DEBUG_STREAM("VFOV : " << vfov_);
     }
   }
+  
+  /**
+  @brief Function that retrieves the parent to the frame_id.
+  @param void
+  @return bool Returns true is frame_id found or false if not
+  **/
+  bool HazmatDetection::getParentFrameId()
+  {
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = _nh.hasParam(model_param_name);
 
+    std::string robot_description = "";
+
+    if(!res || !_nh.getParam(model_param_name, robot_description))
+    {
+      ROS_ERROR("[QrCode_node]:Robot description couldn't be retrieved from the parameter server.");
+      return false;
+    }
+  
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_description));
+
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
+    if(currentLink){
+      boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
+      // Set the parent frame_id to the parent of the frame_id
+      _parent_frame_id = parentLink->name;
+      return true;
+    }
+    else
+      _parent_frame_id = _frame_id;
+      
+    return false;
+  }
+  
   /**
   @brief Callback for a new image
   @param msg [const sensor_msgs::Image&] The new image
@@ -207,20 +238,38 @@ namespace pandora_vision
     cv::Mat temp = in_msg->image.clone();
     hazmatFrame_ = new IplImage(temp);
     hazmatFrameTimestamp_ = msg.header.stamp;
-    std::string frame_id = msg.header.frame_id;
+    _frame_id = msg.header.frame_id;
+    
+     if(_frame_id.c_str()[0] == '/')
+      _frame_id = _frame_id.substr(1);
+      
     if ( hazmatFrame_.empty() )
     {               
       ROS_ERROR("[hazmatNode] : No more Frames");
       return;
     }
-    hazmatDetect(frame_id);
+    
+     std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
+      
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+      bool _indicator = getParentFrameId();
+      
+      _frame_ids_map.insert( it , std::pair<std::string, std::string>(
+         _frame_id, _parent_frame_id));
+      
+       for (it = _frame_ids_map.begin(); it != _frame_ids_map.end(); ++it)
+          ROS_DEBUG_STREAM("" << it->first << " => " << it->second );
+    } 
+    
+    
+    hazmatDetect();
   }
 
   /**
   @brief Method called only when a new image message is present
   @return void
   **/
-  void HazmatDetection::hazmatDetect(std::string frame_id)
+  void HazmatDetection::hazmatDetect()
   {
     cv::Mat allblack = cv::Mat( frameWidth_, frameHeight_, CV_8U );
     if(!hazmatNowOn_)
@@ -243,7 +292,7 @@ namespace pandora_vision
     //if hazmat found
     if (a.size() > 0)
     {
-      hazmatVectorMsg.header.frame_id = frame_id;
+      hazmatVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
       hazmatVectorMsg.header.stamp = hazmatFrameTimestamp_;
       for (unsigned int i = 0; i < a.size() ; i++)
       {

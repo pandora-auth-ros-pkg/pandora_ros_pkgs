@@ -51,7 +51,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 namespace pandora_vision 
 {

@@ -8,7 +8,7 @@
     <arg name="topic_name" value="camera_left/image"/>
     <arg name="frame_id" value="camera_left_link"/>
   </include>
-  
+
   <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
     <arg name="camID" value="/dev/video0"/>
     <arg name="name" value="camera_right"/>
@@ -16,12 +16,18 @@
     <arg name="frame_id" value="camera_right_link"/>
   </include>
   
-  <include file="$(find openni2_launch)/launch/openni2.launch" >
+  <include file="$(find openni_launch)/launch/openni.launch" >
     <arg name="camera" value="kinect" />
+    <arg name="publish_tf" value="false" />
+    <arg name="depth_registration" value="true" />
   </include>
-  <param name="kinect/topic_name" value="kinect/rgb/image_raw"/>
+  
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
   
   <include file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
+  
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
   
 </launch>
 

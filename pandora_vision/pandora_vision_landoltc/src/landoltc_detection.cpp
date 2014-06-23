@@ -48,6 +48,10 @@ namespace pandora_vision
 
 LandoltCDetection::LandoltCDetection(const std::string& ns) : _nh(ns), landoltcNowON(true)
 {
+  //!< Set initial value of parent frame id to null
+  _parent_frame_id = "";
+  _frame_id = "";
+    
   getGeneralParams();
 
   //!< Convert field of view from degrees to rads
@@ -124,9 +128,7 @@ void LandoltCDetection::getGeneralParams()
 
   //!< Get the camera to be used by landoltc node;
   if (_nh.getParam("camera_name", cameraName))
-  {
     ROS_DEBUG_STREAM("camera_name : " << cameraName);
-  }
   else
   {
     ROS_FATAL("[landoltc_node] : Camera name not found");
@@ -135,9 +137,7 @@ void LandoltCDetection::getGeneralParams()
 
   //!< Get the Height parameter if available;
   if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
-  {
     ROS_DEBUG_STREAM("height : " << frameHeight);
-  }
   else
   {
     ROS_DEBUG("[landoltc_node] : Parameter frameHeight not found. Using Default");
@@ -146,9 +146,7 @@ void LandoltCDetection::getGeneralParams()
 
   //!< Get the Width parameter if available;
   if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth))
-  {
     ROS_DEBUG_STREAM("width : " << frameWidth);
-  }
   else
   {
     ROS_DEBUG("[landoltc_node] : Parameter frameWidth not found. Using Default");
@@ -157,9 +155,7 @@ void LandoltCDetection::getGeneralParams()
 
   //!< Get the HFOV parameter if available;
   if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
-  {
     ROS_DEBUG_STREAM("HFOV : " << hfov);
-  }
   else 
   {
     hfov = HFOV;
@@ -168,9 +164,7 @@ void LandoltCDetection::getGeneralParams()
   
   //!< Get the VFOV parameter if available;
   if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
-  {
     ROS_DEBUG_STREAM("VFOV : " << vfov);
-  }
   else 
   {
     vfov = VFOV;
@@ -178,30 +172,52 @@ void LandoltCDetection::getGeneralParams()
   }
     
   //!< Get the listener's topic;
-  if (_nh.hasParam("/" + cameraName + "/topic_name"))
-  {
-    _nh.getParam("/" + cameraName + "/topic_name", imageTopic);
+  if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
     ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
-  }
   else
   {
     ROS_DEBUG("[landoltc_node] : Parameter imageTopic not found. Using Default");
     imageTopic = "/kinect/rgb/image_raw";
   }
 
-  //!< Get the images's frame_id;
-  if (_nh.hasParam("/" + cameraName + "/camera_frame_id"))
-  {
-    _nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId);
-    ROS_DEBUG_STREAM("camera_frame_id : " << cameraFrameId);
-  }
-  else
-  {
-    ROS_DEBUG("[landoltc_node] : Parameter camera_frame_id not found. Using Default");
-    cameraFrameId = "/camera";
-  }
 }
 
+/**
+  @brief Function that retrieves the parent to the frame_id.
+  @param void
+  @return bool Returns true is frame_id found or false if not
+  **/
+  bool LandoltCDetection::getParentFrameId()
+  {
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = _nh.hasParam(model_param_name);
+
+    std::string robot_description = "";
+
+    if(!res || !_nh.getParam(model_param_name, robot_description))
+    {
+      ROS_ERROR("[Motion_node]:Robot description couldn't be retrieved from the parameter server.");
+      return false;
+    }
+  
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_description));
+
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
+    if(currentLink){
+      boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
+      // Set the parent frame_id to the parent of the frame_id
+      _parent_frame_id = parentLink->name;
+      return true;
+    }
+    else
+      _parent_frame_id = _frame_id;
+      
+    return false;
+  }
+  
 /**
 @brief Callback for the RGB Image
 @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image
@@ -214,12 +230,26 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
+  
+  _frame_id = msg->header.frame_id;
+    
+  if(_frame_id.c_str()[0] == '/')
+    _frame_id = _frame_id.substr(1);
+      
   if ( landoltCFrame.empty() )
   {
     ROS_ERROR("[landoltc_node] : No more Frames");
     return;
   }
-
+  
+  std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
+    
+  if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+    bool _indicator = getParentFrameId();
+    
+    _frame_ids_map.insert( it , std::pair<std::string, std::string>(
+       _frame_id, _parent_frame_id));
+  } 
   landoltcCallback();
 
 }
@@ -249,7 +279,7 @@ void LandoltCDetection::landoltcCallback()
   
   bool noAngle = true;
 
-  landoltcVectorMsg.header.frame_id = cameraFrameId;
+  landoltcVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
   landoltcVectorMsg.header.stamp = ros::Time::now();
   
   for(int i = 0; i < _landoltc.size(); i++){
@@ -269,10 +299,10 @@ void LandoltCDetection::landoltcCallback()
         noAngle = false;
   }
   
-  if(noAngle == true && _landoltc.size() > 0)
+  if(noAngle == true && _landoltc.size() > 0){
     _landoltcPublisher.publish(landoltcVectorMsg);
-   
-  
+    ROS_INFO_STREAM("[landoltc_node] : Landoltc found");
+  }
   _landoltcDetector.clear();
 }
 

@@ -51,12 +51,14 @@
 #include <std_srvs/Empty.h>
 #include "vision_communications/QRAlertsVectorMsg.h"
 #include "pandora_vision_qrcode/qrCode_detector.h"
+#include <urdf_parser/urdf_parser.h>
+#include <map>
 
 //!< Horizontal field of view in degrees
 #define HFOV 61.14  
 
 //!< vertical field of view in degrees 
-#define VFOV 48     
+#define VFOV 48
 
 //!< default frame height
 #define DEFAULT_HEIGHT 480
@@ -90,6 +92,9 @@ namespace pandora_vision {
       std::string cameraName;
       
       std::string imageTopic;
+      
+      std::string _parent_frame_id; 
+      std::string _frame_id;
       
       //!< Frame processed by QrCodeDetector
       cv::Mat qrcodeFrame;
@@ -148,16 +153,21 @@ namespace pandora_vision {
        * qrcodes in a given frame
        * @return void
        */
-      void qrDetect(std::string frame_Id);
+      void qrDetect();
 
       /**
-       * Function called when new ROS message appears, for front camera
+       * @brief Function called when new ROS message appears, for front camera
        * @param msg [const sensor_msgs::Image&] The message
        * @return void
        */
       void imageCallback(const sensor_msgs::Image& msg);
-
-   
+      
+      /**
+       *@brief Function that retrieves the parent to the frame_id
+       *@return bool Returns true is frame_id found or false if not 
+      */ 
+      bool getParentFrameId();
+       
       //!< Current state of robot
       int curState;
 
@@ -165,7 +175,9 @@ namespace pandora_vision {
       int prevState;
       
       std::string param;
-
+      
+      std::map<std::string, std::string> _frame_ids_map;
+      
     public:
 
       //!< The Constructor

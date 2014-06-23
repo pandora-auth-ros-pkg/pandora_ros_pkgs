@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     dynamic_reconfigure
     roslint
+    urdf
 )
 
 generate_dynamic_reconfigure_options(
@@ -34,6 +35,7 @@ catkin_package(
       sensor_msgs
       dynamic_reconfigure
       roslint
+      urdf
     INCLUDE_DIRS
       include
     LIBRARIES 

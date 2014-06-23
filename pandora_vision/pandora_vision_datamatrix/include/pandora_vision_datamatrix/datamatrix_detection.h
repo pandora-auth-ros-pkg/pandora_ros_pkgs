@@ -36,6 +36,8 @@
 *********************************************************************/
 
 #include <iostream>
+#include <urdf_parser/urdf_parser.h>
+#include <map>
 #include <opencv2/core/core.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -128,6 +130,9 @@ namespace pandora_vision
     //!< Variable used for State Managing
     bool datamatrixNowON;
     
+    std::string _parent_frame_id; 
+    std::string _frame_id;
+      
     /**
      * @brief Get parameters referring to view and frame 
      * characteristics from launch file
@@ -140,7 +145,7 @@ namespace pandora_vision
      * all present datamatrixes in a given frame
      * @return void
     */
-    void datamatrixDetect(std::string frame_id);
+    void datamatrixDetect();
           
      /**
       @brief Callback for the RGB Image
@@ -154,7 +159,15 @@ namespace pandora_vision
 
     //!< Previous state of robot
     int prevState;
-        
+    
+    std::map<std::string, std::string> _frame_ids_map;
+    
+    /**
+      @brief Function that retrieves the parent to the frame_id
+      @return bool Returns true is frame_id found or false if not 
+    */ 
+    bool getParentFrameId();
+       
     public:
     
     /**

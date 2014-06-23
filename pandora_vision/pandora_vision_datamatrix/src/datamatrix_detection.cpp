@@ -44,6 +44,9 @@ namespace pandora_vision
   **/
   DatamatrixDetection::DatamatrixDetection(const std::string& ns) : _nh(ns), datamatrixNowON(false)
   {
+    //!< Set initial value of parent frame id to null
+    _parent_frame_id = "";
+    _frame_id = "";
     
     //!< Get General Parameters, such as frame width & height , camera id
     getGeneralParams();
@@ -138,9 +141,7 @@ namespace pandora_vision
     
     //!< Get the Height parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
-    {
       ROS_DEBUG_STREAM("height : " << frameHeight);
-    }
     else
     {
       ROS_DEBUG("[Datamatrix_node] : Parameter frameHeight not found. Using Default");
@@ -149,9 +150,7 @@ namespace pandora_vision
 
     //!< Get the Width parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_width", frameWidth))
-    {
       ROS_DEBUG_STREAM("width : " << frameWidth);
-    }
     else
     {
       ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
@@ -160,9 +159,7 @@ namespace pandora_vision
     
     //!< Get the HFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/hfov", hfov))
-    {
       ROS_DEBUG_STREAM("HFOV : " << hfov);
-    }
     else
     {
       ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
@@ -171,14 +168,48 @@ namespace pandora_vision
 
     //!< Get the VFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/vfov", vfov))
-    {
       ROS_DEBUG_STREAM("VFOV : " << vfov);
-    }
     else
     {
       ROS_DEBUG("[Datamatrix_node] : Parameter frameWidth not found. Using Default");
       vfov = VFOV;
     }
+  }
+  
+    /**
+  @brief Function that retrieves the parent to the frame_id.
+  @param void
+  @return bool Returns true is frame_id found or false if not
+  **/
+  bool DatamatrixDetection::getParentFrameId()
+  {
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = _nh.hasParam(model_param_name);
+
+    std::string robot_description = "";
+
+    if(!res || !_nh.getParam(model_param_name, robot_description))
+    {
+      ROS_ERROR("[Datamatrix_node]:Robot description couldn't be retrieved from the parameter server.");
+      return false;
+    }
+  
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_description));
+
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
+    if(currentLink){
+      boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
+      // Set the parent frame_id to the parent of the frame_id
+      _parent_frame_id = parentLink->name;
+      return true;
+    }
+    else
+      _parent_frame_id = _frame_id;
+      
+    return false;
   }
   
   /**
@@ -193,25 +224,38 @@ namespace pandora_vision
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     datamatrixFrame = in_msg->image.clone();
     datamatrixFrameTimestamp = msg.header.stamp;
-    std::string frame_id = msg.header.frame_id;
+    _frame_id = msg.header.frame_id;
+    
+    if(_frame_id.c_str()[0] == '/')
+      _frame_id = _frame_id.substr(1);
+      
     if (!datamatrixFrame.data)
     {
-      ROS_ERROR("[Datamatrix_node] : \
-          No more Frames!");
+      ROS_ERROR("[Datamatrix_node] : No more Frames!");
       return;
     }
-
-    datamatrixDetect(frame_id);
+    
+    std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
+      
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+      bool _indicator = getParentFrameId();
+      
+      _frame_ids_map.insert( it , std::pair<std::string, std::string>(
+         _frame_id, _parent_frame_id));
+      
+       for (it =_frame_ids_map.begin(); it !=_frame_ids_map.end(); ++it)
+          ROS_DEBUG_STREAM("" << it->first << " => " << it->second );
+    } 
+    
+    datamatrixDetect();
   }
-  
-  
   
   /**
    * @brief This method uses a DatamatrixDetector instance to detect 
    * all present datamatrixes in a given frame
    * @return void
   */
-  void DatamatrixDetection::datamatrixDetect(std::string frame_id)
+  void DatamatrixDetection::datamatrixDetect()
   {
     if(!datamatrixNowON)
     {
@@ -220,7 +264,7 @@ namespace pandora_vision
     //!< Create message of DatamatrixCode Detector
     vision_communications::DataMatrixAlertsVectorMsg datamatrixcodeVectorMsg;
     vision_communications::DataMatrixAlertMsg datamatrixcodeMsg;
-    datamatrixcodeVectorMsg.header.frame_id = frame_id;
+    datamatrixcodeVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
     datamatrixcodeVectorMsg.header.stamp = ros::Time::now();
 
     _datamatrixDetector.detect_datamatrix(datamatrixFrame);

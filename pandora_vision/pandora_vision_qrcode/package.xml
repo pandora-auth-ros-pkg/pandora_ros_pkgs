@@ -24,6 +24,7 @@
   <build_depend>state_manager_communications</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>roslint</build_depend>
+  <build_depend>urdf</build_depend>
   
   <run_depend>roscpp</run_depend>
   <run_depend>zbar</run_depend>
@@ -34,6 +35,7 @@
   <run_depend>state_manager_communications</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roslint</run_depend>
+  <run_depend>urdf</run_depend>
 
   <export>
   </export>

@@ -14,27 +14,26 @@
     <arg name="frame_id" value="camera_right_link"/>
   </include>
       
-  <include file="$(find openni2_launch)/launch/openni2.launch" >
+   <include file="$(find openni_launch)/launch/openni.launch" >
     <arg name="camera" value="kinect" />
+    <arg name="publish_tf" value="false" />
+    <arg name="depth_registration" value="true" />
   </include>
-  <param name="kinect/topic_name" value="kinect/rgb/image_raw"/>
+  
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
   
   <group ns="vision">
       
     <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
     <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
     <include file="$(find pandora_vision_landoltc)/launch/landoltc_node.launch" />
-<!--
     <include file="$(find pandora_vision_motion)/launch/motion_node_standalone.launch" />
--->
-<!--
-    <include file="$(find pandora_vision_face)/launch/face_node.launch" />
--->
     <include file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
-<!--
     <include file="$(find pandora_vision_landoltc)/launch/predator-landoltc3d.launch" />
+<!--
+    <include file="$(find pandora_vision_predator)/launch/predator_node.launch" />
 -->
-  
+    
   </group>
   
 </launch>

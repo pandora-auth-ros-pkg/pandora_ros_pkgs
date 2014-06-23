@@ -44,6 +44,10 @@ namespace pandora_vision
    **/
   QrCodeDetection::QrCodeDetection(const std::string& ns) : _nh(ns), qrcodeNowON(false)
   {
+    //!< Set initial value of parent frame id to null
+    _parent_frame_id = "";
+    _frame_id = "";
+    
     //!< Get Motion Detector Parameters
     getQrCodeParams();
 
@@ -104,12 +108,9 @@ namespace pandora_vision
       ROS_BREAK();
     }
   
-    
     //!< Get the debugQrCode parameter if available;
     if (_nh.getParam("debugQrCode", debugQrCode))
-    {
       ROS_DEBUG_STREAM("debugQrCode : " << debugQrCode);
-    }
     else
     {
       debugQrCode = false;
@@ -125,9 +126,7 @@ namespace pandora_vision
           image_transport::ImageTransport(_nh).advertise(param, 1);
       }
       else
-      {
         ROS_WARN("Cannot find qrcode debug show topic");
-      }    
     }
              
     XmlRpc::XmlRpcValue cameras_list;
@@ -141,9 +140,7 @@ namespace pandora_vision
         
         //!< Get the listener's topic for camera
         if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
-        {
           ROS_INFO_STREAM("[QrCode_node]: imageTopic for camera : " << imageTopic);
-        }
         else
         {
          ROS_FATAL("[QrCode_node]: Image topic name not found");
@@ -158,12 +155,9 @@ namespace pandora_vision
       ROS_BREAK(); 
     }
 
-    
     //!< Get the Height parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
-    {
       ROS_DEBUG_STREAM("height : " << frameHeight);
-    }
     else
     {
       frameHeight = DEFAULT_HEIGHT;
@@ -172,9 +166,7 @@ namespace pandora_vision
     
     //!< Get the Width parameter if available;
     if (_nh.hasParam("/" + cameraName + "/image_width"))
-    {
       ROS_DEBUG_STREAM("width : " << frameWidth);
-    }
     else
     {
       frameWidth = DEFAULT_WIDTH;
@@ -183,9 +175,7 @@ namespace pandora_vision
         
     //!< Get the HFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
-    {
       ROS_DEBUG_STREAM("HFOV : " << hfov);
-    }
     else 
     {
       hfov = HFOV;
@@ -194,9 +184,7 @@ namespace pandora_vision
     
     //!< Get the VFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
-    {
       ROS_DEBUG_STREAM("VFOV : " << vfov);
-    }
     else 
     {
       vfov = VFOV;
@@ -204,8 +192,6 @@ namespace pandora_vision
     }
 
   }
-
-
 
   /**
    * @brief Get parameters referring to Qrcode detection algorithm
@@ -238,9 +224,43 @@ namespace pandora_vision
       _qrcodeDetector.gaussiansharpenweight = 0.8;
     }
   }
+  
+  /**
+  @brief Function that retrieves the parent to the frame_id.
+  @param void
+  @return bool Returns true is frame_id found or false if not
+  **/
+  bool QrCodeDetection::getParentFrameId()
+  {
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = _nh.hasParam(model_param_name);
 
+    std::string robot_description = "";
 
+    if(!res || !_nh.getParam(model_param_name, robot_description))
+    {
+      ROS_ERROR("[QrCode_node]:Robot description couldn't be retrieved from the parameter server.");
+      return false;
+    }
+  
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_description));
 
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
+    if(currentLink){
+      boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
+      // Set the parent frame_id to the parent of the frame_id
+      _parent_frame_id = parentLink->name;
+      return true;
+    }
+    else
+      _parent_frame_id = _frame_id;
+      
+    return false;
+  }
+  
   /**
    * @brief Function called when new ROS message appears, for front camera
    * @param msg [const sensor_msgs::Imager&] The message
@@ -252,20 +272,34 @@ namespace pandora_vision
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     qrcodeFrame = in_msg->image.clone();
     qrcodeFrameTimestamp = msg.header.stamp;
-    std::string frame_id = msg.header.frame_id;
-
+    _frame_id = msg.header.frame_id;
+    
+    if(_frame_id.c_str()[0] == '/')
+      _frame_id = _frame_id.substr(1);
+    
     if (qrcodeFrame.empty())
     {
       ROS_ERROR("[QrCode_node] : No more Frames");
       ros::shutdown();
       return;
     }
-
+    
     if(!qrcodeNowON)
-    {
       return;
-    }
-    qrDetect(frame_id);
+    
+    std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
+      
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+      bool _indicator = getParentFrameId();
+      
+      _frame_ids_map.insert( it , std::pair<std::string, std::string>(
+         _frame_id, _parent_frame_id));
+      
+       for (it = _frame_ids_map.begin(); it != _frame_ids_map.end(); ++it)
+          ROS_DEBUG_STREAM("" << it->first << " => " << it->second );
+    } 
+    
+    qrDetect();
   }
 
 
@@ -274,16 +308,16 @@ namespace pandora_vision
    * qrcodes in a given frame
    * @return void
    */
-  void QrCodeDetection::qrDetect(std::string frame_id)
+  void QrCodeDetection::qrDetect()
   {
-
+    
     //!< Create message of QrCode Detector
     vision_communications::QRAlertsVectorMsg qrcodeVectorMsg;
     vision_communications::QRAlertMsg qrcodeMsg;
  
     //!< Qrcode message 
     //!< do detection and examine result cases
-    qrcodeVectorMsg.header.frame_id = frame_id;
+    qrcodeVectorMsg.header.frame_id =  _frame_ids_map.find(_frame_id)->second;
     qrcodeVectorMsg.header.stamp = ros::Time::now();
 
     _qrcodeDetector.detect_qrcode(qrcodeFrame);

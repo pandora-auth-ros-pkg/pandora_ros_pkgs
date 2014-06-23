@@ -43,7 +43,11 @@ namespace pandora_vision
   **/
   MotionDetection::MotionDetection(const std::string& ns) : _nh(ns)
   {
-  
+    
+    //!< Set initial value of parent frame id to null
+    _parent_frame_id = "";
+    _frame_id = "";
+    
     //!< Get General Parameters, such as frame width & height , camera id
     getGeneralParams();
    
@@ -99,9 +103,7 @@ namespace pandora_vision
        
     //!< Get the camera to be used by motion node;
     if (_nh.getParam("camera_name", cameraName)) 
-    {
       ROS_DEBUG_STREAM("camera_name : " << cameraName);
-    }
     else 
     {
       ROS_FATAL("[Motion_node]: Camera name not found");
@@ -110,9 +112,7 @@ namespace pandora_vision
 
     //! Get the Height parameter if available;
     if (_nh.getParam("/" + cameraName + "/image_height", frameHeight)) 
-    {
       ROS_DEBUG_STREAM("height : " << frameHeight);
-    }
     else 
     {
       ROS_DEBUG("[motion_node] : Parameter frameHeight not found. Using Default");
@@ -121,9 +121,7 @@ namespace pandora_vision
     
     //! Get the Width parameter if available;
     if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth)) 
-    {
       ROS_DEBUG_STREAM("width : " << frameWidth);
-    }
     else 
     {
       ROS_DEBUG("[motion_node] : Parameter frameWidth not found. Using Default");
@@ -132,27 +130,68 @@ namespace pandora_vision
     
     //! Get the images's topic;
     if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic)) 
-    {
       ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
-    }
     else 
     {
       ROS_FATAL("Camera name not found");
       ROS_BREAK();
     }
-
-    //! Get the images's frame_id;
-    if (_nh.getParam("/" + cameraName + "/camera_frame_id", cameraFrameId)) 
-    {
-      ROS_DEBUG_STREAM("[Motion_node]: camera_frame_id : " << cameraFrameId);
-    }
+    
+      //!< Get the HFOV parameter if available;
+    if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
+      ROS_DEBUG_STREAM("HFOV : " << hfov);
     else 
     {
-     ROS_FATAL("[Motion_node]: Camera name not found");
-     ROS_BREAK();
+      hfov = HFOV;
+      ROS_DEBUG_STREAM("HFOV : " << hfov);
     }
+    
+    //!< Get the VFOV parameter if available;
+    if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
+      ROS_DEBUG_STREAM("VFOV : " << vfov);
+    else 
+    {
+      vfov = VFOV;
+      ROS_DEBUG_STREAM("VFOV : " << vfov);
+    }  
   }
+  
+  /**
+  @brief Function that retrieves the parent to the frame_id.
+  @param void
+  @return bool Returns true is frame_id found or false if not
+  **/
+  bool MotionDetection::getParentFrameId()
+  {
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = _nh.hasParam(model_param_name);
 
+    std::string robot_description = "";
+
+    if(!res || !_nh.getParam(model_param_name, robot_description))
+    {
+      ROS_ERROR("[Motion_node]:Robot description couldn't be retrieved from the parameter server.");
+      return false;
+    }
+  
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_description));
+
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
+    if(currentLink){
+      boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
+      // Set the parent frame_id to the parent of the frame_id
+      _parent_frame_id = parentLink->name;
+      return true;
+    }
+    else
+      _parent_frame_id = _frame_id;
+      
+    return false;
+  }
+  
   /**
    @brief Function called when new ROS message appears, for front camera
    @param msg [const sensor_msgs::Image&] The message
@@ -164,12 +203,26 @@ namespace pandora_vision
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     motionFrame = in_msg->image.clone();
     motionFrameTimestamp = msg.header.stamp;
-
+    _frame_id = msg.header.frame_id;
+    
+    if(_frame_id.c_str()[0] == '/')
+      _frame_id = _frame_id.substr(1);
+      
+    
     if ( motionFrame.empty() )
     {               
       ROS_ERROR("[motion_node] : No more Frames or something went wrong with bag file");
       return;
     }
+    
+    std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
+      
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+      bool _indicator = getParentFrameId();
+      
+      _frame_ids_map.insert( it , std::pair<std::string, std::string>(
+         _frame_id, _parent_frame_id));
+    } 
     
     motionCallback();
   }
@@ -206,9 +259,9 @@ namespace pandora_vision
     }
     if(motionMessage.probability > 0.1)
     {
-      motionMessage.header.frame_id = cameraFrameId;
+      motionMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
       motionMessage.header.stamp = ros::Time::now();
-      ROS_INFO_STREAM( "[Motion_node] :Motion found with probability: "<< motionMessage.probability);
+      ROS_DEBUG_STREAM( "[Motion_node] :Motion found with probability: "<< motionMessage.probability);
       _motionPublisher.publish(motionMessage);
     }
   }
