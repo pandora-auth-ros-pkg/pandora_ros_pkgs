@@ -27,7 +27,7 @@
     <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
     <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
     <include file="$(find pandora_vision_landoltc)/launch/landoltc_node.launch" />
-    <include file="$(find pandora_vision_motion)/launch/motion_node_standalone.launch" />
+    <include file="$(find pandora_vision_motion)/launch/motion_node.launch" />
     <include file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
     <include file="$(find pandora_vision_landoltc)/launch/predator-landoltc3d.launch" />
 <!--

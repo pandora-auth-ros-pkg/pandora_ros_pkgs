@@ -616,27 +616,28 @@ void LandoltCDetector::fusion()
 {
   for(int i = 0; i < _landoltc.size(); i++)
   {
-    LandoltC* temp = &(_landoltc.at(i));
-    if((*temp).count == 1)
+    if(_landoltc.at(i).count == 1)
     {
       _landoltc.at(i).probability = 0.2;
     }
-    else if((*temp).count == 2)
+    else if(_landoltc.at(i).count == 2)
     {
       _landoltc.at(i).probability = 0.4;
     }
-    else if((*temp).count == 3)
+    else if(_landoltc.at(i).count == 3)
     {
       _landoltc.at(i).probability = 0.6;
     }
-    else if((*temp).count == 4)
+    else if(_landoltc.at(i).count == 4)
     {
       _landoltc.at(i).probability = 0.8;
     }
-    else if((*temp).count == 5)
+    else if(_landoltc.at(i).count == 5)
     {
       _landoltc.at(i).probability = 1;
     }
+    else
+      _landoltc.at(i).probability = 0;
    
   }
   
