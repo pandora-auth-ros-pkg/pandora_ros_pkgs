@@ -33,7 +33,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author: George Aprilis
-* 		    Despoina Paschalidou
+*     Despoina Paschalidou
 *********************************************************************/
 
 #include "pandora_vision_face/face_detector.h"

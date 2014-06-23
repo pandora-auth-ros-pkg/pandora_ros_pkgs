@@ -46,10 +46,12 @@ namespace pandora_vision
   */
   MotionDetector::MotionDetector()
   { 
+    kernel_erode = getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2));
     bg = 
     cv::BackgroundSubtractorMOG2 (MotionParameters::history,
       MotionParameters::varThreshold, MotionParameters::bShadowDetection);
     countDiff = 0;
+    max_deviation = 50;
     ROS_INFO("Created MotionDetector instance");
   }
 
@@ -63,16 +65,17 @@ namespace pandora_vision
   }
 
   /**
-      @brief Function that detects motion, according to substraction
-      between background image and current frame. According to predifined 
-      thresholds motion is detected. According to the type of motion
-      the suitable value is returned.
-      @param _frame [cv::Mat] current frame to be processed 
-      @return [int] Index of evaluation of Motion in current frame.
+    @brief Function that detects motion, according to substraction
+    between background image and current frame. According to predifined 
+    thresholds motion is detected. According to the type of motion
+    the suitable value is returned.
+    @param _frame [cv::Mat] current frame to be processed 
+    @return [int] Index of evaluation of Motion in current frame.
   */
   int MotionDetector::detectMotion(cv::Mat _frame)
   {  
     frame = _frame.clone(); 
+    result = _frame.clone(); 
     
     /// Upadate the background model and create 
     /// binary mask for foreground objects
@@ -85,6 +88,11 @@ namespace pandora_vision
     cv::threshold(temp, temp, MotionParameters::diff_threshold, 
       255, cv::THRESH_BINARY);
     motionIdentification(temp);
+    cv::Mat kernel = 
+      getStructuringElement(cv::MORPH_CROSS , cv::Size(3, 3), cv::Point( -1, -1 ));
+    cv::morphologyEx(temp, temp, cv::MORPH_CLOSE, kernel, cv::Point(-1, -1), 8);
+ 
+    detectMotionPosition(temp);
      
     #ifdef SHOW_DEBUG_IMAGE
       debugShow(temp);
@@ -92,6 +100,60 @@ namespace pandora_vision
    
     return typeOfMovement;
   }
+  
+  /**
+     @brief Function that calculates motion's postion
+     @param
+     @return void 
+  */
+  void MotionDetector::detectMotionPosition(cv::Mat diff)
+  {
+    /// Calculate the standard deviation
+    cv::Scalar mean, stddev;
+    meanStdDev(diff, mean, stddev);
+    /// If not to much changes then the motion is real 
+    if(stddev[0] < max_deviation)
+    {
+      int number_of_changes = 0;
+      int min_x = diff.cols, max_x = 0;
+      int min_y = diff.rows, max_y = 0;
+      /// Loop over image and detect changes
+      for(int j = 1; j < diff.cols-11; j+=2){ // height
+        for(int i = 1; i < diff.rows-11; i+=2){ // width
+            if(static_cast<int>(diff.at<uchar>(j, i)) == 255){
+                number_of_changes++;
+                if(min_x > i) 
+                  min_x = i;
+                if(max_x < i) 
+                  max_x = i;
+                if(min_y > j) 
+                  min_y = j;
+                if(max_y < j) 
+                  max_y = j;
+                }
+            }
+        }
+        if(number_of_changes){
+          cv::Point _tlcorner(min_x, min_y);
+          cv::Point _brcorner(max_x, max_y);
+          rectangle(result, _tlcorner, _brcorner, cv::Scalar(0, 255, 255), 1);
+        }  
+    }
+  }
+  
+  /**@brief Creates the continuous table of motion in current frame
+    @return int[] table of motion position and size
+  */
+  int* MotionDetector::getMotionPosition()
+  {
+    int* table = new int[4];
+    for(int ii = 0; ii < 4; ii++)
+    {
+      
+    }
+    return table;
+  }
+    
   /**
       @brief Function that defines the type of movement 
       according to the number of pixels, that differ from current
@@ -105,17 +167,11 @@ namespace pandora_vision
     //!< counts value of non zero pixels in binary image
     countDiff = countNonZero(diff);
     if (countDiff > MotionParameters::motion_high_thres)
-    {
       typeOfMovement = 2;
-    }
     else if (countDiff > MotionParameters::motion_low_thres)
-    {
       typeOfMovement = 1;
-    }
     else
-    {
       typeOfMovement = 0;
-    } 
   }
   
    /**
@@ -144,6 +200,7 @@ namespace pandora_vision
     cv::imshow("Frame", frame);
     cv::imshow("Background", background);
     cv::imshow("Diff", diff);
+    cv::imshow("Result", result);
     cv::waitKey(10);
   }
      

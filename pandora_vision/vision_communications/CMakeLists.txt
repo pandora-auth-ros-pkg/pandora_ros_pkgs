@@ -19,7 +19,6 @@ add_message_files(
   HolesPositionsVectorMsg.msg
   EnhancedHoleMsg.msg
   EnhancedHolesVectorMsg.msg
-  MotionMsg.msg
   HazmatAlertMsg.msg
   HazmatAlertsVectorMsg.msg
   QRAlertMsg.msg

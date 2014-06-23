@@ -40,7 +40,7 @@
 
 #include "ros/ros.h"
 
-#include "vision_communications/MotionMsg.h"
+#include "pandora_vision_motion/motion_detector.h"
 
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
@@ -50,7 +50,7 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-#include "pandora_vision_motion/motion_detector.h"
+#include "pandora_common_msgs/GeneralAlertMsg.h"
 #include "state_manager/state_client.h"
 
 #include <iostream>

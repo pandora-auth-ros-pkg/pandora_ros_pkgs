@@ -93,7 +93,7 @@ namespace pandora_vision
     if (_nh.getParam("published_topic_names/motion_alert", param))
     {
     _motionPublisher = 
-      _nh.advertise<vision_communications::MotionMsg>(param, 10);
+      _nh.advertise<pandora_common_msgs::GeneralAlertMsg>(param, 10);
     }
     else
     {
@@ -137,7 +137,7 @@ namespace pandora_vision
       ROS_BREAK();
     }
     
-      //!< Get the HFOV parameter if available;
+    //!< Get the HFOV parameter if available;
     if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
       ROS_DEBUG_STREAM("HFOV : " << hfov);
     else 
@@ -240,7 +240,7 @@ namespace pandora_vision
       return;
     }
     //!< Create message of Motion Detector
-    vision_communications::MotionMsg motionMessage;
+    pandora_common_msgs::GeneralAlertMsg motionMessage;
     switch (_motionDetector.detectMotion(motionFrame))
     {
       case 0:
@@ -261,7 +261,9 @@ namespace pandora_vision
     {
       motionMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
       motionMessage.header.stamp = ros::Time::now();
-      ROS_DEBUG_STREAM( "[Motion_node] :Motion found with probability: "<< motionMessage.probability);
+      motionMessage.yaw = 0;
+      motionMessage.pitch = 0;
+      ROS_INFO_STREAM( "[Motion_node] :Motion found with probability: "<< motionMessage.probability);
       _motionPublisher.publish(motionMessage);
     }
   }

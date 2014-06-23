@@ -3,6 +3,7 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
 
   
+<<<<<<< HEAD
   <include file="$(find openni_launch)/launch/openni.launch" >
     <arg name="camera" value="kinect" />
     <arg name="publish_tf" value="false" />
@@ -14,4 +15,15 @@
   
   <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
   
+=======
+  <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
+    <arg name="camID" value="/dev/video1"/>
+    <arg name="name" value="kinect"/>
+    <arg name="topic_name" value="/kinect/image"/>
+    <arg name="frame_id" value="kinect_link"/>
+  </include>
+
+  <include file="$(find pandora_vision_motion)/launch/motion_node.launch" />
+
+>>>>>>> Added extra features in motion detector, now it can allocate white regions
 </launch>

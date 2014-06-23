@@ -1,7 +1,7 @@
 <launch>
 
   <arg name="name" default="camera"/>
-  <arg name="camID" default="/dev/video0"/>
+  <arg name="camID" default="/dev/video1"/>
   <arg name="topic_name" default="/camera/image"/>
   <arg name="frame_id" default="camera"/>
 

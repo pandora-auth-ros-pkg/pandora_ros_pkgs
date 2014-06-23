@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_motion)
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
-    vision_communications
+    pandora_common_msgs
     state_manager
     state_manager_communications
     cv_bridge
@@ -25,7 +25,7 @@ catkin_package(
     DEPENDS
     CATKIN_DEPENDS
       roscpp
-      vision_communications
+      pandora_common_msgs
       state_manager
       state_manager_communications
       cv_bridge

@@ -44,7 +44,7 @@
 #include <vector>
 #include "pandora_vision_motion/motion_parameters.h"
 
-//~ #define SHOW_DEBUG_IMAGE
+#define SHOW_DEBUG_IMAGE
 
 namespace pandora_vision 
 {
@@ -62,6 +62,8 @@ namespace pandora_vision
     //!< and foreground segmentation 
     cv::BackgroundSubtractorMOG2 bg;
     
+    ///!< Erode kernel
+    cv::Mat kernel_erode;
     public:
     
     //!< Number of pixels, that differ from current frame and background 
@@ -69,6 +71,10 @@ namespace pandora_vision
     //!< Identifier of motion type
     int typeOfMovement;
     
+    int max_deviation;
+    
+    cv::Mat result;
+
     /**
       @brief Class Constructor
       Initializes all varialbes for thresholding
@@ -114,6 +120,18 @@ namespace pandora_vision
       @return void
     */ 
     void debugShow(cv::Mat diff);
+    
+    /**
+     @brief Function that calculates motion's postion
+     @param
+     @return void 
+    */
+    void detectMotionPosition(cv::Mat diff); 
+    
+    /**@brief Creates the continuous table of motion in current frame
+    @return int[] table of motion position and size
+    */
+    int* getMotionPosition();
   };
 }// namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_DETECTOR_H
