@@ -118,7 +118,7 @@ namespace pandora_vision
 
     switch(filteringMethod)
     {
-      // Filter #1 (Color homogeneity inside blob)-----------------------------
+      // Filter #1 (Color homogeneity inside blob)------------------------------
       case 1 :
         {
           RgbFilters::checkHolesColorHomogeneity(
@@ -130,7 +130,7 @@ namespace pandora_vision
           windowMsg = "Filter: Color homogeneity";
           break;
         }
-        // Filter #2 (Luminosity difference)----------------------------------
+        // Filter #2 (Luminosity difference)------------------------------------
         // Check for luminosity difference between the points that constitute
         // the blob's bounding box and the points inside the blob's outline
       case 2 :
@@ -146,7 +146,7 @@ namespace pandora_vision
           windowMsg = "Filter: Luminosity difference";
           break;
         }
-        // Filter #3 (Texture difference)-------------------------------------
+        // Filter #3 (Texture difference)---------------------------------------
       case 3 :
         {
           RgbFilters::checkHolesTextureDiff(
@@ -161,7 +161,7 @@ namespace pandora_vision
           windowMsg = "Filter: Texture difference";
           break;
         }
-        // Filter #4 (Back project model histogram)---------------------------
+        // Filter #4 (Back project model histogram)-----------------------------
       case 4 :
         {
           RgbFilters::checkHolesTextureBackProject(
@@ -176,7 +176,7 @@ namespace pandora_vision
           windowMsg = "Filter: Texture back project";
           break;
         }
-      // Filter #5 (through difference of depth)------------------------------
+      // Filter #5 (through difference of depth)--------------------------------
       case 5 :
         {
           DepthFilters::checkHolesDepthDiff(
@@ -190,7 +190,7 @@ namespace pandora_vision
           windowMsg = "Filter: Depth difference";
           break;
         }
-        // Filter #6----------------------------------------------------------
+        // Filter #6------------------------------------------------------------
         // Inflate the bounding boxes by an inflation size.
         // For a blob to be at least a potential hole, all the points that
         // constitute the inflated rectangle should lie on exactly one plane.
@@ -207,7 +207,7 @@ namespace pandora_vision
           windowMsg = "Filter: Outline of rectangle on plane";
           break;
         }
-        // Filter #7 (depth & area comparison)--------------------------------
+        // Filter #7 (depth & area comparison)----------------------------------
       case 7 :
         {
           DepthFilters::checkHolesDepthArea(
@@ -220,7 +220,7 @@ namespace pandora_vision
           windowMsg = "Filter: Area / Depth";
           break;
         }
-        // Filter #8----------------------------------------------------------
+        // Filter #8------------------------------------------------------------
         // Brushfire from blob outline to blob bounding box
         // with an inflation size (inflates the rectangle by x pixels).
         // If the points between the blob's outline and the inflated rectangle
@@ -238,7 +238,7 @@ namespace pandora_vision
           windowMsg = "Filter: Points around blob to plane";
           break;
         }
-        // Filter #9 (Depth homogeneity)---------------------------------------
+        // Filter #9 (Depth homogeneity)----------------------------------------
         // All holes are considered valid except for those that are edgeless
         // inside the area denoted by the conveyor->outlines points
       case 9 :

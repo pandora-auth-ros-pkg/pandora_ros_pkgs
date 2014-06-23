@@ -231,7 +231,6 @@ namespace pandora_vision
 
       // The point cloud corresponding to the squares_ image
       PointCloudPtr cloud;
-
   };
 
 
@@ -356,7 +355,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      0 );
+      ASSIMILATION );
 
 
     // The number of holes should have shrunk by one
@@ -426,7 +425,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      1 );
+      AMALGAMATION );
 
 
     // The number of holes should have shrunk by one
@@ -511,7 +510,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      2 );
+      CONNECTION );
 
     // The number of holes should have shrunk by one
     EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
@@ -631,7 +630,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      0 );
+      ASSIMILATION );
 
     // The number of holes should have shrunk by one
     EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
@@ -699,7 +698,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      1 );
+      AMALGAMATION );
 
     // The number of holes should have shrunk by one
     EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
@@ -784,7 +783,7 @@ namespace pandora_vision
       &conveyor,
       squares_,
       cloud,
-      2 );
+      CONNECTION );
 
     // The number of holes should have shrunk by one
     EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
@@ -804,7 +803,6 @@ namespace pandora_vision
     // Original entry #2 should now be entry #2
     for ( int i = 1; i < 3; i++ )
     {
-
       EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
         originConveyor.holes[i].keypoint.pt.x );
       EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
@@ -961,7 +959,6 @@ namespace pandora_vision
       conveyor.holes[0].keypoint.pt.x );
     EXPECT_NEAR ( amalgamator.holes[0].keypoint.pt.y ,
       conveyor.holes[0].keypoint.pt.y, 1 );
-
   }
 
 
@@ -1094,7 +1091,6 @@ namespace pandora_vision
       conveyor.holes[0].keypoint.pt.x );
     EXPECT_LT ( connector.holes[0].keypoint.pt.y,
       conveyor.holes[0].keypoint.pt.y );
-
   }
 
 
@@ -1110,7 +1106,7 @@ namespace pandora_vision
     int interpolationMethod = 0;
 
     // Apply reasonable thresholds
-    Parameters::HoleFusion::merger_depth_diff_threshold = 0.8;
+    Parameters::HoleFusion::merger_depth_diff_threshold = 0.4;
     Parameters::HoleFusion::merger_depth_area_threshold = 0.8;
 
     // Restore conveyor to its original state

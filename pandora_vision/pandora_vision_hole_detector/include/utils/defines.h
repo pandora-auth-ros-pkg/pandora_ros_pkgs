@@ -82,25 +82,37 @@
 #define DEBUG_SHOW
 #define DEBUG_TIME
 
-//!< Transforms a float number to string
+//! Transforms a float number to string
 #define TOSTR( x )      static_cast< std::ostringstream & >( \
   ( std::ostringstream() << std::dec << x ) ).str()
 
-//!< Takes the file name from an absolute path
+//! Takes the file name from an absolute path
 #define LPATH( x )      x.substr( x.find_last_of("/") + 1 , \
   x.size() - x.find_last_of("/") - 1)
 
-//!< Shortcut to std::string
+//! Shortcut to std::string
 #define STR( x )        std::string(x)
 
-//!< Available processing modes:
-//!< In RGBD_MODE, depth-based filters can be utilized along side RGB-based
-//!< filters in order to ascerain the validity of candidate holes.
-//!< In RGB_ONLY_MODE, depth analysis is not possible due to the overwhelming
-//!< amount of noise present in the input depth image, and so the validity
-//!< of candidate holes can only be tested through RGB-based filters.
+//! Available processing modes:
+//! In RGBD_MODE, depth-based filters can be utilized along side RGB-based
+//! filters in order to ascerain the validity of candidate holes.
+//! In RGB_ONLY_MODE, depth analysis is not possible due to the overwhelming
+//! amount of noise present in the input depth image, and so the validity
+//! of candidate holes can only be tested through RGB-based filters.
 #define RGBD_MODE 0
 #define RGB_ONLY_MODE 1
+
+//! Available merging operations:
+//! Assimilation is the operation performed when a candidate hole completely
+//! overlaps another one. The latter is said to be assimilated by the former.
+//! Amalgamation is the operation performed when a candidate hole partially
+//! overlaps another one. The latter is said to be amalgamated into the former.
+//! Connection is the operation performed when two candidate holes do not
+//! overlap one another. The one with the smaller area is said to be connected
+//! with the one of the larger area.
+#define ASSIMILATION 0
+#define AMALGAMATION 1
+#define CONNECTION 2
 
 // The string identifier of the hole detector package.
 // It must comply with the sub-namespace set in the package's launchers

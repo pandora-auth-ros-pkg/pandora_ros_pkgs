@@ -122,7 +122,7 @@ namespace pandora_vision
       }
 
 
-      if (operationId == 0)
+      if (operationId == ASSIMILATION)
       {
         // Is the activeId-th candidate hole able to assimilate the
         // passiveId-th candidate hole?
@@ -130,7 +130,7 @@ namespace pandora_vision
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
-      if (operationId == 1)
+      if (operationId == AMALGAMATION)
       {
         // Is the activeId-th candidate hole able to amalgamate the
         // passiveId-th candidate hole?
@@ -138,7 +138,7 @@ namespace pandora_vision
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
-      if (operationId == 2)
+      if (operationId == CONNECTION)
       {
         // Is the passiveId-th candidate hole able to be connected with the
         // activeId-th candidate hole?
@@ -167,12 +167,12 @@ namespace pandora_vision
         std::vector<std::set<unsigned int> > tempHolesMasksSetVector;
         tempHolesMasksSetVector = holesMasksSetVector;
 
-        if (operationId == 0)
+        if (operationId == ASSIMILATION)
         {
           // Delete the passiveId-th candidate hole
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
-        else if (operationId == 1)
+        else if (operationId == AMALGAMATION)
         {
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has amalgamated
@@ -185,7 +185,7 @@ namespace pandora_vision
 
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
-        else if (operationId == 2)
+        else if (operationId == CONNECTION)
         {
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has been
@@ -206,25 +206,10 @@ namespace pandora_vision
           tempHolesMasksSetVector.begin() + passiveId);
 
 
-        // Declaration of probabilities is made here because of the
-        // ommision of checkers running during the assimilation operation
-        float da = 0.0;
-        float dd = 0.0;
-
         // Obtain the activeId-th candidate hole in order for it
         // to be checked against the selected filters
         HolesConveyor ithHole =
           HolesConveyorUtils::getHole(tempHolesConveyor, activeId);
-
-
-        // Determines the selected filters execution
-        std::map<int, int> filtersOrder;
-
-        // Depth diff runs first
-        filtersOrder[1] = 5;
-
-        // Depth / Area runs second
-        filtersOrder[2] = 7;
 
         // Create the necessary vectors for each hole checker and
         // merger used
@@ -245,7 +230,8 @@ namespace pandora_vision
           &rectanglesIndices);
 
         // The vector of depth-filters-derived probabilities
-        std::vector<std::vector<float> >probabilitiesVector(2,
+        std::vector<std::vector<float> >probabilitiesVector(
+          2,
           std::vector<float>(1, 0.0));
 
         // Check the difference between the mean depth of the
@@ -260,7 +246,7 @@ namespace pandora_vision
           &probabilitiesVector.at(0));
 
         // The probability that the merged hole is valid by the above filter
-        dd = probabilitiesVector[0][0];
+        float dd = probabilitiesVector[0][0];
 
 
         // Check the depth / area proportion for the ithHole
@@ -272,7 +258,7 @@ namespace pandora_vision
           &probabilitiesVector.at(1));
 
         // The probability that the merged hole is valid by the above filter
-        da = probabilitiesVector[1][0];
+        float da = probabilitiesVector[1][0];
 
 
         // Probabilities threshold for merge acceptance.
@@ -453,7 +439,7 @@ namespace pandora_vision
       // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
       bool isAble = false;
 
-      if (operationId == 0)
+      if (operationId == ASSIMILATION)
       {
         // Is the activeId-th candidate hole able to assimilate the
         // passiveId-th candidate hole?
@@ -461,7 +447,7 @@ namespace pandora_vision
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
-      if (operationId == 1)
+      if (operationId == AMALGAMATION)
       {
         // Is the activeId-th candidate hole able to amalgamate the
         // passiveId-th candidate hole?
@@ -469,7 +455,7 @@ namespace pandora_vision
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
-      if (operationId == 2)
+      if (operationId == CONNECTION)
       {
         // Is the passiveId-th candidate hole able to be connected with the
         // activeId-th candidate hole?
@@ -498,12 +484,12 @@ namespace pandora_vision
         std::vector<std::set<unsigned int> > tempHolesMasksSetVector;
         tempHolesMasksSetVector = holesMasksSetVector;
 
-        if (operationId == 0)
+        if (operationId == ASSIMILATION)
         {
           // Delete the passiveId-th candidate hole
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
-        else if (operationId == 1)
+        else if (operationId == AMALGAMATION)
         {
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has amalgamated
@@ -516,7 +502,7 @@ namespace pandora_vision
 
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
-        else if (operationId == 2)
+        else if (operationId == CONNECTION)
         {
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has been

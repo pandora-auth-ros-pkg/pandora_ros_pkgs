@@ -104,6 +104,21 @@ add_library(hole_merger_lib
 
 target_link_libraries(hole_merger_test hole_merger_lib pcl_filters ${PCL_LIBRARIES} ${catkin_LIBRARIES} utils_lib gtest_main)
 
+###### filters_test.cpp ######
+catkin_add_gtest(filters_test
+  unit/hole_fusion_node/filters_test.cpp)
+
+
+add_library(filters_lib
+  ../src/hole_fusion_node/depth_filters.cpp
+  ../src/hole_fusion_node/filters.cpp
+  ../src/hole_fusion_node/filters_resources.cpp
+  ../src/hole_fusion_node/planes_detection.cpp
+  ../src/hole_fusion_node/rgb_filters.cpp)
+
+target_link_libraries(filters_test filters_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
+
+
 
 ###### filters_resources_test.cpp ######
 catkin_add_gtest(filters_resources_test
@@ -141,4 +156,4 @@ target_link_libraries(rgb_filters_test ${catkin_LIBRARIES} rgb_filters_lib utils
 #    https://pandora.ee.auth.gr/rosbags/2014_bags/hole_detector_test.bag
 #    DESTINATION functional
 #    )
-add_rostest(functional/hole_detector_test.launch)
+#add_rostest(functional/hole_detector_test.launch)
