@@ -60,11 +60,11 @@ class BadBossOrderFile(Exception):
     def __str__(self):
         return repr(self.value)
 
-class AlertDeliveryBoy:
+class AlertDeliveryBoy():
 
-    def __init__(self):
+    def __init__(self, frame_id = 'headCamera'):
 
-        self.frame_id = 'headCamera'
+        self.frame_id = frame_id
 
         self.orderWaitingList = deque([])
         
