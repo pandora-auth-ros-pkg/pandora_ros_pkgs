@@ -501,7 +501,8 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     if(Parameters::Debug::show_check_holes) // Debug
     {
-      Visualization::multipleShow("CheckHoles function", imgs, msgs, 1200, 1);
+      Visualization::multipleShow("CheckHoles function", imgs, msgs,
+        Parameters::Debug::show_check_holes_size, 1);
     }
     #endif
 

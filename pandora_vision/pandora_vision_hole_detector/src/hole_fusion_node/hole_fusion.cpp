@@ -617,7 +617,7 @@ namespace pandora_vision
 
 
   /**
-    @brief Computes the on/off state of the Hole Detector package
+    @brief Computes the on/off state of the Hole Detector package,
     given a state
     @param[in] state [const int&] The robot's state
     @return [bool] True if the hole fusion node's state is set to "on"

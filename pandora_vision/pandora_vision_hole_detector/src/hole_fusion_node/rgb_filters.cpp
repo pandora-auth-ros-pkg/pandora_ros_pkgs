@@ -424,7 +424,7 @@ namespace pandora_vision
       histSize[1] = Parameters::Histogram::number_of_value_bins;
     }
 
-    // hue varies from 0 to 179, saturation from 0 to 255
+    // hue varies from 0 to 179, saturation or value from 0 to 255
     float h_ranges[] = { 0, 180 };
     float sec_ranges[] = { 0, 256 };
 

@@ -102,17 +102,6 @@
 #define RGBD_MODE 0
 #define RGB_ONLY_MODE 1
 
-//! Available merging operations:
-//! Assimilation is the operation performed when a candidate hole completely
-//! overlaps another one. The latter is said to be assimilated by the former.
-//! Amalgamation is the operation performed when a candidate hole partially
-//! overlaps another one. The latter is said to be amalgamated into the former.
-//! Connection is the operation performed when two candidate holes do not
-//! overlap one another. The one with the smaller area is said to be connected
-//! with the one of the larger area.
-#define ASSIMILATION 0
-#define AMALGAMATION 1
-#define CONNECTION 2
 
 // The string identifier of the hole detector package.
 // It must comply with the sub-namespace set in the package's launchers

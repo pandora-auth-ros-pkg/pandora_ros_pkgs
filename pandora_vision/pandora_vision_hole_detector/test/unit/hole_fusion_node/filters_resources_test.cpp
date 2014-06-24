@@ -189,6 +189,8 @@ namespace pandora_vision
   //! Tests FiltersResources::createCheckerRequiredVectors
   TEST_F ( FiltersResourcesTest, createCheckerRequiredVectorsTest )
   {
+    ///////////////////////////////// RGBD_MODE ////////////////////////////////
+
     // The needed resources
     std::vector< cv::Mat > holesMasksImageVector;
     std::vector< std::set< unsigned int > > holesMasksSetVector;
@@ -238,7 +240,7 @@ namespace pandora_vision
                         conveyor,
                         squares_,
                         2,
-                        0,
+                        RGBD_MODE,
                         &holesMasksImageVector,
                         &holesMasksSetVector,
                         &inflatedRectanglesVector,
@@ -402,6 +404,199 @@ namespace pandora_vision
                 }
               }
             }
+          }
+        }
+      }
+    }
+
+    /////////////////////////////// RGB_ONLY_MODE //////////////////////////////
+
+    // The needed resources
+    holesMasksImageVector.clear();
+    holesMasksSetVector.clear();
+    inflatedRectanglesVector.clear();
+    inflatedRectanglesIndices.clear();
+    intermediatePointsImageVector.clear();
+    intermediatePointsSetVector.clear();
+
+    for ( int a = 0; a < 2; a++ )
+    {
+      Parameters::HoleFusion::run_checker_color_homogeneity_urgent = a;
+
+      for ( int b = 0; b < 2; b++ )
+      {
+        Parameters::HoleFusion::run_checker_luminosity_diff_urgent = b;
+
+        for ( int c = 0; c < 2; c++ )
+        {
+          Parameters::HoleFusion::run_checker_texture_diff_urgent = c;
+
+          for ( int d = 0; d < 2; d++ )
+          {
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent = d;
+
+            // Run FiltersResources::createCheckerRequiredVectors
+            FiltersResources::createCheckerRequiredVectors(
+              conveyor,
+              squares_,
+              2,
+              RGB_ONLY_MODE,
+              &holesMasksImageVector,
+              &holesMasksSetVector,
+              &inflatedRectanglesVector,
+              &inflatedRectanglesIndices,
+              &intermediatePointsImageVector,
+              &intermediatePointsSetVector );
+
+
+            // Inquire about holesMasksImageVector
+            if ( a == 1 || c == 1)
+            {
+              // There should be three images of masks of holes
+              EXPECT_EQ ( 3, holesMasksImageVector.size() );
+
+              for ( int j = 0; j < holesMasksImageVector.size(); j++ )
+              {
+                int nonZero = 0;
+                for ( int rows = 0; rows < squares_.rows; rows++ )
+                {
+                  for ( int cols = 0; cols < squares_.cols; cols++ )
+                  {
+                    if ( holesMasksImageVector[j].at
+                      < unsigned char > ( rows, cols ) != 0)
+                    {
+                      nonZero++;
+                    }
+                  }
+                }
+
+                // There should be 100 X 100 - 4 points in each mask
+                EXPECT_EQ ( 10000 - 4, nonZero );
+              }
+            }
+            else if ( a != 1 && c != 1 )
+            {
+              // No masks if the corresponding filters to variables
+              // a and c are disabled
+              EXPECT_EQ ( 0, holesMasksImageVector.size() );
+            }
+
+
+            // Inquire about holesMasksSetVector
+            if ( b == 1 || d == 1 )
+            {
+              // There should be three masks of holes
+              EXPECT_EQ ( 3, holesMasksSetVector.size() );
+
+              for ( int j = 0; j < holesMasksSetVector.size(); j++ )
+              {
+                // Each mask should have 100 X 100 - 4 points
+                EXPECT_EQ ( 10000 - 4, holesMasksSetVector[j].size() );
+              }
+            }
+            else if ( b != 1 && d != 1 )
+            {
+              // No masks if the corresponding filters to variables
+              // b, d, f and i are disabled
+              EXPECT_EQ ( 0, holesMasksSetVector.size() );
+            }
+
+
+            // Inquire about inflatedRectangles*
+            if ( b == 1 || c == 1 || d == 1 )
+            {
+              // The number of rectangles should be equal to the
+              // number of indices
+              EXPECT_EQ ( inflatedRectanglesVector.size(),
+                inflatedRectanglesIndices.size() );
+
+              // In this case, with an inflation size of value 10,
+              // there should be two holes
+              EXPECT_EQ ( 2, inflatedRectanglesVector.size() );
+
+              for ( int j = 0; j < inflatedRectanglesVector.size(); j++ )
+              {
+                // Each rectangle should have exactly four vertices
+                EXPECT_EQ ( 4, inflatedRectanglesVector[j].size() );
+              }
+            }
+            else if (b != 1 && c != 1 && d != 1 )
+            {
+              // The number of rectangles should be equal to the
+              // number of indices
+              EXPECT_EQ ( inflatedRectanglesVector.size(),
+                inflatedRectanglesIndices.size() );
+
+              // No masks if the corresponding filters to variables
+              // b, c, d, e, g and h are disabled
+              EXPECT_EQ ( 0, inflatedRectanglesVector.size() );
+            }
+
+
+            // Inquire about intermediatePointsImageVector
+            if ( c == 1 )
+            {
+              // There should be two masks of intermediate points
+              EXPECT_EQ ( 2, intermediatePointsImageVector.size() );
+
+              for ( int j = 0;
+                j < intermediatePointsImageVector.size(); j++ )
+              {
+                int nonZero = 0;
+                for ( int rows = 0; rows < squares_.rows; rows++ )
+                {
+                  for ( int cols = 0; cols < squares_.cols; cols++ )
+                  {
+                    if ( intermediatePointsImageVector[j].at
+                      < unsigned char > ( rows, cols ) != 0)
+                    {
+                      nonZero++;
+                    }
+                  }
+                }
+
+                // There should be more than 400 intermediate points
+                EXPECT_LT ( 400, nonZero );
+              }
+            }
+            else
+            {
+              // No masks if the corresponding filter to variable
+              // c is disabled
+              EXPECT_EQ ( 0, intermediatePointsImageVector.size() );
+            }
+
+
+            // Inquire about intermediatePointsSetVector
+            if ( b == 1 || d == 1 )
+            {
+              // There should be two masks of intermediate points
+              EXPECT_EQ ( 2, intermediatePointsSetVector.size() );
+
+              for ( int j = 0;
+                j < intermediatePointsSetVector.size(); j++ )
+              {
+                // There should be more than 400 intermediate points
+                EXPECT_LT ( 400,
+                  intermediatePointsSetVector[j].size() );
+              }
+            }
+            else
+            {
+              // No masks if the corresponding filters to variables
+              // b, d and g are disabled
+              EXPECT_EQ ( 0, intermediatePointsSetVector.size() );
+            }
+
+
+            // Clear the vectors for the next run
+            holesMasksImageVector.clear();
+            holesMasksSetVector.clear();
+            inflatedRectanglesVector.clear();
+            inflatedRectanglesIndices.clear();
+            intermediatePointsImageVector.clear();
+            intermediatePointsSetVector.clear();
+
           }
         }
       }
