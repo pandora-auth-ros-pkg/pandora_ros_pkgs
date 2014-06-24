@@ -14,6 +14,7 @@ JrkSerial::JrkSerial()
     ROS_BREAK();
   }
   ROS_INFO("The serial port is opened.");
+  clearErrors();
   #ifndef _WIN32
   struct termios options;
   tcgetattr(fd, &options);
