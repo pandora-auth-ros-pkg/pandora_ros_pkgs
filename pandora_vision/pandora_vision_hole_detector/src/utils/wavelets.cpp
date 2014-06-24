@@ -52,7 +52,7 @@ namespace pandora_vision
 
     int length = in.rows + kernel.size() - 1;
 
-    cv::Mat temp = cv::Mat::zeros(length, in.cols, CV_32FC1);
+    cv::Mat temp = cv::Mat(length, in.cols, CV_32FC1);
 
     for(int k = 0; k < in.cols; k++)
     {
@@ -68,7 +68,7 @@ namespace pandora_vision
           }
         }
 
-        temp.at<float>(i, k)=y;
+        temp.at<float>(i, k) = y;
       }
     }
 
@@ -90,7 +90,7 @@ namespace pandora_vision
 
     int length = in.cols + kernel.size() - 1;
 
-    cv::Mat temp = cv::Mat::zeros(in.rows, length, CV_32FC1);
+    cv::Mat temp = cv::Mat(in.rows, length, CV_32FC1);
 
     for(int k = 0; k < in.rows; k++)
     {
@@ -106,7 +106,7 @@ namespace pandora_vision
           }
         }
 
-        temp.at<float>(k, i)=y;
+        temp.at<float>(k, i) = y;
       }
     }
 
@@ -186,7 +186,7 @@ namespace pandora_vision
       H0.push_back(1 / sqrt(2));
     }
 
-    cv::Mat doubled = cv::Mat::zeros(temp.rows, temp.cols, CV_32FC1);
+    cv::Mat doubled = cv::Mat(temp.rows, temp.cols, CV_32FC1);
 
     for(int y = 0; y < doubled.rows; y++)
     {
@@ -238,7 +238,7 @@ namespace pandora_vision
 
     for (int i = 0; i < 3; i++)
     {
-      cv::Mat doubled = cv::Mat::zeros(inImage.rows, inImage.cols, CV_32FC1);
+      cv::Mat doubled = cv::Mat(inImage.rows, inImage.cols, CV_32FC1);
 
       for(int y = 0; y < doubled.rows; y++)
       {
@@ -257,7 +257,7 @@ namespace pandora_vision
 
     // The outImage. out has to be assigned to *outImage but cannot be done
     // in the following loops immediately
-    cv::Mat out = cv::Mat::zeros(lowLow[0].size(), CV_8UC3);
+    cv::Mat out = cv::Mat(lowLow[0].size(), CV_8UC3);
 
     for (int i = 0; i < 3; i++)
     {
