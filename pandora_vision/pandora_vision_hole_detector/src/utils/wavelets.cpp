@@ -177,7 +177,7 @@ namespace pandora_vision
 
     temp = Visualization::scaleImageForVisualization(inImage, 0);
 
-    Wavelets* wave = new Wavelets();
+    Wavelets wave;
 
     std::vector<float> H0;
 
@@ -202,9 +202,7 @@ namespace pandora_vision
     // of values of the inImage (also in CV_32FC1 format).
     // After obtaining the low-low, reverse the scale operation, in an
     // attempt to approximate the initial depth image's values
-    *outImage = wave->getLowLow(doubled, H0) * (max - min);
-
-    delete[] wave;
+    *outImage = wave.getLowLow(doubled, H0) * (max - min);
 
     #ifdef DEBUG_TIME
     Timer::tick("getLowLow");
@@ -227,7 +225,7 @@ namespace pandora_vision
     Timer::start("getLowLow", "inputRgbImageCallback");
     #endif
 
-    Wavelets* wave = new Wavelets();
+    Wavelets wave;
 
     std::vector<float> H0;
 
@@ -254,7 +252,7 @@ namespace pandora_vision
       // LowLow contains the inImage's low low frequencies, in CV_32FC1 format
       // What we will return will be this image scaled to the actual
       // proportions of values of the inImage (also in CV_32FC1 format).
-      lowLow[i] = wave->getLowLow(doubled, H0);
+      lowLow[i] = wave.getLowLow(doubled, H0);
     }
 
     // The outImage. out has to be assigned to *outImage but cannot be done
@@ -274,8 +272,6 @@ namespace pandora_vision
 
     // Copy out to the output image
     out.copyTo(*outImage);
-
-    delete[] wave;
 
     #ifdef DEBUG_TIME
     Timer::tick("getLowLow");
