@@ -13,5 +13,7 @@
     ns="/linear"
     args="
       joint_state_controller
-      linear_elevator_controller" />
+      linear_elevator_controller" >
+  <remap from="/linear/linear_elevator_controller/command" to="/linear_elevator_controller/command"/>
+      </node>
 </launch>

@@ -13,8 +13,8 @@
     output="screen"
     ns="/linear">
     <remap
-      from="/linear_elevator_controller/command"
-      to="/linear/linear_elevator_controller/command"/>
+      to="/linear_elevator_controller/command"
+      from="/linear/linear_elevator_controller/command"/>
   </node>
     
 </launch>
