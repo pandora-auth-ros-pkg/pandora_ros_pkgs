@@ -117,6 +117,7 @@ namespace motor
     , wheel_radius_multiplier_(1.0)
     , cmd_vel_timeout_(0.5)
     , base_frame_id_("base_link")
+    , odometry_(2)
   {
   }
 
@@ -248,6 +249,7 @@ namespace motor
     {
       hasSlippage_ = false;
     }
+    slipFactor_ = 1;
     return true;
   }
 
@@ -255,7 +257,7 @@ namespace motor
   {
     // COMPUTE AND PUBLISH ODOMETRY
     // Estimate linear and angular velocity using joint information
-    odometry_.update(left_front_wheel_joint_.getPosition(), right_front_wheel_joint_.getPosition(), time);
+    odometry_.update(left_front_wheel_joint_.getPosition(), right_front_wheel_joint_.getPosition(), time, slipFactor_);
 
     // Publish odometry message
     if(last_state_publish_time_ + publish_period_ < time)
@@ -309,9 +311,10 @@ namespace motor
 
     // Apply multipliers:
     double ws = wheel_separation_multiplier_ * wheel_separation_;
-    const double wr = wheel_radius_multiplier_     * wheel_radius_;
+    const double wr = wheel_radius_multiplier_ * wheel_radius_;
 
-    ws = ws * getAngularMultiplier(curr_cmd.ang);
+    slipFactor_ = getAngularMultiplier(curr_cmd.ang);
+    ws = ws * slipFactor_;
 
     // Compute wheels velocities:
     const double vel_left  = (curr_cmd.lin - curr_cmd.ang * ws / 2.0)/wr;

@@ -113,7 +113,8 @@ int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
       break;
   }
 
-  tcflush(fd, TCIFLUSH); //empties incoming buffer
+  tcflush(fd, TCIOFLUSH); //flushes both data received but not read,
+                          //-> and data written but not transmitted
 
   nr = write(fd, (const void *)&bufOUT, COMMAND_NBYTES);
   if (nr != 1)
@@ -133,6 +134,7 @@ int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
   else if (nr != GEYE_NBYTES)
   {
     ROS_ERROR("[Head]: Wrong number of bytes read\n");
+    reconnectUSB();
     return -3;
   }
   else
@@ -161,7 +163,8 @@ float ArmUSBInterface::co2ValueGet()
   int nr;
   uint8_t bufOUT;
 
-  tcflush(fd, TCIFLUSH); //empties incoming buffer
+  tcflush(fd, TCIOFLUSH); //flushes both data received but not read,
+                          //-> and data written but not transmitted
 
   bufOUT = COMMAND_CO2;
   nr = write(fd, (const void *)&bufOUT, COMMAND_NBYTES);
@@ -182,6 +185,7 @@ float ArmUSBInterface::co2ValueGet()
   else if (nr != CO2_NBYTES)
   {
     ROS_ERROR("[Head]: Wrong number of bytes read\n");
+    reconnectUSB();
     return -3;
   }
   else

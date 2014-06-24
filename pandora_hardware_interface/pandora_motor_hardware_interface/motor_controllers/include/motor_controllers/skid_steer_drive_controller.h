@@ -140,6 +140,7 @@ namespace motor
     /// Wheel separation and radius calibration multipliers:
     double wheel_separation_multiplier_;
     double wheel_radius_multiplier_;
+    double slipFactor_;
 
     /// Timeout to consider cmd_vel commands old:
     double cmd_vel_timeout_;
