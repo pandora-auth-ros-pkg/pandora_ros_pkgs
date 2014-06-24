@@ -37,7 +37,7 @@ ObjectVisualization::ObjectVisualization()
 {
   _broadcastTimer = _nh.createTimer(ros::Duration(0.1), &ObjectVisualization::broadcastTimerCb, this);
 
-  while(!ros::service::waitForService("/data_fusion/get_markers", ros::Duration(1)) && ros::ok()) 
+  while (!ros::service::waitForService("/data_fusion/get_markers", ros::Duration(1)) && ros::ok()) 
   {
     ROS_ERROR_THROTTLE(3, "[ ObjectVisualization ] Couldn't find service /data_fusion/get_markers");
   }
@@ -49,7 +49,7 @@ ObjectVisualization::ObjectVisualization()
 
   _hazmat_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("hazmats_markers", 1);
   _landoltc_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("landoltc_markers", 1);
-  _dataMatrix_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("dataMatrix_markers", 1);
+  _dataMatrix_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("datamatrix_markers", 1);
   _hole_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("holes_markers", 1);
   _qr_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("qrs_markers", 1);
   _thermal_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("thermals_markers", 1);
@@ -81,7 +81,6 @@ void ObjectVisualization::broadcastTimerCb(const ros::TimerEvent& event)
   _motion_marker_pub.publish(_markersSrv.response.motions);
   _landoltc_marker_pub.publish(_markersSrv.response.landoltcs);
   _dataMatrix_marker_pub.publish(_markersSrv.response.dataMatrices);
-
   _victims_visited_marker_pub.publish(_markersSrv.response.victimsToGo);
   _victims_to_go_marker_pub.publish(_markersSrv.response.victimsVisited);
 }
