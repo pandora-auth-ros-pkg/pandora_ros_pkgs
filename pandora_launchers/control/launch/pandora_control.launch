@@ -1,14 +1,20 @@
 <launch>
+  <arg name="stabilizer" default="true"/>
+  <arg name="eef_planner" default="true"/>
+
   <!--Stabilizer -->
-  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+  <include if="$(arg stabilizer)"
+    file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
 
-  <!--Linear Kinect and Head-->
-  <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
+  <group if="$(arg eef_planner)">
+    <!--Linear Kinect and Head-->
+    <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
 
-  <!--Center motors -->
-  <node
-    name="move_eef_script"
-    pkg="pandora_end_effector_planner"
-    type="move_eef_script.py"
-    args="1" />
+    <!--Center motors -->
+    <node
+      name="move_eef_script"
+      pkg="pandora_end_effector_planner"
+      type="move_eef_script.py"
+      args="1" />
+  </group>
 </launch>

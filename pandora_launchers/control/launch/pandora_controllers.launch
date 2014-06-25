@@ -1,26 +1,33 @@
 <launch>
+  <arg name="motor" default="true"/>
+  <arg name="dynamixel" default="true"/>
+  <arg name="xmega" default="true"/>
+  <arg name="imu" default="true"/>
+  <arg name="linear" default="true"/>
+  <arg name="arm" default="true"/>
+
   <!-- Launcher for every controller-->
   <!-- Motors -->
-  <include
+  <include  if="$(arg motor)"
     file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/motor_controller.launch" />
 
   <!-- Dynamixel-->
-  <include
+  <include if="$(arg dynamixel)"
     file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controllers.launch" />
 
   <!-- XMega (Power and Range)-->
-<include
+<include if="$(arg xmega)"
     file="$(find pandora_xmega_hardware_interface)/xmega_controllers/launch/xmega_controllers.launch" />
 
   <!-- IMU -->
-  <include
+  <include if="$(arg imu)"
     file="$(find pandora_imu_hardware_interface)/launch/imu_controller.launch" />
 
   <!-- Linear -->
- <include
+ <include if="$(arg linear)"
     file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/launch/linear_motor_controller.launch" />
     
   <!-- Arm -->
-   <include
+   <include if="$(arg arm)"
     file="$(find pandora_arm_hardware_interface)/arm_controllers/launch/arm_controllers.launch" />
 </launch>

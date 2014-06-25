@@ -1,29 +1,41 @@
 <launch>
+  <arg name="motor" default="true"/>
+  <arg name="dynamixel" default="true"/>
+  <arg name="xmega" default="true"/>
+  <arg name="imu" default="true"/>
+  <arg name="linear" default="true"/>
+  <arg name="arm" default="true"/>
+  <arg name="battery_monitor" default="true"/>
+  <arg name="state_indicator" default="true"/>
+
   <!-- Launcher for every hardware interface-->
   <!-- Motors -->
-  <include
+  <include if="$(arg motor)"
     file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />
 
   <!-- Dynamixel -->
-  <include
+  <include if="$(arg dynamixel)"
     file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controller_manager.launch" />
 
   <!-- XMega -->
-  <include
+  <include if="$(arg xmega)"
     file="$(find pandora_xmega_hardware_interface)/xmega_hardware_interface/launch/xmega_hardware_interface.launch" />
 
   <!-- IMU -->
-  <include
+  <include if="$(arg imu)"
     file="$(find pandora_imu_hardware_interface)/launch/imu_hardware_interface.launch" />
 
   <!-- Linear -->
-  <include
+  <include if="$(arg linear)"
     file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/launch/linear_motor_hardware_interface.launch" />
     
   <!-- Arm -->
-  <include
+  <include if="$(arg arm)"
     file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface.launch" />
 
   <!-- Battery monitor node -->
-  <node pkg="pandora_hardware_tools" type="battery_monitor.py" name="battery_monitor" />
+  <node  if="$(arg battery_monitor)" pkg="pandora_hardware_tools" type="battery_monitor.py" name="battery_monitor" />
+
+  <!-- State Indicator node -->
+  <node  if="$(arg state_indicator)" pkg="pandora_hardware_tools" type="state_indicator.py" name="state_indicator" />
 </launch>

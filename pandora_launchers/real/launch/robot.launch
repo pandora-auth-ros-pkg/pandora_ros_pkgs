@@ -1,48 +1,117 @@
 <launch>
-
-  <arg name="bag" default="false"/>
+  <arg name="state_manager" default="true"/>
+  <arg name="robot_description" default="true"/>
+  <arg name="hardware_interface" default="true"/>
   <arg name="control" default="true"/>
+  <arg name="slam" default="true"/>
+  <arg name="navigation" default="false"/>
+  <arg name="data_fusion" default="true"/>
+  <arg name="kinect_filter" default="false"/>
+  <arg name="vision" default="true"/>
+  <arg name="bag" default="false"/>
+  
+  <!--Hardware Interface Arguments -->
+  <arg name="motor" default="true"/>
+  <arg name="dynamixel" default="true"/>
+  <arg name="xmega" default="true"/>
+  <arg name="imu" default="true"/>
+  <arg name="linear" default="true"/>
+  <arg name="arm" default="true"/>
+  <arg name="battery_monitor" default="true"/>
+  <arg name="state_indicator" default="true"/>
+
+  <!--Control Arguments -->
+  <arg name="stabilizer" default="true"/>
+  <arg name="eef_planner" default="true"/>
+
+  <!--Vision Arguments -->
+  <arg name="vision_cameras" default="true"/>
+  <arg name="vision_nodes" default="false"/>
+  <arg name="camera_left" default="true"/>
+  <arg name="camera_right" default="true"/>
   <arg name="xtion" default="true"/>
+  <arg name="vision_qr" default="true"/>
+  <arg name="vision_hazmat" default="true"/>
+  <arg name="vision_landoltc" default="true"/>
+  <arg name="vision_motion" default="true"/>
+  <arg name="vision_datamatrix" default="true"/>
+  <arg name="vision_predator_landoltc3d" default="true"/>
+  <arg name="vision_predator_landoltc" default="false"/>
 
   <!--State Manager -->
-  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <include if="$(arg state_manager)"
+    file="$(find state_manager)/launch/stateManager.launch"/>
 
   <!--Robot Description -->
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include if="$(arg robot_description)" file="$(find pandora_robots_description)/launch/gears/gears_description.launch"/>
 
-  <group if="$(arg control)">
+  <group if="$(arg hardware_interface)">
     <!--Hardware Interface -->
-    <include file="$(find pandora_launchers)/control/launch/pandora_hardware_interface.launch" />
-
+    <include file="$(find pandora_launchers)/control/launch/pandora_hardware_interface.launch">
+      <arg name="motor" value="$(arg vision_cameras)"/>
+      <arg name="dynamixel" value="$(arg motor)"/>
+      <arg name="xmega" value="$(arg xmega)"/>
+      <arg name="imu" value="$(arg imu)"/>
+      <arg name="linear" value="$(arg linear)"/>
+      <arg name="arm" value="$(arg arm)"/>
+      <arg name="battery_monitor" value="$(arg battery_monitor)"/>
+      <arg name="state_indicator" value="$(arg state_indicator)"/>
+    </include>
     <!--Controllers -->
-    <include file="$(find pandora_launchers)/control/launch/pandora_controllers.launch" />
-
-    <!--Control -->
-    <include file="$(find pandora_launchers)/control/launch/pandora_control.launch" />
+    <include file="$(find pandora_launchers)/control/launch/pandora_controllers.launch">
+      <arg name="motor" value="$(arg vision_cameras)"/>
+      <arg name="dynamixel" value="$(arg motor)"/>
+      <arg name="xmega" value="$(arg xmega)"/>
+      <arg name="imu" value="$(arg imu)"/>
+      <arg name="linear" value="$(arg linear)"/>
+      <arg name="arm" value="$(arg arm)"/>
+    </include>
   </group>
 
+  <!--Control -->
+  <include if="$(arg control)" file="$(find pandora_launchers)/control/launch/pandora_control.launch">
+      <arg name="stabilizer" value="$(arg stabilizer)"/>
+      <arg name="eef_planner" value="$(arg eef_planner)"/>
+  </include>
+
   <!-- Slam -->
-  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
-  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+  <group if="$(arg slam)">
+    <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+    <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+  </group>
 
   <!-- Navigation -->
-<!--
-  <include file="$(find pandora_move_base)/launch/move_base.launch" />
-  <include file="$(find pandora_target_selector)/launch/target_selector.launch" />
--->
+  <group if="$(arg navigation)">
+    <include file="$(find pandora_move_base)/launch/move_base.launch" />
+    <include file="$(find pandora_target_selector)/launch/target_selector.launch" />
+  </group>
 
   <!--Data fusion -->
-  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+  <include if="$(arg data_fusion)"
+    file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
 
   <!-- Kinect filter -->
-  <include file="$(find kinect_movement_filter)/launch/kinect_movement_filter.launch" />
+  <include if="$(arg kinect_filter)"
+    file="$(find kinect_movement_filter)/launch/kinect_movement_filter.launch" />
 
   <!-- Vision -->
-  <include if="$(arg xtion)" file="$(find openni2_launch)/launch/openni2.launch">
-    <arg name="camera" value="kinect" />
-    <arg name="depth_registration" value="true" />
-    <arg name="publish_tf" value="false" />
-  </include>
+  <group if="$(arg vision)">
+    <include if="$(arg kinect_filter)" file="$(find pandora_vision_launchers)/launch/all_nodes.launch">
+      <arg name="vision_cameras" value="$(arg vision_cameras)"/>
+      <arg name="vision_nodes" value="$(arg vision_nodes)"/>
+      <arg name="camera_left" value="$(arg camera_left)"/>
+      <arg name="camera_right" value="$(arg camera_right)"/>
+      <arg name="xtion" value="$(arg xtion)"/>
+      <arg name="vision_qr" value="$(arg vision_qr)"/>
+      <arg name="vision_hazmat" value="$(arg vision_hazmat)"/>
+      <arg name="vision_landoltc" value="$(arg vision_landoltc)"/>
+      <arg name="vision_motion" value="$(arg vision_motion)"/>
+      <arg name="vision_motion" value="$(arg vision_motion)"/>
+      <arg name="vision_datamatrix" value="$(arg vision_datamatrix)"/>
+      <arg name="vision_predator_landoltc3d" value="$(arg vision_predator_landoltc3d)"/>
+      <arg name="vision_predator_landoltc" value="$(arg vision_predator_landoltc)"/>
+    </include>
+  </group>
 
   <group if="$(arg bag)">
     <node name="bag" type="record" pkg="rosbag"
