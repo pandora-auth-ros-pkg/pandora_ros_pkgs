@@ -71,7 +71,9 @@ namespace xmega
     {
       if (measurement[ii] > 0)
       {
-        voltage_[ii] = measurement[ii];
+        voltage_[ii][voltageBufferCounter_[ii]] =
+          static_cast<double>(measurement[ii]);
+        voltageBufferCounter_[ii] = fmod(voltageBufferCounter_[ii] + 1, 5);
       }
     }
 
@@ -81,26 +83,26 @@ namespace xmega
     for (RangeMap::iterator it = sensorMap.begin(); it != sensorMap.end(); ++it)
     {
       int address = it->first;
-      for (int jj = 0; jj < rangeData_.size(); jj++)
+      for (int ii = 0; ii < rangeData_.size(); ii++)
       {
-        if ( address == i2c_address_[jj])
+        if ( address == i2c_address_[ii])
         {
-          if (radiationType_[jj] == sensor_msgs::Range::ULTRASOUND)
+          if (radiationType_[ii] == sensor_msgs::Range::ULTRASOUND)
           {
-            range_[jj][bufferCounter_[jj]] =
+            range_[ii][rangeBufferCounter_[ii]] =
               static_cast<double>(it->second.sonarRange) / 100;
-            bufferCounter_[jj] = fmod(bufferCounter_[jj] + 1, 5);
+            rangeBufferCounter_[ii] = fmod(rangeBufferCounter_[ii] + 1, 5);
             exists[0] = true;
             if (exists[1] == true)
             {
               break;
             }
           }
-          else if (radiationType_[jj] == sensor_msgs::Range::INFRARED)
+          else if (radiationType_[ii] == sensor_msgs::Range::INFRARED)
           {
-            range_[jj][bufferCounter_[jj]] =
+            range_[ii][rangeBufferCounter_[ii]] =
               static_cast<double>(it->second.irRange) / 100;
-            bufferCounter_[jj] = fmod(bufferCounter_[jj] + 1, 5);
+            rangeBufferCounter_[ii] = fmod(rangeBufferCounter_[ii] + 1, 5);
             exists[1] = true;
             if (exists[0] == true)
             {
@@ -128,7 +130,8 @@ namespace xmega
     ROS_ASSERT(
       batteryList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
-    voltage_ = new double[batteryList.size()];
+    voltage_ = new double*[batteryList.size()];
+    voltageBufferCounter_ = new int[batteryList.size()];
 
     std::vector<BatteryHandle>
       batteryHandle;
@@ -147,11 +150,18 @@ namespace xmega
       key = "max_voltage";
       ROS_ASSERT(
         batteryList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-      voltage_[ii] = static_cast<double>(batteryList[ii][key]);
+
+      voltage_[ii] = new double[5];
+      for (int jj = 0; jj < 5; jj++)
+      {
+        voltage_[ii][jj] = static_cast<double>(batteryList[ii][key]);
+      }
+
+      voltageBufferCounter_[ii] = 0;
 
       BatteryHandle::Data data;
       data.name = batteryNames_[ii];
-      data.voltage = &voltage_[ii];
+      data.voltage = voltage_[ii];
       batteryData_.push_back(data);
       BatteryHandle handle(
         batteryData_[ii]);
@@ -172,7 +182,7 @@ namespace xmega
     minRange_ = new double[rangeSensorList.size()];
     maxRange_ = new double[rangeSensorList.size()];
     range_ = new double*[rangeSensorList.size()];
-    bufferCounter_ = new int[rangeSensorList.size()];
+    rangeBufferCounter_ = new int[rangeSensorList.size()];
     i2c_address_ = new int[rangeSensorList.size()];
 
 
@@ -220,7 +230,7 @@ namespace xmega
         range_[ii][jj] = static_cast<double>(rangeSensorList[ii][key]);
       }
 
-      bufferCounter_[ii] = 0;
+      rangeBufferCounter_[ii] = 0;
 
       key = "i2c_address";
       ROS_ASSERT(
