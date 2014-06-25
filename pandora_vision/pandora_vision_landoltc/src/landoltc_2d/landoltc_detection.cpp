@@ -35,7 +35,7 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
-#include "pandora_vision_landoltc/landoltc_detection.h"
+#include "pandora_vision_landoltc/landoltc_2d/landoltc_detection.h"
 
 namespace pandora_vision
 {
@@ -273,8 +273,6 @@ void LandoltCDetection::landoltcCallback()
   //!< Create message of Landoltc Detector
   vision_communications::LandoltcAlertsVectorMsg landoltcVectorMsg;
   vision_communications::LandoltcAlertMsg landoltccodeMsg;
-  
-  bool noAngle = true;
 
   landoltcVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
   landoltcVectorMsg.header.stamp = ros::Time::now();
@@ -291,21 +289,22 @@ void LandoltCDetection::landoltcCallback()
     landoltccodeMsg.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
     landoltccodeMsg.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
 
-    landoltccodeMsg.posterior = _landoltc[i].probability;
+    landoltccodeMsg.posterior = _landoltc.at(i).probability;
     
-    for(int j = 0; j < _landoltc[i].angles.size(); j++)
-      landoltccodeMsg.angles.push_back( _landoltc[i].angles.at(j));
+    if(_landoltc.at(i).angles.size() == 0) continue;
     
-    if (_landoltc[i].angles.size() > 0)
-      landoltcVectorMsg.landoltcAlerts.push_back(landoltccodeMsg);
-    else
-        noAngle = false;
-  }
-  
-  if(noAngle == true && _landoltc.size() > 0){
-    _landoltcPublisher.publish(landoltcVectorMsg);
+    for(int j = 0; j < _landoltc.at(i).angles.size(); j++)
+      landoltccodeMsg.angles.push_back( _landoltc.at(i).angles.at(j));
+    
+    landoltcVectorMsg.landoltcAlerts.push_back(landoltccodeMsg);
+    
     ROS_INFO_STREAM("[landoltc_node] : Landoltc found");
+    landoltccodeMsg.angles.clear();
   }
+  if(_landoltc.size() >0){
+    _landoltcPublisher.publish(landoltcVectorMsg);
+    landoltcVectorMsg.landoltcAlerts.clear();
+  }  
   _landoltcDetector.clear();
 }
 
@@ -367,6 +366,6 @@ void LandoltCDetection::parametersCallback(
     LandoltcParameters::centerThreshold = config.centerThreshold;
     LandoltcParameters::huMomentsPrec = config.huMomentsPrec;
     LandoltcParameters::adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
-    
+    LandoltcParameters::visualization = config.visualization;    
   }
 } // namespace pandora_vision

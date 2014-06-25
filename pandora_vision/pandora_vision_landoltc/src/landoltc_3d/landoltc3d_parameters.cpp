@@ -35,17 +35,21 @@
 * Authors: Victor Daropoulos
 *********************************************************************/
 
-#include "pandora_vision_landoltc/landoltc_parameters.h"
+#include "pandora_vision_landoltc/landoltc_3d/landoltc3d_parameters.h"
 
 namespace pandora_vision
 {
   
-  double LandoltcParameters::gradientThreshold = 60;
+  double Landoltc3DParameters::gradientThreshold = 60;
   
-  double LandoltcParameters::centerThreshold = 90;
+  double Landoltc3DParameters::centerThreshold = 90;
   
-  double LandoltcParameters::huMomentsPrec = 0.3;
+  double Landoltc3DParameters::huMomentsPrec = 0.3;
   
-  int LandoltcParameters::adaptiveThresholdSubtractSize = 2;
+  int Landoltc3DParameters::adaptiveThresholdSubtractSize = 2;
+  
+  double Landoltc3DParameters::bradleyPerc = 0.15;
+  
+  bool Landoltc3DParameters::visualization = false;
   
 }// namespace pandora_vision

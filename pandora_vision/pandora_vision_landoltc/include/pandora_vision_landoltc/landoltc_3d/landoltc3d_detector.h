@@ -42,9 +42,8 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "pandora_vision_landoltc/landoltc3d_parameters.h"
+#include "pandora_vision_landoltc/landoltc_3d/landoltc3d_parameters.h"
 
-//~ #define SHOW_DEBUG_IMAGE 
 namespace pandora_vision
 {
   

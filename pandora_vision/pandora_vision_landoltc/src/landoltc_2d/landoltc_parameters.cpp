@@ -35,22 +35,18 @@
 * Authors: Victor Daropoulos
 *********************************************************************/
 
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_PARAMETERS_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_PARAMETERS_H
-#include <dynamic_reconfigure/server.h>
-#include <pandora_vision_landoltc/landoltc_cfgConfig.h>
+#include "pandora_vision_landoltc/landoltc_2d/landoltc_parameters.h"
 
 namespace pandora_vision
 {
-  struct LandoltcParameters
-  {
-    //!< Threshold parameters
-    static double gradientThreshold;
-    static double centerThreshold;
-    static double huMomentsPrec;
-    static int adaptiveThresholdSubtractSize;
-    
-  };
-
-} // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_PARAMETERS_H
+  
+  double LandoltcParameters::gradientThreshold = 60;
+  
+  double LandoltcParameters::centerThreshold = 90;
+  
+  double LandoltcParameters::huMomentsPrec = 0.3;
+  
+  int LandoltcParameters::adaptiveThresholdSubtractSize = 2;
+  
+  bool LandoltcParameters::visualization = false;
+}// namespace pandora_vision

@@ -48,10 +48,10 @@ include_directories(include
 
 ########################### landoltcNode ############################
 add_executable(landoltc_node 
-              src/landoltc_node.cpp
-              src/landoltc_detection.cpp
-              src/landoltc_detector.cpp
-              src/landoltc_parameters.cpp
+              src/landoltc_2d/landoltc_node.cpp
+              src/landoltc_2d/landoltc_detection.cpp
+              src/landoltc_2d/landoltc_detector.cpp
+              src/landoltc_2d/landoltc_parameters.cpp
 )
 target_link_libraries(landoltc_node ${catkin_LIBRARIES} )
 
@@ -63,10 +63,10 @@ add_dependencies(landoltc_node
 
 ########################### landoltc3dNode ############################
 add_executable(landoltc3d_node 
-              src/landoltc3d_parameters.cpp
-              src/landoltc3d_node.cpp
-              src/landoltc3d_detection.cpp
-              src/landoltc3d_detector.cpp
+              src/landoltc_3d/landoltc3d_parameters.cpp
+              src/landoltc_3d/landoltc3d_node.cpp
+              src/landoltc_3d/landoltc3d_detection.cpp
+              src/landoltc_3d/landoltc3d_detector.cpp
               
               
 )
@@ -86,20 +86,20 @@ set(ROSLINT_CPP_OPTS
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
   RELATIVE ${PROJECT_SOURCE_DIR} 
             
-  include/landoltc3d_detector.h
-  include/landoltc3d_detection.h
-  include/landoltc_detector.h
-  include/landoltc_detection.h
-  include/landoltc_parameters.h
-  include/landoltc3d_parameters.h
-  src/landoltc_detector.cpp
-  src/landoltc3d_detector.cpp
-  src/landoltc3d_detection.cpp
-  src/landoltc3d_node.cpp
-  src/landoltc_detection.cpp
-  src/landoltc_node.cpp
-  src/landoltc_parameters.cpp
-  src/landoltc3d_parameters.cpp
+  include/landoltc_3d/landoltc3d_detector.h
+  include/landoltc_3d/landoltc3d_detection.h
+  include/landoltc_2d/landoltc_detector.h
+  include/landoltc_2d/landoltc_detection.h
+  include/landoltc_2d/landoltc_parameters.h
+  include/landoltc_3d/landoltc3d_parameters.h
+  src/landoltc_2d/landoltc_detector.cpp
+  src/landoltc_3d/landoltc3d_detector.cpp
+  src/landoltc_3d/landoltc3d_detection.cpp
+  src/landoltc_3d/landoltc3d_node.cpp
+  src/landoltc_2d/landoltc_detection.cpp
+  src/landoltc_2d/landoltc_node.cpp
+  src/landoltc_2d/landoltc_parameters.cpp
+  src/landoltc_3d/landoltc3d_parameters.cpp
   
             
 )

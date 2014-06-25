@@ -35,7 +35,7 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
-#include "pandora_vision_landoltc/landoltc3d_detector.h"
+#include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"
 
 
 namespace pandora_vision
@@ -90,29 +90,28 @@ void LandoltC3dDetector::initializeReferenceImage(std::string path)
 void LandoltC3dDetector::applyMask()
 {
   for(int i = 0; i < _landoltc3d.size(); i++)
-  {
-    LandoltC3D* temp = &(_landoltc3d.at(i));
-    
-    for (int j = 0; j < (*temp).color.size(); j++)
+  {    
+    for (int j = 0; j < _landoltc3d.at(i).color.size(); j++)
     {
       _mask = cv::Mat(_coloredContours.rows, _coloredContours.cols, CV_8UC1);
     
-      cv::inRange(_coloredContours, (*temp).color[j], (*temp).color[j], _mask);
+      cv::inRange(_coloredContours, _landoltc3d.at(i).color[j], _landoltc3d.at(i).color[j], _mask);
     
-      cv::Mat out = getWarpPerspectiveTransform(_mask, (*temp).bbox[j]);
+      cv::Mat out = getWarpPerspectiveTransform(_mask, _landoltc3d.at(i).bbox[j]);
     
-      cv::Mat cropped = _mask((*temp).bbox[j]).clone(); 
+      cv::Mat cropped = _mask(_landoltc3d.at(i).bbox[j]).clone(); 
     
       cv::Mat padded;
     
       cv::copyMakeBorder(out, padded, 8, 8, 8, 8, cv::BORDER_CONSTANT, cv::Scalar(0));
     
-      findRotation(padded, temp);
+      findRotation(padded, &(_landoltc3d.at(i)));
     
-      #ifdef SHOW_DEBUG_IMAGE
-      cv::imshow("padded", padded);
-      cv::waitKey(20);
-      #endif
+      if(Landoltc3DParameters::visualization)
+      {
+        cv::imshow("padded", padded);
+        cv::waitKey(20);
+      }
     }
   }
 }
@@ -265,11 +264,6 @@ cv::Mat LandoltC3dDetector::getWarpPerspectiveTransform(const cv::Mat& in, cv::R
   // Apply perspective transformation
   cv::warpPerspective(in, quad, transmtx, quad.size());
   
-  #ifdef SHOW_DEBUG_IMAGE
-  //~ cv:imshow("warp", quad);
-  //~ cv::waitKey(5);      
-  #endif
-  
   return quad;
 }
 
@@ -339,10 +333,11 @@ void LandoltC3dDetector::findRotation(const cv::Mat&in, LandoltC3D* temp)
     
   }
   
-  #ifdef SHOW_DEBUG_IMAGE
-  cv::imshow("paddedptr", paddedptr); 
-  cv::waitKey(5); 
-  #endif
+  if(Landoltc3DParameters::visualization)
+  {
+    cv::imshow("paddedptr", paddedptr); 
+    cv::waitKey(5); 
+  }
     
   _edges = 0;
   
@@ -665,13 +660,6 @@ void LandoltC3dDetector::begin(cv::Mat* input)
 
   findCenters(dst.rows, dst.cols, gradXF, gradYF);
   
-  #ifdef SHOW_DEBUG_IMAGE
-  for(std::size_t i = 0; i < _centers.size(); i++)
-  {
-    cv::circle(*input, _centers.at(i), 2, (0, 0, 255), -1);
-  }
-  #endif
-  
   convertScaleAbs( gradX, abs_grad_x );
   
   convertScaleAbs( gradY, abs_grad_y );
@@ -685,10 +673,11 @@ void LandoltC3dDetector::begin(cv::Mat* input)
 
   cv::erode(thresholded, thresholded, erodeKernel);
   
-  #ifdef SHOW_DEBUG_IMAGE
-  cv::imshow("thresholded", thresholded);
-  cv::waitKey(10);
-  #endif
+  if(Landoltc3DParameters::visualization)
+  {
+    cv::imshow("thresholded", thresholded);
+    cv::waitKey(10);
+  }
   
   findLandoltContours(thresholded, thresholded.rows, thresholded.cols, _refContours[0]);
 
@@ -699,10 +688,11 @@ void LandoltC3dDetector::begin(cv::Mat* input)
   
   applyMask();
   
-  #ifdef SHOW_DEBUG_IMAGE
+  if(Landoltc3DParameters::visualization)
+  {
     cv::imshow("Raw", *input);
     cv::waitKey(10);
-  #endif
+  }
   
   fusion();
 
@@ -720,24 +710,23 @@ void LandoltC3dDetector::fusion()
     
     for(int i = 0; i < _landoltc3d.size(); i++)
     {
-      LandoltC3D* temp = &(_landoltc3d.at(i));
-      if((*temp).count == 1)
+      if(_landoltc3d.at(i).angles.size() == 1)
       {
         _landoltc3d.at(i).probability = 0.2;
       }
-      else if((*temp).count == 2)
+      else if(_landoltc3d.at(i).angles.size() == 2)
       {
         _landoltc3d.at(i).probability = 0.4;
       }
-      else if((*temp).count == 3)
+      else if(_landoltc3d.at(i).angles.size() == 3)
       {
         _landoltc3d.at(i).probability = 0.6;
       }
-      else if((*temp).count == 4)
+      else if(_landoltc3d.at(i).angles.size() == 4)
       {
         _landoltc3d.at(i).probability = 0.8;
       }
-      else if((*temp).count == 5)
+      else if(_landoltc3d.at(i).angles.size() == 5)
       {
         _landoltc3d.at(i).probability = 1;
       }

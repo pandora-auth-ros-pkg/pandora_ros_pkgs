@@ -36,7 +36,7 @@
 *********************************************************************/
 
 
-#include "pandora_vision_landoltc/landoltc_detection.h"
+#include "pandora_vision_landoltc/landoltc_2d/landoltc_detection.h"
 
 /**
 @brief Main function of the landoltC node

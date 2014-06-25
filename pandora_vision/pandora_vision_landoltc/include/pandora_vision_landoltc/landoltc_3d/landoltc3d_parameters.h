@@ -32,23 +32,26 @@
 * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Victor Daropoulos
+* Authors: Victor Daropoulos
 *********************************************************************/
 
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_PARAMETERS_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_PARAMETERS_H
+#include <dynamic_reconfigure/server.h>
+#include <pandora_vision_landoltc/landoltc3d_cfgConfig.h>
 
-#include "pandora_vision_landoltc/landoltc3d_detection.h"
-
-/**
-@brief Main function of the landoltC node
-@param argc [int] Number of input arguments
-@param argv [char**] The input arguments
-@return int : 0 for success
-**/
-
-int main(int argc, char** argv) 
+namespace pandora_vision
 {
-  ros::init(argc, argv, "landoltc3d_node");
-  pandora_vision::LandoltC3dDetection landoltc3d_finder("landoltc3d");  
-  ros::spin();
-  return 0;
-}
+  struct Landoltc3DParameters
+  {
+    //!< Threshold parameters
+    static double gradientThreshold;
+    static double centerThreshold;
+    static double huMomentsPrec;
+    static int adaptiveThresholdSubtractSize;
+    static double bradleyPerc;
+    static bool visualization;
+  };
+
+} // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_PARAMETERS_H

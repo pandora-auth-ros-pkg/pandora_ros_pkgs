@@ -35,7 +35,7 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
-#include "pandora_vision_landoltc/landoltc_detector.h"
+#include "pandora_vision_landoltc/landoltc_2d/landoltc_detector.h"
 
 namespace pandora_vision
 {
@@ -203,10 +203,11 @@ void LandoltCDetector::findRotationB(const cv::Mat& in, LandoltC* temp)
     (*temp).angles.push_back(angle);
   }
   
-  #ifdef SHOW_DEBUG_IMAGE
+  if(LandoltcParameters::visualization)
+  {
     cv::imshow("paddedptr", paddedptr); 
     cv::waitKey(30); 
-  #endif
+  }
     
   _edges = 0;
   
@@ -385,29 +386,28 @@ void LandoltCDetector::findCenters(int rows, int cols, float* grX, float* grY)
 void LandoltCDetector::applyMask()
 {
   for(int i = 0; i < _landoltc.size(); i++)
-  {
-    LandoltC* temp = &(_landoltc.at(i));
-    
-    for (int j = 0; j < (*temp).color.size(); j++)
+  {    
+    for (int j = 0; j < _landoltc.at(i).color.size(); j++)
     {
       _mask = cv::Mat::zeros(_coloredContours.rows, _coloredContours.cols, CV_8UC1);
     
-      cv::inRange(_coloredContours, (*temp).color[j], (*temp).color[j], _mask);
+      cv::inRange(_coloredContours, _landoltc.at(i).color[j], _landoltc.at(i).color[j], _mask);
     
-      cv::Mat out = getWarpPerspectiveTransform(_mask, (*temp).bbox[j]);
+      cv::Mat out = getWarpPerspectiveTransform(_mask, _landoltc.at(i).bbox[j]);
     
-      cv::Mat cropped = _mask((*temp).bbox[j]).clone(); 
+      cv::Mat cropped = _mask(_landoltc.at(i).bbox[j]).clone(); 
     
       cv::Mat padded;
     
       cv::copyMakeBorder(out, padded, 8, 8, 8, 8, cv::BORDER_CONSTANT, cv::Scalar(0));
     
-      #ifdef SHOW_DEBUG_IMAGE
-      cv::imshow("padded", padded); 
-      cv::waitKey(30); 
-      #endif
+      if(LandoltcParameters::visualization)
+      {
+        cv::imshow("padded", padded); 
+        cv::waitKey(30);
+      }
     
-      findRotationB(padded, temp);
+      findRotationB(padded, &(_landoltc.at(i)));
     }
   }
 }
@@ -449,10 +449,11 @@ cv::Mat LandoltCDetector::getWarpPerspectiveTransform(const cv::Mat& in, cv::Rec
   // Apply perspective transformation
   cv::warpPerspective(in, quad, transmtx, quad.size());
   
-  #ifdef SHOW_DEBUG_IMAGE
-  cv:imshow("warp", quad);
-  cv::waitKey(5);      
-  #endif
+  if(LandoltcParameters::visualization)
+  {
+    cv::imshow("warp", quad);
+    cv::waitKey(5);      
+  }
   
   return quad;
     
@@ -585,10 +586,11 @@ void LandoltCDetector::begin(cv::Mat* input)
 
   applyMask();
   
-  #ifdef SHOW_DEBUG_IMAGE
-  cv::imshow("Raw", *input);
-  cv::waitKey(20);
-  #endif
+  if(LandoltcParameters::visualization)
+  {
+    cv::imshow("Raw", *input);
+    cv::waitKey(20);
+  }
   
   fusion();
 }
@@ -616,28 +618,26 @@ void LandoltCDetector::fusion()
 {
   for(int i = 0; i < _landoltc.size(); i++)
   {
-    if(_landoltc.at(i).count == 1)
+    if(_landoltc.at(i).angles.size() == 1)
     {
       _landoltc.at(i).probability = 0.2;
     }
-    else if(_landoltc.at(i).count == 2)
+    else if(_landoltc.at(i).angles.size() == 2)
     {
       _landoltc.at(i).probability = 0.4;
     }
-    else if(_landoltc.at(i).count == 3)
+    else if(_landoltc.at(i).angles.size() == 3)
     {
       _landoltc.at(i).probability = 0.6;
     }
-    else if(_landoltc.at(i).count == 4)
+    else if(_landoltc.at(i).angles.size() == 4)
     {
       _landoltc.at(i).probability = 0.8;
     }
-    else if(_landoltc.at(i).count == 5)
+    else if(_landoltc.at(i).angles.size() == 5)
     {
       _landoltc.at(i).probability = 1;
     }
-    else
-      _landoltc.at(i).probability = 0;
    
   }
   

@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include "vision_communications/LandoltcAlertsVectorMsg.h"
 #include "vision_communications/LandoltcPredatorMsg.h"
-#include "pandora_vision_landoltc/landoltc3d_detector.h"
+#include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"
 #include "state_manager/state_client.h"
 #include <urdf_parser/urdf_parser.h>
 #include <map>
