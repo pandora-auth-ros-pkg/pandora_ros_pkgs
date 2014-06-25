@@ -1,7 +1,22 @@
 learning_enabled: false
 operation_state: true
 camera_name: kinect
+
 hfov: 58.0
 vfov: 45.0
 image_width: 640
 image_height: 480
+
+#~ detectorCascade parameters ~#
+variance_filter: true
+ensemble_classifier: true
+nn_classifier: true
+use_shift: true
+shift: 0.1
+min_scale: -10
+max_scale: 10
+min_size: 25
+num_trees: 15
+num_features: 15
+theta_TP: 0.65
+theta_FP: 0.5

@@ -43,10 +43,29 @@
 #include <map>
 #include "state_manager/state_client.h"
 
-//~ #define SHOW_DEBUG_IMAGE 
+#include <dynamic_reconfigure/server.h>
+#include <pandora_vision_predator/predator_cfgConfig.h>
+
+#define SHOW_DEBUG_IMAGE 
 
 namespace pandora_vision
 {
+  
+struct DetectorCascadeParams
+{
+  bool variance_filter;
+  bool ensemble_classifier;
+  bool nn_classifier;
+  bool use_shift;
+  double shift;
+  int min_scale;
+  int max_scale;
+  int min_size;
+  int num_trees;
+  int num_features;
+  double theta_TP;
+  double theta_FP;
+};
 
 class Predator : public StateClient
 {
@@ -144,59 +163,80 @@ class Predator : public StateClient
     std::map<std::string, std::string> _frame_ids_map;
     
     bool predatorNowON;  
+    
+    DetectorCascadeParams detectorCascadeParams;
+    
+    //!< The dynamic reconfigure parameters' server
+    dynamic_reconfigure::Server<pandora_vision_predator::predator_cfgConfig>
+    server;
+
+    dynamic_reconfigure::Server<pandora_vision_predator::predator_cfgConfig>::CallbackType f;
+    
+    /**
+    @brief The function called when a parameter is changed
+    @param[in] config [const pandora_vision_predator::predator_cfgConfig&]
+    @param[in] level [const uint32_t] The level 
+    @return void
+    **/
+    void parametersCallback(
+    const pandora_vision_predator::predator_cfgConfig& config,
+    const uint32_t& level);
+    
+   
+    
   public:
   
-  
-  /**
-  @brief Default Constructor
-  @return void
-  **/
-  explicit Predator(const std::string& n);
-  
-  /**
-  @brief Get parameters referring to view and frame characteristics
-  @return void
-  **/
-  void getGeneralParams();
-  
-  /**
-  @brief Checks for file existence
-  @return [bool]
-  **/
-  bool is_file_exist(const std::string& fileName);
-  
-  /**
-  @brief Sends message of tracked object
-  @param rec [const cv::Rect&] The Bounding Box
-  @param posterior [const float&] Confidence
-  @return void
-  **/
-  void sendMessage(const cv::Rect& rec, const float& posterior, const sensor_msgs::ImageConstPtr& frame);
-  
-  
-  /**
-  @brief Default Destructor
-  @return void
-  **/
-  ~Predator();
-  
-  std::string param;
-  
-  /**
+    static bool show_debug_image;
+    /**
+    @brief Default Constructor
+    @return void
+    **/
+    explicit Predator(const std::string& n);
+
+    /**
+    @brief Get parameters referring to view and frame characteristics
+    @return void
+    **/
+    void getGeneralParams();
+
+    /**
+    @brief Checks for file existence
+    @return [bool]
+    **/
+    bool is_file_exist(const std::string& fileName);
+
+    /**
+    @brief Sends message of tracked object
+    @param rec [const cv::Rect&] The Bounding Box
+    @param posterior [const float&] Confidence
+    @return void
+    **/
+    void sendMessage(const cv::Rect& rec, const float& posterior, const sensor_msgs::ImageConstPtr& frame);
+
+
+    /**
+    @brief Default Destructor
+    @return void
+    **/
+    ~Predator();
+
+    std::string param;
+
+    /**
     @brief Node's state manager
     @param newState [int] The robot's new state
     @return void
-  */
-  void startTransition(int newState);
+    */
+    void startTransition(int newState);
 
-  /**
+    /**
     @brief After completion of state transition
     @return void
-  */
-  void completeTransition(void);
-    
-  int curState;
-  int prevState;
+    */
+    void completeTransition(void);
+
+    int curState;
+    int prevState;
   
 };
 } // namespace pandora_vision

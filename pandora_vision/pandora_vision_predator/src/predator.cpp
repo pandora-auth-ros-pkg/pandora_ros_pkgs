@@ -21,12 +21,15 @@
 
 namespace pandora_vision
 {
+  
+bool Predator::show_debug_image = false;
 
 /**
   @brief Default Constructor
   @return void
 **/
-Predator::Predator(const std::string& ns): _nh(ns), predatorNowON(false)
+Predator::Predator(const std::string& ns): 
+  _nh(ns), predatorNowON(false)
 {
   //!< Set initial value of parent frame id to null
   _parent_frame_id = "";
@@ -35,6 +38,9 @@ Predator::Predator(const std::string& ns): _nh(ns), predatorNowON(false)
   modelLoaded = false;
     
   getGeneralParams();
+  
+  //!< The dynamic reconfigure parameter's callback
+  server.setCallback(boost::bind(&Predator::parametersCallback, this, _1, _2));
   
     
   //!< Get the path to the pattern used for detection
@@ -70,18 +76,18 @@ Predator::Predator(const std::string& ns): _nh(ns), predatorNowON(false)
     
   tld::DetectorCascade* detectorCascade = tld->detectorCascade;
   
-  detectorCascade->varianceFilter->enabled = true;
-  detectorCascade->ensembleClassifier->enabled = true;
-  detectorCascade->nnClassifier->enabled = true;  
-  detectorCascade->useShift = true;
-  detectorCascade->shift = 0.1;
-  detectorCascade->minScale = -10;
-  detectorCascade->maxScale = 10;
-  detectorCascade->minSize = 25;
-  detectorCascade->numTrees = 15;
-  detectorCascade->numFeatures = 15;
-  detectorCascade->nnClassifier->thetaTP = 0.65;
-  detectorCascade->nnClassifier->thetaFP = 0.5;
+  detectorCascade->varianceFilter->enabled = detectorCascadeParams.variance_filter;
+  detectorCascade->ensembleClassifier->enabled = detectorCascadeParams.ensemble_classifier;
+  detectorCascade->nnClassifier->enabled = detectorCascadeParams.nn_classifier;  
+  detectorCascade->useShift = detectorCascadeParams.use_shift;
+  detectorCascade->shift = detectorCascadeParams.shift;
+  detectorCascade->minScale = detectorCascadeParams.min_scale;
+  detectorCascade->maxScale = detectorCascadeParams.max_scale;
+  detectorCascade->minSize = detectorCascadeParams.min_size;
+  detectorCascade->numTrees = detectorCascadeParams.num_trees;
+  detectorCascade->numFeatures = detectorCascadeParams.num_features;
+  detectorCascade->nnClassifier->thetaTP = detectorCascadeParams.theta_TP;
+  detectorCascade->nnClassifier->thetaFP = detectorCascadeParams.theta_FP;
   
   _inputImageSubscriber = _nh.subscribe(imageTopic, 1, &Predator::imageCallback, this);
   
@@ -137,11 +143,11 @@ static void mouseHandler(int event, int x, int y, int flags, void *param)
 
     cv::rectangle(imgCopy, point, cv::Point(x, y), CV_RGB(255, 0, 0), 3, 8, 0);
     
-    #ifdef SHOW_DEBUG_IMAGE
-    cv::imshow("tld", imgCopy);
-    cv::waitKey(20);
-    #endif
-
+    if(Predator::show_debug_image)
+    {
+      cv::imshow("tld", imgCopy);
+      cv::waitKey(20);
+    }
   }
 
   /* user release left button */
@@ -272,79 +278,80 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv::rectangle(PredatorFrame, cv::Point(0, 0), cv::Point(PredatorFrame.cols, 50), CV_RGB(0, 0, 0), CV_FILLED, 8, 0);
   cv::putText(PredatorFrame, mystring, cv::Point(25, 25), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
   
-  #ifdef SHOW_DEBUG_IMAGE
-  cv::imshow("tld", PredatorFrame);
-  #endif
-  
-  int keyCode = cv::waitKey(5)&255;
-  
-  switch (keyCode)
+  if(Predator::show_debug_image)
   {
+    cv::imshow("tld", PredatorFrame);
+  
+    int keyCode = cv::waitKey(5)&255;
     
-    // draw bounding box
-    case 'r':
-    //~ if (semaphore_locked && PredatorFrame.empty() == false)
-                               //~ break;
-
-    ROS_INFO("Draw Bounding Box and Press Enter.");
-
-    semaphore_locked = true;
-    bbox = cv::Rect(-1, -1, -1, -1);
-    cv::setMouseCallback("tld", mouseHandler, &PredatorFrame);
-    break;
-    // end drawing bounding box (Enter)
-    
-    case '\n':
-    
-    if (semaphore_locked == false) break;
-    ROS_INFO("Initiating Hunt.");
-    semaphore_locked = false;
-    if (bbox.x == -1 || bbox.y == -1 || bbox.width == -1 || bbox.height == -1)
+    switch (keyCode)
     {
-      ROS_INFO("Invalid bounding box given.");
-      break;
-    }
-    tld->selectObject(grey, &bbox);
-    break;
-    
-    case 'l':
-    
-    tld->learningEnabled = !tld->learningEnabled;
-    ROS_INFO("LearningEnabled: %d\n", tld->learningEnabled);
-    break;
-    
-    case 'a':
-    
-    tld->alternating = !tld->alternating;
-    ROS_INFO("alternating: %d\n", tld->alternating);
-    break;
-    
-    case 'e':
-    
-    ROS_INFO("Saving model...");
-    tld->writeToFile(modelExportFile);
-    break;
-    
-    case 'c':
-    
-    ROS_INFO("Clearing Model");
-    tld->release();
-    break;
-    
-    case 'q':
-    
-    ROS_INFO("Shutdown Request by User. Quitting...");
-    ros::shutdown();  
-    break; 
-    
-    case 'i':
-    const char* modelPath = patternPath.c_str();
-    tld->release();
-    ROS_INFO("Importing Model");
-    tld->readFromFile(modelPath);
-    break;
+      
+      // draw bounding box
+      case 'r':
+      //~ if (semaphore_locked && PredatorFrame.empty() == false)
+                                 //~ break;
 
-    
+      ROS_INFO("Draw Bounding Box and Press Enter.");
+
+      semaphore_locked = true;
+      bbox = cv::Rect(-1, -1, -1, -1);
+      cv::setMouseCallback("tld", mouseHandler, &PredatorFrame);
+      break;
+      // end drawing bounding box (Enter)
+      
+      case '\n':
+      
+      if (semaphore_locked == false) break;
+      ROS_INFO("Initiating Hunt.");
+      semaphore_locked = false;
+      if (bbox.x == -1 || bbox.y == -1 || bbox.width == -1 || bbox.height == -1)
+      {
+        ROS_INFO("Invalid bounding box given.");
+        break;
+      }
+      tld->selectObject(grey, &bbox);
+      break;
+      
+      case 'l':
+      
+      tld->learningEnabled = !tld->learningEnabled;
+      ROS_INFO("LearningEnabled: %d\n", tld->learningEnabled);
+      break;
+      
+      case 'a':
+      
+      tld->alternating = !tld->alternating;
+      ROS_INFO("alternating: %d\n", tld->alternating);
+      break;
+      
+      case 'e':
+      
+      ROS_INFO("Saving model...");
+      tld->writeToFile(modelExportFile);
+      break;
+      
+      case 'c':
+      
+      ROS_INFO("Clearing Model");
+      tld->release();
+      break;
+      
+      case 'q':
+      
+      ROS_INFO("Shutdown Request by User. Quitting...");
+      ros::shutdown();  
+      break; 
+      
+      case 'i':
+      const char* modelPath = patternPath.c_str();
+      tld->release();
+      ROS_INFO("Importing Model");
+      tld->readFromFile(modelPath);
+      break;
+
+      
+    }
   }
   
   if(modelLoaded)
@@ -397,11 +404,11 @@ void Predator::getGeneralParams()
   
   //! Declare publisher and advertise topic
   //! where algorithm results are posted if it works in compination with landoltc3d
-  if (_nh.getParam("published_topic_names/predator_landoltc_output", param))
+  if (_nh.getParam("published_topic_names/predator_employment_output", param))
   {
     _landoltc3dPredatorPublisher =
       _nh.advertise<vision_communications::LandoltcPredatorMsg>(param, 1000);
-  
+    ROS_ERROR_STREAM(param);
   }
   else
   {
@@ -479,6 +486,144 @@ void Predator::getGeneralParams()
   {
     ROS_FATAL("[predator_node] : Imagetopic name not found");
     ROS_BREAK();
+  }
+  
+  //----------------detectorCascadeParams---------------------//
+  
+  bool param_bool_temp;
+  double param_double_temp;
+  int param_int_temp;
+  
+  if (_nh.getParam("variance_filter", param_bool_temp))
+  {
+    ROS_DEBUG_STREAM("variance_filter : " << param_bool_temp);
+    detectorCascadeParams.variance_filter = param_bool_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : variance_filter param not found");
+    detectorCascadeParams.variance_filter = true;
+  }
+  
+  if (_nh.getParam("ensemble_classifier", param_bool_temp))
+  {
+    ROS_DEBUG_STREAM("ensemble_classifier : " << param_bool_temp);
+    detectorCascadeParams.ensemble_classifier = param_bool_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : ensemble_classifier param not found");
+    detectorCascadeParams.ensemble_classifier = true;
+  }
+  
+  if (_nh.getParam("nn_classifier", param_bool_temp))
+  {
+    ROS_DEBUG_STREAM("nn_classifier : " << param_bool_temp);
+    detectorCascadeParams.nn_classifier = param_bool_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : nn_classifier param not found");
+    detectorCascadeParams.nn_classifier = true;
+  }
+  
+  if (_nh.getParam("use_shift", param_bool_temp))
+  {
+    ROS_DEBUG_STREAM("use_shift : " << param_bool_temp);
+    detectorCascadeParams.use_shift = param_bool_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : use_shift param not found");
+    detectorCascadeParams.use_shift = true;
+  }
+  
+  if (_nh.getParam("shift", param_double_temp))
+  {
+    ROS_DEBUG_STREAM("shift : " << param_double_temp);
+    detectorCascadeParams.shift = param_double_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : shift param not found");
+    detectorCascadeParams.shift = 0.1;
+  }
+  
+  if (_nh.getParam("min_scale", param_int_temp))
+  {
+    ROS_DEBUG_STREAM("min_scale : " << param_int_temp);
+    detectorCascadeParams.min_scale = param_int_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : min_scale param not found");
+    detectorCascadeParams.min_scale = -10;
+  }
+  
+  if (_nh.getParam("max_scale", param_int_temp))
+  {
+    ROS_DEBUG_STREAM("max_scale : " << param_int_temp);
+    detectorCascadeParams.max_scale = param_int_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : max_scale param not found");
+    detectorCascadeParams.max_scale = 10;
+  }
+  
+  if (_nh.getParam("min_size", param_int_temp))
+  {
+    ROS_DEBUG_STREAM("min_size : " << param_int_temp);
+    detectorCascadeParams.min_size = param_int_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : min_size param not found");
+    detectorCascadeParams.min_size = 25;
+  }
+  
+  if (_nh.getParam("num_trees", param_int_temp))
+  {
+    ROS_DEBUG_STREAM("num_trees : " << param_int_temp);
+    detectorCascadeParams.num_trees = param_int_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : num_trees param not found");
+    detectorCascadeParams.num_trees = 15;
+  }
+  
+  if (_nh.getParam("num_features", param_int_temp))
+  {
+    ROS_DEBUG_STREAM("num_features : " << param_int_temp);
+    detectorCascadeParams.num_features = param_int_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : num_features param not found");
+    detectorCascadeParams.num_features = 15;
+  }
+  
+  if (_nh.getParam("theta_TP", param_double_temp))
+  {
+    ROS_DEBUG_STREAM("theta_TP : " << param_double_temp);
+    detectorCascadeParams.theta_TP = param_double_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : theta_TP param not found");
+    detectorCascadeParams.theta_TP = 0.65;
+  }
+  
+  if (_nh.getParam("theta_FP", param_double_temp))
+  {
+    ROS_DEBUG_STREAM("theta_FP : " << param_double_temp);
+    detectorCascadeParams.theta_FP = param_double_temp;
+  }
+  else
+  {
+    ROS_WARN("[predator_node] : theta_FP param not found");
+    detectorCascadeParams.theta_FP = 0.5;
   }
 }
 
@@ -571,6 +716,19 @@ void Predator::startTransition(int newState)
 void Predator::completeTransition()
 {
   ROS_INFO("[Predator_node] : Transition Complete");
+}
+
+/**
+  @brief The function called when a parameter is changed
+  @param[in] config [const pandora_vision_predator::predator_cfgConfig&]
+  @param[in] level [const uint32_t] The level 
+  @return void
+**/
+void Predator::parametersCallback(
+  const pandora_vision_predator::predator_cfgConfig& config,
+  const uint32_t& level)
+{
+  Predator::show_debug_image = config.show_predator_image;
 }
 
 } // namespace pandora_vision

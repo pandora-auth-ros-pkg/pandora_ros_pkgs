@@ -15,6 +15,7 @@ image_transport
 sensor_msgs
 roslint
 urdf
+dynamic_reconfigure
 )
 
 
@@ -28,7 +29,9 @@ src/libopentld/mftracker
 src/libopentld/tld
 src/3rdparty/cvblobs)
 
-
+generate_dynamic_reconfigure_options(
+  config/predator_cfg.cfg
+)
 
 catkin_package(
  INCLUDE_DIRS include
@@ -43,6 +46,7 @@ catkin_package(
  sensor_msgs
  roslint
  urdf
+ dynamic_reconfigure
  DEPENDS system_lib
 )
 
@@ -134,7 +138,7 @@ target_link_libraries(predator_node cvblobs libopentld ${OpenCV_LIBS} ${catkin_L
 add_dependencies(predator_node 
     ${catkin_EXPORTED_TARGETS}
     vision_communications_gencpp
-    
+    pandora_vision_predator_gencfg
 )
 
 #~ To check lint : catkin_make roslint_pandora_vision_predator
