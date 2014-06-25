@@ -62,7 +62,7 @@ class BadBossOrderFile(Exception):
 
 class AlertDeliveryBoy():
 
-    def __init__(self, frame_id = 'headCamera'):
+    def __init__(self, frame_id):
 
         self.frame_id = frame_id
 
@@ -128,7 +128,7 @@ class AlertDeliveryBoy():
                                             holeId = orderId))
         rospy.logdebug(self.hole_msg)
         self.hole_pub.publish(self.hole_msg)
-        rospy.sleep(0.2)
+        rospy.sleep(0.1)
 
     def deliverHazmatOrder(self, orderYaw, 
                           orderPitch, orderPattern):

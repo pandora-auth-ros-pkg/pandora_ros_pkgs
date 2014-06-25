@@ -45,6 +45,7 @@ from geometry_msgs.msg import Quaternion
 from move_base_msgs.msg import MoveBaseAction, MoveBaseFeedback, MoveBaseResult
 from pandora_navigation_msgs.msg import DoExplorationAction, \
     DoExplorationFeedback, DoExplorationResult
+import tf
 
 class MockNavigation():
 
@@ -87,14 +88,17 @@ class MockNavigation():
         self.entered_exploration = True
         while not self.reply:
             rospy.sleep(0.2)
-            #self.robot_pose_.pose.position.x += 0.1
-            #self.robot_pose_.pose.position.y += 0.05
-            #feedback = DoExplorationFeedback()
-            #feedback.base_position.pose.position.x = \
-            #    self.robot_pose_.pose.position.x
-            #feedback.base_position.pose.position.y = \
-            #    self.robot_pose_.pose.position.y
-            #self.do_exploration_as_.publish_feedback(feedback)
+            listner = tf.TransformListener()
+            (trans, rot) = listener.lookupTransform('/map', '/base_footprint', rospy.Time(0))
+            self.robot_pose_.pose.position.x = trans[0]
+            self.robot_pose_.pose.position.y = trans[1]
+            rospy.loginfo(str(trans[0])+' ' +str(trans[1]))
+            feedback = DoExplorationFeedback()
+            feedback.base_position.pose.position.x = \
+                self.robot_pose_.pose.position.x
+            feedback.base_position.pose.position.y = \
+                self.robot_pose_.pose.position.y
+            self.do_exploration_as_.publish_feedback(feedback)
             if self.do_exploration_as_.is_preempt_requested():
                 self.preempted += 1
                 self.entered_exploration = False
