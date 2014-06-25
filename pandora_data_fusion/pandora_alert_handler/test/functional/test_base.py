@@ -65,7 +65,7 @@ def direction(a, b):
 
 class TestBase(unittest.TestCase):
  
-    deliveryBoy = alert_delivery.AlertDeliveryBoy()
+    deliveryBoy = alert_delivery.AlertDeliveryBoy("headCamera")
 
     def mockCallback(self, data):
 
