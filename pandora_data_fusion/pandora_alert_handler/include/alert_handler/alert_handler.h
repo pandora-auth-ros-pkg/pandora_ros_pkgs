@@ -260,7 +260,7 @@ namespace pandora_data_fusion
         if (map_->data.size() == 0)
           return;
 
-        ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",  
+        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",  
             ObjectType::getObjectType() << " ALERT ARRIVED!");
 
         typename ObjectType::PtrVectorPtr objectsVectorPtr;

@@ -1,1 +1,12 @@
 map_type: SLAM
+object_names:
+  hole: HOLE
+  hazmat: HAZMAT
+  qr: QR
+  thermal: THERMAL
+  face: FACE
+  motion: MOTION
+  sound: SOUND
+  co2: CO2
+  landoltc: LANDOLTC
+  datamatrix: DATAMATRIX

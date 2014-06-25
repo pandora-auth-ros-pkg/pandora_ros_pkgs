@@ -193,7 +193,7 @@ namespace pandora_data_fusion
     {
       hazmatPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
             msg.pitch, currentTransform_) );
-      hazmatPtr->setProbability( 0.5 );
+      hazmatPtr->setProbability(0.9);
       hazmatPtr->setPattern( msg.patternType );
       hazmatPtr->initializeObjectFilter();
     }
@@ -204,7 +204,7 @@ namespace pandora_data_fusion
     {
       qrPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
             msg.pitch, currentTransform_) );
-      qrPtr->setProbability( 0.5 );
+      qrPtr->setProbability(0.9);
       qrPtr->setContent( msg.QRcontent );
       qrPtr->initializeObjectFilter();
       qrPtr->setTimeFound(timeFound);
@@ -215,7 +215,7 @@ namespace pandora_data_fusion
     {
       landoltcPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
             msg.pitch, currentTransform_) );
-      landoltcPtr->setProbability( 0.5 );
+      landoltcPtr->setProbability(0.9);
       landoltcPtr->setAngles( msg.angles );
       landoltcPtr->initializeObjectFilter();
     }
@@ -225,7 +225,7 @@ namespace pandora_data_fusion
     {
       dataMatrixPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
             msg.pitch, currentTransform_) );
-      dataMatrixPtr->setProbability( 0.5 );
+      dataMatrixPtr->setProbability(0.9);
       dataMatrixPtr->setContent( msg.datamatrixContent );
       dataMatrixPtr->initializeObjectFilter();
     }

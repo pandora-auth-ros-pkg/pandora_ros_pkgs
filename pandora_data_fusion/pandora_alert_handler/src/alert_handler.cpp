@@ -323,7 +323,7 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Hole::getObjectType() << " ALERT ARRIVED!");
 
       HolePtrVectorPtr holesVectorPtr;
@@ -350,7 +350,7 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Hazmat::getObjectType() << " ALERT ARRIVED!");
 
       HazmatPtrVectorPtr hazmatsVectorPtr;
@@ -373,7 +373,7 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_DEBUG_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
           Qr::getObjectType() << " ALERT ARRIVED!");  
 
       QrPtrVectorPtr qrsVectorPtr;
@@ -396,7 +396,8 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_DEBUG_NAMED("ALERT_HANDLER_ALERT_CALLBACK", "LANDOLTC ALERT ARRIVED!");
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          Landoltc::getObjectType() << " ALERT ARRIVED!");
 
       LandoltcPtrVectorPtr landoltcsVectorPtr;
       try
@@ -418,7 +419,8 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_DEBUG_NAMED("ALERT_HANDLER_ALERT_CALLBACK", "DATA MATRIX ALERT ARRIVED!");
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          DataMatrix::getObjectType() << " ALERT ARRIVED!");
 
       DataMatrixPtrVectorPtr dataMatricesVectorPtr;
       try
@@ -466,10 +468,6 @@ namespace pandora_data_fusion
             it->pose.position.y, 
             it->pose.position.z);
         tf::Transform tfObject(tfQuaternion, vec);
-
-        ROS_DEBUG_NAMED("ALERT_HANDLER_TF_PUBLISHER",
-            "Publishing tf : %f , %f , %f , world to %s ", vec[0], vec[1], vec[2],
-            it->header.frame_id.c_str());
 
         objectsBroadcaster_.sendTransform( 
             tf::StampedTransform(tfObject, it->header.stamp,
@@ -576,7 +574,7 @@ namespace pandora_data_fusion
 
       objectHandler_->updateParams(config.sensorRange, config.clusterRadius);
 
-      victimHandler_->updateParams(config.clusterRadius , config.sameVictimRadius);
+      victimHandler_->updateParams(config.clusterRadius, config.sameVictimRadius);
     }
 
     ///////////////////////////////////////////////////////

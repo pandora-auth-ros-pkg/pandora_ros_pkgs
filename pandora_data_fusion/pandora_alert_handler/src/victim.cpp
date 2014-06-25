@@ -60,8 +60,8 @@ namespace pandora_data_fusion
     {
       visualization_msgs::Marker victimMarker;
       visualization_msgs::Marker victimDescription;
-      victimMarker.header.frame_id = getFrameId();
-      victimDescription.header.frame_id = getFrameId();
+      victimMarker.header.frame_id = "/map";
+      victimDescription.header.frame_id = "/map";
       victimMarker.header.stamp = ros::Time::now();
       victimDescription.header.stamp = ros::Time::now();
       victimMarker.ns = type_;
