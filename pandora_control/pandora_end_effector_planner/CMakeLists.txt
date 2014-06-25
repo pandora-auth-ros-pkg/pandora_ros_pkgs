@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   message_generation
   tf
+  urdf
   roslint
 )
 
@@ -40,6 +41,7 @@ catkin_package(
     actionlib
     actionlib_msgs
     tf
+    urdf
     roslint
     message_runtime
 #  DEPENDS system_lib

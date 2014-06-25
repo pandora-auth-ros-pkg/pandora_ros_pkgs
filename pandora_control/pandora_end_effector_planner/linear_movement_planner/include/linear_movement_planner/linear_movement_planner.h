@@ -43,7 +43,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <pandora_end_effector_planner/MoveLinearAction.h>
 #include <tf/transform_listener.h>
-
+#include <urdf_parser/urdf_parser.h>
 
 namespace pandora_control
 {
@@ -59,7 +59,8 @@ namespace pandora_control
 
       int command_;
       double minElevation_;
-      double maxElevation_;
+      double minCommand_;
+      double maxCommand_;
       double movementThreshold_;
       double commandTimeout_;
       double previousTarget_;

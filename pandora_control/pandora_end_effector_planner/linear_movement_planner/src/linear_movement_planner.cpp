@@ -96,8 +96,8 @@ namespace pandora_control
 
   bool LinearMovementActionServer::getPlannerParams()
   {
-    nodeHandle_.param("min_elevation", minElevation_, 0.0);
-    nodeHandle_.param("max_elevation", maxElevation_, 0.18);
+    nodeHandle_.param("min_command", minCommand_, 0.0);
+    nodeHandle_.param("max_command", maxCommand_, 0.18);
     nodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
     movementThreshold_ = fabs(movementThreshold_);
     nodeHandle_.param("command_timeout", commandTimeout_, 15.0);
@@ -121,6 +121,27 @@ namespace pandora_control
       ROS_FATAL("Failed to get param linear_motor_frame shuting down");
       return false;
     }
+
+    // Parse robot description
+    const std::string model_param_name = "/robot_description";
+    bool res = nodeHandle_.hasParam(model_param_name);
+    std::string robot_model_str="";
+    if(!res || !nodeHandle_.getParam(model_param_name,robot_model_str))
+    {
+      ROS_ERROR_STREAM(
+        "Robot descripion couldn't be retrieved from param server.");
+      return false;
+    }
+
+    boost::shared_ptr<urdf::ModelInterface> model(
+      urdf::parseURDF(robot_model_str));
+
+    // Get current link and its parent
+    boost::shared_ptr<const urdf::Link> link =
+      model->getLink(linearMotorFrame_);
+    minElevation_ =
+      link->parent_joint->parent_to_joint_origin_transform.position.z;
+    ROS_INFO_STREAM("Got minElevation_ from URDF: " << minElevation_);
 
     return true;
   }
@@ -210,18 +231,18 @@ namespace pandora_control
         ROS_ERROR("%s", ex.what());
       }
       linearZ = linearTransform.getOrigin()[2];
-      if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
-      {
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
-        // set the action state to succeeded
-        actionServer_.setAborted();
-        return;
-      }
       if (actionServer_.isPreemptRequested() || !ros::ok())
       {
         ROS_WARN("%s: Preempted", actionName_.c_str());
         // set the action state to preempted
         actionServer_.setPreempted();
+        return;
+      }
+      if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
+      {
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
         return;
       }
     }
@@ -319,7 +340,6 @@ namespace pandora_control
         }
       }
       lastTf = ros::Time::now();
-      rate.sleep();
 
       double deltaZ = linearToTargetTransform.getOrigin()[2]
         - linearToCenterTransform.getOrigin()[2];
@@ -327,21 +347,22 @@ namespace pandora_control
       double targetZ = linearTransform.getOrigin()[2] + deltaZ;
       if (targetZ < minElevation_)
       {
-        targetPosition.data = 0;
+        targetPosition.data = minCommand_;
       }
-      else if (targetZ <= maxElevation_)
+      else if (targetZ <= minElevation_ + maxCommand_)
       {
         targetPosition.data = targetZ - minElevation_;
       }
       else
       {
-        targetPosition.data = 0.18;
+        targetPosition.data = maxCommand_;
       }
       if (fabs(previousTarget_ - targetPosition.data) > movementThreshold_)
       {
         linearCommandPublisher_.publish(targetPosition);
         previousTarget_ = targetPosition.data;
       }
+      rate.sleep();
     }
   }
 }  // namespace pandora_control
