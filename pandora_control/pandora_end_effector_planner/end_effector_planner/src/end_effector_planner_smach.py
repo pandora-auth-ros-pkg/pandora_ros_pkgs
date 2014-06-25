@@ -58,7 +58,7 @@ def main():
 
     with sm:
 
-        sm.userdata.lower_linear = \
+        sm.userdata.reset_head_linear = \
             MoveEndEffectorGoal(command=MoveEndEffectorGoal.PARK)
 
         StateMachine.add(
@@ -80,16 +80,8 @@ def main():
             default_outcome='preempted',
             input_keys=['move_end_effector_msg'],
             output_keys=['move_end_effector_msg'],
-            outcome_map={
-                'succeeded': {'KINECT_ORIENTATION': 'succeeded',
-                              'HEAD_ORIENTATION': 'succeeded',
-                              'LINEAR_MOVEMENT': 'succeeded'},
-                'aborted': {'LINEAR_MOVEMENT': 'aborted'},
-                'preempted': {'KINECT_ORIENTATION': 'preempted',
-                              'HEAD_ORIENTATION': 'preempted',
-                              'LINEAR_MOVEMENT': 'preempted'}
-            },
-            child_termination_cb=termination_cb
+            child_termination_cb=termination_cb,
+            outcome_cb = out_cb
         )
 
         with test_park_track_cc:
@@ -118,15 +110,26 @@ def main():
             'LOWER_LINEAR',
             LinearMovementState(),
             transitions={
-                'succeeded': 'KINECT_ORIENTATION',
+                'succeeded': 'CENTER_HEAD',
                 'aborted': 'aborted',
                 'preempted': 'preempted'
             },
-            remapping={'move_end_effector_msg': 'lower_linear'}
+            remapping={'move_end_effector_msg': 'reset_head_linear'}
         )
 
         StateMachine.add(
-            'KINECT_ORIENTATION',
+            'CENTER_HEAD',
+            HeadOrientationState(),
+            transitions={
+                'succeeded': 'SCAN',
+                'aborted': 'aborted',
+                'preempted': 'preempted'
+            },
+            remapping={'move_end_effector_msg': 'reset_head_linear'}
+        )
+
+        StateMachine.add(
+            'SCAN',
             KinectOrientationState(),
             transitions={
                 'preempted': 'preempted'
@@ -153,8 +156,27 @@ def main():
     rospy.spin()
 
 
+def out_cb(outcome_map):
+    if outcome_map['KINECT_ORIENTATION'] == 'succeeded' and \
+            outcome_map['HEAD_ORIENTATION'] == 'succeeded' and \
+            outcome_map['LINEAR_MOVEMENT'] == 'succeeded':
+        return 'succeeded'
+    if outcome_map['KINECT_ORIENTATION'] == 'aborted':
+        return 'aborted'
+    elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
+        return 'aborted'
+    elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
+        return 'aborted'
+    else:
+        return 'preempted'
+
+
 def termination_cb(outcome_map):
-    if outcome_map['LINEAR_MOVEMENT'] == 'aborted':
+    if outcome_map['KINECT_ORIENTATION'] == 'aborted':
+        return True
+    elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
+        return True
+    elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
         return True
     else:
         return False

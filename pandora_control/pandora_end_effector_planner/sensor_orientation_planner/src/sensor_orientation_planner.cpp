@@ -318,6 +318,7 @@ namespace pandora_control
 
   void SensorOrientationActionServer::pointSensor(std::string pointOfInterest)
   {
+    ros::Time lastTf = ros::Time::now();
     ros::Rate rate(5);
     std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
 
@@ -351,12 +352,20 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
-        // set the action state to succeeded
-        actionServer_.setAborted();
-        return;
+        if (ros::Time::now() - lastTf > ros::Duration(1))
+        {
+          ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
+          ROS_DEBUG("%s: Aborted", actionName_.c_str());
+          // set the action state to succeeded
+          actionServer_.setAborted();
+          return;
+        }
+        else
+        {
+          continue;
+        }
       }
+      lastTf = ros::Time::now();
 
       tf::Vector3 desiredVectorX;
       desiredVectorX = targetTransform.getOrigin() - sensorTransform.getOrigin();

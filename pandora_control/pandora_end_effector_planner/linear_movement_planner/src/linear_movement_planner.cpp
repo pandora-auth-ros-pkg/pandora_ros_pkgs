@@ -139,7 +139,7 @@ namespace pandora_control
       ROS_ERROR("%s", ex.what());
     }
     double startX = linearTransform.getOrigin()[2];
-    double step = -0.03;
+    double step = -0.006;
     if (startX + step < minElevation_)
     {
       step = - step;
@@ -233,6 +233,7 @@ namespace pandora_control
   void LinearMovementActionServer::moveLinear(std::string pointOfInterest,
     std::string centerPoint)
   {
+    ros::Time lastTf = ros::Time::now();
     ros::Rate rate(5);
     std_msgs::Float64 targetPosition;
 
@@ -267,11 +268,25 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
-        // set the action state to succeeded
-        actionServer_.setAborted();
-        return;
+        if (ros::Time::now() - lastTf > ros::Duration(1))
+        {
+          if (actionServer_.isPreemptRequested() || !ros::ok())
+          {
+            ROS_WARN("%s: Preempted", actionName_.c_str());
+            // set the action state to preempted
+            actionServer_.setPreempted();
+            return;
+          }
+          ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
+          ROS_DEBUG("%s: Aborted", actionName_.c_str());
+          // set the action state to succeeded
+          actionServer_.setAborted();
+          return;
+        }
+        else
+        {
+          continue;
+        }
       }
 
       tf::StampedTransform linearToCenterTransform;
@@ -283,11 +298,27 @@ namespace pandora_control
       }
       catch (tf::TransformException ex)
       {
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
-        // set the action state to succeeded
-        actionServer_.setAborted();
-        return;
+        if (ros::Time::now() - lastTf > ros::Duration(1))
+        {
+          if (actionServer_.isPreemptRequested() || !ros::ok())
+          {
+            ROS_WARN("%s: Preempted", actionName_.c_str());
+            // set the action state to preempted
+            actionServer_.setPreempted();
+            return;
+          }
+          ROS_DEBUG_STREAM("Is " << centerPoint << " broadcasted?");
+          ROS_DEBUG("%s: Aborted", actionName_.c_str());
+          // set the action state to succeeded
+          actionServer_.setAborted();
+          return;
+        }
+        else
+        {
+          continue;
+        }
       }
+      lastTf = ros::Time::now();
       rate.sleep();
 
       double deltaZ = linearToTargetTransform.getOrigin()[2]
