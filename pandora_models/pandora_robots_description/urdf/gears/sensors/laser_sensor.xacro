@@ -18,7 +18,7 @@
                          pitch_min_limit="${laser_pitch_joint_min_limit}" 
                          pitch_max_limit="${laser_pitch_joint_max_limit}" >
 
-      <origin xyz="0.1894 0.0 0.09679"
+      <origin xyz="0.1974 0.0 0.09679"
               rpy="${zero}" />
 
     </xacro:hokuyo_caster>
