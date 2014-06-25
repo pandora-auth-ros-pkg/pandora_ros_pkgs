@@ -1,41 +1,46 @@
 import os
+import roslib
+import rospkg
+import rospy
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Slot
 from python_qt_binding.QtGui import QWidget
-import roslib
-import rospkg
-import rospy
-from rospy.exceptions import ROSException
 
 from pandora_data_fusion_msgs.msg import GlobalProbabilitiesMsg
-from std_msgs.msg import Int16
-global_propabilities_topic = "/data_fusion/victim_fusion/global_probabilities"
 from .widget_info import WidgetInfo
+
+global_propabilities_topic = "/data_fusion/victim_fusion/global_probabilities"
 
 
 class ProbabilityInfoWidget(QWidget):
     """
    ProbabilityInfoWidget.start must be called in order to update topic pane.
     """
-
     def __init__(self, plugin=None):
 
         super(ProbabilityInfoWidget, self).__init__()
-        self._id = "ProbabilityInfo"
+        self.id_ = "ProbabilityInfo"
 
         rp = rospkg.RosPack()
-        ui_file = os.path.join(rp.get_path('pandora_rqt_gui'), 'resources', 'ProbabilityInfo.ui')
+        ui_file = os.path.join(
+            rp.get_path('pandora_rqt_gui'),
+            'resources', 'ProbabilityInfo.ui')
         loadUi(ui_file, self)
-        self.widget_probabilities_info = WidgetInfo(global_propabilities_topic, GlobalProbabilitiesMsg)
 
-        self._timer_refresh_widget = QTimer(self)
-        self._timer_refresh_widget.timeout.connect(self.refresh_topics)
+        #create the subcribers
+        self.widget_probabilities_info = WidgetInfo(
+            global_propabilities_topic, GlobalProbabilitiesMsg)
+
+        #create and connect the timer
+        self.timer_refresh_widget = QTimer(self)
+        self.timer_refresh_widget.timeout.connect(self.refresh_topics)
 
     def start(self):
         self.widget_probabilities_info.start_monitoring()
-        self._timer_refresh_widget.start(500)
+        self.timer_refresh_widget.start(500)
 
+    #Connected slot to the timer in order to refresh
     @Slot()
     def refresh_topics(self):
 
@@ -48,4 +53,4 @@ class ProbabilityInfoWidget(QWidget):
 
     def shutdown(self):
         self.widget_probabilities_info.stop_monitoring()
-        self._timer_refresh_widget.stop()
+        self.timer_refresh_widget.stop()

@@ -77,7 +77,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="score_label">
            <property name="text">
             <string>Score</string>
            </property>
@@ -96,7 +96,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLCDNumber" name="victimsFound"/>
+            <widget class="QLCDNumber" name="victims_found"/>
            </item>
           </layout>
          </item>
@@ -107,35 +107,35 @@
      <item row="2" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QCheckBox" name="tempCheckBox">
+        <widget class="QCheckBox" name="temp_checkbox">
          <property name="text">
           <string>Temp</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="co2CheckBox">
+        <widget class="QCheckBox" name="co2_checkbox">
          <property name="text">
           <string>Co2</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="batteryCheckBox">
+        <widget class="QCheckBox" name="battery_checkbox">
          <property name="text">
           <string>Battery</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="sonarsCheckBox">
+        <widget class="QCheckBox" name="sonars_checkbox">
          <property name="text">
           <string>Sonars</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="showAllCheckBox">
+        <widget class="QCheckBox" name="show_all_checkbox">
          <property name="text">
           <string>Show all</string>
          </property>
@@ -144,7 +144,7 @@
       </layout>
      </item>
      <item row="1" column="0">
-      <layout class="QGridLayout" name="internalGrid">
+      <layout class="QGridLayout" name="internal_grid">
        <item row="0" column="1" rowspan="2">
         <layout class="QVBoxLayout" name="Buttons">
          <item>
@@ -170,7 +170,7 @@
             </widget>
            </item>
            <item row="5" column="0">
-            <widget class="QTextEdit" name="textEdit">
+            <widget class="QTextEdit" name="text_edit">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
                <horstretch>0</horstretch>
@@ -310,7 +310,7 @@
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QWidget" name="victimInfo_2" native="true">
+        <widget class="QWidget" name="victim_info_2" native="true">
          <layout class="QGridLayout" name="victimInfo">
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_2">

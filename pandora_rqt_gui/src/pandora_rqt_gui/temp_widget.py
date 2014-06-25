@@ -1,12 +1,12 @@
 import os
+import roslib
+import rospkg
+import rospy
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Slot, QTimer
 from python_qt_binding.QtGui import QWidget
-import roslib
-import rospkg
-import rospy
-from rospy.exceptions import ROSException
+
 from std_msgs.msg import Int16
 from .widget_info import WidgetInfo
 
@@ -21,9 +21,11 @@ class TempWidget(QWidget):
         super(TempWidget, self).__init__()
 
         #Load Ui and name the widget
-        self._id = "Temp"
+        self.id_ = "Temp"
         rp = rospkg.RosPack()
-        ui_file = os.path.join(rp.get_path('pandora_rqt_gui'), 'resources', 'TempWidget.ui')
+        ui_file = os.path.join(
+            rp.get_path('pandora_rqt_gui'),
+            'resources', 'TempWidget.ui')
         loadUi(ui_file, self)
 
         #create the subcribers
@@ -32,14 +34,14 @@ class TempWidget(QWidget):
         self.widget_info_right = WidgetInfo("chatter", Int16)
 
         #create and connect the timer
-        self._timer_refresh_widget = QTimer(self)
-        self._timer_refresh_widget.timeout.connect(self.refresh_topics)
+        self.timer_refresh_widget = QTimer(self)
+        self.timer_refresh_widget.timeout.connect(self.refresh_topics)
 
     def start(self):
         self.widget_info_left.start_monitoring()
         self.widget_info_center.start_monitoring()
         self.widget_info_right.start_monitoring()
-        self._timer_refresh_widget.start(1000)
+        self.timer_refresh_widget.start(1000)
 
     #Connected slot to the timer in order to refresh
     @Slot()
@@ -47,8 +49,10 @@ class TempWidget(QWidget):
 
         if self.widget_info_left.last_message is not None:
             self.lcd1.display(self.widget_info_left.last_message.data)
+
         if self.widget_info_center.last_message is not None:
             self.lcd2.display(self.widget_info_center.last_message.data)
+
         if self.widget_info_right.last_message is not None:
             self.lcd3.display(self.widget_info_right.last_message.data)
 
@@ -57,4 +61,4 @@ class TempWidget(QWidget):
         self.widget_info_left.stop_monitoring()
         self.widget_info_center.stop_monitoring()
         self.widget_info_right.stop_monitoring()
-        self._timer_refresh_widget.stop()
+        self.timer_refresh_widget.stop()
