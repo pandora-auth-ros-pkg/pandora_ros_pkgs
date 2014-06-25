@@ -66,7 +66,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="state">
            <property name="text">
             <string>MODE_OFF</string>
            </property>
@@ -150,7 +150,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
-            <widget class="QPushButton" name="pushButton_9">
+            <widget class="QPushButton" name="autonomous_state_button">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -158,12 +158,12 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>START</string>
+              <string>NonAutonomousState</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="reset_timer_button">
              <property name="text">
               <string>ResetTimer</string>
              </property>
@@ -180,23 +180,29 @@
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QPushButton" name="pushButton_4">
+            <widget class="QPushButton" name="mapping_mission_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>MappingMission</string>
              </property>
             </widget>
            </item>
            <item row="5" column="2">
-            <widget class="QPushButton" name="pushButton_3">
+            <widget class="QPushButton" name="save_geotiff_button">
              <property name="text">
               <string>save Geotiff</string>
              </property>
             </widget>
            </item>
            <item row="0" column="2">
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="teleop_state_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
-              <string>SearchAndRescue</string>
+              <string>TeleopState</string>
              </property>
             </widget>
            </item>
@@ -208,21 +214,27 @@
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="QPushButton" name="pushButton_7">
+            <widget class="QPushButton" name="search_and_rescue_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
-              <string>TeleopState</string>
+              <string>SearchAndRescue</string>
              </property>
             </widget>
            </item>
            <item row="4" column="2">
-            <widget class="QPushButton" name="pushButton_8">
+            <widget class="QPushButton" name="semi_autonomous_state">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>SemiAutonosmousState</string>
              </property>
             </widget>
            </item>
            <item row="6" column="2">
-            <widget class="QPushButton" name="stopButton">
+            <widget class="QPushButton" name="stop_button">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
                <horstretch>0</horstretch>
@@ -255,14 +267,14 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QPushButton" name="mysteryButton1">
+            <widget class="QPushButton" name="left_panel_button">
              <property name="text">
-              <string>MysteryButton 1</string>
+              <string>HideLeftPanel</string>
              </property>
             </widget>
            </item>
            <item row="6" column="0">
-            <widget class="QPushButton" name="goButton">
+            <widget class="QPushButton" name="go_button">
              <property name="font">
               <font>
                <pointsize>24</pointsize>
@@ -343,7 +355,7 @@
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="propability">
+             <widget class="QLabel" name="probability">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -357,7 +369,7 @@
           <item row="0" column="1">
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="0">
-             <widget class="QPushButton" name="declineButton">
+             <widget class="QPushButton" name="decline_button">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -370,7 +382,7 @@
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QPushButton" name="confirmButton">
+             <widget class="QPushButton" name="confirm_button">
               <property name="enabled">
                <bool>false</bool>
               </property>

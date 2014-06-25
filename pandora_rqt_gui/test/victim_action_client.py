@@ -10,7 +10,7 @@ from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIGoal
 
 def victim_validation_client():
     # Creates the SimpleActionClient, passing the type of the action
-    # (FibonacciAction) to the constructor.
+
     client = actionlib.SimpleActionClient("victimValidation", ValidateVictimGUIAction)
 
     # Waits until the action server has started up and started
@@ -22,7 +22,8 @@ def victim_validation_client():
     goal.victimFoundx = 3.2
     goal.victimFoundy = 6.3
     goal.probability = 0.8
-    goal.sensorIDsFound = "Eleana for the Win !"
+    goal.sensorIDsFound.append("Eleana")
+    goal.sensorIDsFound.append("Konstantinos")
 
     # Sends the goal to the action server.
     client.send_goal(goal)

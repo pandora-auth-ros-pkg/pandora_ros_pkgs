@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   std_msgs
   actionlib_msgs
+  roslint
 )
 
 catkin_python_setup()
@@ -30,5 +31,23 @@ catkin_package(
     std_msgs
     actionlib_msgs
     pandora_data_fusion_msgs
+    roslint
 #  DEPENDS system_lib
 )
+
+################ RosLint ###################################################
+FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
+            ${PROJECT_SOURCE_DIR} 
+            src/pandora_rqt_gui/battery_widget.py
+            src/pandora_rqt_gui/co2_widget.py
+            src/pandora_rqt_gui/sonars_widget.py
+            src/pandora_rqt_gui/temp_widget.py
+            src/pandora_rqt_gui/widget_info.py
+            src/pandora_rqt_gui/main_widget.py 
+            src/pandora_rqt_gui/standar_widget.py
+            src/pandora_rqt_gui/victim_found_server.py
+            src/pandora_rqt_gui/probability_info.py
+            src/pandora_rqt_gui/pandora_gui.py
+            )
+roslint_python(${${PROJECT_NAME}_LINT_PYTHON})
+
