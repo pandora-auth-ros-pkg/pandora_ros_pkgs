@@ -126,7 +126,7 @@ namespace pandora_control
     const std::string model_param_name = "/robot_description";
     bool res = nodeHandle_.hasParam(model_param_name);
     std::string robot_model_str="";
-    if(!res || !nodeHandle_.getParam(model_param_name,robot_model_str))
+    if (!res || !nodeHandle_.getParam(model_param_name, robot_model_str))
     {
       ROS_ERROR_STREAM(
         "Robot descripion couldn't be retrieved from param server.");
