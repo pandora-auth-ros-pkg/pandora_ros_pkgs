@@ -464,7 +464,7 @@ void Predator::getGeneralParams()
   }
   
   //!< Get the VFOV parameter if available;
-  if (_nh.getParam("/" + cameraName + "/vfov", vfov))
+  if (_nh.getParam("vfov", vfov))
     ROS_DEBUG_STREAM("VFOV : " << vfov);
   else
   {

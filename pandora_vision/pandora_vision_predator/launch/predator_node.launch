@@ -1,6 +1,6 @@
 <launch>
-  
-  <node name="predator_node" type="predator_node" pkg="pandora_vision_predator" 
+  <arg name="name" default="predator_node"/>
+  <node name="$(arg name)" type="predator_node" pkg="pandora_vision_predator" 
       respawn="False" output="screen" />
   <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   

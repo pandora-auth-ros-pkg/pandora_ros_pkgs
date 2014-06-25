@@ -10,7 +10,7 @@
   <arg name="vision_motion" default="true"/>
   <arg name="vision_datamatrix" default="true"/>
   <arg name="vision_landoltc3d" default="true"/>
-  <arg name="vision_predator" default="false"/>
+  <arg name="vision_predator" default="true"/>
 
 
   <!-- Cameras -->
