@@ -45,28 +45,6 @@ namespace pandora_data_fusion
 
     Landoltc::Landoltc() {}
 
-    bool Landoltc::isSameObject(const ObjectConstPtr& object) const
-    {
-      bool cond = false;
-      float epsilon = 0.2;
-
-      if(!Object<Landoltc>::isSameObject(object))
-        return false;
-      std::vector<float> angles = boost::dynamic_pointer_cast<
-        const Landoltc>(object)->getAngles();
-      if(angles_.size() == angles.size())
-      {
-        for(int ii = 0; ii < angles.size(); ++ii)
-        {
-          cond = (angles[ii] - angles_[ii] > -epsilon) &&
-            (epsilon > angles[ii] - angles_[ii]);
-          if(!cond)
-            return false;
-        }
-      }
-      return true;
-    } 
-
     void Landoltc::getVisualization(visualization_msgs::MarkerArray* markers) const
     {
       visualization_msgs::Marker marker;

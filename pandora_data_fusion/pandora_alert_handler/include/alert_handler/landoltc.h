@@ -69,8 +69,6 @@ namespace pandora_data_fusion
          */
         Landoltc();
 
-        virtual bool isSameObject(const ObjectConstPtr& object) const;
-
         virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
 
         /**
