@@ -163,8 +163,6 @@ namespace pandora_vision
 
   int Parameters::HoleFusion::rectangle_inflation_size = 20;
 
-  float Parameters::HoleFusion::holes_gaussian_mean = 0.15;
-  float Parameters::HoleFusion::holes_gaussian_stddev = 0.2;
 
   int Parameters::HoleFusion::run_checker_color_homogeneity = 1;
   float Parameters::HoleFusion::checker_color_homogeneity_threshold = 0.4;
@@ -193,11 +191,23 @@ namespace pandora_vision
   // The holes' validation process identifier
   int Parameters::HoleFusion::validation_process = 0;
 
+  // Depth diff parameters
+
   // 0 for binary probability assignment on positive depth difference
   // 1 for gaussian probability assignment on positive depth difference
   int Parameters::HoleFusion::depth_difference_probability_assignment_method = 1;
 
-  // Plane detection
+  float Parameters::HoleFusion::holes_gaussian_mean = 0.15;
+  float Parameters::HoleFusion::holes_gaussian_stddev = 0.2;
+
+  // Min difference in depth between the inside and the outside of a hole
+  float Parameters::HoleFusion::depth_diff_cutoff_min_depth = 0.02;
+
+  // Max difference in depth between the inside and the outside of a hole
+  float Parameters::HoleFusion::depth_diff_cutoff_max_depth = 0.5;
+
+
+  // Plane detection parameters
   float Parameters::HoleFusion::filter_leaf_size = 0.1;
   int Parameters::HoleFusion::max_iterations = 1000;
   double Parameters::HoleFusion::num_points_to_exclude = 0.2;
@@ -215,7 +225,7 @@ namespace pandora_vision
   int Parameters::HoleFusion::non_zero_points_in_box_blob_histogram = 0;
 
   // Merger parameters
-  float Parameters::HoleFusion::merger_depth_diff_threshold = 0.4;
+  float Parameters::HoleFusion::merger_depth_diff_threshold = 0.3;
   float Parameters::HoleFusion::merger_depth_area_threshold = 1.0;
 
   // Holes validity thresholds

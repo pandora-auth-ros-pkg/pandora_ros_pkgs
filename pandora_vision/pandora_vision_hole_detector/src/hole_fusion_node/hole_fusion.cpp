@@ -808,6 +808,14 @@ namespace pandora_vision
     Parameters::HoleFusion::holes_gaussian_stddev=
       config.holes_gaussian_stddev;
 
+    // Min difference in depth between the inside and the outside of a hole
+    Parameters::HoleFusion::depth_diff_cutoff_min_depth =
+      config.depth_diff_cutoff_min_depth;
+
+    // Max difference in depth between the inside and the outside of a hole
+    Parameters::HoleFusion::depth_diff_cutoff_max_depth =
+      config.depth_diff_cutoff_max_depth;
+
 
     // Plane detection parameters
     Parameters::HoleFusion::filter_leaf_size =

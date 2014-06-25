@@ -192,8 +192,7 @@ namespace pandora_vision
       static float checker_depth_homogeneity_threshold;
 
       static int rectangle_inflation_size;
-      static float holes_gaussian_mean;
-      static float holes_gaussian_stddev;
+
 
       static int run_checker_color_homogeneity;
       static float checker_color_homogeneity_threshold;
@@ -222,9 +221,20 @@ namespace pandora_vision
       // The holes' validation process identifier
       static int validation_process;
 
+      // Depth diff parameters
+
       // 0 for binary probability assignment on positive depth difference
       // 1 for gaussian probability assignment on positive depth difference
       static int depth_difference_probability_assignment_method;
+
+      static float holes_gaussian_mean;
+      static float holes_gaussian_stddev;
+
+      // Min difference in depth between the inside and the outside of a hole
+      static float depth_diff_cutoff_min_depth;
+
+      // Max difference in depth between the inside and the outside of a hole
+      static float depth_diff_cutoff_max_depth;
 
       // Plane detection
       static float filter_leaf_size;

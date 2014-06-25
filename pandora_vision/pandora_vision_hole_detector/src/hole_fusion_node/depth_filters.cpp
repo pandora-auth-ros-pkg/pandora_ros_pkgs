@@ -177,14 +177,15 @@ namespace pandora_vision
 
       // The keypoint's distance from the depth sensor should be greater than
       // that of the mean distance of the vertices of the candidate hole's
-      // bounding box
-      if (value > 0)
+      // bounding box by at a minimum of depth_diff_cutoff_min_depth cm and at
+      // maximum of depth_diff_cutoff_max_depth cm.
+      if (value > Parameters::HoleFusion::depth_diff_cutoff_min_depth
+        && value < Parameters::HoleFusion::depth_diff_cutoff_max_depth)
       {
         // The probability is binary. If there is a valid depth difference,
         // this hole is marked as valid. A tolerance level of 3cm is employed
         // because of the noise in depth measurements
-        if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 0
-          && value > 0.03)
+        if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 0)
         {
           probabilitiesVector->at(inflatedRectanglesIndices[i]) = 1;
         }
