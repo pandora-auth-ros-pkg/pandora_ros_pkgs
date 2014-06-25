@@ -147,7 +147,7 @@ namespace xmega
       batteryNames_.push_back(
         static_cast<std::string>(batteryList[ii][key]));
 
-      key = "max_voltage";
+      key = "initial_voltage";
       ROS_ASSERT(
         batteryList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
 

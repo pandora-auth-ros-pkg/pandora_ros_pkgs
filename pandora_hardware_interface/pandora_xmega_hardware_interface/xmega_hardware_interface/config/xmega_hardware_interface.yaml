@@ -1,8 +1,8 @@
 batteries:
   - name: '/PSU_battery'
-    max_voltage: 24.0
+    initial_voltage: 12.0
   - name: '/motors_battery'
-    max_voltage: 24.0
+    initial_voltage: 12.0
 range_sensors:
   - name: '/sensors/left_sonar'
     frame_id: 'left_sonar_link'
