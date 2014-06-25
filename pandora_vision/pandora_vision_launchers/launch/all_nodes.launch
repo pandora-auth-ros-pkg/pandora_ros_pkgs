@@ -11,6 +11,7 @@
   <arg name="vision_datamatrix" default="true"/>
   <arg name="vision_landoltc3d" default="true"/>
   <arg name="vision_predator" default="true"/>
+  <arg name="vision_hole_detector" default="true"/>
 
 
   <!-- Cameras -->
@@ -54,6 +55,8 @@
       file="$(find pandora_vision_landoltc)/launch/predator-landoltc3d.launch" />
     <include if="$(arg vision_predator)"
       file="$(find pandora_vision_predator)/launch/predator_node.launch" />
+    <include if="$(arg vision_hole_detector)"
+      file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector.launch" />
 
   </group>
 </launch>

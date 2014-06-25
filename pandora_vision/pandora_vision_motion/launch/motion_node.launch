@@ -1,7 +1,7 @@
 <launch>
           
     <node name="motion_node" type="motion_node" pkg="pandora_vision_motion" 
-      respawn="False" output="screen" />
+      respawn="False" />
     <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
     
     <rosparam file="$(find pandora_vision_motion)/config/motion_topics.yaml" 

@@ -1,6 +1,6 @@
 <launch>
     
-    <node name="landoltc3d_node" type="landoltc3d_node" pkg="pandora_vision_landoltc" respawn="False" output="screen" />
+    <node name="landoltc3d_node" type="landoltc3d_node" pkg="pandora_vision_landoltc" respawn="False" />
     <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
     
     <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_topics.yaml" 

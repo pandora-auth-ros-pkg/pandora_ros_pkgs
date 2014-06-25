@@ -1,6 +1,6 @@
 <launch>
     
-  <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" output="screen" />
+  <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" />
     <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   
   <rosparam file="$(find pandora_vision_support)/config/camera_params.yaml" 

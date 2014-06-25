@@ -1,7 +1,7 @@
 <launch>
     
   <node name="datamatrix_node" type="datamatrix_node" pkg="pandora_vision_datamatrix" 
-    respawn="False" output="screen" />
+    respawn="False" />
   <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   
   <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_topics.yaml" 

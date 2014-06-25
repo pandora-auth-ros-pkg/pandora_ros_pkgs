@@ -1,6 +1,6 @@
 <launch>
   
-    <node name="landoltc_node" type="landoltc_node" pkg="pandora_vision_landoltc" respawn="False" output="screen" />
+    <node name="landoltc_node" type="landoltc_node" pkg="pandora_vision_landoltc" respawn="False" />
     
     <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_topics.yaml" 
         command="load" ns="landoltc"/>
