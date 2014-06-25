@@ -41,23 +41,14 @@
 #include "../tld/TLD.h"
 #include <urdf_parser/urdf_parser.h>
 #include <map>
+#include "state_manager/state_client.h"
 
 //~ #define SHOW_DEBUG_IMAGE 
-
-//!< default frame height
-#define DEFAULT_HEIGHT 480
-
-//!< default frame width
-#define DEFAULT_WIDTH 640
-//!< default horizontal field of view
-#define HFOV 61.14
-//!< default vertical field of view
-#define VFOV 48 
 
 namespace pandora_vision
 {
 
-class Predator
+class Predator : public StateClient
 {
   private:
     
@@ -141,9 +132,6 @@ class Predator
     **/
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
     
-    float ratioX;
-    float ratioY;
-    
     double hfov;
     double vfov;
     
@@ -154,7 +142,8 @@ class Predator
     bool getParentFrameId();
       
     std::map<std::string, std::string> _frame_ids_map;
-      
+    
+    bool predatorNowON;  
   public:
   
   
@@ -192,6 +181,23 @@ class Predator
   ~Predator();
   
   std::string param;
+  
+  /**
+    @brief Node's state manager
+    @param newState [int] The robot's new state
+    @return void
+  */
+  void startTransition(int newState);
+
+  /**
+    @brief After completion of state transition
+    @return void
+  */
+  void completeTransition(void);
+    
+  int curState;
+  int prevState;
+  
 };
 } // namespace pandora_vision
 #endif  // PANDORA_VISION_PREDATOR_PREDATOR_NODE_H

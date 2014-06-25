@@ -48,6 +48,7 @@ namespace pandora_vision
     //!< Set initial value of parent frame id to null
     _parent_frame_id = "";
     _frame_id = "";
+    _camera_indicator = -1;
     
     //!< The dynamic reconfigure (depth) parameter's callback
     server.setCallback(boost::bind(&HazmatDetection::parametersCallback,
@@ -69,11 +70,11 @@ namespace pandora_vision
       static_cast<float>(HazmatParameters::MOThreshold)
     );
             
-    //Convert field of view from degrees to rads
-    ratioX_ = hfov_ / frameWidth_;
-    ratioY_ = vfov_ / frameHeight_;
-
-    hazmatFrame_ = cv::Mat( frameWidth_, frameHeight_, CV_8U );
+    //!< Convert field of view from degrees to rads
+    for(int ii= 0; ii < _hfov.size(); ii++){
+      _hfov.at(ii) = _hfov.at(ii) * CV_PI / 180;
+      _vfov.at(ii) = _vfov.at(ii) * CV_PI / 180;
+    }
       
     for(int ii = 0; ii < _imageTopics.size(); ii++ ){
       //!< subscribe to input image's topic
@@ -126,67 +127,58 @@ namespace pandora_vision
     }
     
     XmlRpc::XmlRpcValue cameras_list;
-    if(_nh.getParam("camera_name", cameras_list)){
-      ROS_ASSERT(cameras_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
+    _nh.getParam("camera_sensors", cameras_list);
+    ROS_ASSERT(cameras_list.getType() == XmlRpc::XmlRpcValue::TypeArray); 
+
+    std::string key;
+    for (int ii = 0; ii < cameras_list.size(); ii++)
+    {
+      ROS_ASSERT(
+        cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
       
-      for(int ii = 0; ii< cameras_list.size(); ii++){
-        ROS_ASSERT(cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
-        cameraName = static_cast<std::string>(cameras_list[ii]);
-        ROS_INFO_STREAM("camera_name : " << cameraName);
-        
-        //!< Get the listener's topic for camera
-        if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
-        {
-          ROS_INFO_STREAM("[Hazmat_node]: imageTopic for camera : " << imageTopic);
-        }
-        else
-        {
-         ROS_FATAL("[Hazmat_node]: Image topic name not found");
-         ROS_BREAK(); 
-        }
-        _imageTopics.push_back("/"+imageTopic);
-        
+      key = "name";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
+      cameraName = static_cast<std::string>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[Hazmat_node]: camera_name : " << cameraName);
+      
+      //!< Get the listener's topic for camera
+      if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
+        ROS_INFO_STREAM("[Hazmat_node]: imageTopic for camera : " << imageTopic);
+      else
+      {
+       ROS_FATAL("[Hazmat_node]: Image topic name not found");
+       ROS_BREAK(); 
       }
-    }
-    else
-    {
-      ROS_FATAL("[Hazmat_node]: Camera_name not found");
-      ROS_BREAK(); 
-    }  
+      _imageTopics.push_back("/"+imageTopic);
+      
+      key = "image_height";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      frameHeight = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[Hazmat_node]: image_height : " << frameHeight);
+        
+      _frameHeight.push_back(frameHeight);
+        
+      key = "image_width";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      frameWidth = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[Hazmat_node]: image_width : " << frameWidth);
+        
+      _frameWidth.push_back(frameWidth);  
+      
+      key = "hfov";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      hfov = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[Hazmat_node]: hfov : " << hfov);
+        
+      _hfov.push_back(hfov);  
+      
+      key = "vfov";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+      vfov = static_cast<double>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[Hazmat_node]: vfov : " << vfov);
+        
+      _vfov.push_back(vfov);  
     
-    //! Get the Height parameter if available;
-    if (_nh.getParam("/" + cameraName + "/image_height", frameHeight_)) 
-      ROS_DEBUG_STREAM("height : " << frameHeight_);
-    else 
-    {
-      ROS_DEBUG("[Hazmat_node]: : Parameter frameHeight not found. Using Default");
-      frameHeight_ = DEFAULT_HEIGHT;
-    }
-    
-    //! Get the Width parameter if available;
-    if ( _nh.getParam("/" + cameraName + "/image_width", frameWidth_)) 
-      ROS_DEBUG_STREAM("width : " << frameWidth_);
-    else 
-    {
-      ROS_DEBUG("[Hazmat_node]: : Parameter frameWidth not found. Using Default");
-      frameWidth_ = DEFAULT_WIDTH;
-    }
-    //!< Get the HFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/hfov", hfov_)) 
-      ROS_DEBUG_STREAM("HFOV : " << hfov_);
-    else 
-    {
-      hfov_ = HFOV;
-      ROS_DEBUG_STREAM("HFOV : " << hfov_);
-    }
-    
-    //!< Get the VFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/vfov", vfov_)) 
-      ROS_DEBUG_STREAM("VFOV : " << vfov_);
-    else 
-    {
-      vfov_ = VFOV;
-      ROS_DEBUG_STREAM("VFOV : " << vfov_);
     }
   }
   
@@ -240,8 +232,10 @@ namespace pandora_vision
     hazmatFrameTimestamp_ = msg.header.stamp;
     _frame_id = msg.header.frame_id;
     
-     if(_frame_id.c_str()[0] == '/')
+     if(_frame_id.c_str()[0] == '/'){
       _frame_id = _frame_id.substr(1);
+      _camera_indicator = 1;
+    }  
       
     if ( hazmatFrame_.empty() )
     {               
@@ -271,7 +265,21 @@ namespace pandora_vision
   **/
   void HazmatDetection::hazmatDetect()
   {
-    cv::Mat allblack = cv::Mat( frameWidth_, frameHeight_, CV_8U );
+    
+    if( _camera_indicator == -1){
+      frameWidth = _frameWidth.at(1);
+      frameHeight = _frameHeight.at(1);
+      hfov = _hfov.at(1);
+      vfov = _vfov.at(1);
+    }
+    else{
+      frameWidth = _frameWidth.at(0);
+      frameHeight = _frameHeight.at(0);
+      hfov = _hfov.at(0);
+      vfov = _vfov.at(0);
+    }
+    
+    cv::Mat allblack = cv::Mat( frameWidth, frameHeight, CV_8U );
     if(!hazmatNowOn_)
     {
       return;
@@ -288,7 +296,7 @@ namespace pandora_vision
      
     std::vector<HazmatEpsilon> a = 
         hazmatDetector_->detectHazmat(hazmatFrame_);
-
+    
     //if hazmat found
     if (a.size() > 0)
     {
@@ -296,8 +304,15 @@ namespace pandora_vision
       hazmatVectorMsg.header.stamp = hazmatFrameTimestamp_;
       for (unsigned int i = 0; i < a.size() ; i++)
       {
-        hazmatMsg.yaw = ratioX_ * ( a[i].x - frameWidth_ / 2 );
-        hazmatMsg.pitch = - ratioY_ * ( a[i].y - frameHeight_ / 2 );
+        // Hazmat's center coordinates relative to the center of the frame
+        float x = a[i].x
+          - static_cast<float>(frameWidth) / 2;
+        float y = static_cast<float>(frameHeight) / 2
+          - a[i].y;
+
+        // Hazmat center's yaw and pitch
+        hazmatMsg.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
+        hazmatMsg.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
         hazmatMsg.patternType = a[i].pattern_num;
         hazmatVectorMsg.hazmatAlerts.push_back(hazmatMsg);
               

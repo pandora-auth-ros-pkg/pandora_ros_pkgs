@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
 cv_bridge
 vision_communications
 pandora_common_msgs
+state_manager
+state_manager_communications
 roscpp
 image_transport
 sensor_msgs
@@ -36,6 +38,8 @@ catkin_package(
  image_transport
  vision_communications
  pandora_common_msgs
+ state_manager
+ state_manager_communications
  sensor_msgs
  roslint
  urdf
@@ -121,7 +125,9 @@ include_directories(
 
 target_link_libraries(libopentld cvblobs ${OpenCV_LIBS})
 
-add_executable(predator_node src/predator_node.cpp)
+add_executable(predator_node 
+      src/predator_node.cpp
+      src/predator.cpp)
 
 target_link_libraries(predator_node cvblobs libopentld ${OpenCV_LIBS} ${catkin_LIBRARIES})
 

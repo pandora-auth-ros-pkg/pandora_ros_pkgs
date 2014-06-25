@@ -44,16 +44,16 @@ include_directories(include
 )
 
 add_executable(hazmat_node 
-            src/hazmat_node.cpp
-						src/hazmat_detection.cpp
-						src/hazmat_detector.cpp
-            src/hazmat_parameters.cpp
-						src/utils.cpp 
-						src/sift.cpp 
-						src/kdtree.cpp 
-						src/minpq.cpp 
-						src/xform.cpp 
-						src/imgfeatures.cpp)
+          src/hazmat_node.cpp
+          src/hazmat_detection.cpp
+          src/hazmat_detector.cpp
+          src/hazmat_parameters.cpp
+          src/utils.cpp 
+          src/sift.cpp 
+          src/kdtree.cpp 
+          src/minpq.cpp 
+          src/xform.cpp 
+          src/imgfeatures.cpp)
 target_link_libraries(hazmat_node ${catkin_LIBRARIES} )
 add_dependencies(hazmat_node 
     pandora_vision_hazmat_gencfg
@@ -64,9 +64,9 @@ add_dependencies(hazmat_node
 ########################### hazmatTrainNode ############################
 if(HAZMAT_ENABLE_TRAIN)
   add_executable(hazmat_train src/hazmat_trainer.cpp
-						src/utils.cpp 
-						src/sift.cpp  
-						src/imgfeatures.cpp)
+          src/utils.cpp 
+          src/sift.cpp  
+          src/imgfeatures.cpp)
   target_link_libraries(hazmat_train ${catkin_LIBRARIES} )
 endif()
 
@@ -84,7 +84,5 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/hazmat_detector.cpp
   src/hazmat_detection.cpp
   src/hazmat_trainer.cpp
-  
-            
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

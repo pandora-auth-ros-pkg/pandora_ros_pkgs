@@ -47,7 +47,7 @@ namespace pandora_vision
     //!< Set initial value of parent frame id to null
     _parent_frame_id = "";
     _frame_id = "";
-    
+    _camera_indicator = -1;
     //!< Get Motion Detector Parameters
     getQrCodeParams();
 
@@ -55,12 +55,10 @@ namespace pandora_vision
     getGeneralParams();
 
     //!< Convert field of view from degrees to rads
-    hfov = hfov * CV_PI / 180;
-    vfov = vfov * CV_PI / 180;
-
-    ratioX = hfov / frameWidth;
-    ratioY = vfov / frameHeight;
-    
+    for(int ii= 0; ii < _hfov.size(); ii++){
+      _hfov.at(ii) = _hfov.at(ii) * CV_PI / 180;
+      _vfov.at(ii) = _vfov.at(ii) * CV_PI / 180;
+    }
     for(int ii = 0; ii < _imageTopics.size(); ii++ ){
       //!< subscribe to input image's topic
       frameSubscriber = _nh.subscribe(
@@ -128,67 +126,60 @@ namespace pandora_vision
       else
         ROS_WARN("Cannot find qrcode debug show topic");
     }
-             
+    
     XmlRpc::XmlRpcValue cameras_list;
-    if(_nh.getParam("camera_name", cameras_list)){
-      ROS_ASSERT(cameras_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
-      
-      for(int ii = 0; ii < cameras_list.size(); ii++){
-        ROS_ASSERT(cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
-        cameraName = static_cast<std::string>(cameras_list[ii]);
-        ROS_INFO_STREAM("[QrCode_node]: camera_name : " << cameraName);
-        
-        //!< Get the listener's topic for camera
-        if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
-          ROS_INFO_STREAM("[QrCode_node]: imageTopic for camera : " << imageTopic);
-        else
-        {
-         ROS_FATAL("[QrCode_node]: Image topic name not found");
-         ROS_BREAK(); 
-        }
-        _imageTopics.push_back("/"+imageTopic);
-      }
-    }
-    else
-    {
-      ROS_FATAL("[QrCode_node]: Camera_name not found");
-      ROS_BREAK(); 
-    }
+    _nh.getParam("camera_sensors", cameras_list);
+    ROS_ASSERT(cameras_list.getType() == XmlRpc::XmlRpcValue::TypeArray); 
 
-    //!< Get the Height parameter if available;
-    if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
-      ROS_DEBUG_STREAM("height : " << frameHeight);
-    else
+    std::string key;
+    for (int ii = 0; ii < cameras_list.size(); ii++)
     {
-      frameHeight = DEFAULT_HEIGHT;
-      ROS_DEBUG_STREAM("height : " << frameHeight);
-    }
-    
-    //!< Get the Width parameter if available;
-    if (_nh.hasParam("/" + cameraName + "/image_width"))
-      ROS_DEBUG_STREAM("width : " << frameWidth);
-    else
-    {
-      frameWidth = DEFAULT_WIDTH;
-      ROS_DEBUG_STREAM("width : " << frameWidth);
-    }
+      ROS_ASSERT(
+        cameras_list[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+      
+      key = "name";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
+      cameraName = static_cast<std::string>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[QrCode_node]: camera_name : " << cameraName);
+      
+      //!< Get the listener's topic for camera
+      if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
+        ROS_INFO_STREAM("[QrCode_node]: imageTopic for camera : " << imageTopic);
+      else
+      {
+       ROS_FATAL("[QrCode_node]: Image topic name not found");
+       ROS_BREAK(); 
+      }
+      _imageTopics.push_back("/"+imageTopic);
+      
+      key = "image_height";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      frameHeight = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[QrCode_node]: image_height : " << frameHeight);
         
-    //!< Get the HFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
-      ROS_DEBUG_STREAM("HFOV : " << hfov);
-    else 
-    {
-      hfov = HFOV;
-      ROS_DEBUG_STREAM("HFOV : " << hfov);
-    }
+      _frameHeight.push_back(frameHeight);
+        
+      key = "image_width";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      frameWidth = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[QrCode_node]: image_width : " << frameWidth);
+        
+      _frameWidth.push_back(frameWidth);  
+      
+      key = "hfov";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
+      hfov = static_cast<int>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[QrCode_node]: hfov : " << hfov);
+        
+      _hfov.push_back(hfov);  
+      
+      key = "vfov";
+      ROS_ASSERT(cameras_list[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+      vfov = static_cast<double>(cameras_list[ii][key]);
+      ROS_INFO_STREAM("[QrCode_node]: vfov : " << vfov);
+        
+      _vfov.push_back(vfov);  
     
-    //!< Get the VFOV parameter if available;
-    if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
-      ROS_DEBUG_STREAM("VFOV : " << vfov);
-    else 
-    {
-      vfov = VFOV;
-      ROS_DEBUG_STREAM("VFOV : " << vfov);
     }
 
   }
@@ -274,9 +265,10 @@ namespace pandora_vision
     qrcodeFrameTimestamp = msg.header.stamp;
     _frame_id = msg.header.frame_id;
     
-    if(_frame_id.c_str()[0] == '/')
+    if(_frame_id.c_str()[0] == '/'){
       _frame_id = _frame_id.substr(1);
-    
+      _camera_indicator = 1;
+    }
     if (qrcodeFrame.empty())
     {
       ROS_ERROR("[QrCode_node] : No more Frames");
@@ -310,7 +302,6 @@ namespace pandora_vision
    */
   void QrCodeDetection::qrDetect()
   {
-    
     //!< Create message of QrCode Detector
     vision_communications::QRAlertsVectorMsg qrcodeVectorMsg;
     vision_communications::QRAlertMsg qrcodeMsg;
@@ -322,17 +313,33 @@ namespace pandora_vision
 
     _qrcodeDetector.detect_qrcode(qrcodeFrame);
     std::vector<QrCode> list_qrcodes = _qrcodeDetector.get_detected_qr();
- 
+     
+    if( _camera_indicator == -1){
+      frameWidth = _frameWidth.at(1);
+      frameHeight = _frameHeight.at(1);
+      hfov = _hfov.at(1);
+      vfov = _vfov.at(1);
+    }
+    else{
+      frameWidth = _frameWidth.at(0);
+      frameHeight = _frameHeight.at(0);
+      hfov = _hfov.at(0);
+      vfov = _vfov.at(0);
+    }
+      
     for(int i = 0; i < static_cast<int>(list_qrcodes.size()); i++)
     {
       qrcodeMsg.QRcontent = list_qrcodes[i].qrcode_desc;
 
-      qrcodeMsg.yaw = ratioX *
-        (list_qrcodes[i].qrcode_center.x - 
-          static_cast<double>(frameWidth) / 2);
-      qrcodeMsg.pitch = -ratioY *
-        (list_qrcodes[i].qrcode_center.y - 
-          static_cast<double>(frameWidth) / 2);
+      // Qr's center coordinates relative to the center of the frame
+      float x = list_qrcodes[i].qrcode_center.x
+        - static_cast<float>(frameWidth) / 2;
+      float y = static_cast<float>(frameHeight) / 2
+        - list_qrcodes[i].qrcode_center.y;
+
+      // Qr center's yaw and pitch
+      qrcodeMsg.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
+      qrcodeMsg.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
 
       qrcodeVectorMsg.qrAlerts.push_back(qrcodeMsg);
 

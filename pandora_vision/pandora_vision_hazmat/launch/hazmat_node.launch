@@ -6,7 +6,7 @@
     <rosparam file="$(find pandora_vision_hazmat)/config/hazmat_topics.yaml" 
     command="load" ns="hazmat"/>
     
-  <rosparam file="$(find pandora_vision_hazmat)/config/hazmat_params.yaml" 
+  <rosparam file="$(find pandora_vision_support)/config/camera_params.yaml" 
     command="load" ns="hazmat"/>
 
 </launch>

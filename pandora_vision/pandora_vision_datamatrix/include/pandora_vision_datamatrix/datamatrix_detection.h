@@ -54,17 +54,6 @@
 #ifndef PANDORA_VISION_DATAMATRIX_DATAMATRIX_DETECTION_H 
 #define PANDORA_VISION_DATAMATRIX_DATAMATRIX_DETECTION_H 
 
-//!< Default frame height
-#define DEFAULT_HEIGHT 480
-
-//!< Default frame width
-#define DEFAULT_WIDTH 640
-
-//!< Default horizontal field of view in degrees
-#define HFOV 61.14
-
-//!< Default vertical field of view in degrees
-#define VFOV 48
 
 /**
   @namespace pandora_vision
@@ -89,14 +78,20 @@ namespace pandora_vision
     //!< pandora_vision_datamatrix package path
     std::string packagePath;
     
-    float ratioX;
-    float ratioY;
+    //!< Horizontal Field Of View (rad)
+    std::vector<double> _hfov;
+
+    //!< Vertical Field Of View (rad)
+    std::vector<double> _vfov;
+
+    std::vector<int> _frameWidth;
+    std::vector<int> _frameHeight;
 
     //!< Horizontal field of view in rad
     double hfov;
-
     //!< Vertical Field Of View (rad)
     double vfov;
+
     int frameWidth;
     int frameHeight;
     
@@ -167,7 +162,8 @@ namespace pandora_vision
       @return bool Returns true is frame_id found or false if not 
     */ 
     bool getParentFrameId();
-       
+    
+    int _camera_indicator;   
     public:
     
     /**

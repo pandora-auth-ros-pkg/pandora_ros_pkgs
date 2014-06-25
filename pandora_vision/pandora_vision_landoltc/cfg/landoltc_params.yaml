@@ -1,1 +1,5 @@
 camera_name: kinect
+hfov: 58.0
+vfov: 45.0
+image_width: 640
+image_height: 480

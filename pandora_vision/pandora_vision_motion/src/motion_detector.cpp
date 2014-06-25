@@ -41,8 +41,8 @@ namespace pandora_vision
 {
   
   /**
-      @brief Class Constructor
-      Initializes all varialbes for thresholding
+    @brief Class Constructor
+    Initializes all varialbes for thresholding
   */
   MotionDetector::MotionDetector()
   { 
@@ -56,8 +56,8 @@ namespace pandora_vision
   }
 
   /**
-   @brief Class Destructor
-   Deallocates memory used for storing images
+    @brief Class Destructor
+    Deallocates memory used for storing images
   */
   MotionDetector::~MotionDetector()
   {
@@ -102,9 +102,9 @@ namespace pandora_vision
   }
   
   /**
-     @brief Function that calculates motion's postion
-     @param
-     @return void 
+    @brief Function that calculates motion's postion
+    @param
+    @return void 
   */
   void MotionDetector::detectMotionPosition(cv::Mat diff)
   {
@@ -141,7 +141,8 @@ namespace pandora_vision
     }
   }
   
-  /**@brief Creates the continuous table of motion in current frame
+  /**
+    @brief Creates the continuous table of motion in current frame
     @return int[] table of motion position and size
   */
   int* MotionDetector::getMotionPosition()
@@ -155,12 +156,12 @@ namespace pandora_vision
   }
     
   /**
-      @brief Function that defines the type of movement 
-      according to the number of pixels, that differ from current
-      frame and background. In case insignificant motion 0 is detected
-      0 is returned. If there is slight motion 1 is returned and last
-      bust not least in case extensive motion is detected 2 is returned
-      @return void
+    @brief Function that defines the type of movement 
+    according to the number of pixels, that differ from current
+    frame and background. In case insignificant motion 0 is detected
+    0 is returned. If there is slight motion 1 is returned and last
+    bust not least in case extensive motion is detected 2 is returned
+    @return void
   */ 
   void MotionDetector::motionIdentification(cv::Mat diff)
   {
@@ -174,7 +175,7 @@ namespace pandora_vision
       typeOfMovement = 0;
   }
   
-   /**
+  /**
     @brief Returns the number of different pixels found
     in a (thresholded) difference between background image and current frame.
     @return [int] countDiff 

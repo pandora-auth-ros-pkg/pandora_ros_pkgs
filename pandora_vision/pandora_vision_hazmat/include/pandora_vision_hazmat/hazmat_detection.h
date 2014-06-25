@@ -58,13 +58,20 @@ namespace pandora_vision
       //nodeHandle
       ros::NodeHandle _nh;
       HazmatEpsilonDetector* hazmatDetector_;
-      float ratioX_;
-      float ratioY_;
       
-      double hfov_;  //horizontal Field Of View (rad)
-      double vfov_;
-      int frameWidth_; //frame width
-      int frameHeight_;  //frame height
+      //!< Horizontal Field Of View (rad)
+      std::vector<double> _hfov;
+
+      //!< Vertical Field Of View (rad)
+      std::vector<double> _vfov;
+
+      std::vector<int> _frameWidth;
+      std::vector<int> _frameHeight;
+
+      double hfov; // horizontal field of view (rad)
+      double vfov; // vertical field of view (rad)
+      int frameWidth; //frame width
+      int frameHeight;  //frame height
       
       cv::Mat hazmatFrame_;  // frame processed by HazmatDetector
       
@@ -134,6 +141,8 @@ namespace pandora_vision
       bool getParentFrameId();
         
       std::map<std::string, std::string> _frame_ids_map;  
+      
+      int _camera_indicator;
     public:
           
       /**

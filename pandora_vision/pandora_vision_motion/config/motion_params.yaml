@@ -1,4 +1,8 @@
 camera_name: kinect
+hfov: 58.0
+vfov: 45.0
+image_width: 640
+image_height: 480
 history: 10
 varThreshold: 16
 bShadowDetection: true

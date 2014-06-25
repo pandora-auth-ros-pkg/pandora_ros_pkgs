@@ -7,7 +7,7 @@
   <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_topics.yaml" 
     command="load" ns="datamatrixcode"/>
     
-  <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_params.yaml" 
+  <rosparam file="$(find pandora_vision_support)/config/camera_params.yaml" 
     command="load" ns="datamatrixcode"/>
         
 </launch>

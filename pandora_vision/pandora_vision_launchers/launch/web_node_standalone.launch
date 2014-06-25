@@ -1,6 +1,30 @@
 <launch>
+  
+  <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
+    <arg name="camID" value="/dev/video1"/>
+    <arg name="name" value="left_camera"/>
+    <arg name="topic_name" value="camera_left/image"/>
+    <arg name="frame_id" value="left_camera_link"/>
+  </include>
+
+  <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
+    <arg name="camID" value="/dev/video0"/>
+    <arg name="name" value="right_camera"/>
+    <arg name="topic_name" value="camera_right/image"/>
+    <arg name="frame_id" value="right_camera_link"/>
+  </include>
+      
+   <include file="$(find openni_launch)/launch/openni.launch" >
+    <arg name="camera" value="kinect" />
+    <arg name="publish_tf" value="false" />
+    <arg name="depth_registration" value="true" />
+  </include>
+  
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
+  
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
   <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  
 </launch>
 

@@ -55,17 +55,6 @@
 #include <urdf_parser/urdf_parser.h>
 #include <map>
 
-//!< default frame height
-#define DEFAULT_HEIGHT 480
-
-//!< default frame width
-#define DEFAULT_WIDTH 640
-
-//!< Horizontal field of view in degrees
-#define HFOV 61.14  
-
-//!< vertical field of view in degrees 
-#define VFOV 48 
 
 namespace pandora_vision
 {
@@ -96,12 +85,6 @@ private:
   /// Frame width
   int frameWidth;
   
-  //!<RatioX
-  float ratioX;
-  
-  //!<RatioY
-  float ratioY;
-
   //!< Horizontal Field Of View (rad)
   double hfov;
 
@@ -188,17 +171,17 @@ public:
     @param newState [int] The robot's new state
     @return void
   */
-    void startTransition(int newState);
+  void startTransition(int newState);
 
   /**
     @brief After completion of state transition
     @return void
   */
-    void completeTransition(void);
+  void completeTransition(void);
     
-    int curState;
-    int prevState;
-    std::string param;
+  int curState;
+  int prevState;
+  std::string param;
 };
 } // namespace pandora_vision
 #endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTION_H

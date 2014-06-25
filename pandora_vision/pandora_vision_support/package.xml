@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_vision_support</name>
+  <version>0.1.0</version>
+  <description>Containts supplementary material used by all vision nodes.</description>
+
+  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Despoina Paschalidou</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <export>
+  </export>
+  
+</package>

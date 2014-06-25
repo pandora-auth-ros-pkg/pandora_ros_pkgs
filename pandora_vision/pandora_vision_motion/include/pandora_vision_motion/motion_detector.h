@@ -44,7 +44,7 @@
 #include <vector>
 #include "pandora_vision_motion/motion_parameters.h"
 
-#define SHOW_DEBUG_IMAGE
+//~ #define SHOW_DEBUG_IMAGE
 
 namespace pandora_vision 
 {

@@ -55,9 +55,6 @@ LandoltC3dDetection::LandoltC3dDetection(const std::string& ns): _nh(ns), landol
   hfov = hfov * CV_PI / 180;
   vfov = vfov * CV_PI / 180;
   
-  ratioX = hfov / frameWidth;
-  ratioY = vfov / frameHeight;
-  
   //!< Initiliaze and preprocess reference image
   _landoltc3dDetector.initializeReferenceImage(patternPath);
   
@@ -164,39 +161,39 @@ void LandoltC3dDetection::getGeneralParams()
   }
 
   //!< Get the Height parameter if available;
-  if (_nh.getParam("/" + cameraName + "/image_height", frameHeight))
+  if (_nh.getParam("image_height", frameHeight))
     ROS_DEBUG_STREAM("height : " << frameHeight);
   else
   {
-    ROS_DEBUG("[landoltc3d_node] : Parameter frameHeight not found. Using Default");
-    frameHeight = DEFAULT_HEIGHT;
+    ROS_FATAL("[landoltc3d_node] : Parameter frameHeight not found");
+    ROS_BREAK();
   }
 
   //!< Get the Width parameter if available;
-  if (_nh.getParam("/" + cameraName + "/image_width", frameWidth))
+  if (_nh.getParam("image_width", frameWidth))
     ROS_DEBUG_STREAM("width : " << frameWidth);
   else
   {
-    ROS_DEBUG("[landoltc3d_node] : Parameter frameWidth not found. Using Default");
-    frameWidth = DEFAULT_WIDTH;
+    ROS_FATAL("[landoltc3d_node] : Parameter frameWidth not found.");
+    ROS_BREAK();
   }
   
   //!< Get the HFOV parameter if available;
-  if (_nh.getParam("/" + cameraName + "/hfov", hfov)) 
+  if (_nh.getParam("hfov", hfov)) 
     ROS_DEBUG_STREAM("HFOV : " << hfov);
   else 
   {
-    hfov = HFOV;
-    ROS_DEBUG_STREAM("HFOV : " << hfov);
+    ROS_FATAL("[landoltc3d_node] : Horiznontal field of view not found.");
+    ROS_BREAK();
   }
   
   //!< Get the VFOV parameter if available;
-  if (_nh.getParam("/" + cameraName + "/vfov", vfov)) 
+  if (_nh.getParam("vfov", vfov)) 
     ROS_DEBUG_STREAM("VFOV : " << vfov);
   else 
   {
-    vfov = VFOV;
-    ROS_DEBUG_STREAM("VFOV : " << vfov);
+    ROS_FATAL("[landoltc3d_node] : Vertical field of view not found.");
+    ROS_BREAK();
   }
 
   //!< Get the listener's topic;
@@ -204,8 +201,8 @@ void LandoltC3dDetection::getGeneralParams()
     ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
   else
   {
-    ROS_DEBUG("[landoltc3d_node] : Parameter imageTopic not found. Using Default");
-    imageTopic = "/camera_head/image_raw";
+    ROS_FATAL("[landoltc3d_node] : Image topic name not found.");
+    ROS_BREAK();
   }
 
 }
@@ -341,10 +338,16 @@ void LandoltC3dDetection::landoltc3dCallback()
   
   for(int i = 0; i < _landoltc3d.size(); i++){
      
-    landoltc3dcodeMsg.yaw = 
-      ratioX * (_landoltc3d.at(i).center.x  - static_cast<double>(frameWidth/2));
-    landoltc3dcodeMsg.pitch = 
-      -ratioY * (_landoltc3d.at(i).center.y  - static_cast<double>(frameHeight/2));
+    // Landoltc center's coordinates relative to the center of the frame
+    float x = _landoltc3d.at(i).center.x
+      - static_cast<float>(frameWidth) / 2;
+    float y = static_cast<float>(frameHeight) / 2
+      - _landoltc3d.at(i).center.y;
+
+    // Landoltc center's yaw and pitch
+    landoltc3dcodeMsg.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
+    landoltc3dcodeMsg.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
+
     landoltc3dcodeMsg.posterior = _landoltc3d[i].probability;
     
     for(int j = 0; j < _landoltc3d[i].angles.size(); j++)
