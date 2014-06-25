@@ -9,24 +9,24 @@
   <arg name="vision_landoltc" default="true"/>
   <arg name="vision_motion" default="true"/>
   <arg name="vision_datamatrix" default="true"/>
-  <arg name="vision_predator_landoltc3d" default="true"/>
-  <arg name="vision_predator_landoltc" default="false"/>
+  <arg name="vision_landoltc3d" default="true"/>
+  <arg name="vision_predator" default="false"/>
 
 
   <!-- Cameras -->
   <group if="$(arg vision_cameras)">
     <include if="$(arg camera_left)" file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
       <arg name="camID" value="/dev/video1"/>
-      <arg name="name" value="camera_left"/>
-      <arg name="topic_name" value="camera_left/image"/>
-      <arg name="frame_id" value="camera_left_link"/>
+      <arg name="name" value="left_camera"/>
+      <arg name="topic_name" value="left_camera/image"/>
+      <arg name="frame_id" value="left_camera_optical_frame"/>
     </include>
 
     <include if="$(arg camera_right)" file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
       <arg name="camID" value="/dev/video0"/>
-      <arg name="name" value="camera_right"/>
-      <arg name="topic_name" value="camera_right/image"/>
-      <arg name="frame_id" value="camera_right_link"/>
+      <arg name="name" value="right_camera"/>
+      <arg name="topic_name" value="right_camera/image"/>
+      <arg name="frame_id" value="right_camera_optical_frame"/>
     </include>
 
     <include if="$(arg xtion)" file="$(find openni2_launch)/launch/openni2.launch">
@@ -50,9 +50,9 @@
       file="$(find pandora_vision_motion)/launch/motion_node.launch" />
     <include if="$(arg vision_datamatrix)"
       file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
-    <include if="$(arg vision_predator_landoltc3d)"
+    <include if="$(arg vision_landoltc3d)"
       file="$(find pandora_vision_landoltc)/launch/predator-landoltc3d.launch" />
-    <include if="$(arg vision_predator_landoltc)"
+    <include if="$(arg vision_predator)"
       file="$(find pandora_vision_predator)/launch/predator_node.launch" />
 
   </group>
