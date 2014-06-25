@@ -81,7 +81,7 @@ def main():
             input_keys=['move_end_effector_msg'],
             output_keys=['move_end_effector_msg'],
             child_termination_cb=termination_cb,
-            outcome_cb = out_cb
+            outcome_cb=out_cb
         )
 
         with test_park_track_cc:
