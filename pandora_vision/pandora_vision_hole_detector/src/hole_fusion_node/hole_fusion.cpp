@@ -746,38 +746,52 @@ namespace pandora_vision
     // Color homogeneity
     Parameters::HoleFusion::run_checker_color_homogeneity =
       config.run_checker_color_homogeneity;
-    Parameters::HoleFusion::run_checker_color_homogeneity_urgent =
-      config.run_checker_color_homogeneity_urgent;
     Parameters::HoleFusion::checker_color_homogeneity_threshold =
       config.checker_color_homogeneity_threshold;
+
+    Parameters::HoleFusion::run_checker_color_homogeneity_urgent =
+      config.run_checker_color_homogeneity_urgent;
+    Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold =
+      config.checker_color_homogeneity_urgent_threshold;
 
     // Luminosity diff
     Parameters::HoleFusion::run_checker_luminosity_diff =
       config.run_checker_luminosity_diff;
-    Parameters::HoleFusion::run_checker_luminosity_diff_urgent =
-      config.run_checker_luminosity_diff_urgent;
     Parameters::HoleFusion::checker_luminosity_diff_threshold =
       config.checker_luminosity_diff_threshold;
+
+    Parameters::HoleFusion::run_checker_luminosity_diff_urgent =
+      config.run_checker_luminosity_diff_urgent;
+    Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold =
+      config.checker_luminosity_diff_urgent_threshold;
 
     // Texture diff
     Parameters::HoleFusion::run_checker_texture_diff =
       config.run_checker_texture_diff;
-    Parameters::HoleFusion::run_checker_texture_diff_urgent =
-      config.run_checker_texture_diff_urgent;
     Parameters::HoleFusion::checker_texture_diff_threshold =
       config.checker_texture_diff_threshold;
+
+    Parameters::HoleFusion::run_checker_texture_diff_urgent =
+      config.run_checker_texture_diff_urgent;
+    Parameters::HoleFusion::checker_texture_diff_urgent_threshold =
+      config.checker_texture_diff_urgent_threshold;
 
     // Texture backproject
     Parameters::HoleFusion::run_checker_texture_backproject =
       config.run_checker_texture_backproject;
-    Parameters::HoleFusion::run_checker_texture_backproject_urgent =
-      config.run_checker_texture_backproject_urgent;
     Parameters::HoleFusion::checker_texture_backproject_threshold =
       config.checker_texture_backproject_threshold;
+
+    Parameters::HoleFusion::run_checker_texture_backproject_urgent =
+      config.run_checker_texture_backproject_urgent;
+    Parameters::HoleFusion::checker_texture_backproject_urgent_threshold =
+      config.checker_texture_backproject_urgent_threshold;
 
     // The inflation size of the bounding box's vertices
     Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;
+
+    // Depth diff parameters
 
     // 0 for binary probability assignment on positive depth difference
     // 1 for gaussian probability assignment on positive depth difference
@@ -795,7 +809,7 @@ namespace pandora_vision
       config.holes_gaussian_stddev;
 
 
-    // Plane detection
+    // Plane detection parameters
     Parameters::HoleFusion::filter_leaf_size =
       config.filter_leaf_size;
     Parameters::HoleFusion::max_iterations =
@@ -805,11 +819,17 @@ namespace pandora_vision
     Parameters::HoleFusion::point_to_plane_distance_threshold =
       config.point_to_plane_distance_threshold;
 
-    // Holes connection - merger
+    // Holes connection - merger parameters
     Parameters::HoleFusion::connect_holes_min_distance =
       config.connect_holes_min_distance;
     Parameters::HoleFusion::connect_holes_max_distance =
       config.connect_holes_max_distance;
+
+    //-------------------------- Validation process ----------------------------
+
+    Parameters::HoleFusion::validation_process =
+      config.validation_process;
+
 
     //--------------------------- Merger parameters ----------------------------
 
@@ -1328,17 +1348,21 @@ namespace pandora_vision
         HolesConveyorUtils::getHole(conveyor, it->first),
         &validHolesConveyor);
 
+      ROS_WARN_NAMED(PKG_NAME, "Hole Found at [%d %d] @ %f %%",
+        static_cast<int>(conveyor.holes[it->first].keypoint.pt.x),
+        static_cast<int>(conveyor.holes[it->first].keypoint.pt.y),
+        100 * it->second);
+
       msgs.push_back(TOSTR(it->second));
     }
 
     // Valid holes on top of the RGB image
     cv::Mat rgbValidHolesImage =
-      Visualization::showHoles("ValidHoles",
+      Visualization::showHoles("Valid Holes",
         rgbImage_,
         validHolesConveyor,
         -1,
         msgs);
-
 
     // Convert the image into a message
     cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
@@ -1572,6 +1596,55 @@ namespace pandora_vision
     // their respective validity probability that will be returned
     std::map<int, float> valid;
 
+    if (Parameters::HoleFusion::validation_process == VALIDATION_SIMPLE)
+    {
+      valid = validationSimple(probabilitiesVector2D);
+    }
+    else if (Parameters::HoleFusion::validation_process == VALIDATION_COMPLEX)
+    {
+      valid = validationComplex(probabilitiesVector2D);
+    }
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME,
+        "[Hole Fusion node] Invalid validation process selected.");
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("validateHoles");
+    #endif
+
+    return valid;
+  }
+
+
+
+  /**
+    @brief Validates candidate holes by giving weights to each
+    probability from the set of per-hole probabilities set.
+    Each weight is a power of two. Two weights shall not have the
+    same value for any number of probabilities. The exponent of 2 used
+    per weight corresponds to the execution order - weighting order of
+    a particular filter.
+    @param[in] probabilitiesVector2D
+    [const std::vector<std::vector<float> >&]
+    A two dimensional vector containing the probabilities of
+    validity of each candidate hole. Each row of it pertains to a specific
+    filter applied, each column to a particular hole
+    @return [std::map<int, float>] The indices of the valid holes and their
+    respective validity probabilities
+   **/
+  std::map<int, float> HoleFusion::validationComplex(
+    const std::vector<std::vector<float> >& probabilitiesVector2D)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("validationComplex", "processCandidateHoles");
+    #endif
+
+    // The map of holes' indices that are valid and
+    // their respective validity probability that will be returned
+    std::map<int, float> valid;
+
     for (int i = 0; i < probabilitiesVector2D[0].size(); i++)
     {
       int exponent = 0;
@@ -1588,6 +1661,7 @@ namespace pandora_vision
       // If depth analysis was not possible, use the urgent weight order.
       if (filteringMode_ == RGBD_MODE)
       {
+        // Color homogeneity
         if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity - 1)
@@ -1597,6 +1671,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Depth / area
         if (Parameters::HoleFusion::run_checker_depth_area > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_depth_area - 1)
@@ -1606,6 +1681,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Luminosity diff
         if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff - 1)
@@ -1615,6 +1691,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Outline of rectangle plane constitution
         if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_outline_of_rectangle - 1)
@@ -1624,6 +1701,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Depth homogeneity
         if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
@@ -1633,6 +1711,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Texture backprojection
         if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject - 1)
@@ -1642,6 +1721,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Intermediate points plane constitution
         if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1)
@@ -1651,6 +1731,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Depth diff
         if (Parameters::HoleFusion::run_checker_depth_diff > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_depth_diff - 1)
@@ -1659,6 +1740,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Texture diff
         if (Parameters::HoleFusion::run_checker_texture_diff > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff - 1)
@@ -1669,6 +1751,7 @@ namespace pandora_vision
       }
       else if (filteringMode_ == RGB_ONLY_MODE)
       {
+        // Color homogeneity
         if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
@@ -1678,6 +1761,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Luminosity diff
         if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
@@ -1687,6 +1771,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Texture backprojection
         if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1)
@@ -1696,6 +1781,7 @@ namespace pandora_vision
           exponent++;
         }
 
+        // Texture diff
         if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
         {
           sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff_urgent - 1)
@@ -1730,6 +1816,8 @@ namespace pandora_vision
           "[Hole Fusion node] Validation process failure");
       }
 
+      // If the total validity probability of the i-th hole exceeds a
+      // pre-determined threshold, we consider the i-th hole to be valid
       if (sum > threshold)
       {
         valid[i] = sum;
@@ -1737,9 +1825,278 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_TIME
-    Timer::tick("validateHoles");
+    Timer::tick("validationComplex");
     #endif
 
+    return valid;
+  }
+
+
+
+  /**
+    @brief Validates candidate holes by checking each set of
+    probabilities obtained against individually-set thresholds
+    per source of probability.
+    Altough, theoretically, all probabilities are set in the [0, 1]
+    interval, not all can reach the value 1 in practice and individual
+    thresholds have to be empirically set. Each hole, if determined valid,
+    is assigned a validity probability equal to the mean of the set
+    of its corresponding probabilities.
+    @param[in] probabilitiesVector2D
+    [const std::vector<std::vector<float> >&]
+    A two dimensional vector containing the probabilities of
+    validity of each candidate hole. Each row of it pertains to a specific
+    filter applied, each column to a particular hole
+    @return [std::map<int, float>] The indices of the valid holes and their
+    respective validity probabilities
+   **/
+  std::map<int, float> HoleFusion::validationSimple(
+    const std::vector<std::vector<float> >& probabilitiesVector2D)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("validationSimple", "processCandidateHoles");
+    #endif
+
+    // The map of holes' indices that are valid and
+    // their respective validity probability that will be returned
+    std::map<int, float> valid;
+
+    for (int i = 0; i < probabilitiesVector2D[0].size(); i++)
+    {
+      float validityProbability = 0.0;
+
+      // RGB + Depth mode. All RGB and Depth active filters produce
+      // probabilities that will have to be checked on a per-filter basis,
+      // against individually-set thresholds.
+      if (filteringMode_ == RGBD_MODE)
+      {
+        // Color homogeneity
+        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i] <
+            Parameters::HoleFusion::checker_color_homogeneity_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+              Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+          }
+        }
+
+        // Depth / area
+        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_area - 1][i] <
+            Parameters::HoleFusion::checker_depth_area_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_area - 1][i];
+          }
+        }
+
+        // Luminosity diff
+        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i] <
+            Parameters::HoleFusion::checker_luminosity_diff_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+          }
+        }
+
+        // Outline of rectangle plane constitution
+        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i] <
+            Parameters::HoleFusion::checker_outline_of_rectangle_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+          }
+        }
+
+        // Depth homogeneity
+        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i] <
+            Parameters::HoleFusion::checker_depth_homogeneity_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+          }
+        }
+
+        // Texture backprojection
+        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject - 1][i] <
+            Parameters::HoleFusion::checker_texture_backproject_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+          }
+        }
+
+        // Intermediate points plane constitution
+        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i] <
+            Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+          }
+        }
+
+        // Depth diff
+        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_diff - 1][i] <
+            Parameters::HoleFusion::checker_depth_diff_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+          }
+        }
+
+        // Texture diff
+        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff - 1][i] <
+            Parameters::HoleFusion::checker_texture_diff_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+          }
+        }
+      }
+      else if (filteringMode_ = RGB_ONLY_MODE)
+      {
+        // Color homogeneity
+        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i] <
+            Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+          }
+        }
+
+        // Luminosity diff
+        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i] <
+            Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+          }
+        }
+
+        // Texture backprojection
+        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i] <
+            Parameters::HoleFusion::checker_texture_backproject_urgent_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+          }
+        }
+
+        // Texture diff
+        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i] <
+            Parameters::HoleFusion::checker_texture_diff_urgent_threshold)
+          {
+            continue;
+          }
+          else
+          {
+            validityProbability += probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
+          }
+        }
+      }
+      else
+      {
+        ROS_ERROR_NAMED(PKG_NAME,
+          "[Hole Fusion node] Validation process failure");
+      }
+
+      // If the i-th candidate hole has passed the above checks,
+      // it surely is valid. Its validity probability will amount to the
+      // mean value of its separate validity probabilities.
+      valid[i] = validityProbability / probabilitiesVector2D.size();
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("validationSimple");
+    #endif
+
+    // Return the valid set
     return valid;
   }
 

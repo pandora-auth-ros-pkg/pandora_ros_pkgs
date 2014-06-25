@@ -196,20 +196,31 @@ namespace pandora_vision
       static float holes_gaussian_stddev;
 
       static int run_checker_color_homogeneity;
-      static int run_checker_color_homogeneity_urgent;
       static float checker_color_homogeneity_threshold;
 
+      static int run_checker_color_homogeneity_urgent;
+      static float checker_color_homogeneity_urgent_threshold;
+
       static int run_checker_luminosity_diff;
-      static int run_checker_luminosity_diff_urgent;
       static float checker_luminosity_diff_threshold;
 
+      static int run_checker_luminosity_diff_urgent;
+      static float checker_luminosity_diff_urgent_threshold;
+
       static int run_checker_texture_diff;
-      static int run_checker_texture_diff_urgent;
       static float checker_texture_diff_threshold;
 
+      static int run_checker_texture_diff_urgent;
+      static float checker_texture_diff_urgent_threshold;
+
       static int run_checker_texture_backproject;
-      static int run_checker_texture_backproject_urgent;
       static float checker_texture_backproject_threshold;
+
+      static int run_checker_texture_backproject_urgent;
+      static float checker_texture_backproject_urgent_threshold;
+
+      // The holes' validation process identifier
+      static int validation_process;
 
       // 0 for binary probability assignment on positive depth difference
       // 1 for gaussian probability assignment on positive depth difference

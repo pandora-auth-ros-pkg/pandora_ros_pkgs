@@ -167,20 +167,31 @@ namespace pandora_vision
   float Parameters::HoleFusion::holes_gaussian_stddev = 0.2;
 
   int Parameters::HoleFusion::run_checker_color_homogeneity = 1;
-  int Parameters::HoleFusion::run_checker_color_homogeneity_urgent = 1;
   float Parameters::HoleFusion::checker_color_homogeneity_threshold = 0.4;
 
+  int Parameters::HoleFusion::run_checker_color_homogeneity_urgent = 1;
+  float Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold = 0.4;
+
   int Parameters::HoleFusion::run_checker_luminosity_diff = 2;
-  int Parameters::HoleFusion::run_checker_luminosity_diff_urgent = 2;
   float Parameters::HoleFusion::checker_luminosity_diff_threshold = 0.4;
 
+  int Parameters::HoleFusion::run_checker_luminosity_diff_urgent = 2;
+  float Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold = 0.4;
+
   int Parameters::HoleFusion::run_checker_texture_diff = 3;
-  int Parameters::HoleFusion::run_checker_texture_diff_urgent = 3;
   float Parameters::HoleFusion::checker_texture_diff_threshold = 0.4;
 
+  int Parameters::HoleFusion::run_checker_texture_diff_urgent = 3;
+  float Parameters::HoleFusion::checker_texture_diff_urgent_threshold = 0.4;
+
   int Parameters::HoleFusion::run_checker_texture_backproject = 4;
-  int Parameters::HoleFusion::run_checker_texture_backproject_urgent = 4;
   float Parameters::HoleFusion::checker_texture_backproject_threshold = 0.4;
+
+  int Parameters::HoleFusion::run_checker_texture_backproject_urgent = 4;
+  float Parameters::HoleFusion::checker_texture_backproject_urgent_threshold = 0.4;
+
+  // The holes' validation process identifier
+  int Parameters::HoleFusion::validation_process = 0;
 
   // 0 for binary probability assignment on positive depth difference
   // 1 for gaussian probability assignment on positive depth difference
