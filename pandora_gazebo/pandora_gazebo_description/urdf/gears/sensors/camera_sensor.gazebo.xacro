@@ -35,7 +35,9 @@
           <!--============================================================= -->
           <frameName>${prefix_y}_camera_optical_frame</frameName>
           <!--============================================================= -->
-          <imageTopicName>${prefix_y}_camera/image</imageTopicName>
+          <cameraName>${prefix_y}_camera</cameraName>
+          <!--============================================================= -->
+          <imageTopicName>image</imageTopicName>
           <!--============================================================= -->
 
         </plugin>

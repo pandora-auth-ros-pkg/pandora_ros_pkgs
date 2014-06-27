@@ -775,9 +775,72 @@ namespace gazebo {
   }
 
   /////////////////////////////////////////////////////////////////////////////
+  void GazeboRosDifferential ::AddPhysicsForces ( void ) { 
+  
+    /* 
+    
+    double m = left_front_wheel_link_ ->GetInertial ( ) ->GetMass ( ) ; 
+
+    math::Vector3 g = left_front_wheel_link_->GetWorld()->GetPhysicsEngine()->GetGravity();
+
+    math::Vector3 z = left_front_wheel_link_->GetWorldCoGPose().pos;
+    
+    double m1 = right_front_wheel_link_ ->GetInertial ( ) ->GetMass ( ) ; 
+
+    math::Vector3 g1 = right_front_wheel_link_->GetWorld()->GetPhysicsEngine()->GetGravity();
+
+    math::Vector3 z1 = right_front_wheel_link_->GetWorldCoGPose().pos;
+
+    */
+    
+    /*
+    
+    double left_front_z = left_front_wheel_link_ ->GetWorldCoGPose ( ) .pos .z ; 
+    double left_rear_z = left_rear_wheel_link_ ->GetWorldCoGPose ( ) .pos .z ; 
+    double right_front_z = right_front_wheel_link_ ->GetWorldCoGPose ( ) .pos .z ; 
+    double right_rear_z = right_rear_wheel_link_ ->GetWorldCoGPose ( ) .pos .z ; 
+    
+    double min_z = 1000.0 ; 
+    
+    double force_multiplier = 100.0 ; 
+    
+    if ( left_front_z < min_z ) 
+    
+      min_z = left_front_z ; 
+      
+    if ( left_rear_z < min_z ) 
+    
+      min_z = left_rear_z ; 
+      
+    if ( right_front_z < min_z ) 
+    
+      min_z = right_front_z ; 
+      
+    if ( right_rear_z < min_z ) 
+    
+      min_z = right_rear_z ; 
+      
+    */
+    
+    //left_front_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , force_multiplier * ( left_front_z - min_z ) ) ) ; 
+    //left_rear_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , force_multiplier * ( left_rear_z - min_z ) ) ) ; 
+    //right_front_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , force_multiplier * ( right_front_z - min_z ) ) ) ; 
+    //right_rear_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , force_multiplier * ( right_rear_z - min_z ) ) ) ; 
+    
+    left_front_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , 20 ) ) ; 
+    left_rear_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , 20 ) ) ; 
+    right_front_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , 20 ) ) ; 
+    right_rear_wheel_link_ ->AddRelativeForce ( math ::Vector3 ( 0 , 0 , 20 ) ) ; 
+  
+    //ROS_INFO ( "LEFT: %f" , left_front_wheel_link_ ->GetRelativeForce ( ) .z ) ; 
+    //ROS_ERROR ( "RIGHT: %f" , right_front_wheel_link_ ->GetRelativeForce ( ) .z ) ; 
+  
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
   void GazeboRosDifferential ::UpdateChild ( void ) { 
   
-    // Get the angles in the current iteration of the engine.
+    // Get the angles in the current iteration of the engine
     GazeboRosDifferential ::UpdateAngles ( ) ; 
     
     // Add PID controlled force at base link (marginally stable)
@@ -791,6 +854,9 @@ namespace gazebo {
     
     // Add forces at y / z axes (real forces, applied due to the differential)
     //GazeboRosDifferential ::AddDifferentialForces ( ) ; 
+    
+    // Add forces to improve robot's behaviour (due to poorly simulated physics)
+    GazeboRosDifferential ::AddPhysicsForces ( ) ; 
     
     // Publish joint states to be used in RViz
     if ( this ->publish_joint_states_ ) 
