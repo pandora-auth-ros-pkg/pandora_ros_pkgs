@@ -383,7 +383,8 @@ namespace pandora_vision
         @param[in] conveyor [const HolesConveyor&] The overall unique holes
         found by the depth and RGB nodes.
         @param[in] map [std::map<int, float>*] A map containing the indices
-        of valid holes and their respective probabilities of validity
+        of valid holes inside the conveyor and their respective
+        probabilities of validity
         @return void
        **/
       void publishValidHoles(const HolesConveyor& conveyor,

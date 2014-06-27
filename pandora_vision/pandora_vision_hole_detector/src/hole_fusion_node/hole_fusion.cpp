@@ -625,8 +625,6 @@ namespace pandora_vision
   bool HoleFusion::isHoleDetectorOn(const int& state)
   {
     return (state ==
-      state_manager_communications::robotModeMsg::MODE_START_AUTONOMOUS)
-      || (state ==
         state_manager_communications::robotModeMsg::MODE_EXPLORATION)
       || (state ==
         state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
@@ -1283,8 +1281,8 @@ namespace pandora_vision
 
     // Keep a backup of the original holes found from both the
     // RGB and Depth nodes
-    HolesConveyor originalHolesConveyor;
-    HolesConveyorUtils::copyTo(rgbdHolesConveyor, &originalHolesConveyor);
+    HolesConveyor originalRgbdHolesConveyor;
+    HolesConveyorUtils::copyTo(rgbdHolesConveyor, &originalRgbdHolesConveyor);
 
     // Apply the {assimilation, amalgamation, connection} processes
     HoleMerger::mergeHoles(&rgbdHolesConveyor,
@@ -1292,17 +1290,17 @@ namespace pandora_vision
       interpolatedDepthImage_,
       pointCloud_);
 
-    // The original holes and the merged ones now reside under the allHoles
-    // conveyor
-    HolesConveyor allHoles;
-    HolesConveyorUtils::merge(originalHolesConveyor, rgbdHolesConveyor,
-      &allHoles);
+    // The original holes and the merged ones now reside under the
+    // rgbdPlusMergedConveyor conveyor
+    HolesConveyor rgbdPlusMergedConveyor;
+    HolesConveyorUtils::merge(originalRgbdHolesConveyor, rgbdHolesConveyor,
+      &rgbdPlusMergedConveyor);
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D;
-    probabilitiesVector2D = filterHoles(allHoles);
+    probabilitiesVector2D = filterHoles(rgbdPlusMergedConveyor);
 
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
@@ -1339,7 +1337,7 @@ namespace pandora_vision
         HolesConveyor oneHole;
 
         HolesConveyorUtils::append(
-          HolesConveyorUtils::getHole(allHoles, it->first),
+          HolesConveyorUtils::getHole(rgbdPlusMergedConveyor, it->first),
           &oneHole);
 
         // Project this valid hole onto the rgb image
@@ -1356,12 +1354,16 @@ namespace pandora_vision
     }
     #endif
 
-    // In general, the allHoles conveyor will contain
+    // In general, the rgbdPlusMergedConveyor conveyor will contain
     // merged and um-merged holes, potentially resulting in multiple entries
     // inside the conveyor for the same physical hole. The method below
     // picks the most probable valid hole among the ones referring to the same
     // physical hole.
-    makeValidHolesUnique(&allHoles, &validHolesMap);
+    makeValidHolesUnique(&rgbdPlusMergedConveyor, &validHolesMap);
+
+    // Rename the rgbdPlusMergedConveyor to uniqueValidHoles
+    HolesConveyor uniqueValidHoles;
+    HolesConveyorUtils::copyTo(rgbdPlusMergedConveyor, &uniqueValidHoles);
 
     #ifdef DEBUG_SHOW
     if (Parameters::HoleFusion::show_final_holes)
@@ -1379,7 +1381,7 @@ namespace pandora_vision
       cv::Mat depthValidHolesImage =
         Visualization::showHoles("Unique Valid Holes",
           interpolatedDepthImage_,
-          allHoles,
+          uniqueValidHoles,
           -1,
           msgs);
 
@@ -1387,7 +1389,7 @@ namespace pandora_vision
       cv::Mat rgbValidHolesImage =
         Visualization::showHoles("Unique Valid Holes",
           rgbImage_,
-          allHoles,
+          uniqueValidHoles,
           -1,
           msgs);
 
@@ -1408,12 +1410,12 @@ namespace pandora_vision
     // If there are valid holes, publish them
     if (validHolesMap.size() > 0)
     {
-      publishValidHoles(allHoles, &validHolesMap);
+      publishValidHoles(uniqueValidHoles, &validHolesMap);
     }
 
     // Publish the enhanced holes message
     // regardless of the amount of valid holes
-    publishEnhancedHoles(allHoles, &validHolesMap);
+    publishEnhancedHoles(uniqueValidHoles, &validHolesMap);
 
     #ifdef DEBUG_TIME
     Timer::tick("processCandidateHoles");
@@ -1539,7 +1541,8 @@ namespace pandora_vision
     @param[in] conveyor [const HolesConveyor&] The overall unique holes
     found by the depth and RGB nodes.
     @param[in] map [std::map<int, float>*] A map containing the indices
-    of valid holes and their respective probabilities of validity
+    of valid holes inside the conveyor and their respective
+    probabilities of validity
     @return void
    **/
   void HoleFusion::publishValidHoles(const HolesConveyor& conveyor,

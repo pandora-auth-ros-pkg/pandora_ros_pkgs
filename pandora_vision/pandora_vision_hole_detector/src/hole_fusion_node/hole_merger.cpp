@@ -379,8 +379,7 @@ namespace pandora_vision
     @param[in] image [const cv::Mat&] An image used for filters' resources
     creation and size usage
     @param[in] operationId [const int&] The identifier of the merging
-    process. Values: 0 for assimilation, 1 for amalgamation and
-    2 for connecting
+    process. Values: 0 for assimilation, 1 for amalgamation
     @return void
    **/
   void HoleMerger::applyMergeOperationWithoutValidation(
