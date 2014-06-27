@@ -32,13 +32,15 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Chris Zalidis
+* Author: Chris Zalidis, Konstantinos Panayiotou
 *********************************************************************/
 
 #ifndef XMEGA_SERIAL_INTERFACE_ENCODER_SENSOR_H
 #define XMEGA_SERIAL_INTERFACE_ENCODER_SENSOR_H
 
 #include <xmega_serial_interface/sensor_base.h>
+
+#define ROTARY_OFFSET 223
 
 namespace pandora_hardware_interface
 {

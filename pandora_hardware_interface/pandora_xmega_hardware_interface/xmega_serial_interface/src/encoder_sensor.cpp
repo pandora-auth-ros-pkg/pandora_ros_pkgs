@@ -32,7 +32,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Chris Zalidis
+* Author: Chris Zalidis, Konstantinos Panayiotou
 *********************************************************************/
 
 #include <xmega_serial_interface/encoder_sensor.h>
@@ -48,7 +48,7 @@ EncoderSensor::EncoderSensor()
 
 void EncoderSensor::handleData()
 {
-  degrees = (static_cast<double>((data[0] << 8) |  data[1]) / 1024) * 360.0;
+  degrees = (static_cast<double>( ((data[0] << 8) |  data[1]) - 223) / 1024) * 360.0;
 }
 
 EncoderSensor::~EncoderSensor()
