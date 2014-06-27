@@ -1,0 +1,4 @@
+published_topic_names:  
+  victim_alert : /vision/victim_alert
+subscribed_topic_names:  
+  enhanded_hole_alert : /vision/enhanced_holes

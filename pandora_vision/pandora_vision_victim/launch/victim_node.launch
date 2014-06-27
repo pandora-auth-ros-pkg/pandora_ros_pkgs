@@ -1,0 +1,14 @@
+<launch>
+      
+    <node name="victim_node" type="victim_node" pkg="pandora_vision_victim" respawn="False" output="screen" />
+    
+    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml" 
+        command="load" ns="victim"/>
+    
+    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml" 
+        command="load" ns="victim"/>
+            
+    <!-- Url for model.xml /-->
+    <param name="model_url" type="str" value="https://pandora.ee.auth.gr/vision/model.xml"/>  
+
+</launch>
