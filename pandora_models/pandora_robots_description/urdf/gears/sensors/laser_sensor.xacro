@@ -3,7 +3,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <!-- ==================================================================== -->
-  <xacro:include filename="$(find pandora_sensors_description)/urdf/hokuyo_urg_04lx.urdf.xacro" />
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/laser.urdf.xacro" />
   <!-- ==================================================================== -->
 
 <!-- ###################################################################### -->
@@ -11,7 +11,7 @@
   <xacro:macro name="laser_sensor"
                params="fixed" >
                
-    <xacro:hokuyo_caster parent="base_link"
+    <xacro:laser_caster parent="base_link"
                          fixed="${fixed}"
                          roll_min_limit="${laser_roll_joint_min_limit}" 
                          roll_max_limit="${laser_roll_joint_max_limit}"
@@ -21,7 +21,7 @@
       <origin xyz="0.1974 0.0 0.09679"
               rpy="${zero}" />
 
-    </xacro:hokuyo_caster>
+    </xacro:laser_caster>
     
   </xacro:macro>
 

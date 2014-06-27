@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2014-05-15T10:59:54</created>
-    <modified>2014-05-15T10:59:54</modified>
+    <created>2014-06-25T18:29:53</created>
+    <modified>2014-06-25T18:29:53</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -36,15 +36,9 @@
             </index_of_refraction>
           </phong>
         </technique>
-        <extra>
-          <technique profile="GOOGLEEARTH">
-            <double_sided>1</double_sided>
-          </technique>
-        </extra>
       </profile_COMMON>
-      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
     </effect>
-    <effect id="Sonar_Black-effect">
+    <effect id="Saffron-effect">
       <profile_COMMON>
         <technique sid="common">
           <phong>
@@ -52,13 +46,13 @@
               <color sid="emission">0 0 0 1</color>
             </emission>
             <ambient>
-              <color sid="ambient">0.02484926 0.02484926 0.02484926 1</color>
+              <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.02484926 0.02484926 0.02484926 1</color>
+              <color sid="diffuse">0.723729 0.4416092 0.02364548 1</color>
             </diffuse>
             <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
+              <color sid="specular">0.25 0.25 0.25 1</color>
             </specular>
             <shininess>
               <float sid="shininess">50</float>
@@ -68,28 +62,22 @@
             </index_of_refraction>
           </phong>
         </technique>
-        <extra>
-          <technique profile="GOOGLEEARTH">
-            <double_sided>1</double_sided>
-          </technique>
-        </extra>
       </profile_COMMON>
-      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
     </effect>
   </library_effects>
   <library_materials>
     <material id="PCB_Green-material" name="PCB_Green">
       <instance_effect url="#PCB_Green-effect"/>
     </material>
-    <material id="Sonar_Black-material" name="Sonar_Black">
-      <instance_effect url="#Sonar_Black-effect"/>
+    <material id="Saffron-material" name="Saffron">
+      <instance_effect url="#Saffron-effect"/>
     </material>
   </library_materials>
   <library_geometries>
     <geometry id="Plane-mesh" name="Plane">
       <mesh>
         <source id="Plane-mesh-positions">
-          <float_array id="Plane-mesh-positions-array" count="75">0.01099991 0.01099973 0 0.01099985 -0.01099997 0 -0.01100015 -0.01099985 0 -0.01099967 0.01100015 0 -0.01099967 0.01100015 0.002601385 -0.01100015 -0.01099985 0.002601385 0.01099985 -0.01099997 0.002601385 0.01099991 0.01099973 0.002601385 0 0.007999956 0.003145456 0.005656838 0.005656838 0.003145456 0.007999956 0 0.003145456 0.005656838 -0.005656838 0.003145456 0 -0.007999956 0.003145456 -0.005656838 -0.005656838 0.003145456 -0.007999956 0 0.003145456 -0.005656838 0.005656838 0.003145456 0 0.007999956 0.01499992 0.005656838 0.005656838 0.01499992 0.007999956 0 0.01499992 0.005656838 -0.005656838 0.01499992 0 -0.007999956 0.01499992 -0.005656838 -0.005656838 0.01499992 -0.007999956 0 0.01499992 -0.005656838 0.005656838 0.01499992 0 0 0.01499992</float_array>
+          <float_array id="Plane-mesh-positions-array" count="75">0.01099985 0.01099967 0 0.01099979 -0.01099991 0 -0.01100009 -0.01099979 0 -0.01099961 0.01100009 0 -0.01099961 0.01100009 0.002601385 -0.01100009 -0.01099979 0.002601385 0.01099979 -0.01099991 0.002601385 0.01099985 0.01099967 0.002601385 0 0.007999956 0.003145456 0.005656838 0.005656838 0.003145456 0.007999956 0 0.003145456 0.005656838 -0.005656838 0.003145456 0 -0.007999956 0.003145456 -0.005656838 -0.005656838 0.003145456 -0.007999956 0 0.003145456 -0.005656838 0.005656838 0.003145456 0 0.007999956 0.01499986 0.005656838 0.005656838 0.01499986 0.007999956 0 0.01499986 0.005656838 -0.005656838 0.01499986 0 -0.007999956 0.01499986 -0.005656838 -0.005656838 0.01499986 -0.007999956 0 0.01499986 -0.005656838 0.005656838 0.01499986 0 0 0.01499986</float_array>
           <technique_common>
             <accessor source="#Plane-mesh-positions-array" count="25" stride="3">
               <param name="X" type="float"/>
@@ -99,7 +87,7 @@
           </technique_common>
         </source>
         <source id="Plane-mesh-normals">
-          <float_array id="Plane-mesh-normals-array" count="108">0 0 1 0 0 1 -5.46091e-6 -1 0 -5.46091e-6 -1 0 1 -2.75166e-6 0 1 -2.75166e-6 0 1.905e-5 1 0 1.905e-5 1 0 -1 2.18013e-5 0 -1 2.18013e-5 0 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 -0.7070834 0.7070834 0 -0.548967 0.548967 0.6302378 0 0.7763603 0.6302378 0 1 0 -1 0 0 -0.7763603 0 0.6302378 -0.7070834 -0.7070834 0 -0.548967 -0.548967 0.6302378 0 -1 0 0 -0.7763603 0.6302378 0.7070834 -0.7070834 0 0.548967 -0.548967 0.6302378 1 0 0 0.7763603 0 0.6302378 0.7070834 0.7070834 0 0.548967 0.548967 0.6302378</float_array>
+          <float_array id="Plane-mesh-normals-array" count="108">0 0 1 0 0 1 -5.46094e-6 -1 0 -5.46094e-6 -1 0 1 -2.70934e-6 0 1 -2.70934e-6 0 1.90925e-5 1 0 1.90925e-5 1 0 -1 2.18014e-5 0 -1 2.18014e-5 0 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 -0.7070834 0.7070834 0 -0.548967 0.548967 0.6302378 0 0.7763603 0.6302378 0 1 0 -1 0 0 -0.7763603 0 0.6302378 -0.7070834 -0.7070834 0 -0.548967 -0.548967 0.6302378 0 -1 0 0 -0.7763603 0.6302378 0.7070834 -0.7070834 0 0.548967 -0.548967 0.6302378 1 0 0 0.7763603 0 0.6302378 0.7070834 0.7070834 0 0.548967 0.548967 0.6302378</float_array>
           <technique_common>
             <accessor source="#Plane-mesh-normals-array" count="36" stride="3">
               <param name="X" type="float"/>
@@ -117,7 +105,7 @@
           <vcount>3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
           <p>5 0 7 0 4 0 5 1 6 1 7 1 1 2 5 2 2 2 1 3 6 3 5 3 0 4 6 4 1 4 0 5 7 5 6 5 7 6 0 6 3 6 3 7 4 7 7 7 2 8 4 8 3 8 2 9 5 9 4 9 0 10 2 10 3 10 0 11 1 11 2 11</p>
         </polylist>
-        <polylist material="Sonar_Black-material" count="24">
+        <polylist material="Saffron-material" count="24">
           <input semantic="VERTEX" source="#Plane-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Plane-mesh-normals" offset="1"/>
           <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
@@ -130,12 +118,12 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Plane" name="Plane" type="NODE">
-        <matrix sid="transform">3.13916e-7 -1.34359e-7 1 0 0 1 1.34359e-7 0 -1 -4.21774e-14 3.13916e-7 0 0 0 0 1</matrix>
+        <matrix sid="transform">3.13916e-7 -1.34359e-7 1 0 0 1 1.34359e-7 0 -1 -4.21775e-14 3.13916e-7 0 0 0 0 1</matrix>
         <instance_geometry url="#Plane-mesh">
           <bind_material>
             <technique_common>
               <instance_material symbol="PCB_Green-material" target="#PCB_Green-material"/>
-              <instance_material symbol="Sonar_Black-material" target="#Sonar_Black-material"/>
+              <instance_material symbol="Saffron-material" target="#Saffron-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>

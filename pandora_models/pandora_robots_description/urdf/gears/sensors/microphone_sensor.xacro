@@ -3,7 +3,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <!-- ==================================================================== -->
-  <xacro:include filename="$(find pandora_sensors_description)/urdf/microphone_sensor.urdf.xacro" />
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/microphone.urdf.xacro" />
   <!-- ==================================================================== -->
 
 <!-- ###################################################################### -->
@@ -12,7 +12,7 @@
   
     <xacro:microphone_caster parent="linear_head_main_link" >
 
-      <origin xyz="0.00915 -0.02181 0.05251"
+      <origin xyz="-0.02175 -0.0374 0.09643"
               rpy="${zero}" />
 
     </xacro:microphone_caster>

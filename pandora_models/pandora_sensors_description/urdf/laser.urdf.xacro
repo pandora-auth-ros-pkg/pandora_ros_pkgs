@@ -4,7 +4,7 @@
 
 <!-- ###################################################################### -->
 
-  <xacro:macro name="hokuyo_caster"
+  <xacro:macro name="laser_caster"
                params="parent
                        fixed
                        roll_min_limit
@@ -38,7 +38,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_urg_04lx/laser_pitch_servo.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/laser/pitch_servo_motor.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
@@ -81,7 +81,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/hokuyo_urg_04lx/hokuyo_urg_04lx.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/laser/hokuyo_urg_04lx.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
@@ -240,6 +240,8 @@
       <!-- ================================================================ -->
                  
     </joint>
+
+    <!-- ################################################################## -->
 
   </xacro:macro>
 

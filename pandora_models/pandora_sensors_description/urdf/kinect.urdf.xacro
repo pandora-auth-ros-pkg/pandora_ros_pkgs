@@ -81,7 +81,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/kinect_camera/kinect_base.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/kinect/base.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
@@ -124,7 +124,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/kinect_camera/asus_xtion_pro.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/kinect/asus_xtion_pro.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
@@ -472,6 +472,8 @@
       <!-- ================================================================ -->
                  
     </joint>
+
+    <!-- ################################################################## -->
 
   </xacro:macro>
 
