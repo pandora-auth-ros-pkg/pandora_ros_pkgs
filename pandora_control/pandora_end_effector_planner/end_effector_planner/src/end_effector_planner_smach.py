@@ -160,6 +160,7 @@ def out_cb(outcome_map):
     if outcome_map['KINECT_ORIENTATION'] == 'succeeded' and \
             outcome_map['HEAD_ORIENTATION'] == 'succeeded' and \
             outcome_map['LINEAR_MOVEMENT'] == 'succeeded':
+        rospy.sleep(0.1)
         return 'succeeded'
     if outcome_map['KINECT_ORIENTATION'] == 'aborted':
         return 'aborted'

@@ -34,4 +34,4 @@ move_head_action:
   pitch_joint_child: linear_head_main_link
   yaw_joint_parent: linear_elevator_link
   yaw_joint_child: linear_head_base_link
-  sensor_frame: middle_thermal_link
+  sensor_frame: middle_thermal_frame
