@@ -629,7 +629,6 @@ namespace pandora_vision
     HoleMerger::applyMergeOperationWithoutValidation(
       &conveyor,
       squares_,
-      cloud,
       ASSIMILATION );
 
     // The number of holes should have shrunk by one
@@ -697,7 +696,6 @@ namespace pandora_vision
     HoleMerger::applyMergeOperationWithoutValidation(
       &conveyor,
       squares_,
-      cloud,
       AMALGAMATION );
 
     // The number of holes should have shrunk by one
@@ -768,80 +766,6 @@ namespace pandora_vision
       }
     }
 
-
-    // Run HoleMerger::applyMergeOperationWithoutValidation
-    //for operationId = 2 : connection
-
-    // But first, restore conveyor to its original state
-    HolesConveyorUtils::replace( originConveyor, &conveyor );
-
-    // Modify the connection parameters
-    Parameters::HoleFusion::connect_holes_min_distance = 3;
-    Parameters::HoleFusion::connect_holes_max_distance = 20;
-
-    HoleMerger::applyMergeOperationWithoutValidation(
-      &conveyor,
-      squares_,
-      cloud,
-      CONNECTION );
-
-    // The number of holes should have shrunk by one
-    EXPECT_EQ ( conveyor.size(), originConveyor.size() - 1 );
-
-    // The connector should have grown in terms of outline points
-    EXPECT_LT ( originConveyor.holes[0].outline.size(),
-      conveyor.holes[0].outline.size() );
-
-    // The connector's keypoint should have moved a bit to the left,
-    // and a bit lower than before
-    EXPECT_GT ( originConveyor.holes[0].keypoint.pt.x,
-      conveyor.holes[0].keypoint.pt.x );
-    EXPECT_LT ( originConveyor.holes[0].keypoint.pt.y,
-      conveyor.holes[0].keypoint.pt.y );
-
-    // Original entry #1 should now be entry #1
-    // Original entry #2 should now be entry #2
-    for ( int i = 1; i < 3; i++ )
-    {
-      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
-        originConveyor.holes[i].keypoint.pt.x );
-      EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
-        originConveyor.holes[i].keypoint.pt.y );
-
-      for ( int r = 0; r < conveyor.holes[i].rectangle.size(); r++ )
-      {
-        EXPECT_EQ ( conveyor.holes[i].rectangle[r].x,
-          originConveyor.holes[i].rectangle[r].x );
-
-        EXPECT_EQ ( conveyor.holes[i].rectangle[r].y,
-          originConveyor.holes[i].rectangle[r].y );
-      }
-
-      for ( int r = 0; r < conveyor.holes[i].outline.size(); r++ )
-      {
-        EXPECT_EQ ( conveyor.holes[i].outline[r].x,
-          originConveyor.holes[i].outline[r].x );
-        EXPECT_EQ ( conveyor.holes[i].outline[r].y,
-          originConveyor.holes[i].outline[r].y );
-      }
-    }
-
-    // Original entry #4 should now be entry #3
-    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.x,
-      originConveyor.holes[4].keypoint.pt.x );
-    EXPECT_EQ ( conveyor.holes[3].keypoint.pt.y,
-      originConveyor.holes[4].keypoint.pt.y );
-
-    for ( int r = 0; r < conveyor.holes[3].rectangle.size(); r++ )
-    {
-      EXPECT_EQ ( conveyor.holes[3].rectangle[r].x,
-        originConveyor.holes[4].rectangle[r].x );
-
-      EXPECT_EQ ( conveyor.holes[3].rectangle[r].y,
-        originConveyor.holes[4].rectangle[r].y );
-    }
-
-
     // Restore conveyor to its original state
     HolesConveyorUtils::replace( originConveyor, &conveyor );
 
@@ -852,12 +776,11 @@ namespace pandora_vision
       HoleMerger::applyMergeOperationWithoutValidation(
         &conveyor,
         squares_,
-        cloud,
         i);
     }
 
-    // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.size() );
+    // The number of holes should have shrunk to three
+    EXPECT_EQ ( 3, conveyor.size() );
   }
 
 
@@ -1136,8 +1059,8 @@ namespace pandora_vision
       squares_,
       cloud);
 
-    // The number of holes should have shrunk to two
-    EXPECT_EQ ( 2, conveyor.size() );
+    // The number of holes should have shrunk to three
+    EXPECT_EQ ( 3, conveyor.size() );
   }
 
 }  // namespace pandora_vision

@@ -106,9 +106,6 @@ namespace pandora_vision
         candidate holes conveyor
         @param[in] image [const cv::Mat&] An image used for filters' resources
         creation and size usage
-        @param[in] pointCloud [const PointCloudPtr] An interpolated point
-        cloud used in the connection operation; it is used to obtain real world
-        distances between holes
         @param[in] operationId [const int&] The identifier of the merging
         process. Values: 0 for assimilation, 1 for amalgamation and
         2 for connecting
@@ -117,7 +114,6 @@ namespace pandora_vision
       static void applyMergeOperationWithoutValidation(
         HolesConveyor* rgbdHolesConveyor,
         const cv::Mat& image,
-        const PointCloudPtr& pointCloud,
         const int& operationId);
 
       /**

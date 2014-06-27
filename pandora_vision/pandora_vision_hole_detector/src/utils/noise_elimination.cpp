@@ -121,25 +121,25 @@ namespace pandora_vision
     Timer::start("brushfireNearStep");
     #endif
 
-    unsigned int x = index / image->cols;
-    unsigned int y = index % image->cols;
+    int x = index / image->cols;
+    int y = index % image->cols;
 
-    std::vector<unsigned int> current, next;
-    std::set<unsigned int> visited;
+    std::vector<int> current, next;
+    std::set<int> visited;
 
     current.push_back(x * image->cols + y);
     visited.insert(x * image->cols + y);
 
     while(current.size() != 0)
     {
-      for(unsigned int i = 0; i < current.size(); i++)
+      for(int i = 0; i < current.size(); i++)
       {
         for(int m = -1 ; m < 2 ; m++)
         {
           for(int n = -1 ; n < 2 ; n++)
           {
-            x = static_cast<int>(current[i]) / image->cols + m;
-            y = static_cast<int>(current[i]) % image->cols + n;
+            x = current[i] / image->cols + m;
+            y = current[i] % image->cols + n;
 
             // Boundaries check.
             // If a neighboring points goes out of bounds, discard it
@@ -170,7 +170,7 @@ namespace pandora_vision
     float val = 0.0;
     const float noise = 0.0;
 
-    for(std::set<unsigned int>::iterator it = visited.begin();
+    for(std::set<int>::iterator it = visited.begin();
       it != visited.end(); it++)
     {
       x = *it / image->cols;
@@ -208,7 +208,7 @@ namespace pandora_vision
       // Now that the lowest value of non-zero neighboring pixels of
       // this black concentration of pixels has been found,
       // assign it to the whole of the concentration
-      for(std::set<unsigned int>::iterator it = visited.begin();
+      for(std::set<int>::iterator it = visited.begin();
         it != visited.end(); it++)
       {
         image->at<float>(*it / image->cols, *it % image->cols) = lower;

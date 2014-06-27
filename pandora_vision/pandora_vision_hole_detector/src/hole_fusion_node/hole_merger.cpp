@@ -378,9 +378,6 @@ namespace pandora_vision
     candidate holes conveyor
     @param[in] image [const cv::Mat&] An image used for filters' resources
     creation and size usage
-    @param[in] pointCloud [const PointCloudPtr] An interpolated point
-    cloud used in the connection operation; it is used to obtain real world
-    distances between holes
     @param[in] operationId [const int&] The identifier of the merging
     process. Values: 0 for assimilation, 1 for amalgamation and
     2 for connecting
@@ -389,7 +386,6 @@ namespace pandora_vision
   void HoleMerger::applyMergeOperationWithoutValidation(
     HolesConveyor* rgbdHolesConveyor,
     const cv::Mat& image,
-    const PointCloudPtr& pointCloud,
     const int& operationId)
   {
     #ifdef DEBUG_TIME
@@ -412,7 +408,7 @@ namespace pandora_vision
     std::vector<int> finishVector(rgbdHolesConveyor->size(), 0);
 
     // The index of the candidate hole that will
-    // {assimilate, amalgamate, connect} the passiveId-th candidate hole.
+    // {assimilate, amalgamate} the passiveId-th candidate hole.
     // The activeId always has a value of 0 due to the implementation's
     // rationale: The candidate hole that examines each hole in the
     // rgbdHolesConveyor is always the first one. When it has finished,
@@ -420,7 +416,7 @@ namespace pandora_vision
     const int activeId = 0;
 
     // The index of the candidate hole that will be
-    // {assimilated, amalgamated, connected} by / with
+    // {assimilated, amalgamated} by / with
     // the activeId-th candidate hole
     int passiveId = 1;
 
@@ -436,7 +432,7 @@ namespace pandora_vision
 
 
       // Is the activeId-th candidate hole able to
-      // {assimilate, amalgamate, connect to} the passiveId-th candidate hole?
+      // {assimilate, amalgamate} the passiveId-th candidate hole?
       bool isAble = false;
 
       if (operationId == ASSIMILATION)
@@ -455,18 +451,6 @@ namespace pandora_vision
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
-      if (operationId == CONNECTION)
-      {
-        // Is the passiveId-th candidate hole able to be connected with the
-        // activeId-th candidate hole?
-        isAble = HoleMerger::isCapableOfConnecting(*rgbdHolesConveyor,
-          activeId,
-          passiveId,
-          holesMasksSetVector[activeId],
-          holesMasksSetVector[passiveId],
-          pointCloud);
-      }
-
 
       if (isAble)
       {
@@ -502,40 +486,24 @@ namespace pandora_vision
 
           HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
         }
-        else if (operationId == CONNECTION)
-        {
-          // Delete the passiveId-th candidate hole,
-          // alter the activeId-th candidate hole so that it has been
-          // connected with the passiveId -th candidate hole
-          HoleMerger::connectOnce(&tempHolesConveyor,
-            activeId, passiveId,
-            &tempHolesMasksSetVector[activeId],
-            image);
 
-          HolesConveyorUtils::removeHole(&tempHolesConveyor, passiveId);
-        }
-
-        // Since the {assimilator, amalgamator, connector} is able,
+        // Since the {assimilator, amalgamator} is able,
         // delete the assimilable's entries in the vectors needed
         // for filtering and merging
         tempHolesMasksSetVector.erase(
           tempHolesMasksSetVector.begin() + passiveId);
 
-
         // Since the merge has been uncondionally happened,
         // the tempHolesConveyor is now the new rgbdHolesConveyor
         HolesConveyorUtils::replace(tempHolesConveyor, rgbdHolesConveyor);
-
 
         // ..and the new holesMasksSetVector is the positively tested
         // temp one
         holesMasksSetVector = tempHolesMasksSetVector;
 
-
         // Delete the passiveId-th entry of the finishVector since the
         // passiveId-th hole has been absorbed by the activeId-th hole
         finishVector.erase(finishVector.begin() + passiveId);
-
 
         // Because of the merge happening, the activeId-th
         // candidate hole must re-examine all the other holes
@@ -1277,7 +1245,6 @@ namespace pandora_vision
         HoleMerger::applyMergeOperationWithoutValidation(
           conveyor,
           interpolatedDepthImage,
-          pointCloud,
           i);
       }
     }

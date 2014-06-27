@@ -639,6 +639,174 @@ namespace pandora_vision
 
 
   /**
+    @brief Takes as input a container of holes and a map of indices
+    of holes referring to the container to validity probabilities.
+    It outputs the most probable unique valid holes and a map
+    adjusted to fit the altered container of holes.
+
+    Inside the allHoles container, reside holes that have originated
+    from the Depth and RGB nodes, plus any merges between them. Having
+    acquired the validity probability of each one of them, this method
+    locates valid holes that refer to the same physical hole in space
+    inside the allHoles container and picks the one with the largest
+    validity probability.
+    @param[in,out] allHoles [HolesConveyor*] The conveyor of holes.
+    @param[in,out] validHolesMap [std::map<int, float>*] The std::map
+    that maps holes inside the allHoles conveyor to their validity
+    probability
+    @return void
+   **/
+  void HoleFusion::makeValidHolesUnique(HolesConveyor* allHoles,
+    std::map<int, float>* validHolesMap)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("makeValidHolesUnique", "processCandidateHoles");
+    #endif
+
+    // Each set inside the map refers a valid hole inside the allHoles conveyor.
+    // The entries of each set are indices to valid holes inside
+    // the allHoles conveyor.
+    // Each map.first refers to a specific valid hole inside the allHoles
+    // conveyor.
+    // map.first-> map.second means the residence of the keypoint of the
+    // hole with index map.first within the bounding box of holes with
+    // indices in map.second
+    std::map<int, std::set<int> > residenceMap;
+
+    // Find the indices of holes that the keypoint of each valid hole
+    // is located in.
+    for (std::map<int, float>::iterator o_it = validHolesMap->begin();
+      o_it != validHolesMap->end(); o_it++)
+    {
+      // The keypoint of the i-th hole in cv::Point2f format
+      cv::Point2f keypoint;
+      keypoint.x = allHoles->holes[o_it->first].keypoint.pt.x;
+      keypoint.y = allHoles->holes[o_it->first].keypoint.pt.y;
+
+      // A set of the identifiers of holes inside the allHoles conveyor,
+      // whose bounding box the i-th hole is inside
+      std::set<int> parents;
+      for (std::map<int, float>::iterator i_it = validHolesMap->begin();
+        i_it != validHolesMap->end(); i_it++)
+      {
+        if (cv::pointPolygonTest(
+            allHoles->holes[i_it->first].rectangle, keypoint, false) > 0)
+        {
+          parents.insert(i_it->first);
+        }
+      }
+
+      residenceMap[o_it->first] = parents;
+    }
+
+    // The outcome is a map of ints to sets, one per valid hole.
+    // Each set contains the indices of parent holes
+    // that have been deemed valid.
+    // What we want now is to locate which holes need to be
+    // compared against one another.
+
+    // Each set inside the groupSet contains holes whose overall validity
+    // probability needs to be compared against all the others within that set.
+    // The largest of them corresponds to a unique hole, whose keypoint,
+    // outline and bounding rectangle are considered most accurate between
+    // the holes in its respective set.
+    std::set<std::set<int> > groupSet;
+    for (std::map<int, std::set<int> >::iterator hole_it = residenceMap.begin();
+      hole_it != residenceMap.end(); hole_it++)
+    {
+      // The set of indices of holes with which the
+      // hole_it->first-th hole must be compared to
+      std::set<int> holeComparingGroupSet;
+      for (std::set<int>::iterator set_it = hole_it->second.begin();
+        set_it != hole_it->second.end(); set_it++)
+      {
+        for (std::map<int, std::set<int> >::iterator
+          comp_it = residenceMap.begin();
+          comp_it != residenceMap.end(); comp_it++)
+        {
+          if (std::find(
+              comp_it->second.begin(),
+              comp_it->second.end(),
+              *set_it) != comp_it->second.end())
+          {
+            holeComparingGroupSet.insert(comp_it->first);
+          }
+        }
+
+        // Insert the set of indices of holes with which the i-th hole will be
+        // compared to inside the overall set of sets.
+        groupSet.insert(holeComparingGroupSet);
+      }
+    }
+
+    // The conveyor of unique and valid holes
+    HolesConveyor uniqueHoles;
+
+    // Maps a unique, valid hole to its validity probability
+    std::map<int, float> finalMap;
+
+    // A hole counter
+    int numHoles = 0;
+
+    // Iterate over the set of sets within which the validity probability
+    // of holes needs to be compared with one another. We will locate the
+    // hole in a set within groupSet that has the highest probability among
+    // the holes inside the set
+    for (std::set<std::set<int> >::iterator o_it = groupSet.begin();
+      o_it != groupSet.end(); o_it++)
+    {
+      // The maximum probability of the cluser of nearby holes
+      float maxProbability = 0.0;
+
+      // The index of the hole with maximum probability inside the cluster
+      // of nearby holes
+      int index = 0;
+
+      // Iterate over the current set inside the groupSet
+      for (std::set<int>::iterator g_it = o_it->begin();
+        g_it != o_it->end(); g_it++)
+      {
+        // An iterator over the input validHolesMap.
+        // It points to the index and probability of the *g_it-th hole
+        std::map<int, float>::iterator map_it = validHolesMap->find(*g_it);
+        if (map_it != validHolesMap->end())
+        {
+          if (map_it->second > maxProbability)
+          {
+            maxProbability = map_it->second;
+            index = map_it->first;
+          }
+        }
+      }
+
+      // The index-th hole inside this cluster of nearby holes is the most
+      // accurate one, since its probability is the highest among its rearby
+      // holes. Append it to the uniqueHoles conveyor.
+      HolesConveyorUtils::append(
+        HolesConveyorUtils::getHole(*allHoles, index),
+        &uniqueHoles);
+
+      // Map the most accurate hole to its probability.
+      finalMap[numHoles] = maxProbability;
+
+      numHoles++;
+    }
+
+    // All unique holes have been found.
+    // Replace the uniqueHoles conveyor with the one containing
+    // clusters of holes and the input map with the one corresponding to the
+    // unique holes found.
+    HolesConveyorUtils::replace(uniqueHoles, allHoles);
+    *validHolesMap = finalMap;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("makeValidHolesUnique");
+    #endif
+  }
+
+
+
+  /**
     @brief The function called when a parameter is changed
     @param[in] config
     [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
@@ -1081,17 +1249,28 @@ namespace pandora_vision
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
       &rgbdHolesConveyor);
 
+    // Keep a backup of the original holes found from both the
+    // RGB and Depth nodes
+    HolesConveyor originalHolesConveyor;
+    HolesConveyorUtils::copyTo(rgbdHolesConveyor, &originalHolesConveyor);
+
     // Apply the {assimilation, amalgamation, connection} processes
     HoleMerger::mergeHoles(&rgbdHolesConveyor,
       filteringMode_,
       interpolatedDepthImage_,
       pointCloud_);
 
+    // Here needs to be a method that inserts original, merged and un-merged
+    // holes, without allowing duplicate holes
+    HolesConveyor allHoles;
+    HolesConveyorUtils::merge(originalHolesConveyor, rgbdHolesConveyor,
+      &allHoles);
+
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D;
-    probabilitiesVector2D = filterHoles(rgbdHolesConveyor);
+    probabilitiesVector2D = filterHoles(allHoles);
 
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
@@ -1103,41 +1282,39 @@ namespace pandora_vision
     std::map<int, float> validHolesMap;
     validHolesMap = validateHoles(probabilitiesVector2D);
 
+    makeValidHolesUnique(&allHoles, &validHolesMap);
+
+    // Merged and original holes point to a definite hole in space.
+    // See which ones have the highest probability among the ones that refer
+    // to a define hole and keep that one.
+
     // If there are valid holes, publish them
     if (validHolesMap.size() > 0)
     {
-      publishValidHoles(rgbdHolesConveyor, &validHolesMap);
+      publishValidHoles(allHoles, &validHolesMap);
     }
 
     // Publish the enhanced holes message
     // regardless of the amount of valid holes
-    publishEnhancedHoles(rgbdHolesConveyor, &validHolesMap);
+    publishEnhancedHoles(allHoles, &validHolesMap);
 
     #ifdef DEBUG_SHOW
     if (Parameters::HoleFusion::show_final_holes)
     {
-      // The holes conveyor containing only the valid holes
-      HolesConveyor validHolesConveyor;
-
       // Contains the validity probability for each hole considered valid
       std::vector<std::string> msgs;
 
       for (std::map<int, float>::iterator it = validHolesMap.begin();
         it != validHolesMap.end(); it++)
       {
-        HolesConveyorUtils::append(
-          HolesConveyorUtils::getHole(rgbdHolesConveyor, it->first),
-          &validHolesConveyor);
-
         msgs.push_back(TOSTR(it->second));
       }
-
 
       // Valid holes on top of the interpolated depth image
       cv::Mat depthValidHolesImage =
         Visualization::showHoles("Valid Holes",
           interpolatedDepthImage_,
-          validHolesConveyor,
+          allHoles,
           -1,
           msgs);
 
@@ -1145,7 +1322,7 @@ namespace pandora_vision
       cv::Mat rgbValidHolesImage =
         Visualization::showHoles("ValidHoles",
           rgbImage_,
-          validHolesConveyor,
+          allHoles,
           -1,
           msgs);
 
@@ -2022,7 +2199,7 @@ namespace pandora_vision
           }
         }
       }
-      else if (filteringMode_ = RGB_ONLY_MODE)
+      else if (filteringMode_ == RGB_ONLY_MODE)
       {
         // Color homogeneity
         if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
