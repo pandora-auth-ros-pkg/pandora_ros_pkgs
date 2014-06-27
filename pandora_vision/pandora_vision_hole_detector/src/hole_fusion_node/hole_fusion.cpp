@@ -1214,8 +1214,9 @@ namespace pandora_vision
 
       // Holes originated from analysis on the depth image,
       // on top of the depth image
-      cv::Mat depthHolesImage =
-        Visualization::showHoles("Holes originated from Depth analysis",
+      cv::Mat depthHolesOnDepthImage =
+        Visualization::showHoles(
+          "Holes originated from Depth analysis, on the Depth image",
           interpolatedDepthImage_,
           depthHolesConveyor_,
           -1,
@@ -1223,22 +1224,48 @@ namespace pandora_vision
 
       // Holes originated from analysis on the RGB image,
       // on top of the RGB image
-      cv::Mat rgbHolesImage =
-        Visualization::showHoles("Holes originated from RGB analysis",
+      cv::Mat rgbHolesOnRgbImage =
+        Visualization::showHoles(
+          "Holes originated from RGB analysis, on the RGB image",
           rgbImage_,
           rgbHolesConveyor_,
           -1,
           msgs);
 
-      // The two images
+      // Holes originated from analysis on the depth image,
+      // on top of the RGB image
+      cv::Mat depthHolesOnRgbImage =
+        Visualization::showHoles(
+          "Holes originated from Depth analysis, on the RGB image",
+          rgbImage_,
+          depthHolesConveyor_,
+          -1,
+          msgs);
+
+      // Holes originated from analysis on the RGB image,
+      // on top of the Depth image
+      cv::Mat rgbHolesOnDepthImage =
+        Visualization::showHoles(
+          "Holes originated from RGB analysis, on the Depth image",
+          interpolatedDepthImage_,
+          rgbHolesConveyor_,
+          -1,
+          msgs);
+
+      // The four images
       std::vector<cv::Mat> imgs;
-      imgs.push_back(depthHolesImage);
-      imgs.push_back(rgbHolesImage);
+      imgs.push_back(depthHolesOnDepthImage);
+      imgs.push_back(depthHolesOnRgbImage);
+      imgs.push_back(rgbHolesOnRgbImage);
+      imgs.push_back(rgbHolesOnDepthImage);
 
       // The titles of the images
       std::vector<std::string> titles;
-      titles.push_back("Holes originated from Depth analysis");
-      titles.push_back("Holes originated from RGB analysis");
+
+      titles.push_back("Holes originated from Depth analysis, on the Depth image");
+      titles.push_back("Holes originated from Depth analysis, on the RGB image");
+      titles.push_back("Holes originated from RGB analysis, on the RGB image");
+      titles.push_back("Holes originated from RGB analysis, on the Depth image");
 
       Visualization::multipleShow("Respective keypoints", imgs, titles, 1280, 1);
     }
@@ -1260,8 +1287,8 @@ namespace pandora_vision
       interpolatedDepthImage_,
       pointCloud_);
 
-    // Here needs to be a method that inserts original, merged and un-merged
-    // holes, without allowing duplicate holes
+    // The original holes and the merged ones now reside under the allHoles
+    // conveyor
     HolesConveyor allHoles;
     HolesConveyorUtils::merge(originalHolesConveyor, rgbdHolesConveyor,
       &allHoles);
@@ -1282,6 +1309,11 @@ namespace pandora_vision
     std::map<int, float> validHolesMap;
     validHolesMap = validateHoles(probabilitiesVector2D);
 
+    // In general, the allHoles conveyor will contain
+    // merged and um-merged holes, potentially resulting in multiple entries
+    // inside the conveyor for the same physical hole. The method below
+    // picks the most probable valid hole among the ones referring to the same
+    // physical hole.
     makeValidHolesUnique(&allHoles, &validHolesMap);
 
     // Merged and original holes point to a definite hole in space.
@@ -1407,13 +1439,13 @@ namespace pandora_vision
     vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
 
     // Set the rgbImage in the enhancedHolesMsg message to the rgb image
-    MessageConversions::convertImageToMessage(
+    enhancedHolesMsg.rgbImage = MessageConversions::convertImageToMessage(
       rgbImage_,
       sensor_msgs::image_encodings::TYPE_8UC3,
       enhancedHolesMsg.rgbImage);
 
     // Set the depthImage in the enhancedHolesMsg message to the depth image
-    MessageConversions::convertImageToMessage(
+    enhancedHolesMsg.depthImage = MessageConversions::convertImageToMessage(
       Visualization::scaleImageForVisualization(interpolatedDepthImage_,
         Parameters::Image::scale_method),
       sensor_msgs::image_encodings::TYPE_8UC1,
