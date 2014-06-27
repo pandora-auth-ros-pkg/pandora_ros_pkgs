@@ -172,8 +172,13 @@ namespace pandora_vision
       // hole fusion node, on top of their respective origin images
       static bool show_respective_holes;
 
-      // The product of this package: valid holes
+      // Show all valid holes, from either the Depth or RGB source, or
+      // the merges between them
+      static bool show_valid_holes;
+
+      // The product of this package: unique, valid holes
       static bool show_final_holes;
+
 
       // Hole checkers and their thresholds`
       static int run_checker_depth_diff;

@@ -854,7 +854,12 @@ namespace pandora_vision
     Parameters::HoleFusion::show_respective_holes =
       config.show_respective_holes;
 
-    // The product of this package: valid holes
+    // Show all valid holes, from either the Depth or RGB source, or
+    // the merges between them
+    Parameters::HoleFusion::show_valid_holes =
+     config.show_valid_holes;
+
+    // The product of this package: unique, valid holes
     Parameters::HoleFusion::show_final_holes =
      config.show_final_holes;
 
@@ -1309,26 +1314,54 @@ namespace pandora_vision
     std::map<int, float> validHolesMap;
     validHolesMap = validateHoles(probabilitiesVector2D);
 
+    #ifdef DEBUG_SHOW
+    if (Parameters::HoleFusion::show_valid_holes)
+    {
+      // A vector containing images, one per valid hole found.
+      std::vector<cv::Mat> holesImages;
+
+      // A vector of validity probabilities per valid hole found.
+      std::vector<std::string> msgs;
+
+      // Iterate over the map of valid holes to their validity probabilities
+      for (std::map<int, float>::iterator it = validHolesMap.begin();
+        it != validHolesMap.end(); it++)
+      {
+        // A vector containing one entry: the validity probability of the
+        // it->first-th hole
+        std::vector<std::string> msg;
+
+        msg.push_back(TOSTR(it->second));
+
+        msgs.push_back(TOSTR(it->second));
+
+        // The it->first-th valid hole
+        HolesConveyor oneHole;
+
+        HolesConveyorUtils::append(
+          HolesConveyorUtils::getHole(allHoles, it->first),
+          &oneHole);
+
+        // Project this valid hole onto the rgb image
+        holesImages.push_back(
+          Visualization::showHoles("",
+            rgbImage_,
+            oneHole,
+            -1,
+            msg));
+      }
+
+      // Show all valid holes in one window
+      Visualization::multipleShow("Valid Holes", holesImages, msgs, 1280, 1);
+    }
+    #endif
+
     // In general, the allHoles conveyor will contain
     // merged and um-merged holes, potentially resulting in multiple entries
     // inside the conveyor for the same physical hole. The method below
     // picks the most probable valid hole among the ones referring to the same
     // physical hole.
     makeValidHolesUnique(&allHoles, &validHolesMap);
-
-    // Merged and original holes point to a definite hole in space.
-    // See which ones have the highest probability among the ones that refer
-    // to a define hole and keep that one.
-
-    // If there are valid holes, publish them
-    if (validHolesMap.size() > 0)
-    {
-      publishValidHoles(allHoles, &validHolesMap);
-    }
-
-    // Publish the enhanced holes message
-    // regardless of the amount of valid holes
-    publishEnhancedHoles(allHoles, &validHolesMap);
 
     #ifdef DEBUG_SHOW
     if (Parameters::HoleFusion::show_final_holes)
@@ -1344,7 +1377,7 @@ namespace pandora_vision
 
       // Valid holes on top of the interpolated depth image
       cv::Mat depthValidHolesImage =
-        Visualization::showHoles("Valid Holes",
+        Visualization::showHoles("Unique Valid Holes",
           interpolatedDepthImage_,
           allHoles,
           -1,
@@ -1352,7 +1385,7 @@ namespace pandora_vision
 
       // Valid holes on top of the RGB image
       cv::Mat rgbValidHolesImage =
-        Visualization::showHoles("ValidHoles",
+        Visualization::showHoles("Unique Valid Holes",
           rgbImage_,
           allHoles,
           -1,
@@ -1365,12 +1398,22 @@ namespace pandora_vision
 
       // The titles of the images
       std::vector<std::string> titles;
-      titles.push_back("Valid Holes");
-      titles.push_back("Valid Holes");
+      titles.push_back("Unique Valid Holes");
+      titles.push_back("Unique Valid Holes");
 
-      Visualization::multipleShow("Valid Holes", imgs, titles, 1280, 1);
+      Visualization::multipleShow("Unique Valid Holes", imgs, titles, 1280, 1);
     }
     #endif
+
+    // If there are valid holes, publish them
+    if (validHolesMap.size() > 0)
+    {
+      publishValidHoles(allHoles, &validHolesMap);
+    }
+
+    // Publish the enhanced holes message
+    // regardless of the amount of valid holes
+    publishEnhancedHoles(allHoles, &validHolesMap);
 
     #ifdef DEBUG_TIME
     Timer::tick("processCandidateHoles");
