@@ -1,21 +1,21 @@
 co2_sensors:
   - name: '/sensors/co2'
-    frame_id: 'co2'
+    frame_id: 'co2_frame'
 thermal_sensors:
   - name: '/sensors/left_thermal'
-    frame_id: 'left_thermal_link'
+    frame_id: 'left_thermal_optical_frame'
     height: 8
     width: 8
     step: 8
     address: 'L'
   - name: '/sensors/center_thermal'
-    frame_id: 'middle_thermal_link'
+    frame_id: 'middle_thermal_optical_frame'
     height: 8
     width: 8
     step: 8
     address: 'C'
   - name: '/sensors/right_thermal'
-    frame_id: 'right_thermal_link'
+    frame_id: 'right_thermal_optical_frame'
     height: 8
     width: 8
     step: 8

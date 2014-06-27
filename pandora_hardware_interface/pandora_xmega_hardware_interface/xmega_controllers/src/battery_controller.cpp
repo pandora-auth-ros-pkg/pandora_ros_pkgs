@@ -99,13 +99,8 @@ namespace xmega
           // Fill voltage
           realtimePublisher_->msg_.name.push_back(
             batteryHandles_[ii].getName());
-          double averageVoltage = 0;
-          for (int jj = 0; jj < 5; jj++)
-          {
-            averageVoltage =
-              averageVoltage + batteryHandles_[ii].getVoltage()[jj]/5;
-          }
-          realtimePublisher_->msg_.voltage.push_back(averageVoltage);
+          realtimePublisher_->msg_.voltage.push_back(
+            *batteryHandles_[ii].getVoltage());
         }
         realtimePublisher_->unlockAndPublish();
       }

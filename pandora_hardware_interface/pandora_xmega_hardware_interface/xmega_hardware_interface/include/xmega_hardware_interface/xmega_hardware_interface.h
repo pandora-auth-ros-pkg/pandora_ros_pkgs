@@ -67,8 +67,7 @@ namespace xmega
         rangeData_;
 
       std::vector<std::string> batteryNames_;
-      double** voltage_;
-      int* voltageBufferCounter_;
+      double* voltage_;
 
       std::vector<std::string> rangeSensorName_;
       std::vector<std::string> frameId_;
@@ -77,7 +76,7 @@ namespace xmega
       double* minRange_;
       double* maxRange_;
       double** range_;
-      int* rangeBufferCounter_;
+      int* bufferCounter_;
       int* i2c_address_;  // not stored in handle
 
       std::vector<std::string> jointNames_;
