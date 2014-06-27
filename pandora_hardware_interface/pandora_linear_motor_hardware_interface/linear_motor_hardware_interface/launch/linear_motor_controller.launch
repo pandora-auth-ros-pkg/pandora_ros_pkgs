@@ -9,11 +9,14 @@
   <node
     name="linear_motor_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
+    type="controller_manager" output="screen"
     ns="/linear"
     args="
+      spawn
       joint_state_controller
-      linear_elevator_controller" >
-  <remap from="/linear/linear_elevator_controller/command" to="/linear_elevator_controller/command"/>
-      </node>
+      linear_elevator_controller">
+    <remap
+      from="/linear/linear_elevator_controller/command"
+      to="/linear_elevator_controller/command"/>
+  </node>
 </launch>

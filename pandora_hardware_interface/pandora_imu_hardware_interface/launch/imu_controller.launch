@@ -11,8 +11,8 @@
   <node
     name="imu_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
+    type="controller_manager"
+    output="screen"
     ns="$(arg namespace)"
-    args="
-      imu_sensor_controller" />
+    args="spawn imu_sensor_controller"/>
 </launch>

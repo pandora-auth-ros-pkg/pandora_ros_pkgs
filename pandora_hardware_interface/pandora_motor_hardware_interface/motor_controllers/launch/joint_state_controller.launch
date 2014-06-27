@@ -11,8 +11,7 @@
   <node
     name="joint_state_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
+    type="controller_manager" output="screen"
     ns="$(arg namespace)"
-    args="
-      joint_state_controller" />
+    args="spawn joint_state_controller" />
 </launch>

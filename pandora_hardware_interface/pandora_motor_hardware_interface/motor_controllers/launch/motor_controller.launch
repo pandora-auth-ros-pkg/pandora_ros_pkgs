@@ -20,9 +20,10 @@
   <node
     name="motor_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
+    type="controller_manager" output="screen"
     ns="$(arg namespace)"
     args="
+      spawn
       joint_state_controller
       skid_steer_drive_controller" />
 </launch>

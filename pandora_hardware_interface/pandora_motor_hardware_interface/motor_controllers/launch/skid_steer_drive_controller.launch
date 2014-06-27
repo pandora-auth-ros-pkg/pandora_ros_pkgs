@@ -14,8 +14,7 @@
   <node
     name="skid_steer_drive_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
+    type="controller_manager" output="screen"
     ns="$(arg namespace)"
-    args="
-      skid_steer_drive_controller" />
+    args="spawn skid_steer_drive_controller" />
 </launch>

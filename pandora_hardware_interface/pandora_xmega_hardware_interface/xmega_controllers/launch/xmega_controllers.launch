@@ -20,7 +20,11 @@
   <node
     name="xmega_controllers_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
-    args="battery_controller range_sensor_controller joint_state_controller"
+    type="controller_manager" output="screen"
+    args="
+      spawn
+      battery_controller
+      range_sensor_controller
+      joint_state_controller"
     ns = "$(arg namespace)"/>
 </launch>

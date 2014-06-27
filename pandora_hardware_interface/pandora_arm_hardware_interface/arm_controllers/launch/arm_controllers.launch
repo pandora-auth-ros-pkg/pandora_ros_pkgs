@@ -16,7 +16,7 @@
   <node
     name="arm_controller_spawner"
     pkg="controller_manager"
-    type="spawner" output="screen"
-    args="co2_sensor_controller thermal_sensor_controller"
+    type="controller_manager" output="screen"
+    args="spawn co2_sensor_controller thermal_sensor_controller"
     ns = "$(arg namespace)"/>
 </launch>
