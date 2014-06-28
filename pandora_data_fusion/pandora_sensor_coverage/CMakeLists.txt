@@ -6,9 +6,14 @@ find_package(catkin REQUIRED COMPONENTS
   tf 
   roslint
   pandora_alert_handler
+  #pandora_vision_hole_detector
   state_manager
   state_manager_communications
+  octomap_msgs
+  octomap_ros
   )
+
+find_package(octomap REQUIRED)
 
 catkin_package(
   DEPENDS
@@ -17,6 +22,7 @@ catkin_package(
   tf 
   roslint
   pandora_alert_handler
+  #pandora_vision_hole_detector
   state_manager
   state_manager_communications
   INCLUDE_DIRS 
@@ -27,6 +33,36 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${OCTOMAP_INCLUDE_DIRS}
+  )
+link_directories(
+  ${OCTOMAP_LIBRARY_DIRS}
+  )
+
+########################  coverage checker  #########################
+
+add_library(coverage_checker
+  src/coverage_checker.cpp)
+target_link_libraries(coverage_checker
+  ${catkin_LIBRARIES}
+  )
+
+########################  space checker  ############################
+
+add_library(space_checker
+  src/space_checker.cpp)
+target_link_libraries(space_checker
+  ${catkin_LIBRARIES}
+  coverage_checker
+  )
+
+########################  surface checker  ##########################
+
+add_library(surface_checker
+  src/surface_checker.cpp)
+target_link_libraries(surface_checker
+  ${catkin_LIBRARIES}
+  coverage_checker
   )
 
 ########################  sensor  ###################################
@@ -36,6 +72,8 @@ add_library(sensor
 target_link_libraries(sensor
   ${catkin_LIBRARIES}
   ros_tf_listener
+  space_checker
+  surface_checker
   )
 
 ########################  sensor_coverage  ##########################

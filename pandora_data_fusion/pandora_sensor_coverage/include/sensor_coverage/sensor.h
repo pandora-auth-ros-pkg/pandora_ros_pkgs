@@ -42,13 +42,14 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "octomap_msgs/Octomap.h"
-
 #include "state_manager_communications/robotModeMsg.h"
 
 #include "alert_handler/tf_finder.h"
 #include "alert_handler/tf_listener.h"
 #include "alert_handler/exceptions.h"
+
+#include "sensor_coverage/space_checker.h"
+#include "sensor_coverage/surface_checker.h"
 
 namespace pandora_data_fusion
 {
@@ -61,7 +62,6 @@ namespace pandora_data_fusion
     using ::pandora_data_fusion::pandora_alert_handler::TfListenerPtr;
     using ::pandora_data_fusion::pandora_alert_handler::TfException;
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
-    typedef boost::shared_ptr<octomap_msgs::Octomap> OctomapPtr;
 
     /**
      * @brief class that correspond to a tracked sensor.
@@ -73,11 +73,10 @@ namespace pandora_data_fusion
         /**
          * @brief constructor for sensor class
          * @param nh [NodeHandlePtr const&] pointer to node's nodehandle
-         * @param globalMap [OctomapPtr const&] pointer to global octomap
          * @param frameName [std::string const&] frame whose view is to be tracked
          * @param mapOrigin [std::string const&] map's origin (SLAM or TEST)
          */
-        Sensor(const NodeHandlePtr& nh, const OctomapPtr& globalMap,
+        Sensor(const NodeHandlePtr& nh,
             const std::string& frameName, const std::string& mapOrigin);
 
         /**
@@ -87,6 +86,59 @@ namespace pandora_data_fusion
          */
         void notifyStateChange(int newState);
 
+        /**
+         * @brief Setter for static variable map2d_
+         * @param map2d [nav_msgs::OccupancyGridPtr const&] map
+         * @return void
+         */
+        static void setMap2d(const nav_msgs::OccupancyGridPtr& map2d)
+        {
+          map2d_ = map2d;
+          CoverageChecker::setMap2d(map2d);
+        }
+
+        /**
+         * @brief Setter for static variable map3d_
+         * @param map3d [boost::shared_ptr<octomap::OcTree> const&] map
+         * @note Will reset to null, deleting reference, if a null ptr is passed.
+         * @return void
+         */
+        static void setMap3d(const boost::shared_ptr<octomap::OcTree>& map3d)
+        {
+          map3d_ = map3d;
+          CoverageChecker::setMap3d(map3d);
+        }
+
+        /**
+         * @brief Setter for static global static frame.
+         * @param globalFrame [std::string const&] static frame of map
+         * @return void
+         */
+        static void setGlobalFrame(const std::string& globalFrame)
+        {
+          GLOBAL_FRAME = globalFrame;
+        }
+
+        /**
+         * @brief Setter for robot's base frame.
+         * @param robotBaseFrame [std::string const&] base footprint
+         * @return void
+         */
+        static void setRobotBaseFrame(const std::string& robotBaseFrame)
+        {
+          ROBOT_BASE_FRAME = robotBaseFrame;
+        }
+
+        /**
+         * @brief delegate to coverage checker
+         * @param occupiedCellThres [double] threshold
+         * @return void
+         */
+        static void setOccupiedCellThres(double occupiedCellThres)
+        {
+          CoverageChecker::setOccupiedCellThres(occupiedCellThres);
+        }
+
       protected:
         /**
          * @brief callback for timer that updates sensor's coverage patch
@@ -94,12 +146,6 @@ namespace pandora_data_fusion
          * @return void
          */
         void coverageUpdate(const ros::TimerEvent& event);
-
-        /**
-         * @brief function that draws upon coverage patch, triggered when updating it
-         * @return void
-         */
-        void patchDrawer();
 
       private:
         /**
@@ -109,36 +155,35 @@ namespace pandora_data_fusion
         void getParameters();
 
       protected:
-        //!< Node's shared NodeHandle
+        //!< Node's shared NodeHandle.
         NodeHandlePtr nh_;
 
-        //!< Publisher for this sensor's coverage patch
-        ros::Publisher coveragePublisher_;
-        //!< Timer that triggers updating of the coverage patch
+        //!< Timer that triggers updating of the surface coverage patch
+        //!< and space coverage map.
         ros::Timer coverageUpdater_;
 
         //!< is sensor open and working?
         bool sensorWorking_;
-
-        //!< Global 3d map as it sent from SLAM
-        OctomapPtr globalMap_;
-
-        //!< Sensor's tf frame which is being tracked
+        //!< Sensor's tf frame which is being tracked.
         std::string frameName_;
+        //!< Is surface coverage needed?
+        bool surfaceCoverage_;
+
         //!< Abstract transformation listener.
         TfListenerPtr listener_;
-        //!< Current sensor's transformation stamped
-        tf::StampedTransform tfTransform_;
-        //!< Sensor's coverage patch (this object's output)
-        octomap_msgs::Octomap coveragePatch_;
 
-        /*  Parameters  */
-        //!< sensor's range
-        double SENSOR_RANGE;
-        //!< sensor's horizontal field of view
-        double SENSOR_HFOV;
-        //!< sensor's vertical field of view
-        double SENSOR_VFOV;
+        //!< Space coverage finder
+        boost::scoped_ptr<SpaceChecker> spaceChecker_;
+        //!< Surface coverage finder
+        boost::scoped_ptr<SurfaceChecker> surfaceChecker_;
+
+        //!< Global 3d and 2d maps as they are sent by SLAM
+        static boost::shared_ptr<octomap::OcTree> map3d_;
+        static nav_msgs::OccupancyGridPtr map2d_;
+
+        /*  Params  */
+        static std::string GLOBAL_FRAME;
+        static std::string ROBOT_BASE_FRAME;
 
         /*  Sensor's state: True if open, False if closed  */
         //!< sensor's state in EXPLORATION_MODE

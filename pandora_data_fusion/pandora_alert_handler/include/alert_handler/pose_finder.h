@@ -79,8 +79,10 @@ namespace pandora_data_fusion
         std::pair<Point, Point> findDiameterEndPointsOnWall(
             std::vector<Point> points);
 
+        /* DEPRECATED
         void publishVisionTransform(float alertYaw, float alertPitch,
             tf::Transform worldHeadCameraTransform);
+        */
 
       private:
         MapPtr map_;

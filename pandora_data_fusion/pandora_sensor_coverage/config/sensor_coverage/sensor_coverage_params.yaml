@@ -1,17 +1,34 @@
+footprint:
+  width: 0.58
+  height: 0.42
+
+map_origin: SLAM
+occupied_cell_thres: 0.5
+global_frame: /map
+robot_base_frame: /base_footprint
+max_height: 1.00
+orientation_circle: 0.03
+
 subscribed_topic_names:
-  map: /map
-frames_to_track: [kinect]
-published_topic_names:
-  kinect: kinect
-sensor_range:
-  kinect: 10
-sensor_hfov:
-  kinect: 60
-sensor_vfov:
-  kinect: 40
-exploration_state:
-  kinect: true
-identification_state:
-  kinect: true
-hold_state:
-  kinect: true
+  map2d: /slam/map
+  map3d: /octomap_full
+
+frames_to_track: [kinect_rgb_frame]
+
+# kinect_rgb_frame
+kinect_rgb_frame:
+  produce_surface_coverage: false
+  published_topic_names:
+    space_coverage: kinect_space
+    area_coverage: area_covered
+    surface_coverage: kinect_surface
+  binary:
+    space_coverage: true
+    surface_coverage: false
+  surface_blur_factor: 3
+  sensor_range: 2.2
+  sensor_hfov: 58
+  sensor_vfov: 45
+  exploration_state: true
+  identification_state: true
+  hold_state: true

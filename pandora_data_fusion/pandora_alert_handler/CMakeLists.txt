@@ -44,6 +44,7 @@ catkin_package(
     include
     ${BFL_INCLUDE_DIRS}
   LIBRARIES 
+    utils
   )
 
 include_directories(

@@ -36,48 +36,49 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_DEFINES_H
-#define ALERT_HANDLER_DEFINES_H
+#include <string>
 
-#include <boost/math/constants/constants.hpp>
-
-#include <geometry_msgs/Pose.h>
-#include <nav_msgs/OccupancyGrid.h>
-
-//!< Set that boost::noncopyable will set private default constructors
-#ifndef BOOST_NO_DEFAULTED_FUNCTIONS
-#define BOOST_NO_DEFAULTED_FUNCTIONS
-#endif
-
-//!< Macro for pi.
-#define PI boost::math::constants::pi<float>()
-
-//!< Macro for a degree in radians.
-#define DEGREE (PI / 180.0)
-
-//!< Macro to convert to map coordinates from meters.
-#define COORDS(X, Y, MAP) int(floor((X - MAP->info.origin.position.x)\
-    / MAP->info.resolution) + floor((Y - MAP->info.origin.position.y)\
-      / MAP->info.resolution) * MAP->info.width)
-
-//!< Macro to convert to map coordinates from meters.
-#define CELL(X, Y, MAP) MAP->data[COORDS(X, Y, MAP)]
+#include "sensor_coverage/coverage_checker.h"
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+  namespace pandora_sensor_coverage
   {
 
-    using geometry_msgs::Point;
-    using geometry_msgs::Pose;
-    using geometry_msgs::PoseStamped;
+    CoverageChecker::CoverageChecker(const NodeHandlePtr& nh, const std::string& frameName)
+      : nh_(nh), frameName_(frameName)
+    {}
 
-    typedef std::vector<PoseStamped> PoseStampedVector;
-    typedef nav_msgs::OccupancyGrid Map;
-    typedef nav_msgs::OccupancyGridPtr MapPtr;
-    typedef nav_msgs::OccupancyGridConstPtr MapConstPtr;
+    boost::shared_ptr<octomap::OcTree> CoverageChecker::map3d_;
+    nav_msgs::OccupancyGridPtr CoverageChecker::map2d_;
+    double CoverageChecker::OCCUPIED_CELL_THRES = 0.5;
 
-}  // namespace pandora_alert_handler
+    void CoverageChecker::findCoverage(const tf::StampedTransform& transform)
+    {
+      transform.getBasis().getRPY(roll_, pitch_, yaw_);
+      position_ = octomap::pointMsgToOctomap(
+          Utils::vector3ToPoint(transform.getOrigin()));
+    }
+
+    void CoverageChecker::getParameters()
+    {
+      if (!nh_->getParam(frameName_+"/sensor_range", SENSOR_RANGE))
+      {
+        ROS_FATAL("%s sensor range param not found", frameName_.c_str());
+        ROS_BREAK();
+      }
+      if (!nh_->getParam(frameName_+"/sensor_hfov", SENSOR_HFOV))
+      {
+        ROS_FATAL("%s sensor hfov param not found", frameName_.c_str());
+        ROS_BREAK();
+      }
+      if (!nh_->getParam(frameName_+"/sensor_vfov", SENSOR_VFOV))
+      {
+        ROS_FATAL("%s sensor vfov param not found", frameName_.c_str());
+        ROS_BREAK();
+      }
+    }
+
+}  // namespace pandora_sensor_coverage
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_DEFINES_H

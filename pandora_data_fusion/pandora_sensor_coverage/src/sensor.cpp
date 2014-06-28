@@ -45,31 +45,33 @@ namespace pandora_data_fusion
   namespace pandora_sensor_coverage
   {
 
-    Sensor::Sensor(const NodeHandlePtr& nh, const OctomapPtr& globalMap,
-            const std::string& frameName, const std::string& mapOrigin)
-      : nh_(nh), globalMap_(globalMap), frameName_(frameName)
+    Sensor::Sensor(const NodeHandlePtr& nh,
+        const std::string& frameName, const std::string& mapOrigin)
+      : nh_(nh), frameName_(frameName)
     {
-      sensorWorking_ = false;
-
-      listener_.reset(TfFinder::newTfListener(mapOrigin));
-
-      std::string topic;
-
-      if (nh_->getParam("published_topic_names/"+frameName_, topic))
+      if (!nh_->getParam(frameName_+"/produces_surface_coverage", surfaceCoverage_))
       {
-        coveragePublisher_ = nh_->advertise<octomap_msgs::Octomap>(topic, 1);
-      }
-      else
-      {
-        ROS_FATAL("%s topic name param not found", frameName_.c_str());
+        ROS_FATAL("%s produces surface coverage param not found", frameName_.c_str());
         ROS_BREAK();
       }
-
+      spaceChecker_.reset( new SpaceChecker(nh_, frameName_) );
+      if (surfaceCoverage_)
+      {
+        surfaceChecker_.reset( new SurfaceChecker(nh_, frameName_) );
+        spaceChecker_->setCoverageMap3d(
+            boost::dynamic_pointer_cast<octomap::OcTree>(surfaceChecker_->getCoverageMap3d()));
+      }
+      sensorWorking_ = false;
+      listener_.reset(TfFinder::newTfListener(mapOrigin));
       getParameters();
-
       coverageUpdater_ = nh_->createTimer(ros::Duration(0.1),
           &Sensor::coverageUpdate, this);
     }
+
+    boost::shared_ptr<octomap::OcTree> Sensor::map3d_ = boost::shared_ptr<octomap::OcTree>();
+    nav_msgs::OccupancyGridPtr Sensor::map2d_;
+    std::string Sensor::GLOBAL_FRAME;
+    std::string Sensor::ROBOT_BASE_FRAME;
 
     void Sensor::notifyStateChange(int newState)
     {
@@ -98,58 +100,51 @@ namespace pandora_data_fusion
       //  If sensor is not open and working, do not update coverage patch.
       if (!sensorWorking_)
         return;
+      if (map2d_->data.size() == 0 || map3d_.get() == NULL)
+        return;
       //  If it does, fetch current transformation.
+      ros::Time timeNow = ros::Time::now();
+      tf::StampedTransform sensorTransform, baseTransform;
       try
       {
-        ros::Time timeNow = ros::Time::now();
         listener_->waitForTransform(
-            "/map", frameName_, timeNow, ros::Duration(0.5));
+            GLOBAL_FRAME, frameName_, timeNow, ros::Duration(0.5));
         listener_->lookupTransform(
-            "/map", frameName_, timeNow, tfTransform_);
+            GLOBAL_FRAME, frameName_, timeNow, sensorTransform);
+        listener_->waitForTransform(
+            GLOBAL_FRAME, ROBOT_BASE_FRAME, timeNow, ros::Duration(0.5));
+        listener_->lookupTransform(
+            GLOBAL_FRAME, ROBOT_BASE_FRAME, timeNow, baseTransform);
+        //  Update coverage perception.
+        //  Publish updated coverage perception.
+        if (surfaceCoverage_)
+        {
+          surfaceChecker_->findCoverage(sensorTransform);
+          surfaceChecker_->publishCoverage();
+        }
+        spaceChecker_->findCoverage(sensorTransform, baseTransform);
+        spaceChecker_->publishCoverage();
       }
       catch (TfException ex)
       {
         ROS_WARN_NAMED("SENSOR_COVERAGE",
             "[SENSOR_COVERAGE_SENSOR %d] %s", __LINE__, ex.what());
       }
-      //  Update coverage patch.
-      patchDrawer();
-      //  Publish fresh patch.
-      coveragePublisher_.publish(coveragePatch_);
-    }
-
-    void Sensor::patchDrawer()
-    {
     }
 
     void Sensor::getParameters()
     {
-      if (!nh_->getParam("sensor_range/"+frameName_, SENSOR_RANGE))
-      {
-        ROS_FATAL("%s sensor range param not found", frameName_.c_str());
-        ROS_BREAK();
-      }
-      if (!nh_->getParam("sensor_hfov/"+frameName_, SENSOR_HFOV))
-      {
-        ROS_FATAL("%s sensor hfov param not found", frameName_.c_str());
-        ROS_BREAK();
-      }
-      if (!nh_->getParam("sensor_vfov/"+frameName_, SENSOR_VFOV))
-      {
-        ROS_FATAL("%s sensor vfov param not found", frameName_.c_str());
-        ROS_BREAK();
-      }
-      if (!nh_->getParam("exploration_state/"+frameName_, EXPLORATION_STATE))
+      if (!nh_->getParam(frameName_+"/exploration_state", EXPLORATION_STATE))
       {
         ROS_FATAL("%s exploration state param not found", frameName_.c_str());
         ROS_BREAK();
       }
-      if (!nh_->getParam("identification_state/"+frameName_, IDENTIFICATION_STATE))
+      if (!nh_->getParam(frameName_+"/identification_state", IDENTIFICATION_STATE))
       {
         ROS_FATAL("%s identification state param not found", frameName_.c_str());
         ROS_BREAK();
       }
-      if (!nh_->getParam("hold_state/"+frameName_, HOLD_STATE))
+      if (!nh_->getParam(frameName_+"/hold_state", HOLD_STATE))
       {
         ROS_FATAL("%s hold state param not found", frameName_.c_str());
         ROS_BREAK();

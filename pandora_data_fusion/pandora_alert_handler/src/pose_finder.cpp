@@ -62,6 +62,7 @@ namespace pandora_data_fusion
       ORIENTATION_DIST = orientationDist;
     }
 
+    /* DEPRECATED
     void PoseFinder::publishVisionTransform(float alertYaw, float alertPitch, 
         tf::Transform worldHeadCameraTransform)
     {
@@ -75,13 +76,12 @@ namespace pandora_data_fusion
       rotation.setRPY(0, cameraPitch - alertPitch, cameraYaw - alertYaw);
       transVision.setRotation(rotation);
     }
+    */
 
     Pose PoseFinder::findAlertPose(float alertYaw, float alertPitch,
         tf::Transform tfTransform)
     {
       Pose outPose;
-
-      publishVisionTransform(alertYaw, alertPitch, tfTransform);
 
       tfScalar pitch, roll, yaw, horizontalDirection, verticalDirection;
 
@@ -211,8 +211,8 @@ namespace pandora_data_fusion
       second.y = alertPoint.y + ORIENTATION_DIST * sin((-PI / 2) + angle);
       approachPoints.second = second;
 
-      if ( Utils::distanceBetweenPoints2D(framePoint, approachPoints.first) < 
-          Utils::distanceBetweenPoints2D(framePoint, approachPoints.second) )
+      if (Utils::distanceBetweenPoints2D(framePoint, approachPoints.first) < 
+          Utils::distanceBetweenPoints2D(framePoint, approachPoints.second))
       {
         return Utils::calculateQuaternion(alertPoint, approachPoints.first);
       }

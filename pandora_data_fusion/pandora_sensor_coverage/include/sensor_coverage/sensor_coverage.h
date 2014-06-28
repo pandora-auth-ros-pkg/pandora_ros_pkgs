@@ -50,7 +50,9 @@
 
 #include <ros/ros.h>
 
+#include "octomap/octomap.h"
 #include "octomap_msgs/Octomap.h"
+#include "nav_msgs/OccupancyGrid.h"
 
 #include "state_manager/state_client.h"
 
@@ -63,7 +65,6 @@ namespace pandora_data_fusion
 
     //!< Type Definitions
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
-    typedef boost::shared_ptr<octomap_msgs::Octomap> OctomapPtr;
 
     class SensorCoverage
       : public StateClient, private boost::noncopyable
@@ -94,23 +95,34 @@ namespace pandora_data_fusion
 
       private:
         /**
-         * @brief mapSubscriber_'s callback to copy map from SLAM
-         * @param map [octomap_msgs::Octomap const&] fetched map
+         * @brief map3dSubscriber_'s callback to copy map from SLAM
+         * @param msg [octomap_msgs::Octomap const&] fetched map
          * @return void
          */
-        void mapUpdate(const octomap_msgs::Octomap& map);
+        void map3dUpdate(const octomap_msgs::Octomap& msg);
+
+        /**
+         * @brief map2dsubscriber_'s callback to copy map from SLAM
+         * @param msg [nav_msgs::OccupancyGridConstPtr const&] fetched map
+         * @return void
+         */
+        void map2dUpdate(const nav_msgs::OccupancyGridConstPtr& msg);
 
       private:
         //!< This node's NodeHandle.
         NodeHandlePtr nh_;
 
-        //!< subscriber that fetches map.
-        ros::Subscriber mapSubscriber_;
+        //!< subscriber that fetches 3d map.
+        ros::Subscriber map3dSubscriber_;
+        //!< subscriber that fetches 2d map.
+        ros::Subscriber map2dSubscriber_;
 
-        //!< Robot's current mode of operation
+        //!< Robot's current mode of operation.
         int currentState_;
         //!< 3d map recieved from SLAM.
-        OctomapPtr globalMap_;
+        boost::shared_ptr<octomap::OcTree> globalMap3d_;
+        //!< 2d map recieved from SLAM.
+        nav_msgs::OccupancyGridPtr globalMap2d_;
         //!< vector containing all sensors registered to track their views and
         //!< make their coverage patches.
         std::vector<SensorPtr> registeredSensors_;
