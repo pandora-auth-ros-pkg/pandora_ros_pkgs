@@ -63,9 +63,9 @@ namespace pandora_vision
         image
         @param[in] maxSize [const int&] The maximum size of the window
         @param[in] ms [const int&] How many seconds the showing lasts
-        @return void
+        @return [cv::Mat] An image featuring multiple images
        **/
-      static void multipleShow(
+      static cv::Mat multipleShow(
         const std::string& title,
         const std::vector<cv::Mat>& imgs,
         const std::vector<std::string>& titles,

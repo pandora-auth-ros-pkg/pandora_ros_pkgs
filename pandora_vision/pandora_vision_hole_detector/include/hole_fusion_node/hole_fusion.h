@@ -114,6 +114,16 @@ namespace pandora_vision
       std::string enhancedHolesTopic_;
 
       // The ROS publisher that will be used to publish an image depicting
+      // the keypoint, outline points and bounding rectangle of holes found
+      // by the Depth and RGB nodes
+      image_transport::Publisher debugRespectiveHolesPublisher_;
+
+      // The name of the topic where the Hole Fusion node puplishes
+      // an image depicting the keypoint, outline points and
+      // bounding rectangle of holes found by the Depth and RGB nodes
+      std::string debugRespectiveHolesTopic_;
+
+      // The ROS publisher that will be used to publish an image depicting
       // the keypoint, outline points and bounding rectangle for all
       // valid holes found
       image_transport::Publisher debugValidHolesPublisher_;
@@ -377,6 +387,14 @@ namespace pandora_vision
        **/
       void publishEnhancedHoles (const HolesConveyor& conveyor,
         std::map<int, float>* validHolesMap);
+
+      /**
+        @brief Publishes an image showing holes found from the Depth node
+        and the RGB node.
+        @param void
+        @return void
+       **/
+      void publishRespectiveHolesFound();
 
       /**
         @brief Publishes the valid holes' information.

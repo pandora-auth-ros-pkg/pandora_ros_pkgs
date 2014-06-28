@@ -86,6 +86,14 @@ namespace pandora_vision
     debugValidHolesPublisher_ = imageTransport_.advertise
       (debugValidHolesTopic_, 1000, true);
 
+    // Advertise the topic that information about holes found by the Depth
+    // and RGB nodes will be published to
+    // Command line usage:
+    // image_view /pandora_vision/hole_detector/debug_respective_holes_image
+    // _image_transport:=compressed
+    debugRespectiveHolesPublisher_ = imageTransport_.advertise
+      (debugRespectiveHolesTopic_, 1000, true);
+
     // Advertise the topic that the image of the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
@@ -595,6 +603,22 @@ namespace pandora_vision
     {
       ROS_INFO_NAMED (PKG_NAME, "[Hole Fusion Node] Could not find topic"
         " make_synchronizer_leave_subscription_to_input");
+    }
+
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // an image of holes found by the Depth and RGB nodes
+    if (nodeHandle_.getParam(ns +
+        "/hole_fusion_node/published_topics/debug_respective_holes_image",
+        debugRespectiveHolesTopic_))
+    {
+      ROS_INFO_NAMED(PKG_NAME,
+        "[Hole Fusion Node] Advertising to topic where an image of the"
+        " respective holes found is published");
+    }
+    else
+    {
+      ROS_INFO_NAMED (PKG_NAME,
+        "[Hole Fusion Node] Could not find topic debug_respective_holes_image");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
@@ -1274,6 +1298,9 @@ namespace pandora_vision
     }
     #endif
 
+    // Publish an image depicting the holes found by the Depth and RGB nodes
+    publishRespectiveHolesFound();
+
     // Merge the conveyors from the RGB and Depth sources
     HolesConveyor rgbdHolesConveyor;
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
@@ -1532,6 +1559,65 @@ namespace pandora_vision
 
     // Publish the overall message
     enhancedHolesPublisher_.publish(enhancedHolesMsg);
+  }
+
+
+
+  /**
+    @brief Publishes an image showing holes found from the Depth node
+    and the RGB node.
+    @param void
+    @return void
+   **/
+  void HoleFusion::publishRespectiveHolesFound()
+  {
+    std::vector<std::string> msgs;
+
+    // Holes originated from analysis on the depth image,
+    // on top of the depth image
+    cv::Mat depthHolesOnDepthImage =
+      Visualization::showHoles(
+        "Holes originated from Depth analysis, on the Depth image",
+        interpolatedDepthImage_,
+        depthHolesConveyor_,
+        -1,
+        msgs);
+
+    // Holes originated from analysis on the RGB image,
+    // on top of the RGB image
+    cv::Mat rgbHolesOnRgbImage =
+      Visualization::showHoles(
+        "Holes originated from RGB analysis, on the RGB image",
+        rgbImage_,
+        rgbHolesConveyor_,
+        -1,
+        msgs);
+
+    // The four images
+    std::vector<cv::Mat> imgs;
+    imgs.push_back(depthHolesOnDepthImage);
+    imgs.push_back(rgbHolesOnRgbImage);
+
+    // The titles of the images
+    std::vector<std::string> titles;
+
+    titles.push_back("Holes originated from Depth analysis, on the Depth image");
+    titles.push_back("Holes originated from RGB analysis, on the RGB image");
+
+    cv::Mat respectiveHolesImage =
+      Visualization::multipleShow("Respective keypoints",
+        imgs, titles, 1280, 0);
+
+    // Convert the image into a message
+    cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
+
+    msgPtr->header.frame_id = frame_id_;
+    msgPtr->header.stamp = timestamp_;
+    msgPtr->encoding = sensor_msgs::image_encodings::BGR8;
+    msgPtr->image = respectiveHolesImage;
+
+    // Publish the image message
+    debugRespectiveHolesPublisher_.publish(*msgPtr->toImageMsg());
   }
 
 

@@ -51,20 +51,15 @@ namespace pandora_vision
     image
     @param[in] maxSize [const int&] The maximum size of the window
     @param[in] ms [const int&] How many seconds the showing lasts
-    @return void
+    @return [cv::Mat] An image featuring multiple images
    **/
-  void Visualization::multipleShow(
+  cv::Mat Visualization::multipleShow(
     const std::string& title,
     const std::vector<cv::Mat>& imgs,
     const std::vector<std::string>& titles,
     const int& maxSize,
     const int& ms)
   {
-    if(imgs.size() == 0)
-    {
-      return;
-    }
-
     unsigned int rows = 0, cols = 0;
     unsigned int sqdim = sqrt(imgs.size());
     rows = sqdim;
@@ -127,10 +122,17 @@ namespace pandora_vision
         CV_RGB(255, 255, 255), 2, 8);
     }
 
+
     // Final resize
     cv::Mat resized(finalRows, finalCols, CV_8UC3);
     cv::resize(big, resized, cv::Size(finalCols, finalRows));
-    show(title, resized, ms);
+
+    if (ms > 0)
+    {
+      show(title, resized, ms);
+    }
+
+    return resized;
   }
 
 
