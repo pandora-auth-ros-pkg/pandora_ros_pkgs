@@ -3,10 +3,9 @@ Panels:
     Help Height: 0
     Name: Displays
     Property Tree Widget:
-      Expanded:
-        - /Map1
+      Expanded: ~
       Splitter Ratio: 0.5
-    Tree Height: 590
+    Tree Height: 394
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -25,7 +24,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: Robot camera
 Visualization Manager:
   Class: ""
   Displays:
@@ -67,7 +66,7 @@ Visualization Manager:
       Draw Behind: true
       Enabled: true
       Name: Map
-      Topic: /map
+      Topic: /slam/map
       Value: true
     - Alpha: 0.5
       Class: rviz/Map
@@ -81,10 +80,26 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: costmap
       Draw Behind: false
-      Enabled: false
+      Enabled: true
       Name: Local Costmap
       Topic: /move_base/local_costmap/costmap
+      Value: true
+    - Alpha: 0.7
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: false
+      Name: Exploration Costmap
+      Topic: /explorer/explore_costmap/costmap
       Value: false
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /explorer/frontier_markers
+      Name: Frontiers
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -126,7 +141,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 8.876
@@ -139,9 +154,31 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.03
       Style: Squares
-      Topic: /move_base/TrajectoryPlannerROS/cost_cloud
+      Topic: /move_base/DWAPlannerROS/cost_cloud
       Use Fixed Frame: true
       Use rainbow: true
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /move_base/DWAPlannerROS/trajectories
+      Name: Trajectories
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.1
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.3
+      Head Radius: 0.1
+      Name: Pose
+      Shaft Length: 0.5
+      Shaft Radius: 0.05
+      Shape: Arrow
+      Topic: /move_base/current_goal
       Value: true
     - Alpha: 1
       Class: rviz/Polygon
@@ -156,7 +193,7 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Global Plan
-      Topic: /move_base/TrajectoryPlannerROS/global_plan
+      Topic: /move_base/DWAPlannerROS/global_plan
       Value: true
     - Alpha: 1
       Buffer Length: 1
@@ -164,12 +201,12 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Local Plan
-      Topic: /move_base/TrajectoryPlannerROS/local_plan
+      Topic: /move_base/DWAPlannerROS/local_plan
       Value: true
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 216; 216; 0
+      Color: 255; 0; 0
       Enabled: true
       Name: Trajectory
       Topic: /robot_trajectory
@@ -191,7 +228,7 @@ Visualization Manager:
       Max Color: 255; 255; 255
       Max Intensity: 999999
       Min Color: 0; 0; 0
-      Min Intensity: 3.92364e-44
+      Min Intensity: 0
       Name: LaserScan
       Position Transformer: XYZ
       Queue Size: 10
@@ -199,60 +236,250 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.02
       Style: Flat Squares
-      Topic: /slam/scan
+      Topic: /laser/scan
       Use Fixed Frame: true
       Use rainbow: true
+      Value: false
+    - Alpha: 0.5
+      Buffer Length: 1
+      Class: rviz/Range
+      Color: 255; 255; 0
+      Enabled: false
+      Name: Sonars
+      Queue Size: 100
+      Topic: /sensors/range
       Value: false
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: false
+      Enabled: true
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        co2_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        co2_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        kinect_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        kinect_depth_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_depth_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        kinect_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_rgb_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_rgb_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        kinect_servo_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        laser_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        laser_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        laser_servo_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_camera_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_front_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_rear_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_side_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_sonar_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_sonar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_thermal_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_thermal_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_thermal_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        linear_elevator_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        linear_head_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        linear_head_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        microphone_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        microphone_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        middle_thermal_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        middle_thermal_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        middle_thermal_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_camera_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_front_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_rear_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_side_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_sonar_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_sonar_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_thermal_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_thermal_main_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_thermal_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
       Update Interval: 0
-      Value: false
+      Value: true
       Visual Enabled: true
     - Class: octomap_rviz_plugin/OccupancyGrid
       Enabled: false
+      Max. Octree Depth: 16
       Name: Octomaps
-    - Alpha: 0.5
-      Buffer Length: 1
-      Class: rviz/Range
-      Color: 255; 255; 0
-      Enabled: true
-      Name: Sonar RL
-      Queue Size: 100
-      Topic: /sensors/sonar/rear_left
-      Value: true
-    - Alpha: 0.5
-      Buffer Length: 1
-      Class: rviz/Range
-      Color: 255; 255; 0
-      Enabled: true
-      Name: Sonar RR
-      Queue Size: 100
-      Topic: /sensors/sonar/rear_right
-      Value: true
-    - Class: rviz/Image
-      Enabled: false
-      Image Topic: /vision/hole_detector/debug_valid_holes_image
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Hole Debug Camera
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
+      Octomap Topic: /octomap_binary
+      Queue Size: 5
       Value: false
+      Voxel Coloring: Z-Axis
+      Voxel Rendering: Occupied Voxels
     - Class: rviz/Image
-      Enabled: false
+      Enabled: true
       Image Topic: /kinect/rgb/image_raw
       Max Value: 1
       Median window: 5
@@ -261,14 +488,43 @@ Visualization Manager:
       Normalize Range: true
       Queue Size: 2
       Transport Hint: compressed
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: RGB8
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Xtion Point Cloud
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.01
+      Style: Flat Squares
+      Topic: /kinect/depth_registered/points
+      Use Fixed Frame: true
+      Use rainbow: true
       Value: false
     - Class: rviz/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Vision Frame
       Radius: 0.01
-      Reference Frame: headCamera
-      Value: true
+      Reference Frame: kinect_frame
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /data_fusion/hazmats_markers
@@ -278,13 +534,13 @@ Visualization Manager:
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /data_fusion/holes_markers
       Name: Holes
       Namespaces:
         {}
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /data_fusion/qrs_markers
@@ -311,11 +567,10 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /data_fusion/thermals_markers
+      Marker Topic: /data_fusion/tpas_markers
       Name: Thermal
       Namespaces:
-        THERMAL: true
-        THERMAL_BRIEF: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -355,8 +610,7 @@ Visualization Manager:
       Marker Topic: /data_fusion/victims_to_go_markers
       Name: Vitctims to go
       Namespaces:
-        VICTIM: true
-        VICTIM_BRIEF: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -391,32 +645,30 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.80327
+      Distance: 7.09855
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.262577
-        Y: 0.283126
-        Z: -0.175183
+        X: 0
+        Y: 0
+        Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.604801
+      Pitch: 0.685398
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.22218
+      Yaw: 4.44858
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 815
+  Height: 960
   Hide Left Dock: false
   Hide Right Dock: false
-  Hole Debug Camera:
-    collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000026e0000028ffc020000000bfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000410000028f000000dd00fffffffb000000180052006f0062006f0074002000630061006d006500720061000000021c000001450000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000387000000170000000000000000fb000000220048006f006c0065002000440065006200750067002000430061006d00650072006100000002350000012c0000001600ffffff000000010000014d0000031dfc020000000bfb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060043006f0032000000003e000000160000000000000000fb0000000e0054006800650072006d0061006c0100000112000000dc0000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060063006f003201000001f4000000c60000000000000000fb0000000a0073006f0075006e006401000002c00000009e0000000000000000fb0000000e0054006800650072006d0061006c010000022f000001570000000000000000fb000000060043006f00320100000370000000160000000000000000fb0000000a00560069006500770073000000010e00000250000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006400000003bfc0100000002fb0000000800540069006d0065010000000000000640000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000003cc0000028f00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001cf00000320fc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000041000001cb000000dd00fffffffb000000180052006f0062006f0074002000630061006d00650072006101000002120000014f0000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000387000000170000000000000000000000010000014d0000031dfc020000000bfb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060043006f0032000000003e000000160000000000000000fb0000000e0054006800650072006d0061006c0100000112000000dc0000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060063006f003201000001f4000000c60000000000000000fb0000000a0073006f0075006e006401000002c00000009e0000000000000000fb0000000e0054006800650072006d0061006c010000022f000001570000000000000000fb000000060043006f00320100000370000000160000000000000000fb0000000a00560069006500770073000000010e00000250000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006900000003bfc0100000002fb0000000800540069006d0065010000000000000690000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000004bb0000032000000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Robot camera:
     collapsed: false
   Selection:
@@ -427,6 +679,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1600
-  X: -8
-  Y: 33
+  Width: 1680
+  X: -7
+  Y: 38
