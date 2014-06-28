@@ -16,6 +16,7 @@
       <xacro:property name="enable_right_camera_sensor" value="true" />
     <!-- ================================================================== -->
     <xacro:property name="enable_sonar_sensors" value="true" />
+      <xacro:property name="enable_linear_sonar_sensor" value="true" />
       <xacro:property name="enable_left_sonar_sensor" value="true" />
       <xacro:property name="enable_right_sonar_sensor" value="true" />
     <!-- ================================================================== -->

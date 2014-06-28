@@ -5,11 +5,11 @@
 <!-- ###################################################################### -->
 
   <xacro:macro name="sonar_caster"
-               params="parent prefix_y *origin" >
+               params="parent name *origin" >
 
     <!-- ################################################################## -->
 
-    <link name="${prefix_y}_sonar_link" >
+    <link name="${name}_sonar_link" >
 
       <inertial>
         <!-- ============================================================== -->
@@ -52,7 +52,7 @@
 
     <!-- ################################################################## -->
 
-    <link name="${prefix_y}_sonar_frame" >
+    <link name="${name}_sonar_frame" >
 
       <inertial>
         <!-- ============================================================== -->
@@ -73,12 +73,12 @@
 
     <!-- ################################################################## -->
 
-    <joint name="${prefix_y}_sonar_main_joint"
+    <joint name="${name}_sonar_main_joint"
            type="fixed" >
 
       <!-- ================================================================ -->
       <parent link="${parent}" />
-      <child link="${prefix_y}_sonar_link" />
+      <child link="${name}_sonar_link" />
       <!-- ================================================================ -->
       <xacro:insert_block name="origin" />
       <!-- ================================================================ -->
@@ -87,12 +87,12 @@
 
     <!-- ################################################################## -->
 
-    <joint name="${prefix_y}_sonar_joint"
+    <joint name="${name}_sonar_joint"
            type="fixed" >
 
       <!-- ================================================================ -->
-      <parent link="${prefix_y}_sonar_link" />
-      <child link="${prefix_y}_sonar_frame" />
+      <parent link="${name}_sonar_link" />
+      <child link="${name}_sonar_frame" />
       <!-- ================================================================ -->
       <origin xyz="0.015 0.0 0.0" 
               rpy="0.0 0.0 0.0" />

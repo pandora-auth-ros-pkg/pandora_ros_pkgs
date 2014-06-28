@@ -9,9 +9,21 @@
 <!-- ###################################################################### -->
 
   <!-- ==================================================================== -->
+  <xacro:macro name="linear_sonar_sensor" >
+  
+    <xacro:sonar_caster name="linear"
+                        parent="linear_elevator_link" >
+
+      <origin xyz="0.01195 0.0 0.32700"
+              rpy="${zero}" />
+
+    </xacro:sonar_caster>
+    
+  </xacro:macro>
+  <!-- ==================================================================== -->
   <xacro:macro name="left_sonar_sensor" >
   
-    <xacro:sonar_caster prefix_y="left"
+    <xacro:sonar_caster name="left"
                         parent="base_link" >
 
       <origin xyz="-0.15026 0.06429 0.39925"
@@ -23,7 +35,7 @@
   <!-- ==================================================================== -->
   <xacro:macro name="right_sonar_sensor" >
   
-    <xacro:sonar_caster prefix_y="right"
+    <xacro:sonar_caster name="right"
                         parent="base_link" >
 
       <origin xyz="-0.15026 -0.06429 0.39925"
