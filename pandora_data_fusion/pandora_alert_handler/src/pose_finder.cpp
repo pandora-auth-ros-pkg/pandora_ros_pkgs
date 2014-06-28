@@ -167,7 +167,7 @@ namespace pandora_data_fusion
         x = alertPoint.x + ORIENTATION_CIRCLE * cos((i / 180.0) * PI);
         y = alertPoint.y + ORIENTATION_CIRCLE * sin((i / 180.0) * PI);
 
-        if (map_->data[COORDS(x, y, map_)]
+        if (CELL(x, y, map_)
             > OCCUPIED_CELL_THRES * 100)
         {
           Point temp;
@@ -184,8 +184,8 @@ namespace pandora_data_fusion
 
       //!< if points are too close, first point should be the
       //!< diametrically opposite of the second
-      if ( Utils::distanceBetweenPoints2D
-          (pointsOnWall.first, pointsOnWall.second) < ORIENTATION_CIRCLE / 2 )
+      if (Utils::distanceBetweenPoints2D
+          (pointsOnWall.first, pointsOnWall.second) < ORIENTATION_CIRCLE / 2)
       {  
         angle = atan2((alertPoint.y - pointsOnWall.second.y),
             (alertPoint.x - pointsOnWall.second.x));

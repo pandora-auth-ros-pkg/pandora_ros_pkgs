@@ -65,13 +65,13 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.fillInfo(outs)
         pose = outs[0].hazmats.pop().pose
 
-        self.assertAlmostEqual(pose.position.x, 0.99525856)
-        self.assertAlmostEqual(pose.position.y, 0.52000838)
+        self.assertAlmostEqual(pose.position.x, 0.99525856, 3)
+        self.assertAlmostEqual(pose.position.y, 0.52000838, 3)
         self.assertAlmostEqual(pose.position.z, 1)
         self.assertAlmostEqual(pose.orientation.x, 0)
         self.assertAlmostEqual(pose.orientation.y, 0)
-        self.assertAlmostEqual(pose.orientation.z, 0.70710679)
-        self.assertAlmostEqual(pose.orientation.w, 0.70710679)
+        self.assertAlmostEqual(pose.orientation.z, 0.70710679, 3)
+        self.assertAlmostEqual(pose.orientation.w, 0.70710679, 3)
 
     def test_objects_coexist(self):
 
