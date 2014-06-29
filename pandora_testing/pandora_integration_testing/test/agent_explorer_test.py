@@ -37,7 +37,7 @@ __maintainer__ = "Tsirigotis Christos"
 __email__ = "tsirif@gmail.com"
 
 PKG = 'pandora_integration_testing'
-NAME = 'data_fusion_agent_test'
+NAME = 'agent_explorer_test'
 
 import sys
 
@@ -63,7 +63,7 @@ class DataFusionAgentTest(test_base.TestBase):
         rospy.wait_for_service('/data_fusion/get_objects')
         cls.get_objects = rospy.ServiceProxy('/data_fusion/get_objects', GetObjectsSrv, True)
         rospy.loginfo("[DataFusionAgentTest] Setting up mocks")
-        cls.mocks = integration_tester.IntegrationTester()
+        cls.mocks = integration_tester.IntegrationTester(mocking_exploration=False)
 
         cls.victimPose = PoseStamped() 
         cls.victimBefore = Point()
@@ -117,7 +117,7 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertEqual(self.mocks.end_effector_planner.center_point, 'kinect_frame')
 
         self.assertTrue(self.mocks.navigation.moves_base)
-        self.assertEqual(0, self.mocks.navigation.preempted)
+        self.assertEqual(1, self.mocks.navigation.preempted)
         self.mocks.navigation.navigation_succedes = True
         self.assertTrue(test_base.isPositionGrounded(
           self.victimPose.pose.position, self.mocks.navigation.target_position))
@@ -176,7 +176,9 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.SCAN)
         rospy.sleep(2.)
-        self.assertTrue(self.mocks.explorer.entered_exploration)
+        rospy.loginfo("Explorer picks a frontier and orders navigation to go to it.")
+        self.assertTrue(self.mocks.navigation.moves_base)
+        self.assertEqual(0, self.mocks.navigation.preempted)
         rospy.sleep(1.)
 
         rospy.loginfo("Another hole is detected and qualifies to victim.")
@@ -197,15 +199,16 @@ class DataFusionAgentTest(test_base.TestBase):
         self.victimPose = outs.victimsToGo[0]
         rospy.sleep(1.)
 
-        #  Agent is informed and orders navigation to go to it but navigation
-        #  aborts the order...
+        rospy.loginfo("Agent is informed and orders navigation to go to it but navigation")
+        rospy.loginfo("aborts the order...")
         self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.TRACK)
         self.assertEqual(self.mocks.end_effector_planner.point_of_interest, 'VICTIM_1')
         self.assertEqual(self.mocks.end_effector_planner.center_point, 'kinect_frame')
+        rospy.loginfo("Explorer preempts any move_base action.")
         self.assertTrue(self.mocks.navigation.moves_base)
-        self.assertEqual(1, self.mocks.explorer.preempted)
+        self.assertEqual(1, self.mocks.navigation.preempted)
         self.mocks.navigation.navigation_succedes = False
         self.assertTrue(test_base.isPositionGrounded(
           self.victimPose.pose.position, self.mocks.navigation.target_position))
@@ -214,8 +217,8 @@ class DataFusionAgentTest(test_base.TestBase):
         self.mocks.navigation.reply = True
         rospy.sleep(2.)
 
-        #  Agents acknowledges victim as potential noise and orders Data Fusion
-        #  to delete it. Navigation is ordered to return to exploration.
+        rospy.loginfo("Agents acknowledges victim as potential noise and orders Data Fusion")
+        rospy.loginfo("to delete it. Navigation is ordered to return to exploration.")
         outs = self.get_objects()
         self.assertEqual(1, len(outs.holes))
         self.assertEqual(1, len(outs.faces))
@@ -228,10 +231,11 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertEqual(robotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
-        self.assertTrue(self.mocks.explorer.entered_exploration)
+        self.assertTrue(self.mocks.navigation.moves_base)
+        self.assertEqual(0, self.mocks.navigation.preempted)
         rospy.sleep(1.)
 
-        #  Another hole is detected and qualifies to a victim.
+        rospy.loginfo("Another hole is detected and qualifies to a victim.")
         self.mocks.delivery_boy.deliverHoleOrder(orderYaw = 1, orderPitch = 0, orderProbability = 0.8)
         self.mocks.delivery_boy.deliverHoleOrder(orderYaw = 1, orderPitch = 0, orderProbability = 0.8)
         self.assertEqual(1, len(self.messageList[1][-1].victims))
@@ -247,7 +251,7 @@ class DataFusionAgentTest(test_base.TestBase):
         self.victimPose = outs.victimsToGo[0]
         rospy.sleep(1.)
 
-        #  Agent recognises new victim and orders navigation to go to it.
+        rospy.loginfo("Agent recognises new victim and orders navigation to go to it.")
         self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
@@ -255,14 +259,14 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertEqual(self.mocks.end_effector_planner.point_of_interest, 'VICTIM_2')
         self.assertEqual(self.mocks.end_effector_planner.center_point, 'kinect_frame')
         self.assertTrue(self.mocks.navigation.moves_base)
-        self.assertEqual(2, self.mocks.explorer.preempted)
+        self.assertEqual(1, self.mocks.navigation.preempted)
         self.assertTrue(test_base.isPositionGrounded(
           self.victimPose.pose.position, self.mocks.navigation.target_position))
         self.assertTrue(test_base.isOrientationReversed(
           self.victimPose.pose.orientation, self.mocks.navigation.target_orientation))
         rospy.sleep(1.5)
 
-        #  Current victim is thought to be displaced.
+        rospy.loginfo("Current victim is thought to be displaced.")
         self.mocks.delivery_boy.deliverHoleOrder(orderYaw=0.97, orderPitch=0, orderProbability=0.9)
         self.mocks.delivery_boy.deliverHoleOrder(orderYaw=0.95, orderPitch=0, orderProbability=0.9)
         self.mocks.delivery_boy.deliverHoleOrder(orderYaw=0.94, orderPitch=0, orderProbability=0.9)
@@ -279,8 +283,8 @@ class DataFusionAgentTest(test_base.TestBase):
         self.victimPose = outs.victimsToGo[0]
         rospy.sleep(1.)
 
-        #  Agent think that displacement cannot be ignored and re-orders navigation.
-        #  Navigation target has changed.
+        rospy.loginfo("Agent think that displacement cannot be ignored and re-orders navigation.")
+        rospy.loginfo("Navigation target has changed.")
         self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
@@ -288,7 +292,7 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertEqual(self.mocks.end_effector_planner.point_of_interest, 'VICTIM_2')
         self.assertEqual(self.mocks.end_effector_planner.center_point, 'kinect_frame')
         self.assertTrue(self.mocks.navigation.moves_base)
-        self.assertEqual(2, self.mocks.navigation.preempted)
+        self.assertEqual(4, self.mocks.navigation.preempted)
         self.assertTrue(test_base.isPositionGrounded(
           self.victimPose.pose.position, self.mocks.navigation.target_position))
         self.assertTrue(test_base.isOrientationReversed(
@@ -297,9 +301,9 @@ class DataFusionAgentTest(test_base.TestBase):
         self.mocks.navigation.reply = True
         rospy.sleep(1.)
 
-        #  Agent waits for verification but victim fails to verify...
-        #  Agent orders Data Fusion to think this victim as non valid.
-        #  Navigation returns to exploration.
+        rospy.logdebug("Agent waits for verification but victim fails to verify...")
+        rospy.logdebug("Agent orders Data Fusion to think this victim as non valid.")
+        rospy.logdebug("Navigation returns to exploration.")
         rospy.sleep(15.)
         outs = self.get_objects()
         self.assertEqual(2, len(outs.holes))
@@ -315,7 +319,8 @@ class DataFusionAgentTest(test_base.TestBase):
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.SCAN)
-        self.assertTrue(self.mocks.explorer.entered_exploration)
+        self.assertTrue(self.mocks.navigation.moves_base)
+        self.assertEqual(0, self.mocks.navigation.preempted)
         
         rospy.signal_shutdown("[TestBase.disconnect] Disconnecting and terminating.")
 

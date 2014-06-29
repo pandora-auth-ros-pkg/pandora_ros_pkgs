@@ -1,7 +1,7 @@
 <launch>
 
   <node pkg="map_server" type="map_server" name="static_map_publisher"
-    args="$(find pandora_alert_handler)/test/test_maps/map1.yaml"/>
+    args="$(find pandora_integration_testing)/test/test_maps/half_unknown.yaml"/>
   
   <node pkg="tf" type="static_transform_publisher" 
     name="world2headCamera" args="1 2 1 -1.574 0 0 /map headCamera 100" />
@@ -13,9 +13,11 @@
   <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_standalone.launch" />
   <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
 
+  <include file="$(find pandora_exploration)/launch/explorer.launch" /> 
+
   <node pkg="pandora_fsm" type="robocup_agent.py" name="agent" output="screen" />
 
-  <test test-name="DataFusionAgentTest" pkg="pandora_integration_testing"
-    type="data_fusion_agent_test.py" time-limit="180" />
+  <test test-name="AgentExplorerTest" pkg="pandora_integration_testing"
+    type="agent_explorer_test.py" time-limit="180" />
 
 </launch>

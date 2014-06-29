@@ -45,6 +45,8 @@ import roslib
 import actionlib
 import sys
 import rosbag
+from tf.transformations import euler_from_quaternion
+from tf.transformations import quaternion_from_euler
 
 from pandora_testing_tools.msg import ReplayBagsAction
 from pandora_testing_tools.msg import ReplayBagsGoal
@@ -55,10 +57,17 @@ def distance(a, b):
 
     return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
 
-def isSameOrientation(a, b):
+def isOrientationReversed(a, b):
 
-    distance = math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2 + (a.w - b.w)**2)
+    roll, pitch, yaw = euler_from_quaternion([a.x, a.y, a.z, a.w])
+    reversed_a = quaternion_from_euler(roll, pitch, yaw + math.pi)
+    distance = math.sqrt((reversed_a[0] - b.x)**2 + (reversed_a[1] - b.y)**2 + (reversed_a[2] - b.z)**2 + (reversed_a[3] - b.w)**2)
     return distance == 0
+
+def isPositionGrounded(a, b):
+
+    a.z = 0
+    return distance(a, b) == 0
 
 def direction(a, b):
         

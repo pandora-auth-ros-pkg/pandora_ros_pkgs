@@ -77,9 +77,9 @@ class MockEndEffectorPlanner():
         while not self.reply:
             rospy.sleep(1.)
             if self.end_effector_planner_as_.is_preempt_requested():
-                self.end_effector_planner_as_.set_preempted()
+                self.end_effector_planner_as_.set_preempted(MoveEndEffectorResult())
                 self.moves_end_effector = False
-                break
+                return None
         else:
             self.reply = False
             result = MoveEndEffectorResult()

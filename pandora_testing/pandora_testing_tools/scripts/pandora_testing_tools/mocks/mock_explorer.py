@@ -39,15 +39,14 @@ __email__ = "tsirif@gmail.com"
 import rospy
 from actionlib import SimpleActionServer
 
-from geometry_msgs.msg import Point
 from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import Quaternion
-from move_base_msgs.msg import MoveBaseAction, MoveBaseFeedback, MoveBaseResult
+from pandora_navigation_msgs.msg import DoExplorationAction, \
+    DoExplorationFeedback, DoExplorationResult
 import tf
 
-class MockNavigation():
+class MockExplorer():
 
-    def __init__(self, move_base_topic):
+    def __init__(self, exploration_topic):
 
         self.robot_pose_ = PoseStamped()
         self.listener = tf.TransformListener()
@@ -56,64 +55,53 @@ class MockNavigation():
         self.reply = False
         self.preempted = 0
         
-        self.moves_base = False
-        self.target_position = Point()
-        self.target_orientation = Quaternion() 
+        self.entered_exploration = False
 
-        self.move_base_as_ = SimpleActionServer(
-            move_base_topic,
-            MoveBaseAction,
-            execute_cb = self.move_base_cb,
+        self.do_exploration_as_ = SimpleActionServer(
+            exploration_topic,
+            DoExplorationAction,
+            execute_cb = self.do_exploration_cb,
             auto_start = False)
-        self.move_base_as_.start()
+        self.do_exploration_as_.start()
 
     def __del__(self):
 
-        self.move_base_as_.__del__()
+        self.do_exploration_as_.__del__()
 
-    def move_base_cb(self, goal):
-        rospy.loginfo('move_base_cb')
+    def do_exploration_cb(self, goal):
+        rospy.loginfo('do_exploration_cb')
 
-        self.target_position = goal.target_pose.pose.position
-        self.target_orientation = goal.target_pose.pose.orientation
-        self.moves_base = True
+        self.entered_exploration = True
         while not self.reply:
             rospy.sleep(0.2)
             (trans, rot) = self.listener.lookupTransform('/map', '/base_footprint', rospy.Time(0))
             self.robot_pose_.pose.position.x = trans[0]
             self.robot_pose_.pose.position.y = trans[1]
-            feedback = MoveBaseFeedback()
+            feedback = DoExplorationFeedback()
             feedback.base_position.pose.position.x = \
                 self.robot_pose_.pose.position.x
             feedback.base_position.pose.position.y = \
                 self.robot_pose_.pose.position.y
-            self.move_base_as_.publish_feedback(feedback)
-            if self.move_base_as_.is_preempt_requested():
+            self.do_exploration_as_.publish_feedback(feedback)
+            if self.do_exploration_as_.is_preempt_requested():
                 self.preempted += 1
                 rospy.loginfo("Preempted!")
-                self.moves_base = False
-                self.move_base_as_.set_preempted()
-                return None
-            if self.move_base_as_.is_new_goal_available():
-                self.preempted += 1
-                self.move_base_cb(self.move_base_as_.accept_new_goal())
+                self.entered_exploration = False
+                self.do_exploration_as_.set_preempted(DoExplorationResult())
                 return None
         else:
-            result = MoveBaseResult()
+            result = DoExplorationResult()
             self.reply = False
             self.preempted = 0
-            self.moves_base = False
-            self.target_position = Point()
-            self.target_orientation = Quaternion() 
+            self.entered_exploration = False
             if self.navigation_succedes:
-                self.move_base_as_.set_succeeded(result)
+                self.do_exploration_as_.set_succeded(result) 
             else:
-                self.move_base_as_.set_aborted(result)
+                self.do_exploration_as_.set_aborted(result)
     
 if __name__ == '__main__':
 
     rospy.sleep(0.5)
-    rospy.init_node('MockNavigation', anonymous=True)
-    navigation = MockNavigation(
-        move_base_topic = '/move_base')
+    rospy.init_node('MockExplorer', anonymous=True)
+    explorer = MockExploration(exploration_topic = '/do_exploration')
 
