@@ -255,10 +255,10 @@ namespace pandora_data_fusion
     {
       tf::StampedTransform tfTransform;
 
-      listener_->waitForTransform("/map", header.frame_id,
+      listener_->waitForTransform(BaseObject::getGlobalFrame(), header.frame_id,
           header.stamp, ros::Duration(1));
 
-      listener_->lookupTransform("/map", header.frame_id, 
+      listener_->lookupTransform(BaseObject::getObjectFrame(), header.frame_id, 
           header.stamp, tfTransform);
 
       return tfTransform;

@@ -53,6 +53,7 @@
 #include "alert_handler/tf_finder.h"
 #include "alert_handler/tf_listener.h"
 #include "alert_handler/utils.h"
+#include "alert_handler/base_object.h"
 
 namespace pandora_data_fusion
 {

@@ -73,13 +73,23 @@ namespace pandora_data_fusion
       victimsToGo_.reset( new VictimList );
       victimsVisited_.reset( new VictimList );
 
-      std::string mapType;
-      nh_->getParam("map_type", mapType);
-      objectFactory_.reset( new ObjectFactory(map_, mapType) );
+      std::string param;
+      if (!nh_->getParam("map_type", param))
+      {
+        ROS_FATAL("map type param not found");
+        ROS_BREAK();
+      }
+      objectFactory_.reset( new ObjectFactory(map_, param) );
       objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
       victimHandler_.reset( new VictimHandler(victimsToGo_, victimsVisited_) );
 
-      BaseObject::setGlobalFrame("/map");
+      if (!nh_->getParam("global_frame", param))
+      {
+        ROS_FATAL("global frame param not found");
+        ROS_BREAK();
+      }
+      BaseObject::setGlobalFrame(param);
+
       initRosInterfaces();
     }
 

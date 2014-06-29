@@ -69,7 +69,7 @@ namespace pandora_data_fusion
         MarkerArray* markers) const
     {
       visualization_msgs::Marker marker;
-      marker.header.frame_id = "/map";
+      marker.header.frame_id = Qr::getGlobalFrame();
       marker.header.stamp = ros::Time::now();
       marker.ns = type_;
       marker.id = id_;
@@ -85,7 +85,7 @@ namespace pandora_data_fusion
       markers->markers.push_back(marker);
 
       visualization_msgs::Marker description;
-      description.header.frame_id = "/map";
+      description.header.frame_id = Qr::getGlobalFrame();
       description.header.stamp = ros::Time::now();
       description.ns = type_ + "_BRIEF";
       description.id = id_;
