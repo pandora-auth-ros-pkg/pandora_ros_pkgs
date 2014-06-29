@@ -56,7 +56,7 @@
 #define DEGREE (PI / 180.0)
 
 //!< Macro to convert to map coordinates from meters.
-#define COORDS(X, Y, MAP) int(ceil((X - MAP->info.origin.position.x)\
+#define COORDS(X, Y, MAP) static_cast<int>(ceil((X - MAP->info.origin.position.x)\
     / MAP->info.resolution) + ceil((Y - MAP->info.origin.position.y)\
       / MAP->info.resolution) * MAP->info.width)
 
