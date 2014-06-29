@@ -76,7 +76,7 @@ namespace pandora_vision
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
       <vision_communications::HolesDirectionsVectorMsg>(
-        validHolesTopic_, 1000, true);
+        validHolesTopic_, 10, true);
 
     // Advertise the topic that information about the final holes,
     // will be published to
@@ -84,7 +84,7 @@ namespace pandora_vision
     // image_view /pandora_vision/hole_detector/debug_valid_holes_image
     // _image_transport:=compressed
     debugValidHolesPublisher_ = imageTransport_.advertise
-      (debugValidHolesTopic_, 1000, true);
+      (debugValidHolesTopic_, 1, true);
 
     // Advertise the topic that information about holes found by the Depth
     // and RGB nodes will be published to
@@ -92,7 +92,7 @@ namespace pandora_vision
     // image_view /pandora_vision/hole_detector/debug_respective_holes_image
     // _image_transport:=compressed
     debugRespectiveHolesPublisher_ = imageTransport_.advertise
-      (debugRespectiveHolesTopic_, 1000, true);
+      (debugRespectiveHolesTopic_, 1, true);
 
     // Advertise the topic that the image of the final holes,
     // will be published to
@@ -1945,13 +1945,20 @@ namespace pandora_vision
     // their respective validity probability that will be returned
     std::map<int, float> valid;
 
-    if (Parameters::HoleFusion::validation_process == VALIDATION_SIMPLE)
+    if (Parameters::HoleFusion::validation_process ==
+      VALIDATION_VIA_THRESHOLDING)
     {
-      valid = validationSimple(probabilitiesVector2D);
+      valid = validateHolesViaThresholding(probabilitiesVector2D);
     }
-    else if (Parameters::HoleFusion::validation_process == VALIDATION_COMPLEX)
+    else if (Parameters::HoleFusion::validation_process ==
+      VALIDATION_VIA_WEIGHTING)
     {
-      valid = validationComplex(probabilitiesVector2D);
+      valid = validateHolesViaWeighting(probabilitiesVector2D);
+    }
+    else if (Parameters::HoleFusion::validation_process ==
+      VALIDATION_VIA_THRESHOLDED_WEIGHTING)
+    {
+      valid = validateHolesViaThresholdedWeighting(probabilitiesVector2D);
     }
     else
     {
@@ -1983,7 +1990,7 @@ namespace pandora_vision
     @return [std::map<int, float>] The indices of the valid holes and their
     respective validity probabilities
    **/
-  std::map<int, float> HoleFusion::validationComplex(
+  std::map<int, float> HoleFusion::validateHolesViaWeighting(
     const std::vector<std::vector<float> >& probabilitiesVector2D)
   {
     #ifdef DEBUG_TIME
@@ -2183,6 +2190,318 @@ namespace pandora_vision
 
 
   /**
+    @brief Validates candidate holes by giving weights to each
+    probability from the set of per-hole probabilities set.
+    Additionally, each probability obtained is compared against
+    individually-set thresholds per source of probability.
+    Altough, theoretically, all probabilities are set in the [0, 1]
+    interval, not all can reach the value 1 in practice and individual
+    thresholds have to be empirically set. Each hole, if determined valid,
+    is assigned a validity probability equal to the mean of the set
+    of its corresponding probabilities.
+    Each weight is a power of two. Two weights shall not have the
+    same value for any number of probabilities. The exponent of 2 used
+    per weight corresponds to the execution order - weighting order of
+    a particular filter.
+    @param[in] probabilitiesVector2D
+    [const std::vector<std::vector<float> >&]
+    A two dimensional vector containing the probabilities of
+    validity of each candidate hole. Each row of it pertains to a specific
+    filter applied, each column to a particular hole
+    @return [std::map<int, float>] The indices of the valid holes and their
+    respective validity probabilities
+   **/
+  std::map<int, float> HoleFusion::validateHolesViaThresholdedWeighting(
+    const std::vector<std::vector<float> >& probabilitiesVector2D)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("validationComplex", "processCandidateHoles");
+    #endif
+
+    // The map of holes' indices that are valid and
+    // their respective validity probability that will be returned
+    std::map<int, float> valid;
+
+    for (int i = 0; i < probabilitiesVector2D[0].size(); i++)
+    {
+      int exponent = 0;
+      float sum = 0.0;
+
+      // Commence setting of priorities given to hole checkers.
+      // Each priority given is not fixed,
+      // but there is an apparent hierarchy witnessed here.
+      // In order to reach a valid conclusion, an analytical method had to be
+      // used, which is one analogous to the one presented in
+      // {insert link of Manos Tsardoulias's PHD thesis}
+
+      // Apply a weight to each probability according to its weight order.
+      // If depth analysis was not possible, use the urgent weight order.
+      if (filteringMode_ == RGBD_MODE)
+      {
+        // Color homogeneity
+        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i] <
+            Parameters::HoleFusion::checker_color_homogeneity_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+
+          exponent++;
+        }
+
+        // Depth / area
+        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_area - 1][i] <
+            Parameters::HoleFusion::checker_depth_area_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_area - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_area - 1][i];
+
+          exponent++;
+        }
+
+        // Luminosity diff
+        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i] <
+            Parameters::HoleFusion::checker_luminosity_diff_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+
+          exponent++;
+        }
+
+        // Outline of rectangle plane constitution
+        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i] <
+            Parameters::HoleFusion::checker_outline_of_rectangle_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_outline_of_rectangle - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+
+          exponent++;
+        }
+
+        // Depth homogeneity
+        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i] <
+            Parameters::HoleFusion::checker_depth_homogeneity_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+
+          exponent++;
+        }
+
+        // Texture backprojection
+        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject - 1][i] <
+            Parameters::HoleFusion::checker_texture_backproject_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+
+          exponent++;
+        }
+
+        // Intermediate points plane constitution
+        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i] <
+            Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+
+          exponent++;
+        }
+
+        // Depth diff
+        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_depth_diff - 1][i] <
+            Parameters::HoleFusion::checker_depth_diff_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_depth_diff - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+
+          exponent++;
+        }
+
+        // Texture diff
+        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff - 1][i] <
+            Parameters::HoleFusion::checker_texture_diff_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+
+          exponent++;
+        }
+      }
+      else if (filteringMode_ == RGB_ONLY_MODE)
+      {
+        // Color homogeneity
+        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i] <
+            Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+
+          exponent++;
+        }
+
+        // Luminosity diff
+        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i] <
+            Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+
+          exponent++;
+        }
+
+        // Texture backprojection
+        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i] <
+            Parameters::HoleFusion::checker_texture_backproject_urgent_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1)
+            * probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+
+          exponent++;
+        }
+
+        // Texture diff
+        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        {
+          if (probabilitiesVector2D[
+            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i] <
+            Parameters::HoleFusion::checker_texture_diff_urgent_threshold)
+          {
+            continue;
+          }
+
+          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff_urgent - 1)
+            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
+
+          exponent++;
+        }
+      }
+      else
+      {
+        ROS_ERROR_NAMED(PKG_NAME,
+          "[Hole Fusion node] Validation process failure");
+      }
+
+      // The total validity probability of the i-th hole
+      sum /= (pow(2, exponent) - 1);
+
+      // The validity acceptance threshold
+      float threshold = 0.0;
+
+      if (filteringMode_ == RGBD_MODE)
+      {
+        threshold = Parameters::HoleFusion::holes_validity_threshold_normal;
+      }
+      else if (filteringMode_ == RGB_ONLY_MODE)
+      {
+        threshold = Parameters::HoleFusion::holes_validity_threshold_urgent;
+      }
+      else
+      {
+        ROS_ERROR_NAMED(PKG_NAME,
+          "[Hole Fusion node] Validation process failure");
+      }
+
+      // If the total validity probability of the i-th hole exceeds a
+      // pre-determined threshold, we consider the i-th hole to be valid
+      if (sum > threshold)
+      {
+        valid[i] = sum;
+      }
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("validationComplex");
+    #endif
+
+    return valid;
+  }
+
+
+
+  /**
     @brief Validates candidate holes by checking each set of
     probabilities obtained against individually-set thresholds
     per source of probability.
@@ -2199,7 +2518,7 @@ namespace pandora_vision
     @return [std::map<int, float>] The indices of the valid holes and their
     respective validity probabilities
    **/
-  std::map<int, float> HoleFusion::validationSimple(
+  std::map<int, float> HoleFusion::validateHolesViaThresholding(
     const std::vector<std::vector<float> >& probabilitiesVector2D)
   {
     #ifdef DEBUG_TIME

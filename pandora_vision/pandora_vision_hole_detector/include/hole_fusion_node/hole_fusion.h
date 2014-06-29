@@ -63,8 +63,9 @@
 #include "hole_fusion_node/hole_merger.h"
 
 // The hole's validation process identifiers
-#define VALIDATION_SIMPLE 0
-#define VALIDATION_COMPLEX 1
+#define VALIDATION_VIA_THRESHOLDING 0
+#define VALIDATION_VIA_WEIGHTING 1
+#define VALIDATION_VIA_THRESHOLDED_WEIGHTING 2
 
 /**
   @namespace pandora_vision
@@ -505,7 +506,32 @@ namespace pandora_vision
         @return [std::map<int, float>] The indices of the valid holes and their
         respective validity probabilities
        **/
-      std::map<int, float> validationComplex(
+      std::map<int, float> validateHolesViaWeighting(
+        const std::vector<std::vector<float> >& probabilitiesVector2D);
+
+      /**
+        @brief Validates candidate holes by giving weights to each
+        probability from the set of per-hole probabilities set.
+        Additionally, each probability obtained is compared against
+        individually-set thresholds per source of probability.
+        Altough, theoretically, all probabilities are set in the [0, 1]
+        interval, not all can reach the value 1 in practice and individual
+        thresholds have to be empirically set. Each hole, if determined valid,
+        is assigned a validity probability equal to the mean of the set
+        of its corresponding probabilities.
+        Each weight is a power of two. Two weights shall not have the
+        same value for any number of probabilities. The exponent of 2 used
+        per weight corresponds to the execution order - weighting order of
+        a particular filter.
+        @param[in] probabilitiesVector2D
+        [const std::vector<std::vector<float> >&]
+        A two dimensional vector containing the probabilities of
+        validity of each candidate hole. Each row of it pertains to a specific
+        filter applied, each column to a particular hole
+        @return [std::map<int, float>] The indices of the valid holes and their
+        respective validity probabilities
+       **/
+      std::map<int, float> validateHolesViaThresholdedWeighting(
         const std::vector<std::vector<float> >& probabilitiesVector2D);
 
       /**
@@ -525,7 +551,7 @@ namespace pandora_vision
         @return [std::map<int, float>] The indices of the valid holes and their
         respective validity probabilities
        **/
-      std::map<int, float> validationSimple(
+      std::map<int, float> validateHolesViaThresholding(
         const std::vector<std::vector<float> >& probabilitiesVector2D);
 
 

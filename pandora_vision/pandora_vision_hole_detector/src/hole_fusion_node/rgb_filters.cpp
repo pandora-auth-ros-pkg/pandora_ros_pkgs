@@ -231,7 +231,7 @@ namespace pandora_vision
       // than the luminosity of the points beyond it and restricted by the
       // edges of its bounding box, it surely is not a hole
       if (meanBlobLuminosity < meanBoundingBoxLuminosity
-        && meanBoundingBoxLuminosity != 0)
+        && meanBoundingBoxLuminosity > 0)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
           1 - meanBlobLuminosity / meanBoundingBoxLuminosity;
