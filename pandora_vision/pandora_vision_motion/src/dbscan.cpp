@@ -196,6 +196,7 @@ namespace pandora_vision
           }
       }
     }  
+    delete DP;
   }
   
   double DBSCAN::calculateDistanceMatrix(int pt1, int pt2)

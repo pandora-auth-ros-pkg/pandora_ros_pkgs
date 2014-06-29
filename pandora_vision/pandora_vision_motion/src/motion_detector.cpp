@@ -94,9 +94,9 @@ namespace pandora_vision
  
     detectMotionPosition(temp);
      
-    #ifdef SHOW_DEBUG_IMAGE
+    ROS_INFO_STREAM("MotionParameters::visualization" << MotionParameters::visualization); 
+    if(MotionParameters::visualization)
       debugShow(temp);
-    #endif  
    
     return typeOfMovement;
   }
@@ -136,7 +136,10 @@ namespace pandora_vision
         if(number_of_changes){
           cv::Point _tlcorner(min_x, min_y);
           cv::Point _brcorner(max_x, max_y);
+          
           rectangle(result, _tlcorner, _brcorner, cv::Scalar(0, 255, 255), 1);
+          cv::Rect rect(_tlcorner.x, _tlcorner.y, max_x- min_x, max_y -min_y);
+          _bounding_box = rect;
         }  
     }
   }
@@ -148,10 +151,17 @@ namespace pandora_vision
   int* MotionDetector::getMotionPosition()
   {
     int* table = new int[4];
-    for(int ii = 0; ii < 4; ii++)
-    {
-      
-    }
+    
+    //!< Center_x
+    table [0] = round( _bounding_box.x + _bounding_box.width * 0.5 );
+    //!< Center_y
+    table [1] = round( _bounding_box.y + _bounding_box.height * 0.5 );
+    
+    //!< Rectangle width
+    table[2] = _bounding_box.width;
+
+    //!< Rectangle height
+    table[3] = _bounding_box.height;
     return table;
   }
     

@@ -54,6 +54,7 @@ namespace pandora_vision
     static int diff_threshold;
     static double motion_high_thres;
     static double motion_low_thres;
+    static bool visualization;
     
   };
 

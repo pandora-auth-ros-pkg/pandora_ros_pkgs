@@ -339,6 +339,7 @@ namespace pandora_vision
     isDepthEnabled = false;
     
     _frame_id = msg.header.frame_id; 
+    victimFrameTimestamp = msg.header.stamp;
     _enhancedHoles = msg;
     if (_enhancedHoles.enhancedHoles.size() > 0)
       isHole = true;

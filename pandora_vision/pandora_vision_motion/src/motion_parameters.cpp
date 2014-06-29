@@ -61,4 +61,6 @@ namespace pandora_vision
   /// less means no movement at all
   double MotionParameters::motion_low_thres = 200;
   
+  bool MotionParameters::visualization = false;
+  
 }// namespace pandora_vision

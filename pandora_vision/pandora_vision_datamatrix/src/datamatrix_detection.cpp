@@ -256,7 +256,7 @@ namespace pandora_vision
     vision_communications::DataMatrixAlertsVectorMsg datamatrixcodeVectorMsg;
     vision_communications::DataMatrixAlertMsg datamatrixcodeMsg;
     datamatrixcodeVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
-    datamatrixcodeVectorMsg.header.stamp = ros::Time::now();
+    datamatrixcodeVectorMsg.header.stamp = datamatrixFrameTimestamp;
 
     _datamatrixDetector.detect_datamatrix(datamatrixFrame);
     std::vector<DataMatrixQode> list_datamatrices = _datamatrixDetector.get_detected_datamatrix();
