@@ -88,6 +88,30 @@ namespace pandora_data_fusion
         virtual void setProbability(float probability) = 0;
         virtual void setPose(const Pose& pose) = 0;
 
+        /**
+         * @brief setter for static variable globalFrame_
+         * @param globalFrame [std::string const&] the static global frame to
+         * which all objects' poses are refering.
+         * @return void
+         */
+        static void setGlobalFrame(const std::string& globalFrame)
+        {
+          globalFrame_ = globalFrame;
+        }
+
+        /**
+         * @brief getter for static variable globalFrame_
+         * @return std::string
+         */
+        static std::string getGlobalFrame()
+        {
+          return globalFrame_;
+        }
+
+      protected:
+        //!< Static global frame to which all objects' poses are refering.
+        static std::string globalFrame_;
+
       private:
         friend class ObjectListTest;
     };

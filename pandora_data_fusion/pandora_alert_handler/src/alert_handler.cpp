@@ -79,6 +79,7 @@ namespace pandora_data_fusion
       objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
       victimHandler_.reset( new VictimHandler(victimsToGo_, victimsVisited_) );
 
+      BaseObject::setGlobalFrame("/map");
       initRosInterfaces();
     }
 

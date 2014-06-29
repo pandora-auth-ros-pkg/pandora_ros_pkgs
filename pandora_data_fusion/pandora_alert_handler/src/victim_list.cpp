@@ -121,8 +121,9 @@ namespace pandora_data_fusion
         pandora_data_fusion_msgs::VictimInfoMsg victimInfo;
 
         victimInfo.id = (*it)->getId();
+        victimInfo.victimFrameId = (*it)->getFrameId();
         victimInfo.victimPose.header.stamp = now;
-        victimInfo.victimPose.header.frame_id = (*it)->getFrameId();
+        victimInfo.victimPose.header.frame_id = Victim::getGlobalFrame();
         victimInfo.victimPose.pose = (*it)->getPose();
         victimInfo.probability = (*it)->getProbability();
         for (ObjectConstPtrVector::const_iterator iter = (*it)->getObjects().begin();

@@ -75,14 +75,14 @@ target_link_libraries(filter_model
 
 ########################  objects  ##################################
 
-#add_library(base_object
-#  src/base_object.cpp)
-#target_link_libraries(base_object
-#  ${catkin_LIBRARIES}
-#  )
-#add_dependencies(base_object 
-#  pandora_data_fusion_msgs_gencpp
-#  ) 
+add_library(base_object
+  src/base_object.cpp)
+target_link_libraries(base_object
+  ${catkin_LIBRARIES}
+  )
+add_dependencies(base_object 
+  pandora_data_fusion_msgs_gencpp
+  ) 
 
 add_library(objects
   src/hole.cpp
@@ -99,6 +99,7 @@ add_library(objects
 target_link_libraries(objects
   ${catkin_LIBRARIES}
   ${BFL_LIBRARIES}
+  base_object
   utils
   filter_model
   )
