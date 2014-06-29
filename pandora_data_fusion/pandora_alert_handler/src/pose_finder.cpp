@@ -258,7 +258,7 @@ namespace pandora_data_fusion
       listener_->waitForTransform(BaseObject::getGlobalFrame(), header.frame_id,
           header.stamp, ros::Duration(1));
 
-      listener_->lookupTransform(BaseObject::getObjectFrame(), header.frame_id, 
+      listener_->lookupTransform(BaseObject::getGlobalFrame(), header.frame_id, 
           header.stamp, tfTransform);
 
       return tfTransform;
