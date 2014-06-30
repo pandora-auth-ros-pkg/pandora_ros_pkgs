@@ -13,7 +13,7 @@ from pandora_xmega_hardware_interface.msg import BatteryMsg
 
 class BatteryMonitor:
 
-    beeper = ['beep','-f','3000','-r','100']
+    beeper = ['beep','-f','3000','-r','20']
     highest_voltage = []
     previous_voltage = []
     ok = []
@@ -32,12 +32,12 @@ class BatteryMonitor:
 
         for i in range(len(data.name)):
 
-            if data.voltage[i] > 20 and self.previous_voltage[i] < 20:
+            if data.voltage[i] > 18 and self.previous_voltage[i] < 18:
                 self.ok[i] = True
 
             self.highest_voltage[i] = max(data.voltage[i], self.highest_voltage[i])
 
-            if self.highest_voltage[i] > 20 and data.voltage[i] < 21:
+            if self.highest_voltage[i] > 20 and data.voltage[i] < 20.5:
                 rospy.logerr(str(data.name[i]) + ' '+ str(data.voltage[i]) + 'V !!')
                 if self.ok[i]:
                     subprocess.Popen(self.beeper)
