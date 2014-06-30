@@ -69,6 +69,8 @@ namespace pandora_vision
          
     public:
     
+    DepthSystemValidator();
+    
     ///Constructor
     explicit DepthSystemValidator(std::string depth_classifier_path);
     

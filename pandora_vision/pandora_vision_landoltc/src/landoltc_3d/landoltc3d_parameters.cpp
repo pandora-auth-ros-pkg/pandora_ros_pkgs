@@ -52,4 +52,6 @@ namespace pandora_vision
   
   bool Landoltc3DParameters::visualization = false;
   
+  double Landoltc3DParameters::timerThreshold = 0.05;
+  
 }// namespace pandora_vision

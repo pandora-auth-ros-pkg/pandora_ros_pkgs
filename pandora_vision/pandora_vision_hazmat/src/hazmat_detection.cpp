@@ -88,6 +88,8 @@ namespace pandora_vision
 
     //initialize state Managing Variables
     hazmatNowOn_ = false;
+    
+    _lastTimeProcessed = ros::Time::now(); 
       
     clientInitialize();
       
@@ -180,6 +182,15 @@ namespace pandora_vision
       _vfov.push_back(vfov);  
     
     }
+     //!< Get the debugQrCode parameter if available;
+    if (_nh.getParam("timerThreshold", _timerThreshold))
+      ROS_DEBUG_STREAM("timerThreshold : " << _timerThreshold);
+    else
+    {
+      _timerThreshold = 0.1;
+      ROS_DEBUG_STREAM("timerThreshold : " << _timerThreshold);
+    }
+    
   }
   
   /**
@@ -225,6 +236,9 @@ namespace pandora_vision
   **/
   void HazmatDetection::imageCallback(const sensor_msgs::Image& msg)
   {
+    if( ros::Time::now() - _lastTimeProcessed < ros::Duration (_timerThreshold))
+      return;
+      
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     cv::Mat temp = in_msg->image.clone();
@@ -255,7 +269,8 @@ namespace pandora_vision
           ROS_DEBUG_STREAM("" << it->first << " => " << it->second );
     } 
     
-    
+    _lastTimeProcessed = ros::Time::now(); 
+     
     hazmatDetect();
   }
 

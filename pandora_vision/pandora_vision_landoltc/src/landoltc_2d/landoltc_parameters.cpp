@@ -49,4 +49,6 @@ namespace pandora_vision
   int LandoltcParameters::adaptiveThresholdSubtractSize = 2;
   
   bool LandoltcParameters::visualization = false;
+  
+  double LandoltcParameters::timerThreshold = 0.16;
 }// namespace pandora_vision

@@ -56,6 +56,10 @@ namespace pandora_vision
     _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 1e-6);
   }
   
+  DepthSystemValidator::DepthSystemValidator()
+  {
+  }
+  
   /**
     @brief Destructor
   */

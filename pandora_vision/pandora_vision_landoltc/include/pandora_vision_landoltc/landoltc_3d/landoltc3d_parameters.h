@@ -51,6 +51,7 @@ namespace pandora_vision
     static int adaptiveThresholdSubtractSize;
     static double bradleyPerc;
     static bool visualization;
+    static double timerThreshold;
   };
 
 } // namespace pandora_vision

@@ -119,6 +119,8 @@ private:
   //!< Variable for checking if Predator is On
   bool PredatorOn;
   
+  ros::Time _lastTimeProcessed;
+    
   //!< The dynamic reconfigure (landoltc3d) parameters' server
   dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc3d_cfgConfig> server;
   

@@ -50,6 +50,7 @@ namespace pandora_vision
     static double huMomentsPrec;
     static int adaptiveThresholdSubtractSize;
     static bool visualization;
+    static double timerThreshold;
     
   };
 

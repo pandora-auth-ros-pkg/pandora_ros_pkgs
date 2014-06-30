@@ -104,6 +104,10 @@ namespace pandora_vision
       
       int prevState;  //Previous state of robot
       
+      double _timerThreshold;
+      
+      ros::Time _lastTimeProcessed;
+      
       //!< The dynamic reconfigure (motion's) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hazmat::hazmat_cfgConfig>
         server;

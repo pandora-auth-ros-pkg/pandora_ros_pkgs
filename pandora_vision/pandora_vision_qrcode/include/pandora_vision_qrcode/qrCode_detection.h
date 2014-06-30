@@ -118,7 +118,10 @@ namespace pandora_vision {
 
       //!< Variable used for State Managing
       bool qrcodeNowON;
-
+      
+      double _timerThreshold;
+      
+      ros::Time _lastTimeProcessed;
       /**
        * @brief Get parameters referring to view and frame characteristics from
        * launch file

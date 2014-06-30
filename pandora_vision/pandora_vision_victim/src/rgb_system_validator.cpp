@@ -57,6 +57,11 @@ namespace pandora_vision
     ROS_DEBUG("[victim_node] : RgbSystemValidator instance created");
   }
   
+  RgbSystemValidator::RgbSystemValidator()
+  {
+    
+  }
+  
   /**
     @brief Destructor
   */

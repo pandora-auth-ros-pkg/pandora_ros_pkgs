@@ -85,7 +85,9 @@ LandoltC3dDetection::LandoltC3dDetection(const std::string& ns): _nh(ns), landol
   prevState = state_manager_communications::robotModeMsg::MODE_OFF;
 
   clientInitialize();
-        
+  
+  _lastTimeProcessed = ros::Time::now();
+          
   ROS_INFO("[landoltc3d_node] : Created LandoltC3d Detection instance");
 
 }
@@ -251,7 +253,9 @@ bool LandoltC3dDetection::getParentFrameId()
 
 void LandoltC3dDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-
+  if( ros::Time::now() - _lastTimeProcessed < ros::Duration (Landoltc3DParameters::timerThreshold))
+      return;
+      
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
@@ -277,7 +281,8 @@ void LandoltC3dDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   } 
   
   //ROS_INFO("Getting Frame From Camera");
-
+  _lastTimeProcessed = ros::Time::now(); 
+   
   landoltc3dCallback();
 
 }
@@ -430,6 +435,7 @@ const uint32_t& level)
   Landoltc3DParameters::adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
   Landoltc3DParameters::bradleyPerc = config.bradleyPerc;    
   Landoltc3DParameters::visualization = config.visualization;
+  Landoltc3DParameters::timerThreshold = config.timerThreshold;
 }
 
 } // namespace pandora_vision

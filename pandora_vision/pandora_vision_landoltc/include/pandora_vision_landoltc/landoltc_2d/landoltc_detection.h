@@ -114,6 +114,8 @@ private:
   
   dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc_cfgConfig>::CallbackType f;
   
+  ros::Time _lastTimeProcessed;
+   
   /**
   @brief Callback for the RGB Image
   @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image

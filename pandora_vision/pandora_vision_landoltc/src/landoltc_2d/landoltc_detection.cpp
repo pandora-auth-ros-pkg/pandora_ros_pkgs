@@ -72,7 +72,8 @@ LandoltCDetection::LandoltCDetection(const std::string& ns) : _nh(ns), landoltcN
   prevState = state_manager_communications::robotModeMsg::MODE_OFF;
 
   clientInitialize();
-      
+  
+  _lastTimeProcessed = ros::Time::now();    
       
   ROS_INFO("[landoltc_node] : Created LandoltC Detection instance");
 
@@ -223,7 +224,10 @@ void LandoltCDetection::getGeneralParams()
 
 void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
-
+  
+  if( ros::Time::now() - _lastTimeProcessed < ros::Duration (LandoltcParameters::timerThreshold))
+      return;
+      
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
@@ -247,6 +251,9 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     _frame_ids_map.insert( it , std::pair<std::string, std::string>(
        _frame_id, _parent_frame_id));
   } 
+  
+  _lastTimeProcessed = ros::Time::now(); 
+   
   landoltcCallback();
 
 }
@@ -370,5 +377,6 @@ void LandoltCDetection::parametersCallback(
     LandoltcParameters::huMomentsPrec = config.huMomentsPrec;
     LandoltcParameters::adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
     LandoltcParameters::visualization = config.visualization;    
+    LandoltcParameters::timerThreshold = config.timerThreshold;    
   }
 } // namespace pandora_vision
