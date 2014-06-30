@@ -12,19 +12,20 @@
   <arg name="vision_landoltc3d" default="true"/>
   <arg name="vision_predator" default="true"/>
   <arg name="vision_hole_detector" default="true"/>
+  <arg name="vision_victim" default="true"/>
 
 
   <!-- Cameras -->
   <group if="$(arg vision_cameras)">
     <include if="$(arg camera_left)" file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
-      <arg name="camID" value="/dev/video1"/>
+      <arg name="camID" value="/dev/left_camera"/>
       <arg name="name" value="left_camera"/>
       <arg name="topic_name" value="left_camera/image"/>
       <arg name="frame_id" value="left_camera_optical_frame"/>
     </include>
 
     <include if="$(arg camera_right)" file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
-      <arg name="camID" value="/dev/video0"/>
+      <arg name="camID" value="/dev/right_camera"/>
       <arg name="name" value="right_camera"/>
       <arg name="topic_name" value="right_camera/image"/>
       <arg name="frame_id" value="right_camera_optical_frame"/>
@@ -57,6 +58,8 @@
       file="$(find pandora_vision_predator)/launch/predator_node.launch" />
     <include if="$(arg vision_hole_detector)"
       file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector.launch" />
+    <include if="$(arg vision_victim)"
+      file="$(find pandora_vision_victim)/launch/victim_node.launch" />
 
   </group>
 </launch>

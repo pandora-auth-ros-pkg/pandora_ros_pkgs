@@ -1,7 +1,6 @@
 <launch>
       
-    <node name="victim_node" type="victim_node" pkg="pandora_vision_victim" 
-      respawn="False"/>
+    <node name="victim_node" type="victim_node" pkg="pandora_vision_victim"  />
     
     <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml" 
         command="load" ns="victim"/>
