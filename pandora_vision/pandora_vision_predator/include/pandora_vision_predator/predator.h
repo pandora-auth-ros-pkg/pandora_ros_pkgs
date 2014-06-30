@@ -46,8 +46,6 @@
 #include <dynamic_reconfigure/server.h>
 #include <pandora_vision_predator/predator_cfgConfig.h>
 
-#define SHOW_DEBUG_IMAGE 
-
 namespace pandora_vision
 {
   
@@ -85,6 +83,9 @@ class Predator : public StateClient
   
     //!< Current frame to be processed
     cv::Mat PredatorFrame;
+    
+    //!Predator Frame TimeStamp
+    ros::Time PredatorFrameTimeStamp;
     
     //!< Grey frame of type 8UC1
     cv::Mat grey;
@@ -140,9 +141,15 @@ class Predator : public StateClient
     //!<Value for enabling or disabling TLD learning mode
     bool learningEnabled;
     
-    ///Flag to identify if it works alone or in combination with
-    ///landoltc3d_node
+    //!<Flag to identify if it works alone or in combination with
+    //!<landoltc3d_node
     bool operation_state;
+    
+    //!<Vertical Field of view
+    double hfov;
+    
+    //!<Horizontal Field of view
+    double vfov;
     
     /**
     @brief Callback for the RGB Image
@@ -150,9 +157,6 @@ class Predator : public StateClient
     @return void
     **/
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
-    
-    double hfov;
-    double vfov;
     
     /**
     @brief Function that retrieves the parent to the frame_id

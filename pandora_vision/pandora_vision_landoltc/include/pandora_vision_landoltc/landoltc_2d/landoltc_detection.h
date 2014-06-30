@@ -70,6 +70,9 @@ private:
   //!< Current frame to be processed
   cv::Mat landoltCFrame;
   
+  //!< Landoltc frame timestamp
+  ros::Time landoltcFrameTimestamp;
+  
   //!<Landoltc Detector object
   LandoltCDetector _landoltcDetector;
   

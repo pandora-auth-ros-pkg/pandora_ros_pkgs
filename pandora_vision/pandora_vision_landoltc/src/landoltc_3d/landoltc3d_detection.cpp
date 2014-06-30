@@ -255,7 +255,7 @@ void LandoltC3dDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
-  
+  landoltc3dFrameTimestamp = msg->header.stamp;  
   _frame_id = msg->header.frame_id;
     
   if(_frame_id.c_str()[0] == '/')
@@ -287,6 +287,7 @@ void LandoltC3dDetection::predatorCallback(const vision_communications::Landoltc
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg.img, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
+  landoltc3dFrameTimestamp = msg.header.stamp;
   _frame_id  = msg.header.frame_id;
   
   std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
@@ -325,14 +326,13 @@ void LandoltC3dDetection::landoltc3dCallback()
   _landoltc3dDetector.begin(&landoltCFrame);
   
   std::vector<LandoltC3D> _landoltc3d = _landoltc3dDetector.getDetectedLandolt();
-  //~ ROS_INFO("Size is %d", _landoltc3d.size());
   
   //!< Create message of Landoltc Detector
   vision_communications::LandoltcAlertsVectorMsg landoltc3dVectorMsg;
   vision_communications::LandoltcAlertMsg landoltc3dcodeMsg;
 
   landoltc3dVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
-  landoltc3dVectorMsg.header.stamp = ros::Time::now();
+  landoltc3dVectorMsg.header.stamp = landoltc3dFrameTimestamp;
   
   for(int i = 0; i < _landoltc3d.size(); i++){
      
@@ -362,7 +362,7 @@ void LandoltC3dDetection::landoltc3dCallback()
     landoltc3dcodeMsg.angles.clear();
     
   }
-  if(_landoltc3d.size() > 0){
+  if(_landoltc3d.size() > 0 && landoltc3dVectorMsg.landoltcAlerts.size() > 0){
     _landoltc3dPublisher.publish(landoltc3dVectorMsg);
     landoltc3dVectorMsg.landoltcAlerts.clear();
   }  
@@ -400,7 +400,9 @@ void LandoltC3dDetection::startTransition(int newState)
   }
 
   prevState = curState;
-
+  
+  //!< this needs to be called everytime a node finishes transition
+  transitionComplete(curState);
 }
 
 /**

@@ -227,7 +227,7 @@ void LandoltCDetection::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   cv_bridge::CvImagePtr in_msg;
   in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
   landoltCFrame = in_msg -> image.clone();
-  
+  landoltcFrameTimestamp = msg->header.stamp;  
   _frame_id = msg->header.frame_id;
     
   if(_frame_id.c_str()[0] == '/')
@@ -275,7 +275,7 @@ void LandoltCDetection::landoltcCallback()
   vision_communications::LandoltcAlertMsg landoltccodeMsg;
 
   landoltcVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
-  landoltcVectorMsg.header.stamp = ros::Time::now();
+  landoltcVectorMsg.header.stamp = landoltcFrameTimestamp;
   
   for(int i = 0; i < _landoltc.size(); i++){
      
@@ -301,7 +301,7 @@ void LandoltCDetection::landoltcCallback()
     ROS_INFO_STREAM("[landoltc_node] : Landoltc found");
     landoltccodeMsg.angles.clear();
   }
-  if(_landoltc.size() >0){
+  if(_landoltc.size() > 0 && landoltcVectorMsg.landoltcAlerts.size() > 0){
     _landoltcPublisher.publish(landoltcVectorMsg);
     landoltcVectorMsg.landoltcAlerts.clear();
   }  
@@ -339,6 +339,9 @@ void LandoltCDetection::startTransition(int newState)
   }
 
   prevState = curState;
+  
+  //!< this needs to be called everytime a node finishes transition
+  transitionComplete(curState);
 
 }
 

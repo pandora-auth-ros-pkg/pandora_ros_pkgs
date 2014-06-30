@@ -1,5 +1,5 @@
 learning_enabled: false
-operation_state: true
+operation_state: false
 camera_name: kinect
 
 hfov: 58.0

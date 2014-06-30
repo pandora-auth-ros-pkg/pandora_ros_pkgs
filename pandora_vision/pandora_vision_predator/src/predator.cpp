@@ -203,6 +203,11 @@ bool Predator::getParentFrameId()
 void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
   
+  if(!predatorNowON)
+  {
+    return;
+  }
+      
   double start = static_cast<double>(cv::getTickCount());
   framecounter++;
   double fps;
@@ -215,6 +220,7 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     cv_bridge::CvImagePtr in_msg;
     in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     PredatorFrame = in_msg -> image.clone();
+    PredatorFrameTimeStamp = msg->header.stamp;
     _frame_id = msg->header.frame_id;
     
     if(_frame_id.c_str()[0] == '/')
@@ -229,14 +235,13 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
     
     std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
       
-    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
-      bool _indicator = getParentFrameId();
-      
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) 
+    {
+      bool _indicator = getParentFrameId();      
       _frame_ids_map.insert( it , std::pair<std::string, std::string>(
-         _frame_id, _parent_frame_id));
+      _frame_id, _parent_frame_id));
     } 
     
-    //cv::Mat grey(PredatorFrame.rows, PredatorFrame.cols, CV_8UC1);
     cvtColor(PredatorFrame, grey, CV_BGR2GRAY);
     
     tld->detectorCascade->imgWidth = grey.cols;
@@ -245,9 +250,7 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
   
     
     tld->processImage(PredatorFrame);
-    
-    //fps = cv::getTickFrequency() / (cv::getTickCount() - start);
-    
+        
     double end = (cvGetTickCount() - start) / cvGetTickFrequency();
 
     end = end / 1000000;
@@ -289,8 +292,6 @@ void Predator::imageCallback(const sensor_msgs::ImageConstPtr& msg)
       
       // draw bounding box
       case 'r':
-      //~ if (semaphore_locked && PredatorFrame.empty() == false)
-                                 //~ break;
 
       ROS_INFO("Draw Bounding Box and Press Enter.");
 
@@ -408,7 +409,6 @@ void Predator::getGeneralParams()
   {
     _landoltc3dPredatorPublisher =
       _nh.advertise<vision_communications::LandoltcPredatorMsg>(param, 1000);
-    ROS_ERROR_STREAM(param);
   }
   else
   {
@@ -637,10 +637,12 @@ void Predator::getGeneralParams()
 void Predator::sendMessage(const cv::Rect& rec, const float& posterior, 
     const sensor_msgs::ImageConstPtr& frame)
 {
+  
   if( operation_state == true){
     
     vision_communications::LandoltcPredatorMsg predatorLandoltcMsg;
     predatorLandoltcMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
+    predatorLandoltcMsg.header.stamp = PredatorFrameTimeStamp;
     predatorLandoltcMsg.x = rec.x;
     predatorLandoltcMsg.y = rec.y;
     predatorLandoltcMsg.width = rec.width;
@@ -655,7 +657,8 @@ void Predator::sendMessage(const cv::Rect& rec, const float& posterior,
     pandora_common_msgs::GeneralAlertMsg predatorAlertMsg;
     
     if(posterior != 0){
-      predatorAlertMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;;
+      predatorAlertMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
+      predatorAlertMsg.header.stamp = PredatorFrameTimeStamp;
       predatorAlertMsg.probability = posterior;
       int center_x = rec.x + rec.width/2;
       int center_y = rec.y + rec.height/2;
@@ -684,7 +687,7 @@ void Predator::startTransition(int newState)
 {
   curState = newState;
 
-  //!< check if datamatrix algorithm should be running now
+  //!< check if predator algorithm should be running now
   predatorNowON =
     (curState ==
      state_manager_communications::robotModeMsg::MODE_EXPLORATION)
@@ -706,7 +709,9 @@ void Predator::startTransition(int newState)
   }
 
   prevState = curState;
-
+  
+  //!< this needs to be called everytime a node finishes transition
+  transitionComplete(curState);
 }
 
 /**
