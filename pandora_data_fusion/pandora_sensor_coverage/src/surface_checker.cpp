@@ -117,8 +117,7 @@ namespace pandora_data_fusion
           {
             if (coveredSurface_->insertRay(position_,
                 pointOnWall,
-                SENSOR_RANGE,
-                true))
+                SENSOR_RANGE))
             {
               octomap::ColorOcTreeNode* node = coveredSurface_->search(pointOnWall);
               if (node != NULL)
@@ -132,7 +131,7 @@ namespace pandora_data_fusion
           }
         }
       }
-      coveredSurface_->updateInnerOccupancy();
+      // coveredSurface_->updateInnerOccupancy();
     }
 
     unsigned char SurfaceChecker::findPointCoverage(const octomap::point3d& pointOnWall,
@@ -270,11 +269,16 @@ namespace pandora_data_fusion
         return pointsOnWall;
       }
 
-    void SurfaceChecker::publishCoverage()
+    void SurfaceChecker::publishCoverage(const std::string& frame)
     {
       coveredSurface_->toMaxLikelihood();
       coveredSurface_->prune();
       octomap_msgs::Octomap msg;
+      msg.header.stamp = ros::Time::now();
+      msg.header.frame_id = frame;
+      msg.binary = false;
+      msg.id = coveredSurface_->getTreeType();
+      msg.resolution = coveredSurface_->getResolution();
       if (octomap_msgs::fullMapToMsg(*coveredSurface_, msg))
         coveragePublisher_.publish(msg);
     }

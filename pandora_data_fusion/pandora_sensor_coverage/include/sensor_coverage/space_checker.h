@@ -76,9 +76,10 @@ namespace pandora_data_fusion
         /**
          * @override
          * @brief publishes coverage map or patch
+         * @param frame [std::string const&] frame id of the coverage.
          * @return void
          */
-        virtual void publishCoverage();
+        virtual void publishCoverage(const std::string& frame);
 
         /**
          * @brief Setter for variable coverageMap3d_

@@ -304,12 +304,9 @@ namespace pandora_data_fusion
               y = jj * oldMetaData.resolution;
               xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
               yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-              int coords = static_cast<int>((ceil((xn + yn * coveredSpace_.info.width)
-                    / coveredSpace_.info.resolution)));
+              int coords = static_cast<int>(round((xn + yn * coveredSpace_.info.width)
+                    / coveredSpace_.info.resolution));
               coveredSpace_.data[coords] = oldCoverage[ii + jj * oldMetaData.width];
-              //int coords = static_cast<int>(floor(xn/coveredSpace_.info.resolution) +
-                    //floor(yn/coveredSpace_.info.resolution) * coveredSpace_.info.width);
-              //coveredSpace_.data[coords] = oldCoverage[ii + jj * oldMetaData.width];
               coverageDilation(2, COORDS(xn, yn, (&coveredSpace_)));
             }
           }
@@ -367,8 +364,10 @@ namespace pandora_data_fusion
       }
     }
 
-    void SpaceChecker::publishCoverage()
+    void SpaceChecker::publishCoverage(const std::string& frame)
     {
+      coveredSpace_.header.stamp = ros::Time::now();
+      coveredSpace_.header.frame_id = frame;
       coveragePublisher_.publish(coveredSpace_);
       std_msgs::Float32 msg;
       msg.data = totalAreaCovered_;

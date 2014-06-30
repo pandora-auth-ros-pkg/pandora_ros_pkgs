@@ -1,11 +1,8 @@
 <launch>
 
-  <node pkg="tf" type="static_transform_publisher" 
-    name="world2map" args="0 0 0 0 0 0 /world /map 100" />
-
   <!--  Sensor Coverage  -->
   <node pkg="pandora_sensor_coverage" type="sensor_coverage_node"              
-    name="sensor_coverage" respawn="false" output="screen" ns="data_fusion" launch-prefix="gdb -ex run --args" /> 
+    name="sensor_coverage" respawn="false" output="screen" ns="data_fusion" /> 
 
   <rosparam file="$(find pandora_sensor_coverage)/config/sensor_coverage/sensor_coverage_params.yaml" 
     command="load" ns="data_fusion/sensor_coverage" />

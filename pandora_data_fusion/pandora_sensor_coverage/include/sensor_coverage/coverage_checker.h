@@ -82,9 +82,10 @@ namespace pandora_data_fusion
 
         /**
          * @brief publishes coverage map or patch
+         * @param frame [std::string const&] frame id of the coverage.
          * @return void
          */
-        virtual void publishCoverage() {}
+        virtual void publishCoverage(const std::string& frame) {}
 
         /**
          * @brief Setter for static variable map2D_
