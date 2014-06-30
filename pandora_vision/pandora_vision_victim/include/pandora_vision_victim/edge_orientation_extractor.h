@@ -41,6 +41,7 @@
 #include <iostream>
 #include <limits>
 #include "ros/ros.h"
+#include "pandora_vision_victim/victim_parameters.h"
 
 //~ #define SHOW_DEBUG_IMAGE
 

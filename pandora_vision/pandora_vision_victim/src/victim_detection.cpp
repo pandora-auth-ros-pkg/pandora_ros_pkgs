@@ -286,29 +286,6 @@ namespace pandora_vision
       
     return false;
   }
-  
-  
-  /**
-   * @brief Function called when new ROS message appears, for camera
-   * @param msg [const sensor_msgs::Image&] The message
-   * @return void
-  */
-  void VictimDetection::dummyimageCallback(const sensor_msgs::Image& msg)
-  {
-    cv_bridge::CvImagePtr in_msg;
-    in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-    _rgbImage = in_msg->image.clone();
-    victimFrameTimestamp = msg.header.stamp;
-    
-    if (_rgbImage.empty() )
-    {
-      ROS_ERROR("[face_node] : No more Frames ");
-      return;
-    }
-    isDepthEnabled = false;
-    isHole = true;
-    checkState();
-  }
 
   /**
    * @brief Function called when new message appears from hole_detector_node
@@ -335,31 +312,14 @@ namespace pandora_vision
       cv_bridge::toCvCopy(msg.depthImage, sensor_msgs::image_encodings::TYPE_8UC1);
     _depthImage = in_msg->image.clone();
     
-    //~ isDepthEnabled = msg.isDepth;
-    isDepthEnabled = false;
+    isDepthEnabled = msg.isDepth;
+    
     
     _frame_id = msg.header.frame_id; 
     victimFrameTimestamp = msg.header.stamp;
     _enhancedHoles = msg;
     if (_enhancedHoles.enhancedHoles.size() > 0)
       isHole = true;
-    
-    
-    
-    //~ for(unsigned int k = 0 ; k < msg.enhancedHoles.size() ; k++)
-    //~ {
-      //~ for(int i = 0; i < 4; i++ ){
-        //~ cv::line(_rgbImage, 
-          //~ cv::Point(msg.enhancedHoles[k].verticesX[i],
-            //~ msg.enhancedHoles[k].verticesY[i]),
-          //~ cv::Point(msg.enhancedHoles[k].verticesX[(i+1)%4],
-            //~ msg.enhancedHoles[k].verticesY[(i+1)%4]), 
-          //~ CV_RGB(255, 0, 0), 1, 8);
-      //~ }
-    //~ }
-    //~ 
-    //~ cv::imshow("blabla",_rgbImage);
-    //~ cv::waitKey(30);
     
     victimFrameTimestamp = in_msg->header.stamp;
     cameraFrameId= in_msg->header.frame_id;
@@ -384,11 +344,17 @@ namespace pandora_vision
   */
   void VictimDetection::checkState()
   {
-    //~ _rgbdImages.clear();
     DetectionImages imgs; 
     _stateIndicator = 2 * isDepthEnabled + isHole + 1;
     
-    imgs.rgb = _rgbImage;
+    {
+      EnhancedMat emat;
+      emat.img = _rgbImage;
+      imgs.rgb = emat;
+      imgs.rgb.bounding_box = cv::Rect(0, 0, 0, 0);
+      imgs.rgb.keypoint = cv::Point2f(0, 0);
+    }
+      
     switch(_stateIndicator)
     {
       case 1:
@@ -399,11 +365,23 @@ namespace pandora_vision
         break;
       case 3:
         _victimDetector->detectionMode = GOT_DEPTH;
-        imgs.depth = _depthImage;
+        {
+          EnhancedMat emat;
+          emat.img = _depthImage;
+          imgs.depth = emat;
+          imgs.depth.bounding_box = cv::Rect(0, 0, 0, 0);
+          imgs.depth.keypoint = cv::Point2f(0, 0);
+        }
         break;
       case 4:
-        _victimDetector->detectionMode = GOT_ALL;
-        imgs.depth = _depthImage;
+      _victimDetector->detectionMode = GOT_ALL;
+        {
+          EnhancedMat emat;
+          emat.img = _depthImage;
+          imgs.depth = emat;
+          imgs.depth.bounding_box = cv::Rect(0, 0, 0, 0);
+          imgs.depth.keypoint = cv::Point2f(0, 0);
+        }
         break;
     }
     for(unsigned int i = 0 ; i < _enhancedHoles.enhancedHoles.size();
@@ -421,15 +399,24 @@ namespace pandora_vision
         maxy = yy > maxy ? yy : maxy;
       }
       cv::Rect rect(minx, miny, maxx - minx, maxy - miny);
-      cv::Mat temp = _rgbImage(rect);
-      cv::resize(temp, temp, cv::Size(640, 480));
-      imgs.rgbMasks.push_back(temp);
+      
+      EnhancedMat emat;
+      emat.img = _rgbImage(rect);
+      cv::resize(emat.img, emat.img, cv::Size(640, 480));
+      emat.bounding_box = rect;
+      emat.keypoint = cv::Point2f(
+        _enhancedHoles.enhancedHoles[i].keypointX,
+        _enhancedHoles.enhancedHoles[i].keypointY
+      );
+
+      imgs.rgbMasks.push_back(emat);
       if(isDepthEnabled)
       {
-        temp = _depthImage(rect);
-        imgs.depthMasks.push_back(temp);
+        emat.img = _depthImage(rect);
+        imgs.depthMasks.push_back(emat);
       }
     }
+    
     victimDetect(imgs);    
   }
   
@@ -442,32 +429,32 @@ namespace pandora_vision
   {
     if(!victimNowON)
       return;
-    int facesNum = 0;
-    facesNum = _victimDetector->victimFusion(imgs);
+
+    std::vector<DetectedVictim> final_victims = _victimDetector->victimFusion(imgs);
     
     //!< Create message of Victim Detector
     pandora_common_msgs::GeneralAlertMsg victimMessage;
     
-    if(facesNum > 0){
-    int* facesTable = _victimDetector->_faceDetector->getFacePositionTable();
-    
-    for(int i = 0;  i < facesNum; i++){
-      // Victim's center coordinates relative to the center of the frame
-      float x = facesTable[i * 4]
+    for(int i = 0;  i < final_victims.size() ; i++){
+      
+      if(final_victims[i].probability < 0.1)
+      {
+        continue;
+      }
+      
+      float x = final_victims[i].keypoint.x
           - static_cast<float>(frameWidth) / 2;
       float y = static_cast<float>(frameHeight) / 2
-          - facesTable[i * 4 + 1];
+          - final_victims[i].keypoint.y;
                                       
       victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
-      victimMessage.header.stamp = ros::Time::now();
-      victimMessage.yaw = atan(2 * x / frameWidth * tan(hfov / 2));;
-      victimMessage.pitch = atan(2 * y / frameHeight * tan(vfov / 2));;
-      victimMessage.probability = _victimDetector->_faceDetector->getProbability();
-      ROS_INFO_STREAM( "[victim_node] :Victim ");
+      victimMessage.header.stamp = victimFrameTimestamp;
+      victimMessage.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
+      victimMessage.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
+      victimMessage.probability = final_victims[i].probability;
+      ROS_INFO_STREAM( "[victim_node] :Victim " << final_victims[i].probability);
       _victimDirectionPublisher.publish(victimMessage);
-     }
-     delete facesTable; 
-    } 
+    }
   }
 
 
@@ -478,7 +465,6 @@ namespace pandora_vision
    */
   void VictimDetection::startTransition(int newState)
   {
-
     curState = newState;
 
     //!< check if face detection algorithm should be running now

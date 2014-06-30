@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ros/ros.h"
+#include "pandora_vision_victim/victim_parameters.h"
 
 namespace pandora_vision
 {

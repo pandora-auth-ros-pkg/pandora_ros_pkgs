@@ -49,10 +49,11 @@ namespace pandora_vision
     ///Load classifier path for rgb subsystem
     _depthSvm.load(depth_classifier_path.c_str());
     
-    _params.svm_type    = CvSVM::C_SVC;
-    _params.kernel_type = CvSVM::LINEAR;
-    _params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
-    ROS_DEBUG("[victim_node] : DepthSystemValidator instance created");
+    _params.svm_type = CvSVM::C_SVC;
+    _params.kernel_type = CvSVM::RBF;
+    _params.C = 312.5;
+    _params.gamma = 0.50625;
+    _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 1e-6);
   }
   
   /**
@@ -69,7 +70,7 @@ namespace pandora_vision
    * @param inImage [cv::Mat] current depth frame to be processed
    * @return void
   */ 
-  void DepthSystemValidator::extractDepthFeatures(cv::Mat inImage)
+  float DepthSystemValidator::calculateSvmDepthProbability(cv::Mat inImage)
   {
     ///Extract statistics oriented features for depth image
     _channelsStatisticsDetector.findDepthChannelsStatisticsFeatures(inImage);
@@ -83,6 +84,8 @@ namespace pandora_vision
       _depthFeatureVector.clear();
     
     setDepthFeatureVector();
+    
+    return predictionToProbability(predict());
   }
   
   /**
@@ -138,14 +141,15 @@ namespace pandora_vision
     * according to the featurevector given for each image
     * @return void
   */ 
-  void DepthSystemValidator::predict()
+  float DepthSystemValidator::predict()
   {
     cv::Mat samples_mat = vectorToMat(_depthFeatureVector);
     
     ///Normalize the data from [-1,1]
     cv::normalize(samples_mat, samples_mat, -1.0, 1.0, cv::NORM_MINMAX, -1);    
-    prediction = _depthSvm.predict(samples_mat, true);
+    float prediction = _depthSvm.predict(samples_mat, true);
     ROS_INFO_STREAM("Depth_subsystem prediction: "<< prediction);
+    return prediction;
   }
   
   /**
@@ -170,8 +174,13 @@ namespace pandora_vision
     * @brief This function prediction according to the rgb classifier
     * @return [float] prediction
   */ 
-  float DepthSystemValidator::getPrediction()
+  float DepthSystemValidator::predictionToProbability(float prediction)
   {
-    return prediction;
+    float probability;
+    //~ Normalize probability to [-1,1]
+    probability = tanh(0.5 * (prediction - 7.0) );
+    //~ Normalize probability to [0,1]
+    probability = (1 + probability) / 2.0;
+    return probability;
   }
 }// namespace pandora_vision 

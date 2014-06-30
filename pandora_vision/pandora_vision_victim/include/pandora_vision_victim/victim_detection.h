@@ -163,9 +163,7 @@ private:
    * @return void
   */
   void imageCallback(const vision_communications::EnhancedHolesVectorMsg& msg);
-  
-  void dummyimageCallback(const sensor_msgs::Image& msg);
-  
+
   /**
     @brief Function that retrieves the parent to the frame_id
     @return bool Returns true is frame_id found or false if not 
@@ -176,6 +174,8 @@ private:
   
   std::string _frame_id;
   std::string _parent_frame_id;
+  
+  VictimParameters params;
    
 public:
 

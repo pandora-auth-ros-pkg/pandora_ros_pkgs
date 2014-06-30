@@ -71,7 +71,7 @@ namespace pandora_vision
    * @param inImage [cv::Mat] current rgb frame to be processed
    * @return void
   */ 
-  void RgbSystemValidator::extractRgbFeatures(cv::Mat inImage)
+  float RgbSystemValidator::calculateSvmRgbProbability(const cv::Mat& inImage)
   {
     ///Extract color and statistics oriented features
     ///for rgb image
@@ -88,7 +88,9 @@ namespace pandora_vision
       _rgbFeatureVector.clear();
     
     setRgbFeatureVector();
-    predict();
+    
+    
+    return predictionToProbability(predict());
   }
   
   /**
@@ -144,14 +146,13 @@ namespace pandora_vision
     * according to the featurevector given for each image
     * @return void
   */ 
-  void RgbSystemValidator::predict()
+  float RgbSystemValidator::predict()
   {
     cv::Mat samples_mat = vectorToMat(_rgbFeatureVector);
     
     ///Normalize the data from [-1,1]
     cv::normalize(samples_mat, samples_mat, -1.0, 1.0, cv::NORM_MINMAX, -1);    
-    prediction = _rgbSvm.predict(samples_mat, true);
-    ROS_INFO_STREAM("Rgb_subsystem prediction: "<< prediction);
+    return _rgbSvm.predict(samples_mat, true);
   }
   
   /**
@@ -177,8 +178,13 @@ namespace pandora_vision
     * @brief This function prediction according to the rgb classifier
     * @return [float] prediction
   */ 
-  float RgbSystemValidator::getPrediction()
+  float RgbSystemValidator::predictionToProbability(float prediction)
   {
-    return prediction;
+    float probability;
+    //~ Normalize probability to [-1,1]
+    probability = tanh(0.5 * (prediction - 7.0) );
+    //~ Normalize probability to [0,1]
+    probability = (1 + probability) / 2.0;
+    return probability;
   }
 }// namespace pandora_vision 

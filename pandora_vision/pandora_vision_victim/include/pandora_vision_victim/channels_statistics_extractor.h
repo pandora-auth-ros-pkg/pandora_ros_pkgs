@@ -39,6 +39,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "ros/ros.h"
+#include "pandora_vision_victim/victim_parameters.h"
 
 namespace pandora_vision
 {
@@ -143,7 +144,7 @@ namespace pandora_vision
      * @param src [cv::Mat] current frame to be processed
      * @return void
     */ 
-    void findChannelsStatisticsFeatures(cv::Mat src);
+    void findChannelsStatisticsFeatures(const cv::Mat& src);
     
     /**
      * @brief This is the main function which calls all other for the 

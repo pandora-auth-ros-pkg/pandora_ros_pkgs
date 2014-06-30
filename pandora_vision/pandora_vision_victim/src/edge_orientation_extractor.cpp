@@ -70,12 +70,14 @@ namespace pandora_vision
       cvtColor( src, src, CV_BGR2GRAY );
     
     //!<block size
-    int colsBlockSize = src.cols/4;
-    int rowsBlockSize = src.rows/4;
-    ROS_INFO_STREAM("src.cols" << src.cols);
-    ROS_INFO_STREAM("src.rows" << src.rows);
+    int colsBlockSize = static_cast<int>(src.cols/4) + 1;
+    int rowsBlockSize = static_cast<int>(src.rows/4) + 1;
+    cv::resize(src, src, cv::Size(
+      static_cast<int>(src.cols/4 + 1) * 4,
+      static_cast<int>(src.rows/4 + 1) * 4)
+    );
     if(src.rows % 4 != 0 && src.cols % 4 != 0)
-      ROS_INFO("[victim_node] : Incorrect Division");
+      ROS_ERROR("[victim_node] : Incorrect Division");
       
     edgeFeatures = partition(src, colsBlockSize, rowsBlockSize);
     

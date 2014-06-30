@@ -93,12 +93,12 @@ namespace pandora_vision
 * @param src [cv::Mat] current frame to be processed
 * @return void
 */
-  void ChannelsStatisticsExtractor::findChannelsStatisticsFeatures(cv::Mat src)
+  void ChannelsStatisticsExtractor::findChannelsStatisticsFeatures(const cv::Mat& src)
   {
     inFrame = src.clone();
     cv::Mat hsv;
     //! Transform it to HSV
-    cvtColor( src, hsv, CV_BGR2HSV );
+    cvtColor( inFrame, hsv, CV_BGR2HSV );
     //!Preprocess current image, to find histogramms in HSV planes
     setHistogramms(hsv);
     

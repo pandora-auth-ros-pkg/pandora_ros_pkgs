@@ -69,52 +69,85 @@ namespace pandora_vision
    * vector can be either 2 or 1, if we have both rgbd information or not
    * @return void
   */ 
-  int VictimDetector::victimFusion(DetectionImages imgs)
+  std::vector<DetectedVictim> VictimDetector::victimFusion(DetectionImages imgs)
   {
-    int faceNum = 0;
-    ///Enable Viola Jones for rgb image
-    faceNum = _faceDetector->findFaces(imgs.rgb);
+    std::vector<DetectedVictim> final_probabilities;
+    
+    std::vector<DetectedVictim> rgb_vj_probabilities;
+    std::vector<DetectedVictim> depth_vj_probabilities;
+    std::vector<DetectedVictim> rgb_svm_probabilities;
+    std::vector<DetectedVictim> depth_svm_probabilities;
+    
+    DetectedVictim temp;
+    
+    ///Enable Viola Jones for rgb image 
+    rgb_vj_probabilities = _faceDetector->findFaces(imgs.rgb.img);
+    
     if(detectionMode == GOT_ALL || detectionMode == GOT_DEPTH)
     {
-      _faceDetector->findFaces(imgs.depth);
+      depth_vj_probabilities = _faceDetector->findFaces(imgs.depth.img);
+      
     }
     if(detectionMode == GOT_ALL || detectionMode == GOT_MASK)
     {
-      for(int i = 0 ; i < imgs.rgbMasks.size(); i++){
-        //~ cv::imshow("rgb mask",imgs.rgbMasks.at(i));
-        //~ cv::waitKey(30);
-        rgbFeaturesDetect(imgs.rgbMasks.at(i));
+      for(int i = 0 ; i < imgs.rgbMasks.size(); i++)
+      {
+        temp.probability = _rgbSystemValidator.calculateSvmRgbProbability(
+            imgs.rgbMasks.at(i).img);
+        temp.keypoint = imgs.rgbMasks[i].keypoint;
+        rgb_svm_probabilities.push_back(temp);
       }  
     }
     if(detectionMode == GOT_ALL)
     {
-      for(int i = 0 ; i < imgs.depthMasks.size(); i++){
-        depthFeaturesDetect(imgs.depthMasks.at(i));
+      for(int i = 0 ; i < imgs.depthMasks.size(); i++)
+      {
+        temp.probability = _depthSystemValidator.calculateSvmDepthProbability(
+            imgs.depthMasks.at(i).img);
+        temp.keypoint = imgs.depthMasks[i].keypoint;
+        depth_svm_probabilities.push_back(temp);
       }
     }
-    return faceNum;
-  }
-  
     
-  /**
-   *@brief Function that extracts handles rgb subsystem
-   *@param [cv::Mat] current frame to be processed
-   *@return void
-  */ 
-  void VictimDetector::rgbFeaturesDetect(cv::Mat _rgbImage)
-  {
-    _rgbSystemValidator.extractRgbFeatures(_rgbImage); 
+    // SVM mask merging
+    if(detectionMode == GOT_ALL)
+    {
+      for(unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
+      {
+        temp.probability = (VictimParameters::depth_svm_weight * depth_svm_probabilities[i].probability + 
+          VictimParameters::rgb_svm_weight * rgb_svm_probabilities[i].probability) / 
+            (VictimParameters::depth_svm_weight + 
+            VictimParameters::rgb_svm_weight);
+        temp.keypoint = depth_svm_probabilities[i].keypoint;
+        final_probabilities.push_back(temp);
+      }
+    }
+    if(detectionMode == GOT_MASK)
+    {
+      for(unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
+      {
+        temp.probability = rgb_svm_probabilities[i].probability * VictimParameters::rgb_svm_weight;
+        temp.keypoint = rgb_svm_probabilities[i].keypoint;
+        final_probabilities.push_back(temp);
+      }
+    }
+    
+    // VJ mask merging (?)
+    for(unsigned int i = 0 ; i < rgb_vj_probabilities.size() ; i++)
+    {
+      temp.probability = rgb_vj_probabilities[i].probability * VictimParameters::rgb_vj_weight;
+      temp.keypoint = rgb_vj_probabilities[i].keypoint;
+      final_probabilities.push_back(temp);
+    }
+    for(unsigned int i = 0 ; i < depth_vj_probabilities.size() ; i++)
+    {
+      temp.probability = depth_vj_probabilities[i].probability * VictimParameters::depth_vj_weight;
+      temp.keypoint = depth_vj_probabilities[i].keypoint;
+      final_probabilities.push_back(temp);
+    }
+    
+    return final_probabilities;
   }
-  
-  /**
-   *@brief Function that extracts handles depth subsystem
-   *@param [cv::Mat] current frame to be processed
-   *@return void
-  */ 
-  void VictimDetector::depthFeaturesDetect(cv::Mat _depthImage)
-  {
-    _depthSystemValidator.extractDepthFeatures(_depthImage); 
-  }
-  
+
 }// namespace pandora_vision
 

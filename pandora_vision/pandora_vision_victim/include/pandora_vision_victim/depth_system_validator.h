@@ -81,7 +81,7 @@ namespace pandora_vision
      * @param inImage [cv::Mat] current depth frame to be processed
      * @return void
      */ 
-    void extractDepthFeatures(cv::Mat inImage);
+    float calculateSvmDepthProbability(cv::Mat inImage);
     
     /**
      * @brief This function creates feature vector according to the
@@ -103,7 +103,7 @@ namespace pandora_vision
      * according to the featurevector given for each image
      * @return void
     */ 
-    void predict();
+    float predict();
     
     /**
      * @brief Function that converts a given vector of doubles
@@ -118,9 +118,7 @@ namespace pandora_vision
      * @brief This function prediction according to the rgb classifier
      * @return [float] prediction
      */ 
-    float getPrediction();
-    
-    float prediction; 
+    float predictionToProbability(float prediction);
     
   };
 }// namespace pandora_vision 

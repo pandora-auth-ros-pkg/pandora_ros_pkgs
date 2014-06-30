@@ -12,11 +12,15 @@ find_package(catkin REQUIRED COMPONENTS
     state_manager_communications
     cv_bridge
     image_transport
+    dynamic_reconfigure
     sensor_msgs
     roslint
     urdf
 )
 
+generate_dynamic_reconfigure_options(
+  config/victim_dyn_reconf.config
+  )
 
 catkin_package(
     DEPENDS
@@ -28,6 +32,7 @@ catkin_package(
       state_manager_communications
       cv_bridge
       image_transport
+      dynamic_reconfigure
       sensor_msgs
       roslint
       urdf
@@ -50,10 +55,12 @@ add_executable(victim_node
     src/channels_statistics_extractor.cpp
     src/edge_orientation_extractor.cpp
     src/haralickfeature_extractor.cpp
+    src/victim_parameters.cpp
 )
 target_link_libraries(victim_node ${catkin_LIBRARIES} )
 add_dependencies(victim_node
     vision_communications_gencpp
+    pandora_vision_victim_gencfg
     ${catkin_EXPORTED_TARGETS}
 )
 

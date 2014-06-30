@@ -40,9 +40,11 @@
 
 #include <opencv2/opencv.hpp>
 #include "ros/ros.h"
+#include "pandora_vision_victim/victim_parameters.h"
 
 namespace pandora_vision
 {
+
   class FaceDetector
   {
     private:
@@ -51,21 +53,6 @@ namespace pandora_vision
 
     std::vector<cv::Rect_<int> > faces_total;
 
-    int _bufferSize;
-
-    int now;
-
-    //!< Total probability of face found in a frame
-    float probability;
-
-    //!< Image buffer used to store frames
-    std::vector<cv::Mat> frame_buffer;
-
-    //!< Vector with partial probabilities that are used to
-    //!< calculate total probability of face according to
-    //!< consistency in last _bufferSize frames
-    std::vector<float> probability_buffer;
-
     //!< Cascade classifier for face detection
     cv::CascadeClassifier trained_cascade;
 
@@ -73,19 +60,12 @@ namespace pandora_vision
     cv::Ptr<cv::FaceRecognizer> trained_model;
 
     /**
-      @brief Initializes frame and probability buffer
-      @param frame [cv::Mat] The current frame
-      @return void
-    */
-    void initFrameProbBuffers(cv::Mat frame);
-
-    /**
       @brief Calls detectMultiscale to scan frame for faces and drawFace
         to create rectangles around the faces found in each frame
       @param frame [cv::Mat] the frame to be scaned.
       @return [int] the number of faces found in each frame
     */
-    int detectFace(cv::Mat frame);
+    std::vector<float> detectFace(cv::Mat frame);
     
     /**
     @brief Crate rectangles to current frame according to the positions
@@ -110,27 +90,20 @@ namespace pandora_vision
       @param frame [cv::Mat] The current frame
       @return number [int] of faces found in current frame
     **/
-    int findFaces(cv::Mat frame);
+    std::vector<DetectedVictim> findFaces(cv::Mat frame);
 
     /**
       @brief Creates the continuous table of faces found that contains
       information for each face in every set of 4 values.
       @return int[] table of face positions and sizes
     */
-    int* getFacePositionTable();
-
-    /**
-      @brief Returns the size of the table with the positions of the
-      faces found
-      @return [int] size of table
-    */
-    int getFaceTableSize();
+    std::vector<cv::Point2f> getAlertKeypoints();
 
     /**
       @brief Returns the probability of the faces detected in the frame
       @return [float] probability value
     */
-    float getProbability();
+    std::vector<float> predictionToProbability(std::vector<float> predictions);
 
   };
 }// namespace pandora_vision

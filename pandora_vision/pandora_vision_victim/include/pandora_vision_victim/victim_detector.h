@@ -52,21 +52,28 @@ namespace pandora_vision
     GOT_DEPTH = 3
   };
   
+  struct EnhancedMat
+  {
+    cv::Mat img;
+    cv::Rect bounding_box;
+    cv::Point2f keypoint;
+  };
+  
+  
   
   struct DetectionImages
   {
-    cv::Mat rgb;
-    cv::Mat depth;
-    std::vector<cv::Mat> rgbMasks;
-    std::vector<cv::Mat> depthMasks;
+    EnhancedMat rgb;
+    EnhancedMat depth;
+    std::vector<EnhancedMat> rgbMasks;
+    std::vector<EnhancedMat> depthMasks;
   };
   
   class VictimDetector
   {
     private:
-      
-      
-    
+      /// Instance of class face_detector
+      FaceDetector* _faceDetector;
       ///Instance of class rgbSystemValidator
       RgbSystemValidator _rgbSystemValidator;
       
@@ -98,24 +105,8 @@ namespace pandora_vision
        * vector can be either 2 or 1, if we have both rgbd information or not
        * @return void
       */ 
-      int victimFusion( DetectionImages imgs );
-      
-      /**
-       *@brief Function that extracts handles rgb subsystem
-       *@param [cv::Mat] current frame to be processed
-       *@return void
-      */ 
-      void rgbFeaturesDetect(cv::Mat _rgbImage);
-      
-      /**
-       *@brief Function that extracts handles depth subsystem
-       *@param [cv::Mat] current frame to be processed
-       *@return void
-      */ 
-      void depthFeaturesDetect(cv::Mat _depthImage);
-      /// Instance of class face_detector
-      FaceDetector* _faceDetector;
-      
+      std::vector<DetectedVictim> victimFusion( DetectionImages imgs );
+     
   }; 
 }// namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_DETECTOR_H
