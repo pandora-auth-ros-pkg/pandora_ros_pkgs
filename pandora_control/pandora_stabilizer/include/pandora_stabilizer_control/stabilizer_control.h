@@ -49,7 +49,7 @@ namespace pandora_control
   {
     private:
       ros::NodeHandle nodeHandle_;
-      ros::Subscriber compassSubscriber_;
+      ros::Subscriber imuSubscriber_;
 
       ros::Publisher laserRollPublisher_;
       ros::Publisher laserPitchPublisher_;

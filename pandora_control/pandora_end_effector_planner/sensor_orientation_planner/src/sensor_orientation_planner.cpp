@@ -262,6 +262,7 @@ namespace pandora_control
   {
     ros::Rate rate(1.1);
     std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
+    double baseRoll, basePitch, baseYaw;
 
     while (ros::ok())
     {
@@ -271,6 +272,20 @@ namespace pandora_control
         actionServer_.setPreempted();
         return;
       }
+
+      tf::StampedTransform baseTransform;
+      try
+      {
+        tfListener_.lookupTransform(
+          "map", "base_link",
+          ros::Time(0), baseTransform);
+      }
+      catch (tf::TransformException ex)
+      {
+        ROS_ERROR("%s", ex.what());
+        continue;
+      }
+      baseTransform.getBasis().getRPY(baseRoll, basePitch, baseYaw);
 
       switch (position_)
       {
@@ -310,6 +325,7 @@ namespace pandora_control
           position_ = HIGH_CENTER;
           break;
       }
+      pitchTargetPosition.data = pitchTargetPosition.data - basePitch;
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       rate.sleep();

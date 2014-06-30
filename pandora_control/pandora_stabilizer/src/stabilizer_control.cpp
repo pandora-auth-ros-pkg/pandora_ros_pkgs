@@ -40,50 +40,65 @@ namespace pandora_control
 {
   StabilizerController::StabilizerController(void)
   {
-    std::string compassTopic;
-    if ( nodeHandle_.hasParam("compass_topic") )
+    std::string imuTopic;
+    if ( nodeHandle_.hasParam("imu_topic") )
     {
-      nodeHandle_.getParam("compass_topic", compassTopic);
+      nodeHandle_.getParam("imu_topic", imuTopic);
       ROS_DEBUG(
-        "[stabilizer_control_node]: Got parameter compass_topic : %s",
-        compassTopic.c_str());
+        "[stabilizer_control_node]: Got parameter imu_topic : %s",
+        imuTopic.c_str());
     }
     else
     {
       ROS_DEBUG(
-        "[stabilizer_control_node] : Parameter compass_topic not found. Using Default");
-      compassTopic = "/sensors/imu";
+        "[stabilizer_control_node] : Parameter imu_topic not found. Using Default");
+      imuTopic = "/sensors/imu";
     }
-    if ( nodeHandle_.hasParam("buffer_size") )
+    std::string rollCommandTopic;
+    if ( nodeHandle_.hasParam("roll_command_topic") )
     {
-      nodeHandle_.getParam("buffer_size", bufferSize_);
-      ROS_DEBUG_STREAM(
-        "[stabilizer_control_node]: Got parameter buffer_size : "
-        << bufferSize_);
+      nodeHandle_.getParam("roll_command_topic", rollCommandTopic);
+      ROS_DEBUG(
+        "[stabilizer_control_node]: Got parameter roll_command_topic : %s",
+        rollCommandTopic.c_str());
     }
     else
     {
-      ROS_DEBUG_STREAM(
-        "[stabilizer_control_node] : Parameter buffer_size not found. Using Default 5");
-      bufferSize_ = 5;
+      ROS_DEBUG(
+        "[stabilizer_control_node] : Parameter roll_command_topic not found. Using Default");
+      rollCommandTopic = "/laser_roll_controller/command";
     }
+    std::string pitchCommandTopic;
+    if ( nodeHandle_.hasParam("pitch_command_topic") )
+    {
+      nodeHandle_.getParam("pitch_command_topic", pitchCommandTopic);
+      ROS_DEBUG(
+        "[stabilizer_control_node]: Got parameter pitch_command_topic : %s",
+        pitchCommandTopic.c_str());
+    }
+    else
+    {
+      ROS_DEBUG(
+        "[stabilizer_control_node] : Parameter pitch_command_topic not found. Using Default");
+      pitchCommandTopic = "/laser_pitch_controller/command";
+    }
+    nodeHandle_.param("buffer_size", bufferSize_, 5);
     nodeHandle_.param("min_roll", minRoll_, -1.57);
     nodeHandle_.param("min_pitch", minPitch_, -1.57);
     nodeHandle_.param("max_roll", maxRoll_, 1.57);
     nodeHandle_.param("max_pitch", maxPitch_, 0.785);
 
-
-    compassSubscriber_ = nodeHandle_.subscribe(
-      compassTopic,
+    imuSubscriber_ = nodeHandle_.subscribe(
+      imuTopic,
       1,
       &StabilizerController::serveImuMessage,
       this);
 
     laserRollPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
-      "/laser_roll_controller/command",
+      rollCommandTopic,
       5);
     laserPitchPublisher_ = nodeHandle_.advertise<std_msgs::Float64>(
-      "/laser_pitch_controller/command",
+      pitchCommandTopic,
       5);
 
     for (int ii = 0; ii < bufferSize_; ii++)
@@ -97,9 +112,9 @@ namespace pandora_control
   void StabilizerController::serveImuMessage(
     const sensor_msgs::ImuConstPtr& msg)
   {
-    double compassYaw;
-    double compassPitch;
-    double compassRoll;
+    double imuYaw;
+    double imuPitch;
+    double imuRoll;
     std_msgs::Float64 str;
 
     tf::Matrix3x3 matrix(
@@ -109,10 +124,10 @@ namespace pandora_control
         msg->orientation.z,
         msg->orientation.w));
 
-    matrix.getRPY(compassRoll, compassPitch, compassYaw);
+    matrix.getRPY(imuRoll, imuPitch, imuYaw);
 
-    rollBuffer_[bufferCounter_] = compassRoll;
-    pitchBuffer_[bufferCounter_] = compassPitch;
+    rollBuffer_[bufferCounter_] = imuRoll;
+    pitchBuffer_[bufferCounter_] = imuPitch;
     bufferCounter_ = fmod(bufferCounter_ + 1, bufferSize_);
 
     double command[2];

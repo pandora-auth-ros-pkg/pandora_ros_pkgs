@@ -124,13 +124,11 @@ namespace pandora_control
 
     // Parse robot description
     const std::string model_param_name = "/robot_description";
-    bool res = nodeHandle_.hasParam(model_param_name);
     std::string robot_model_str="";
-    if (!res || !nodeHandle_.getParam(model_param_name, robot_model_str))
+    while (!nodeHandle_.getParam(model_param_name, robot_model_str))
     {
       ROS_ERROR_STREAM(
         "Robot descripion couldn't be retrieved from param server.");
-      return false;
     }
 
     boost::shared_ptr<urdf::ModelInterface> model(

@@ -1,10 +1,16 @@
 <launch>
+  <!-- load params -->
+  <rosparam
+    command="load"
+    ns="control"
+    file="$(find pandora_stabilizer)/config/stabilizer_control.yaml"/>
 
   <node
     name="stabilizer_control_node"
     pkg="pandora_stabilizer"
     type="stabilizer_control_node" 
     respawn="false"
+    ns="control"
     output="screen"/>
 
 </launch>
