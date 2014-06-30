@@ -461,16 +461,17 @@ namespace pandora_vision
         blobHistogram, inHistogram, CV_COMP_HELLINGER);
 
       // This blob is considered valid if there is a correlation between
-      // blobToRectangleHistogram and the model histogram
-      // (inHistogram)
-      // greater than a threshold and, simultaneously, the blob's histogram
-      // is more loosely correlated to the model histogram than the
-      // blobToRectangleHistogram is
-      // The use of the CV_COMP_HELLINGER for histogram comparison
+      // the histogram of the external to the hole's outline points
+      // and the model histogram (inHistogram) greater than a threshold and,
+      // simultaneously, the correlation between the histogram of the points
+      // inside the hole's outline points and the model histogram is lower than
+      // a threshold.
+      // CAUTION: The use of the CV_COMP_HELLINGER for histogram comparison
       // inverts the inequality checks
       if (rectangleToModelCorrelation <=
         Parameters::HoleFusion::match_texture_threshold &&
-        rectangleToModelCorrelation < blobToModelCorrelation)
+        blobToModelCorrelation >=
+        Parameters::HoleFusion::mismatch_texture_threshold)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
           blobToModelCorrelation - rectangleToModelCorrelation;

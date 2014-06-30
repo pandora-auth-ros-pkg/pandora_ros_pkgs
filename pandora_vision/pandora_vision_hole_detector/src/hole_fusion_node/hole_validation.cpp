@@ -74,28 +74,36 @@ namespace pandora_vision
     // their respective validity probability that will be returned
     std::map<int, float> valid;
 
-    if (Parameters::HoleFusion::validation_process ==
-      VALIDATION_VIA_THRESHOLDING)
+    switch (Parameters::HoleFusion::validation_process)
     {
-      valid = validateHolesViaThresholding(
-        probabilitiesVector2D, filteringMode);
-    }
-    else if (Parameters::HoleFusion::validation_process ==
-      VALIDATION_VIA_WEIGHTING)
-    {
-      valid = validateHolesViaWeighting(
-        probabilitiesVector2D, filteringMode);
-    }
-    else if (Parameters::HoleFusion::validation_process ==
-      VALIDATION_VIA_THRESHOLDED_WEIGHTING)
-    {
-      valid = validateHolesViaThresholdedWeighting(
-        probabilitiesVector2D, filteringMode);
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[Hole Fusion node] Invalid validation process selected.");
+      case VALIDATION_VIA_THRESHOLDING :
+        {
+          valid = validateHolesViaThresholding(
+            probabilitiesVector2D, filteringMode);
+
+          break;
+        }
+      case VALIDATION_VIA_WEIGHTING :
+        {
+          valid = validateHolesViaWeighting(
+            probabilitiesVector2D, filteringMode);
+
+          break;
+        }
+      case VALIDATION_VIA_THRESHOLDED_WEIGHTING :
+        {
+          valid = validateHolesViaThresholdedWeighting(
+            probabilitiesVector2D, filteringMode);
+
+          break;
+        }
+      default:
+        {
+          ROS_ERROR_NAMED(PKG_NAME,
+            "[Hole Fusion node] Invalid validation process selected.");
+
+          break;
+        }
     }
 
     #ifdef DEBUG_TIME

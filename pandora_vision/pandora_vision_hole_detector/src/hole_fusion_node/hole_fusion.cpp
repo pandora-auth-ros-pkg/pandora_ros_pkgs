@@ -1048,6 +1048,10 @@ namespace pandora_vision
     Parameters::HoleFusion::match_texture_threshold =
       config.match_texture_threshold;
 
+    // The threshold for texture mismatching
+    Parameters::HoleFusion::mismatch_texture_threshold =
+      config.mismatch_texture_threshold;
+
     // Color homogeneity parameters
     Parameters::HoleFusion::num_bins_threshold =
       config.num_bins_threshold;

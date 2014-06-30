@@ -255,6 +255,9 @@ namespace pandora_vision
       // The threshold for texture matching
       static float match_texture_threshold;
 
+      // The threshold for texture mismatching
+      static float mismatch_texture_threshold;
+
       // Color homogeneity parameters
       static int num_bins_threshold;
       static int non_zero_points_in_box_blob_histogram;
