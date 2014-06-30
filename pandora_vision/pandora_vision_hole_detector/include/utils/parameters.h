@@ -223,6 +223,9 @@ namespace pandora_vision
       static int run_checker_texture_backproject_urgent;
       static float checker_texture_backproject_urgent_threshold;
 
+      // In the terminal window, show the probabilities of candidate holes
+      static bool show_probabilities;
+
       // The holes' validation process identifier
       static int validation_process;
 

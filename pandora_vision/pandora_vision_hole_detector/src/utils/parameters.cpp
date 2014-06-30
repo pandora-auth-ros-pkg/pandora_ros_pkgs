@@ -193,6 +193,10 @@ namespace pandora_vision
   int Parameters::HoleFusion::run_checker_texture_backproject_urgent = 4;
   float Parameters::HoleFusion::checker_texture_backproject_urgent_threshold = 0.4;
 
+
+  // In the terminal window, show the probabilities of candidate holes
+  bool Parameters::HoleFusion::show_probabilities = false;
+
   // The holes' validation process identifier
   int Parameters::HoleFusion::validation_process = 0;
 

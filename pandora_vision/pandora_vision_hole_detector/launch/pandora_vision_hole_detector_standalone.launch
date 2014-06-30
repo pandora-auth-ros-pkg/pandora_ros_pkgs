@@ -104,6 +104,7 @@
     type="hole_fusion_node"
     pkg="pandora_vision_hole_detector"
     respawn="False"
+    output="screen"
     ns="$(arg namespace)">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/hole_fusion_node_topics.yaml"

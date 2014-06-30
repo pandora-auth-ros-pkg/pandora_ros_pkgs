@@ -982,6 +982,10 @@ namespace pandora_vision
     Parameters::HoleFusion::checker_texture_backproject_urgent_threshold =
       config.checker_texture_backproject_urgent_threshold;
 
+    // In the terminal window, show the probabilities of candidate holes
+    Parameters::HoleFusion::show_probabilities =
+      config.show_probabilities;
+
     // The inflation size of the bounding box's vertices
     Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;
@@ -1332,6 +1336,23 @@ namespace pandora_vision
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D;
     probabilitiesVector2D = filterHoles(rgbdPlusMergedConveyor);
+
+    if (Parameters::HoleFusion::show_probabilities)
+    {
+      for(int i = 0; i < rgbdPlusMergedConveyor.size(); i++)
+      {
+        ROS_INFO_NAMED(PKG_NAME, "--------------------------------");
+        ROS_INFO_NAMED(PKG_NAME, "Keypoint [%f %f]",
+          rgbdPlusMergedConveyor.holes[i].keypoint.pt.x,
+          rgbdPlusMergedConveyor.holes[i].keypoint.pt.y);
+
+        for (int j = 0; j < probabilitiesVector2D.size(); j++)
+        {
+          ROS_INFO_STREAM_NAMED(PKG_NAME,
+            "filter j = " << j << ": " <<probabilitiesVector2D[j][i]);
+        }
+      }
+    }
 
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
