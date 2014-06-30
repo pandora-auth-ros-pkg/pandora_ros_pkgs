@@ -471,7 +471,8 @@ namespace pandora_vision
       if (rectangleToModelCorrelation <=
         Parameters::HoleFusion::match_texture_threshold &&
         blobToModelCorrelation >=
-        Parameters::HoleFusion::mismatch_texture_threshold)
+        Parameters::HoleFusion::mismatch_texture_threshold &&
+        rectangleToModelCorrelation < blobToModelCorrelation)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =
           blobToModelCorrelation - rectangleToModelCorrelation;
