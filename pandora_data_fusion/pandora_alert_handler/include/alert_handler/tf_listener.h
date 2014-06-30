@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -54,22 +54,24 @@ namespace pandora_data_fusion
     class TfListener
     {
       public:
-
+        //!< Type Definitions
         typedef boost::shared_ptr<TfListener> Ptr;
         typedef boost::shared_ptr<TfListener const> ConstPtr;
 
+      public:
         TfListener() {}
 
-        virtual bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
+        virtual bool waitForTransform(const std::string& target_frame,
+            const std::string& source_frame, const ros::Time& time,
+            const ros::Duration& timeout,
+            const ros::Duration& polling_sleep_duration = ros::Duration(0.01),
             std::string* error_msg = NULL) const
         {
           return true;
         }
-        virtual void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
+
+        virtual void lookupTransform(const std::string& target_frame,
+            const std::string& source_frame, const ros::Time& time,
             tf::StampedTransform& transform) const
         {
           transform.setOrigin(tf::Vector3(5, 5, 0.3));
@@ -83,22 +85,19 @@ namespace pandora_data_fusion
     class RosTfListener: public TfListener
     {
       public:
-
         RosTfListener();
 
-        bool waitForTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
-            const ros::Duration& timeout, 
-            const ros::Duration& polling_sleep_duration = ros::Duration(0.01), 
+        bool waitForTransform(const std::string& target_frame,
+            const std::string& source_frame, const ros::Time& time,
+            const ros::Duration& timeout,
+            const ros::Duration& polling_sleep_duration = ros::Duration(0.01),
             std::string* error_msg = NULL) const;
-        void lookupTransform(const std::string& target_frame, 
-            const std::string& source_frame, const ros::Time& time, 
+        void lookupTransform(const std::string& target_frame,
+            const std::string& source_frame, const ros::Time& time,
             tf::StampedTransform& transform) const;
 
       private:
-
         tf::TransformListener listener;
-
     };
 
 }  // namespace pandora_alert_handler

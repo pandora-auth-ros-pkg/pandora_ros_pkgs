@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
@@ -51,8 +51,7 @@ namespace pandora_data_fusion
     class VictimClustererTest : public ::testing::Test
     {
       protected:
-
-        VictimClustererTest() 
+        VictimClustererTest()
           : victimClustererPtr_( new VictimClusterer(3) )
         {
           ros::Time::init();
@@ -62,7 +61,7 @@ namespace pandora_data_fusion
 
         /* Helper functions */
 
-        //!< We create manually Thermal1(0, 3.87, 4), 
+        //!< We create manually Thermal1(0, 3.87, 4),
         //!< Thermal2(1, 0, 2), Hole1(-1, 0, 2)
         void createVariousObjects1(ObjectConstPtrVectorPtr objConstPtrVectPtr)
         {
@@ -81,9 +80,9 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(thermalPtr1);
           objConstPtrVectPtr->push_back(thermalPtr2);
           objConstPtrVectPtr->push_back(holePtr1);
-        } 
+        }
 
-        //!< We create manually Thermal1(2, 3, 4), 
+        //!< We create manually Thermal1(2, 3, 4),
         //!< Hole1(4, 3, 2), Hole2(0, 4, 2) with yaw=PI/4
         void createVariousObjects2(ObjectConstPtrVectorPtr objConstPtrVectPtr)
         {
@@ -104,7 +103,7 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(thermalPtr1);
           objConstPtrVectPtr->push_back(holePtr1);
           objConstPtrVectPtr->push_back(holePtr2);
-        } 
+        }
 
         //!< We create manually Thermal1(0, 3.87, 4), Thermal2(1, 0, 2), Hole1(-1, 0, 2)
         void createVariousObjects3(ObjectConstPtrVectorPtr objConstPtrVectPtr)
@@ -167,16 +166,16 @@ namespace pandora_data_fusion
 
         ObjectConstPtrVectorVector groupObjects(const ObjectConstPtrVectorPtr& allObjects)
         {
-          return victimClustererPtr_->groupObjects(allObjects); 
+          return victimClustererPtr_->groupObjects(allObjects);
         }
 
         geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects)
         {
           return victimClustererPtr_->findGroupCenterPoint(objects);
         }
-        
+
         /* Accesing private variables */
-        
+
         float* getclusterRadius()
         {
           return &victimClustererPtr_->CLUSTER_RADIUS;
@@ -205,23 +204,23 @@ namespace pandora_data_fusion
 
       victimClustererPtr_->updateParams(-3);
       EXPECT_FLOAT_EQ(-3, *getclusterRadius());
-    } 
+    }
 
     TEST_F(VictimClustererTest, findGroupCenterPoint)
     {
       ObjectConstPtrVectorPtr objConstPtrVect1( new ObjectConstPtrVector );
       ObjectConstPtrVectorPtr objConstPtrVect2( new ObjectConstPtrVector );
-      geometry_msgs::Point point1; 
+      geometry_msgs::Point point1;
       // Thermal1(0, 3.87, 4), Thermal2(1, 0, 2), Hole1(-1, 0, 2)
       createVariousObjects1(objConstPtrVect1);
       point1 = findGroupCenterPoint(*objConstPtrVect1);
       EXPECT_FLOAT_EQ(0, point1.x);
-      EXPECT_FLOAT_EQ(1.29, point1.y); 
+      EXPECT_FLOAT_EQ(1.29, point1.y);
       // Thermal1(2, 3, 4), Hole1(4, 3, 2), Hole2(0, 4, 2)
       createVariousObjects2(objConstPtrVect2);
       point1 = findGroupCenterPoint(*objConstPtrVect2);
       EXPECT_FLOAT_EQ(2, point1.x);
-      EXPECT_NEAR(3.334, point1.y, 0.001);  
+      EXPECT_NEAR(3.334, point1.y, 0.001);
     }
 
     TEST_F(VictimClustererTest, groupObjects)
@@ -264,7 +263,7 @@ namespace pandora_data_fusion
       EXPECT_EQ(2, groupedObjects[1].size());
       EXPECT_EQ(2, groupedObjects[2].size());
       EXPECT_EQ(1, groupedObjects[3].size());
-    } 
+    }
 
     TEST_F(VictimClustererTest, createVictimList)
     {

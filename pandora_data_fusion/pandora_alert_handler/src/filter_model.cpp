@@ -32,9 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
+
+#include <vector>
 
 #include "alert_handler/filter_model.h"
 
@@ -75,7 +77,7 @@ namespace pandora_data_fusion
       systemNoiseMean(1) = 0.0;
       systemNoiseVariance(1, 1) = pow(systemStdDev, 2);
 
-      BFL::Gaussian systemUncertainty(systemNoiseMean, systemNoiseVariance); 
+      BFL::Gaussian systemUncertainty(systemNoiseMean, systemNoiseVariance);
       systemPdfPtr_.reset( new AnalyticGaussian(matrixAB, systemUncertainty) );
 
       systemModelX_.reset( new SystemModel(systemPdfPtr_.get()) );
@@ -97,14 +99,14 @@ namespace pandora_data_fusion
       measurementMean(1) = 0.0;
       measurementVariance(1, 1) = pow(measurementStdDev, 2);
 
-      BFL::Gaussian measurementUncertainty(measurementMean, 
+      BFL::Gaussian measurementUncertainty(measurementMean,
           measurementVariance);
-      measurementPdfPtrX_.reset( new AnalyticGaussian(matrixH, 
-            measurementUncertainty ));
-      measurementPdfPtrY_.reset( new AnalyticGaussian(matrixH, 
-            measurementUncertainty ));
-      measurementPdfPtrZ_.reset( new AnalyticGaussian(matrixH, 
-            measurementUncertainty ));
+      measurementPdfPtrX_.reset( new AnalyticGaussian(matrixH,
+            measurementUncertainty) );
+      measurementPdfPtrY_.reset( new AnalyticGaussian(matrixH,
+            measurementUncertainty) );
+      measurementPdfPtrZ_.reset( new AnalyticGaussian(matrixH,
+            measurementUncertainty) );
 
       measurementModelX_.reset( new MeasurementModel(measurementPdfPtrX_.get()) );
       measurementModelY_.reset( new MeasurementModel(measurementPdfPtrY_.get()) );

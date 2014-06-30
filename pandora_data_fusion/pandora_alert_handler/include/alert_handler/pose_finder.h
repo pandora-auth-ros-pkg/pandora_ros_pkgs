@@ -41,8 +41,9 @@
 #ifndef ALERT_HANDLER_POSE_FINDER_H
 #define ALERT_HANDLER_POSE_FINDER_H
 
-#include <utility> 
+#include <utility>
 #include <vector>
+#include <string>
 #include <boost/utility.hpp>
 
 #include <tf/transform_broadcaster.h>

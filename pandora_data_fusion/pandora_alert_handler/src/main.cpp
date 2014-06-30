@@ -47,10 +47,10 @@ using pandora_data_fusion::pandora_alert_handler::AlertHandler;
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "alert_handler", ros::init_options::NoSigintHandler);
-  if(argc == 1 && !strcmp(argv[0], "--debug"))
+  if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
-    if( ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) 
+    if (ros::console::set_logger_level(
+          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
     {
       ros::console::notifyLoggerLevelsChanged();
     }

@@ -32,9 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
+
+#include <string>
 
 #include "alert_handler/object_handler.h"
 
@@ -45,7 +47,7 @@ namespace pandora_data_fusion
 
     ObjectHandler::ObjectHandler(const NodeHandlePtr& nh,
         const VictimListConstPtr& victimsToGoList,
-        const VictimListConstPtr& victimsVisitedList) : 
+        const VictimListConstPtr& victimsVisitedList) :
       victimsToGoList_(victimsToGoList),
       victimsVisitedList_(victimsVisitedList)
     {
@@ -101,18 +103,17 @@ namespace pandora_data_fusion
     {
       keepValidHoles(newHoles, transform);
 
-      for(int ii = 0; ii < newHoles->size(); ++ii)
+      for (int ii = 0; ii < newHoles->size(); ++ii)
       {
-        Hole::getList()->add( newHoles->at(ii) );
+        Hole::getList()->add(newHoles->at(ii));
       }
     }
 
-    void ObjectHandler::handleQrs(const QrPtrVectorPtr& newQrs) 
+    void ObjectHandler::handleQrs(const QrPtrVectorPtr& newQrs)
     {
-      for(int ii = 0; ii < newQrs->size(); ++ii)
+      for (int ii = 0; ii < newQrs->size(); ++ii)
       {
-        int qrScore = Qr::getList()->add(newQrs->at(ii));
-        if(qrScore)
+        if (Qr::getList()->add(newQrs->at(ii)))
         {
           pandora_data_fusion_msgs::QrNotificationMsg newQrNofifyMsg;
           newQrNofifyMsg.header.stamp = newQrs->at(ii)->getTimeFound();
@@ -121,7 +122,7 @@ namespace pandora_data_fusion
           newQrNofifyMsg.content = newQrs->at(ii)->getContent();
           qrPublisher_.publish(newQrNofifyMsg);
           std_msgs::Int32 updateScoreMsg;
-          roboCupScore_ += qrScore;
+          roboCupScore_ += Qr::getObjectScore();
           updateScoreMsg.data = roboCupScore_;
           scorePublisher_.publish(updateScoreMsg);
         }
@@ -136,14 +137,14 @@ namespace pandora_data_fusion
 
       HolePtrVector::iterator iter = holesPtr->begin();
 
-      while(iter != holesPtr->end())
+      while (iter != holesPtr->end())
       {
         bool invalid = !Utils::arePointsInRange((*iter)->getPose().position,
-            framePosition, SENSOR_RANGE );
+            framePosition, SENSOR_RANGE);
 
-        if(invalid)
+        if (invalid)
         {
-          ROS_DEBUG_NAMED("object_handler",
+          ROS_DEBUG_NAMED("OBJECT_HANDLER",
               "[OBJECT_HANDLER %d] Deleting not valid hole...", __LINE__);
           iter = holesPtr->erase(iter);
         }

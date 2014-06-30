@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -46,7 +46,7 @@ namespace pandora_data_fusion
   {
 
     /**
-     * @details 
+     * @details
      */
     VictimHandler::VictimHandler(VictimListPtr victimsToGoList,
         VictimListPtr victimsVisitedList) :
@@ -55,7 +55,7 @@ namespace pandora_data_fusion
     {
       Victim::setObjectType("VICTIM");
 
-      clusterer_.reset( new VictimClusterer(0.2) );
+      clusterer_.reset(new VictimClusterer(0.2));
     }
 
     /**
@@ -63,19 +63,19 @@ namespace pandora_data_fusion
      * the list with the unvisited victims with it.
      */
     void VictimHandler::notify()
-    {  
-      ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();  
+    {
+      ObjectConstPtrVectorPtr allObjects = getAllLegitObjects();
 
       VictimPtrVector newVictimVector = clusterer_->createVictimList(allObjects);
 
-      for(int ii = 0; ii < newVictimVector.size(); ii++)
+      for (int ii = 0; ii < newVictimVector.size(); ii++)
       {
-        if(victimsVisitedList_->contains(newVictimVector[ii]))
+        if (victimsVisitedList_->contains(newVictimVector[ii]))
         {
           continue;
         }
         bool victimIsNew = victimsToGoList_->add(newVictimVector[ii]);
-        if(victimIsNew)
+        if (victimIsNew)
         {
           ROS_INFO_NAMED("victim_handler",
               "[VICTIM_HANDLER %d] New victim found ", __LINE__);
@@ -95,7 +95,7 @@ namespace pandora_data_fusion
 
     /**
      * @details Collects from object lists, all these objects
-     * that are thought to be legitimate and are to be grouped to 
+     * that are thought to be legitimate and are to be grouped to
      * Victim objects. Delegates to ObjectList.
      */
     ObjectConstPtrVectorPtr VictimHandler::getAllLegitObjects()
@@ -117,7 +117,7 @@ namespace pandora_data_fusion
      */
     void VictimHandler::getVictimsInfo(
         pandora_data_fusion_msgs::WorldModelMsg* worldModelMsg)
-    {  
+    {
       victimsToGoList_->getVictimsInfo(&(worldModelMsg->victims));
       victimsVisitedList_->getVictimsInfo(&(worldModelMsg->visitedVictims));
     }
@@ -129,7 +129,7 @@ namespace pandora_data_fusion
     {
       VictimPtr deletedVictim( new Victim );
       bool deleted = victimsToGoList_->deleteVictim(victimId, deletedVictim);
-      if(deleted)
+      if (deleted)
       {
         Hole::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
         Thermal::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
@@ -148,7 +148,7 @@ namespace pandora_data_fusion
     {
       VictimPtr currentVictim = victimsToGoList_->validateVictim(victimId, victimValid);
 
-      if(currentVictim.get())
+      if (currentVictim.get())
       {
         victimsVisitedList_->addUnchanged(currentVictim);
         return true;
@@ -158,7 +158,7 @@ namespace pandora_data_fusion
 
     ////////////////////////////////////////////////////////////////////////////////
 
-    void VictimHandler::getVictimsPosesStamped(PoseStampedVector* victimsToGo, 
+    void VictimHandler::getVictimsPosesStamped(PoseStampedVector* victimsToGo,
         PoseStampedVector* victimsVisited)
     {
       victimsToGoList_->getObjectsPosesStamped(victimsToGo);
@@ -166,7 +166,7 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details 
+     * @details
      */
     void VictimHandler::fillGeotiff(
         pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response* res)
@@ -175,7 +175,7 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details 
+     * @details
      */
     void VictimHandler::getVisualization(
         visualization_msgs::MarkerArray* victimsVisitedMarkers,
@@ -186,7 +186,7 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details 
+     * @details
      */
     void VictimHandler::updateParams(float clusterRadius, float sameVictimRadius)
     {
@@ -196,7 +196,7 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details 
+     * @details
      */
     void VictimHandler::flush()
     {

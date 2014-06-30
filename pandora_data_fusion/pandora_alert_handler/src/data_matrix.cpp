@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -47,7 +47,7 @@ namespace pandora_data_fusion
 
     bool DataMatrix::isSameObject(const ObjectConstPtr& object) const
     {
-      bool cond = Object<DataMatrix>::isSameObject(object) 
+      bool cond = Object<DataMatrix>::isSameObject(object)
         && !content_.compare(
             boost::dynamic_pointer_cast<const DataMatrix>(object)->getContent());
 

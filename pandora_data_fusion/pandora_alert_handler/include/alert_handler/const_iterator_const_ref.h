@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -57,11 +57,9 @@ namespace pandora_data_fusion
         >
     {
       private:
-
         struct enabler {};  // a private type avoids misuse
 
       public:
-
         const_iterator_const_ref()
           : const_iterator_const_ref::iterator_adaptor_(Iterator()) {}
 
@@ -87,9 +85,7 @@ namespace pandora_data_fusion
           : const_iterator_const_ref::iterator_adaptor_(other.base()) {}
 
       private:
-
         friend class boost::iterator_core_access;
-
     };
 
 }  // namespace pandora_alert_handler

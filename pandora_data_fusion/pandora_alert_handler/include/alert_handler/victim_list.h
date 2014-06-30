@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -58,15 +58,14 @@ namespace pandora_data_fusion
   {
 
     class VictimList : public ObjectList<Victim>
-    {  
+    {
       public:
-
         /**
          * @brief Constructor
          * @param counterThreshold [float] Initialization value for counterThreshold
          * @param distanceThreshold [float] Initialization value for distanceThreshold
          * @param approachDistance [float] Initialization value for approachDistance
-         */ 
+         */
         VictimList();
 
         /**
@@ -78,7 +77,7 @@ namespace pandora_data_fusion
         bool contains(const VictimConstPtr& victim) const;
 
         /**
-         * @brief Inspects the objects contained in each victim and calculates 
+         * @brief Inspects the objects contained in each victim and calculates
          * an associated probability to the victim.
          * @return void
          */
@@ -122,7 +121,6 @@ namespace pandora_data_fusion
         void clear();
 
       protected:
-
         /**
          * @override
          */
@@ -130,7 +128,6 @@ namespace pandora_data_fusion
             const IteratorList& iteratorList);
 
       private:
-
         friend class VictimListTest;
     };
 

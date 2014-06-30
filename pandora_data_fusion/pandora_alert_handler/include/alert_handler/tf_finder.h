@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -54,14 +54,13 @@ namespace pandora_data_fusion
     class TfFinder : private boost::noncopyable
     {
       public:
-
         static TfListener* newTfListener(const std::string& type)
         {
-          if( type == "SLAM" )
+          if (type == "SLAM")
           {
             return new RosTfListener;
           }
-          if( type == "TEST" )
+          if (type == "TEST")
           {
             return new TfListener;
           }
@@ -71,7 +70,6 @@ namespace pandora_data_fusion
             return NULL;
           }
         }
-
     };
 
 }  // namespace pandora_alert_handler

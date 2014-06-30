@@ -68,7 +68,7 @@ namespace pandora_data_fusion
       return sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
     }
 
-    geometry_msgs::Quaternion Utils::calculateQuaternion(Point a, 
+    geometry_msgs::Quaternion Utils::calculateQuaternion(Point a,
         Point b)
     {
       tfScalar yaw;
@@ -100,15 +100,15 @@ namespace pandora_data_fusion
 
     float Utils::probabilityFromStdDev(float boundingRadius, float deviation)
     {
-      if(boundingRadius <= 0)
+      if (boundingRadius <= 0)
       {
         throw std::range_error("Bounding radius haw always a positive value.");
       }
-      if(deviation < 0)
+      if (deviation < 0)
       {
         throw std::range_error("Standard deviation is a positive value.");
       }
-      if(deviation == 0)
+      if (deviation == 0)
         return 1;
       float x = boundingRadius / deviation;
       return 1 - exp(-pow(x, 2) / 2);
@@ -116,11 +116,11 @@ namespace pandora_data_fusion
 
     float Utils::stdDevFromProbability(float boundingRadius, float probability)
     {
-      if(boundingRadius <= 0)
+      if (boundingRadius <= 0)
       {
         throw std::range_error("Bounding radius haw always a positive value.");
       }
-      if(probability > 1 || probability < 0)
+      if (probability > 1 || probability < 0)
       {
         throw std::range_error("Probability value is between 0 and 1.");
       }

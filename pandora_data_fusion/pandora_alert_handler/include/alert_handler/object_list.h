@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -58,23 +58,21 @@ namespace pandora_data_fusion
       class ObjectList
       {
         public:
-
           //!< Type Definitions
           typedef boost::shared_ptr< ObjectType > Ptr;
           typedef boost::shared_ptr< ObjectType const > ConstPtr;
           typedef std::list< Ptr > List;
-          typedef typename List::iterator iterator;  
+          typedef typename List::iterator iterator;
           typedef typename List::const_iterator const_iterator_vol_ref;
           typedef typename List::const_iterator const_iterator;
-          // typedef const_iterator_const_ref<const_iterator_vers_ref, Ptr, 
+          // typedef const_iterator_const_ref<const_iterator_vers_ref, Ptr,
           // ConstPtr> const_iterator;
           typedef std::list<iterator> IteratorList;
 
         public:
+          ObjectList();
 
-          ObjectList(); 
-
-          int add(const Ptr& object);
+          bool add(const Ptr& object);
 
           /**
            * @brief Fills a vector with all legit ObjectTypes from list.
@@ -100,7 +98,6 @@ namespace pandora_data_fusion
           void getVisualization(visualization_msgs::MarkerArray* markers) const;
 
         protected:
-
           bool isAnExistingObject(
               const ConstPtr& object, IteratorList* iteratorListPtr);
 
@@ -110,15 +107,12 @@ namespace pandora_data_fusion
           void removeElementAt(iterator it);
 
         protected:
-
           List objects_;
 
         private:
-
           int id_;
 
         private:
-
           friend class ObjectListTest;
       };
 
@@ -127,7 +121,7 @@ namespace pandora_data_fusion
     typedef boost::shared_ptr< const ObjectList<BaseObject> > ObjectListConstPtr;
 
     template <class ObjectType>
-      ObjectList<ObjectType>::ObjectList() 
+      ObjectList<ObjectType>::ObjectList()
       {
         id_ = 0;
       }
@@ -147,19 +141,19 @@ namespace pandora_data_fusion
       }
 
     template <class ObjectType>
-      int ObjectList<ObjectType>::add(const Ptr& object)
+      bool ObjectList<ObjectType>::add(const Ptr& object)
       {
         IteratorList iteratorList;
 
         if (isAnExistingObject(object, &iteratorList))
         {
           updateObjects(object, iteratorList);
-          return 0;
+          return false;
         }
 
         object->setId(id_++);
         objects_.push_back(object);
-        return ObjectType::getObjectScore();
+        return true;
       }
 
     template <class ObjectType>
@@ -168,9 +162,9 @@ namespace pandora_data_fusion
       {
         const_iterator objectIt;
 
-        for(objectIt = objects_.begin(); objectIt != objects_.end(); ++objectIt)
+        for (objectIt = objects_.begin(); objectIt != objects_.end(); ++objectIt)
         {
-          if((*objectIt)->getLegit())
+          if ((*objectIt)->getLegit())
           {
             vector->push_back(*objectIt);
           }
@@ -207,20 +201,20 @@ namespace pandora_data_fusion
       bool ObjectList<ObjectType>::isObjectPoseInList(
           const ObjectConstPtr& object, float radius, bool is3D) const
       {
-        for(const_iterator it = this->begin(); it != this->end(); ++it)
+        for (const_iterator it = this->begin(); it != this->end(); ++it)
         {
           float distance = 0;
-          if(is3D)
+          if (is3D)
           {
-            distance = Utils::distanceBetweenPoints3D(object->getPose().position, 
+            distance = Utils::distanceBetweenPoints3D(object->getPose().position,
                 (*it)->getPose().position);
           }
           else
           {
-            distance = Utils::distanceBetweenPoints2D(object->getPose().position, 
+            distance = Utils::distanceBetweenPoints2D(object->getPose().position,
                 (*it)->getPose().position);
           }
-          if(distance < radius)
+          if (distance < radius)
           {
             return true;
           }
@@ -240,13 +234,13 @@ namespace pandora_data_fusion
           bool inRange = Utils::distanceBetweenPoints3D(
               object->getPose().position, (*iter)->getPose().position) < range;
 
-          if ( inRange ) 
+          if (inRange)
           {
-            ROS_DEBUG_NAMED("object_handler",
-                "[OBJECT_HANDLER %d] Deleting hole...", __LINE__);
-            objects_.erase(iter++);
+            ROS_DEBUG_NAMED("OBJECT_LIST",
+                "[OBJECT_LIST %d] Deleting hole...", __LINE__);
+            iter = objects_.erase(iter);
           }
-          else 
+          else
           {
             ++iter;
           }
@@ -295,7 +289,7 @@ namespace pandora_data_fusion
             iteratorListPtr->push_back(it);
           }
         }
-        if (!iteratorListPtr->empty()) 
+        if (!iteratorListPtr->empty())
         {
           return true;
         }
@@ -306,7 +300,7 @@ namespace pandora_data_fusion
       void ObjectList<ObjectType>::updateObjects(const ConstPtr& object,
           const IteratorList& iteratorList)
       {
-        for ( typename IteratorList::const_iterator it = iteratorList.begin(); 
+        for (typename IteratorList::const_iterator it = iteratorList.begin();
             it != iteratorList.end(); ++it)
         {
           (*(*it))->update(object);

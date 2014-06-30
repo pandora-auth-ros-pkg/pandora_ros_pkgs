@@ -38,6 +38,10 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <utility>
+#include <vector>
+#include <string>
+
 #include "alert_handler/pose_finder.h"
 
 namespace pandora_data_fusion
@@ -45,10 +49,10 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    PoseFinder::PoseFinder(const MapPtr& map, const std::string& mapType) 
+    PoseFinder::PoseFinder(const MapPtr& map, const std::string& mapType)
       : map_(map)
     {
-      listener_.reset( TfFinder::newTfListener(mapType) );
+      listener_.reset(TfFinder::newTfListener(mapType));
     }
 
     void PoseFinder::updateParams(float occupiedCellThres,
@@ -63,7 +67,7 @@ namespace pandora_data_fusion
     }
 
     /* DEPRECATED
-    void PoseFinder::publishVisionTransform(float alertYaw, float alertPitch, 
+    void PoseFinder::publishVisionTransform(float alertYaw, float alertPitch,
         tf::Transform worldHeadCameraTransform)
     {
       tfScalar cameraYaw, cameraPitch, cameraRoll;
@@ -151,8 +155,8 @@ namespace pandora_data_fusion
         onWall.x = x;
         onWall.y = y;
         return onWall;
-      } 
-      else 
+      }
+      else
         throw AlertException("Can not find point on wall");
     }
 
@@ -186,7 +190,7 @@ namespace pandora_data_fusion
       //!< diametrically opposite of the second
       if (Utils::distanceBetweenPoints2D
           (pointsOnWall.first, pointsOnWall.second) < ORIENTATION_CIRCLE / 2)
-      {  
+      {
         angle = atan2((alertPoint.y - pointsOnWall.second.y),
             (alertPoint.x - pointsOnWall.second.x));
 
@@ -196,7 +200,7 @@ namespace pandora_data_fusion
         pointsOnWall.first = onWall;
       }
 
-      angle = atan2((pointsOnWall.second.y - pointsOnWall.first.y), 
+      angle = atan2((pointsOnWall.second.y - pointsOnWall.first.y),
           (pointsOnWall.second.x - pointsOnWall.first.x));
 
       std::pair<Point, Point> approachPoints;
@@ -211,7 +215,7 @@ namespace pandora_data_fusion
       second.y = alertPoint.y + ORIENTATION_DIST * sin((-PI / 2) + angle);
       approachPoints.second = second;
 
-      if (Utils::distanceBetweenPoints2D(framePoint, approachPoints.first) < 
+      if (Utils::distanceBetweenPoints2D(framePoint, approachPoints.first) <
           Utils::distanceBetweenPoints2D(framePoint, approachPoints.second))
       {
         return Utils::calculateQuaternion(alertPoint, approachPoints.first);
@@ -258,7 +262,7 @@ namespace pandora_data_fusion
       listener_->waitForTransform(BaseObject::getGlobalFrame(), header.frame_id,
           header.stamp, ros::Duration(1));
 
-      listener_->lookupTransform(BaseObject::getGlobalFrame(), header.frame_id, 
+      listener_->lookupTransform(BaseObject::getGlobalFrame(), header.frame_id,
           header.stamp, tfTransform);
 
       return tfTransform;

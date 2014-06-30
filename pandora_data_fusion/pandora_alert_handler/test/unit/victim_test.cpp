@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
@@ -47,13 +47,12 @@ namespace pandora_data_fusion
   {
 
     class VictimTest : public ::testing::Test
-    { 
+    {
       protected:
-
-        VictimTest() 
+        VictimTest()
         {
           ros::Time::init();
-          victim1_.reset( new Victim ); 
+          victim1_.reset( new Victim );
           victim2_.reset( new Victim );
           objConstPtrVect1_.reset( new ObjectConstPtrVector );
           objConstPtrVect2_.reset( new ObjectConstPtrVector );
@@ -61,25 +60,25 @@ namespace pandora_data_fusion
         }
 
         virtual void SetUp()
-        {  
+        {
           Hole::setObjectType("hole");
           Thermal::setObjectType("thermal");
-          //!< create the Objectvector1 and fill it with various objects 
-          //!< Thermal1(2, 3, 4) Thermal2(4, 3, 2) Hole1(1, 2, 0) 
+          //!< create the Objectvector1 and fill it with various objects
+          //!< Thermal1(2, 3, 4) Thermal2(4, 3, 2) Hole1(1, 2, 0)
           //!< (yaw = 0) ApproachDist = 5
           createVariousObjects1(objConstPtrVect1_);
-          //!< create the Objectvector2 and fill it with various objects 
-          //!< Thermal1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) 
+          //!< create the Objectvector2 and fill it with various objects
+          //!< Thermal1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
           //!< (yaw = PI/4) ApproachDist = 6
           createVariousObjects2(objConstPtrVect2_);
-          //!< create the Objectvector3 and fill it with various objects 
-          //!< Thermal1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2) 
+          //!< create the Objectvector3 and fill it with various objects
+          //!< Thermal1(2, 3, 4) Hole1(4, 3, 2) Hole2(0, 4, 2)
           //!< (yaw = PI/4) ApproachDist = 6
           createVariousObjects3(objConstPtrVect3_);
-        } 
+        }
 
         virtual void TearDown()
-        { 
+        {
           clear();
         }
 
@@ -94,7 +93,7 @@ namespace pandora_data_fusion
           return sqrt(x_ * x_ + y_ * y_ + z_ * z_);
         }
 
-        //!< We create manually Thermal1(2, 3, 4), 
+        //!< We create manually Thermal1(2, 3, 4),
         //!< Thermal2(4, 3, 2), Hole1(1, 2, 0)
         void createVariousObjects1(ObjectConstPtrVectorPtr objConstPtrVectPtr)
         {
@@ -113,9 +112,9 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(thermalPtr1);
           objConstPtrVectPtr->push_back(thermalPtr2);
           objConstPtrVectPtr->push_back(holePtr1);
-        } 
+        }
 
-        //!< We create manually Thermal1(2, 3, 4), 
+        //!< We create manually Thermal1(2, 3, 4),
         //!< Hole1(4, 3, 2), Hole2(0, 4, 2) with yaw=PI/4
         void createVariousObjects2(ObjectConstPtrVectorPtr objConstPtrVectPtr)
         {
@@ -139,9 +138,9 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(thermalPtr1);
           objConstPtrVectPtr->push_back(holePtr1);
           objConstPtrVectPtr->push_back(holePtr2);
-        } 
+        }
 
-        //!< We create manually thermal1(2, 3, 4) thermal2(4, 3, 2) thermal3(0, 4, 2) 
+        //!< We create manually thermal1(2, 3, 4) thermal2(4, 3, 2) thermal3(0, 4, 2)
         //!< Yaw = PI/4
         void createVariousObjects3(ObjectConstPtrVectorPtr objConstPtrVectPtr)
         {
@@ -165,9 +164,9 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(thermalPtr1);
           objConstPtrVectPtr->push_back(thermalPtr2);
           objConstPtrVectPtr->push_back(thermalPtr3);
-        } 
+        }
 
-        //!< We create manually thermal1(2, 3, 4) thermal2(4, 3, 2) thermal3(0, 4, 2) 
+        //!< We create manually thermal1(2, 3, 4) thermal2(4, 3, 2) thermal3(0, 4, 2)
         //!< Yaw = PI/4
         Pose makePose(float x, float y, float z, float yaw = 0)
         {
@@ -182,7 +181,7 @@ namespace pandora_data_fusion
         /* Accessors to private functions */
 
         template <class ObjectType>
-        void findRepresentativeObject(VictimPtr victim, 
+        void findRepresentativeObject(VictimPtr victim,
             const ObjectConstPtrVector& objects)
         {
           victim->findRepresentativeObject<ObjectType>(objects);
@@ -197,9 +196,9 @@ namespace pandora_data_fusion
 
         float getStdDevX(ObjectConstPtr object)
         {
-          if(object->getType() == "hole")
+          if (object->getType() == "hole")
             return boost::dynamic_pointer_cast<const Hole>(object)->getStdDevX();
-          if(object->getType() == "thermal")
+          if (object->getType() == "thermal")
             return boost::dynamic_pointer_cast<const Thermal>(object)->getStdDevX();
         }
 
@@ -248,7 +247,7 @@ namespace pandora_data_fusion
     }
 
     TEST_F(VictimTest, setObjects1)
-    {  
+    {
       victim1_->setObjects(*objConstPtrVect1_);
       // There will be 2 objects left in victim1_. One Hole and one Thermal type.
       EXPECT_EQ(2, victim1_->getObjects().size());
@@ -258,17 +257,17 @@ namespace pandora_data_fusion
       // victim1_'s Thermal object should be the thermalPtr1! thermalPtr1 had more confidence
       // in its belief about position that thermalPtr2, so it was prefered during
       // setObject()
-      EXPECT_GE(getStdDevX(objConstPtrVect1_->at(0)), 
+      EXPECT_GE(getStdDevX(objConstPtrVect1_->at(0)),
           getStdDevX(victim1_->getObjects().at(1)));
-      EXPECT_GT(getStdDevX(objConstPtrVect1_->at(1)) - 
+      EXPECT_GT(getStdDevX(objConstPtrVect1_->at(1)) -
           getStdDevX(victim1_->getObjects().at(1)),
           getStdDevX(objConstPtrVect1_->at(0)) -
           getStdDevX(victim1_->getObjects().at(1)));
-      // thermalPtr1 object should be updated so that its position is 
+      // thermalPtr1 object should be updated so that its position is
       // closer to thermalPtr2's
-      EXPECT_GT(distance(objConstPtrVect1_->at(0), objConstPtrVect1_->at(1)), 
+      EXPECT_GT(distance(objConstPtrVect1_->at(0), objConstPtrVect1_->at(1)),
           distance(victim1_->getObjects().at(1), objConstPtrVect1_->at(1)));
-      EXPECT_GT(distance(objConstPtrVect1_->at(0), objConstPtrVect1_->at(1)), 
+      EXPECT_GT(distance(objConstPtrVect1_->at(0), objConstPtrVect1_->at(1)),
           distance(victim1_->getObjects().at(1), objConstPtrVect1_->at(0)));
     }
 
@@ -285,17 +284,17 @@ namespace pandora_data_fusion
       // victim1_'s Thermal object should be the thermalPtr1! thermalPtr1 had more confidence
       // in its belief about position that thermalPtr2, so it was prefered during
       // setObject()
-      EXPECT_GE(getStdDevX(objConstPtrVect2_->at(1)), 
+      EXPECT_GE(getStdDevX(objConstPtrVect2_->at(1)),
           getStdDevX(victim2_->getObjects().at(0)));
-      EXPECT_GT(getStdDevX(objConstPtrVect2_->at(2)) - 
+      EXPECT_GT(getStdDevX(objConstPtrVect2_->at(2)) -
           getStdDevX(victim2_->getObjects().at(0)),
           getStdDevX(objConstPtrVect2_->at(1)) -
           getStdDevX(victim2_->getObjects().at(0)));
-      // thermalPtr1 object should be updated so that its position is 
+      // thermalPtr1 object should be updated so that its position is
       // closer to thermalPtr2's
-      EXPECT_GT(distance(objConstPtrVect2_->at(1), objConstPtrVect2_->at(2)), 
+      EXPECT_GT(distance(objConstPtrVect2_->at(1), objConstPtrVect2_->at(2)),
           distance(victim2_->getObjects().at(0), objConstPtrVect2_->at(2)));
-      EXPECT_GT(distance(objConstPtrVect2_->at(1), objConstPtrVect2_->at(2)), 
+      EXPECT_GT(distance(objConstPtrVect2_->at(1), objConstPtrVect2_->at(2)),
           distance(victim2_->getObjects().at(0), objConstPtrVect2_->at(1)));
     }
 
@@ -306,9 +305,9 @@ namespace pandora_data_fusion
       EXPECT_EQ("thermal", victim2_->getObjects().at(0)->getType());
       EXPECT_EQ(3, victim2_->getObjects().at(0)->getId());
     }
-    
+
     TEST_F(VictimTest, eraseObjectAt)
-    {  
+    {
       // Thermal1(2, 3, 4) Thermal2(4, 3, 2) Hole1(1, 2, 0)
       victim1_->setObjects(*objConstPtrVect1_);
       victim1_->eraseObjectAt(1);
@@ -318,7 +317,7 @@ namespace pandora_data_fusion
       EXPECT_EQ(0, victim1_->getPose().position.z);
       EXPECT_EQ(0, victim1_->getSelectedObjectIndex());
       EXPECT_EQ(1, victim1_->getObjects().size());
-      // hole1 is erased 
+      // hole1 is erased
       victim1_->eraseObjectAt(0);
       EXPECT_EQ(0, victim1_->getObjects().size());
 

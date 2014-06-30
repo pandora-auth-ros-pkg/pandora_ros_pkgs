@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -86,15 +86,14 @@ namespace pandora_data_fusion
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
     typedef actionlib::SimpleActionServer
       <pandora_data_fusion_msgs::DeleteVictimAction> DeleteVictimServer;
-    typedef actionlib::SimpleActionServer 
-      <pandora_data_fusion_msgs::ValidateVictimAction> 
+    typedef actionlib::SimpleActionServer
+      <pandora_data_fusion_msgs::ValidateVictimAction>
       ValidateVictimServer;
     typedef boost::shared_ptr<const ValidateVictimServer::Goal> GoalConstPtr;
 
     class AlertHandler : private boost::noncopyable
     {
       public:
-
         /**
          * @brief Constructor
          * @param ns [std::string const&] Has the namespace of the node.
@@ -126,7 +125,6 @@ namespace pandora_data_fusion
             std_srvs::Empty::Response &rs);
 
       private:
-        
         /* Alert-concerned Subscribers */
         void holeDirectionAlertCallback(
             const vision_communications::HolesDirectionsVectorMsg& msg);
@@ -139,7 +137,7 @@ namespace pandora_data_fusion
             const vision_communications::LandoltcAlertsVectorMsg& msg);
         void dataMatrixAlertCallback(
             const vision_communications::DataMatrixAlertsVectorMsg& msg);
-        template <class ObjectType> 
+        template <class ObjectType>
           void objectDirectionAlertCallback(
               const pandora_common_msgs::GeneralAlertMsg& msg);
 
@@ -153,7 +151,7 @@ namespace pandora_data_fusion
          * @return void
          */
         void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
-        
+
         /* Map Visualization Callbacks */
 
         bool getObjectsServiceCb(
@@ -193,7 +191,6 @@ namespace pandora_data_fusion
         void initRosInterfaces();
 
       private:
-
         NodeHandlePtr nh_;
 
         ros::Subscriber holeDirectionSubscriber_;
@@ -243,9 +240,9 @@ namespace pandora_data_fusion
         LandoltcListPtr landoltcs_;
         DataMatrixListPtr dataMatrices_;
 
-        //!< The unvisited victims list  
+        //!< The unvisited victims list
         VictimListPtr victimsToGo_;
-        //!< The visited victims list  
+        //!< The visited victims list
         VictimListPtr victimsVisited_;
 
         ObjectFactoryPtr objectFactory_;
@@ -253,14 +250,14 @@ namespace pandora_data_fusion
         VictimHandlerPtr victimHandler_;
     };
 
-    template <class ObjectType> 
+    template <class ObjectType>
       void AlertHandler::objectDirectionAlertCallback(
           const pandora_common_msgs::GeneralAlertMsg& msg)
       {
         if (map_->data.size() == 0)
           return;
 
-        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",  
+        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
             ObjectType::getObjectType() << " ALERT ARRIVED!");
 
         typename ObjectType::PtrVectorPtr objectsVectorPtr;

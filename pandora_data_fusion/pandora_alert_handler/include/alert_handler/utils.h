@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -61,11 +61,10 @@ namespace pandora_data_fusion
     class Utils : private boost::noncopyable
     {
       public:
-
         static Point point2DAndHeight2Point3D(Point position, float height);
         static float distanceBetweenPoints2D(Point a, Point b);
         static float distanceBetweenPoints3D(Point a, Point b);
-        static bool arePointsInRange(Point pointA, Point pointB, float sensor_range );
+        static bool arePointsInRange(Point pointA, Point pointB, float sensor_range);
         static geometry_msgs::Quaternion calculateQuaternion(Point a,
             Point b);
         static Point vector3ToPoint(tf::Vector3 vector);

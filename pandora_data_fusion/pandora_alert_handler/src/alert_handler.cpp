@@ -32,9 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
+
+#include <string>
 
 #include "alert_handler/alert_handler.h"
 
@@ -48,16 +50,16 @@ namespace pandora_data_fusion
       nh_.reset( new ros::NodeHandle(ns) );
       map_.reset( new Map );
 
-      holes_.reset( new ObjectList<Hole> );
-      qrs_.reset( new ObjectList<Qr> );
-      hazmats_.reset( new ObjectList<Hazmat> );
-      thermals_.reset( new ObjectList<Thermal> );
-      faces_.reset( new ObjectList<Face> );
-      motions_.reset( new ObjectList<Motion> );
-      sounds_.reset( new ObjectList<Sound> );
-      co2s_.reset( new ObjectList<Co2> );
-      landoltcs_.reset( new ObjectList<Landoltc> );
-      dataMatrices_.reset( new ObjectList<DataMatrix> );
+      holes_.reset( new HoleList );
+      qrs_.reset( new QrList );
+      hazmats_.reset( new HazmatList );
+      thermals_.reset( new ThermalList );
+      faces_.reset( new FaceList );
+      motions_.reset( new MotionList );
+      sounds_.reset( new SoundList );
+      co2s_.reset( new Co2List );
+      landoltcs_.reset( new LandoltcList );
+      dataMatrices_.reset( new DataMatrixList );
 
       Hole::setList(holes_);
       Qr::setList(qrs_);
@@ -102,13 +104,13 @@ namespace pandora_data_fusion
 
     void AlertHandler::initRosInterfaces()
     {
-      std::string param; 
+      std::string param;
 
       //!< alert-concerned subscribers
 
       if (nh_->getParam("subscribed_topic_names/holeDirection", param))
       {
-        holeDirectionSubscriber_ = nh_->subscribe(param, 
+        holeDirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::holeDirectionAlertCallback, this);
       }
       else
@@ -119,7 +121,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/thermalDirection", param))
       {
-        thermalDirectionSubscriber_ = nh_->subscribe(param, 
+        thermalDirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::objectDirectionAlertCallback< Thermal >, this);
       }
       else
@@ -140,7 +142,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/hazmat", param))
       {
-        hazmatSubscriber_ = nh_->subscribe(param, 
+        hazmatSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::hazmatAlertCallback, this);
       }
       else
@@ -151,7 +153,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/faceDirection", param))
       {
-        faceDirectionSubscriber_ = nh_->subscribe(param, 
+        faceDirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::objectDirectionAlertCallback< Face >, this);
       }
       else
@@ -162,7 +164,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/co2Direction", param))
       {
-        co2DirectionSubscriber_ = nh_->subscribe(param, 
+        co2DirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::objectDirectionAlertCallback< Co2 >, this);
       }
       else
@@ -173,7 +175,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/motionDirection", param))
       {
-        motionDirectionSubscriber_ = nh_->subscribe(param, 
+        motionDirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::objectDirectionAlertCallback< Motion >, this);
       }
       else
@@ -184,7 +186,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/soundDirection", param))
       {
-        soundDirectionSubscriber_ = nh_->subscribe(param, 
+        soundDirectionSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::objectDirectionAlertCallback< Sound >, this);
       }
       else
@@ -195,7 +197,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/landoltc", param))
       {
-        landoltcSubscriber_ = nh_->subscribe(param, 
+        landoltcSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::landoltcAlertCallback, this);
       }
       else
@@ -206,7 +208,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("subscribed_topic_names/dataMatrix", param))
       {
-        dataMatrixSubscriber_ = nh_->subscribe(param, 
+        dataMatrixSubscriber_ = nh_->subscribe(param,
             1, &AlertHandler::dataMatrixAlertCallback, this);
       }
       else
@@ -245,14 +247,14 @@ namespace pandora_data_fusion
       if (nh_->getParam("action_server_names/delete_victim", param))
       {
         deleteVictimServer_.reset(new DeleteVictimServer(*nh_, param, false));
-      } 
+      }
       else
       {
         ROS_FATAL("delete_victim action name param not found");
         ROS_BREAK();
       }
       deleteVictimServer_->registerGoalCallback(
-          boost::bind( &AlertHandler::deleteVictimCallback, this) );
+          boost::bind(&AlertHandler::deleteVictimCallback, this));
       deleteVictimServer_->start();
 
       if (nh_->getParam("action_server_names/validate_victim", param))
@@ -266,14 +268,14 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
       validateVictimServer_->registerGoalCallback(
-          boost::bind( &AlertHandler::validateVictimCallback, this) );
+          boost::bind(&AlertHandler::validateVictimCallback, this));
       validateVictimServer_->start();
 
       //!< service servers
 
       if (nh_->getParam("service_server_names/flush_queues", param))
       {
-        flushService_ = nh_->advertiseService(param, 
+        flushService_ = nh_->advertiseService(param,
             &AlertHandler::flushQueues, this);
       }
       else
@@ -284,10 +286,10 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("service_server_names/get_objects", param))
       {
-        getObjectsService_ = nh_->advertiseService(param, 
+        getObjectsService_ = nh_->advertiseService(param,
             &AlertHandler::getObjectsServiceCb, this);
       }
-      else 
+      else
       {
         ROS_FATAL("get_objects service name param not found");
         ROS_BREAK();
@@ -295,7 +297,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("service_server_names/get_markers", param))
       {
-        getMarkersService_ = nh_->advertiseService(param, 
+        getMarkersService_ = nh_->advertiseService(param,
             &AlertHandler::getMarkersServiceCb, this);
       }
       else
@@ -306,7 +308,7 @@ namespace pandora_data_fusion
 
       if (nh_->getParam("service_server_names/geotiff", param))
       {
-        geotiffService_ = nh_->advertiseService(param, 
+        geotiffService_ = nh_->advertiseService(param,
             &AlertHandler::geotiffServiceCb, this);
       }
       else
@@ -322,9 +324,9 @@ namespace pandora_data_fusion
 
       //!< timers
 
-      tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1), 
+      tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1),
           &AlertHandler::tfPublisherCallback, this);
-    }  
+    }
 
     //!< Alert-concerned callbacks
 
@@ -334,7 +336,7 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
           Hole::getObjectType() << " ALERT ARRIVED!");
 
       HolePtrVectorPtr holesVectorPtr;
@@ -361,7 +363,7 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
           Hazmat::getObjectType() << " ALERT ARRIVED!");
 
       HazmatPtrVectorPtr hazmatsVectorPtr;
@@ -384,8 +386,8 @@ namespace pandora_data_fusion
       if (map_->data.size() == 0)
         return;
 
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK", 
-          Qr::getObjectType() << " ALERT ARRIVED!");  
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          Qr::getObjectType() << " ALERT ARRIVED!");
 
       QrPtrVectorPtr qrsVectorPtr;
       try
@@ -451,7 +453,7 @@ namespace pandora_data_fusion
 
     void AlertHandler::tfPublisherCallback(const ros::TimerEvent& event)
     {
-      PoseStampedVector objectsPosesStamped; 
+      PoseStampedVector objectsPosesStamped;
       qrs_->getObjectsPosesStamped(&objectsPosesStamped);
       hazmats_->getObjectsPosesStamped(&objectsPosesStamped);
       thermals_->getObjectsPosesStamped(&objectsPosesStamped);
@@ -463,26 +465,26 @@ namespace pandora_data_fusion
       dataMatrices_->getObjectsPosesStamped(&objectsPosesStamped);
       victimsToGo_->getObjectsPosesStamped(&objectsPosesStamped);
 
-      broadcastPoseVector(objectsPosesStamped); 
+      broadcastPoseVector(objectsPosesStamped);
     }
 
     void AlertHandler::broadcastPoseVector(const PoseStampedVector& poseVector)
     {
-      for(PoseStampedVector::const_iterator it = poseVector.begin(); 
+      for (PoseStampedVector::const_iterator it = poseVector.begin();
           it != poseVector.end(); ++it)
       {
-        tf::Quaternion tfQuaternion(it->pose.orientation.x, 
-            it->pose.orientation.y, 
-            it->pose.orientation.z, 
+        tf::Quaternion tfQuaternion(it->pose.orientation.x,
+            it->pose.orientation.y,
+            it->pose.orientation.z,
             it->pose.orientation.w);
-        tf::Vector3 vec(it->pose.position.x, 
-            it->pose.position.y, 
+        tf::Vector3 vec(it->pose.position.x,
+            it->pose.position.y,
             it->pose.position.z);
         tf::Transform tfObject(tfQuaternion, vec);
 
-        objectsBroadcaster_.sendTransform( 
+        objectsBroadcaster_.sendTransform(
             tf::StampedTransform(tfObject, it->header.stamp,
-              "/world", it->header.frame_id ) );
+              "/world", it->header.frame_id));
       }
     }
 
@@ -491,7 +493,7 @@ namespace pandora_data_fusion
       int victimId = deleteVictimServer_->acceptNewGoal()->victimId;
       bool deleted = victimHandler_->deleteVictim(victimId);
       publishVictims();
-      if(!deleted)
+      if (!deleted)
         deleteVictimServer_->setAborted();
       deleteVictimServer_->setSucceeded();
     }
@@ -501,16 +503,16 @@ namespace pandora_data_fusion
       GoalConstPtr goal = validateVictimServer_->acceptNewGoal();
       bool validated = victimHandler_->validateVictim(goal->victimId, goal->victimValid);
       publishVictims();
-      if(!validated)
+      if (!validated)
         validateVictimServer_->setAborted();
       validateVictimServer_->setSucceeded();
     }
 
     void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
     {
-      prevxMin = msg->info.origin.position.x / msg->info.resolution 
+      prevxMin = msg->info.origin.position.x / msg->info.resolution
         + msg->info.width / 2;
-      prevyMin = msg->info.origin.position.y / msg->info.resolution 
+      prevyMin = msg->info.origin.position.y / msg->info.resolution
         + msg->info.height / 2;
 
       *map_ = *msg;
@@ -519,9 +521,9 @@ namespace pandora_data_fusion
     void AlertHandler::dynamicReconfigCallback(
         const ::pandora_alert_handler::AlertHandlerConfig& config, uint32_t level)
     {
-      objectFactory_->dynamicReconfigForward( config.occupiedCellThres,
-          config.highThres, config.lowThres, 
-          config.orientationCircle, config.orientationDist); 
+      objectFactory_->dynamicReconfigForward(config.occupiedCellThres,
+          config.highThres, config.lowThres,
+          config.orientationCircle, config.orientationDist);
 
       Hole::setObjectScore(-1);
       Hole::setProbabilityThres(config.holeMinProbability);

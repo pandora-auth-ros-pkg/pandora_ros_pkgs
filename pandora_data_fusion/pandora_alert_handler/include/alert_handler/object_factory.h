@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -64,9 +64,8 @@ namespace pandora_data_fusion
   {
 
     class ObjectFactory : private boost::noncopyable
-    { 
+    {
       public:
-
         ObjectFactory(const MapPtr& map, const std::string& mapType);
 
         HolePtrVectorPtr makeHoles(
@@ -88,57 +87,53 @@ namespace pandora_data_fusion
           return currentTransform_;
         }
 
-        void dynamicReconfigForward(float occupiedCellThres, 
+        void dynamicReconfigForward(float occupiedCellThres,
             float highThres, float lowThres,
             float orientationCircle, float orientationDist);
 
       private:
-
         /**
          * @brief Sets this Object up according to the info from the Alert.
-         * @param objectPtr [const ObjectPtr&] Pointer to Object 
+         * @param objectPtr [const ObjectPtr&] Pointer to Object
          * variable to be filled.
-         * @param msg [const ..._communications::...Msg&] 
+         * @param msg [const ..._communications::...Msg&]
          * Incoming ros message containing info.
          * @return void
          */
-        void setUpHole(const HolePtr& holePtr, 
+        void setUpHole(const HolePtr& holePtr,
             const vision_communications::HoleDirectionMsg& msg);
-        void setUpHazmat(const HazmatPtr& hazmatPtr, 
+        void setUpHazmat(const HazmatPtr& hazmatPtr,
             const vision_communications::HazmatAlertMsg& msg);
-        void setUpQr(const QrPtr& qrPtr, 
+        void setUpQr(const QrPtr& qrPtr,
             const vision_communications::QRAlertMsg& msg,
             ros::Time timeFound);
-        void setUpLandoltc(const LandoltcPtr& landoltcPtr, 
+        void setUpLandoltc(const LandoltcPtr& landoltcPtr,
             const vision_communications::LandoltcAlertMsg& msg);
-        void setUpDataMatrix(const DataMatrixPtr& dataMatrixPtr, 
+        void setUpDataMatrix(const DataMatrixPtr& dataMatrixPtr,
             const vision_communications::DataMatrixAlertMsg& msg);
         template <class ObjectType>
           void setUpObject(
-              const typename ObjectType::Ptr& objectPtr, 
+              const typename ObjectType::Ptr& objectPtr,
               const pandora_common_msgs::GeneralAlertMsg& msg);
 
       private:
-
         tf::Transform currentTransform_;
 
         PoseFinderPtr poseFinder_;
-
     };
 
     template <class ObjectType>
       typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
           const pandora_common_msgs::GeneralAlertMsg& msg)
       {
-        currentTransform_ = poseFinder_->lookupTransformFromWorld( msg.header );
+        currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
 
-        typename ObjectType::PtrVectorPtr objectsVectorPtr(
-            new typename ObjectType::PtrVector);
+        typename ObjectType::PtrVectorPtr objectsVectorPtr(new typename ObjectType::PtrVector);
         try
         {
-          typename ObjectType::Ptr newObject( new ObjectType );
-          setUpObject<ObjectType>( newObject, msg );
-          objectsVectorPtr->push_back( newObject );
+          typename ObjectType::Ptr newObject(new ObjectType);
+          setUpObject<ObjectType>(newObject, msg);
+          objectsVectorPtr->push_back(newObject);
         }
         catch (AlertException ex)
         {
@@ -151,16 +146,16 @@ namespace pandora_data_fusion
 
     template <class ObjectType>
       void ObjectFactory::setUpObject(
-          const typename ObjectType::Ptr& objectPtr, 
+          const typename ObjectType::Ptr& objectPtr,
           const pandora_common_msgs::GeneralAlertMsg& msg)
       {
-        objectPtr->setPose( poseFinder_->findAlertPose(msg.yaw, 
-              msg.pitch, currentTransform_) );
-        objectPtr->setProbability( msg.probability );
+        objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+              msg.pitch, currentTransform_));
+        objectPtr->setProbability(msg.probability);
         objectPtr->initializeObjectFilter();
       }
 
-    typedef boost::scoped_ptr< ObjectFactory > ObjectFactoryPtr;
+    typedef boost::scoped_ptr<ObjectFactory> ObjectFactoryPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

@@ -32,12 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_LANDOLTC_H
 #define ALERT_HANDLER_LANDOLTC_H
+
+#include <vector>
 
 #include "alert_handler/kalman_object.h"
 
@@ -49,21 +51,20 @@ namespace pandora_data_fusion
     /**
      * @class Landoltc
      * @brief Concrete class representing a Landoltc Object. Inherits from Object
-     */ 
+     */
     class Landoltc : public KalmanObject<Landoltc>
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<Landoltc> Ptr;
         typedef boost::shared_ptr<Landoltc const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<Landoltc> > ListPtr;
+        typedef ObjectList<Landoltc> List;
+        typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Landoltc> > ListConstPtr;
 
       public:
-
         /**
          * @brief Constructor
          */
@@ -90,7 +91,6 @@ namespace pandora_data_fusion
         }
 
       private:
-
         //!< The hazmat's pattern
         std::vector<float> angles_;
     };
@@ -99,6 +99,7 @@ namespace pandora_data_fusion
     typedef Landoltc::ConstPtr LandoltcConstPtr;
     typedef Landoltc::PtrVector LandoltcPtrVector;
     typedef Landoltc::PtrVectorPtr LandoltcPtrVectorPtr;
+    typedef Landoltc::List LandoltcList;
     typedef Landoltc::ListPtr LandoltcListPtr;
     typedef Landoltc::ListConstPtr LandoltcListConstPtr;
 

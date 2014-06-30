@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -56,7 +56,6 @@ namespace pandora_data_fusion
         public Object<DerivedObject>
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<DerivedObject> Ptr;
         typedef boost::shared_ptr<DerivedObject const> ConstPtr;
@@ -66,7 +65,6 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<Filter> FilterPtr;
 
       public:
-
         KalmanObject() {};
 
         /**
@@ -76,7 +74,7 @@ namespace pandora_data_fusion
         void initializeObjectFilter();
 
         /**
-         * @brief Update with measurement Object's information the conviction pdf 
+         * @brief Update with measurement Object's information the conviction pdf
          * of this object's filter.
          * @param measurement [ConstPtr const&] Object that carries measurement info.
          * @param model [FilterModelConstPtr const&] Filter's model that the update
@@ -114,7 +112,7 @@ namespace pandora_data_fusion
 
         /**
          * @brief Setter for the reference of filter model.
-         * @param modelPtr [FilterModelPtr const&] 
+         * @param modelPtr [FilterModelPtr const&]
          * Reference to filter model.
          * @return void
          */
@@ -125,7 +123,7 @@ namespace pandora_data_fusion
 
         /**
          * @brief Setter for the reference of filter model.
-         * @param modelPtr [FilterModelPtr const&] 
+         * @param modelPtr [FilterModelPtr const&]
          * Reference to filter model.
          * @return void
          */
@@ -135,7 +133,6 @@ namespace pandora_data_fusion
         }
 
       protected:
-
         //!< Filter's prior gaussian for dimension x
         GaussianPtr priorX_;
         //!< Filter's prior gaussian for dimension y
@@ -154,18 +151,17 @@ namespace pandora_data_fusion
         static FilterModelPtr modelPtr_;
 
       private:
-
         friend class ObjectListTest;
     };
 
     template <class DerivedObject>
       FilterModelPtr KalmanObject<DerivedObject>::
-      modelPtr_ = FilterModelPtr( new FilterModel );
+      modelPtr_ = FilterModelPtr(new FilterModel);
 
     template <class DerivedObject>
       void KalmanObject<DerivedObject>::initializeObjectFilter()
       {
-        //!< Priors  
+        //!< Priors
         //!< Filter's prior mean
         MatrixWrapper::ColumnVector priorMean(1);
         //!< Filter's prior covariance
@@ -176,16 +172,16 @@ namespace pandora_data_fusion
         priorVariance(1, 1) = pow(stdDeviation, 2);
 
         priorMean(1) = this->pose_.position.x;
-        priorX_.reset( new BFL::Gaussian(priorMean, priorVariance) );
-        filterX_.reset( new Filter(priorX_.get()) );
+        priorX_.reset(new BFL::Gaussian(priorMean, priorVariance));
+        filterX_.reset(new Filter(priorX_.get()));
 
         priorMean(1) = this->pose_.position.y;
-        priorY_.reset( new BFL::Gaussian(priorMean, priorVariance) );
-        filterY_.reset( new Filter(priorY_.get()) );
+        priorY_.reset(new BFL::Gaussian(priorMean, priorVariance));
+        filterY_.reset(new Filter(priorY_.get()));
 
         priorMean(1) = this->pose_.position.z;
-        priorZ_.reset( new BFL::Gaussian(priorMean, priorVariance) );
-        filterZ_.reset( new Filter(priorZ_.get()) );
+        priorZ_.reset(new BFL::Gaussian(priorMean, priorVariance));
+        filterZ_.reset(new Filter(priorZ_.get()));
       }
 
     /**
@@ -199,17 +195,17 @@ namespace pandora_data_fusion
       void KalmanObject<DerivedObject>::
       update(const ObjectConstPtr& measurement)
       {
-        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
-            "before measurement std dev = " 
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+            "before measurement std dev = "
             << std::endl << "x : " << getStdDevX()
             << std::endl << "y : " << getStdDevY()
             << std::endl << "z : " << getStdDevZ());
-        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
             "before measurement probability = " << this->getProbability());
         Point measurementPosition = measurement->getPose().position;
         MatrixWrapper::ColumnVector newPosition(1);
         //!< Filter's input vector
-        MatrixWrapper::ColumnVector input(1);  
+        MatrixWrapper::ColumnVector input(1);
         //!< Input is 0.0 as our actions doesn't change the world model.
         input(1) = 0.0;
 
@@ -220,15 +216,15 @@ namespace pandora_data_fusion
         measurementModels = modelPtr_->getMeasurementModels();
 
         newPosition(1) = measurementPosition.x;
-        filterX_->Update(systemModels[0].get(), 
+        filterX_->Update(systemModels[0].get(),
             input, measurementModels[0].get(), newPosition);
 
         newPosition(1) = measurementPosition.y;
-        filterY_->Update(systemModels[1].get(), 
+        filterY_->Update(systemModels[1].get(),
             input, measurementModels[1].get(), newPosition);
 
         newPosition(1) = measurementPosition.z;
-        filterZ_->Update(systemModels[2].get(), 
+        filterZ_->Update(systemModels[2].get(),
             input, measurementModels[2].get(), newPosition);
 
         //!< Updating existing object's expected pose.
@@ -246,16 +242,16 @@ namespace pandora_data_fusion
         this->pose_ = newObjectPose;
 
         //!< Updating object's probability.
-        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
-            "after Measurement std dev = " 
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+            "after Measurement std dev = "
             << std::endl << "x : " << getStdDevX()
             << std::endl << "y : " << getStdDevY()
             << std::endl << "z : " << getStdDevZ());
         this->probability_ = (
-            Utils::probabilityFromStdDev(this->distanceThres_, getStdDevX()) + 
+            Utils::probabilityFromStdDev(this->distanceThres_, getStdDevX()) +
             Utils::probabilityFromStdDev(this->distanceThres_, getStdDevY()) +
             Utils::probabilityFromStdDev(this->distanceThres_, getStdDevZ())) / 3;
-        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE", 
+        ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
             "after Measurement probability = " << this->probability_);
 
         //!< Check if object has become a legitimate one.

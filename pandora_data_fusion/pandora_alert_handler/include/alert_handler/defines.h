@@ -32,13 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_DEFINES_H
 #define ALERT_HANDLER_DEFINES_H
 
+#include <vector>
 #include <boost/math/constants/constants.hpp>
 
 #include <geometry_msgs/Pose.h>

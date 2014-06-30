@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -73,7 +73,6 @@ namespace pandora_data_fusion
     class FilterModel
     {
       public:
-
         /**
          * @brief Default constructor.
          */
@@ -89,7 +88,7 @@ namespace pandora_data_fusion
 
         /**
          * @brief Getter for linear analytic measurement's model.
-         * @return MeasurementModelPtrVector Vector that contains the models one 
+         * @return MeasurementModelPtrVector Vector that contains the models one
          * for each dimension.
          */
         MeasurementModelPtrVector getMeasurementModels() const;
@@ -109,7 +108,6 @@ namespace pandora_data_fusion
         void initializeMeasurementModel(float measurementStdDev);
 
       private:
-
         //!< Filter's system pdf
         AnalyticGaussianPtr systemPdfPtr_;
         //!< Filter's system model for dimension x

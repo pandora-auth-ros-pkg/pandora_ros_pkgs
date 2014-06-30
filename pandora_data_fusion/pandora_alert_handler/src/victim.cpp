@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -73,12 +73,12 @@ namespace pandora_data_fusion
       victimDescription.pose.position.z = pose_.position.z + 0.1;
       victimMarker.type = visualization_msgs::Marker::SPHERE;
       victimDescription.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-      victimDescription.text = getFrameId(); 
+      victimDescription.text = getFrameId();
       victimMarker.scale.x = 0.1;
       victimMarker.scale.y = 0.1;
       victimMarker.scale.z = 0.1;
       victimDescription.scale.z = 0.1;
-      if(visited_)
+      if (visited_)
       {
         victimMarker.color.r = 1;
         victimMarker.color.g = 0;
@@ -88,7 +88,7 @@ namespace pandora_data_fusion
         victimDescription.color.g = 0;
         victimDescription.color.b = 0;
         victimDescription.color.a = 1;
-        if(valid_)
+        if (valid_)
         {
           victimDescription.text = "VALID_" + victimDescription.text + "!!!!";
         }
@@ -116,10 +116,10 @@ namespace pandora_data_fusion
     void Victim::fillGeotiff(pandora_data_fusion_msgs::
         DatafusionGeotiffSrv::Response* res) const
     {
-      if(valid_)
+      if (valid_)
       {
-        res->victimsx.push_back( pose_.position.x );
-        res->victimsy.push_back( pose_.position.y );
+        res->victimsx.push_back(pose_.position.x);
+        res->victimsy.push_back(pose_.position.y);
       }
     }
 
@@ -127,20 +127,20 @@ namespace pandora_data_fusion
     {
       float probability = 0;
       bool victimVisionFound = false;
-      for(int ii = 0; ii < objects_.size(); ++ii)
+      for (int ii = 0; ii < objects_.size(); ++ii)
       {
-        if(objects_[ii]->getType() == Face::getObjectType())
+        if (objects_[ii]->getType() == Face::getObjectType())
         {
           setProbability(objects_[ii]->getProbability());
           victimVisionFound = true;
           break;
         }
-        else if(objects_[ii]->getType() != Hole::getObjectType())
+        else if (objects_[ii]->getType() != Hole::getObjectType())
         {
           probability += objects_[ii]->getProbability();
         }
       }
-      if(!victimVisionFound)
+      if (!victimVisionFound)
       {
         int numberOfObjects = 2 > objects_.size() - 1 ? 2 : objects_.size() - 1;
         probability /= numberOfObjects;
@@ -149,14 +149,14 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details Representative Object should be the one in the cluster 
-     * with the most confidence (least standard deviation-most probability), 
-     * with its conviction pdf updated by the rest objects in victim. 
+     * @details Representative Object should be the one in the cluster
+     * with the most confidence (least standard deviation-most probability),
+     * with its conviction pdf updated by the rest objects in victim.
      * Between the hole and the thermal candidate, hole will be prefered.
      */
     void Victim::setObjects(const ObjectConstPtrVector& objects)
     {
-      ROS_DEBUG_STREAM_NAMED("VICTIM_SET_OBJECTS", 
+      ROS_DEBUG_STREAM_NAMED("VICTIM_SET_OBJECTS",
           "Setting up victim with " << objects.size() << " objects.");
       objects_.clear();
 
@@ -177,31 +177,31 @@ namespace pandora_data_fusion
      * method would have been changed.
      */
     void Victim::updateRepresentativeObject()
-    {  
-      if(objects_.size() == 0)
+    {
+      if (objects_.size() == 0)
       {
         selectedObjectIndex_ = -1;
       }
 
       int tpaIndex = -1;
-      for(int ii = 0; ii < objects_.size(); ++ii)
+      for (int ii = 0; ii < objects_.size(); ++ii)
       {
-        if(objects_[ii]->getType() == Hole::getObjectType())
+        if (objects_[ii]->getType() == Hole::getObjectType())
         {
           selectedObjectIndex_ = ii;
         }
-        else if(objects_[ii]->getType() == Thermal::getObjectType())
+        else if (objects_[ii]->getType() == Thermal::getObjectType())
         {
           tpaIndex = ii;
         }
       }
 
-      if(selectedObjectIndex_ == -1)
+      if (selectedObjectIndex_ == -1)
       {
         selectedObjectIndex_ = tpaIndex;
       }
 
-      if(selectedObjectIndex_ > -1)
+      if (selectedObjectIndex_ > -1)
       {
         setPose(objects_[selectedObjectIndex_]->getPose());
       }
@@ -231,8 +231,8 @@ namespace pandora_data_fusion
     tf::Transform Victim::getTransform() const
     {
       tf::Quaternion tfQuaternion(
-          pose_.orientation.x, pose_.orientation.y, 
-          pose_.orientation.z, pose_.orientation.w );
+          pose_.orientation.x, pose_.orientation.y,
+          pose_.orientation.z, pose_.orientation.w);
       tf::Vector3 vec(pose_.position.x, pose_.position.y, pose_.position.z);
       return tf::Transform(tfQuaternion, vec);
     }

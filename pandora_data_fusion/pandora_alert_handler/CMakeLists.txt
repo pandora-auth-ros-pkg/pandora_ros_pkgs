@@ -137,6 +137,7 @@ target_link_libraries(pose_finder
   ${catkin_LIBRARIES}
   utils
   ros_tf_listener
+  base_object
   )
 
 ########################  object_factory  ###########################
@@ -219,8 +220,6 @@ target_link_libraries(alert_handler_node
 
 ########################  roslint  ##################################
 
-set(ROSLINT_CPP_OPTS 
-    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens, -whitespace/braces")
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
   RELATIVE ${PROJECT_SOURCE_DIR} 
     include/alert_handler/*.h 
@@ -235,7 +234,7 @@ LIST(REMOVE_ITEM ${PROJECT_NAME}_LINT_SRCS
     )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 set(ROSLINT_CPP_OPTS 
-    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens, -whitespace/braces, -runtime/references")
+    "--filter=-runtime/references")
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS_WITH_REFS
   RELATIVE ${PROJECT_SOURCE_DIR} 
     include/alert_handler/alert_handler.h
@@ -244,8 +243,6 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS_WITH_REFS
     src/ros_tf_listener.cpp
     )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS_WITH_REFS})
-set(ROSLINT_CPP_OPTS 
-    "--filter=-whitespace/end_of_line,-build/include,-whitespace/blank_line,-whitespace/parens,-whitespace/braces")
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST 
   RELATIVE ${PROJECT_SOURCE_DIR} 
     test/unit/*

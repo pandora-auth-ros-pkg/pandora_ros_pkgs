@@ -32,12 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_VICTIM_H
 #define ALERT_HANDLER_VICTIM_H
+
+#include <vector>
 
 #include "alert_handler/objects.h"
 
@@ -54,7 +56,6 @@ namespace pandora_data_fusion
     class Victim : public Object<Victim>
     {
       public:
-
         //!< Type definitions
         typedef boost::shared_ptr<Victim> Ptr;
         typedef boost::shared_ptr<Victim const> ConstPtr;
@@ -62,7 +63,6 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
 
       public:
-
         /**
          * @brief Default constructor
          */
@@ -71,16 +71,16 @@ namespace pandora_data_fusion
         /**
          * @brief Setter of the objects associated with the Victim. Selects and keeps
          * as many objects as the different types of objects comprising this victim.
-         * @param objects [ObjectConstPtrVector const&] 
+         * @param objects [ObjectConstPtrVector const&]
          * Group of objects considered a victim
-         * @param approachDistance [float] 
+         * @param approachDistance [float]
          * Approach point's desired distance away from victim
          * @return void
          */
         void setObjects(const ObjectConstPtrVector& objects);
 
         /**
-         * @brief Inspects this victim's objects in order to verify it. 
+         * @brief Inspects this victim's objects in order to verify it.
          * Sets its probability.
          * @return void
          */
@@ -89,7 +89,7 @@ namespace pandora_data_fusion
         /**
          * @brief Erases from victim's associated objects
          * @param index [int] Index in victim's vector of objects
-         * @param approachDistance [float] 
+         * @param approachDistance [float]
          * Approach point's desired distance away from victim
          * @return void
          */
@@ -193,9 +193,8 @@ namespace pandora_data_fusion
         }
 
       private:
-
         /**
-         * @brief Updates the representative object and consequently the pose 
+         * @brief Updates the representative object and consequently the pose
          * @param approachDistance [float] The disired distance from the wall
          * @details Should be always called after any change on the objects_
          * @return void
@@ -218,10 +217,9 @@ namespace pandora_data_fusion
         tf::Transform getTransform() const;
 
       protected:
-
         //!< The validity of the victim
         bool valid_;
-        //!< True if the victim was visited false otherwise     
+        //!< True if the victim was visited false otherwise
         bool visited_;
         //!< The time when this victim was made
         ros::Time timeFound_;
@@ -233,11 +231,9 @@ namespace pandora_data_fusion
         ObjectConstPtrVector objects_;
 
       private:
-
         static int lastVictimId_;  //!< The last in line victim ID
 
       private:
-
         friend class VictimTest;
     };
 
@@ -252,10 +248,10 @@ namespace pandora_data_fusion
         ObjectConstPtrVector::const_iterator objectIt = objects.end();
         float maxObjectProbability = 0;
 
-        for(ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        for (ObjectConstPtrVector::const_iterator it = objects.begin();
             it != objects.end(); it++)
         {
-          if((*it)->getType() == ObjectType::getObjectType() && 
+          if ((*it)->getType() == ObjectType::getObjectType() &&
               (*it)->getProbability() > maxObjectProbability)
           {
             maxObjectProbability = (*it)->getProbability();
@@ -263,15 +259,15 @@ namespace pandora_data_fusion
           }
         }
 
-        typename ObjectType::Ptr representativeObject( new ObjectType );
+        typename ObjectType::Ptr representativeObject(new ObjectType);
 
-        if(objectIt != objects.end())
+        if (objectIt != objects.end())
           *representativeObject = *(boost::dynamic_pointer_cast<const ObjectType>(*objectIt));
 
-        for(ObjectConstPtrVector::const_iterator it = objects.begin(); 
+        for (ObjectConstPtrVector::const_iterator it = objects.begin();
             it != objects.end(); it++)
         {
-          if((*it)->getType() == ObjectType::getObjectType() && it != objectIt)
+          if ((*it)->getType() == ObjectType::getObjectType() && it != objectIt)
           {
             representativeObject->update((*it));
           }

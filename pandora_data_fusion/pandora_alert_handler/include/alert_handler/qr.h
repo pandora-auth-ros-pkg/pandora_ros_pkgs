@@ -32,12 +32,15 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_QR_H
 #define ALERT_HANDLER_QR_H
+
+#include <vector>
+#include <string>
 
 #include "alert_handler/kalman_object.h"
 
@@ -49,21 +52,20 @@ namespace pandora_data_fusion
     /**
      * @class Qr
      * @brief Concrete class representing a Qr Object. Inherits from Object
-     */ 
+     */
     class Qr : public KalmanObject<Qr>
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<Qr> Ptr;
         typedef boost::shared_ptr<Qr const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<Qr> > ListPtr;
+        typedef ObjectList<Qr> List;
+        typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Qr> > ListConstPtr;
 
       public:
-
         /**
          * @brief Constructor
          */
@@ -114,7 +116,6 @@ namespace pandora_data_fusion
         }
 
       private:
-
         //!< The qr's content
         std::string content_;
         //!< The time when this qr was first found
@@ -125,6 +126,7 @@ namespace pandora_data_fusion
     typedef Qr::ConstPtr QrConstPtr;
     typedef Qr::PtrVector QrPtrVector;
     typedef Qr::PtrVectorPtr QrPtrVectorPtr;
+    typedef Qr::List QrList;
     typedef Qr::ListPtr QrListPtr;
     typedef Qr::ListConstPtr QrListConstPtr;
 

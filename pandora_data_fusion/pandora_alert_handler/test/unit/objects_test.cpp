@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
@@ -47,11 +47,10 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    class ObjectsTest : public ::testing::Test 
+    class ObjectsTest : public ::testing::Test
     {
       protected:
-
-        ObjectsTest() 
+        ObjectsTest()
         {
           qr1_.reset( new Qr );
           qr2_.reset( new Qr );
@@ -63,10 +62,10 @@ namespace pandora_data_fusion
           thermal2_.reset( new Thermal );
         }
 
-        // Seting up all the different objects that will be used 
-        // for our test cases. The distance between the points 
+        // Seting up all the different objects that will be used
+        // for our test cases. The distance between the points
         // (0,0,0), (4,3,0) is 5.
-        virtual void SetUp() 
+        virtual void SetUp()
         {
           pose1_.position.x = 0;
           pose1_.position.y = 0;
@@ -92,7 +91,7 @@ namespace pandora_data_fusion
           qr2_->setPose(pose2_);
           qr2_->setId(2);
           qr2_->setProbability(0.5);
-          qr2_->initializeObjectFilter(); 
+          qr2_->initializeObjectFilter();
 
           Hazmat::setObjectType("HAZMAT");
           Hazmat::setDistanceThres(6);
@@ -161,25 +160,25 @@ namespace pandora_data_fusion
     TEST_F(ObjectsTest, QrConstrustor)
     {
       EXPECT_FALSE(qr1_->getLegit());
-      EXPECT_EQ(Qr::getObjectType(), qr1_->getType()); 
+      EXPECT_EQ(Qr::getObjectType(), qr1_->getType());
     }
 
     TEST_F(ObjectsTest, HazmatConstrustor)
     {
       EXPECT_FALSE(hazmat1_->getLegit());
-      EXPECT_EQ(Hazmat::getObjectType(), hazmat1_->getType()); 
+      EXPECT_EQ(Hazmat::getObjectType(), hazmat1_->getType());
     }
 
     TEST_F(ObjectsTest, HoleConstrustor)
     {
       EXPECT_FALSE(hole1_->getLegit());
-      EXPECT_EQ(Hole::getObjectType(), hole1_->getType()); 
+      EXPECT_EQ(Hole::getObjectType(), hole1_->getType());
     }
 
     TEST_F(ObjectsTest, ThermalConstrustor)
     {
       EXPECT_FALSE(thermal1_->getLegit());
-      EXPECT_EQ(Thermal::getObjectType(), thermal1_->getType()); 
+      EXPECT_EQ(Thermal::getObjectType(), thermal1_->getType());
     }
 
     TEST_F(ObjectsTest, isSameObject)

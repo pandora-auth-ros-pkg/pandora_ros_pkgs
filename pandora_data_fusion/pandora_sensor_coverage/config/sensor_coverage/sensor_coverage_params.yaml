@@ -17,16 +17,16 @@ frames_to_track: [kinect_rgb_frame]
 
 # kinect_rgb_frame
 kinect_rgb_frame:
-  produce_surface_coverage: false
+  produces_surface_coverage: true
   published_topic_names:
     space_coverage: kinect_space
     area_coverage: area_covered
     surface_coverage: kinect_surface
   binary:
     space_coverage: true
-    surface_coverage: false
+    surface_coverage: true
   surface_blur_factor: 3
-  sensor_range: 2.2
+  sensor_range: 2.0
   sensor_hfov: 58
   sensor_vfov: 45
   exploration_state: true

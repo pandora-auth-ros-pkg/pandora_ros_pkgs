@@ -32,12 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_CO2_H
 #define ALERT_HANDLER_CO2_H
+
+#include <vector>
 
 #include "alert_handler/kalman_object.h"
 
@@ -49,21 +51,20 @@ namespace pandora_data_fusion
     /**
      * @class Co2
      * @brief Concrete class representing a Co2 Object. Inherits from Object
-     */ 
+     */
     class Co2 : public KalmanObject<Co2>
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<Co2> Ptr;
         typedef boost::shared_ptr<Co2 const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<Co2> > ListPtr;
+        typedef ObjectList<Co2> List;
+        typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Co2> > ListConstPtr;
 
       public:
-
         /**
          * @brief Constructor
          */
@@ -76,6 +77,7 @@ namespace pandora_data_fusion
     typedef Co2::ConstPtr Co2ConstPtr;
     typedef Co2::PtrVector Co2PtrVector;
     typedef Co2::PtrVectorPtr Co2PtrVectorPtr;
+    typedef Co2::List Co2List;
     typedef Co2::ListPtr Co2ListPtr;
     typedef Co2::ListConstPtr Co2ListConstPtr;
 

@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -47,8 +47,8 @@ namespace pandora_data_fusion
 
     bool Hazmat::isSameObject(const ObjectConstPtr& object) const
     {
-      bool cond = Object<Hazmat>::isSameObject(object) 
-        && pattern_ == 
+      bool cond = Object<Hazmat>::isSameObject(object)
+        && pattern_ ==
         boost::dynamic_pointer_cast<const Hazmat>(object)->getPattern();
 
       return cond;
@@ -57,9 +57,9 @@ namespace pandora_data_fusion
     void Hazmat::fillGeotiff(pandora_data_fusion_msgs::
         DatafusionGeotiffSrv::Response* res) const
     {
-      res->hazmatx.push_back( pose_.position.x );
-      res->hazmaty.push_back( pose_.position.y );
-      res->pattern.push_back( pattern_ );
+      res->hazmatx.push_back(pose_.position.x);
+      res->hazmaty.push_back(pose_.position.y);
+      res->pattern.push_back(pattern_);
     }
 
     void Hazmat::getVisualization(visualization_msgs::
@@ -89,7 +89,7 @@ namespace pandora_data_fusion
       description.pose = pose_;
       description.pose.position.z = pose_.position.z + 0.1;
       description.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-      description.text = type_ + "_" + boost::to_string(id_) + "_" + 
+      description.text = type_ + "_" + boost::to_string(id_) + "_" +
         boost::to_string(pattern_);
       description.scale.z = 0.1;
       description.color.r = 1;

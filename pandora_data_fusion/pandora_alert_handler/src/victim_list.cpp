@@ -32,11 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
+
+#include <vector>
 
 #include "alert_handler/victim_list.h"
 
@@ -68,9 +70,9 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details A victimToUpdate from victim list is selected (this will be the 
-     * oldest among the ones from iteratorList). Its info is updated by copying 
-     * the given victim's objects and the rest victims that are thought to be the 
+     * @details A victimToUpdate from victim list is selected (this will be the
+     * oldest among the ones from iteratorList). Its info is updated by copying
+     * the given victim's objects and the rest victims that are thought to be the
      * same are deleted from victim list.
      */
     void VictimList::updateObjects(const ConstPtr& victim,
@@ -81,10 +83,10 @@ namespace pandora_data_fusion
       iterator victimToUpdate = *(iteratorList.begin());
       ros::Time oldestVictim = (*victimToUpdate)->getTimeFound();
 
-      for(IteratorList::const_iterator it = ++iteratorList.begin();
+      for (IteratorList::const_iterator it = ++iteratorList.begin();
           it != iteratorList.end() ; ++it)
       {
-        if((*(*it))->getTimeFound() < oldestVictim)
+        if ((*(*it))->getTimeFound() < oldestVictim)
         {
           oldestVictim = (*(*it))->getTimeFound();
           victimToUpdate = *it;
@@ -93,10 +95,10 @@ namespace pandora_data_fusion
 
       (*victimToUpdate)->setObjects(victim->getObjects());
 
-      for(IteratorList::const_iterator it = iteratorList.begin();
+      for (IteratorList::const_iterator it = iteratorList.begin();
           it != iteratorList.end(); ++it)
       {
-        if((*it) == victimToUpdate)
+        if ((*it) == victimToUpdate)
         {
           continue;
         }
@@ -129,7 +131,7 @@ namespace pandora_data_fusion
         for (ObjectConstPtrVector::const_iterator iter = (*it)->getObjects().begin();
             iter != (*it)->getObjects().end(); ++iter)
         {
-          if((*iter)->getType() != Hole::getObjectType())
+          if ((*iter)->getType() != Hole::getObjectType())
           {
             victimInfo.sensors.push_back((*iter)->getType());
           }
@@ -147,10 +149,10 @@ namespace pandora_data_fusion
      */
     bool VictimList::deleteVictim(int victimId, const VictimPtr& deletedVictim)
     {
-      for(VictimList::iterator it = objects_.begin();
+      for (VictimList::iterator it = objects_.begin();
           it != objects_.end(); ++it)
       {
-        if((*it)->getId() == victimId)
+        if ((*it)->getId() == victimId)
         {
           deletedVictim->setPose((*it)->getPose());
           objects_.erase(it);
@@ -161,18 +163,18 @@ namespace pandora_data_fusion
     }
 
     /**
-     * @details Sets the appropriate victim visited. 
-     * Also, sets its validation variable according to agent's order. 
+     * @details Sets the appropriate victim visited.
+     * Also, sets its validation variable according to agent's order.
      * Next this victim is deleted from victim list and returned.
      */
     VictimPtr VictimList::validateVictim(int victimId, bool victimValid)
     {
       VictimPtr currentVictim;
 
-      for(VictimList::iterator it = objects_.begin();
+      for (VictimList::iterator it = objects_.begin();
           it != objects_.end(); ++it)
       {
-        if((*it)->getId() == victimId)
+        if ((*it)->getId() == victimId)
         {
           currentVictim = *it;
           currentVictim->setValid(victimValid);

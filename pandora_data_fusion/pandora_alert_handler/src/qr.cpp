@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -47,7 +47,7 @@ namespace pandora_data_fusion
 
     bool Qr::isSameObject(const ObjectConstPtr& object) const
     {
-      bool cond = Object<Qr>::isSameObject(object) 
+      bool cond = Object<Qr>::isSameObject(object)
         && !content_.compare(
             boost::dynamic_pointer_cast<const Qr>(object)->getContent());
 
@@ -57,10 +57,10 @@ namespace pandora_data_fusion
     void Qr::fillGeotiff(pandora_data_fusion_msgs::
         DatafusionGeotiffSrv::Response* res) const
     {
-      res->qrx.push_back( pose_.position.x );
-      res->qry.push_back( pose_.position.y );
-      res->qrworldx.push_back( pose_.position.x );
-      res->qrworldy.push_back( pose_.position.y );
+      res->qrx.push_back(pose_.position.x);
+      res->qry.push_back(pose_.position.y);
+      res->qrworldx.push_back(pose_.position.x);
+      res->qrworldy.push_back(pose_.position.y);
       res->qrcontent.push_back(content_);
       res->qrtimestamp.push_back(timeFound_);
     }

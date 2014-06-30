@@ -32,12 +32,15 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_OBJECT_H
 #define ALERT_HANDLER_OBJECT_H
+
+#include <vector>
+#include <string>
 
 #include "alert_handler/base_object.h"
 #include "alert_handler/object_list.h"
@@ -54,7 +57,6 @@ namespace pandora_data_fusion
     template <class DerivedObject> class Object : public BaseObject
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<DerivedObject> Ptr;
         typedef boost::shared_ptr<DerivedObject const> ConstPtr;
@@ -64,7 +66,6 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr< const ObjectList<DerivedObject> > ListConstPtr;
 
       public:
-
         /**
          * @brief Constructor
          */
@@ -178,7 +179,7 @@ namespace pandora_data_fusion
          * @brief Getter for static distance threshold.
          * @return float distanceThres
          */
-        float getDistanceThres() const
+        static float getDistanceThres()
         {
           return distanceThres_;
         }
@@ -285,7 +286,6 @@ namespace pandora_data_fusion
         }
 
       protected:
-
         //!< The object's id
         int id_;
         //!< The reference frame for object.
@@ -311,7 +311,6 @@ namespace pandora_data_fusion
         static ListPtr listPtr_;
 
       private:
-
         friend class ObjectListTest;
     };
 
@@ -330,7 +329,7 @@ namespace pandora_data_fusion
     template <class DerivedObject>
       std::string Object<DerivedObject>::type_ = "object";
     template <class DerivedObject>
-      typename Object<DerivedObject>::ListPtr Object<DerivedObject>::listPtr_ = 
+      typename Object<DerivedObject>::ListPtr Object<DerivedObject>::listPtr_ =
       typename Object<DerivedObject>::ListPtr();
 
     template <class DerivedObject>
@@ -346,7 +345,7 @@ namespace pandora_data_fusion
     template <class DerivedObject>
       bool Object<DerivedObject>::isSameObject(const ObjectConstPtr& object) const
       {
-        if(type_ != object->getType())
+        if (type_ != object->getType())
           return false;
         return Utils::distanceBetweenPoints3D(
             pose_.position, object->getPose().position)
@@ -362,7 +361,7 @@ namespace pandora_data_fusion
     template <class DerivedObject>
       void Object<DerivedObject>::checkLegit()
       {
-        if(probability_ >= probabilityThres_)
+        if (probability_ >= probabilityThres_)
         {
           legit_ = true;
         }

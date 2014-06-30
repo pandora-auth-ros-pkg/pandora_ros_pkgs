@@ -99,22 +99,28 @@ namespace pandora_data_fusion
       // Declare helper variables
       CoverageChecker::findCoverage(sensorTransform);
       const float resolution = map2d_->info.resolution;
-      float robotX = baseTransform.getOrigin()[0];
-      float robotY = baseTransform.getOrigin()[1];
+      double robotX = baseTransform.getOrigin()[0];
+      double robotY = baseTransform.getOrigin()[1];
       float minZ = baseTransform.getOrigin()[2];
+      double robotRoll = 0, robotPitch = 0, robotYaw = 0;
+      baseTransform.getBasis().getRPY(robotRoll, robotPitch, robotYaw);
       float currX = position_.x();
       float currY = position_.y();
       float fov = (SENSOR_HFOV / 180.0) * PI;
       octomap::point3d cell;
 
       // Robot is standing in fully covered space (assumption).
-      for (int ii = -static_cast<int>((ceil(FOOTPRINT_WIDTH/resolution)));
-          ii < static_cast<int>((ceil(FOOTPRINT_WIDTH/resolution))) + 1; ii++)
+      double xn = 0, yn = 0;
+      for (double x = -FOOTPRINT_WIDTH / 2;
+          x <= FOOTPRINT_WIDTH / 2; x += resolution)
       {
-        for (int jj = -static_cast<int>((ceil(FOOTPRINT_HEIGHT/resolution)));
-            jj < static_cast<int>((ceil(FOOTPRINT_HEIGHT/resolution))) + 1; jj++)
+        for (double y = -FOOTPRINT_HEIGHT / 2;
+            y <= FOOTPRINT_HEIGHT / 2; y += resolution)
         {
-          coveredSpace_.data[ii + jj * coveredSpace_.info.width] = 100;
+          xn = cos(robotYaw) * x - sin(robotYaw) * y + robotX;
+          yn = sin(robotYaw) * x + cos(robotYaw) * y + robotY;
+          CELL(xn, yn, (&coveredSpace_)) = 100;
+          coverageDilation(1, COORDS(xn, yn, (&coveredSpace_)));
         }
       }
 
@@ -298,10 +304,13 @@ namespace pandora_data_fusion
               y = jj * oldMetaData.resolution;
               xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
               yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-              int coords = static_cast<int>((floor((xn + yn * coveredSpace_.info.width)
+              int coords = static_cast<int>((ceil((xn + yn * coveredSpace_.info.width)
                     / coveredSpace_.info.resolution)));
               coveredSpace_.data[coords] = oldCoverage[ii + jj * oldMetaData.width];
-              coverageDilation(1, COORDS(xn, yn, (&coveredSpace_)));
+              //int coords = static_cast<int>(floor(xn/coveredSpace_.info.resolution) +
+                    //floor(yn/coveredSpace_.info.resolution) * coveredSpace_.info.width);
+              //coveredSpace_.data[coords] = oldCoverage[ii + jj * oldMetaData.width];
+              coverageDilation(2, COORDS(xn, yn, (&coveredSpace_)));
             }
           }
         }

@@ -32,10 +32,12 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
+
+#include <string>
 
 #include <ros/package.h>
 
@@ -51,27 +53,26 @@ namespace pandora_data_fusion
   {
 
     class ObjectFactoryTest : public ::testing::Test
-    { 
-      public: 
-
+    {
+      public:
         /* Constructor SetUp */
 
         //!< Loading the Map and initializing Objectfactory with a
         //!< very small orientation circle(The other Params are the same)
-        ObjectFactoryTest() 
-          : map_type("TEST"), mapPtr(new Map) 
-        { 
+        ObjectFactoryTest()
+          : map_type("TEST"), mapPtr( new Map )
+        {
           ros::Time::init();
           *mapPtr = map_loader::loadMap(
-              ros::package::getPath("pandora_alert_handler") + 
+              ros::package::getPath("pandora_alert_handler") +
               "/test/test_maps/map1.yaml");
-          objectFactoryPtr.reset(new ObjectFactory(mapPtr, map_type));
+          objectFactoryPtr.reset( new ObjectFactory(mapPtr, map_type) );
           objectFactoryPtr->dynamicReconfigForward(0.5, 1.2, 0, 0.5, 0.25);
         }
 
         //!< Creating all the Different Alerts we will use
-        virtual void SetUp() 
-        { 
+        virtual void SetUp()
+        {
           createHoleDirVector();
           createHazmatAlertVector();
           createQrAlertVector();
@@ -79,27 +80,26 @@ namespace pandora_data_fusion
         }
 
       protected:
-
         /* Helper Functions */
 
         //!< Creating 3 HoleAlerts two on Walls and one very High
         void createHoleDirVector()
         {
-          holeDirVect1.header.seq = 1; 
+          holeDirVect1.header.seq = 1;
           holeDirVect1.header.frame_id = "Maria";
           holeDir1.yaw = -PI/4;
-          holeDir1.pitch = PI/6; 
+          holeDir1.pitch = PI/6;
           holeDir1.probability = 0.3;
-          holeDir1.holeId = 1; 
-          holeDirVect1.holesDirections.push_back(holeDir1); 
+          holeDir1.holeId = 1;
+          holeDirVect1.holesDirections.push_back(holeDir1);
           holeDir2.yaw = -PI/2;
-          holeDir2.pitch = 0; 
-          holeDir2.probability = 0.5; 
+          holeDir2.pitch = 0;
+          holeDir2.probability = 0.5;
           holeDir2.holeId = 2;
           holeDirVect1.holesDirections.push_back(holeDir2);
-          holeDir3.yaw = 0; 
-          holeDir3.pitch = PI/2; 
-          holeDir3.probability = 0.8; 
+          holeDir3.yaw = 0;
+          holeDir3.pitch = PI/2;
+          holeDir3.probability = 0.8;
           holeDir3.holeId = 3;
           holeDirVect1.holesDirections.push_back(holeDir3);
         }
@@ -107,18 +107,17 @@ namespace pandora_data_fusion
         // Creating 3 QrAlerts two on Walls and one very High
         void createQrAlertVector()
         {
-
           qrAlert1.yaw = -PI/4;
           qrAlert1.pitch = PI/6;
-          qrAlert1.QRcontent = 
-            "No one can make you feel inferior without your consent."; 
-          qrAlertVect1.qrAlerts.push_back(qrAlert1); 
+          qrAlert1.QRcontent =
+            "No one can make you feel inferior without your consent.";
+          qrAlertVect1.qrAlerts.push_back(qrAlert1);
           qrAlert2.yaw = -PI/2;
-          qrAlert2.pitch = 0; 
+          qrAlert2.pitch = 0;
           qrAlert2.QRcontent =
-            "Let him who would enjoy a good future waste none of his present."; 
+            "Let him who would enjoy a good future waste none of his present.";
           qrAlertVect1.qrAlerts.push_back(qrAlert2);
-          qrAlert3.yaw = 0; 
+          qrAlert3.yaw = 0;
           qrAlert3.pitch = PI/2;
           qrAlert3.QRcontent =
             "Live as if you were to die tomorrow. Learn as if you were to live forever.";
@@ -129,15 +128,15 @@ namespace pandora_data_fusion
         void createHazmatAlertVector()
         {
           hazmatAlert1.yaw = -PI/4;
-          hazmatAlert1.pitch = PI/6; 
-          hazmatAlert1.patternType = 1; 
-          hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert1); 
+          hazmatAlert1.pitch = PI/6;
+          hazmatAlert1.patternType = 1;
+          hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert1);
           hazmatAlert2.yaw = -PI/2;
-          hazmatAlert2.pitch = 0; 
+          hazmatAlert2.pitch = 0;
           hazmatAlert2.patternType = 2;
           hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert2);
-          hazmatAlert3.yaw = 0;  
-          hazmatAlert3.pitch = PI/2; 
+          hazmatAlert3.yaw = 0;
+          hazmatAlert3.pitch = PI/2;
           hazmatAlert3.patternType = 3;
           hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert3);
         }
@@ -159,10 +158,10 @@ namespace pandora_data_fusion
         const std::string map_type;
         ObjectFactoryPtr objectFactoryPtr;
         vision_communications::HolesDirectionsVectorMsg holeDirVect1;
-        vision_communications::HoleDirectionMsg holeDir1; 
-        vision_communications::HoleDirectionMsg holeDir2; 
+        vision_communications::HoleDirectionMsg holeDir1;
+        vision_communications::HoleDirectionMsg holeDir2;
         vision_communications::HoleDirectionMsg holeDir3;
-        vision_communications::QRAlertsVectorMsg qrAlertVect1; 
+        vision_communications::QRAlertsVectorMsg qrAlertVect1;
         vision_communications::QRAlertMsg qrAlert1;
         vision_communications::QRAlertMsg qrAlert2;
         vision_communications::QRAlertMsg qrAlert3;
@@ -180,13 +179,13 @@ namespace pandora_data_fusion
     /* Test Cases */
 
     TEST_F(ObjectFactoryTest, makeHoles)
-    { 
-      HolePtrVectorPtr holesVectorPtr(new HolePtrVector);
+    {
+      HolePtrVectorPtr holesVectorPtr( new HolePtrVector );
       holesVectorPtr = objectFactoryPtr->makeHoles(holeDirVect1);
       ASSERT_EQ(2, holesVectorPtr->size());
 
       HolePtr holePtr1 = (*holesVectorPtr)[0];
-      EXPECT_EQ(1, holePtr1->getHoleId()); 
+      EXPECT_EQ(1, holePtr1->getHoleId());
       EXPECT_NEAR(5.76, holePtr1->getPose().position.x, 0.1);
       EXPECT_NEAR(5.76, holePtr1->getPose().position.y, 0.1);
       EXPECT_NEAR(0.9205, holePtr1->getPose().position.z, 0.01);
@@ -204,17 +203,17 @@ namespace pandora_data_fusion
       EXPECT_NEAR(0, holePtr2->getPose().orientation.y, 0.1);
       EXPECT_NEAR(-0.70711, holePtr2->getPose().orientation.z, 0.1);
       EXPECT_NEAR(+0.70711, holePtr2->getPose().orientation.w, 0.1);
-    } 
+    }
 
     TEST_F(ObjectFactoryTest, makeQrs)
     {
-      QrPtrVectorPtr qrsVectorPtr(new QrPtrVector);
+      QrPtrVectorPtr qrsVectorPtr( new QrPtrVector );
       qrsVectorPtr = objectFactoryPtr->makeQrs(qrAlertVect1);
       ASSERT_EQ(2, qrsVectorPtr->size());
 
       QrPtr qrPtr1 = (*qrsVectorPtr)[0];
-      EXPECT_STREQ( "No one can make you feel inferior without your consent."
-          , qrPtr1->getContent().c_str()); 
+      EXPECT_STREQ("No one can make you feel inferior without your consent."
+          , qrPtr1->getContent().c_str());
       EXPECT_NEAR(5.76, qrPtr1->getPose().position.x, 0.1);
       EXPECT_NEAR(5.76, qrPtr1->getPose().position.y, 0.1);
       EXPECT_NEAR(0.9205, qrPtr1->getPose().position.z, 0.01);
@@ -233,16 +232,16 @@ namespace pandora_data_fusion
       EXPECT_NEAR(0, qrPtr2->getPose().orientation.y, 0.1);
       EXPECT_NEAR(-0.70711, qrPtr2->getPose().orientation.z, 0.1);
       EXPECT_NEAR(+0.70711, qrPtr2->getPose().orientation.w, 0.1);
-    } 
+    }
 
     TEST_F(ObjectFactoryTest, makeHazmats)
-    { 
+    {
       HazmatPtrVectorPtr hazmatsVectorPtr( new HazmatPtrVector );
       hazmatsVectorPtr = objectFactoryPtr->makeHazmats(hazmatAlertVect1);
       EXPECT_EQ(2, hazmatsVectorPtr->size());
 
       HazmatPtr hazmatPtr1 = (*hazmatsVectorPtr)[0];
-      EXPECT_EQ(1, hazmatPtr1->getPattern()); 
+      EXPECT_EQ(1, hazmatPtr1->getPattern());
       EXPECT_NEAR(5.75, hazmatPtr1->getPose().position.x, 0.01);
       EXPECT_NEAR(5.75, hazmatPtr1->getPose().position.y, 0.01);
       EXPECT_NEAR(0.9205, hazmatPtr1->getPose().position.z, 0.01);
@@ -259,11 +258,11 @@ namespace pandora_data_fusion
       EXPECT_NEAR(0, hazmatPtr2->getPose().orientation.y, 0.1);
       EXPECT_NEAR(-0.70711, hazmatPtr2->getPose().orientation.z, 0.1);
       EXPECT_NEAR(+0.70711, hazmatPtr2->getPose().orientation.w, 0.1);
-    } 
+    }
 
     //!<  A vector is returned although thermal will always be alone :(
     TEST_F(ObjectFactoryTest, makeThermals)
-    { 
+    {
       ThermalPtrVectorPtr thermalsVectorPtr( new ThermalPtrVector );
       thermalsVectorPtr = objectFactoryPtr->makeObjects<Thermal>(thermalDir1);
       EXPECT_EQ(1, thermalsVectorPtr->size());

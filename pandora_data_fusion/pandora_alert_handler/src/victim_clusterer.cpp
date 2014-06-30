@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -59,7 +59,7 @@ namespace pandora_data_fusion
      */
     VictimPtrVector VictimClusterer::createVictimList(
         const ObjectConstPtrVectorPtr& allObjects)
-    {  
+    {
       ObjectConstPtrVectorVector groupedObjects = groupObjects(allObjects);
 
       VictimPtrVector newVictimVector;
@@ -81,24 +81,24 @@ namespace pandora_data_fusion
      * metric with threshold to decide whether an object should be added
      * to the group or not.
      */
-    ObjectConstPtrVectorVector 
+    ObjectConstPtrVectorVector
       VictimClusterer::groupObjects(const ObjectConstPtrVectorPtr& allObjects)
       {
         ObjectConstPtrVectorVector groupedObjects;
 
-        for(int objectIt = 0 ; objectIt < allObjects->size() ; ++objectIt)
+        for (int objectIt = 0 ; objectIt < allObjects->size() ; ++objectIt)
         {
           ObjectConstPtr currentObj = allObjects->at(objectIt);
 
           bool isAdded = false;
 
-          for(int ii = 0; ii < groupedObjects.size(); ++ii)
+          for (int ii = 0; ii < groupedObjects.size(); ++ii)
           {
             geometry_msgs::Point groupCenterPoint =
               findGroupCenterPoint(groupedObjects[ii]);
 
             double distance = 0;
-            if(currentObj->getType() != Sound::getObjectType() &&
+            if (currentObj->getType() != Sound::getObjectType() &&
                 currentObj->getType() != Co2::getObjectType())
             {
               distance =
@@ -112,11 +112,11 @@ namespace pandora_data_fusion
                     getPose().position, groupCenterPoint);
             }
 
-            if(distance < CLUSTER_RADIUS)
+            if (distance < CLUSTER_RADIUS)
             {
               groupedObjects[ii].push_back(currentObj);
               isAdded = true;
-              if(currentObj->getType() != Sound::getObjectType())
+              if (currentObj->getType() != Sound::getObjectType())
                 break;
             }
           }

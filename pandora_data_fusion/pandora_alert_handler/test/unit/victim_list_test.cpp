@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
@@ -49,8 +49,7 @@ namespace pandora_data_fusion
     class VictimListTest : public ::testing::Test
     {
       protected:
-
-        VictimListTest() 
+        VictimListTest()
         {
           ros::Time::init();
           victim1_.reset( new Victim );
@@ -81,7 +80,7 @@ namespace pandora_data_fusion
           fillVictim(victim4_, objConstPtrVect4_);
 
           fillVictimListAdd(victimList_);
-        } 
+        }
 
         virtual void TearDown()
         {
@@ -124,10 +123,10 @@ namespace pandora_data_fusion
         }
 
         //!< We fill the iteratorList_ specifically around victim2_.
-        void fillIteratorList(VictimListPtr victimList, 
+        void fillIteratorList(VictimListPtr victimList,
             VictimList::IteratorList* iteratorListPtr)
         {
-          for(VictimList::iterator it = victimList->objects_.begin(); 
+          for (VictimList::iterator it = victimList->objects_.begin();
               it != victimList->objects_.end(); ++it)
           {
             if ((*it)->isSameObject(victim2_))
@@ -137,22 +136,22 @@ namespace pandora_data_fusion
           }
         }
 
-        //!< Thermal1(-1, 0, 0), Thermal2(1, 0, 0), Hole1(0 , 1, 0)  
+        //!< Thermal1(-1, 0, 0), Thermal2(1, 0, 0), Hole1(0 , 1, 0)
         void createVariousObjects1(ObjectConstPtrVectorPtr objConstPtrVect)
         {
-          ThermalPtr thermalPtr1(new Thermal);
+          ThermalPtr thermalPtr1( new Thermal );
           thermalPtr1->setPose(makePose(-1, 0, 0));
           thermalPtr1->setId(1);
           thermalPtr1->setProbability(0.5);
           thermalPtr1->initializeObjectFilter();
-          ThermalPtr thermalPtr2(new Thermal);
+          ThermalPtr thermalPtr2( new Thermal );
           thermalPtr2->setPose(makePose(1, 0, 0));
           thermalPtr2->setId(2);
           thermalPtr2->setProbability(0.5);
           thermalPtr2->initializeObjectFilter();
           thermalPtr2->update(thermalPtr2);
           thermalPtr2->update(thermalPtr2);
-          HolePtr holePtr1(new Hole);
+          HolePtr holePtr1( new Hole );
           holePtr1->setPose(makePose(0, 1, 0));
           holePtr1->setId(1);
           holePtr1->setProbability(0.5);
@@ -162,16 +161,16 @@ namespace pandora_data_fusion
           objConstPtrVect->push_back(holePtr1);
         }
 
-        //!< Thermal1(2, 3, 0), Hole1(3, 3, 0), Hole2(2, 2.5, 0) 
+        //!< Thermal1(2, 3, 0), Hole1(3, 3, 0), Hole2(2, 2.5, 0)
         void createVariousObjects2(ObjectConstPtrVectorPtr objConstPtrVect)
         {
-          ThermalPtr thermalPtr1(new Thermal); 
+          ThermalPtr thermalPtr1( new Thermal );
           thermalPtr1->setPose(makePose(2, 3, 0));
           thermalPtr1->setId(1);
           thermalPtr1->setProbability(0.5);
           thermalPtr1->initializeObjectFilter();
 
-          HolePtr holePtr1(new Hole);
+          HolePtr holePtr1( new Hole );
           holePtr1->setPose(makePose(3, 3, 0));
           holePtr1->setId(1);
           holePtr1->setProbability(0.5);
@@ -179,27 +178,27 @@ namespace pandora_data_fusion
           holePtr1->update(holePtr1);
           holePtr1->update(holePtr1);
 
-          HolePtr holePtr2(new Hole); 
+          HolePtr holePtr2( new Hole );
           holePtr2->setPose(makePose(2, 2.5, 0));
           holePtr2->setId(2);
           holePtr2->setProbability(0.5);
           holePtr2->initializeObjectFilter();
 
-          objConstPtrVect->push_back(thermalPtr1); 
-          objConstPtrVect->push_back(holePtr1); 
+          objConstPtrVect->push_back(thermalPtr1);
+          objConstPtrVect->push_back(holePtr1);
           objConstPtrVect->push_back(holePtr2);
         }
 
-        //!< Thermal1(2.7, 3, 0), Thermal2(3, 3, 0) 
+        //!< Thermal1(2.7, 3, 0), Thermal2(3, 3, 0)
         void createVariousObjects3(ObjectConstPtrVectorPtr objConstPtrVect)
         {
-          ThermalPtr thermalPtr1(new Thermal);
+          ThermalPtr thermalPtr1( new Thermal );
           thermalPtr1->setPose(makePose(2.7, 3, 0));
           thermalPtr1->setId(1);
           thermalPtr1->setProbability(0.5);
           thermalPtr1->initializeObjectFilter();
 
-          ThermalPtr thermalPtr2(new Thermal);
+          ThermalPtr thermalPtr2( new Thermal );
           thermalPtr2->setPose(makePose(3, 3, 0));
           thermalPtr2->setId(2);
           thermalPtr2->setProbability(0.5);
@@ -209,29 +208,29 @@ namespace pandora_data_fusion
 
           objConstPtrVect->push_back(thermalPtr1);
           objConstPtrVect->push_back(thermalPtr2);
-        } 
+        }
 
-        //!< Thermal1(3, 3, 0), Hole1(10, 3, 0) 
+        //!< Thermal1(3, 3, 0), Hole1(10, 3, 0)
         void createVariousObjects4(ObjectConstPtrVectorPtr objConstPtrVect)
         {
-          ThermalPtr thermalPtr1(new Thermal);
+          ThermalPtr thermalPtr1( new Thermal );
           thermalPtr1->setPose(makePose(3, 3, 0));
           thermalPtr1->setId(1);
           thermalPtr1->setProbability(0.5);
           thermalPtr1->initializeObjectFilter();
-          HolePtr holePtr1(new Hole);
+          HolePtr holePtr1( new Hole );
           holePtr1->setPose(makePose(10, 3, 0));
           holePtr1->setId(1);
           holePtr1->setProbability(0.5);
           holePtr1->initializeObjectFilter();
           objConstPtrVect->push_back(thermalPtr1);
           objConstPtrVect->push_back(holePtr1);
-        } 
+        }
 
         /* Accesors to private functions */
 
         void updateObjects(VictimListPtr victimList,
-            const VictimPtr& victim, 
+            const VictimPtr& victim,
             const VictimList::IteratorList& iteratorList_)
         {
           victimList->updateObjects(victim, iteratorList_);
@@ -258,10 +257,10 @@ namespace pandora_data_fusion
 
     TEST_F(VictimListTest, contains)
     {
-      // Victim1 Thermal(1, 0, 0) Hole(0, 1, 0)  
+      // Victim1 Thermal(1, 0, 0) Hole(0, 1, 0)
       // Victim2 Thermal(2, 3, 0) Hole(3, 3, 0)
       // Victim3 Thermal(3, 3, 0)
-      // Victim4 Thermal(3, 3, 0) Hole(10, 3, 0) 
+      // Victim4 Thermal(3, 3, 0) Hole(10, 3, 0)
 
       // victim 3 is the same as victim 2 (samePosition)
       ASSERT_EQ(3, victimList_->size());
@@ -285,7 +284,7 @@ namespace pandora_data_fusion
       EXPECT_EQ(victim2_, *(++it));
       EXPECT_EQ(victim3_, *(++it));
       EXPECT_EQ(victim4_, *(++it));
-      // Victim3 will be removed 
+      // Victim3 will be removed
       updateObjects(victimList2, victim2_, iteratorList_);
       ASSERT_EQ(3, victimList2->size());
       it = getObjects(victimList2).begin();

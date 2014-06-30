@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -66,12 +66,11 @@ namespace pandora_data_fusion
 
     /**
      * @class VictimHandler
-     * @brief Controller that keeps track of victims 
-     */ 
+     * @brief Controller that keeps track of victims
+     */
     class VictimHandler : private boost::noncopyable
     {
       public:
-
         /**
          * @brief Constructor
          */
@@ -115,7 +114,7 @@ namespace pandora_data_fusion
         /**
          * @brief Validates current victim.
          * @param victimId [int] Id of victim to be validated.
-         * @param victimValid [bool] True for positive and false for 
+         * @param victimValid [bool] True for positive and false for
          * negative validation
          * @return bool true, if succeded, false, if not found
          */
@@ -137,13 +136,13 @@ namespace pandora_data_fusion
          * @param approachPoints [PoseStampedVector*] vector with approach points.
          * @return void
          */
-        void getVictimsPosesStamped(PoseStampedVector* victimsToGo, 
+        void getVictimsPosesStamped(PoseStampedVector* victimsToGo,
             PoseStampedVector* victimsVisited);
 
         /**
-         * @brief Fill in the geotiff info with the victims details 
-         * @param res 
-         * [pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response*] 
+         * @brief Fill in the geotiff info with the victims details
+         * @param res
+         * [pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response*]
          * The output service response param
          * @return void
          */
@@ -152,35 +151,33 @@ namespace pandora_data_fusion
 
         /**
          * @brief Get the victims visualization
-         * @param victimsVisitedMarkers [visualization_msgs::MarkerArray*] 
-         * The output param for the visited victims 
-         * @param victimsToGoMarkers [visualization_msgs::MarkerArray*] 
-         * The output param for the unvisited victims 
+         * @param victimsVisitedMarkers [visualization_msgs::MarkerArray*]
+         * The output param for the visited victims
+         * @param victimsToGoMarkers [visualization_msgs::MarkerArray*]
+         * The output param for the unvisited victims
          * @return void
          */
-        void getVisualization(visualization_msgs::MarkerArray* victimsVisitedMarkers, 
+        void getVisualization(visualization_msgs::MarkerArray* victimsVisitedMarkers,
             visualization_msgs::MarkerArray* victimsToGoMarkers);
 
       private:
-
         /**
-         * @brief Returns all the legit Objects from all the Object lists 
+         * @brief Returns all the legit Objects from all the Object lists
          * concatenated into a single vector
          * @return ObjectConstPtrVector A vector contaiing all the legit Objects
          */
         ObjectConstPtrVectorPtr getAllLegitObjects();
 
       private:
-
         VictimClustererPtr clusterer_;
 
-        //!< The unvisited victims list  
+        //!< The unvisited victims list
         VictimListPtr victimsToGoList_;
-        //!< The visited victims list  
+        //!< The visited victims list
         VictimListPtr victimsVisitedList_;
 
         //!< Radius within which all legit objects are associated with a victim.
-        float CLUSTER_RADIUS; 
+        float CLUSTER_RADIUS;
     };
 
     typedef boost::scoped_ptr<VictimHandler> VictimHandlerPtr;

@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -71,7 +71,7 @@ namespace pandora_data_fusion
       description.pose = pose_;
       description.pose.position.z = pose_.position.z + 0.1;
       description.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-      description.text = type_ + "_" + boost::to_string(id_) + "_" + 
+      description.text = type_ + "_" + boost::to_string(id_) + "_" +
         boost::to_string(angles_.size());
       description.scale.z = 0.1;
       description.color.r = 0.80;

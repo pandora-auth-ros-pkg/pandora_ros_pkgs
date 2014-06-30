@@ -32,12 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #ifndef ALERT_HANDLER_HAZMAT_H
 #define ALERT_HANDLER_HAZMAT_H
+
+#include <vector>
 
 #include "alert_handler/kalman_object.h"
 
@@ -49,21 +51,20 @@ namespace pandora_data_fusion
     /**
      * @class Hazmat
      * @brief Concrete class representing a Hazmat Object. Inherits from Object
-     */ 
+     */
     class Hazmat : public KalmanObject<Hazmat>
     {
       public:
-
         //!< Type Definitions
         typedef boost::shared_ptr<Hazmat> Ptr;
         typedef boost::shared_ptr<Hazmat const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<Hazmat> > ListPtr;
+        typedef ObjectList<Hazmat> List;
+        typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Hazmat> > ListConstPtr;
 
       public:
-
         /**
          * @brief Constructor
          */
@@ -95,7 +96,6 @@ namespace pandora_data_fusion
         }
 
       private:
-
         //!< The hazmat's pattern
         int pattern_;
     };
@@ -104,6 +104,7 @@ namespace pandora_data_fusion
     typedef Hazmat::ConstPtr HazmatConstPtr;
     typedef Hazmat::PtrVector HazmatPtrVector;
     typedef Hazmat::PtrVectorPtr HazmatPtrVectorPtr;
+    typedef Hazmat::List HazmatList;
     typedef Hazmat::ListPtr HazmatListPtr;
     typedef Hazmat::ListConstPtr HazmatListConstPtr;
 

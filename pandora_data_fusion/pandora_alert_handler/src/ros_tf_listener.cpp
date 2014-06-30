@@ -32,9 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
+
+#include <string>
 
 #include "alert_handler/tf_listener.h"
 
@@ -50,32 +52,32 @@ namespace pandora_data_fusion
       waitForTransform("/map", "/map",
           ros::Time(0), ros::Duration(1));
 
-      lookupTransform("/map", "/map", 
+      lookupTransform("/map", "/map",
           ros::Time(0), tfTransform);
     }
 
-    bool RosTfListener::waitForTransform(const std::string& target_frame, 
-        const std::string& source_frame, const ros::Time& time, 
-        const ros::Duration& timeout, const ros::Duration& polling_sleep_duration, 
+    bool RosTfListener::waitForTransform(const std::string& target_frame,
+        const std::string& source_frame, const ros::Time& time,
+        const ros::Duration& timeout, const ros::Duration& polling_sleep_duration,
         std::string* error_msg) const
     {
       bool flag;
       try
       {
-        flag = listener.waitForTransform(target_frame, source_frame, time, 
+        flag = listener.waitForTransform(target_frame, source_frame, time,
             timeout, polling_sleep_duration, error_msg);
       }
       catch (tf::TransformException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s", __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s", __LINE__, ex.what());
         throw TfException(
             "Something went wrong with tf, ignoring current message");
       }
       return flag;
     }
 
-    void RosTfListener::lookupTransform(const std::string& target_frame, 
-        const std::string& source_frame, const ros::Time& time, 
+    void RosTfListener::lookupTransform(const std::string& target_frame,
+        const std::string& source_frame, const ros::Time& time,
         tf::StampedTransform& transform) const
     {
       try
@@ -84,7 +86,7 @@ namespace pandora_data_fusion
       }
       catch (tf::TransformException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s", __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s", __LINE__, ex.what());
         throw TfException(
             "Something went wrong with tf, ignoring current message");
       }

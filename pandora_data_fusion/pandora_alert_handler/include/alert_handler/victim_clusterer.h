@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Christos Zalidis <zalidis@gmail.com>
  *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
@@ -56,12 +56,11 @@ namespace pandora_data_fusion
 
     /**
      * @class VictimClusterer
-     * @brief Controller that keeps track of victims 
-     */ 
+     * @brief Controller that keeps track of victims
+     */
     class VictimClusterer : private boost::noncopyable
     {
       public:
-
         /**
          * @brief Constructor
          */
@@ -71,7 +70,7 @@ namespace pandora_data_fusion
          * @brief Creates a new victim vector from groups of Objects
          * @param groupedObjects [ObjectPtrVectorVector] The vector containing the
          * groups of Objects
-         * @return VictimPtrVector The resulting victim vector 
+         * @return VictimPtrVector The resulting victim vector
          */
         VictimPtrVector createVictimList(
             const ObjectConstPtrVectorPtr& allObjects);
@@ -84,7 +83,6 @@ namespace pandora_data_fusion
         void updateParams(float clusterRadius);
 
       private:
-
         /**
          * @brief Clusters the existing Objects into victims
          * @return ObjectPtrVectorVector A vector containing
@@ -100,13 +98,11 @@ namespace pandora_data_fusion
         geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects);
 
       private:
-
-        friend class VictimClustererTest;
-
-      private:
-
         //!< The radius used for clustering
         float CLUSTER_RADIUS;
+
+      private:
+        friend class VictimClustererTest;
     };
 
     typedef boost::scoped_ptr<VictimClusterer> VictimClustererPtr;
