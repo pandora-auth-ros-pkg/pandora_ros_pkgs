@@ -14,7 +14,7 @@
     <xacro:sonar_caster name="linear"
                         parent="linear_elevator_link" >
 
-      <origin xyz="0.01195 0.0 0.32700"
+      <origin xyz="0.0195 -0.0051 0.3270"
               rpy="${zero}" />
 
     </xacro:sonar_caster>
