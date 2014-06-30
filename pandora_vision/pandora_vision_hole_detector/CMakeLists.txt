@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_hole_detector)
 
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
 # Uncomment for generating coverage statistics.
 # CMAKE_BUILD_TYPE should not be set.
