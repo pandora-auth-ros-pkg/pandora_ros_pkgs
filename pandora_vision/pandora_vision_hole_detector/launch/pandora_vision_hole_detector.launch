@@ -1,18 +1,12 @@
 <launch>
 
-  <!-- ============ The namespace of the hole detector package ============= -->
-
-  <arg name="namespace" default="vision/hole_detector" />
-
-
   <!-- ========================= Synchronizer node ========================= -->
 
   <node name="synchronizer_node"
         type="synchronizer_node"
         pkg="pandora_vision_hole_detector"
         respawn="False"
-        output="screen"
-        ns="$(arg namespace)" >
+        output="screen">
 
     <!-- The width and height variables needed when in simulation mode -->
     <param name="width" value="640" />
@@ -29,8 +23,7 @@
         type="depth_node"
         pkg="pandora_vision_hole_detector"
         respawn="False"
-        output="screen"
-        ns="$(arg namespace)" >
+        output="screen">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/depth_node_topics.yaml"
               command="load" />
@@ -43,8 +36,7 @@
         type="rgb_node"
         pkg="pandora_vision_hole_detector"
         respawn="False"
-        output="screen"
-        ns="$(arg namespace)" >
+        output="screen">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/rgb_node_topics.yaml"
               command="load" />
@@ -57,8 +49,7 @@
         type="hole_fusion_node"
         pkg="pandora_vision_hole_detector"
         respawn="False"
-        output="screen"
-        ns="$(arg namespace)" >
+        output="screen">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/hole_fusion_node_topics.yaml"
               command="load" />
