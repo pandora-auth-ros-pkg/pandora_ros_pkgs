@@ -621,7 +621,7 @@ namespace pandora_vision
     EXPECT_EQ ( 0.0, probabilitiesVector_10[0] );
     EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
     EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
-    EXPECT_LT ( 0.0, probabilitiesVector_10[3] );
+    EXPECT_EQ ( 0.0, probabilitiesVector_10[3] );
     EXPECT_LT ( 0.0, probabilitiesVector_10[4] );
   }
 
@@ -814,7 +814,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
         EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
         EXPECT_LT ( 0.0, probabilitiesVector_10[3] );
-        EXPECT_LT ( 0.0, probabilitiesVector_10[4] );
+        EXPECT_EQ ( 0.0, probabilitiesVector_10[4] );
       }
     }
   }
