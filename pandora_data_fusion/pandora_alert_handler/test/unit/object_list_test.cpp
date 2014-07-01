@@ -73,7 +73,6 @@ namespace pandora_data_fusion
           qr11.reset( new Qr );
         }
 
-
         /* SetUp/TearDown definitions */
 
         virtual void SetUp()

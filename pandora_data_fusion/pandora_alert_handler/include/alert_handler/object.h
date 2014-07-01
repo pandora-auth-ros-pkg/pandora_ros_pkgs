@@ -185,6 +185,15 @@ namespace pandora_data_fusion
         }
 
         /**
+         * @brief Getter for static merge threshold.
+         * @return float mergeDistance
+         */
+        static float getMergeDistance()
+        {
+          return mergeDistance_;
+        }
+
+        /**
          * @brief Method for accessing DerivedObject's associated list.
          * @return ListPtr the list
          */
@@ -255,6 +264,16 @@ namespace pandora_data_fusion
         }
 
         /**
+         * @brief Setter for static merge threshold.
+         * @param mergeDistance [float] distance
+         * @return void
+         */
+        static void setMergeDistance(float mergeDistance)
+        {
+          mergeDistance_ = mergeDistance;
+        }
+
+        /**
          * @brief Setter for static object type's score.
          * @param objectScore [int] score
          * @return void
@@ -300,6 +319,8 @@ namespace pandora_data_fusion
 
         //!< Variable with objects' min distance.
         static float distanceThres_;
+        //!< Variable with objects' merge distance.
+        static float mergeDistance_;
         //!< Variable containing object type's score.
         static int objectScore_;
         //!< Variable containing object type's probability threshold for an
@@ -322,6 +343,8 @@ namespace pandora_data_fusion
 
     template <class DerivedObject>
       float Object<DerivedObject>::distanceThres_ = 0.5;
+    template <class DerivedObject>
+      float Object<DerivedObject>::mergeDistance_ = 0.03;
     template <class DerivedObject>
       float Object<DerivedObject>::probabilityThres_ = 0;
     template <class DerivedObject>

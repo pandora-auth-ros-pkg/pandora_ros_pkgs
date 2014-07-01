@@ -464,6 +464,7 @@ namespace pandora_data_fusion
       landoltcs_->getObjectsPosesStamped(&objectsPosesStamped);
       dataMatrices_->getObjectsPosesStamped(&objectsPosesStamped);
       victimsToGo_->getObjectsPosesStamped(&objectsPosesStamped);
+      victimsVisited_->getObjectsPosesStamped(&objectsPosesStamped);
 
       broadcastPoseVector(objectsPosesStamped);
     }
@@ -528,60 +529,70 @@ namespace pandora_data_fusion
       Hole::setObjectScore(-1);
       Hole::setProbabilityThres(config.holeMinProbability);
       Hole::setDistanceThres(config.holeMinDistance);
+      Hole::setMergeDistance(config.objectMergeDistance);
       Hole::getFilterModel()->initializeSystemModel(config.holeSystemNoiseSD);
       Hole::getFilterModel()->initializeMeasurementModel(config.holeMeasurementSD);
 
       Hazmat::setObjectScore(config.hazmatScore);
       Hazmat::setProbabilityThres(config.hazmatMinProbability);
       Hazmat::setDistanceThres(config.hazmatMinDistance);
+      Hazmat::setMergeDistance(config.objectMergeDistance);
       Hazmat::getFilterModel()->initializeSystemModel(config.hazmatSystemNoiseSD);
       Hazmat::getFilterModel()->initializeMeasurementModel(config.hazmatMeasurementSD);
 
       Qr::setObjectScore(config.qrScore);
       Qr::setProbabilityThres(config.qrMinProbability);
       Qr::setDistanceThres(config.qrMinDistance);
+      Qr::setMergeDistance(config.objectMergeDistance);
       Qr::getFilterModel()->initializeSystemModel(config.qrSystemNoiseSD);
       Qr::getFilterModel()->initializeMeasurementModel(config.qrMeasurementSD);
 
       DataMatrix::setObjectScore(config.dataMatrixScore);
       DataMatrix::setProbabilityThres(config.dataMatrixMinProbability);
       DataMatrix::setDistanceThres(config.dataMatrixMinDistance);
+      DataMatrix::setMergeDistance(config.objectMergeDistance);
       DataMatrix::getFilterModel()->initializeSystemModel(config.dataMatrixSystemNoiseSD);
       DataMatrix::getFilterModel()->initializeMeasurementModel(config.dataMatrixMeasurementSD);
 
       Landoltc::setObjectScore(config.landoltcScore);
       Landoltc::setProbabilityThres(config.landoltcMinProbability);
       Landoltc::setDistanceThres(config.landoltcMinDistance);
+      Landoltc::setMergeDistance(config.objectMergeDistance);
       Landoltc::getFilterModel()->initializeSystemModel(config.landoltcSystemNoiseSD);
       Landoltc::getFilterModel()->initializeMeasurementModel(config.landoltcMeasurementSD);
 
       Thermal::setObjectScore(config.thermalScore);
       Thermal::setProbabilityThres(config.thermalMinProbability);
       Thermal::setDistanceThres(config.thermalMinDistance);
+      Thermal::setMergeDistance(config.objectMergeDistance);
       Thermal::getFilterModel()->initializeSystemModel(config.thermalSystemNoiseSD);
       Thermal::getFilterModel()->initializeMeasurementModel(config.thermalMeasurementSD);
 
       Face::setObjectScore(config.faceScore);
       Face::setProbabilityThres(config.faceMinProbability);
       Face::setDistanceThres(config.faceMinDistance);
+      Face::setMergeDistance(config.objectMergeDistance);
       Face::getFilterModel()->initializeSystemModel(config.faceSystemNoiseSD);
       Face::getFilterModel()->initializeMeasurementModel(config.faceMeasurementSD);
 
       Motion::setObjectScore(config.motionScore);
       Motion::setProbabilityThres(config.motionMinProbability);
       Motion::setDistanceThres(config.motionMinDistance);
+      Motion::setMergeDistance(config.objectMergeDistance);
       Motion::getFilterModel()->initializeSystemModel(config.motionSystemNoiseSD);
       Motion::getFilterModel()->initializeMeasurementModel(config.motionMeasurementSD);
 
       Sound::setObjectScore(config.soundScore);
       Sound::setProbabilityThres(config.soundMinProbability);
       Sound::setDistanceThres(config.soundMinDistance);
+      Sound::setMergeDistance(config.objectMergeDistance);
       Sound::getFilterModel()->initializeSystemModel(config.soundSystemNoiseSD);
       Sound::getFilterModel()->initializeMeasurementModel(config.soundMeasurementSD);
 
       Co2::setObjectScore(config.co2Score);
       Co2::setProbabilityThres(config.co2MinProbability);
       Co2::setDistanceThres(config.co2MinDistance);
+      Co2::setMergeDistance(config.objectMergeDistance);
       Co2::getFilterModel()->initializeSystemModel(config.co2SystemNoiseSD);
       Co2::getFilterModel()->initializeMeasurementModel(config.co2MeasurementSD);
 

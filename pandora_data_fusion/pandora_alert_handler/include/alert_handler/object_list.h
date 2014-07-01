@@ -117,7 +117,6 @@ namespace pandora_data_fusion
       };
 
     typedef boost::shared_ptr< ObjectList<BaseObject> > ObjectListPtr;
-
     typedef boost::shared_ptr< const ObjectList<BaseObject> > ObjectListConstPtr;
 
     template <class ObjectType>
@@ -300,10 +299,21 @@ namespace pandora_data_fusion
       void ObjectList<ObjectType>::updateObjects(const ConstPtr& object,
           const IteratorList& iteratorList)
       {
+        bool first = true;
         for (typename IteratorList::const_iterator it = iteratorList.begin();
             it != iteratorList.end(); ++it)
         {
           (*(*it))->update(object);
+          if (Utils::distanceBetweenPoints3D(
+                object->getPose().position, (*(*it))->getPose().position) < ObjectType::getMergeDistance())
+          {
+            if (first)
+            {
+              first = false;
+              continue;
+            }
+            removeElementAt(*it);
+          }
         }
       }
 

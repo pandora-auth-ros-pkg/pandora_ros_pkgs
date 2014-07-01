@@ -240,12 +240,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         # I expect that 3-4 alerts would bring the conviction high enough to be
         # recognised as a victim, but no less.
         self.assertEqual(len(outs[0].victimsToGo), 0)
-        self.assertEqual(len(outs[1].victimsToGo), 0)
-        for i in range(3, 12):
-            if len(outs[i-1].victimsToGo) == 1:
-                break
-        rospy.logdebug("Victim found in %s-th alert!", str(i))
-        self.assertTrue(i == 3 or i == 4)
+        self.assertEqual(len(outs[1].victimsToGo), 1)
         # If the measurement differs the same way, then the updated expected position
         # should draw closer to that measurement - towards the same direction.  That
         # means that expected position's distance from the initial expected position

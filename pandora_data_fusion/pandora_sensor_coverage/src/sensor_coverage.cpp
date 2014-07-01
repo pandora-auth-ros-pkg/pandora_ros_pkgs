@@ -166,18 +166,15 @@ namespace pandora_data_fusion
     void SensorCoverage::startTransition(int newState)
     {
       currentState_ = newState;
-      for (int ii = 0; ii < registeredSensors_.size(); ++ii)
-      {
-        registeredSensors_[ii]->notifyStateChange(currentState_);
-      }
+      transitionComplete(newState);
     }
 
     void SensorCoverage::completeTransition()
     {
-      // for (int ii = 0; ii < registeredSensors_.size(); ++ii)
-      // {
-      //   registeredSensors_[ii]->notifyStateChange(currentState_);
-      // }
+      for (int ii = 0; ii < registeredSensors_.size(); ++ii)
+      {
+        registeredSensors_[ii]->notifyStateChange(currentState_);
+      }
     }
 
     void SensorCoverage::map3dUpdate(const octomap_msgs::Octomap& msg)
