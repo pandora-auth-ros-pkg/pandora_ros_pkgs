@@ -4,6 +4,6 @@
   <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
 
   <!--  Sensor Coverage  -->
-  <!--<include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" /> -->
+  <include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" /> 
   
 </launch>
