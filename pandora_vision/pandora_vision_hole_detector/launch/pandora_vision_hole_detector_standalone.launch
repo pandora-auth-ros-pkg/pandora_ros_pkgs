@@ -58,6 +58,7 @@
     type="synchronizer_node"
     pkg="pandora_vision_hole_detector"
     respawn="False"
+    output="screen"
     ns="$(arg namespace)">
 
     <!-- The width and height variables needed when in simulation mode -->
@@ -76,6 +77,7 @@
     type="depth_node"
     pkg="pandora_vision_hole_detector"
     respawn="False"
+    output="screen"
     ns="$(arg namespace)">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/depth_node_topics.yaml"
@@ -90,6 +92,7 @@
     type="rgb_node"
     pkg="pandora_vision_hole_detector"
     respawn="False"
+    output="screen"
     ns="$(arg namespace)">
 
     <rosparam file="$(find pandora_vision_hole_detector)/cfg/rgb_node_topics.yaml"

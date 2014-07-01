@@ -686,7 +686,10 @@ namespace pandora_vision
       // If the i-th candidate hole has passed the above checks,
       // it surely is valid. Its validity probability will amount to the
       // mean value of its separate validity probabilities.
-      valid[i] = validityProbability / probabilitiesVector2D.size();
+      if (probabilitiesVector2D.size() > 0)
+      {
+        valid[i] = validityProbability / probabilitiesVector2D.size();
+      }
     }
 
     #ifdef DEBUG_TIME

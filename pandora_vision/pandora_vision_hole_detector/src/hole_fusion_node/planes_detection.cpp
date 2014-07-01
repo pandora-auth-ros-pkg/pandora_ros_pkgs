@@ -151,6 +151,8 @@ namespace pandora_vision
     Timer::start("locatePlanesUsingSACSegmentation", "locatePlanes");
     #endif
 
+    pcl::console::setVerbosityLevel(pcl::console::L_ALWAYS);
+
     // Create the segmentation object
     pcl::SACSegmentation<pcl::PointXYZ> seg;
 
@@ -195,7 +197,7 @@ namespace pandora_vision
 
       if (inliers->indices.size () == 0)
       {
-        ROS_ERROR_NAMED(PKG_NAME,
+        ROS_DEBUG_NAMED(PKG_NAME,
           "Could not estimate a planar model for the given dataset.");
 
         break;
@@ -234,7 +236,6 @@ namespace pandora_vision
 
       // Increment the number of planes found
       i++;
-
     }
 
     #ifdef DEBUG_TIME
