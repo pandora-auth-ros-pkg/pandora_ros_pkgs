@@ -178,11 +178,18 @@ namespace pandora_vision
     Timer::start("checkHolesLuminosityDiff", "applyFilter");
     #endif
 
-    // Instead of applying the formula
-    // Y = 0.299 * R + 0.587 * G + 0.114 * B to find the luminosity of each
-    // pixel, turn inImage into grayscale
+    // In order to find the luminosity
+    // convert the input RGB image to YCrCb format.
+    cv::Mat inImageYCrCb(inImage.size(), CV_8UC1);
+    cv::cvtColor(inImage, inImageYCrCb, CV_BGR2YCrCb);
+
+    // Split the image to its three components
+    std::vector<cv::Mat> channels;
+    cv::split(inImageYCrCb, channels);
+
+    // The luminosity of the image is expressed by the Y channel.
     cv::Mat luminosityImage(inImage.size(), CV_8UC1);
-    cv::cvtColor(inImage, luminosityImage, CV_BGR2GRAY);
+    luminosityImage = channels[0];
 
     unsigned char* ptr = luminosityImage.ptr();
 
@@ -468,9 +475,7 @@ namespace pandora_vision
       // a threshold.
       // CAUTION: The use of the CV_COMP_HELLINGER for histogram comparison
       // inverts the inequality checks
-      if (rectangleToModelCorrelation <=
-        Parameters::HoleFusion::match_texture_threshold &&
-        blobToModelCorrelation >=
+      if (blobToModelCorrelation >=
         Parameters::HoleFusion::mismatch_texture_threshold &&
         rectangleToModelCorrelation < blobToModelCorrelation)
       {
