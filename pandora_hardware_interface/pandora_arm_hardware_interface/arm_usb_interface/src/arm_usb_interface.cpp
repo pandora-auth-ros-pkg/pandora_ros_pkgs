@@ -77,7 +77,11 @@ ArmUSBInterface::ArmUSBInterface()
     ROS_ERROR("init_serialport: Couldn't get term attributes\n");
   }
 
-  tios.c_lflag &= ~(ICANON | ISIG | ECHO);
+  tios.c_lflag &= ~(ICANON | ISIG | ECHO |  IEXTEN | ECHOE | ECHOK);
+
+  tios.c_iflag &= ~(ICRNL | IXON );
+
+  tios.c_oflag &= ~(OPOST );
 
   if (tcsetattr(fd, TCSANOW, &tios) < 0)
   {

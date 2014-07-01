@@ -52,7 +52,7 @@ namespace linear
   {
     private:
       ros::NodeHandle nodeHandle_;
-      JrkSerial linear_motor_;
+      JrkSerial* linear_motor_;
 
       hardware_interface::JointStateInterface jointStateInterface_;
       hardware_interface::PositionJointInterface positionJointInterface_;
