@@ -706,7 +706,7 @@ namespace pandora_vision
       keypoint.y = allHoles->holes[o_it->first].keypoint.pt.y;
 
       // A set of the identifiers of holes inside the allHoles conveyor,
-      // whose bounding box the i-th hole is inside
+      // whose bounding box the i-th hole is inside, recursively.
       std::set<int> parents;
       for (std::map<int, float>::iterator i_it = validHolesMap->begin();
         i_it != validHolesMap->end(); i_it++)
@@ -736,27 +736,38 @@ namespace pandora_vision
     for (std::map<int, std::set<int> >::iterator hole_it = residenceMap.begin();
       hole_it != residenceMap.end(); hole_it++)
     {
-      // The set of indices of holes with which the
-      // hole_it->first-th hole must be compared to
+      // Traverse the parents (the hole_it->second set)
+      // of this hole (its id is hole_it->first)
       std::set<int> holeComparingGroupSet;
       for (std::set<int>::iterator set_it = hole_it->second.begin();
         set_it != hole_it->second.end(); set_it++)
       {
+        // For each parent of the hole_id->first-th hole,
+        // check the set of its corresponding parent holes
+        // and add them to the set of the hole_id->first-th hole's parents.
+        // The grandfathers added are the hole_id->first-th hole's recursive
+        // parents.
         for (std::map<int, std::set<int> >::iterator
           comp_it = residenceMap.begin();
           comp_it != residenceMap.end(); comp_it++)
         {
+          // A parent to the parent of hole hole_it->first is also its parent.
           if (std::find(
               comp_it->second.begin(),
               comp_it->second.end(),
               *set_it) != comp_it->second.end())
           {
-            holeComparingGroupSet.insert(comp_it->first);
+            for (std::set<int>::iterator a_it = comp_it->second.begin();
+              a_it != comp_it->second.end(); a_it++)
+            {
+              holeComparingGroupSet.insert(*a_it);
+            }
           }
         }
 
-        // Insert the set of indices of holes with which the i-th hole will be
-        // compared to inside the overall set of sets.
+        // Insert the set of indices of holes with which the
+        // hole_it->first-th hole will be compared to inside the overall
+        // set of sets.
         groupSet.insert(holeComparingGroupSet);
       }
     }
