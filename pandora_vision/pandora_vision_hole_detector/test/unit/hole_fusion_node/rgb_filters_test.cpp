@@ -774,7 +774,6 @@ namespace pandora_vision
 
       // Set the texture threshold to 0.9, or else all probabilities would be
       // equal to zero
-      Parameters::HoleFusion::match_texture_threshold = 0.9;
       Parameters::HoleFusion::mismatch_texture_threshold = 0.8;
 
       // Generate the histogram of walls
@@ -794,13 +793,14 @@ namespace pandora_vision
 
       if ( sec == 1 )
       {
-        for ( int p = 0; p < 5; p++ )
-        {
-          // For some reason, using the saturation as the secondary channel for
-          // the generation of the histograms, gives all probabilities
-          // equal to zero. Crappy behaviour.
-          EXPECT_EQ ( 0.0, probabilitiesVector_10[p] );
-        }
+        // For some reason, using the saturation as the secondary channel for
+        // the generation of the histograms, gives all probabilities
+        // equal to zero. Crappy behaviour.
+        EXPECT_EQ ( 0.0, probabilitiesVector_10[0] );
+        EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
+        EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
+        EXPECT_LT ( 0.0, probabilitiesVector_10[3] );
+        EXPECT_EQ ( 0.0, probabilitiesVector_10[4] );
       }
 
       if ( sec == 2 )
