@@ -10,6 +10,11 @@ JrkSerial::JrkSerial():
 {
 }	
 
+JrkSerial::~JrkSerial()
+{
+	closeDevice();
+}
+
 void JrkSerial::init()
 {
 	if (serialPtr_ == NULL)

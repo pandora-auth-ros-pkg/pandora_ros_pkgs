@@ -25,6 +25,7 @@ class JrkSerial
     const int timeout_;
   public:
     JrkSerial();
+    ~JrkSerial();
     void init();
     int readVariable(const unsigned char command);
     bool write(const uint8_t *data, size_t size);
