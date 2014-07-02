@@ -79,9 +79,9 @@ ArmUSBInterface::ArmUSBInterface()
 
   tios.c_lflag &= ~(ICANON | ISIG | ECHO |  IEXTEN | ECHOE | ECHOK);
 
-  tios.c_iflag &= ~(ICRNL | IXON );
+  tios.c_iflag &= ~(ICRNL | IXON);
 
-  tios.c_oflag &= ~(OPOST );
+  tios.c_oflag &= ~(OPOST);
 
   if (tcsetattr(fd, TCSANOW, &tios) < 0)
   {
