@@ -1,0 +1,8 @@
+<launch>
+
+  <!--  Thermal Processor  --> 
+  <include file="$(find pandora_sensor_processing)/launch/thermal_processor.launch" />
+  <!--  Co2 Processor  --> 
+  <include file="$(find pandora_sensor_processing)/launch/co2_processor.launch" />
+
+</launch>

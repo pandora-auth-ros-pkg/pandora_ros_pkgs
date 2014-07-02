@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="pandora_sensor_processing" type="co2_node" name="co2_processor"
+    output="screen" ns="sensor_processing" />
+  <rosparam file="$(find pandora_sensor_processing)/config/sensor_processing/co2_processor_topic_names.yaml" command="load" ns="sensor_processing/co2_processor"/>
+
+</launch>
