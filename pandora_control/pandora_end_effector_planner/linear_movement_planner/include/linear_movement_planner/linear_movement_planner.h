@@ -62,6 +62,7 @@ namespace pandora_control
       double minCommand_;
       double maxCommand_;
       double movementThreshold_;
+      double laxMovementThreshold_;
       double commandTimeout_;
       double previousTarget_;
       std::string linearCommandTopic_;
@@ -74,7 +75,8 @@ namespace pandora_control
       bool getPlannerParams();
       void testLinear();
       void lowerLinear();
-      void moveLinear(std::string pointOfInterest, std::string centerPoint);
+      void moveLinear(std::string pointOfInterest, std::string centerPoint,
+        double movementThreshold);
 
     public:
       LinearMovementActionServer(

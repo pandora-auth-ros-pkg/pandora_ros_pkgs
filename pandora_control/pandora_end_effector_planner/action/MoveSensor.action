@@ -1,7 +1,8 @@
 uint32 TEST = 0
 uint32 CENTER = 1
 uint32 POINT = 2
-uint32 MOVE = 3
+uint32 LAX_POINT = 3
+uint32 MOVE = 4
 
 # Define the goal
 uint32 command

@@ -49,13 +49,11 @@ namespace pandora_control
 {
   enum
   {
-    HIGH_CENTER = 0,
-    HIGH_LEFT = 1,
-    LOW_LEFT = 2,
-    LOW_CENTER = 3,
-    LOW_RIGHT = 4,
-    HIGH_RIGHT = 5,
-    UNKNOWN = 6
+    START = 0,
+    LEFT = 1,
+    CENTER = 2,
+    RIGHT = 3,
+    UNKNOWN = 4
   };
 
   class SensorOrientationActionServer
@@ -77,9 +75,10 @@ namespace pandora_control
       double minYaw_;
       double maxPitch_;
       double maxYaw_;
-      double timeStep_;
+      double scanRate_;
       double commandTimeout_;
       double movementThreshold_;
+      double laxMovementThreshold_;
       std::string pitchJointParent_;
       std::string pitchJointChild_;
       std::string yawJointParent_;
@@ -96,9 +95,11 @@ namespace pandora_control
       void testSensor();
       void centerSensor();
       void scan();
-      void pointSensor(std::string pointOfInterest);
+      void pointSensor(std::string pointOfInterest, double movementThreshold);
       int checkGoalCompletion(double pitchCommand, double yawCommand);
       void setGoalState(int state);
+      void checkAngleLimits(std_msgs::Float64 *pitchTargetPosition,
+        std_msgs::Float64 *yawTargetPosition);
     public:
       SensorOrientationActionServer(
         std::string name,

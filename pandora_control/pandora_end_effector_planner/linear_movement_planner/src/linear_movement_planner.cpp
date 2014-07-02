@@ -84,7 +84,13 @@ namespace pandora_control
     }
     else if (command_ == pandora_end_effector_planner::MoveLinearGoal::MOVE)
     {
-      moveLinear(goal->point_of_interest, goal->center_point);
+      moveLinear(goal->point_of_interest, goal->center_point,
+        movementThreshold_);
+    }
+    else if (command_ == pandora_end_effector_planner::MoveLinearGoal::LAX_MOVE)
+    {
+      moveLinear(goal->point_of_interest, goal->center_point,
+        laxMovementThreshold_);
     }
     else
     {
@@ -99,6 +105,7 @@ namespace pandora_control
     nodeHandle_.param("min_command", minCommand_, 0.0);
     nodeHandle_.param("max_command", maxCommand_, 0.18);
     nodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
+    nodeHandle_.param("lax_movement_threshold", laxMovementThreshold_, 0.03);
     movementThreshold_ = fabs(movementThreshold_);
     nodeHandle_.param("command_timeout", commandTimeout_, 15.0);
 
@@ -250,7 +257,7 @@ namespace pandora_control
   }
 
   void LinearMovementActionServer::moveLinear(std::string pointOfInterest,
-    std::string centerPoint)
+    std::string centerPoint, double movementThreshold)
   {
     ros::Time lastTf = ros::Time::now();
     ros::Rate rate(5);
@@ -355,7 +362,7 @@ namespace pandora_control
       {
         targetPosition.data = maxCommand_;
       }
-      if (fabs(previousTarget_ - targetPosition.data) > movementThreshold_)
+      if (fabs(previousTarget_ - targetPosition.data) > movementThreshold)
       {
         linearCommandPublisher_.publish(targetPosition);
         previousTarget_ = targetPosition.data;

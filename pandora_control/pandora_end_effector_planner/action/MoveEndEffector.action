@@ -1,7 +1,8 @@
 uint32 TEST = 0
 uint32 PARK = 1
 uint32 TRACK = 2
-uint32 SCAN = 3
+uint32 LAX_TRACK = 3
+uint32 SCAN = 4
 
 # Define the goal
 uint32 command
