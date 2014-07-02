@@ -61,12 +61,12 @@ class StandarWidget(QWidget):
         self.victim_info = []
 
         self.timer_started = False
-        
+
         #connecting the radioButtons
         self.yellow_arena_radio_button.clicked.connect(self.yellow_arena_radio_button_clicked)
         self.yellow_black_arena_radio_button.clicked.connect(self.yellow_black_arena_radio_button_clicked)
         self.mapping_mission_radio_button.clicked.connect(self.mapping_mission_radio_button_clicked)
-        
+
         #Connecting the Buttons
         self.go_button.clicked.connect(self.go_button_clicked)
         self.stop_button.clicked.connect(self.stop_button_clicked)
@@ -93,7 +93,6 @@ class StandarWidget(QWidget):
 
         #The left panel is visible
         self.left_panel = True
-
 
         # Refresh timer
         self.timer_refresh_widget = QTimer(self)
@@ -226,7 +225,7 @@ class StandarWidget(QWidget):
         pass
 
     #~ def autonomous_state_button_clicked(self):
-#~ 
+#~
         #~ if self.autonomous:
             #~ self.teleop_state_button.setEnabled(True)
             #~ self.semi_autonomous_state.setEnabled(True)
@@ -242,7 +241,6 @@ class StandarWidget(QWidget):
             #~ self.mapping_mission_button.setEnabled(False)
             #~ self.autonomous_state_button.setText("NonAutonomousState")
             #~ self.autonomous = True
-            
 
     def teleop_state_button_clicked(self):
         self.yellow_arena_radio_button.setEnabled(True)
@@ -257,17 +255,17 @@ class StandarWidget(QWidget):
         self.GuiStateClient_.transition_to_state(7)
 
     def yellow_arena_radio_button_clicked(self):
-        
+
         pass
          #~ self.dynamic_reconfigure_client.update_configuration(
            #~ {"arenaType":0})
-      
+
     def yellow_black_arena_radio_button_clicked(self):
-        
+
         pass
       #~ self.dynamic_reconfigure_client.update_configuration(
            #~ {"arenaType":1})
-      
+
     def mapping_mission_radio_button_clicked(self):
         pass
         #~ self.dynamic_reconfigure_client.update_configuration(
