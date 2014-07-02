@@ -51,7 +51,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="textVisible">
           <bool>true</bool>
@@ -98,7 +98,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="textVisible">
           <bool>true</bool>

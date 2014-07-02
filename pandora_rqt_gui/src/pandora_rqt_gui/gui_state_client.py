@@ -12,17 +12,16 @@ class GuiStateClient(StateClient):
 
        self.state_ = robotModeMsg.MODE_OFF
        self.int_to_state_dict = {
-                                  robotModeMsg.MODE_OFF: "MODE_OFF",
-                                  robotModeMsg.MODE_START_AUTONOMOUS: "MODE_START_AUTONOMOUS",
-                                  robotModeMsg.MODE_EXPLORATION: "MODE_EXPLORATION",
-                                  robotModeMsg.MODE_IDENTIFICATION: "MODE_IDENTIFICATION",
-                                  robotModeMsg.MODE_ARM_APPROACH: "MODE_ARM_APPROACH",
-                                  robotModeMsg.MODE_DF_HOLD: "MODE_DF_HOLD",
-                                  robotModeMsg.MODE_SEMI_AUTONOMOUS: "MODE_SEMI_AUTONOMOUS",
-                                  robotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "MODE_TELEOPERATED_LOCOMOTION",
-                                  robotModeMsg.MODE_ARM_TELEOPERATION: "MODE_ARM_TELEOPERATION",
-                                  robotModeMsg.MODE_ARM_TELEOPERATION_TUCK: "MODE_ARM_TELEOPERATION_TUCK",
-                                  robotModeMsg.MODE_TERMINATING: "MODE_TERMINATING"
+           robotModeMsg.MODE_OFF: "MODE_OFF",
+           robotModeMsg.MODE_START_AUTONOMOUS: "MODE_START_AUTONOMOUS",
+           robotModeMsg.MODE_EXPLORATION_RESCUE: "MODE_EXPLORATION_RESCUE",
+           robotModeMsg.MODE_IDENTIFICATION: "MODE_IDENTIFICATION",
+           robotModeMsg.MODE_SENSOR_HOLD: "MODE_SENSOR_HOLD",
+           robotModeMsg.MODE_SEMI_AUTONOMOUS: "MODE_SEMI_AUTONOMOUS",
+           robotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "MODE_TELEOPERATED_LOCOMOTION",
+           robotModeMsg.MODE_SENSOR_TEST: "MODE_SENSOR_TEST",
+           robotModeMsg.MODE_EXPLORATION_MAPPING:"MODE_EXPLORATION_MAPPING",
+           robotModeMsg.MODE_TERMINATING: "MODE_TERMINATING"
                                   }
 
 

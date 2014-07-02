@@ -40,7 +40,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -89,7 +89,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -138,7 +138,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -193,7 +193,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -248,7 +248,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
