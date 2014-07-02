@@ -19,7 +19,7 @@ subscribed_topic_names:
   hazmat: /vision/hazmat_alert
   landoltc: /vision/landoltc_alert
   dataMatrix: /vision/dataMatrix_alert
-  faceDirection: /vision/face_direction_alert
+  faceDirection: /vision/victim_direction_alert
   co2Direction: /sensor_processing/co2_alert
   motionDirection: /vision/motion_alert
   soundDirection: /sensor_processing/sound_direction_alert
