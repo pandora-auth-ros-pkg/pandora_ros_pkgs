@@ -66,7 +66,7 @@ namespace pandora_sensor_processing
   void ThermalProcessor::
     sensorCallback(const sensor_msgs::Image& msg)
   {
-    ROS_INFO_NAMED("SENSOR_PROCESSING",
+    ROS_DEBUG_NAMED("SENSOR_PROCESSING",
         "[%s] Incoming thermal raw measurement.", name_.c_str());
     if (frameToClusterer_.find(msg.header.frame_id) ==
         frameToClusterer_.end())
@@ -156,7 +156,7 @@ namespace pandora_sensor_processing
 
       // OK. Warmer cluster has a cell from current measurement.
       // Considering cluster to be a valid alert!
-      ROS_INFO_NAMED("SENSOR_PROCESSING",
+      ROS_INFO_THROTTLE_NAMED(5, "SENSOR_PROCESSING",
           "[%s] Found thermal alert with temperature: %f", name_.c_str(), center(3));
       alert_.probability = Utils::normalPdf(center(3), 
           OPTIMAL_TEMPERATURE, THERMAL_STD_DEV);

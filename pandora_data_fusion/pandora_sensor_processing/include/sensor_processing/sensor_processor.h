@@ -166,7 +166,7 @@ namespace pandora_sensor_processing
   template <class DerivedProcessor>
     void SensorProcessor<DerivedProcessor>::publishAlert()
     {
-      ROS_INFO_NAMED("SENSOR_PROCESSING", "[%s] Publishing alert.", name_.c_str());
+      ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Publishing alert.", name_.c_str());
       alertPublisher_.publish(alert_);
     }
 

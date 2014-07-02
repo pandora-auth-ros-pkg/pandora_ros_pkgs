@@ -52,7 +52,7 @@ namespace pandora_sensor_processing
   void Co2Processor::sensorCallback(
       const pandora_arm_hardware_interface::Co2Msg& msg)
   {
-    ROS_INFO_NAMED("SENSOR_PROCESSING", 
+    ROS_DEBUG_NAMED("SENSOR_PROCESSING", 
         "[%s] Incoming co2 raw info.", name_.c_str());
     alert_.yaw = 0;
     alert_.pitch = 0;
