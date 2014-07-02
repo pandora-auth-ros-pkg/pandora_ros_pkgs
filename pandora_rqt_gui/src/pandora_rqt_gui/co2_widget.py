@@ -38,7 +38,7 @@ class CO2Widget(QWidget):
 
     def start(self):
         self.widget_info.start_monitoring()
-        self.timer_refresh_widget.start(1000)
+        self.timer_refresh_widget.start(100)
 
     #Connected slot to the timer in order to refresh
     @Slot()

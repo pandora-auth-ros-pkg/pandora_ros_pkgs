@@ -40,7 +40,7 @@ class SonarsWidget(QWidget):
 
     def start(self):
         self.widget_info_sonars.start_monitoring()
-        self.timer_refresh_widget.start(1000)
+        self.timer_refresh_widget.start(100)
 
     #Connected slot to the timer in order to refresh
     @Slot()
@@ -48,10 +48,10 @@ class SonarsWidget(QWidget):
 
         if self.widget_info_sonars.last_message is not None:
 
-            if self.widget_info_sonars.last_message.header.frame_id == "left":
+            if self.widget_info_sonars.last_message.header.frame_id == "left_sonar_frame":
                 self.lcd1.display(self.widget_info_sonars.last_message.range)
 
-            elif self.widget_info_sonars.last_message.header.frame_id == "right":
+            elif self.widget_info_sonars.last_message.header.frame_id == "right_sonar_frame":
                 self.lcd2.display(self.widget_info_sonars.last_message.range)
 
     #Method called when the Widget is terminated

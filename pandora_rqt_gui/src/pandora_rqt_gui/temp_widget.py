@@ -9,6 +9,7 @@ from python_qt_binding.QtGui import QWidget
 
 from std_msgs.msg import Int16
 from .widget_info import WidgetInfo
+from pandora_arm_hardware_interface.msg import ThermalMeanMsg
 
 
 class TempWidget(QWidget):
@@ -29,36 +30,32 @@ class TempWidget(QWidget):
         loadUi(ui_file, self)
 
         #create the subcribers
-        self.widget_info_left = WidgetInfo("chatter", Int16)
-        self.widget_info_center = WidgetInfo("chatter", Int16)
-        self.widget_info_right = WidgetInfo("chatter", Int16)
+        self.widget_info = WidgetInfo("/sensors/thermal_mean", ThermalMeanMsg)
 
         #create and connect the timer
         self.timer_refresh_widget = QTimer(self)
         self.timer_refresh_widget.timeout.connect(self.refresh_topics)
 
     def start(self):
-        self.widget_info_left.start_monitoring()
-        self.widget_info_center.start_monitoring()
-        self.widget_info_right.start_monitoring()
-        self.timer_refresh_widget.start(1000)
+        self.widget_info.start_monitoring()
+        self.timer_refresh_widget.start(100)
 
     #Connected slot to the timer in order to refresh
     @Slot()
     def refresh_topics(self):
 
-        if self.widget_info_left.last_message is not None:
-            self.lcd1.display(self.widget_info_left.last_message.data)
+        if self.widget_info.last_message is not None:
 
-        if self.widget_info_center.last_message is not None:
-            self.lcd2.display(self.widget_info_center.last_message.data)
+            if self.widget_info.last_message.header.frame_id == 'left_thermal_optical_frame':
+                self.lcd1.display(self.widget_info.last_message.thermal_mean)
 
-        if self.widget_info_right.last_message is not None:
-            self.lcd3.display(self.widget_info_right.last_message.data)
+            elif self.widget_info.last_message.header.frame_id == 'middle_thermal_optical_frame':
+                self.lcd2.display(self.widget_info.last_message.thermal_mean)
+
+            elif self.widget_info.last_message.header.frame_id == 'right_thermal_optical_frame':
+                self.lcd3.display(self.widget_info.last_message.thermal_mean)
 
     #Method called when the Widget is terminated
     def shutdown(self):
-        self.widget_info_left.stop_monitoring()
-        self.widget_info_center.stop_monitoring()
-        self.widget_info_right.stop_monitoring()
+        self.widget_info.stop_monitoring()
         self.timer_refresh_widget.stop()

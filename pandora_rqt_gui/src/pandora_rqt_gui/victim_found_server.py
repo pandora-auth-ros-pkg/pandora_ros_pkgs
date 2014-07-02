@@ -58,6 +58,6 @@ class ValidateVictimActionServer(object):
 
 
 if __name__ == '__main__':
-    rospy.init_node('victimValidation')
-    ValidateVictimActionServer('victimValidation')
+    rospy.init_node('/gui/validate_victim')
+    ValidateVictimActionServer('/gui/validate_victim')
     rospy.spin()

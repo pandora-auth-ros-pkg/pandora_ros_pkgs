@@ -39,7 +39,7 @@ class BatteryWidget(QWidget):
 
     def start(self):
         self.widget_info_batteries.start_monitoring()
-        self.timer_refresh_widget.start(1000)
+        self.timer_refresh_widget.start(100)
 
     #Connected slot to the timer in order to refresh
     @Slot()

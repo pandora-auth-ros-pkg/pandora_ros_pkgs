@@ -16,7 +16,7 @@ from .probability_info import ProbabilityInfoWidget
 from .console import Console
 from .gui_state_client import GuiStateClient
 
-world_model_info_topic = '/data_fusion/world_model_info'
+world_model_info_topic = '/data_fusion/world_model'
 robocup_score_topic = 'data_fusion/robocup_score'
 
 
@@ -50,7 +50,7 @@ class StandarWidget(QWidget):
 
         # the ValidateVictimActionServer is used called when a victim is found
         self.ValidateVictimActionServer_ = ValidateVictimActionServer(
-            'victimValidation')
+            '/gui/validate_victim')
 
         #Subscribe the score the world_model_info and Info
         self.score_info = WidgetInfo(robocup_score_topic, Int32)
@@ -101,7 +101,7 @@ class StandarWidget(QWidget):
 
         self.score_info.start_monitoring()
         self.world_model_info.start_monitoring()
-        self.timer_refresh_widget.start(1000)
+        self.timer_refresh_widget.start(100)
 
     def enable_victim_found_options(self):
 
@@ -175,11 +175,12 @@ class StandarWidget(QWidget):
         self.timer_started = True
         self.time_ = (self.timer.time())
         self.timer.setTime(self.time_)
+        self.GuiStateClient_.transition_to_state(1)
 
     #Stop the timer and The robot
     def stop_button_clicked(self):
         self.timer_started = False
-        self.GuiStateClient_.transition_to_state(10)
+        self.GuiStateClient_.transition_to_state(0)
 
     def decline_button_clicked(self):
         self.ValidateVictimActionServer_.victim_valid = False

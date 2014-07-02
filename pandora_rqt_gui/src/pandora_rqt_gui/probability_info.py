@@ -10,7 +10,7 @@ from python_qt_binding.QtGui import QWidget
 from pandora_data_fusion_msgs.msg import GlobalProbabilitiesMsg
 from .widget_info import WidgetInfo
 
-global_propabilities_topic = "/data_fusion/victim_fusion/global_probabilities"
+global_propabilities_topic = "/data_fusion/signs_of_life"
 
 
 class ProbabilityInfoWidget(QWidget):
@@ -38,7 +38,7 @@ class ProbabilityInfoWidget(QWidget):
 
     def start(self):
         self.widget_probabilities_info.start_monitoring()
-        self.timer_refresh_widget.start(500)
+        self.timer_refresh_widget.start(100)
 
     #Connected slot to the timer in order to refresh
     @Slot()
@@ -49,7 +49,7 @@ class ProbabilityInfoWidget(QWidget):
             self.thermalBar.setValue(self.widget_probabilities_info.last_message.thermal % 100)
             self.motionBar.setValue(self.widget_probabilities_info.last_message.motion % 100)
             self.soundBar.setValue(self.widget_probabilities_info.last_message.sound % 100)
-            self.faceBar.setValue(self.widget_probabilities_info.last_message.face % 100)
+            self.faceBar.setValue(self.widget_probabilities_info.last_message.victim % 100)
 
     def shutdown(self):
         self.widget_probabilities_info.stop_monitoring()
