@@ -197,6 +197,9 @@ namespace pandora_vision
   // In the terminal window, show the probabilities of candidate holes
   bool Parameters::HoleFusion::show_probabilities = false;
 
+  // Show the texture's watersheded backprojection
+  bool Parameters::HoleFusion::show_texture = false;
+
   // The holes' validation process identifier
   int Parameters::HoleFusion::validation_process = 0;
 

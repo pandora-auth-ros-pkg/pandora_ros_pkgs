@@ -51,7 +51,7 @@
   </group>
 
   <!-- Output selection -->
-  <arg name="output" default="log" />
+  <arg name="output" default="screen" />
 
 
   <!-- ========================= Synchronizer node ========================= -->

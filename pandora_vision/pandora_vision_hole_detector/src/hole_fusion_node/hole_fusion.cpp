@@ -997,6 +997,10 @@ namespace pandora_vision
     Parameters::HoleFusion::show_probabilities =
       config.show_probabilities;
 
+    // Show the texture's watersheded backprojection
+    Parameters::HoleFusion::show_texture =
+      config.show_texture;
+
     // The inflation size of the bounding box's vertices
     Parameters::HoleFusion::rectangle_inflation_size =
       config.rectangle_inflation_size;

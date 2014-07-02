@@ -226,6 +226,9 @@ namespace pandora_vision
       // In the terminal window, show the probabilities of candidate holes
       static bool show_probabilities;
 
+      // Show the texture's watersheded backprojection
+      static bool show_texture;
+
       // The holes' validation process identifier
       static int validation_process;
 

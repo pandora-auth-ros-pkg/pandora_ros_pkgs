@@ -308,6 +308,14 @@ namespace pandora_vision
     EdgeDetection::watershedViaBackprojection(inImage, backProject, false,
       &watersheded);
 
+    #ifdef DEBUG_SHOW
+    if (Parameters::HoleFusion::show_texture)
+    {
+      Visualization::show("Texture: watersheded backprojection",
+        watersheded, 1);
+    }
+    #endif
+
     // Obtain a pointer on watersheded
     unsigned char* ptr = watersheded.ptr();
 
