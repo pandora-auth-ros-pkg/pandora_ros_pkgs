@@ -4,11 +4,11 @@ action_name:
 move_kinect_action:
   pitch_step: -0.2
   yaw_step: 0.7
-  min_pitch: -0.7
-  min_yaw: -1
+  min_pitch: -0.45
+  min_yaw: -0.7
   max_pitch: 0.75
   max_yaw: 1
-  scan_rate: 1.0
+  scan_rate: 0.5
   command_timeout: 10.0
   movement_threshold: 0.05
   lax_movement_threshold: 0.5
@@ -22,9 +22,9 @@ move_kinect_action:
 move_head_action:
   pitch_step: 0.4
   yaw_step: 0.5
-  min_pitch: -1
+  min_pitch: -0.5
   min_yaw: -1
-  max_pitch: 1
+  max_pitch: 0.7
   max_yaw: 1
   time_step: 1
   command_timeout: 10.0
