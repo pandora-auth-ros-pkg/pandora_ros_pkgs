@@ -8,8 +8,8 @@ laser_roll_controller:
     motor:
         id: 2
         init: 512
-        min: 0
-        max: 1023
+        min: 415
+        max: 610
 
 laser_pitch_controller:
     controller:
@@ -21,8 +21,8 @@ laser_pitch_controller:
     motor:
         id: 1
         init: 512
-        min: 0
-        max: 1023
+        min: 445
+        max: 610
 
 kinect_pitch_controller:
     controller:
@@ -34,8 +34,8 @@ kinect_pitch_controller:
     motor:
         id: 3
         init: 512
-        min: 0
-        max: 1023
+        min: 420
+        max: 715
 
 kinect_yaw_controller:
     controller:
@@ -43,12 +43,12 @@ kinect_yaw_controller:
         module: joint_position_controller
         type: JointPositionController
     joint_name: kinect_yaw_joint
-    joint_speed: 0.5
+    joint_speed: 1.0
     motor:
         id: 4
         init: 512
-        min: 0
-        max: 1023
+        min: 370
+        max: 715
 
 linear_head_pitch_controller:
     controller:
@@ -60,8 +60,8 @@ linear_head_pitch_controller:
     motor:
         id: 6
         init: 512
-        min: 0
-        max: 1023
+        min: 415
+        max: 650
 
 linear_head_yaw_controller:
     controller:
@@ -73,5 +73,5 @@ linear_head_yaw_controller:
     motor:
         id: 5
         init: 512
-        min: 0
-        max: 1023
+        min: 310
+        max: 715
