@@ -73,6 +73,8 @@ namespace pandora_control
 
       std_msgs::Float64 targetPosition;
       targetPosition.data = 0;
+      lastPitchTarget_ = 0;
+      lastYawTarget_ = 0;
       sensorPitchPublisher_.publish(targetPosition);
       sensorYawPublisher_.publish(targetPosition);
       position_ = START;
@@ -237,6 +239,8 @@ namespace pandora_control
     pitchTargetPosition.data = pitchStep_;
     yawTargetPosition.data = yawStep_;
     position_ = UNKNOWN;
+    lastPitchTarget_ = pitchTargetPosition.data;
+    lastYawTarget_ = yawTargetPosition.data;
     sensorPitchPublisher_.publish(pitchTargetPosition);
     sensorYawPublisher_.publish(yawTargetPosition);
 
@@ -251,6 +255,8 @@ namespace pandora_control
       std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
       pitchTargetPosition.data = 0;
       yawTargetPosition.data = 0;
+      lastPitchTarget_ = pitchTargetPosition.data;
+      lastYawTarget_ = yawTargetPosition.data;
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       position_ = START;
@@ -323,6 +329,8 @@ namespace pandora_control
       }
       pitchTargetPosition.data = pitchTargetPosition.data - basePitch;
       checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
+      lastPitchTarget_ = pitchTargetPosition.data;
+      lastYawTarget_ = yawTargetPosition.data;
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
       rate.sleep();
@@ -335,8 +343,6 @@ namespace pandora_control
     ros::Time lastTf = ros::Time::now();
     ros::Rate rate(5);
     std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-    double lastPitchTarget = movementThreshold;
-    double lastYawTarget = movementThreshold;
 
     while (ros::ok())
     {
@@ -407,9 +413,11 @@ namespace pandora_control
       pitchTargetPosition.data = pitch;
       yawTargetPosition.data = yaw;
       checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
-      if (fabs(lastPitchTarget - pitchTargetPosition.data) > movementThreshold
-        && fabs(lastYawTarget - yawTargetPosition.data) > movementThreshold)
+      if (fabs(lastPitchTarget_ - pitchTargetPosition.data) > movementThreshold
+        && fabs(lastYawTarget_ - yawTargetPosition.data) > movementThreshold)
       {
+        lastPitchTarget_ = pitchTargetPosition.data;
+        lastYawTarget_ = yawTargetPosition.data;
         sensorPitchPublisher_.publish(pitchTargetPosition);
         sensorYawPublisher_.publish(yawTargetPosition);
         position_ = UNKNOWN;

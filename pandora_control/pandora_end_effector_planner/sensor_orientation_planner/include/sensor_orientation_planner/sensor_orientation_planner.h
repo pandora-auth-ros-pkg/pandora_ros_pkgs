@@ -86,6 +86,8 @@ namespace pandora_control
       std::string pitchCommandTopic_;
       std::string yawCommandTopic_;
       std::string sensorFrame_;
+      double lastPitchTarget_;
+      double lastYawTarget_;
 
       tf::TransformListener tfListener_;
 
