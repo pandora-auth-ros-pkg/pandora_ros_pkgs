@@ -414,7 +414,7 @@ namespace pandora_control
       yawTargetPosition.data = yaw;
       checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
       if (fabs(lastPitchTarget_ - pitchTargetPosition.data) > movementThreshold
-        && fabs(lastYawTarget_ - yawTargetPosition.data) > movementThreshold)
+        || fabs(lastYawTarget_ - yawTargetPosition.data) > movementThreshold)
       {
         lastPitchTarget_ = pitchTargetPosition.data;
         lastYawTarget_ = yawTargetPosition.data;
