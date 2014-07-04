@@ -1,13 +1,17 @@
-
 <library path="src">
   <class name="PandoraPlugin" type="pandora_rqt_gui.pandora_gui.PandoraPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
       A Plugin to fasilitate the needs of Team Pandora 
     </description>
     <qtgui>
-      <label>PANDORA_GUI</label>
-      <icon type="theme">system-help</icon>
-      <statustip>Chamzas is the Best.</statustip>
+      <group>
+        <label>GUI</label>
+        <icon type="theme">folder</icon>
+        <statustip>Chamzas is the Best.</statustip>
+      </group>
+      <label>Pandora Gui</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>A Python GUI plugin for monitoring ROS topics.</statustip>
     </qtgui>
   </class>
 </library>

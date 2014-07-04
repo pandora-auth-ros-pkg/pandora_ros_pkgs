@@ -40,7 +40,7 @@ from rqt_console.message_list import MessageList
 class MessageDataModel(QAbstractTableModel):
 
     # the column names must match the message attributes
-    columns = ['message','node','topics']
+    columns = ['message','node']
 
     severity_colors = {
         Message.DEBUG: QBrush(Qt.darkCyan),

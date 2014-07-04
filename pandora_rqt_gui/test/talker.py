@@ -28,7 +28,7 @@ def talker():
     pub_victims = rospy.Publisher(world_model_info_topic ,WorldModelMsg ,queue_size=10)
 
     rospy.init_node('talker', anonymous = False)
-    r = rospy.Rate(0.5) # 2 hz
+    r = rospy.Rate(10)#2 hz
 
     batteries_msg = BatteryMsg()
     batteries_msg.voltage.append(float((random.randrange(19,39)))/4)
@@ -36,8 +36,8 @@ def talker():
 
     sonars_msg_left = Range()
     sonars_msg_right = Range()
-    sonars_msg_left.header.frame_id = "left"
-    sonars_msg_right.header.frame_id = "right"
+    sonars_msg_left.header.frame_id = "left_sonar_frame"
+    sonars_msg_right.header.frame_id = "right_sonar_frame"
     
     co2_msg = Co2Msg()
     
@@ -72,10 +72,11 @@ def talker():
         pub_score.publish(i/3)
         pub_batteries.publish(batteries_msg)
         pub_sonars.publish(sonars_msg_left)
+        pub_sonars.publish(sonars_msg_right)
         pub_co2.publish(co2_msg)
         pub_victims.publish(world_msg)
         r.sleep()
-        pub_sonars.publish(sonars_msg_right)
+        
 
         i = i+4
         r.sleep()

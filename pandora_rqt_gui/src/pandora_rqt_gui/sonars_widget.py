@@ -12,7 +12,7 @@ from std_msgs.msg import Int16
 from .widget_info import WidgetInfo
 from sensor_msgs.msg import Range
 
-sonars_topic = "sensors/range"
+sonars_topic = "/sensors/range"
 
 
 class SonarsWidget(QWidget):

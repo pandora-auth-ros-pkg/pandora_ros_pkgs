@@ -1,8 +1,6 @@
 from qt_gui.plugin import Plugin
 from .main_widget import MainWidget
 
-from std_msgs.msg import String
-
 
 class PandoraPlugin(Plugin):
 
@@ -12,10 +10,10 @@ class PandoraPlugin(Plugin):
         self.setObjectName('Pandora_Gui')
 
         self.widget_ = MainWidget(self)
-
+        self.widget_.setWindowTitle("Pandora Gui")
         if context.serial_number() > 1:
-            self.widget.setWindowTitle(
-                self.widget_.windowTitle() +
+            self.widget_.setWindowTitle(
+                "Pandora Plugin" +
                 (' (%d)' % context.serial_number()))
 
         context.add_widget(self.widget_)

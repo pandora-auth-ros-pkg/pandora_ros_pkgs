@@ -38,11 +38,13 @@ class StandarWidget(QWidget):
 
         self.Console_ = Console()
         self.ConsoleWidget_ = self.Console_._widget
+
         self.ProbabilityInfoWidget_ = ProbabilityInfoWidget(self)
         self.GuiStateClient_ = GuiStateClient()
 
         #Add Console in the 2,1 position of InternalGrid
         self.internal_grid.addWidget(self.ConsoleWidget_, 2, 1)
+        self.ConsoleWidget_._handle_column_resize_clicked()
 
         #use full ABSOLUTE path to the image, not relative
         self.image.setPixmap(QPixmap(os.path.join(
@@ -53,7 +55,7 @@ class StandarWidget(QWidget):
         self.ValidateVictimActionServer_ = ValidateVictimActionServer(
             '/gui/validate_victim')
          # dynamic_reconfigure client is used to change the parameters
-        #~ self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
+        self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
 
         #Subscribe the score the world_model_info and Info
         self.score_info = WidgetInfo(robocup_score_topic, Int32)
@@ -73,9 +75,12 @@ class StandarWidget(QWidget):
         self.confirm_button.clicked.connect(self.confirm_victim_clicked)
         self.decline_button.clicked.connect(self.decline_button_clicked)
         self.left_panel_button.clicked.connect(self.left_panel_button_clicked)
+        self.console_options_button.clicked.connect(self.console_options_button_clicked)
         self.save_geotiff_button.clicked.connect(self.save_geotiff_button_clicked)
         self.teleop_state_button.clicked.connect(self.teleop_state_button_clicked)
         self.sensor_test_state_button.clicked.connect(self.sensor_test_state_button_clicked)
+        self.semi_autonomous_state_button.clicked.connect(self.sensor_test_state_button_clicked)
+        self.terminate_button.clicked.connect(self.terminate_button_clicked)
 
         #Connecting the CheckBoxes
         self.temp_checkbox.stateChanged.connect(self.temp_checked)
@@ -83,8 +88,9 @@ class StandarWidget(QWidget):
         self.sonars_checkbox.stateChanged.connect(self.sonars_checked)
         self.battery_checkbox.stateChanged.connect(self.battery_checked)
         self.show_all_checkbox.stateChanged.connect(self.show_all)
+        self.terminate_check_box.stateChanged.connect(self.terminate_checked)
 
-        #In the Beggining all the checkboxes are unchecked
+        #In the Beggining all the checkboxes are unchecked(used for MainWidget)
         self.temp_checked = False
         self.battery_checked = False
         self.sonars_checked = False
@@ -93,6 +99,12 @@ class StandarWidget(QWidget):
 
         #The left panel is visible
         self.left_panel = True
+
+        # Resize at first
+        self.resize = True
+
+        #Show the console options at first
+        self.console_show_options = True
 
         # Refresh timer
         self.timer_refresh_widget = QTimer(self)
@@ -148,6 +160,9 @@ class StandarWidget(QWidget):
     def refresh_topics(self):
 
         self.state.setText(self.GuiStateClient_.get_state())
+        if self.resize:
+            self.ConsoleWidget_._handle_column_resize_clicked()
+            self.resize = False
 
         if self.score_info.last_message is not None:
             self.score.display(self.score_info.last_message.data)
@@ -176,27 +191,25 @@ class StandarWidget(QWidget):
         self.timer_started = True
         self.go_button.setEnabled(False)
         self.stop_button.setEnabled(True)
-        #~ self.teleop_state_button.setEnabled(True)
-        #~ self.semi_autonomous_state.setEnabled(True)
-        #~ self.sensor_test_button.setEnabled(True)
         self.yellow_arena_radio_button.setEnabled(False)
         self.yellow_black_arena_radio_button.setEnabled(False)
         self.mapping_mission_radio_button.setEnabled(False)
+        self.sensor_test_state_button.setEnabled(False)
         self.time_ = (self.timer.time())
         self.timer.setTime(self.time_)
         self.GuiStateClient_.transition_to_state(1)
+        self.ConsoleWidget_._handle_column_resize_clicked()
 
     #Stop the timer and The robot
     def stop_button_clicked(self):
+        self.ConsoleWidget_._handle_column_resize_clicked()
         self.timer_started = False
         self.go_button.setEnabled(True)
         self.stop_button.setEnabled(False)
-        #~ self.teleop_state_button.setEnabled(False)
-        #~ self.semi_autonomous_state.setEnabled(True)
-        #~ self.sensor_test_button.setEnabled(True)
         self.GuiStateClient_.transition_to_state(0)
 
     def decline_button_clicked(self):
+
         self.ValidateVictimActionServer_.victim_valid = False
         self.disable_victim_found_options()
         self.ValidateVictimActionServer_.operator_responded = True
@@ -213,63 +226,74 @@ class StandarWidget(QWidget):
         if self.left_panel:
             self.image.close()
             self.victim_info_2.close()
-            self.left_panel_button.setText("ShowLeftPanel")
+            self.left_panel_button.setText("Show Left Panel")
             self.left_panel = False
         else:
             self.image.show()
             self.victim_info_2.show()
-            self.left_panel_button.setText("HideLeftPanel")
+            self.left_panel_button.setText("Hide Left Panel")
             self.left_panel = True
+
+    def console_options_button_clicked(self):
+        if self.console_show_options:
+            self.console_options_button.setText("Console Options")
+            self.ConsoleWidget_.exclude_group_box.close()
+            self.ConsoleWidget_.highlight_group_box.close()
+            self.console_show_options = False
+        else:
+            self.console_options_button.setText("Hide Console Options")
+            self.ConsoleWidget_.exclude_group_box.show()
+            self.ConsoleWidget_.highlight_group_box.show()
+            self.console_show_options = True
 
     def save_geotiff_button_clicked(self):
         pass
-
-    #~ def autonomous_state_button_clicked(self):
-#~
-        #~ if self.autonomous:
-            #~ self.teleop_state_button.setEnabled(True)
-            #~ self.semi_autonomous_state.setEnabled(True)
-            #~ self.search_and_rescue_button.setEnabled(True)
-            #~ self.mapping_mission_button.setEnabled(True)
-            #~ self.autonomous_state_button.setText("AutonomousState")
-            #~ self.autonomous = False
-        #~ else:
-            #~ self.GuiStateClient_.transition_to_state(1)
-            #~ self.teleop_state_button.setEnabled(False)
-            #~ self.semi_autonomous_state.setEnabled(False)
-            #~ self.search_and_rescue_button.setEnabled(False)
-            #~ self.mapping_mission_button.setEnabled(False)
-            #~ self.autonomous_state_button.setText("NonAutonomousState")
-            #~ self.autonomous = True
 
     def teleop_state_button_clicked(self):
         self.yellow_arena_radio_button.setEnabled(True)
         self.yellow_black_arena_radio_button.setEnabled(True)
         self.mapping_mission_radio_button.setEnabled(True)
+        self.go_button.setEnabled(True)
+        self.stop_button.setEnabled(False)
         self.GuiStateClient_.transition_to_state(6)
 
     def semi_autonomous_state_clicked(self):
+        self.yellow_arena_radio_button.setEnabled(True)
+        self.yellow_black_arena_radio_button.setEnabled(True)
+        self.mapping_mission_radio_button.setEnabled(True)
+        self.go_button.setEnabled(True)
+        self.stop_button.setEnabled(False)
         self.GuiStateClient_.transition_to_state(5)
 
     def sensor_test_state_button_clicked(self):
         self.GuiStateClient_.transition_to_state(7)
 
+    def terminate_button_clicked(self):
+        self.timer_started = False
+        self.yellow_arena_radio_button.setEnabled(False)
+        self.yellow_black_arena_radio_button.setEnabled(False)
+        self.mapping_mission_radio_button.setEnabled(False)
+        self.go_button.setEnabled(False)
+        self.stop_button.setEnabled(False)
+        self.teleop_state_button.setEnabled(False)
+        self.semi_autonomous_state_button.setEnabled(False)
+        self.sensor_test_state_button.setEnabled(False)
+        self.GuiStateClient_.transition_to_state(9)
+
     def yellow_arena_radio_button_clicked(self):
 
-        pass
-         #~ self.dynamic_reconfigure_client.update_configuration(
-           #~ {"arenaType":0})
+        self.dynamic_reconfigure_client.update_configuration(
+            {"arenaType": 0})
 
     def yellow_black_arena_radio_button_clicked(self):
 
-        pass
-      #~ self.dynamic_reconfigure_client.update_configuration(
-           #~ {"arenaType":1})
+        self.dynamic_reconfigure_client.update_configuration(
+            {"arenaType": 1})
 
     def mapping_mission_radio_button_clicked(self):
-        pass
-        #~ self.dynamic_reconfigure_client.update_configuration(
-            #~ {"arenaType":2})
+
+        self.dynamic_reconfigure_client.update_configuration(
+            {"arenaType": 2})
 
     #The _checkboxes slots
     def sonars_checked(self):
@@ -290,6 +314,9 @@ class StandarWidget(QWidget):
 
     def show_all(self):
         self.show_all_checked = self.show_all_checkbox.isChecked()
+
+    def terminate_checked(self):
+        self.terminate_button.setEnabled(self.terminate_check_box.isChecked())
 
     #Method called when the Widget is terminated
     def shutdown(self):

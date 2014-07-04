@@ -82,8 +82,8 @@ class ConsoleWidget(QWidget):
 
         ui_file = os.path.join(self._rospack.get_path('rqt_console'), 'resource', 'console_widget.ui')
         loadUi(ui_file, self)
-        self.exclude_group_box.close()
-        self.highlight_group_box.close()
+        #~ self.exclude_group_box.close()
+        #~ self.highlight_group_box.close()
         if minimal:
             self.load_button.hide()
             self.save_button.hide()
