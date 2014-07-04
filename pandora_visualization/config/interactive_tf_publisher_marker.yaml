@@ -1,0 +1,4 @@
+interactive_target_publisher_marker:
+  parent_frame: base_link
+  marker_frame: target_frame
+  publish_period: 0.05

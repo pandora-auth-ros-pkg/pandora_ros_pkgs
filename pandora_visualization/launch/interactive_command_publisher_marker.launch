@@ -1,0 +1,34 @@
+<launch>
+  <!-- load params -->
+  <rosparam
+    command="load"
+    ns="visualization"
+    file="$(find pandora_visualization)/config/interactive_command_publisher_marker.yaml"/>
+
+  <node
+    name="interactive_kinect_command_publisher_marker"
+    pkg="pandora_visualization"
+    type="interactive_command_publisher_marker"
+    respawn="false"
+    output="screen"
+    ns="visualization"
+    args="interactive_kinect_command_publisher_marker"/>
+
+  <node
+    name="interactive_head_command_publisher_marker"
+    pkg="pandora_visualization"
+    type="interactive_command_publisher_marker"
+    respawn="false"
+    output="screen"
+    ns="visualization"
+    args="interactive_head_command_publisher_marker"/>
+
+  <node
+    name="interactive_linear_command_publisher_marker"
+    pkg="pandora_visualization"
+    type="interactive_command_publisher_marker"
+    respawn="false"
+    output="screen"
+    ns="visualization"
+    args="interactive_linear_command_publisher_marker"/>
+</launch>

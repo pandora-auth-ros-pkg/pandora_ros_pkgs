@@ -1,0 +1,17 @@
+<launch>
+  <!-- load params -->
+  <rosparam
+    command="load"
+    ns="visualization"
+    file="$(find pandora_visualization)/config/interactive_tf_publisher_marker.yaml"/>
+
+  <node
+    name="interactive_target_publisher_marker"
+    pkg="pandora_visualization"
+    type="interactive_tf_publisher_marker"
+    respawn="false"
+    output="screen"
+    ns="visualization"
+    args="interactive_target_publisher_marker"/>
+
+</launch>

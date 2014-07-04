@@ -1,0 +1,14 @@
+interactive_kinect_command_publisher_marker:
+  parent_frame: kinect_servo_link
+  pitch_topic: /kinect_pitch_controller/command
+  yaw_topic: /kinect_yaw_controller/command
+  publish_period: 0.5
+interactive_head_command_publisher_marker:
+  parent_frame: linear_head_base_link
+  pitch_topic: /linear_head_pitch_controller/command
+  yaw_topic: /linear_head_yaw_controller/command
+  publish_period: 0.5
+interactive_linear_command_publisher_marker:
+  parent_frame: base_link
+  z_topic: /linear_elevator_controller/command
+  publish_period: 0.5

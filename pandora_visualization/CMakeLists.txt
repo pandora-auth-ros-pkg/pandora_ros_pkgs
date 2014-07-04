@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
       tf
       pandora_data_fusion_msgs
       sensor_msgs
+      interactive_markers
 )
 
 include_directories(
@@ -21,7 +22,8 @@ catkin_package(
       tf
       pandora_data_fusion_msgs
       sensor_msgs
-    INCLUDE_DIRS 
+      interactive_markers
+    INCLUDE_DIRS
     LIBRARIES # TODO
 )
 
@@ -32,3 +34,17 @@ add_dependencies(data_fusion_object_visualization  pandora_data_fusion_msgs_genc
 
 add_executable(temprature_visualization src/temprature_visualization.cpp)
 target_link_libraries(temprature_visualization ${catkin_LIBRARIES} )
+
+add_executable(
+  interactive_tf_publisher_marker
+  src/interactive_markers/interactive_tf_publisher_marker.cpp)
+target_link_libraries(
+  interactive_tf_publisher_marker
+  ${catkin_LIBRARIES} )
+
+add_executable(
+  interactive_command_publisher_marker
+  src/interactive_markers/interactive_command_publisher_marker.cpp)
+target_link_libraries(
+  interactive_command_publisher_marker
+  ${catkin_LIBRARIES} )
