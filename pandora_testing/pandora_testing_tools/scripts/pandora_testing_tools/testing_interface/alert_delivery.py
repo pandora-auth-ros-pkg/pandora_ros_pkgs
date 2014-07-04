@@ -104,7 +104,7 @@ class AlertDeliveryBoy():
         self.thermalDeliveryAddress = '/sensor_processing/thermal_direction_alert'
         self.thermal_pub = rospy.Publisher(self.thermalDeliveryAddress,
                                        GeneralAlertMsg)
-        self.faceDeliveryAddress = '/vision/face_direction_alert'
+        self.faceDeliveryAddress = '/vision/victim_direction_alert'
         self.face_pub = rospy.Publisher(self.faceDeliveryAddress,
                                        GeneralAlertMsg)
         self.soundDeliveryAddress = '/sensor_processing/sound_direction_alert'
