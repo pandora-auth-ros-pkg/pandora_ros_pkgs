@@ -5,21 +5,21 @@ batteries:
     max_voltage: 24.0
 range_sensors:
   - name: '/sensors/left_sonar'
-    frame_id: 'left_sonar_frame"'
+    frame_id: 'left_sonar_frame'
     radiation_type: 0
     field_of_view: 60.0
     min_range: 0.2
     max_range: 4.0
     i2c_address: 130
   - name: '/sensors/right_sonar'
-    frame_id: 'right_sonar_frame"'
+    frame_id: 'right_sonar_frame'
     radiation_type: 0
     field_of_view: 60.0
     min_range: 0.2
     max_range: 4.0
     i2c_address: 134
   - name: '/sensors/linear_sonar'
-    frame_id: 'linear_sonar_frame"'
+    frame_id: 'linear_sonar_frame'
     radiation_type: 0
     field_of_view: 60.0
     min_range: 0.2
