@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
       visualization_msgs
       tf
       pandora_data_fusion_msgs
+      sensor_msgs
 )
 
 include_directories(
@@ -19,6 +20,7 @@ catkin_package(
       visualization_msgs
       tf
       pandora_data_fusion_msgs
+      sensor_msgs
     INCLUDE_DIRS 
     LIBRARIES # TODO
 )
@@ -27,3 +29,6 @@ catkin_package(
 add_executable(data_fusion_object_visualization src/data_fusion_object_visualization.cpp)
 target_link_libraries(data_fusion_object_visualization ${catkin_LIBRARIES} )
 add_dependencies(data_fusion_object_visualization  pandora_data_fusion_msgs_gencpp )
+
+add_executable(temprature_visualization src/temprature_visualization.cpp)
+target_link_libraries(temprature_visualization ${catkin_LIBRARIES} )
