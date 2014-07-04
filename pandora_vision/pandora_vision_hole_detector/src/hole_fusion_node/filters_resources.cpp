@@ -95,7 +95,7 @@ namespace pandora_vision
     std::vector<std::set<unsigned int> >* intermediatePointsSetVector)
   {
     #ifdef DEBUG_TIME
-    Timer::start("createCheckerRequiredVectors", "checkHoles");
+    Timer::start("createCheckerRequiredVectors", "filterHoles");
     #endif
 
     // Indicate the necessity of creating particular resources

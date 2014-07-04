@@ -47,7 +47,19 @@ namespace pandora_vision
     @brief The HoleFusion constructor
    **/
   HoleFusion::HoleFusion(void) :
-    pointCloud_(new PointCloud), imageTransport_(nodeHandle_)
+    pointCloud_(new PointCloud),
+    nodeHandle_(""),
+    generalNodeHandle_("~/general"),
+    debugNodeHandle_("~/debug"),
+    filtersOrderNodeHandle_("~/order"),
+    filtersThresholdsNodeHandle_("~/thresholds"),
+    validityNodeHandle_("~/validation"),
+    serverDebug(debugNodeHandle_),
+    serverFiltersOrder(filtersOrderNodeHandle_),
+    serverFiltersThresholds(filtersThresholdsNodeHandle_),
+    serverGeneral(generalNodeHandle_),
+    serverValidity(validityNodeHandle_),
+    imageTransport_(nodeHandle_)
   {
     // Initialize the parent frame_id to an empty string
     parent_frame_id_ = "";
@@ -131,8 +143,33 @@ namespace pandora_vision
       pointCloudTopic_, 1,
       &HoleFusion::pointCloudCallback, this);
 
-    // The dynamic reconfigure (hole fusion's) parameter's callback
-    server.setCallback(boost::bind(&HoleFusion::parametersCallback,
+
+    // The dynamic reconfigure server for debugging parameters
+    serverDebug.setCallback(
+      boost::bind(&HoleFusion::parametersCallbackDebug,
+        this, _1, _2));
+
+    // The dynamic reconfigure server for parameters pertaining to the order
+    // of filters
+    serverFiltersOrder.setCallback(
+      boost::bind(&HoleFusion::parametersCallbackFiltersOrder,
+        this, _1, _2));
+
+    // The dynamic reconfigure server for parameters pertaining to
+    // thresholds of filters
+    serverFiltersThresholds.setCallback(
+      boost::bind(&HoleFusion::parametersCallbackFiltersThresholds,
+        this, _1, _2));
+
+    // The dynamic reconfigure server for general parameters
+    serverGeneral.setCallback(
+      boost::bind(&HoleFusion::parametersCallbackGeneral,
+        this, _1, _2));
+
+    // The dynamic reconfigure server for parameters pertaining to
+    // the validity of holes
+    serverValidity.setCallback(
+      boost::bind(&HoleFusion::parametersCallbackValidity,
         this, _1, _2));
 
     // Set the initial on/off state of the Hole Detector package to off
@@ -838,16 +875,15 @@ namespace pandora_vision
   }
 
 
-
   /**
-    @brief The function called when a parameter is changed
+    @brief The function called when a debugging parameter is changed
     @param[in] config
-    [const pandora_vision_hole_detector::hole_fusion_cfgConfig&]
+    [const pandora_vision_hole_detector::debug_cfgConfig&]
     @param[in] level [const uint32_t]
     @return void
    **/
-  void HoleFusion::parametersCallback(
-    const pandora_vision_hole_detector::hole_fusion_cfgConfig &config,
+  void HoleFusion::parametersCallbackDebug(
+    const pandora_vision_hole_detector::debug_cfgConfig &config,
     const uint32_t& level)
   {
     ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
@@ -882,6 +918,10 @@ namespace pandora_vision
     Parameters::Debug::show_merge_holes_size =
       config.show_merge_holes_size;
 
+    // Show the texture's watersheded backprojection
+    Parameters::HoleFusion::show_texture =
+      config.show_texture;
+
     // Show the holes that each of the depth and RGB nodes transmit to the
     // hole fusion node, on top of their respective origin images
     Parameters::HoleFusion::show_respective_holes =
@@ -895,6 +935,152 @@ namespace pandora_vision
     // The product of this package: unique, valid holes
     Parameters::HoleFusion::show_final_holes =
      config.show_final_holes;
+  }
+
+
+
+  /**
+    @brief The function called when a parameter regarding the order
+    of filters is changed
+    @param[in] config
+    [const pandora_vision_hole_detector::filters_order_cfgConfig&]
+    @param[in] level [const uint32_t]
+    @return void
+   **/
+  void HoleFusion::parametersCallbackFiltersOrder(
+    const pandora_vision_hole_detector::filters_order_cfgConfig &config,
+    const uint32_t& level)
+  {
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+
+    // Depth / Area
+    Parameters::HoleFusion::run_checker_depth_area =
+      config.run_checker_depth_area;
+
+    // Depth diff
+    Parameters::HoleFusion::run_checker_depth_diff =
+      config.run_checker_depth_diff;
+
+    // Outline of rectangle plane constitution
+    Parameters::HoleFusion::run_checker_outline_of_rectangle =
+      config.run_checker_outline_of_rectangle;
+
+    // Intermediate points plane constitution
+    Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle =
+      config.run_checker_brushfire_outline_to_rectangle;
+
+    // Depth homogeneity
+    Parameters::HoleFusion::run_checker_depth_homogeneity =
+      config.run_checker_depth_homogeneity;
+
+    // Color homogeneity
+    Parameters::HoleFusion::run_checker_color_homogeneity =
+      config.run_checker_color_homogeneity;
+
+    Parameters::HoleFusion::run_checker_color_homogeneity_urgent =
+      config.run_checker_color_homogeneity_urgent;
+
+    // Luminosity diff
+    Parameters::HoleFusion::run_checker_luminosity_diff =
+      config.run_checker_luminosity_diff;
+
+    Parameters::HoleFusion::run_checker_luminosity_diff_urgent =
+      config.run_checker_luminosity_diff_urgent;
+
+    // Texture diff
+    Parameters::HoleFusion::run_checker_texture_diff =
+      config.run_checker_texture_diff;
+
+    Parameters::HoleFusion::run_checker_texture_diff_urgent =
+      config.run_checker_texture_diff_urgent;
+
+    // Texture backproject
+    Parameters::HoleFusion::run_checker_texture_backproject =
+      config.run_checker_texture_backproject;
+
+    Parameters::HoleFusion::run_checker_texture_backproject_urgent =
+      config.run_checker_texture_backproject_urgent;
+  }
+
+
+
+  /**
+    @brief The function called when a parameter regarding thresholds
+    of filters is changed
+    @param[in] config
+    [const pandora_vision_hole_detector::debug_cfgConfig&]
+    @param[in] level [const uint32_t]
+    @return void
+   **/
+  void HoleFusion::parametersCallbackFiltersThresholds(
+    const pandora_vision_hole_detector::filters_thresholds_cfgConfig &config,
+    const uint32_t& level)
+  {
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+
+    // Depth / Area
+    Parameters::HoleFusion::checker_depth_area_threshold =
+      config.checker_depth_area_threshold;
+
+    // Depth diff
+    Parameters::HoleFusion::checker_depth_diff_threshold =
+      config.checker_depth_diff_threshold;
+
+    // Outline of rectangle plane constitution
+    Parameters::HoleFusion::checker_outline_of_rectangle_threshold =
+      config.checker_outline_of_rectangle_threshold;
+
+    // Intermediate points plane constitution
+    Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold =
+      config.checker_brushfire_outline_to_rectangle_threshold;
+
+    // Depth homogeneity
+    Parameters::HoleFusion::checker_depth_homogeneity_threshold =
+      config.checker_depth_homogeneity_threshold;
+
+    // Color homogeneity
+    Parameters::HoleFusion::checker_color_homogeneity_threshold =
+      config.checker_color_homogeneity_threshold;
+
+    Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold =
+      config.checker_color_homogeneity_urgent_threshold;
+
+    // Luminosity diff
+    Parameters::HoleFusion::checker_luminosity_diff_threshold =
+      config.checker_luminosity_diff_threshold;
+
+    Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold =
+      config.checker_luminosity_diff_urgent_threshold;
+
+    // Texture diff
+    Parameters::HoleFusion::checker_texture_diff_threshold =
+      config.checker_texture_diff_threshold;
+
+    Parameters::HoleFusion::checker_texture_diff_urgent_threshold =
+      config.checker_texture_diff_urgent_threshold;
+
+    // Texture backproject
+    Parameters::HoleFusion::checker_texture_backproject_threshold =
+      config.checker_texture_backproject_threshold;
+
+    Parameters::HoleFusion::checker_texture_backproject_urgent_threshold =
+      config.checker_texture_backproject_urgent_threshold;
+  }
+
+
+
+  /**
+    @brief The function called when a general parameter is changed
+    @param[in] config
+    [const pandora_vision_hole_detector::general_cfgConfig&]
+    @param[in] level [const uint32_t]
+    @return void
+   **/
+  void HoleFusion::parametersCallbackGeneral(
+    const pandora_vision_hole_detector::general_cfgConfig &config,
+    const uint32_t& level)
+  {
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
 
 
     // Threshold parameters
@@ -919,87 +1105,10 @@ namespace pandora_vision
 
     //////////////////// Hole checkers and their thresholds/////////////////////
 
-    // Depth / Area
-    Parameters::HoleFusion::run_checker_depth_area =
-      config.run_checker_depth_area;
-    Parameters::HoleFusion::checker_depth_area_threshold =
-      config.checker_depth_area_threshold;
-
-    // Depth diff
-    Parameters::HoleFusion::run_checker_depth_diff =
-      config.run_checker_depth_diff;
-    Parameters::HoleFusion::checker_depth_diff_threshold =
-      config.checker_depth_diff_threshold;
-
-    // Outline of rectangle plane constitution
-    Parameters::HoleFusion::run_checker_outline_of_rectangle =
-      config.run_checker_outline_of_rectangle;
-    Parameters::HoleFusion::checker_outline_of_rectangle_threshold =
-      config.checker_outline_of_rectangle_threshold;
-
-    // Intermediate points plane constitution
-    Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle =
-      config.run_checker_brushfire_outline_to_rectangle;
-    Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold =
-      config.checker_brushfire_outline_to_rectangle_threshold;
-
-    // Depth homogeneity
-    Parameters::HoleFusion::run_checker_depth_homogeneity =
-      config.run_checker_depth_homogeneity;
-    Parameters::HoleFusion::checker_depth_homogeneity_threshold =
-      config.checker_depth_homogeneity_threshold;
-
-    // Color homogeneity
-    Parameters::HoleFusion::run_checker_color_homogeneity =
-      config.run_checker_color_homogeneity;
-    Parameters::HoleFusion::checker_color_homogeneity_threshold =
-      config.checker_color_homogeneity_threshold;
-
-    Parameters::HoleFusion::run_checker_color_homogeneity_urgent =
-      config.run_checker_color_homogeneity_urgent;
-    Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold =
-      config.checker_color_homogeneity_urgent_threshold;
-
-    // Luminosity diff
-    Parameters::HoleFusion::run_checker_luminosity_diff =
-      config.run_checker_luminosity_diff;
-    Parameters::HoleFusion::checker_luminosity_diff_threshold =
-      config.checker_luminosity_diff_threshold;
-
-    Parameters::HoleFusion::run_checker_luminosity_diff_urgent =
-      config.run_checker_luminosity_diff_urgent;
-    Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold =
-      config.checker_luminosity_diff_urgent_threshold;
-
-    // Texture diff
-    Parameters::HoleFusion::run_checker_texture_diff =
-      config.run_checker_texture_diff;
-    Parameters::HoleFusion::checker_texture_diff_threshold =
-      config.checker_texture_diff_threshold;
-
-    Parameters::HoleFusion::run_checker_texture_diff_urgent =
-      config.run_checker_texture_diff_urgent;
-    Parameters::HoleFusion::checker_texture_diff_urgent_threshold =
-      config.checker_texture_diff_urgent_threshold;
-
-    // Texture backproject
-    Parameters::HoleFusion::run_checker_texture_backproject =
-      config.run_checker_texture_backproject;
-    Parameters::HoleFusion::checker_texture_backproject_threshold =
-      config.checker_texture_backproject_threshold;
-
-    Parameters::HoleFusion::run_checker_texture_backproject_urgent =
-      config.run_checker_texture_backproject_urgent;
-    Parameters::HoleFusion::checker_texture_backproject_urgent_threshold =
-      config.checker_texture_backproject_urgent_threshold;
 
     // In the terminal window, show the probabilities of candidate holes
     Parameters::HoleFusion::show_probabilities =
       config.show_probabilities;
-
-    // Show the texture's watersheded backprojection
-    Parameters::HoleFusion::show_texture =
-      config.show_texture;
 
     // The inflation size of the bounding box's vertices
     Parameters::HoleFusion::rectangle_inflation_size =
@@ -1047,10 +1156,6 @@ namespace pandora_vision
     Parameters::HoleFusion::connect_holes_max_distance =
       config.connect_holes_max_distance;
 
-    //-------------------------- Validation process ----------------------------
-
-    Parameters::HoleFusion::validation_process =
-      config.validation_process;
 
 
     //--------------------------- Merger parameters ----------------------------
@@ -1114,8 +1219,28 @@ namespace pandora_vision
     Parameters::Rgb::watershed_background_erosion_factor =
       config.watershed_background_erosion_factor;
 
+  }
 
-    //////////////////////// Holes validity thresholds /////////////////////////
+
+
+  /**
+    @brief The function called when a parameter regarding the validity of
+    holes is changed
+    @param[in] config
+    [const pandora_vision_hole_detector::debug_cfgConfig&]
+    @param[in] level [const uint32_t]
+    @return void
+   **/
+  void HoleFusion::parametersCallbackValidity(
+    const pandora_vision_hole_detector::validity_cfgConfig &config,
+    const uint32_t& level)
+  {
+    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+
+    // The validation process
+    Parameters::HoleFusion::validation_process =
+      config.validation_process;
+
 
     // Normal : when depth analysis is applicable
     Parameters::HoleFusion::holes_validity_threshold_normal =
@@ -1125,7 +1250,6 @@ namespace pandora_vision
     // on RGB analysis
     Parameters::HoleFusion::holes_validity_threshold_urgent =
       config.holes_validity_threshold_urgent;
-
   }
 
 
