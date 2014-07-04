@@ -1,12 +1,17 @@
 <launch>
     
+  <arg name="openni" default="true" />
+  
   <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_standalone.launch" >
    <arg name="openni" value="true" />
+   <arg name="output" value="log" />
   </include>
   
   <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
 
-  <include file="$(find pandora_vision_victim)/launch/victim_node.launch" />
+  <include file="$(find pandora_vision_victim)/launch/victim_node.launch">
+    <arg name="output" value="screen" />
+  </include>
  <!-- 
   <include file="$(find state_manager)/launch/stateManager.launch" />
 

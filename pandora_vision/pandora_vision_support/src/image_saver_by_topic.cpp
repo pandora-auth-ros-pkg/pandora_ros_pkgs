@@ -53,12 +53,18 @@ struct Params
   static std::string folder;  // The folder for the images to be saved
   static unsigned int width;  // The width for the image to be resized
   static unsigned int height; // The height of the image to be resized
+  static std::string prefix;
+  static int start_num;
+  static std::string suffix;
 };
 
 //! Initialization of the static members
 std::string Params::folder = "~/Desktop";
 unsigned int Params::width = 0;
 unsigned int Params::height = 0;
+std::string Params::prefix = "";
+std::string Params::suffix = "png";
+int Params::start_num = 0;
 
 static int drag = 0;
 static cv::Point point;
@@ -112,11 +118,11 @@ static void mouseHandler(int event, int x, int y, int flags, void *param)
     
     //! Cast counter to string
     std::ostringstream convert;
-    convert << counter;
+    convert << counter + Params::start_num;
     
     //! Produce image path
-    std::string file_name = Params::folder + "/image_" 
-      + convert.str() + ".png";
+    std::string file_name = Params::folder + "/" + Params::prefix 
+      + convert.str() + "." + Params::suffix;
     
     cv::Mat rect_image = (*img)(bbox);
     //! Resize if requested by the user
@@ -153,7 +159,7 @@ void imageCallback(const sensor_msgs::Image& msg)
   }
   else
   {
-    cv::rectangle(current_frame, point, cv::Point(xx, yy), CV_RGB(255, 0, 0), 3, 8, 0);
+    //~ cv::rectangle(current_frame, point, cv::Point(xx, yy), CV_RGB(255, 0, 0), 3, 8, 0);
   }
 
   cv::setMouseCallback("image", mouseHandler, &current_frame);
@@ -166,11 +172,11 @@ void imageCallback(const sensor_msgs::Image& msg)
     {
       //! Cast counter to string
       std::ostringstream convert;
-      convert << counter;
+      convert << counter + Params::start_num;
       
       //! Produce image path
-      std::string file_name = Params::folder + "/image_" 
-        + convert.str() + ".png";
+      std::string file_name = Params::folder + "/" + Params::prefix 
+        + convert.str() + "." + Params::suffix;
       
       //! Resize if requested by the user
       if(Params::width != 0 && Params::height != 0)
@@ -206,31 +212,44 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   
   //! Check the arguments. If 3 no resizing is requested.
-  ROS_WARN("Image saver intializes... \n\tPress 's' to save image\n\t\
-Press '0' to set the counter to 0\n\tDraw a rectangle with mouse to \
-save image");
-  if(argc != 3 && argc != 5)
+  ROS_WARN("Image saver intializes... \
+              \n\tPress 's' to save image\
+              \n\tPress '0' to set the counter to 0\
+              \n\tDraw a rectangle with mouse to save image");
+  if(argc != 6 && argc != 8)
   {
     ROS_ERROR("You haven't provided correct input. \nUsage:\n\trosrun \
 pandora_vision_support image_saver_by_topic $image_topic $folder_for_imgs\
- [$width] [$height]\nExiting...");
+ $prefix $start_number $suffix [$width] [$height]\nExiting...");
     exit(0);
   }
   
   //! Argument parsing
   std::string topic(argv[1]);
   std::string folder(argv[2]);
+  Params::prefix = std::string(argv[3]);
+  Params::start_num = atoi(argv[4]);
   Params::folder = folder;
+  Params::suffix = std::string(argv[5]);
   
   //!< If arguments were 5 the resize operation was requested
-  if(argc == 5)
+  if(argc == 8)
   {
-    Params::width = atoi(argv[3]);
-    Params::height = atoi(argv[4]);
+    Params::width = atoi(argv[6]);
+    Params::height = atoi(argv[7]);
   }
   
   //! Topic subscription
   ROS_WARN("Subscribing to topic %s", topic.c_str());
+  ROS_INFO_STREAM("Parameters:\n" << 
+    "Topic : " << topic << 
+    "\nFolder : " << folder << 
+    "\nPrefix : " << Params::prefix << 
+    "\nStart num : " << Params::start_num << 
+    "\nSuffix : " << Params::suffix << 
+    "\nWidth :" << Params::width << 
+    "\nHeight :" << Params::height<<"\n");
+    
   ros::Subscriber sub = n.subscribe(topic.c_str(), 1, imageCallback);
   
   ros::spin();

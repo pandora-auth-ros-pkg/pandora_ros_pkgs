@@ -42,7 +42,11 @@ namespace pandora_vision
   /**
    @brief Constructor
   */ 
-  DepthSystemValidator::DepthSystemValidator(std::string depth_classifier_path)
+  DepthSystemValidator::DepthSystemValidator()
+  {
+  }
+  
+  void DepthSystemValidator::initialize(std::string depth_classifier_path)
   {
     _depth_classifier_path = depth_classifier_path;
     
@@ -51,13 +55,10 @@ namespace pandora_vision
     
     _params.svm_type = CvSVM::C_SVC;
     _params.kernel_type = CvSVM::RBF;
-    _params.C = 312.5;
-    _params.gamma = 0.50625;
-    _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 1e-6);
-  }
-  
-  DepthSystemValidator::DepthSystemValidator()
-  {
+    _params.C = VictimParameters::depth_svm_C;
+    _params.gamma = VictimParameters::depth_svm_gamma;
+    _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 
+      100000, 1e-6);
   }
   
   /**
@@ -152,7 +153,6 @@ namespace pandora_vision
     ///Normalize the data from [-1,1]
     cv::normalize(samples_mat, samples_mat, -1.0, 1.0, cv::NORM_MINMAX, -1);    
     float prediction = _depthSvm.predict(samples_mat, true);
-    ROS_INFO_STREAM("Depth_subsystem prediction: "<< prediction);
     return prediction;
   }
   
@@ -182,9 +182,11 @@ namespace pandora_vision
   {
     float probability;
     //~ Normalize probability to [-1,1]
-    probability = tanh(0.5 * (prediction - 7.0) );
+    probability = tanh(VictimParameters::depth_svm_prob_scaling 
+      * (prediction - VictimParameters::depth_svm_prob_translation) );
     //~ Normalize probability to [0,1]
     probability = (1 + probability) / 2.0;
+    ROS_INFO_STREAM("SVM DEPTH pred/prob :" << prediction <<" "<<probability);
     return probability;
   }
 }// namespace pandora_vision 

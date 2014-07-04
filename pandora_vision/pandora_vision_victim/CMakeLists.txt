@@ -48,13 +48,19 @@ include_directories(include
 add_executable(victim_node
     src/victim_node.cpp
     src/victim_detection.cpp
-    src/victim_detector.cpp
     src/rgb_system_validator.cpp
     src/depth_system_validator.cpp
-    src/face_detector.cpp
-    src/channels_statistics_extractor.cpp
-    src/edge_orientation_extractor.cpp
-    src/haralickfeature_extractor.cpp
+    src/victim_vj_detector.cpp
+    
+    src/utilities/channels_statistics_extractor.cpp
+    src/utilities/edge_orientation_extractor.cpp
+    src/utilities/haralickfeature_extractor.cpp
+    
+    src/feature_extractors/mean_std_dev.cpp
+    src/feature_extractors/dominant_color.cpp
+    src/feature_extractors/dft_coeffs.cpp
+    src/feature_extractors/color_angles.cpp
+    
     src/victim_parameters.cpp
 )
 target_link_libraries(victim_node ${catkin_LIBRARIES} )
@@ -67,12 +73,20 @@ add_dependencies(victim_node
 ########################### victimTrainer ############################
 if(VICTIM_ENABLE_TRAIN)
   add_executable(victim_train_node
+                  src/training.cpp
                   src/rgb_system_validator.cpp
                   src/depth_system_validator.cpp
-                  src/channels_statistics_extractor.cpp
-                  src/edge_orientation_extractor.cpp
-                  src/haralickfeature_extractor.cpp
-                  src/training.cpp
+                  src/utilities/channels_statistics_extractor.cpp
+                  src/utilities/edge_orientation_extractor.cpp
+                  src/utilities/haralickfeature_extractor.cpp
+                  
+                  src/feature_extractors/mean_std_dev.cpp
+                  src/feature_extractors/dominant_color.cpp
+                  src/feature_extractors/dft_coeffs.cpp
+                  src/feature_extractors/color_angles.cpp
+                  
+                  src/victim_parameters.cpp
+                  src/training_parameters.cpp
   )
   target_link_libraries(victim_train_node ${catkin_LIBRARIES} )
 endif()
@@ -93,20 +107,22 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
   
   include/victim_detection.h
-  include/victim_detector.h
   include/face_detector.h
   include/rgb_system_validator.h
   include/depth_system_validator.h
-  include/channels_statistics_extractor.h
-  include/edge_orientation_extractor.h
-  include/haralickfeature_extractor.h
+  include/utilities/channels_statistics_extractor.h
+  include/utilities/edge_orientation_extractor.h
+  include/utilities/haralickfeature_extractor.h
+  include/training.h
   src/victim_detection.cpp
   src/victim_detector.cpp
-  src/face_detector.cpp
+  src/victim_vj_detector.cpp
   src/rgb_system_validator.cpp
   src/depth_system_validator.cpp
-  src/channels_statistics_extractor.cpp
-  src/edge_orientation_extractor.cpp
-  src/haralickfeature_extractor.cpp
+  src/utilities/channels_statistics_extractor.cpp
+  src/utilities/edge_orientation_extractor.cpp
+  src/utilities/haralickfeature_extractor.cpp
+  src/training.cpp
+
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

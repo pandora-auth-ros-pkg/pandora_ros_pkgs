@@ -42,24 +42,24 @@ namespace pandora_vision
   /**
    @brief Constructor
   */ 
-  RgbSystemValidator::RgbSystemValidator(std::string rgb_classifier_path)
+  RgbSystemValidator::RgbSystemValidator(void)
+  {
+    ROS_DEBUG("[victim_node] : RgbSystemValidator instance created");
+  }
+  
+  void RgbSystemValidator::initialize(std::string rgb_classifier_path)
   {
     _rgb_classifier_path = rgb_classifier_path;
         
     _params.svm_type = CvSVM::C_SVC;
     _params.kernel_type = CvSVM::RBF;
-    _params.C = 312.5;
-    _params.gamma = 0.50625;
-    _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 10000, 1e-6);
+    _params.C = VictimParameters::rgb_svm_C;
+    _params.gamma = VictimParameters::rgb_svm_gamma;
+    _params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER + CV_TERMCRIT_EPS, 
+      10000, 1e-6);
     
     ///Load classifier path for rgb subsystem
     _rgbSvm.load(rgb_classifier_path.c_str());
-    ROS_DEBUG("[victim_node] : RgbSystemValidator instance created");
-  }
-  
-  RgbSystemValidator::RgbSystemValidator()
-  {
-    
   }
   
   /**
@@ -126,7 +126,7 @@ namespace pandora_vision
           
     ///Deallocate memory
     channelsStatictisFeatureVector.clear();
-    _channelsStatisticsDetector.emptyCurrentFrameFeatureVector();
+    //~ _channelsStatisticsDetector.emptyCurrentFrameFeatureVector();
     
     edgeOrientationFeatureVector.clear();
     _edgeOrientationDetector.emptyCurrentFrameFeatureVector(); 
@@ -187,9 +187,11 @@ namespace pandora_vision
   {
     float probability;
     //~ Normalize probability to [-1,1]
-    probability = tanh(0.5 * (prediction - 7.0) );
+    probability = tanh(VictimParameters::rgb_svm_prob_scaling * 
+      (abs(prediction) - VictimParameters::rgb_svm_prob_translation) );
     //~ Normalize probability to [0,1]
     probability = (1 + probability) / 2.0;
+    ROS_INFO_STREAM("SVM RGB pred/prob :" << abs(prediction) <<" "<<probability);
     return probability;
   }
 }// namespace pandora_vision 

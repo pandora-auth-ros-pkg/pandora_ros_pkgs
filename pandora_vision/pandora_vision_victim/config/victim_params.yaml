@@ -3,10 +3,18 @@ hfov: 58.0
 vfov: 45.0
 image_width: 640
 image_height: 480
-bufferSize: 5
-isDepthEnabled: false
 cascade_path: /data/cascade.xml
-isHole: false
-model_path: /data/model.xml
-rgb_classifier_path: /data/rgb_svm_classifier.xml    
+model_path: /data/model_dolls.xml
+rgb_classifier_path: /data/rgb_svm_classifier4.xml    
 depth_classifier_path: /data/depth_svm_classifier.xml    
+model_image_width: 128
+model_image_height: 96
+
+rgb_svm_C: 312.5
+rgb_svm_gamma: 0.50625
+
+depth_svm_C: 312.5
+depth_svm_gamma: 0.50625
+depth_svm_prob_scaling: 0.5
+depth_svm_prob_translation: 7.0
+

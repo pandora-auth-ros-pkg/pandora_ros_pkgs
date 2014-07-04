@@ -690,15 +690,13 @@ void Predator::startTransition(int newState)
   //!< check if predator algorithm should be running now
   predatorNowON =
     (curState ==
-     state_manager_communications::robotModeMsg::MODE_EXPLORATION)
+     state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE)
     || (curState ==
         state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
     || (curState ==
-        state_manager_communications::robotModeMsg::MODE_ARM_APPROACH)
+        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD)
     || (curState ==
-        state_manager_communications::robotModeMsg::MODE_TELEOPERATED_LOCOMOTION)
-    || (curState ==
-        state_manager_communications::robotModeMsg::MODE_DF_HOLD);
+        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST);
 
   //!< shutdown if the robot is switched off
   if (curState ==

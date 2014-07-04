@@ -354,16 +354,13 @@ namespace pandora_vision
     //check if each algorithm should be running now
     hazmatNowOn_ = 
       ( curState == 
-        state_manager_communications::robotModeMsg::MODE_EXPLORATION ) ||
+        state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE ) ||
       ( curState == 
         state_manager_communications::robotModeMsg::MODE_IDENTIFICATION ) ||
       ( curState == 
-        state_manager_communications::robotModeMsg::MODE_ARM_APPROACH ) ||
+        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD ) ||
       ( curState == 
-        state_manager_communications::robotModeMsg::\
-          MODE_TELEOPERATED_LOCOMOTION )
-      ||( curState == 
-        state_manager_communications::robotModeMsg::MODE_DF_HOLD );
+        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST );
         
     if (curState == state_manager_communications::robotModeMsg::\
       MODE_TERMINATING)

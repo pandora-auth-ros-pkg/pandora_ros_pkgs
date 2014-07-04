@@ -398,17 +398,8 @@ namespace pandora_vision
     curState = newState;
 
     //!< check if QR algorithm should be running now
-    qrcodeNowON =
-      (curState ==
-       state_manager_communications::robotModeMsg::MODE_EXPLORATION)
-      || (curState ==
-          state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
-      || (curState ==
-          state_manager_communications::robotModeMsg::MODE_ARM_APPROACH)
-      || (curState ==
-          state_manager_communications::robotModeMsg::MODE_TELEOPERATED_LOCOMOTION)
-      || (curState ==
-          state_manager_communications::robotModeMsg::MODE_DF_HOLD);
+    qrcodeNowON = (curState !=
+          state_manager_communications::robotModeMsg::MODE_OFF);
 
     //!< shutdown if the robot is switched off
     if (curState ==

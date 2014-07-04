@@ -37,22 +37,91 @@
 
 #ifndef PANDORA_VISION_VICTIM_VICTIM_PARAMETERS_H
 #define PANDORA_VISION_VICTIM_VICTIM_PARAMETERS_H
+
+#include <iostream>
+#include <cstdlib>
+#include <limits>
+#include <map>
+#include <vector>
+
+#include "ros/ros.h"
+#include <ros/package.h>
+
 #include <dynamic_reconfigure/server.h>
-#include <pandora_vision_victim/victim_dyn_reconfConfig.h>
+
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <image_transport/image_transport.h>
+#include <urdf_parser/urdf_parser.h>
+
 #include <opencv2/opencv.hpp>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include <cv_bridge/cv_bridge.h>
+
+#include "pandora_common_msgs/GeneralAlertMsg.h"
+#include "vision_communications/EnhancedHolesVectorMsg.h"
+#include "vision_communications/EnhancedHoleMsg.h"
+#include "state_manager/state_client.h"
+#include <pandora_vision_victim/victim_dyn_reconfConfig.h>
 
 namespace pandora_vision
 {
+  
+  enum VictimSource
+  {
+    RGB_VJ,
+    DEPTH_VJ,
+    RGB_SVM,
+    DEPTH_RGB_SVM
+  };
   
   struct DetectedVictim
   {
     cv::Point2f keypoint;
     float probability;
+    cv::Rect boundingBox;
+    VictimSource source;
   };
 
+  enum DetectionMode
+  { 
+    GOT_RGB = 1,
+    GOT_HOLES_AND_DEPTH = 4,
+    GOT_HOLES = 2,
+    GOT_DEPTH = 3
+  };
+  
+  struct EnhancedMat
+  {
+    cv::Mat img;
+    cv::Rect bounding_box;
+    cv::Point2f keypoint;
+  };
+
+  struct DetectionImages
+  {
+    EnhancedMat rgb;
+    EnhancedMat depth;
+    std::vector<EnhancedMat> rgbMasks;
+    std::vector<EnhancedMat> depthMasks;
+  };
+  
+  struct BoundingBox
+  {
+    cv::Rect bounding_box;
+    cv::Point2f keypoint;
+  };
   
   class VictimParameters
   {
+    private:
+    
+      ros::NodeHandle _nh;
+    
+      void getGeneralParams(void);
+      void getVictimDetectorParameters(void);
+    
     public:
       //!< Weight parameters for the victim subsystems
       static double rgb_vj_weight;
@@ -60,16 +129,51 @@ namespace pandora_vision
       static double rgb_svm_weight;
       static double depth_svm_weight;
       
+      //!< Parameters for debug purposes
       static bool debug_img;
-    
-      //!< The dynamic reconfigure (motion's) parameters' server
-      dynamic_reconfigure::Server<pandora_vision_victim::victim_dyn_reconfConfig>
-        server;
-      //!< The dynamic reconfigure (depth) parameters' callback
-      dynamic_reconfigure::Server<pandora_vision_victim::victim_dyn_reconfConfig>
-        ::CallbackType f;  
+      static bool debug_img_publisher;
+
+      //!< parameters referring to the view and frame characteristics
+      static std::string packagePath;
+      static std::string victimAlertTopic;
+      static std::string victimDebugImg;
+      static std::string interpolatedDepthImg;
+      static std::string enhancedHolesTopic;
+      static std::string cameraName;
+      static int frameHeight;
+      static int frameWidth;
+      static int modelImageHeight;
+      static int modelImageWidth;
+      static double hfov;
+      static double vfov;
       
-      VictimParameters(void);
+      //!< parameters referring to the face detection algorithm
+      static std::string cascade_path;
+      static std::string model_url;
+      static std::string model_path;
+      static std::string rgb_classifier_path;
+      static std::string depth_classifier_path;
+      
+      //! parameters for svms
+      static double rgb_svm_C;
+      static double rgb_svm_gamma;
+      static double rgb_svm_prob_scaling;
+      static double rgb_svm_prob_translation;
+      static double depth_svm_C;
+      static double depth_svm_gamma;
+      static double depth_svm_prob_scaling;
+      static double depth_svm_prob_translation;
+      
+      //----------------------------------------------------------------------//
+      //!< The dynamic reconfigure (motion's) parameters' server
+      dynamic_reconfigure::Server
+        <pandora_vision_victim::victim_dyn_reconfConfig>server;
+      //!< The dynamic reconfigure (depth) parameters' callback
+      dynamic_reconfigure::Server
+        <pandora_vision_victim::victim_dyn_reconfConfig>::CallbackType f;  
+      
+      //!< Default contructor
+      VictimParameters(const std::string& ns);
         
       /**
         @brief The function called when a parameter is changed

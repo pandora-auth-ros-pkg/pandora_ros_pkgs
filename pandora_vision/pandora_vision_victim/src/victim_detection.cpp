@@ -42,42 +42,52 @@ namespace pandora_vision
   /**
     @brief Constructor
   **/
-  VictimDetection::VictimDetection(const std::string& ns) : _nh(ns), victimNowON(false)
+  VictimDetection::VictimDetection(const std::string& ns) : 
+    _nh(ns), 
+    params(ns),
+    imageTransport_(_nh)
   {
      //!< Set initial value of parent frame id to null
     _parent_frame_id = "";
     _frame_id = "";
-    
-    /// Get general parameters for image processing
-    getGeneralParams();
-    
-    /// Get parameters referring to faceDetector instance
-    getVictimDetectorParameters();
 
     /// Convert field of view from degrees to rads
-    hfov = hfov * CV_PI / 180;
-    vfov = vfov * CV_PI / 180;
-    
-    //!< Subscribe to input image's topic
-    //!< image_transport::ImageTransport it(_nh);
-    //~ _frameSubscriber = _nh.subscribe(
-                       //~ "/kinect/rgb/image_color", 1, &VictimDetection::dummyimageCallback, this);
+    VictimParameters::hfov = VictimParameters::hfov * CV_PI / 180;
+    VictimParameters::vfov = VictimParameters::vfov * CV_PI / 180;
+                       
+    //! Declare publisher and advertise topic
+    //! where algorithm results are posted
+    _victimDirectionPublisher = 
+      _nh.advertise<pandora_common_msgs::GeneralAlertMsg>(
+        VictimParameters::victimAlertTopic, 10, true);
                        
     /// Subscribe to input image's topic
     /// image_transport::ImageTransport it(_nh);
     _frameSubscriber = _nh.subscribe(
-              _enhancedHolesTopic, 1, &VictimDetection::imageCallback, this);
-    
-     /// Initialize victim detector
-    _victimDetector = new VictimDetector(cascade_path, model_path, bufferSize,
-      rgb_classifier_path, depth_classifier_path);
+      VictimParameters::enhancedHolesTopic, 
+        1, &VictimDetection::imageCallback, this);
+      
+    /// Initialize the face detector and the svm classifiers
+    _rgbViolaJonesDetector = VictimVJDetector(
+      VictimParameters::cascade_path, 
+      VictimParameters::model_path);
+      
+    _rgbSystemValidator.initialize(
+      VictimParameters::rgb_classifier_path);
+      
+    _depthSystemValidator.initialize(
+      VictimParameters::depth_classifier_path);
     
     /// Initialize states - robot starts in STATE_OFF
     curState = state_manager_communications::robotModeMsg::MODE_OFF;
     prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+    
+    _debugVictimsPublisher = imageTransport_.advertise
+      (VictimParameters::victimDebugImg, 1, true);
+    _interpolatedDepthPublisher = imageTransport_.advertise
+      (VictimParameters::interpolatedDepthImg, 1, true);
 
     clientInitialize();
-    _rgbImage = cv::Mat::zeros(frameWidth, frameHeight, CV_8UC3);
     
     ROS_INFO("[victim_node] : Created Victim Detection instance");
   }
@@ -88,167 +98,6 @@ namespace pandora_vision
   VictimDetection::~VictimDetection()
   {
     ROS_DEBUG("[victim_node] : Destroying Victim Detection instance");
-   
-  }
-
-  /**
-   @brief Get parameters referring to the view and
-   *frame characteristics
-   @return void
-  **/
-  void VictimDetection::getGeneralParams()
-  {
-    packagePath = ros::package::getPath("pandora_vision_victim");
-    
-    //! Publishers
-      
-    //! Declare publisher and advertise topic
-    //! where algorithm results are posted
-    if (_nh.getParam("published_topic_names/victim_alert", param)){
-      _victimDirectionPublisher = 
-        _nh.advertise<pandora_common_msgs::GeneralAlertMsg>(param, 10, true);
-    }
-    else{
-      ROS_FATAL("[victim_node] : Victim alert topic name param not found");
-      ROS_BREAK();
-    }
-     
-    //! Subscribers
-      
-    //! Declare subsciber's topic name
-    if (_nh.getParam("subscribed_topic_names/enhanded_hole_alert", param))
-    {
-      ROS_INFO_STREAM("PARAM"<< param);
-      _enhancedHolesTopic = param;
-    }  
-    else{
-      ROS_FATAL("[victim_node] : Victim subscribed topic name param not found");
-      ROS_BREAK();
-    }  
-    
-        
-    //!< Get the camera to be used by motion node;
-    if (_nh.getParam("camera_name", cameraName)) 
-      ROS_DEBUG_STREAM("camera_name : " << cameraName);
-    else 
-    {
-      ROS_FATAL("[Motion_node]: Camera name not found");
-      ROS_BREAK(); 
-    }
-
-    //! Get the Height parameter if available;
-    if (_nh.getParam("image_height", frameHeight)) 
-      ROS_DEBUG_STREAM("height : " << frameHeight);
-    else 
-    {
-      ROS_FATAL("[motion_node] : Parameter frameHeight not found. Using Default");
-      ROS_BREAK();
-    }
-    
-    //! Get the Width parameter if available;
-    if ( _nh.getParam("image_width", frameWidth)) 
-      ROS_DEBUG_STREAM("width : " << frameWidth);
-    else 
-    {
-      ROS_FATAL("[motion_node] : Parameter frameWidth not found. Using Default");
-      ROS_BREAK();
-    }
-  
-    //!< Get the HFOV parameter if available;
-    if (_nh.getParam("hfov", hfov)) 
-      ROS_DEBUG_STREAM("HFOV : " << hfov);
-    else 
-    {
-     ROS_FATAL("[motion_node]: Horizontal field of view not found");
-     ROS_BREAK();
-    }
-    
-    //!< Get the VFOV parameter if available;
-    if (_nh.getParam("vfov", vfov)) 
-      ROS_DEBUG_STREAM("VFOV : " << vfov);
-    else 
-    {
-     ROS_FATAL("[motion_node]: Vertical field of view not found");
-     ROS_BREAK();
-    }  
-    
-  }
-
-  /**
-    @brief Get parameters referring to the face detection algorithm
-    @return void
-  **/
-  void VictimDetection::getVictimDetectorParameters()
-  {
-    //!< Get the path of haar_cascade xml file if available;
-    if ( _nh.getParam("cascade_path", cascade_path)){
-      cascade_path = packagePath + cascade_path;
-      ROS_INFO_STREAM("[victim_node]: cascade_path : " << cascade_path);
-    }
-    else{
-      model_path = packagePath + "/data/haarcascade_frontalface_alt_tree.xml";
-      ROS_INFO_STREAM("[victim_node]: cascade_path : " << cascade_path);
-    }
-
-    //!< Get the model.xml url;
-    if (_nh.getParam("model_url", model_url))
-      ROS_INFO_STREAM("[victim_node]: modelURL : " << model_url);
-    else{
-      model_url = "https://pandora.ee.auth.gr/vision/model.xml";
-      ROS_INFO_STREAM("[victim_node]: modelURL : " << model_url);
-    }
-
-    //!< Get the path of model_path xml file to be loaded
-    if (_nh.getParam("model_path",  model_path)){
-      model_path = packagePath + model_path;
-      ROS_INFO_STREAM("[victim_node]: model_path : " <<  model_path);
-    }
-    else{
-      model_path = packagePath + "/data/model.xml";
-      ROS_INFO_STREAM("[victim_node]: model_path : " <<  model_path);
-    }
-    
-    //!< Get the path of rgb classifier
-    if (_nh.getParam("rgb_classifier_path",  rgb_classifier_path)){
-      rgb_classifier_path = packagePath + rgb_classifier_path;
-      ROS_INFO_STREAM("[victim_node]: rgb_training_path classifier  : " 
-            <<  rgb_classifier_path);
-    }
-    else{
-      rgb_classifier_path = packagePath + "/data/rgb_svm_classifier.xml";
-      ROS_INFO_STREAM("[victim_node]: rgb_training_path classifier  : " 
-            <<  rgb_classifier_path);
-    }
-    
-    //!< Get the path of depth classifier
-    if (_nh.getParam("depth_classifier_path",  depth_classifier_path)){
-      depth_classifier_path = packagePath + depth_classifier_path;
-      ROS_INFO_STREAM("[victim_node]: depth_training_path classifier  : " 
-            <<  depth_classifier_path);
-    }
-    else{
-      depth_classifier_path = packagePath + "/data/depth_svm_classifier.xml";
-      ROS_INFO_STREAM("[victim_node]: depth_training_path classifier  : " 
-            <<  depth_classifier_path);
-    }
-    
-    /// Parameter that changes respectivly if we have depth information
-    if ( _nh.getParam("isDepthEnabled", isDepthEnabled))
-      ROS_DEBUG_STREAM("[victim_node] : isDepthEnabled : " << isDepthEnabled);
-    else
-      isDepthEnabled = false;
-      
-    /// Parameter that changes respectivly if we have information
-    ///about the position of the hole
-    if ( _nh.getParam("isHole", isHole))
-      ROS_DEBUG_STREAM("[victim_node] : isHole : " << isHole);
-    else
-      isDepthEnabled = false;
-      
-    if ( _nh.getParam("bufferSize", bufferSize))
-      ROS_DEBUG_STREAM("[victim_node] : bufferSize : " << bufferSize);
-    else
-      bufferSize = 5;
   }
   
   /**
@@ -266,7 +115,8 @@ namespace pandora_vision
 
     if(!res || !_nh.getParam(model_param_name, robot_description))
     {
-      ROS_ERROR("[Motion_node]:Robot description couldn't be retrieved from the parameter server.");
+      ROS_ERROR("[Motion_node]:Robot description couldn't be \
+        retrieved from the parameter server.");
       return false;
     }
   
@@ -295,42 +145,72 @@ namespace pandora_vision
   void VictimDetection::imageCallback(
       const vision_communications::EnhancedHolesVectorMsg& msg)
   {
+    
+    if(
+      (curState != 
+        state_manager_communications::robotModeMsg::MODE_IDENTIFICATION) &&
+      (curState != 
+        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD) && 
+      (curState != 
+        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST)
+    )
+    {
+      return;
+    }
+    
     cv_bridge::CvImagePtr in_msg;
-    in_msg = cv_bridge::toCvCopy(msg.rgbImage, sensor_msgs::image_encodings::TYPE_8UC3);
-    _rgbImage = in_msg->image.clone();
+    in_msg = cv_bridge::toCvCopy(msg.rgbImage, 
+      sensor_msgs::image_encodings::TYPE_8UC3);
+    
+    cv::Mat rgbImage = in_msg->image.clone();
     
     if(_frame_id.c_str()[0] == '/')
       _frame_id = _frame_id.substr(1);
       
        
-    if (_rgbImage.empty()){
+    if (rgbImage.empty()){
       ROS_FATAL("[victim_node] : No more frames ");
       ROS_BREAK();
     }
     
-    in_msg = 
-      cv_bridge::toCvCopy(msg.depthImage, sensor_msgs::image_encodings::TYPE_8UC1);
-    _depthImage = in_msg->image.clone();
+    cv_bridge::CvImagePtr in_msg_d = cv_bridge::toCvCopy(msg.depthImage, 
+      sensor_msgs::image_encodings::TYPE_8UC1);
     
-    isDepthEnabled = msg.isDepth;
-    
-    
+    cv::Mat depthImage = in_msg_d->image.clone();
+
     _frame_id = msg.header.frame_id; 
     victimFrameTimestamp = msg.header.stamp;
-    _enhancedHoles = msg;
-    if (_enhancedHoles.enhancedHoles.size() > 0)
-      isHole = true;
-    
+
     victimFrameTimestamp = in_msg->header.stamp;
     cameraFrameId= in_msg->header.frame_id;
     
-    checkState();
+    //! The actual victim detection
+    detectVictims(
+      msg.isDepth, 
+      msg.enhancedHoles.size() > 0,
+      rgbImage,
+      depthImage,
+      msg
+    );
     
+    //! Interpolated depth image publishing
+    {
+      // Convert the image into a message
+      cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
+
+      msgPtr->header = msg.header;
+      msgPtr->encoding = sensor_msgs::image_encodings::MONO8;
+      depthImage.copyTo(msgPtr->image);
+      
+      // Publish the image message
+      _interpolatedDepthPublisher.publish(*msgPtr->toImageMsg());
+    }
+    
+    //! Resolve frame ids (must explain more)
     std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
-      
-    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) {
+    if(_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) 
+    {
       bool _indicator = getParentFrameId();
-      
       _frame_ids_map.insert( it , std::pair<std::string, std::string>(
          _frame_id, _parent_frame_id));
     } 
@@ -342,119 +222,406 @@ namespace pandora_vision
    * the information sent from hole_detector_node
    * @return void
   */
-  void VictimDetection::checkState()
+  void VictimDetection::detectVictims(
+    bool depthEnabled, 
+    bool holesEnabled,
+    const cv::Mat& rgbImage,
+    const cv::Mat& depthImage,
+    const vision_communications::EnhancedHolesVectorMsg& msg
+  )
   {
+    
+    if(VictimParameters::debug_img || VictimParameters::debug_img_publisher)
+    {
+      rgbImage.copyTo(debugImage);
+      rgb_vj_keypoints.clear();
+      rgb_svm_keypoints.clear();
+      depth_vj_keypoints.clear();
+      depth_svm_keypoints.clear();
+      rgb_vj_bounding_boxes.clear();
+      rgb_svm_bounding_boxes.clear();
+      depth_vj_bounding_boxes.clear();
+      depth_svm_bounding_boxes.clear();
+      holes_bounding_boxes.clear();
+      rgb_vj_p.clear();
+      rgb_svm_p.clear();
+      depth_vj_p.clear();
+      depth_svm_p.clear();
+    }
+    
     DetectionImages imgs; 
-    _stateIndicator = 2 * isDepthEnabled + isHole + 1;
+    int stateIndicator = 2 * depthEnabled + holesEnabled + 1;
     
     {
       EnhancedMat emat;
-      emat.img = _rgbImage;
+      rgbImage.copyTo(emat.img);
       imgs.rgb = emat;
       imgs.rgb.bounding_box = cv::Rect(0, 0, 0, 0);
       imgs.rgb.keypoint = cv::Point2f(0, 0);
     }
       
-    switch(_stateIndicator)
+    DetectionMode detectionMode;
+    switch(stateIndicator)
     {
       case 1:
-        _victimDetector->detectionMode = GOT_NOTHING;
+        detectionMode = GOT_RGB;
         break;
       case 2:
-        _victimDetector->detectionMode = GOT_MASK;
+        detectionMode = GOT_HOLES;
         break;
       case 3:
-        _victimDetector->detectionMode = GOT_DEPTH;
+        detectionMode = GOT_DEPTH;
         {
           EnhancedMat emat;
-          emat.img = _depthImage;
+          depthImage.copyTo(emat.img);
           imgs.depth = emat;
           imgs.depth.bounding_box = cv::Rect(0, 0, 0, 0);
           imgs.depth.keypoint = cv::Point2f(0, 0);
         }
         break;
       case 4:
-      _victimDetector->detectionMode = GOT_ALL;
+        detectionMode = GOT_HOLES_AND_DEPTH;
         {
           EnhancedMat emat;
-          emat.img = _depthImage;
+          depthImage.copyTo(emat.img);
           imgs.depth = emat;
           imgs.depth.bounding_box = cv::Rect(0, 0, 0, 0);
           imgs.depth.keypoint = cv::Point2f(0, 0);
         }
         break;
     }
-    for(unsigned int i = 0 ; i < _enhancedHoles.enhancedHoles.size();
+    for(unsigned int i = 0 ; i < msg.enhancedHoles.size();
       i++)
     {
       
       int minx = 10000, maxx = -1, miny = 10000, maxy = -1;
       for(unsigned int j = 0 ; j < 4 ; j++)
       {
-        int xx = _enhancedHoles.enhancedHoles[i].verticesX[j];
-        int yy = _enhancedHoles.enhancedHoles[i].verticesY[j];
+        int xx = msg.enhancedHoles[i].verticesX[j];
+        int yy = msg.enhancedHoles[i].verticesY[j];
         minx = xx < minx ? xx : minx;
         maxx = xx > maxx ? xx : maxx;
         miny = yy < miny ? yy : miny;
         maxy = yy > maxy ? yy : maxy;
       }
       cv::Rect rect(minx, miny, maxx - minx, maxy - miny);
+      holes_bounding_boxes.push_back(rect);
       
       EnhancedMat emat;
-      emat.img = _rgbImage(rect);
-      cv::resize(emat.img, emat.img, cv::Size(640, 480));
+      emat.img = rgbImage(rect);
+      cv::resize(emat.img, emat.img, 
+        cv::Size(VictimParameters::frameWidth, VictimParameters::frameHeight));
       emat.bounding_box = rect;
       emat.keypoint = cv::Point2f(
-        _enhancedHoles.enhancedHoles[i].keypointX,
-        _enhancedHoles.enhancedHoles[i].keypointY
+        msg.enhancedHoles[i].keypointX,
+        msg.enhancedHoles[i].keypointY
       );
-
       imgs.rgbMasks.push_back(emat);
-      if(isDepthEnabled)
+      
+      if(GOT_HOLES_AND_DEPTH || GOT_DEPTH)
       {
-        emat.img = _depthImage(rect);
+        emat.img = depthImage(rect);
         imgs.depthMasks.push_back(emat);
       }
     }
-    
-    victimDetect(imgs);    
-  }
-  
-  /**
-   * @brief This method uses a FaceDetector instance to detect all
-   * present faces in a given frame
-   * @return void
-  */
-  void VictimDetection::victimDetect(DetectionImages imgs)
-  {
-    if(!victimNowON)
-      return;
 
-    std::vector<DetectedVictim> final_victims = _victimDetector->victimFusion(imgs);
-    
-    //!< Create message of Victim Detector
-    pandora_common_msgs::GeneralAlertMsg victimMessage;
-    
-    for(int i = 0;  i < final_victims.size() ; i++){
-      
-      if(final_victims[i].probability < 0.1)
-      {
-        continue;
-      }
+    std::vector<DetectedVictim> final_victims = 
+      victimFusion(imgs, detectionMode);
+
+    //!< Message alert creation
+    for(int i = 0;  i < final_victims.size() ; i++)
+    {
       
       float x = final_victims[i].keypoint.x
-          - static_cast<float>(frameWidth) / 2;
-      float y = static_cast<float>(frameHeight) / 2
-          - final_victims[i].keypoint.y;
+        - static_cast<float>(VictimParameters::frameWidth) / 2;
+      float y = static_cast<float>(VictimParameters::frameHeight) / 2
+        - final_victims[i].keypoint.y;
+          
+      //!< Create message of Victim Detector
+      pandora_common_msgs::GeneralAlertMsg victimMessage;
                                       
       victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
+      
       victimMessage.header.stamp = victimFrameTimestamp;
-      victimMessage.yaw = atan(2 * x / frameWidth * tan(hfov / 2));
-      victimMessage.pitch = atan(2 * y / frameHeight * tan(vfov / 2));
+      
+      victimMessage.yaw = 
+        atan(2 * x / VictimParameters::frameWidth 
+          * tan(VictimParameters::hfov / 2));
+      
+      victimMessage.pitch = 
+        atan(2 * y / VictimParameters::frameHeight 
+          * tan(VictimParameters::vfov / 2));
+          
       victimMessage.probability = final_victims[i].probability;
-      ROS_INFO_STREAM( "[victim_node] :Victim " << final_victims[i].probability);
+      
       _victimDirectionPublisher.publish(victimMessage);
+      
+      //!< Debug purposes
+      if(VictimParameters::debug_img || VictimParameters::debug_img_publisher)
+      {
+        cv::KeyPoint kp(final_victims[i].keypoint, 10);
+        cv::Rect re = final_victims[i].boundingBox;
+        switch(final_victims[i].source)
+        {
+          case RGB_VJ:
+            rgb_vj_keypoints.push_back(kp);
+            rgb_vj_bounding_boxes.push_back(re);
+            rgb_vj_p.push_back(final_victims[i].probability);
+            break;
+          case RGB_SVM:
+            rgb_svm_keypoints.push_back(kp);
+            rgb_svm_bounding_boxes.push_back(re);
+            rgb_svm_p.push_back(final_victims[i].probability);
+            break;
+          case DEPTH_VJ:
+            depth_vj_keypoints.push_back(kp);
+            depth_vj_bounding_boxes.push_back(re);
+            depth_vj_p.push_back(final_victims[i].probability);
+            break;
+          case DEPTH_RGB_SVM:
+            depth_svm_keypoints.push_back(kp);
+            depth_svm_bounding_boxes.push_back(re);
+            depth_svm_p.push_back(final_victims[i].probability);
+            break;
+        }
+
+      }
+    } 
+    
+    //! Debug image
+    if(VictimParameters::debug_img || VictimParameters::debug_img_publisher)
+    {
+      cv::drawKeypoints(debugImage, rgb_vj_keypoints, debugImage, 
+        CV_RGB(0, 255, 0),
+        cv::DrawMatchesFlags::DEFAULT);
+      for(unsigned int i = 0 ; i < rgb_vj_bounding_boxes.size() ; i++)
+      {
+        cv::rectangle(debugImage, rgb_vj_bounding_boxes[i], 
+          CV_RGB(0, 255, 0));
+        {
+          std::ostringstream convert;
+          convert << rgb_vj_p[i];
+          cv::putText(debugImage, convert.str().c_str(),
+            rgb_vj_keypoints[i].pt,
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 0), 1, CV_AA);
+        }
+      }
+        
+      cv::drawKeypoints(debugImage, depth_vj_keypoints, debugImage, 
+        CV_RGB(255, 100, 0),
+        cv::DrawMatchesFlags::DEFAULT);
+      for(unsigned int i = 0 ; i < depth_vj_bounding_boxes.size() ; i++)
+      {
+        cv::rectangle(debugImage, depth_vj_bounding_boxes[i], 
+          CV_RGB(255, 100, 0));
+        {
+          std::ostringstream convert;
+          convert << depth_vj_p[i];
+          cv::putText(debugImage, convert.str().c_str(),
+            depth_vj_keypoints[i].pt,
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 0), 1, CV_AA);
+        }
+      }
+        
+      cv::drawKeypoints(debugImage, rgb_svm_keypoints, debugImage, 
+        CV_RGB(0, 100, 255),
+        cv::DrawMatchesFlags::DEFAULT);
+      for(unsigned int i = 0 ; i < rgb_svm_bounding_boxes.size() ; i++)
+      {
+        cv::rectangle(debugImage, rgb_svm_bounding_boxes[i], 
+          CV_RGB(0, 100, 255));
+        {
+          std::ostringstream convert;
+          convert << rgb_svm_p[i];
+          cv::putText(debugImage, convert.str().c_str(),
+            rgb_svm_keypoints[i].pt,
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
+        }
+      }
+      
+      cv::drawKeypoints(debugImage, depth_svm_keypoints, debugImage, 
+        CV_RGB(0, 255, 255),
+        cv::DrawMatchesFlags::DEFAULT);
+      for(unsigned int i = 0 ; i < depth_svm_bounding_boxes.size() ; i++)
+      {
+        cv::rectangle(debugImage, depth_svm_bounding_boxes[i], 
+          CV_RGB(0, 255, 255));
+        {
+          std::ostringstream convert;
+          convert << depth_svm_p[i];
+          cv::putText(debugImage, convert.str().c_str(),
+            depth_svm_keypoints[i].pt,
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
+        }
+      }
+      for(unsigned int i = 0 ; i < holes_bounding_boxes.size() ; i++)
+      {
+        cv::rectangle(debugImage, holes_bounding_boxes[i], 
+          CV_RGB(0, 0, 0));
+      }
+      
+      {
+        std::ostringstream convert;
+        convert << "RGB_VJ : "<< rgb_vj_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10,20),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 0), 1, CV_AA);
+      }
+      {
+        std::ostringstream convert;
+        convert << "DEPTH_VJ : "<< depth_vj_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10,40),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 0), 1, CV_AA);
+      }
+      {
+        std::ostringstream convert;
+        convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10,60),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
+      }
+      {
+        std::ostringstream convert;
+        convert << "DEPTH_RGB_SVM : "<< depth_svm_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10,80),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
+      }
+      {
+        std::ostringstream convert;
+        convert << "Holes got : "<< msg.enhancedHoles.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10,100),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 0, 0), 1, CV_AA);
+      }
     }
+    if(VictimParameters::debug_img_publisher)
+    {
+      // Convert the image into a message
+      cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
+
+      msgPtr->header = msg.header;
+      msgPtr->encoding = sensor_msgs::image_encodings::BGR8;
+      msgPtr->image = debugImage;
+      // Publish the image message
+      _debugVictimsPublisher.publish(*msgPtr->toImageMsg());
+    }
+    if(VictimParameters::debug_img)
+    {
+      cv::imshow("Victim detector", debugImage);
+      cv::waitKey(30);
+    }
+  }
+  
+    /**
+   *@brief Function that enables suitable subsystems, according
+   * to the current State 
+   * @param [std::vector<cv::Mat>] vector of images to be processed. Size of
+   * vector can be either 2 or 1, if we have both rgbd information or not
+   * @return void
+  */ 
+  std::vector<DetectedVictim> VictimDetection::victimFusion(
+    DetectionImages imgs,
+    DetectionMode detectionMode)
+  {
+    std::vector<DetectedVictim> final_probabilities;
+    
+    std::vector<DetectedVictim> rgb_vj_probabilities;
+    std::vector<DetectedVictim> depth_vj_probabilities;
+    std::vector<DetectedVictim> rgb_svm_probabilities;
+    std::vector<DetectedVictim> depth_svm_probabilities;
+    
+    DetectedVictim temp;
+    
+    ///Enable Viola Jones for rgb image 
+    rgb_vj_probabilities = _rgbViolaJonesDetector.findFaces(imgs.rgb.img);
+    
+    if(detectionMode == GOT_HOLES_AND_DEPTH || detectionMode == GOT_DEPTH)
+    {
+      depth_vj_probabilities = _rgbViolaJonesDetector.findFaces(imgs.depth.img);
+    }
+    if(detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH)
+    {
+      for(int i = 0 ; i < imgs.rgbMasks.size(); i++)
+      {
+        temp.probability = _rgbSystemValidator.calculateSvmRgbProbability(
+          imgs.rgbMasks.at(i).img);
+        temp.keypoint = imgs.rgbMasks[i].keypoint;
+        temp.source = RGB_SVM;
+        temp.boundingBox = imgs.depthMasks[i].bounding_box;
+        rgb_svm_probabilities.push_back(temp);
+      }  
+    }
+    if(detectionMode == GOT_HOLES_AND_DEPTH)
+    {
+      for(int i = 0 ; i < imgs.depthMasks.size(); i++)
+      {
+        temp.probability = _depthSystemValidator.calculateSvmDepthProbability(
+          imgs.depthMasks.at(i).img);
+        temp.keypoint = imgs.depthMasks[i].keypoint;
+        temp.source = DEPTH_RGB_SVM;
+        temp.boundingBox = imgs.depthMasks[i].bounding_box;
+        depth_svm_probabilities.push_back(temp);
+      }
+    }
+
+    // SVM mask merging
+    // Combine rgb & depth probabilities
+    if(detectionMode == GOT_HOLES_AND_DEPTH) 
+    {
+      for(unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
+      {
+        //! Weighted mean
+        temp.probability = 
+          (VictimParameters::depth_svm_weight * 
+            depth_svm_probabilities[i].probability + 
+          VictimParameters::rgb_svm_weight * 
+            rgb_svm_probabilities[i].probability) / 
+          (VictimParameters::depth_svm_weight + 
+            VictimParameters::rgb_svm_weight);
+        
+        temp.keypoint = depth_svm_probabilities[i].keypoint;
+        temp.source = DEPTH_RGB_SVM;
+        temp.boundingBox = depth_svm_probabilities[i].boundingBox;
+        final_probabilities.push_back(temp);
+      }
+    }
+    // Only rgb svm probabilities
+    if(detectionMode == GOT_HOLES)
+    {
+      for(unsigned int i = 0 ; i < rgb_svm_probabilities.size() ; i++)
+      {
+        temp.probability = rgb_svm_probabilities[i].probability * 
+          VictimParameters::rgb_svm_weight;
+        temp.keypoint = rgb_svm_probabilities[i].keypoint;
+        temp.source = RGB_SVM;
+        temp.boundingBox = rgb_svm_probabilities[i].boundingBox;
+        final_probabilities.push_back(temp);
+      }
+    }
+    
+    // VJ mask merging (?)
+    for(unsigned int i = 0 ; i < rgb_vj_probabilities.size() ; i++)
+    {
+      temp.probability = rgb_vj_probabilities[i].probability * 
+        VictimParameters::rgb_vj_weight;
+      temp.keypoint = rgb_vj_probabilities[i].keypoint;
+      temp.source = RGB_VJ;
+      temp.boundingBox = rgb_vj_probabilities[i].boundingBox;
+      final_probabilities.push_back(temp);
+    }
+    for(unsigned int i = 0 ; i < depth_vj_probabilities.size() ; i++)
+    {
+      temp.probability = depth_vj_probabilities[i].probability * 
+        VictimParameters::depth_vj_weight;
+      temp.keypoint = depth_vj_probabilities[i].keypoint;
+      temp.source = DEPTH_VJ;
+      temp.boundingBox = depth_vj_probabilities[i].boundingBox;
+      final_probabilities.push_back(temp);
+    }
+    
+    return final_probabilities;
   }
 
 
@@ -467,14 +634,9 @@ namespace pandora_vision
   {
     curState = newState;
 
-    //!< check if face detection algorithm should be running now
-    victimNowON = 
-    (curState == state_manager_communications::robotModeMsg::MODE_EXPLORATION) ||
-    (curState == state_manager_communications::robotModeMsg::MODE_ARM_APPROACH) ||
-    (curState == state_manager_communications::robotModeMsg::MODE_DF_HOLD);
-
     //!< shutdown if the robot is switched off
-    if (curState == state_manager_communications::robotModeMsg::MODE_TERMINATING)
+    if (curState == 
+      state_manager_communications::robotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;

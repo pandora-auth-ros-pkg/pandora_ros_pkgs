@@ -290,7 +290,9 @@ namespace pandora_vision
     curState = newState;
     //!< Check if motion algorithm should be running now
     motionNowON = ( curState == 
-      state_manager_communications::robotModeMsg::MODE_DF_HOLD );
+      state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD ) ||
+      ( curState == 
+      state_manager_communications::robotModeMsg::MODE_SENSOR_TEST );
 
     //!< Shutdown if the robot is switched off
     if (curState == 
