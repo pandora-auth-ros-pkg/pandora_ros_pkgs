@@ -85,6 +85,9 @@ void TempratureVisualization ::ThermalCallback ( const sensor_msgs
 
 void TempratureVisualization ::ConvertImage ( const sensor_msgs ::Image & msg , 
                                               sensor_msgs ::Image & image ) { 
+                 
+  //FIXME: Receive from param                             
+  float alpha = 0.784 ; 
   
   for ( unsigned int i = 0 ; i < msg .width ; i++ ) { 
 
@@ -94,13 +97,65 @@ void TempratureVisualization ::ConvertImage ( const sensor_msgs ::Image & msg ,
       
       temp =  std ::min ( std ::max ( temp , lowTemp_ ) , highTemp_ ) ; 
       
+      float low_spec = lowTemp_ + ( highTemp_ - lowTemp_ ) * ( 1.0 / 3.0 ) ; 
+      float high_spec = lowTemp_ + ( highTemp_ - lowTemp_ ) * ( 2.0 / 3.0 ) ; 
+      
+      float from , to ; 
+      
+      float R , G , B ; 
+      
+      if ( temp < low_spec ) { 
+      
+        from = 0.5 ; 
+        
+        to = 1.0 ; 
+        
+        B = 1.0 ; 
+        
+        G = 0.0 ; 
+      
+        R = ( temp - lowTemp_ ) * ( to - from ) / ( highTemp_ - lowTemp_ ) + 
+            from ; 
+      
+      }
+      
+      else if ( low_spec <= temp && temp <= high_spec ) { 
+      
+        from = 1.0 ; 
+        
+        to = 0.0 ; 
+        
+        B = 1 - ( temp - lowTemp_ ) * ( from - to ) / ( highTemp_ - lowTemp_ ) - 
+            from ;
+        
+        G = 0.0 ; 
+      
+        R = 1.0 ; 
+      
+      }
+      
+      else if ( high_spec < temp ) { 
+      
+        from = 0.0 ; 
+        
+        to = 0.5 ; 
+        
+        B = 0.0 ; 
+        
+        G = ( temp - lowTemp_ ) * ( to - from ) / ( highTemp_ - lowTemp_ ) + 
+            from ;
+      
+        R = 1.0 ; 
+      
+      }
+      
       float red = ( temp - lowTemp_ ) * 255.0 / ( highTemp_ - lowTemp_ ) ; 
       
       float blue = 1 - red ; 
     
-      image .data .push_back ( ( char ) blue ) ; 
-      image .data .push_back ( ( char ) 0.0 ) ; 
-      image .data .push_back ( ( char ) red ) ; 
+      image .data .push_back ( ( char ) ( B * 255.0 * alpha ) ) ; 
+      image .data .push_back ( ( char ) ( G * 255.0 * alpha ) ) ; 
+      image .data .push_back ( ( char ) ( R * 255.0 * alpha ) ) ; 
     
     }
     
@@ -116,12 +171,13 @@ int main ( int argc , char ** argv )
   
   ROS_INFO ( "Starting temprature visualization node." ) ; 
   
-  //TODO: Take temprature limits from dynamic reconfigure
+  //Grid-eye sensor limits
   const int minTemp = - 20 ; 
   const int maxTemp = 80 ; 
   
-  int lowTemp ; 
-  int highTemp ; 
+  //TODO: Take temprature limits from dynamic reconfigure
+  int lowTemp = 20 ; 
+  int highTemp = 47 ; 
   
   if ( argc == 3 ) { 
   
@@ -132,18 +188,18 @@ int main ( int argc , char ** argv )
     highTemp = atoi ( argv [ 2 ] ) ; 
     
     highTemp = std ::min ( highTemp , maxTemp ) ; 
+  
+    ROS_INFO ( "Temprature range was set to [%d,%d]C ." , 
+               lowTemp , 
+               highTemp ) ; 
     
   }
     
   else { 
   
-    lowTemp = minTemp ; 
-    
-    highTemp = maxTemp ; 
-  
-    ROS_WARN ( "Temprature range was not specified, defaults to [%d,%d]C ." , 
-               minTemp , 
-               maxTemp ) ; 
+    ROS_INFO ( "Temprature range was not specified, defaults to [%d,%d]C ." , 
+               lowTemp , 
+               highTemp ) ; 
   
   }
 
