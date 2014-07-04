@@ -45,7 +45,7 @@ namespace pandora_sensor_processing
 
   ThermalProcessor::
     ThermalProcessor(const std::string& ns) : 
-      SensorProcessor<ThermalProcessor>(ns, "thermal", false)
+      SensorProcessor<ThermalProcessor>(ns, "thermal")
   {
     MAX_CLUSTER_MEMORY = 3;
     MAX_CLUSTER_ITERATIONS = 100;
@@ -141,22 +141,25 @@ namespace pandora_sensor_processing
       float mean2 = clusterer->getMean2()(3);
       float diff = mean1 - mean2;
 
-      if (diff > OPTIMAL_HEAT_DIFFERENCE)
+      if (abs(diff) > OPTIMAL_HEAT_DIFFERENCE)
       {
-        if (!clusterer->getCurrentMean1(&center))
-          return false;
-      }
-      else if (diff < -OPTIMAL_HEAT_DIFFERENCE)
-      {
-        if (!clusterer->getCurrentMean2(&center))
-          return false;
+        if (mean1 > mean2)
+        {
+          if (!clusterer->getCurrentMean1(&center))
+            return false;
+        }
+        else
+        {
+          if (!clusterer->getCurrentMean2(&center))
+            return false;
+        }
       }
       else
         return false;
 
       // OK. Warmer cluster has a cell from current measurement.
       // Considering cluster to be a valid alert!
-      ROS_INFO_THROTTLE_NAMED(5, "SENSOR_PROCESSING",
+      ROS_INFO_THROTTLE_NAMED(10, "SENSOR_PROCESSING",
           "[%s] Found thermal alert with temperature: %f", name_.c_str(), center(3));
       alert_.probability = Utils::normalPdf(center(3), 
           OPTIMAL_TEMPERATURE, THERMAL_STD_DEV);

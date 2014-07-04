@@ -70,11 +70,14 @@ namespace pandora_data_fusion
         /**
          * @override
          * @brief function that finds coverage, triggered when updating it
-         * @param transform [tf::StampedTransform const&] tf that will be used
+         * @param sensorTransform [tf::StampedTransform const&] tf that will be used
          * in coverage finding
+         * @param baseTransform [tf::StampedTransform const&] base footprint's tf
          * @return void
          */
-        virtual void findCoverage(const tf::StampedTransform& transform);
+        virtual void findCoverage(
+            const tf::StampedTransform& sensorTransform,
+            const tf::StampedTransform& baseTransform);
 
         /**
          * @override
@@ -83,6 +86,13 @@ namespace pandora_data_fusion
          * @return void
          */
         virtual void publishCoverage(const std::string& frame);
+
+        /**
+         * @override
+         * @brief resets coverage map.
+         * @return void
+         */
+        virtual void resetCoverage();
 
         /**
          * @brief Setter for static variable ORIENTATION_CIRCLE

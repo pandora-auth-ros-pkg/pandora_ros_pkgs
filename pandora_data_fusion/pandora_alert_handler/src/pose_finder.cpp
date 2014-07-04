@@ -66,22 +66,6 @@ namespace pandora_data_fusion
       ORIENTATION_DIST = orientationDist;
     }
 
-    /* DEPRECATED
-    void PoseFinder::publishVisionTransform(float alertYaw, float alertPitch,
-        tf::Transform worldHeadCameraTransform)
-    {
-      tfScalar cameraYaw, cameraPitch, cameraRoll;
-
-      worldHeadCameraTransform.getBasis().getRPY(cameraRoll,
-          cameraPitch, cameraYaw);
-
-      tf::Transform transVision = worldHeadCameraTransform;
-      tf::Quaternion rotation;
-      rotation.setRPY(0, cameraPitch - alertPitch, cameraYaw - alertYaw);
-      transVision.setRotation(rotation);
-    }
-    */
-
     Pose PoseFinder::findAlertPose(float alertYaw, float alertPitch,
         tf::Transform tfTransform)
     {

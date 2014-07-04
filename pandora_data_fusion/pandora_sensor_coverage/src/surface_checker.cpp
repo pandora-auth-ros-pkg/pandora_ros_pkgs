@@ -50,7 +50,8 @@ namespace pandora_data_fusion
     SurfaceChecker::SurfaceChecker(const NodeHandlePtr& nh, const std::string& frameName)
       : CoverageChecker(nh, frameName)
     {
-      coveredSurface_.reset();
+      double resolution = map3d_->getResolution() / blurFactor_;
+      coveredSurface_.reset( new octomap::ColorOcTree(resolution) );
 
       std::string topic;
       if (nh_->getParam(frameName_+"/published_topic_names/surface_coverage", topic))
@@ -81,17 +82,12 @@ namespace pandora_data_fusion
 
     double SurfaceChecker::ORIENTATION_CIRCLE = 0.03;
 
-    void SurfaceChecker::findCoverage(const tf::StampedTransform& transform)
+    void SurfaceChecker::findCoverage(
+        const tf::StampedTransform& sensorTransform,
+        const tf::StampedTransform& baseTransform)
     {
-      //  Initialize surface coverage map, if uninitialized.
-      if (coveredSurface_.get() == NULL)
-      {
-        double resolution = map3d_->getResolution() / blurFactor_;
-        coveredSurface_.reset( new octomap::ColorOcTree(resolution) );
-      }
-
       // Declare helper variables.
-      CoverageChecker::findCoverage(transform);
+      CoverageChecker::findCoverage(sensorTransform, baseTransform);
       double yaw_curr = 0, pitch_curr = 0;
       double h_fov = (SENSOR_HFOV / 180.0) * PI;
       double v_fov = (SENSOR_VFOV / 180.0) * PI;
@@ -100,22 +96,22 @@ namespace pandora_data_fusion
       // For every direction in sensor's field of view, ray trace on 3d map.
       // If it hits successfully find its corresponding coverage (metric) and
       // save ray to surface coverage.
-      for (double h_angle = -h_fov / 2; h_angle < h_fov / 2;
+      for (double h_angle = -h_fov / 2; h_angle <= h_fov / 2;
           h_angle += blurFactor_ * DEGREE)
       {
-        for (double v_angle = -v_fov / 2; v_angle < v_fov / 2;
+        for (double v_angle = -v_fov / 2; v_angle <= v_fov / 2;
             v_angle += blurFactor_ * DEGREE)
         {
-          yaw_curr = yaw_ + h_angle;
-          pitch_curr = pitch_ + v_angle;
+          yaw_curr = sensorYaw_ + h_angle;
+          pitch_curr = sensorPitch_ + v_angle;
           octomap::point3d direction(1, 0, 0);
-          if (map3d_->castRay(position_,
-                direction.rotate_IP(roll_, pitch_curr, yaw_curr),
+          if (map3d_->castRay(sensorPosition_,
+                direction.rotate_IP(sensorRoll_, pitch_curr, yaw_curr),
                 pointOnWall,
                 false,
                 SENSOR_RANGE))
           {
-            if (coveredSurface_->insertRay(position_,
+            if (coveredSurface_->insertRay(sensorPosition_,
                 pointOnWall,
                 SENSOR_RANGE))
             {
@@ -278,9 +274,16 @@ namespace pandora_data_fusion
       msg.header.frame_id = frame;
       msg.binary = false;
       msg.id = coveredSurface_->getTreeType();
+      ROS_DEBUG("Tree class type: %s", msg.id.c_str());
       msg.resolution = coveredSurface_->getResolution();
       if (octomap_msgs::fullMapToMsg(*coveredSurface_, msg))
         coveragePublisher_.publish(msg);
+    }
+
+    void SurfaceChecker::resetCoverage()
+    {
+      double resolution = map3d_->getResolution() / blurFactor_;
+      coveredSurface_.reset( new octomap::ColorOcTree(resolution) );
     }
 
 }  // namespace pandora_sensor_coverage

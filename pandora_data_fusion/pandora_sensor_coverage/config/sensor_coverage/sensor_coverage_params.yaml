@@ -13,11 +13,14 @@ subscribed_topic_names:
   map2d: /slam/map
   map3d: /octomap_full
 
+service_server_names:
+  flush_coverage: /data_fusion/flush_coverage
+
 frames_to_track: [kinect_rgb_frame]
 
 # kinect_rgb_frame
 kinect_rgb_frame:
-  produces_surface_coverage: false
+  produces_surface_coverage: false 
   published_topic_names:
     space_coverage: kinect_space
     area_coverage: area_covered

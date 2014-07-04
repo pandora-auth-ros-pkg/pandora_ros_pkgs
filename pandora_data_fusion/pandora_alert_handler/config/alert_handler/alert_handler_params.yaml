@@ -11,6 +11,7 @@ object_names:
   co2: CO2
   landoltc: LANDOLTC
   datamatrix: DATAMATRIX
+  victim: VICTIM
 
 subscribed_topic_names:
   holeDirection: /vision/holes_direction_alert
@@ -25,9 +26,10 @@ subscribed_topic_names:
   soundDirection: /sensor_processing/sound_direction_alert
   map: /slam/map
 published_topic_names:  
-  world_model : /data_fusion/world_model
-  qr_notification : /data_fusion/qr_notification
-  robocup_score : /data_fusion/robocup_score
+  world_model: /data_fusion/world_model
+  qr_notification: /data_fusion/qr_notification
+  robocup_score: /data_fusion/robocup_score
+  global_probabilities: /data_fusion/signs_of_life
 action_server_names:
   delete_victim: /data_fusion/delete_victim
   validate_victim: /data_fusion/validate_victim
@@ -36,5 +38,4 @@ service_server_names:
   get_markers: /data_fusion/get_markers
   geotiff: /data_fusion/geotiffSrv
   flush_queues: /data_fusion/flush_queues
-      
   

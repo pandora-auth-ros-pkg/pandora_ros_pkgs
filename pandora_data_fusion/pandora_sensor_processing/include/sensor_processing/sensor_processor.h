@@ -70,15 +70,12 @@ namespace pandora_sensor_processing
          * @brief Constructor
          * @param ns [std::string const&] Has the namespace of the node.
          * @param sensorType [std::string const&] Name of sensor
-         * @param toggle [bool] if subscribe topic is to be toggled
-         * @param open [bool] if subscribe topic is to be opened by construction
          */
-        SensorProcessor(const std::string& ns,
-            const std::string& sensorType, bool toggle = true, bool open = true);
+        SensorProcessor(const std::string& ns, const std::string& sensorType);
 
         void startTransition(int newState);
 
-        void completeTransition() {}
+        void completeTransition();
 
         /**
          * @brief getter for general alert message alert_
@@ -94,126 +91,55 @@ namespace pandora_sensor_processing
          * @brief Delegates to alertPublisher_.
          * @return void
          */
-        void publishAlert();
+        virtual void publishAlert();
 
       private:
-        void toggleSubscriber();
+        /**
+         * @brief Toggles subscriber on, if toWork is true, or off else.
+         * @param toWork [bool] is sensor going to work?
+         * @return void
+         */
+        void toggleSubscriber(bool toWork);
 
       protected:
+        //!< Alert message that includes info to be filled by Derived Processor.
         pandora_common_msgs::GeneralAlertMsg alert_;
 
+        //!< Name of this Sensor Processor.
         std::string name_;
 
       private:
         ros::NodeHandle nh_;
 
+        //!< Contains this processor's sensor type.
         std::string sensorType_;
 
+        //!< Publisher for the final product of sensor processing.
         ros::Publisher alertPublisher_;
+        //!< Topic to which alerts are being published.
         std::string publisherTopic_;
 
+        //!< Subscriber for raw input data from hardware interface.
         ros::Subscriber sensorSubscriber_;
+        //!< Topic to which sensor processor is listening.
         std::string subscriberTopic_;
-        bool toggle_;
-        bool open_;
-        bool opened_;
+        //!< is sensor currently working?
+        bool working_;
 
         dynamic_reconfigure::Server< SensorProcessingConfig >
           dynReconfServer_;
+
+        /*  Parameters  */
+        //!< Is sensor open in exploration state?
+        bool EXPLORATION_STATE;
+        //!< Is sensor open in identification state?
+        bool IDENTIFICATION_STATE;
+        //!< Is sensor open in sensor hold state?
+        bool SENSOR_HOLD_STATE;
     };
 
-  template <class DerivedProcessor> 
-    SensorProcessor<DerivedProcessor>::SensorProcessor(const std::string& ns,
-        const std::string& sensorType, bool toggle, bool open)
-    : nh_(ns), sensorType_(sensorType), open_(open), toggle_(toggle), opened_(false)
-    {
-      name_ = boost::to_upper_copy(ros::this_node::getName());
-
-      if (!nh_.getParam("subscribed_topic_names/" + sensorType_ + "_raw", subscriberTopic_))
-      {
-        ROS_FATAL("[%s] %s_raw topic name param not found.", 
-            name_.c_str(), sensorType_.c_str());
-        ROS_BREAK();
-      }
-
-      if (open_)
-      {
-        sensorSubscriber_ = nh_.subscribe(subscriberTopic_, 1, 
-            &DerivedProcessor::sensorCallback, static_cast<DerivedProcessor*>(this));
-        opened_ = true;
-      }
-
-      if (nh_.getParam("published_topic_names/" + sensorType_ + "_alert", publisherTopic_))
-      {
-        alertPublisher_ = nh_.advertise<pandora_common_msgs::GeneralAlertMsg>
-          (publisherTopic_, 5);
-      }
-      else
-      {
-        ROS_FATAL("[%s] %s_alert topic name param not found.", 
-            name_.c_str(), sensorType_.c_str());
-        ROS_BREAK();
-      }
-
-      dynReconfServer_.setCallback(
-          boost::bind(
-            &DerivedProcessor::dynamicReconfigCallback, 
-            static_cast<DerivedProcessor*>(this), _1, _2));
-
-      clientInitialize();
-    }
-
-  template <class DerivedProcessor>
-    void SensorProcessor<DerivedProcessor>::publishAlert()
-    {
-      ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Publishing alert.", name_.c_str());
-      alertPublisher_.publish(alert_);
-    }
-
-  template <class DerivedProcessor>
-    void SensorProcessor<DerivedProcessor>::startTransition(int newState)
-    {
-      switch (newState)
-      {
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION:
-          ROS_INFO("[%s] Entering Exploration mode.", name_.c_str());
-          open_ = false;
-          break;
-        case state_manager_communications::robotModeMsg::MODE_IDENTIFICATION:
-          ROS_INFO("[%s] Entering Identification mode.", name_.c_str());
-          open_ = true;
-          break;
-        case state_manager_communications::robotModeMsg::MODE_TERMINATING:
-          ROS_ERROR("[%s] Terminating node.", name_.c_str());
-          exit(0);
-          break;
-        case state_manager_communications::robotModeMsg::MODE_OFF:
-          ROS_INFO("[%s] Node is off.", name_.c_str());
-          break;
-        default:
-          break;
-      }
-
-      if (toggle_)
-        toggleSubscriber();
-    }
-
-  template <class DerivedProcessor>
-    void SensorProcessor<DerivedProcessor>::toggleSubscriber()
-    {
-      if (open_ && !opened_)
-      {
-        sensorSubscriber_ = nh_.subscribe(subscriberTopic_, 1, 
-            &DerivedProcessor::sensorCallback, static_cast<DerivedProcessor*>(this));
-        opened_ = true;
-      }
-      else if (!open_ && opened_)
-      {
-        sensorSubscriber_.shutdown();
-        opened_ = false;
-      }
-    }
-
 }  // namespace pandora_sensor_processing
+
+#include "sensor_processing/sensor_processor.hxx"
 
 #endif  // SENSOR_PROCESSING_SENSOR_PROCESSOR_H

@@ -83,7 +83,7 @@ namespace pandora_data_fusion
       }
       objectFactory_.reset( new ObjectFactory(map_, param) );
       objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
-      victimHandler_.reset( new VictimHandler(victimsToGo_, victimsVisited_) );
+      victimHandler_.reset( new VictimHandler(nh_, victimsToGo_, victimsVisited_) );
 
       if (!nh_->getParam("global_frame", param))
       {
@@ -106,7 +106,7 @@ namespace pandora_data_fusion
     {
       std::string param;
 
-      //!< alert-concerned subscribers
+      // Alert-concerned Subscribers
 
       if (nh_->getParam("subscribed_topic_names/holeDirection", param))
       {
@@ -217,7 +217,7 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      //!< map subscriber
+      // Map Subscriber
 
       if (nh_->getParam("subscribed_topic_names/map", param))
       {
@@ -229,7 +229,7 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      //!< publishers
+      // Publishers
 
       if (nh_->getParam("published_topic_names/world_model", param))
       {
@@ -242,7 +242,7 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      //!< action servers
+      // Action Servers
 
       if (nh_->getParam("action_server_names/delete_victim", param))
       {
@@ -271,7 +271,7 @@ namespace pandora_data_fusion
           boost::bind(&AlertHandler::validateVictimCallback, this));
       validateVictimServer_->start();
 
-      //!< service servers
+      // Service Servers
 
       if (nh_->getParam("service_server_names/flush_queues", param))
       {
@@ -317,18 +317,18 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
-      //!< dynamic reconfigure server
+      // Dynamic Reconfigure Server
 
       dynReconfServer_.setCallback(boost::bind(
             &AlertHandler::dynamicReconfigCallback, this, _1, _2));
 
-      //!< timers
+      // Timers
 
       tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1),
           &AlertHandler::tfPublisherCallback, this);
     }
 
-    //!< Alert-concerned callbacks
+    /*  Alert-concerned Callbacks  */
 
     void AlertHandler::holeDirectionAlertCallback(
         const vision_communications::HolesDirectionsVectorMsg& msg)
@@ -346,7 +346,7 @@ namespace pandora_data_fusion
       }
       catch (TfException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
         return;
       }
 
@@ -396,7 +396,7 @@ namespace pandora_data_fusion
       }
       catch (TfException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
         return;
       }
 
@@ -419,7 +419,7 @@ namespace pandora_data_fusion
       }
       catch (TfException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
         return;
       }
 
@@ -442,14 +442,14 @@ namespace pandora_data_fusion
       }
       catch (TfException ex)
       {
-        ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
         return;
       }
 
       objectHandler_->handleObjects<DataMatrix>(dataMatricesVectorPtr);
     }
 
-    //!< Other Callbacks
+    /*  Other Callbacks  */
 
     void AlertHandler::tfPublisherCallback(const ros::TimerEvent& event)
     {
@@ -485,7 +485,7 @@ namespace pandora_data_fusion
 
         objectsBroadcaster_.sendTransform(
             tf::StampedTransform(tfObject, it->header.stamp,
-              "/world", it->header.frame_id));
+              BaseObject::getGlobalFrame(), it->header.frame_id));
       }
     }
 

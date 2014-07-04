@@ -348,12 +348,11 @@ namespace pandora_data_fusion
     template <class DerivedObject>
       float Object<DerivedObject>::probabilityThres_ = 0;
     template <class DerivedObject>
-      int Object<DerivedObject>::objectScore_ = -1;
+      int Object<DerivedObject>::objectScore_ = 0;
     template <class DerivedObject>
       std::string Object<DerivedObject>::type_ = "object";
     template <class DerivedObject>
-      typename Object<DerivedObject>::ListPtr Object<DerivedObject>::listPtr_ =
-      typename Object<DerivedObject>::ListPtr();
+      typename Object<DerivedObject>::ListPtr Object<DerivedObject>::listPtr_;
 
     template <class DerivedObject>
       PoseStamped Object<DerivedObject>::getPoseStamped() const

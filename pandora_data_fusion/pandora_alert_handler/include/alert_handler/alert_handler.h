@@ -114,18 +114,14 @@ namespace pandora_data_fusion
          */
         void validateVictimCallback();
 
-        /* Dynamic Reconfiguration Callback */
+        /*  Dynamic Reconfiguration Callback  */
         void dynamicReconfigCallback(
             const ::pandora_alert_handler::AlertHandlerConfig &config,
             uint32_t level);
 
-        /* Services Callbacks */
-        bool flushQueues(
-            std_srvs::Empty::Request& rq,
-            std_srvs::Empty::Response &rs);
-
       private:
-        /* Alert-concerned Subscribers */
+        /*  Alert-concerned Subscribers  */
+
         void holeDirectionAlertCallback(
             const vision_communications::HolesDirectionsVectorMsg& msg);
         void thermalDirectionAlertCallback(
@@ -141,9 +137,9 @@ namespace pandora_data_fusion
           void objectDirectionAlertCallback(
               const pandora_common_msgs::GeneralAlertMsg& msg);
 
-        /* Victim-concerned Subscribers */
+        /*  Victim-concerned Subscribers  */
 
-        /* MapSubsriber Callback - Communication with SLAM */
+        /*  Map Subsriber Callback - Communication with SLAM  */
 
         /**
          * @brief Communication with SLAM. Gets current global map.
@@ -152,7 +148,7 @@ namespace pandora_data_fusion
          */
         void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
 
-        /* Map Visualization Callbacks */
+        /*  Map Visualization Callbacks  */
 
         bool getObjectsServiceCb(
             pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
@@ -165,6 +161,12 @@ namespace pandora_data_fusion
         bool getMarkersServiceCb(
             pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
             pandora_data_fusion_msgs::GetMarkersSrv::Response &rs);
+
+        /*  Services Callbacks  */
+
+        bool flushQueues(
+            std_srvs::Empty::Request& rq,
+            std_srvs::Empty::Response& rs);
 
         /**
          * @brief Function that posts objects' transformations periodically.
@@ -267,7 +269,7 @@ namespace pandora_data_fusion
         }
         catch (TfException ex)
         {
-          ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
+          ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
           return;
         }
 

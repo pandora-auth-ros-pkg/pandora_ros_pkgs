@@ -68,6 +68,8 @@ namespace pandora_data_fusion
         Pose findAlertPose(float alertYaw, float alertPitch,
             tf::Transform tfTransform);
         tf::Transform lookupTransformFromWorld(std_msgs::Header header);
+        geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
+            Point alertPoint);
 
         void updateParams(float occupiedCellThres,
             float heightHighThres, float heightLowThres,
@@ -76,22 +78,15 @@ namespace pandora_data_fusion
       private:
         Point positionOnWall(Point startPoint, float angle);
         float calcHeight(float alertPitch, float height, float distFromAlert);
-        geometry_msgs::Quaternion findNormalVectorOnWall(Point framePoint,
-            Point alertPoint);
         std::pair<Point, Point> findDiameterEndPointsOnWall(
             std::vector<Point> points);
-
-        /* DEPRECATED
-        void publishVisionTransform(float alertYaw, float alertPitch,
-            tf::Transform worldHeadCameraTransform);
-        */
 
       private:
         MapPtr map_;
 
         TfListenerPtr listener_;
 
-        //!< params
+        /*  Parameters  */
         float ORIENTATION_CIRCLE;
         float ORIENTATION_DIST;
         float HEIGHT_HIGH_THRES;

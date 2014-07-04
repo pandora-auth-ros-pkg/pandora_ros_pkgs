@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_sensor_coverage)
 
+set(DCMAKE_BUILD_TYPE Debug)
+
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
   tf 
   roslint
   pandora_alert_handler
-  #pandora_vision_hole_detector
   state_manager
   state_manager_communications
   octomap_msgs
@@ -22,7 +23,6 @@ catkin_package(
   tf 
   roslint
   pandora_alert_handler
-  #pandora_vision_hole_detector
   state_manager
   state_manager_communications
   INCLUDE_DIRS 
@@ -49,12 +49,12 @@ target_link_libraries(coverage_checker
 
 ########################  space checker  ############################
 
-add_library(space_checker
-  src/space_checker.cpp)
-target_link_libraries(space_checker
-  ${catkin_LIBRARIES}
-  coverage_checker
-  )
+#add_library(space_checker
+  #src/space_checker.cpp)
+#target_link_libraries(space_checker
+  #${catkin_LIBRARIES}
+  #coverage_checker
+  #)
 
 ########################  surface checker  ##########################
 
@@ -72,7 +72,6 @@ add_library(sensor
 target_link_libraries(sensor
   ${catkin_LIBRARIES}
   ros_tf_listener
-  space_checker
   surface_checker
   )
 

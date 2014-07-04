@@ -1,0 +1,8 @@
+subscribed_topic_names:
+  raw_input: /sensors/thermal
+published_topic_names:
+  alert_output: thermal_direction_alert
+states:
+  exploration: false
+  identification: true
+  sensor_hold: true

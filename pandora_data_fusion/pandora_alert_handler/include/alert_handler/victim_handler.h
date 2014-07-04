@@ -52,6 +52,7 @@
 
 #include "pandora_data_fusion_msgs/VictimInfoMsg.h"
 #include "pandora_data_fusion_msgs/WorldModelMsg.h"
+#include "pandora_data_fusion_msgs/GlobalProbabilitiesMsg.h"
 #include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
 
 #include "alert_handler/victim.h"
@@ -64,6 +65,9 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
+    //!< Type Definitions
+    typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
+
     /**
      * @class VictimHandler
      * @brief Controller that keeps track of victims
@@ -74,7 +78,9 @@ namespace pandora_data_fusion
         /**
          * @brief Constructor
          */
-        VictimHandler(VictimListPtr victimsToGoList,
+        VictimHandler(
+            const NodeHandlePtr& nh,
+            VictimListPtr victimsToGoList,
             VictimListPtr victimsVisitedList);
 
         /**
@@ -169,6 +175,10 @@ namespace pandora_data_fusion
         ObjectConstPtrVectorPtr getAllLegitObjects();
 
       private:
+        //!< Publisher for victim concerned probabilities.
+        ros::Publisher probabilitiesPublisher_;
+
+        //!< Victim Clusterer.
         VictimClustererPtr clusterer_;
 
         //!< The unvisited victims list

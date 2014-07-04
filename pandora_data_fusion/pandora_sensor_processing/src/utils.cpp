@@ -61,10 +61,10 @@ namespace pandora_sensor_processing
       return (1/(stdDev * sqrt(2*PI))) * exp(-0.5 * pow(xCenteredScaled, 2));
     }
   
-  float Utils::
-    weibullPdf(float x, float k, float l)
+  double Utils::
+    weibullPdf(double x, double k, double l)
     {
-      float xScaled = x / l;
+      double xScaled = x / l;
       return (k / l) * pow(xScaled, k - 1) * exp(-pow(xScaled, k));
     }
 

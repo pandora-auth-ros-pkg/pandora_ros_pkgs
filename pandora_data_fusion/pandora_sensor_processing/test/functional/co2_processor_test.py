@@ -48,31 +48,33 @@ import roslib; roslib.load_manifest(PKG)
 import rostest
 import rospy
 
-import test_base
+from pandora_testing_tools.testing_interface import test_base
 from pandora_arm_hardware_interface.msg import Co2Msg
 from pandora_common_msgs.msg import GeneralAlertMsg 
 
 class Co2ProcessorTest(test_base.TestBase):
     
-    def publish_raw(self):
+    def publish_raw(self, percentage):
 
         self.raw = Co2Msg()
         self.raw.header.frame_id = "aer"
         self.raw.header.stamp = rospy.get_rostime()
-        self.raw.co2_percentage = 0.4
+        self.raw.co2_percentage = percentage
 
-        self.mock_publisher.publish(self.raw)
+        self.publishers[0].publish(self.raw)
         self.replied = False
         rospy.sleep(0.1)
 
-    def expect_success(self, times):
+    def expect_success(self):
 
         self.assertTrue(self.replied)
-        self.assertEqual(len(self.alertList), times)
-        self.assertAlmostEqual(self.alertList[times - 1].probability, 0.68171501)
-        self.assertEqual(self.alertList[times - 1].yaw, 0)
-        self.assertEqual(self.alertList[times - 1].pitch, 0)
-        self.assertEqual(self.alertList[times - 1].header.frame_id, "aer")
+        times = -1
+        if len(self.alertList) == 1:
+          times = 0
+        self.assertGreater(self.alertList[times].probability, 0.4)
+        self.assertEqual(self.alertList[times].yaw, 0)
+        self.assertEqual(self.alertList[times].pitch, 0)
+        self.assertEqual(self.alertList[times].header.frame_id, "aer")
 
     def expect_fail(self):
 
@@ -82,40 +84,61 @@ class Co2ProcessorTest(test_base.TestBase):
 
         self.state_changer.transition_to_state(2)
         rospy.sleep(1.)
-        self.publish_raw()
+        self.publish_raw(0.1)
+        self.publish_raw(0.15)
         self.expect_fail()
 
     def test_mode_identification(self):
 
         self.state_changer.transition_to_state(3)
         rospy.sleep(1.)
-        self.publish_raw()
-        self.expect_success(1)
+        self.publish_raw(0.1)
+        self.expect_fail()
+        rospy.sleep(0.3)
+        self.publish_raw(0.2)
+        self.expect_success()
+        rospy.sleep(0.3)
+        self.publish_raw(0.2)
+        self.expect_success()
+        rospy.sleep(3.)
+        self.publish_raw(0.2)
+        self.expect_fail()
+        rospy.sleep(0.2)
+        self.publish_raw(0.3)
+        self.expect_success()
+        rospy.sleep(0.2)
+        self.publish_raw(0.125)
+        self.expect_fail()
+        rospy.sleep(0.2)
+        self.publish_raw(0.3)
+        self.expect_success()
 
     def test_toggle(self):
 
         self.state_changer.transition_to_state(2)
         rospy.sleep(1.)
-        self.publish_raw()
+        self.publish_raw(0.1)
         self.expect_fail()
         self.state_changer.transition_to_state(2)
         rospy.sleep(1.)
-        self.publish_raw()
+        self.publish_raw(0.1)
         self.expect_fail()
         self.state_changer.transition_to_state(3)
         rospy.sleep(1.)
-        self.publish_raw()
-        self.expect_success(1)
+        self.publish_raw(0.1)
+        self.expect_fail()
         self.state_changer.transition_to_state(3)
-        rospy.sleep(1.)
-        self.publish_raw()
-        self.expect_success(2)
+        rospy.sleep(0.5)
+        self.publish_raw(0.2)
+        self.expect_success()
 
 if __name__ == '__main__':
 
-    rospy.sleep(10.)
-    rospy.init_node(NAME, anonymous=True, log_level=rospy.DEBUG)
-    Co2ProcessorTest.connect("co2")
+    rospy.sleep(5.)
+    rospy.init_node(NAME, anonymous=True)
+    publisher_topics = [("/test/raw_input", "pandora_arm_hardware_interface", "Co2Msg")]
+    subscriber_topics = [("/test/alert_ouput", "pandora_common_msgs", "GeneralAlertMsg")]
+    Co2ProcessorTest.connect(subscriber_topics, publisher_topics, 1, False)
     rostest.rosrun(PKG, NAME, Co2ProcessorTest, sys.argv)
     Co2ProcessorTest.disconnect()
 

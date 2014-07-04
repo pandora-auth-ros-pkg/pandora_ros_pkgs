@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     }
   }
   ThermalProcessor thermalProcessor("/sensor_processing/thermal_processor");
-  ROS_INFO_NAMED("SENSOR_PROCESSING", "Beginning Thermal Processor node");
+  ROS_INFO_NAMED("SENSOR_PROCESSING", "[SENSOR_PROCESSING] Beginning Thermal Processor node");
   ros::spin();
   return 0;
 }

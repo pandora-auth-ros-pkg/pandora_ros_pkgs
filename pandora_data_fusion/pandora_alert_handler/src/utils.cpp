@@ -68,8 +68,7 @@ namespace pandora_data_fusion
       return sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
     }
 
-    geometry_msgs::Quaternion Utils::calculateQuaternion(Point a,
-        Point b)
+    geometry_msgs::Quaternion Utils::calculateQuaternion(Point a, Point b)
     {
       tfScalar yaw;
 
@@ -88,7 +87,7 @@ namespace pandora_data_fusion
       return point;
     }
 
-    bool Utils::arePointsInRange(Point pointA, Point pointB, float sensor_range )
+    bool Utils::arePointsInRange(Point pointA, Point pointB, float sensor_range)
     {
       float dist = distanceBetweenPoints2D(pointA, pointB);
 

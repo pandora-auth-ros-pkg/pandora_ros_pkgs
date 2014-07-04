@@ -142,6 +142,17 @@ namespace pandora_data_fusion
     template <class ObjectType>
       bool ObjectList<ObjectType>::add(const Ptr& object)
       {
+        // Shepherdness for resolving uninitialized pose issue.
+        bool cool = true;
+        cool = cool && object->getPose().position.x == 0;
+        cool = cool && object->getPose().position.y == 0;
+        cool = cool && object->getPose().position.z == 0;
+        cool = cool && object->getPose().orientation.x == 0;
+        cool = cool && object->getPose().orientation.y == 0;
+        cool = cool && object->getPose().orientation.z == 0;
+        cool = cool && object->getPose().orientation.w == 0;
+        ROS_ASSERT_MSG(!cool, "Tried to add an object with uninitialized pose.");
+
         IteratorList iteratorList;
 
         if (isAnExistingObject(object, &iteratorList))

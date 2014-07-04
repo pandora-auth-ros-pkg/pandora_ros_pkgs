@@ -41,17 +41,19 @@
 
 #include "std_msgs/Float32.h"
 
-#include "sensor_coverage/space_checker.h"
-
 namespace pandora_data_fusion
 {
   namespace pandora_sensor_coverage
   {
 
-    SpaceChecker::SpaceChecker(const NodeHandlePtr& nh, const std::string& frameName)
+    template <class TreeType>
+    SpaceChecker<TreeType>::SpaceChecker(
+        const NodeHandlePtr& nh, const std::string& frameName)
       : CoverageChecker(nh, frameName)
     {
-      coverageMap3d_ = map3d_;
+      resetCoverage();
+
+      coverageMap3d_ = boost::dynamic_pointer_cast<TreeType>(map3d_);
 
       std::string topic;
 
@@ -86,28 +88,74 @@ namespace pandora_data_fusion
       getParameters();
     }
 
-    double SpaceChecker::MAX_HEIGHT = 0;
-    double SpaceChecker::FOOTPRINT_WIDTH = 0;
-    double SpaceChecker::FOOTPRINT_HEIGHT = 0;
-
-    void SpaceChecker::findCoverage(const tf::StampedTransform& sensorTransform,
+    template <class TreeType>
+    void SpaceChecker<TreeType>::findCoverage(
+        const tf::StampedTransform& sensorTransform,
         const tf::StampedTransform& baseTransform)
     {
       // Aligning coverage OGD with current map. Resizing, rotating and translating.
       alignCoverageWithMap();
 
       // Declare helper variables
-      CoverageChecker::findCoverage(sensorTransform);
+      CoverageChecker::findCoverage(sensorTransform, baseTransform);
       const float resolution = map2d_->info.resolution;
-      double robotX = baseTransform.getOrigin()[0];
-      double robotY = baseTransform.getOrigin()[1];
-      float minZ = baseTransform.getOrigin()[2];
-      double robotRoll = 0, robotPitch = 0, robotYaw = 0;
-      baseTransform.getBasis().getRPY(robotRoll, robotPitch, robotYaw);
-      float currX = position_.x();
-      float currY = position_.y();
+      float currX = sensorPosition_.x();
+      float currY = sensorPosition_.y();
       float fov = (SENSOR_HFOV / 180.0) * PI;
       octomap::point3d cell;
+
+      // Raycast on 2d map rays that orient between -fov_x/2 and fov_x/2 and
+      // find how to much covered space (line) corresponds to a 2d cell of
+      // the map inside the raycasting area.
+      for (float angle = -fov/2; angle < fov/2; angle += DEGREE)
+      {
+        cell.x() = resolution * cos(sensorYaw_ + angle) + currX;
+        cell.y() = resolution * sin(sensorYaw_ + angle) + currY;
+
+        while (CELL(cell.x(), cell.y(), map2d_)
+            < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100)
+            && Utils::distanceBetweenPoints2D(octomap::pointOctomapToMsg(sensorPosition_),
+              octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
+        {
+          signed covered;
+          if (binary_)
+            covered = 100;
+          else
+            covered = static_cast<signed char>(
+                round(cellCoverage(cell, robotPosition_.z()) * 100));
+          if (covered > CELL(cell.x(), cell.y(), coveredSpace_))
+          {
+            CELL(cell.x(), cell.y(), coveredSpace_) = covered;
+          }
+          coverageDilation(1, COORDS(cell.x(), cell.y(), coveredSpace_));
+          cell.x() += resolution * cos(sensorYaw_ + angle);
+          cell.y() += resolution * sin(sensorYaw_ + angle);
+        }
+      }
+
+      // Exclude all cells that are currently truly unknown or occupied. Count all those
+      // that are covered indeed.
+      unsigned int cellsCovered = 0;
+      for (int ii = 0; ii < coveredSpace_->info.width; ++ii)
+      {
+        for (int jj = 0; jj < coveredSpace_->info.height; ++jj)
+        {
+          if (map2d_->data[ii + jj * map2d_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
+          {
+            coveredSpace_->data[ii + jj * coveredSpace_->info.width] = 0;
+          }
+          if (coveredSpace_->data[ii + jj * coveredSpace_->info.width] != 0)
+          {
+            cellsCovered++;
+          }
+        }
+      }
+
+      // Calculate total area explored according to this sensor.
+      totalAreaCovered_ = cellsCovered * resolution * resolution;
+      ROS_INFO_THROTTLE(20,
+          "[SENSOR_COVERAGE_SPACE_CHECKER %d] Total area covered is %f m^2.",
+          __LINE__, totalAreaCovered_);
 
       // Robot is standing in fully covered space (assumption).
       double xn = 0, yn = 0;
@@ -117,63 +165,12 @@ namespace pandora_data_fusion
         for (double y = -FOOTPRINT_HEIGHT / 2;
             y <= FOOTPRINT_HEIGHT / 2; y += resolution)
         {
-          xn = cos(robotYaw) * x - sin(robotYaw) * y + robotX;
-          yn = sin(robotYaw) * x + cos(robotYaw) * y + robotY;
-          CELL(xn, yn, (&coveredSpace_)) = 100;
-          coverageDilation(1, COORDS(xn, yn, (&coveredSpace_)));
+          xn = cos(robotYaw_) * x - sin(robotYaw_) * y + robotPosition_.x();
+          yn = sin(robotYaw_) * x + cos(robotYaw_) * y + robotPosition_.y();
+          CELL(xn, yn, coveredSpace_) = 100;
+          coverageDilation(1, COORDS(xn, yn, coveredSpace_));
         }
       }
-
-      // Raycast on 2d map rays that orient between -fov_x/2 and fov_x/2 and
-      // find how to much covered space (line) corresponds to a 2d cell of
-      // the map inside the raycasting area.
-      for (float angle = -fov/2; angle < fov/2; angle += DEGREE)
-      {
-        cell.x() = resolution * cos(yaw_ + angle) + currX;
-        cell.y() = resolution * sin(yaw_ + angle) + currY;
-
-        while (CELL(cell.x(), cell.y(), map2d_)
-            < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100)
-            && Utils::distanceBetweenPoints2D(octomap::pointOctomapToMsg(position_),
-              octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
-        {
-          signed covered;
-          if (binary_)
-            covered = 100;
-          else
-            covered = static_cast<signed char>(floor(cellCoverage(cell, minZ) * 100));
-          if (covered > CELL(cell.x(), cell.y(), (&coveredSpace_)))
-          {
-            CELL(cell.x(), cell.y(), (&coveredSpace_)) = covered;
-          }
-          coverageDilation(1, COORDS(cell.x(), cell.y(), (&coveredSpace_)));
-          cell.x() += resolution * cos(yaw_ + angle);
-          cell.y() += resolution * sin(yaw_ + angle);
-        }
-      }
-
-      // Exclude all cells that are currently truly unknown or occupied. Count all those
-      // that are covered indeed.
-      unsigned int cellsCovered = 0;
-      for (int ii = 0; ii < coveredSpace_.info.width; ++ii)
-      {
-        for (int jj = 0; jj < coveredSpace_.info.height; ++jj)
-        {
-          if (map2d_->data[ii + jj * map2d_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
-          {
-            coveredSpace_.data[ii + jj * coveredSpace_.info.width] = 0;
-          }
-          if (coveredSpace_.data[ii + jj * coveredSpace_.info.width] != 0)
-          {
-            cellsCovered++;
-          }
-        }
-      }
-      // Calculate total area explored according to this sensor.
-      totalAreaCovered_ = cellsCovered * resolution * resolution;
-      ROS_INFO_THROTTLE(20,
-          "[SENSOR_COVERAGE_SPACE_CHECKER %d] Total area covered is %f m^2.",
-          __LINE__, totalAreaCovered_);
     }
 
     /**
@@ -186,7 +183,9 @@ namespace pandora_data_fusion
      * but it assures that coverage as a percentage is true at all times and it is not
      * dependent of current z.
      */
-    float SpaceChecker::cellCoverage(const octomap::point3d& cell, float minHeight)
+    template <class TreeType>
+    float SpaceChecker<TreeType>::cellCoverage(
+        const octomap::point3d& cell, float minHeight)
     {
       octomap::point3d end(cell.x(), cell.y(), minHeight);
       //  begin can be later implemented having z = minHeight + MAX_HEIGHT.
@@ -261,38 +260,39 @@ namespace pandora_data_fusion
       return coveredSpace / unoccupiedSpace;
     }
 
-    void SpaceChecker::alignCoverageWithMap()
+    template <class TreeType>
+    void SpaceChecker<TreeType>::alignCoverageWithMap()
     {
-      int oldSize = coveredSpace_.data.size();
+      int oldSize = coveredSpace_->data.size();
       int newSize = map2d_->data.size();
       int8_t* oldCoverage = new int8_t[oldSize];
       nav_msgs::MapMetaData oldMetaData;
       if (oldSize != 0 && oldSize != newSize)
       {
         // Copy old coverage map meta data.
-        oldMetaData = coveredSpace_.info;
+        oldMetaData = coveredSpace_->info;
         // Copy old coverage map.
         for (unsigned int ii = 0; ii < oldSize; ++ii)
         {
-          oldCoverage[ii] = coveredSpace_.data[ii];
+          oldCoverage[ii] = coveredSpace_->data[ii];
         }
       }
-      // Reset coveredSpace_ and copy map2D_'s metadata.
-      coveredSpace_.header = map2d_->header;
-      coveredSpace_.info = map2d_->info;
+      // Reset coveredSpace_->and copy map2D_'s metadata.
+      coveredSpace_->header = map2d_->header;
+      coveredSpace_->info = map2d_->info;
       if (oldSize != newSize)
       {
         ROS_WARN("[SENSOR_COVERAGE_SPACE_CHECKER %d] Resizing space coverage...", __LINE__);
-        coveredSpace_.data.resize(newSize, 0);
-        ROS_ASSERT(newSize == coveredSpace_.data.size());
+        coveredSpace_->data.resize(newSize, 0);
+        ROS_ASSERT(newSize == coveredSpace_->data.size());
 
         if (oldSize != 0)
         {
-          double yawDiff = tf::getYaw(coveredSpace_.info.origin.orientation) -
+          double yawDiff = tf::getYaw(coveredSpace_->info.origin.orientation) -
             tf::getYaw(oldMetaData.origin.orientation);
-          double xDiff = coveredSpace_.info.origin.position.x -
+          double xDiff = coveredSpace_->info.origin.position.x -
             oldMetaData.origin.position.x;
-          double yDiff = coveredSpace_.info.origin.position.y -
+          double yDiff = coveredSpace_->info.origin.position.y -
             oldMetaData.origin.position.y;
 
           double x = 0, y = 0, xn = 0, yn = 0;
@@ -304,10 +304,10 @@ namespace pandora_data_fusion
               y = jj * oldMetaData.resolution;
               xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
               yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-              int coords = static_cast<int>(round((xn + yn * coveredSpace_.info.width)
-                    / coveredSpace_.info.resolution));
-              coveredSpace_.data[coords] = oldCoverage[ii + jj * oldMetaData.width];
-              coverageDilation(2, COORDS(xn, yn, (&coveredSpace_)));
+              int coords = static_cast<int>(round((xn + yn * coveredSpace_->info.width)
+                    / coveredSpace_->info.resolution));
+              coveredSpace_->data[coords] = oldCoverage[ii + jj * oldMetaData.width];
+              coverageDilation(2, COORDS(xn, yn, coveredSpace_));
             }
           }
         }
@@ -315,63 +315,71 @@ namespace pandora_data_fusion
       delete[] oldCoverage;
     }
 
-    void SpaceChecker::coverageDilation(int steps, int coords)
+    template <class TreeType>
+    void SpaceChecker<TreeType>::coverageDilation(int steps, int coords)
     {
       if (steps == 0)
         return;
 
-      signed char cell = coveredSpace_.data[coords];
+      signed char cell = coveredSpace_->data[coords];
 
       if (cell != 0)  // That's foreground
       {
         // Check for all adjacent
-        if (coveredSpace_.data[coords + coveredSpace_.info.width + 1] == 0)
+        if (coveredSpace_->data[coords + coveredSpace_->info.width + 1] == 0)
         {
-          coveredSpace_.data[coords + coveredSpace_.info.width + 1] = cell;
-          coverageDilation(steps - 1, coords + coveredSpace_.info.width + 1);
+          coveredSpace_->data[coords + coveredSpace_->info.width + 1] = cell;
+          coverageDilation(steps - 1, coords + coveredSpace_->info.width + 1);
         }
-        if (coveredSpace_.data[coords + coveredSpace_.info.width] == 0)
+        if (coveredSpace_->data[coords + coveredSpace_->info.width] == 0)
         {
-          coveredSpace_.data[coords + coveredSpace_.info.width] = cell;
+          coveredSpace_->data[coords + coveredSpace_->info.width] = cell;
         }
-        if (coveredSpace_.data[coords + coveredSpace_.info.width - 1] == 0)
+        if (coveredSpace_->data[coords + coveredSpace_->info.width - 1] == 0)
         {
-          coveredSpace_.data[coords + coveredSpace_.info.width - 1] = cell;
-          coverageDilation(steps - 1, coords + coveredSpace_.info.width - 1);
+          coveredSpace_->data[coords + coveredSpace_->info.width - 1] = cell;
+          coverageDilation(steps - 1, coords + coveredSpace_->info.width - 1);
         }
-        if (coveredSpace_.data[coords + 1] == 0)
+        if (coveredSpace_->data[coords + 1] == 0)
         {
-          coveredSpace_.data[coords + 1] = cell;
+          coveredSpace_->data[coords + 1] = cell;
         }
-        if (coveredSpace_.data[coords - 1] == 0)
+        if (coveredSpace_->data[coords - 1] == 0)
         {
-          coveredSpace_.data[coords - 1] = cell;
+          coveredSpace_->data[coords - 1] = cell;
         }
-        if (coveredSpace_.data[coords - coveredSpace_.info.width + 1] == 0)
+        if (coveredSpace_->data[coords - coveredSpace_->info.width + 1] == 0)
         {
-          coveredSpace_.data[coords - coveredSpace_.info.width + 1] = cell;
-          coverageDilation(steps - 1, coords - coveredSpace_.info.width + 1);
+          coveredSpace_->data[coords - coveredSpace_->info.width + 1] = cell;
+          coverageDilation(steps - 1, coords - coveredSpace_->info.width + 1);
         }
-        if (coveredSpace_.data[coords - coveredSpace_.info.width] == 0)
+        if (coveredSpace_->data[coords - coveredSpace_->info.width] == 0)
         {
-          coveredSpace_.data[coords - coveredSpace_.info.width] = cell;
+          coveredSpace_->data[coords - coveredSpace_->info.width] = cell;
         }
-        if (coveredSpace_.data[coords - coveredSpace_.info.width - 1] == 0)
+        if (coveredSpace_->data[coords - coveredSpace_->info.width - 1] == 0)
         {
-          coveredSpace_.data[coords - coveredSpace_.info.width - 1] = cell;
-          coverageDilation(steps - 1, coords - coveredSpace_.info.width - 1);
+          coveredSpace_->data[coords - coveredSpace_->info.width - 1] = cell;
+          coverageDilation(steps - 1, coords - coveredSpace_->info.width - 1);
         }
       }
     }
 
-    void SpaceChecker::publishCoverage(const std::string& frame)
+    template <class TreeType>
+    void SpaceChecker<TreeType>::publishCoverage(const std::string& frame)
     {
-      coveredSpace_.header.stamp = ros::Time::now();
-      coveredSpace_.header.frame_id = frame;
-      coveragePublisher_.publish(coveredSpace_);
+      coveredSpace_->header.stamp = ros::Time::now();
+      coveredSpace_->header.frame_id = frame;
+      coveragePublisher_.publish(*coveredSpace_);
       std_msgs::Float32 msg;
       msg.data = totalAreaCovered_;
       areaCoveragePublisher_.publish(msg);
+    }
+
+    template <class TreeType>
+    void SpaceChecker<TreeType>::resetCoverage()
+    {
+      coveredSpace_.reset( new nav_msgs::OccupancyGrid );
     }
 
 }  // namespace pandora_sensor_coverage

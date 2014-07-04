@@ -75,13 +75,25 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
 
+      // Server of flushing service
+      if (nh_->getParam("service_server_names/flush_coverage", param))
+      {
+        flushService_ = nh_->advertiseService(param,
+            &SensorCoverage::flushCoverage, this);
+      }
+      else
+      {
+        ROS_FATAL("flush_coverage service name param not found");
+        ROS_BREAK();
+      }
+
       //  Set up occupancy grid 2d map occupancy threshold.
       nh_->param<double>("occupied_cell_thres", paramD, static_cast<double>(0.5));
-      SpaceChecker::setOccupiedCellThres(paramD);
+      CoverageChecker::setOccupiedCellThres(paramD);
 
       //  Set up maximum height of interest.
       if (nh_->getParam("max_height", paramD))
-        SpaceChecker::setMaxHeight(paramD);
+        CoverageChecker::setMaxHeight(paramD);
       else
       {
         ROS_FATAL("max height param not found");
@@ -90,7 +102,7 @@ namespace pandora_data_fusion
 
       //  Set up footprint's width.
       if (nh_->getParam("footprint/width", paramD))
-        SpaceChecker::setFootprintWidth(paramD);
+        CoverageChecker::setFootprintWidth(paramD);
       else
       {
         ROS_FATAL("footprint's width param not found");
@@ -99,7 +111,7 @@ namespace pandora_data_fusion
 
       //  Set up footprint's height.
       if (nh_->getParam("footprint/height", paramD))
-        SpaceChecker::setFootprintHeight(paramD);
+        CoverageChecker::setFootprintHeight(paramD);
       else
       {
         ROS_FATAL("footprint's height param not found");
@@ -206,6 +218,18 @@ namespace pandora_data_fusion
     {
       *globalMap2d_ = *msg;
       globalMap2d_->info.origin.orientation.w = 1;
+    }
+
+    bool SensorCoverage::flushCoverage(
+        std_srvs::Empty::Request& rq,
+        std_srvs::Empty::Response& rs)
+    {
+      for (int ii = 0; ii < registeredSensors_.size(); ++ii)
+      {
+        registeredSensors_[ii]->flushCoverage();
+      }
+
+      return true;
     }
 
 }  // namespace pandora_sensor_coverage

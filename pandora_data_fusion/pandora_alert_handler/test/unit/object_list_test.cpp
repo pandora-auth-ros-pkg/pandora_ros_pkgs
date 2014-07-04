@@ -191,6 +191,7 @@ namespace pandora_data_fusion
           pose.position.x = x;
           pose.position.y = y;
           pose.position.z = z;
+          pose.orientation.w = 1;
           qr->setPose(pose);
           qr->setProbability(0.5);
           qr->initializeObjectFilter();

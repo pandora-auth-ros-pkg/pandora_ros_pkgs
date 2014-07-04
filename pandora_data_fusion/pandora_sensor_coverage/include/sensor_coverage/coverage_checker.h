@@ -75,10 +75,14 @@ namespace pandora_data_fusion
 
         /**
          * @brief function that finds coverage, triggered when updating it
-         * @param transform [tf::StampedTransform const&] tf used in coverage finding
+         * @param sensorTransform [tf::StampedTransform const&] tf that will be used
+         * in coverage finding
+         * @param baseTransform [tf::StampedTransform const&] base footprint's tf
          * @return void
          */
-        virtual void findCoverage(const tf::StampedTransform& transform);
+        virtual void findCoverage(
+            const tf::StampedTransform& sensorTransform,
+            const tf::StampedTransform& baseTransform);
 
         /**
          * @brief publishes coverage map or patch
@@ -86,6 +90,12 @@ namespace pandora_data_fusion
          * @return void
          */
         virtual void publishCoverage(const std::string& frame) {}
+
+        /**
+         * @brief resets coverage map.
+         * @return void
+         */
+        virtual void resetCoverage() {}
 
         /**
          * @brief Setter for static variable map2D_
@@ -118,6 +128,37 @@ namespace pandora_data_fusion
           OCCUPIED_CELL_THRES = occupiedCellThres;
         }
 
+        /**
+         * @brief Setter for static variable MAX_HEIGHT
+         * @param maxHeight [double] maximum height of interest
+         * @return void
+         */
+        static void setMaxHeight(double maxHeight)
+        {
+          MAX_HEIGHT = maxHeight;
+        }
+
+        /**
+         * @brief Setter for static variable FOOTPRINT_WIDTH
+         * @param footprintWidth [double] robot's orthogonal footprint width
+         * @return void
+         */
+        static void setFootprintWidth(double orientationCircle)
+        {
+          FOOTPRINT_WIDTH = orientationCircle;
+        }
+
+        /**
+         * @brief Setter for static variable FOOTPRINT_HEIGHT
+         * @param footprintHeight [double] robot's orthogonal footprint height
+         * @return void
+         */
+        static void setFootprintHeight(double footprintHeight)
+        {
+          FOOTPRINT_HEIGHT = footprintHeight;
+        }
+
+
       protected:
         /**
          * @brief Getter for sensor's parameters
@@ -133,10 +174,14 @@ namespace pandora_data_fusion
         //!< Publisher for this sensor's surface coverage.
         ros::Publisher coveragePublisher_;
         //!< Useful for coverage finding.
-        double roll_;
-        double pitch_;
-        double yaw_;
-        octomap::point3d position_;
+        double sensorRoll_;
+        double sensorPitch_;
+        double sensorYaw_;
+        octomap::point3d sensorPosition_;
+        double robotRoll_;
+        double robotPitch_;
+        double robotYaw_;
+        octomap::point3d robotPosition_;
 
         //!< Global 3d and 2d maps as they are sent by SLAM
         static boost::shared_ptr<octomap::OcTree> map3d_;
@@ -151,11 +196,16 @@ namespace pandora_data_fusion
         double SENSOR_VFOV;
         //!< 2d map's occupancy threshold
         static double OCCUPIED_CELL_THRES;
+        //!< maximum height of interest
+        static double MAX_HEIGHT;
+        //!< Robot's footprint width
+        static double FOOTPRINT_WIDTH;
+        //!< Robot's footprint height
+        static double FOOTPRINT_HEIGHT;
     };
 
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_data_fusion
 
 #endif  // SENSOR_COVERAGE_COVERAGE_CHECKER_H
-
 

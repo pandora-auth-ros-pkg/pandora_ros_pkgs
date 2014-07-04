@@ -87,6 +87,12 @@ namespace pandora_data_fusion
         void notifyStateChange(int newState);
 
         /**
+         * @brief flushes coverage.
+         * @return void
+         */
+        void flushCoverage();
+
+        /**
          * @brief Setter for static variable map2d_
          * @param map2d [nav_msgs::OccupancyGridPtr const&] map
          * @return void
@@ -173,9 +179,9 @@ namespace pandora_data_fusion
         TfListenerPtr listener_;
 
         //!< Space coverage finder
-        boost::scoped_ptr<SpaceChecker> spaceChecker_;
+        boost::shared_ptr<CoverageChecker> spaceChecker_;
         //!< Surface coverage finder
-        boost::scoped_ptr<SurfaceChecker> surfaceChecker_;
+        boost::shared_ptr<SurfaceChecker> surfaceChecker_;
 
         //!< Global 3d and 2d maps as they are sent by SLAM
         static boost::shared_ptr<octomap::OcTree> map3d_;

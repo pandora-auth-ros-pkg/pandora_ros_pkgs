@@ -93,7 +93,7 @@ namespace pandora_sensor_processing
        * @param l [float] X's scale
        * @return float pdf's corresponding value
        */
-      static float weibullPdf(float x, float k, float l);
+      static double weibullPdf(double x, double k, double l);
   };
 
 }  // namespace pandora_sensor_processing

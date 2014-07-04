@@ -28,6 +28,8 @@ generate_dynamic_reconfigure_options(
 # in CMakeLists.txt.
 set(CMAKE_CXX_FLAGS_COVERAGE "-fprofile-arcs -ftest-coverage")
 
+set(DCMAKE_BUILD_TYPE Debug)
+
 catkin_package(
   DEPENDS
     orocos-bfl

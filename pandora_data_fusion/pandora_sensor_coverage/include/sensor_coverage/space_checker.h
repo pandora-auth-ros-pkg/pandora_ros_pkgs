@@ -53,128 +53,103 @@ namespace pandora_data_fusion
      * @brief class that correspond to a tracked sensor.
      * Contains methods that draw coverage into current map.
      */
-    class SpaceChecker : public CoverageChecker
-    {
-      public:
-        /**
-         * @brief constructor for sensor class
-         * @param nh [NodeHandlePtr const&] pointer to node's nodehandle
-         * @param frameName [std::string const&] frame whose view is to be tracked
-         */
-        SpaceChecker(const NodeHandlePtr& nh, const std::string& frameName);
+    template <class TreeType>
+      class SpaceChecker : public CoverageChecker
+      {
+        public:
+          /**
+           * @brief constructor for sensor class
+           * @param nh [NodeHandlePtr const&] pointer to node's nodehandle
+           * @param frameName [std::string const&] frame whose view is to be tracked
+           */
+          SpaceChecker(const NodeHandlePtr& nh, const std::string& frameName);
 
-        /**
-         * @override
-         * @brief function that finds coverage, triggered when updating it
-         * @param transform [tf::StampedTransform const&] tf that will be used
-         * in coverage finding
-         * @return void
-         */
-        virtual void findCoverage(const tf::StampedTransform& sensorTransform,
-            const tf::StampedTransform& baseTransform);
+          /**
+           * @override
+           * @brief function that finds coverage, triggered when updating it
+           * @param sensorTransform [tf::StampedTransform const&] tf that will be used
+           * in coverage finding
+           * @param baseTransform [tf::StampedTransform const&] base footprint's tf
+           * @return void
+           */
+          virtual void findCoverage(const tf::StampedTransform& sensorTransform,
+              const tf::StampedTransform& baseTransform);
 
-        /**
-         * @override
-         * @brief publishes coverage map or patch
-         * @param frame [std::string const&] frame id of the coverage.
-         * @return void
-         */
-        virtual void publishCoverage(const std::string& frame);
+          /**
+           * @override
+           * @brief publishes coverage map or patch
+           * @param frame [std::string const&] frame id of the coverage.
+           * @return void
+           */
+          virtual void publishCoverage(const std::string& frame);
 
-        /**
-         * @brief Setter for variable coverageMap3d_
-         * @param map [boost::shared_ptr<octomap::OcTree> const&]
-         * map which will be projected down to find area and space coverage.
-         * @return void
-         */
-        void setCoverageMap3d(const boost::shared_ptr<octomap::OcTree>& map)
-        {
-          coverageMap3d_ = map;
-        }
+          /**
+           * @override
+           * @brief resets coverage map.
+           * @return void
+           */
+          virtual void resetCoverage();
 
-        /**
-         * @brief Setter for static variable MAX_HEIGHT
-         * @param maxHeight [double] maximum height of interest
-         * @return void
-         */
-        static void setMaxHeight(double maxHeight)
-        {
-          MAX_HEIGHT = maxHeight;
-        }
+          /**
+           * @brief Setter for variable coverageMap3d_
+           * @param map [boost::shared_ptr<TreeType> const&]
+           * map which will be projected down to find area and space coverage.
+           * @return void
+           */
+          void setCoverageMap3d(const boost::shared_ptr<TreeType>& map)
+          {
+            coverageMap3d_ = map;
+          }
 
-        /**
-         * @brief Setter for static variable FOOTPRINT_WIDTH
-         * @param footprintWidth [double] robot's orthogonal footprint width
-         * @return void
-         */
-        static void setFootprintWidth(double orientationCircle)
-        {
-          FOOTPRINT_WIDTH = orientationCircle;
-        }
+        private:
+          /**
+           * @brief finds cell's space coverage as a percentage of the covered
+           * space above it
+           * @param cell [octomath::Vector3 const&] cell in question
+           * @param minHeight [float] minimun height of interest (base footprint)
+           * @return float percentage of space covered by sensor.
+           */
+          float cellCoverage(const octomath::Vector3& cell, float minHeight);
 
-        /**
-         * @brief Setter for static variable FOOTPRINT_HEIGHT
-         * @param footprintHeight [double] robot's orthogonal footprint height
-         * @return void
-         */
-        static void setFootprintHeight(double footprintHeight)
-        {
-          FOOTPRINT_HEIGHT = footprintHeight;
-        }
+          /**
+           * @brief aligns coverage map with current global world map. Rotates,
+           * translates and scales coverage map appropriately.
+           * @return void
+           */
+          void alignCoverageWithMap();
 
-      private:
-        /**
-         * @brief finds cell's space coverage as a percentage of the covered
-         * space above it
-         * @param cell [octomath::Vector3 const&] cell in question
-         * @param minHeight [float] minimun height of interest (base footprint)
-         * @return float percentage of space covered by sensor.
-         */
-        float cellCoverage(const octomath::Vector3& cell, float minHeight);
+          /**
+           * @brief Wrapper for pandora_vision::Morphology::dilation()
+           * @return void
+           */
+          void coverageDilation(int steps, int coords);
 
-        /**
-         * @brief aligns coverage map with current global world map. Rotates,
-         * translates and scales coverage map appropriately.
-         * @return void
-         */
-        void alignCoverageWithMap();
+        protected:
+          //!< If space coverage is considered as a binary value or as a percentage.
+          bool binary_;
+          //!< Do we use for 3d map, the produced map by surface checker?
+          bool surfaceCoverage_;
+          //!< Sensor's space coverage map.
+          nav_msgs::OccupancyGridPtr coveredSpace_;
 
-        /**
-         * @brief Wrapper for pandora_vision::Morphology::dilation()
-         * @return void
-         */
-        void coverageDilation(int steps, int coords);
+          //!< 3d coverage map produced when surfacing checking.
+          boost::shared_ptr<TreeType> coverageMap3d_;
 
-      protected:
-        //!< If space coverage is considered as a binary value or as a percentage.
-        bool binary_;
-        //!< Do we use for 3d map, the produced map by surface checker?
-        bool surfaceCoverage_;
-        //!< Sensor's space coverage map.
-        nav_msgs::OccupancyGrid coveredSpace_;
+          //!< Total area covered with this sensor.
+          float totalAreaCovered_;
+          //!< publishes total area covered with this sensor.
+          ros::Publisher areaCoveragePublisher_;
 
-        //!< 3d coverage map produced when surfacing checking.
-        boost::shared_ptr<octomap::OcTree> coverageMap3d_;
+          /*  Parameters  */
 
-        //!< Total area covered with this sensor.
-        float totalAreaCovered_;
-        //!< publishes total area covered with this sensor.
-        ros::Publisher areaCoveragePublisher_;
-
-        /*  Parameters  */
-        //!< maximum height of interest
-        static double MAX_HEIGHT;
-        //!< Robot's footprint width
-        static double FOOTPRINT_WIDTH;
-        //!< Robot's footprint height
-        static double FOOTPRINT_HEIGHT;
-
-      private:
-        friend class SpaceCheckerTest;
-    };
+        private:
+          friend class SpaceCheckerTest;
+      };
 
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_data_fusion
+
+#include "sensor_coverage/space_checker.hxx"
 
 #endif  // SENSOR_COVERAGE_SPACE_CHECKER_H
 

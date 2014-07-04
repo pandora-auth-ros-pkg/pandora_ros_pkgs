@@ -1,0 +1,4 @@
+subscribed_topic_names:
+  raw_input: /test/raw_input
+published_topic_names:
+  alert_output: /test/alert_output

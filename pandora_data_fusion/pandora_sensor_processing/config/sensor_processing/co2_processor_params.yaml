@@ -1,0 +1,8 @@
+subscribed_topic_names:
+  raw_input: /sensors/co2
+published_topic_names:
+  alert_output: co2_alert
+states:
+  exploration: false
+  identification: true
+  sensor_hold: true

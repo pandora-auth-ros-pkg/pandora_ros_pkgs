@@ -54,12 +54,16 @@ namespace pandora_data_fusion
         ROS_FATAL("%s produces surface coverage param not found", frameName_.c_str());
         ROS_BREAK();
       }
-      spaceChecker_.reset( new SpaceChecker(nh_, frameName_) );
       if (surfaceCoverage_)
       {
+        spaceChecker_.reset( new SpaceChecker<octomap::ColorOcTree>(nh_, frameName_) );
         surfaceChecker_.reset( new SurfaceChecker(nh_, frameName_) );
-        spaceChecker_->setCoverageMap3d(
-            boost::dynamic_pointer_cast<octomap::OcTree>(surfaceChecker_->getCoverageMap3d()));
+        boost::dynamic_pointer_cast< SpaceChecker<octomap::ColorOcTree> >(spaceChecker_)->
+          setCoverageMap3d(surfaceChecker_->getCoverageMap3d());
+      }
+      else
+      {
+        spaceChecker_.reset( new SpaceChecker<octomap::OcTree>(nh_, frameName_) );
       }
       sensorWorking_ = false;
       listener_.reset(TfFinder::newTfListener(mapOrigin));
@@ -77,22 +81,28 @@ namespace pandora_data_fusion
     {
       switch (newState)
       {
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION:
+        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE:
           sensorWorking_ = EXPLORATION_STATE;
           break;
         case state_manager_communications::robotModeMsg::MODE_IDENTIFICATION:
           sensorWorking_ = IDENTIFICATION_STATE;
           break;
-        case state_manager_communications::robotModeMsg::MODE_DF_HOLD:
+        case state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD:
           sensorWorking_ = HOLD_STATE;
           break;
-        case state_manager_communications::robotModeMsg::MODE_ARM_APPROACH:
-          sensorWorking_ = HOLD_STATE;
+        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_MAPPING:
+          sensorWorking_ = true;
           break;
         default:
           sensorWorking_ = false;
           break;
       }
+    }
+
+    void Sensor::flushCoverage()
+    {
+      spaceChecker_->resetCoverage();
+      surfaceChecker_->resetCoverage();
     }
 
     void Sensor::coverageUpdate(const ros::TimerEvent& event)
@@ -119,7 +129,7 @@ namespace pandora_data_fusion
         //  Publish updated coverage perception.
         if (surfaceCoverage_)
         {
-          surfaceChecker_->findCoverage(sensorTransform);
+          surfaceChecker_->findCoverage(sensorTransform, baseTransform);
           surfaceChecker_->publishCoverage(GLOBAL_FRAME);
         }
         spaceChecker_->findCoverage(sensorTransform, baseTransform);

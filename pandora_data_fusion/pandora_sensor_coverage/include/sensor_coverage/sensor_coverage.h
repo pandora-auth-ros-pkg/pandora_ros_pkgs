@@ -50,6 +50,7 @@
 
 #include <ros/ros.h>
 
+#include <std_srvs/Empty.h>
 #include "octomap/octomap.h"
 #include "octomap_msgs/Octomap.h"
 #include "nav_msgs/OccupancyGrid.h"
@@ -108,6 +109,16 @@ namespace pandora_data_fusion
          */
         void map2dUpdate(const nav_msgs::OccupancyGridConstPtr& msg);
 
+        /**
+         * @brief Callback for service that flushes coverage.
+         * @param rq [std_srvs::Empty::Request&] request
+         * @param rs [std_srvs::Empty::Response&] response
+         * @return bool
+         */
+        bool flushCoverage(
+            std_srvs::Empty::Request& rq,
+            std_srvs::Empty::Response& rs);
+
       private:
         //!< This node's NodeHandle.
         NodeHandlePtr nh_;
@@ -116,6 +127,8 @@ namespace pandora_data_fusion
         ros::Subscriber map3dSubscriber_;
         //!< subscriber that fetches 2d map.
         ros::Subscriber map2dSubscriber_;
+        //!< server for coverage flushing service.
+        ros::ServiceServer flushService_;
 
         //!< Robot's current mode of operation.
         int currentState_;
