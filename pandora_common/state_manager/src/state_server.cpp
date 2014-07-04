@@ -63,14 +63,14 @@ void StateServer::watchdog(const ros::TimerEvent&) {
 
 void StateServer::setStateNames() {
 	stateNames[state_manager_communications::robotModeMsg::MODE_OFF] = "MODE_OFF";
-	stateNames[state_manager_communications::robotModeMsg::MODE_EXPLORATION] = "MODE_EXPLORATION";
+	stateNames[state_manager_communications::robotModeMsg::MODE_START_AUTONOMOUS] = "MODE_START_AUTONOMOUS";
+	stateNames[state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE] = "MODE_EXPLORATION_RESCUE";
 	stateNames[state_manager_communications::robotModeMsg::MODE_IDENTIFICATION] = "MODE_IDENTIFICATION";
-	stateNames[state_manager_communications::robotModeMsg::MODE_ARM_APPROACH] = "MODE_ARM_APPROACH";
-	stateNames[state_manager_communications::robotModeMsg::MODE_DF_HOLD] = "MODE_DF_HOLD";
+	stateNames[state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD] = "MODE_SENSOR_HOLD";
 	stateNames[state_manager_communications::robotModeMsg::MODE_SEMI_AUTONOMOUS] = "MODE_SEMI_AUTONOMOUS";
 	stateNames[state_manager_communications::robotModeMsg::MODE_TELEOPERATED_LOCOMOTION] = "MODE_TELEOPERATED_LOCOMOTION";
-	stateNames[state_manager_communications::robotModeMsg::MODE_ARM_TELEOPERATION] = "MODE_ARM_TELEOPERATION";
-	stateNames[state_manager_communications::robotModeMsg::MODE_ARM_TELEOPERATION_TUCK] = "MODE_ARM_TELEOPERATION_TUCK";
+	stateNames[state_manager_communications::robotModeMsg::MODE_SENSOR_TEST] = "MODE_SENSOR_TEST";
+	stateNames[state_manager_communications::robotModeMsg::MODE_EXPLORATION_MAPPING] = "MODE_EXPLORATION_MAPPING";
 	stateNames[state_manager_communications::robotModeMsg::MODE_TERMINATING] = " MODE_TERMINATING";
 }
 
