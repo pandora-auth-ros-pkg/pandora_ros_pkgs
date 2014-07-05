@@ -270,8 +270,8 @@ namespace pandora_vision
                             }
                           }
 
-                          // There should be 100 X 100 - 4 points in each mask
-                          EXPECT_EQ ( 10000 - 4, nonZero );
+                          // There should be 100 X 100 points in each mask
+                          EXPECT_EQ ( 10000, nonZero );
                         }
                       }
                       else if ( a != 1 && c != 1 )
@@ -290,8 +290,8 @@ namespace pandora_vision
 
                         for ( int j = 0; j < holesMasksSetVector.size(); j++ )
                         {
-                          // Each mask should have 100 X 100 - 4 points
-                          EXPECT_EQ ( 10000 - 4, holesMasksSetVector[j].size() );
+                          // Each mask should have 100 X 100 points
+                          EXPECT_EQ ( 10000, holesMasksSetVector[j].size() );
                         }
                       }
                       else if ( b != 1 && d != 1 && f != 1 && i != 1 )
@@ -470,8 +470,8 @@ namespace pandora_vision
                   }
                 }
 
-                // There should be 100 X 100 - 4 points in each mask
-                EXPECT_EQ ( 10000 - 4, nonZero );
+                // There should be 100 X 100 points in each mask
+                EXPECT_EQ ( 10000, nonZero );
               }
             }
             else if ( a != 1 && c != 1 )
@@ -490,8 +490,8 @@ namespace pandora_vision
 
               for ( int j = 0; j < holesMasksSetVector.size(); j++ )
               {
-                // Each mask should have 100 X 100 - 4 points
-                EXPECT_EQ ( 10000 - 4, holesMasksSetVector[j].size() );
+                // Each mask should have 100 X 100 points
+                EXPECT_EQ ( 10000, holesMasksSetVector[j].size() );
               }
             }
             else if ( b != 1 && d != 1 )
@@ -643,16 +643,12 @@ namespace pandora_vision
     }
 
     // The total number of non-zero value pixels in all of the images should
-    // be equal to three times as much as in any image, which is 100 X 100 minus
-    // the four corners of each square, due to the nature of the brushfire
-    // exploring method
-    EXPECT_EQ ( 3 * (10000 - 4), nonZero );
+    // be equal to three times as much as in any image, which is 100 X 100
+    EXPECT_EQ ( 3 * 10000, nonZero );
 
     for ( int h = 0; h < conveyor.size(); h++ )
     {
-      // Each mask should have 100 X 100 points minus the square's four corners
-      // due to the nature of the brushfire exploring method
-      EXPECT_EQ ( 10000 - 4, holesMasksSetVector[h].size() );
+      EXPECT_EQ ( 10000, holesMasksSetVector[h].size() );
     }
 
   }
@@ -697,10 +693,8 @@ namespace pandora_vision
     }
 
     // The total number of non-zero value pixels in all of the images should
-    // be equal to three times as much as in any image, which is 100 X 100 minus
-    // the four corners of each square, due to the nature of the brushfire
-    // exploring method
-    EXPECT_EQ ( 3 * (10000 - 4), nonZero );
+    // be equal to three times as much as in any image, which is 100 X 100
+    EXPECT_EQ ( 3 * 10000, nonZero );
   }
 
 
@@ -720,9 +714,8 @@ namespace pandora_vision
 
     for ( int h = 0; h < conveyor.size(); h++ )
     {
-      // Each mask should have 100 X 100 points minus the square's four corners
-      // due to the nature of the brushfire exploring method
-      EXPECT_EQ ( 10000 - 4, holesMasksSetVector[h].size() );
+      // Each mask should have 100 X 100 points
+      EXPECT_EQ ( 10000, holesMasksSetVector[h].size() );
 
       // Uncomment for visual inspection
       /*

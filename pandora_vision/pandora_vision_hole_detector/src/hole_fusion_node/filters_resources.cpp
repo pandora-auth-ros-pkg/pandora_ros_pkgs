@@ -469,14 +469,28 @@ namespace pandora_vision
       // The set of indices of points inside the i-th hole's outline
       std::set<unsigned int> holeMaskSet;
 
-
-      // The point from which the brushfire will begin
-      cv::Point2f keypoint(
+      // The point from which the floodfill will begin
+      cv::Point2f seedPoint(
         conveyor.holes[i].keypoint.pt.x, conveyor.holes[i].keypoint.pt.y);
 
-      // Brushfire from the keypoint to the hole's outline
-      // to obtain the points inside it
-      BlobDetection::brushfirePoint(keypoint, &holeMask, &holeMaskSet);
+      // Fill the inside of the i-th hole
+      cv::floodFill(holeMask, seedPoint, cv::Scalar(255));
+
+      // Take a pointer on the mask image
+      unsigned char* ptr = holeMask.ptr();
+
+      // The points with non-zero value are the ones inside the i-th hole.
+      // Insert them into the desired set.
+      for (int rows = 0; rows < holeMask.rows; rows++)
+      {
+        for (int cols = 0; cols < holeMask.cols; cols++)
+        {
+          if (ptr[rows * holeMask.cols + cols] != 0)
+          {
+            holeMaskSet.insert(rows * holeMask.cols + cols);
+          }
+        }
+      }
 
       holesMasksSetVector->push_back(holeMaskSet);
     }
@@ -765,11 +779,6 @@ namespace pandora_vision
 
     for (int i = 0; i < inflatedRectanglesVector.size(); i++)
     {
-      // The brushfire start point is the hole's keypoint
-      cv::Point2f keypoint(
-        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.x,
-        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.y);
-
       // The current hole's mask
       cv::Mat intermediatePointsMask = cv::Mat::zeros(image.size(), CV_8UC1);
 
@@ -790,10 +799,31 @@ namespace pandora_vision
       // The set of indices of points inside the i-th hole's outline
       std::set<unsigned int> holeOutlineFilledSet;
 
-      // Brushfire from the keypoint to the hole's outline
+      // The brushfire start point is the hole's seedPoint
+      cv::Point2f seedPoint(
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.x,
+        conveyor.holes[inflatedRectanglesIndices[i]].keypoint.pt.y);
+
+      // floodFill from the seedPoint to the hole's outline
       // to obtain the points inside it
-      BlobDetection::brushfirePoint(keypoint,
-        &holeOutlineFilledImage, &holeOutlineFilledSet);
+      cv::floodFill(holeOutlineFilledImage, seedPoint, cv::Scalar(255));
+
+      // Take a pointer on the mask image
+      unsigned char* ptr = holeOutlineFilledImage.ptr();
+
+      // The points with non-zero value are the ones inside the i-th hole.
+      // Insert them into the desired set.
+      for (int rows = 0; rows < holeOutlineFilledImage.rows; rows++)
+      {
+        for (int cols = 0; cols < holeOutlineFilledImage.cols; cols++)
+        {
+          if (ptr[rows * holeOutlineFilledImage.cols + cols] != 0)
+          {
+            holeOutlineFilledSet.insert(
+              rows * holeOutlineFilledImage.cols + cols);
+          }
+        }
+      }
 
       // holeOutlineFilledSet is now constructed
 
@@ -818,11 +848,26 @@ namespace pandora_vision
       // bounding rectangle
       std::set<unsigned int> rectangleOutlineFilledSet;
 
-      // Brushfire from the keypoint to the hole's bounding rectangle
+      // floodFill from the seedPoint to the hole's bounding rectangle
       // to obtain the points inside it
-      BlobDetection::brushfirePoint(keypoint,
-        &rectangleOutlineFilledImage, &rectangleOutlineFilledSet);
+      cv::floodFill(rectangleOutlineFilledImage, seedPoint, cv::Scalar(255));
 
+      // Take a pointer on the mask image
+      ptr = rectangleOutlineFilledImage.ptr();
+
+      // The points with non-zero value are the ones inside the i-th hole.
+      // Insert them into the desired set.
+      for (int rows = 0; rows < rectangleOutlineFilledImage.rows; rows++)
+      {
+        for (int cols = 0; cols < rectangleOutlineFilledImage.cols; cols++)
+        {
+          if (ptr[rows * rectangleOutlineFilledImage.cols + cols] != 0)
+          {
+            rectangleOutlineFilledSet.insert(
+              rows * rectangleOutlineFilledImage.cols + cols);
+          }
+        }
+      }
       // rectangleOutlineFilledSet is now constructed
 
 
