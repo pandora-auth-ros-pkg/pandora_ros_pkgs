@@ -19,6 +19,7 @@ from .gui_state_client import GuiStateClient
 
 world_model_info_topic = '/data_fusion/world_model'
 robocup_score_topic = 'data_fusion/robocup_score'
+validate_victim_service_name = '/gui/validate_victim'
 
 
 class StandarWidget(QWidget):
@@ -44,7 +45,6 @@ class StandarWidget(QWidget):
 
         #Add Console in the 2,1 position of InternalGrid
         self.internal_grid.addWidget(self.ConsoleWidget_, 2, 1)
-        self.ConsoleWidget_._handle_column_resize_clicked()
 
         #use full ABSOLUTE path to the image, not relative
         self.image.setPixmap(QPixmap(os.path.join(
@@ -53,9 +53,11 @@ class StandarWidget(QWidget):
 
         # the ValidateVictimActionServer is used called when a victim is found
         self.ValidateVictimActionServer_ = ValidateVictimActionServer(
-            '/gui/validate_victim')
+            validate_victim_service_name)
          # dynamic_reconfigure client is used to change the parameters
-        self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
+        #~ self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
+
+        self.dynamic_reconfigure_client = None
 
         #Subscribe the score the world_model_info and Info
         self.score_info = WidgetInfo(robocup_score_topic, Int32)
@@ -122,7 +124,6 @@ class StandarWidget(QWidget):
         self.decline_button.setEnabled(True)
         self.victimx.setEnabled(True)
         self.victimy.setEnabled(True)
-        self.victimz.setEnabled(True)
         self.sensorID.setEnabled(True)
         self.probability.setEnabled(True)
         self.setvictim_info()
@@ -136,7 +137,6 @@ class StandarWidget(QWidget):
         self.decline_button.setEnabled(False)
         self.victimx.setEnabled(False)
         self.victimy.setEnabled(False)
-        self.victimz.setEnabled(False)
         self.sensorID.setEnabled(False)
         self.probability.setEnabled(False)
         self.internal_grid.removeWidget(self.ProbabilityInfoWidget_)
@@ -147,7 +147,6 @@ class StandarWidget(QWidget):
 
         self.victimx.setText(" Victim X Position " + str(self.victim_info[0]))
         self.victimy.setText(" Victim Y Position " + str(self.victim_info[1]))
-        self.victimz.setText(" Victim Z Position " + str(self.victim_info[2]))
         sensors = ""
         for sensor in self.victim_info[4]:
             sensors = sensors+(sensor)+" "
@@ -281,19 +280,19 @@ class StandarWidget(QWidget):
         self.GuiStateClient_.transition_to_state(9)
 
     def yellow_arena_radio_button_clicked(self):
-
-        self.dynamic_reconfigure_client.update_configuration(
-            {"arenaType": 0})
+        if self.dynamic_reconfigure_client is not None:
+            self.dynamic_reconfigure_client.update_configuration(
+                {"arenaType": 0})
 
     def yellow_black_arena_radio_button_clicked(self):
-
-        self.dynamic_reconfigure_client.update_configuration(
-            {"arenaType": 1})
+        if self.dynamic_reconfigure_client is not None:
+            self.dynamic_reconfigure_client.update_configuration(
+                {"arenaType": 1})
 
     def mapping_mission_radio_button_clicked(self):
-
-        self.dynamic_reconfigure_client.update_configuration(
-            {"arenaType": 2})
+        if self.dynamic_reconfigure_client is not None:
+            self.dynamic_reconfigure_client.update_configuration(
+                {"arenaType": 2})
 
     #The _checkboxes slots
     def sonars_checked(self):

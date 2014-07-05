@@ -7,11 +7,11 @@ import rospy
 import actionlib
 from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIGoal
 
-
+validate_victim_service_name = '/gui/validate_victim'
 def victim_validation_client():
     # Creates the SimpleActionClient, passing the type of the action
 
-    client = actionlib.SimpleActionClient("victimValidation", ValidateVictimGUIAction)
+    client = actionlib.SimpleActionClient(validate_victim_service_name, ValidateVictimGUIAction)
 
     # Waits until the action server has started up and started
     # listening for goals.
