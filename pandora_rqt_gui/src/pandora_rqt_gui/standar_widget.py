@@ -16,6 +16,7 @@ from .victim_found_server import ValidateVictimActionServer
 from .probability_info import ProbabilityInfoWidget
 from .console import Console
 from .gui_state_client import GuiStateClient
+from .save_mission_client import SaveMissionClient
 
 world_model_info_topic = '/data_fusion/world_model'
 robocup_score_topic = 'data_fusion/robocup_score'
@@ -54,10 +55,13 @@ class StandarWidget(QWidget):
         # the ValidateVictimActionServer is used called when a victim is found
         self.ValidateVictimActionServer_ = ValidateVictimActionServer(
             validate_victim_service_name)
-         # dynamic_reconfigure client is used to change the parameters
+        # dynamic_reconfigure client is used to change the parameters
         #~ self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
 
         self.dynamic_reconfigure_client = None
+
+        #The SaveMissionClient is used to save the mission geotiff
+        self.SaveMissionClient = SaveMissionClient()
 
         #Subscribe the score the world_model_info and Info
         self.score_info = WidgetInfo(robocup_score_topic, Int32)
@@ -246,7 +250,8 @@ class StandarWidget(QWidget):
             self.console_show_options = True
 
     def save_geotiff_button_clicked(self):
-        pass
+            mission_name = self.mission_name_text.toPlainText()
+            self.SaveMissionClient.save_mission_client("ELEANA")
 
     def teleop_state_button_clicked(self):
         self.yellow_arena_radio_button.setEnabled(True)
