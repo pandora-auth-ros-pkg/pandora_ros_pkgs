@@ -774,7 +774,7 @@ namespace pandora_vision
 
       // Set the texture threshold to 0.9, or else all probabilities would be
       // equal to zero
-      Parameters::HoleFusion::mismatch_texture_threshold = 0.8;
+      Parameters::Filters::TextureDiff::mismatch_texture_threshold = 0.8;
 
       // Generate the histogram of walls
       cv::MatND histogram;

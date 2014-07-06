@@ -74,7 +74,7 @@ namespace pandora_vision
     // their respective validity probability that will be returned
     std::map<int, float> valid;
 
-    switch (Parameters::HoleFusion::validation_process)
+    switch (Parameters::HoleFusion::Validation::validation_process)
     {
       case VALIDATION_VIA_THRESHOLDING :
         {
@@ -167,152 +167,163 @@ namespace pandora_vision
       if (filteringMode == RGBD_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i] <
-            Parameters::HoleFusion::checker_color_homogeneity_threshold)
+            Parameters::Filters::ColourHomogeneity::rgbd_priority - 1][i] <
+            Parameters::Filters::ColourHomogeneity::rgbd_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+          sum +=
+            pow(2, Parameters::Filters::ColourHomogeneity::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+            Parameters::Filters::ColourHomogeneity::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Depth / area
-        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        if (Parameters::Filters::DepthArea::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_area - 1][i] <
-            Parameters::HoleFusion::checker_depth_area_threshold)
+            Parameters::Filters::DepthArea::priority - 1][i] <
+            Parameters::Filters::DepthArea::threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_area - 1)
+          sum +=
+            pow(2, Parameters::Filters::DepthArea::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_area - 1][i];
+            Parameters::Filters::DepthArea::priority - 1][i];
 
           exponent++;
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        if (Parameters::Filters::LuminosityDiff::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i] <
-            Parameters::HoleFusion::checker_luminosity_diff_threshold)
+            Parameters::Filters::LuminosityDiff::rgbd_priority - 1][i] <
+            Parameters::Filters::LuminosityDiff::rgbd_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+          sum +=
+            pow(2, Parameters::Filters::LuminosityDiff::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+            Parameters::Filters::LuminosityDiff::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Outline of rectangle plane constitution
-        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        if (Parameters::Filters::RectanglePlaneConstitution::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i] <
-            Parameters::HoleFusion::checker_outline_of_rectangle_threshold)
+            Parameters::Filters::RectanglePlaneConstitution::priority - 1][i] <
+            Parameters::Filters::RectanglePlaneConstitution::threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_outline_of_rectangle - 1)
+          sum +=
+            pow(2, Parameters::Filters::RectanglePlaneConstitution::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+            Parameters::Filters::RectanglePlaneConstitution::priority - 1][i];
 
           exponent++;
         }
 
         // Depth homogeneity
-        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+        if (Parameters::Filters::DepthHomogeneity::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i] <
-            Parameters::HoleFusion::checker_depth_homogeneity_threshold)
+            Parameters::Filters::DepthHomogeneity::priority - 1][i] <
+            Parameters::Filters::DepthHomogeneity::threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+          sum +=
+            pow(2, Parameters::Filters::DepthHomogeneity::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+            Parameters::Filters::DepthHomogeneity::priority - 1][i];
 
           exponent++;
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        if (Parameters::Filters::TextureBackprojection::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject - 1][i] <
-            Parameters::HoleFusion::checker_texture_backproject_threshold)
+            Parameters::Filters::TextureBackprojection::rgbd_priority - 1][i] <
+            Parameters::Filters::TextureBackprojection::rgbd_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject - 1)
+          sum +=
+            pow(2, Parameters::Filters::TextureBackprojection::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+            Parameters::Filters::TextureBackprojection::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Intermediate points plane constitution
-        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+        if (Parameters::Filters::IntermediatePointsPlaneConstitution::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i] <
-            Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold)
+            Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1][i] <
+            Parameters::Filters::IntermediatePointsPlaneConstitution::threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1)
+          sum +=
+            pow(2, Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+            Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1][i];
 
           exponent++;
         }
 
         // Depth diff
-        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+        if (Parameters::Filters::DepthDiff::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_diff - 1][i] <
-            Parameters::HoleFusion::checker_depth_diff_threshold)
+            Parameters::Filters::DepthDiff::priority - 1][i] <
+            Parameters::Filters::DepthDiff::threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_diff - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+          sum +=
+            pow(2, Parameters::Filters::DepthDiff::priority - 1)
+            * probabilitiesVector2D[
+            Parameters::Filters::DepthDiff::priority - 1][i];
 
           exponent++;
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        if (Parameters::Filters::TextureDiff::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff - 1][i] <
-            Parameters::HoleFusion::checker_texture_diff_threshold)
+            Parameters::Filters::TextureDiff::rgbd_priority - 1][i] <
+            Parameters::Filters::TextureDiff::rgbd_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+          sum +=
+            pow(2, Parameters::Filters::TextureDiff::rgbd_priority - 1)
+            * probabilitiesVector2D[
+            Parameters::Filters::TextureDiff::rgbd_priority - 1][i];
 
           exponent++;
         }
@@ -320,68 +331,73 @@ namespace pandora_vision
       else if (filteringMode == RGB_ONLY_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i] <
-            Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold)
+            Parameters::Filters::ColourHomogeneity::rgb_priority - 1][i] <
+            Parameters::Filters::ColourHomogeneity::rgb_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+          sum +=
+            pow(2, Parameters::Filters::ColourHomogeneity::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+            Parameters::Filters::ColourHomogeneity::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        if (Parameters::Filters::LuminosityDiff::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i] <
-            Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold)
+            Parameters::Filters::LuminosityDiff::rgb_priority - 1][i] <
+            Parameters::Filters::LuminosityDiff::rgb_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+          sum +=
+            pow(2, Parameters::Filters::LuminosityDiff::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+            Parameters::Filters::LuminosityDiff::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        if (Parameters::Filters::TextureBackprojection::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i] <
-            Parameters::HoleFusion::checker_texture_backproject_urgent_threshold)
+            Parameters::Filters::TextureBackprojection::rgb_priority - 1][i] <
+            Parameters::Filters::TextureBackprojection::rgb_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1)
+          sum +=
+            pow(2, Parameters::Filters::TextureBackprojection::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+            Parameters::Filters::TextureBackprojection::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        if (Parameters::Filters::TextureDiff::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i] <
-            Parameters::HoleFusion::checker_texture_diff_urgent_threshold)
+            Parameters::Filters::TextureDiff::rgb_priority - 1][i] <
+            Parameters::Filters::TextureDiff::rgb_threshold)
           {
             continue;
           }
 
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff_urgent - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
+          sum +=
+            pow(2, Parameters::Filters::TextureDiff::rgb_priority - 1)
+            * probabilitiesVector2D[
+            Parameters::Filters::TextureDiff::rgb_priority - 1][i];
 
           exponent++;
         }
@@ -400,11 +416,11 @@ namespace pandora_vision
 
       if (filteringMode == RGBD_MODE)
       {
-        threshold = Parameters::HoleFusion::holes_validity_threshold_normal;
+        threshold = Parameters::HoleFusion::Validation::rgbd_validity_threshold;
       }
       else if (filteringMode == RGB_ONLY_MODE)
       {
-        threshold = Parameters::HoleFusion::holes_validity_threshold_urgent;
+        threshold = Parameters::HoleFusion::Validation::rgb_validity_threshold;
       }
       else
       {
@@ -468,212 +484,212 @@ namespace pandora_vision
       if (filteringMode == RGBD_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i] <
-            Parameters::HoleFusion::checker_color_homogeneity_threshold)
+            Parameters::Filters::ColourHomogeneity::rgbd_priority - 1][i] <
+            Parameters::Filters::ColourHomogeneity::rgbd_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-              Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+              Parameters::Filters::ColourHomogeneity::rgbd_priority - 1][i];
           }
         }
 
         // Depth / area
-        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        if (Parameters::Filters::DepthArea::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_area - 1][i] <
-            Parameters::HoleFusion::checker_depth_area_threshold)
+            Parameters::Filters::DepthArea::priority - 1][i] <
+            Parameters::Filters::DepthArea::threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_area - 1][i];
+            Parameters::Filters::DepthArea::priority - 1][i];
           }
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        if (Parameters::Filters::LuminosityDiff::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i] <
-            Parameters::HoleFusion::checker_luminosity_diff_threshold)
+            Parameters::Filters::LuminosityDiff::rgbd_priority - 1][i] <
+            Parameters::Filters::LuminosityDiff::rgbd_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+            Parameters::Filters::LuminosityDiff::rgbd_priority - 1][i];
           }
         }
 
         // Outline of rectangle plane constitution
-        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        if (Parameters::Filters::RectanglePlaneConstitution::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i] <
-            Parameters::HoleFusion::checker_outline_of_rectangle_threshold)
+            Parameters::Filters::RectanglePlaneConstitution::priority - 1][i] <
+            Parameters::Filters::RectanglePlaneConstitution::threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+            Parameters::Filters::RectanglePlaneConstitution::priority - 1][i];
           }
         }
 
         // Depth homogeneity
-        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+        if (Parameters::Filters::DepthHomogeneity::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i] <
-            Parameters::HoleFusion::checker_depth_homogeneity_threshold)
+            Parameters::Filters::DepthHomogeneity::priority - 1][i] <
+            Parameters::Filters::DepthHomogeneity::threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+            Parameters::Filters::DepthHomogeneity::priority - 1][i];
           }
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        if (Parameters::Filters::TextureBackprojection::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject - 1][i] <
-            Parameters::HoleFusion::checker_texture_backproject_threshold)
+            Parameters::Filters::TextureBackprojection::rgbd_priority - 1][i] <
+            Parameters::Filters::TextureBackprojection::rgbd_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+            Parameters::Filters::TextureBackprojection::rgbd_priority - 1][i];
           }
         }
 
         // Intermediate points plane constitution
-        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+        if (Parameters::Filters::IntermediatePointsPlaneConstitution::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i] <
-            Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold)
+            Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1][i] <
+            Parameters::Filters::IntermediatePointsPlaneConstitution::threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+            Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1][i];
           }
         }
 
         // Depth diff
-        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+        if (Parameters::Filters::DepthDiff::priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_diff - 1][i] <
-            Parameters::HoleFusion::checker_depth_diff_threshold)
+            Parameters::Filters::DepthDiff::priority - 1][i] <
+            Parameters::Filters::DepthDiff::threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+            Parameters::Filters::DepthDiff::priority - 1][i];
           }
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        if (Parameters::Filters::TextureDiff::rgbd_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff - 1][i] <
-            Parameters::HoleFusion::checker_texture_diff_threshold)
+            Parameters::Filters::TextureDiff::rgbd_priority - 1][i] <
+            Parameters::Filters::TextureDiff::rgbd_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+            Parameters::Filters::TextureDiff::rgbd_priority - 1][i];
           }
         }
       }
       else if (filteringMode == RGB_ONLY_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i] <
-            Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold)
+            Parameters::Filters::ColourHomogeneity::rgb_priority - 1][i] <
+            Parameters::Filters::ColourHomogeneity::rgb_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+            Parameters::Filters::ColourHomogeneity::rgb_priority - 1][i];
           }
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        if (Parameters::Filters::LuminosityDiff::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i] <
-            Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold)
+            Parameters::Filters::LuminosityDiff::rgb_priority - 1][i] <
+            Parameters::Filters::LuminosityDiff::rgb_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+            Parameters::Filters::LuminosityDiff::rgb_priority- 1][i];
           }
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        if (Parameters::Filters::TextureBackprojection::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i] <
-            Parameters::HoleFusion::checker_texture_backproject_urgent_threshold)
+            Parameters::Filters::TextureBackprojection::rgb_priority- 1][i] <
+            Parameters::Filters::TextureBackprojection::rgb_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+            Parameters::Filters::TextureBackprojection::rgb_priority - 1][i];
           }
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        if (Parameters::Filters::TextureDiff::rgb_priority > 0)
         {
           if (probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i] <
-            Parameters::HoleFusion::checker_texture_diff_urgent_threshold)
+            Parameters::Filters::TextureDiff::rgb_priority - 1][i] <
+            Parameters::Filters::TextureDiff::rgb_threshold)
           {
             continue;
           }
           else
           {
             validityProbability += probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
+            Parameters::Filters::TextureDiff::rgb_priority - 1][i];
           }
         }
       }
@@ -746,89 +762,89 @@ namespace pandora_vision
       if (filteringMode == RGBD_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgbd_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+          sum += pow(2, Parameters::Filters::ColourHomogeneity::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity - 1][i];
+            Parameters::Filters::ColourHomogeneity::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Depth / area
-        if (Parameters::HoleFusion::run_checker_depth_area > 0)
+        if (Parameters::Filters::DepthArea::priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_area - 1)
+          sum += pow(2, Parameters::Filters::DepthArea::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_area - 1][i];
+            Parameters::Filters::DepthArea::priority - 1][i];
 
           exponent++;
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+        if (Parameters::Filters::LuminosityDiff::rgbd_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+          sum += pow(2, Parameters::Filters::LuminosityDiff::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff - 1][i];
+            Parameters::Filters::LuminosityDiff::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Outline of rectangle plane constitution
-        if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+        if (Parameters::Filters::RectanglePlaneConstitution::priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_outline_of_rectangle - 1)
+          sum += pow(2, Parameters::Filters::RectanglePlaneConstitution::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_outline_of_rectangle - 1][i];
+            Parameters::Filters::RectanglePlaneConstitution::priority - 1][i];
 
           exponent++;
         }
 
         // Depth homogeneity
-        if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+        if (Parameters::Filters::DepthHomogeneity::priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+          sum += pow(2, Parameters::Filters::DepthHomogeneity::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_depth_homogeneity - 1][i];
+            Parameters::Filters::DepthHomogeneity::priority - 1][i];
 
           exponent++;
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+        if (Parameters::Filters::TextureBackprojection::rgbd_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject - 1)
+          sum += pow(2, Parameters::Filters::TextureBackprojection::rgbd_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject - 1][i];
+            Parameters::Filters::TextureBackprojection::rgbd_priority - 1][i];
 
           exponent++;
         }
 
         // Intermediate points plane constitution
-        if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+        if (Parameters::Filters::IntermediatePointsPlaneConstitution::priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1)
+          sum += pow(2, Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1][i];
+            Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1][i];
 
           exponent++;
         }
 
         // Depth diff
-        if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+        if (Parameters::Filters::DepthDiff::priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_depth_diff - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_depth_diff - 1][i];
+          sum += pow(2, Parameters::Filters::DepthDiff::priority - 1)
+            * probabilitiesVector2D[Parameters::Filters::DepthDiff::priority - 1][i];
 
           exponent++;
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+        if (Parameters::Filters::TextureDiff::rgbd_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff - 1][i];
+          sum += pow(2, Parameters::Filters::TextureDiff::rgbd_priority - 1)
+            * probabilitiesVector2D[Parameters::Filters::TextureDiff::rgbd_priority - 1][i];
 
           exponent++;
         }
@@ -836,40 +852,40 @@ namespace pandora_vision
       else if (filteringMode == RGB_ONLY_MODE)
       {
         // Color homogeneity
-        if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+        if (Parameters::Filters::ColourHomogeneity::rgb_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+          sum += pow(2, Parameters::Filters::ColourHomogeneity::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1][i];
+            Parameters::Filters::ColourHomogeneity::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Luminosity diff
-        if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+        if (Parameters::Filters::LuminosityDiff::rgb_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+          sum += pow(2, Parameters::Filters::LuminosityDiff::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1][i];
+            Parameters::Filters::LuminosityDiff::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Texture backprojection
-        if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+        if (Parameters::Filters::TextureBackprojection::rgb_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1)
+          sum += pow(2, Parameters::Filters::TextureBackprojection::rgb_priority - 1)
             * probabilitiesVector2D[
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent - 1][i];
+            Parameters::Filters::TextureBackprojection::rgb_priority - 1][i];
 
           exponent++;
         }
 
         // Texture diff
-        if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+        if (Parameters::Filters::TextureDiff::rgb_priority > 0)
         {
-          sum += pow(2, Parameters::HoleFusion::run_checker_texture_diff_urgent - 1)
-            * probabilitiesVector2D[Parameters::HoleFusion::run_checker_texture_diff_urgent - 1][i];
+          sum += pow(2, Parameters::Filters::TextureDiff::rgb_priority - 1)
+            * probabilitiesVector2D[Parameters::Filters::TextureDiff::rgb_priority - 1][i];
 
           exponent++;
         }
@@ -888,11 +904,11 @@ namespace pandora_vision
 
       if (filteringMode == RGBD_MODE)
       {
-        threshold = Parameters::HoleFusion::holes_validity_threshold_normal;
+        threshold = Parameters::HoleFusion::Validation::rgbd_validity_threshold;
       }
       else if (filteringMode == RGB_ONLY_MODE)
       {
-        threshold = Parameters::HoleFusion::holes_validity_threshold_urgent;
+        threshold = Parameters::HoleFusion::Validation::rgb_validity_threshold;
       }
       else
       {

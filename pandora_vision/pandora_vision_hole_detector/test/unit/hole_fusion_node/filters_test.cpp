@@ -901,15 +901,15 @@ namespace pandora_vision
     // ------------------------------ RGBD_MODE --------------------------------
 
     // Set the order of the filters' execution in random
-    Parameters::HoleFusion::run_checker_depth_diff = 1;
-    Parameters::HoleFusion::run_checker_color_homogeneity = 2;
-    Parameters::HoleFusion::run_checker_outline_of_rectangle = 3;
-    Parameters::HoleFusion::run_checker_luminosity_diff = 4;
-    Parameters::HoleFusion::run_checker_depth_area = 5;
-    Parameters::HoleFusion::run_checker_depth_homogeneity = 6;
-    Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle = 7;
-    Parameters::HoleFusion::run_checker_texture_diff = 0;
-    Parameters::HoleFusion::run_checker_texture_backproject = 0;
+    Parameters::Filters::DepthDiff::priority = 1;
+    Parameters::Filters::ColourHomogeneity::rgbd_priority = 2;
+    Parameters::Filters::RectanglePlaneConstitution::priority = 3;
+    Parameters::Filters::LuminosityDiff::rgbd_priority = 4;
+    Parameters::Filters::DepthArea::priority = 5;
+    Parameters::Filters::DepthHomogeneity::priority = 6;
+    Parameters::Filters::IntermediatePointsPlaneConstitution::priority = 7;
+    Parameters::Filters::TextureDiff::rgbd_priority = 0;
+    Parameters::Filters::TextureBackprojection::rgbd_priority = 0;
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
@@ -944,7 +944,7 @@ namespace pandora_vision
     // Filter-wise
     for ( int f = 0; f < probabilitiesVector2D_0_RGBD_MODE.size(); f++ )
     {
-      if ( f == Parameters::HoleFusion::run_checker_depth_diff - 1 )
+      if ( f == Parameters::Filters::DepthDiff::priority - 1 )
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][1] );
@@ -953,7 +953,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_outline_of_rectangle - 1 )
+      if ( f == Parameters::Filters::RectanglePlaneConstitution::priority - 1 )
       {
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][0] );
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][1] );
@@ -962,7 +962,7 @@ namespace pandora_vision
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_depth_area - 1 )
+      if ( f == Parameters::Filters::DepthArea::priority - 1 )
       {
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][0] );
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][1] );
@@ -971,7 +971,7 @@ namespace pandora_vision
         EXPECT_EQ ( 1.0, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1 )
+      if ( f == Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1 )
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][1] );
@@ -980,7 +980,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+      if ( f == Parameters::Filters::DepthHomogeneity::priority - 1)
       {
         // The east and south edges of the lower right square are clipped
         EXPECT_NEAR ( 196 / 9996, probabilitiesVector2D_0_RGBD_MODE[f][0], 0.1 );
@@ -990,7 +990,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+      if ( f == Parameters::Filters::ColourHomogeneity::rgbd_priority - 1)
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGBD_MODE[f][1] );
@@ -999,7 +999,7 @@ namespace pandora_vision
         EXPECT_LT ( 0.8, probabilitiesVector2D_0_RGBD_MODE[f][4] );
       }
 
-      if (f == Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+      if (f == Parameters::Filters::LuminosityDiff::rgbd_priority - 1)
       {
         // All probabilities amount to zero: the size of each set inside the
         // intermediatePointsSetVector_0 vector is zero
@@ -1015,10 +1015,10 @@ namespace pandora_vision
     // ---------------------------- RGB_ONLY_MODE ------------------------------
 
     // Set the order of the filters' execution in random
-    Parameters::HoleFusion::run_checker_color_homogeneity_urgent = 2;
-    Parameters::HoleFusion::run_checker_luminosity_diff_urgent = 1;
-    Parameters::HoleFusion::run_checker_texture_diff_urgent = 0;
-    Parameters::HoleFusion::run_checker_texture_backproject_urgent = 0;
+    Parameters::Filters::ColourHomogeneity::rgb_priority = 2;
+    Parameters::Filters::LuminosityDiff::rgb_priority = 1;
+    Parameters::Filters::TextureDiff::rgb_priority = 0;
+    Parameters::Filters::TextureBackprojection::rgb_priority = 0;
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
@@ -1049,7 +1049,7 @@ namespace pandora_vision
     // Filter-wise
     for ( int f = 0; f < probabilitiesVector2D_0_RGB_ONLY_MODE.size(); f++ )
     {
-      if ( f == Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+      if ( f == Parameters::Filters::ColourHomogeneity::rgb_priority - 1)
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGB_ONLY_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_0_RGB_ONLY_MODE[f][1] );
@@ -1058,7 +1058,7 @@ namespace pandora_vision
         EXPECT_LT ( 0.8, probabilitiesVector2D_0_RGB_ONLY_MODE[f][4] );
       }
 
-      if (f == Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+      if (f == Parameters::Filters::LuminosityDiff::rgb_priority - 1)
       {
         // All probabilities amount to zero: the size of each set inside the
         // intermediatePointsSetVector_0 vector is zero
@@ -1121,15 +1121,15 @@ namespace pandora_vision
     // ------------------------------ RGBD_MODE --------------------------------
 
     // Set the order of the filters' execution in random
-    Parameters::HoleFusion::run_checker_depth_diff = 1;
-    Parameters::HoleFusion::run_checker_color_homogeneity = 2;
-    Parameters::HoleFusion::run_checker_outline_of_rectangle = 3;
-    Parameters::HoleFusion::run_checker_luminosity_diff = 4;
-    Parameters::HoleFusion::run_checker_depth_area = 5;
-    Parameters::HoleFusion::run_checker_depth_homogeneity = 6;
-    Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle = 7;
-    Parameters::HoleFusion::run_checker_texture_diff = 0;
-    Parameters::HoleFusion::run_checker_texture_backproject = 0;
+    Parameters::Filters::DepthDiff::priority = 1;
+    Parameters::Filters::ColourHomogeneity::rgbd_priority = 2;
+    Parameters::Filters::RectanglePlaneConstitution::priority = 3;
+    Parameters::Filters::LuminosityDiff::rgbd_priority = 4;
+    Parameters::Filters::DepthArea::priority = 5;
+    Parameters::Filters::DepthHomogeneity::priority = 6;
+    Parameters::Filters::IntermediatePointsPlaneConstitution::priority = 7;
+    Parameters::Filters::TextureDiff::rgbd_priority = 0;
+    Parameters::Filters::TextureBackprojection::rgbd_priority = 0;
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
@@ -1162,7 +1162,7 @@ namespace pandora_vision
     // Filter-wise
     for ( int f = 0; f < probabilitiesVector2D_10_RGBD_MODE.size(); f++ )
     {
-      if ( f == Parameters::HoleFusion::run_checker_depth_diff - 1 )
+      if ( f == Parameters::Filters::DepthDiff::priority - 1 )
       {
         EXPECT_LT ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][1] );
@@ -1171,7 +1171,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_outline_of_rectangle - 1 )
+      if ( f == Parameters::Filters::RectanglePlaneConstitution::priority - 1 )
       {
         EXPECT_EQ ( 1.0, probabilitiesVector2D_10_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][1] );
@@ -1180,7 +1180,7 @@ namespace pandora_vision
         EXPECT_EQ ( 1.0, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_depth_area - 1 )
+      if ( f == Parameters::Filters::DepthArea::priority - 1 )
       {
         EXPECT_EQ ( 1.0, probabilitiesVector2D_10_RGBD_MODE[f][0] );
         EXPECT_EQ ( 1.0, probabilitiesVector2D_10_RGBD_MODE[f][1] );
@@ -1189,7 +1189,7 @@ namespace pandora_vision
         EXPECT_EQ ( 1.0, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle - 1 )
+      if ( f == Parameters::Filters::IntermediatePointsPlaneConstitution::priority - 1 )
       {
         EXPECT_LT ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][1] );
@@ -1198,7 +1198,7 @@ namespace pandora_vision
         EXPECT_LT ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_depth_homogeneity - 1)
+      if ( f == Parameters::Filters::DepthHomogeneity::priority - 1)
       {
         // The east and south edges of the lower right square are clipped
         EXPECT_NEAR ( 196 / 9996, probabilitiesVector2D_10_RGBD_MODE[f][0], 0.1 );
@@ -1208,7 +1208,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if ( f == Parameters::HoleFusion::run_checker_color_homogeneity - 1)
+      if ( f == Parameters::Filters::ColourHomogeneity::rgbd_priority - 1)
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGBD_MODE[f][1] );
@@ -1217,7 +1217,7 @@ namespace pandora_vision
         EXPECT_LT ( 0.8, probabilitiesVector2D_10_RGBD_MODE[f][4] );
       }
 
-      if (f == Parameters::HoleFusion::run_checker_luminosity_diff - 1)
+      if (f == Parameters::Filters::LuminosityDiff::rgbd_priority - 1)
       {
         // All probabilities amount to zero: the size of each set inside the
         // intermediatePointsSetVector_0 vector is zero
@@ -1233,10 +1233,10 @@ namespace pandora_vision
     // ---------------------------- RGB_ONLY_MODE ------------------------------
 
     // Set the order of the filters' execution in random
-    Parameters::HoleFusion::run_checker_color_homogeneity_urgent = 2;
-    Parameters::HoleFusion::run_checker_luminosity_diff_urgent = 1;
-    Parameters::HoleFusion::run_checker_texture_diff_urgent = 0;
-    Parameters::HoleFusion::run_checker_texture_backproject_urgent = 0;
+    Parameters::Filters::ColourHomogeneity::rgb_priority = 2;
+    Parameters::Filters::LuminosityDiff::rgb_priority = 1;
+    Parameters::Filters::TextureDiff::rgb_priority = 0;
+    Parameters::Filters::TextureBackprojection::rgb_priority = 0;
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
@@ -1267,7 +1267,7 @@ namespace pandora_vision
     // Filter-wise
     for ( int f = 0; f < probabilitiesVector2D_10_RGB_ONLY_MODE.size(); f++ )
     {
-      if ( f == Parameters::HoleFusion::run_checker_color_homogeneity_urgent - 1)
+      if ( f == Parameters::Filters::ColourHomogeneity::rgb_priority - 1)
       {
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGB_ONLY_MODE[f][0] );
         EXPECT_EQ ( 0.0, probabilitiesVector2D_10_RGB_ONLY_MODE[f][1] );
@@ -1276,7 +1276,7 @@ namespace pandora_vision
         EXPECT_LT ( 0.8, probabilitiesVector2D_10_RGB_ONLY_MODE[f][4] );
       }
 
-      if (f == Parameters::HoleFusion::run_checker_luminosity_diff_urgent - 1)
+      if (f == Parameters::Filters::LuminosityDiff::rgb_priority - 1)
       {
         // All probabilities amount to zero: the size of each set inside the
         // intermediatePointsSetVector_0 vector is zero

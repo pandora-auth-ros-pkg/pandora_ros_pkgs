@@ -381,86 +381,86 @@ namespace pandora_vision
     // Active Depth and RGB filters will both be applied
     if (filteringMode == RGBD_MODE)
     {
-      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+      if (Parameters::Filters::ColourHomogeneity::rgbd_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_color_homogeneity] = 1;
+          Parameters::Filters::ColourHomogeneity::rgbd_priority] = 1;
       }
 
-      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+      if (Parameters::Filters::LuminosityDiff::rgbd_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_luminosity_diff] = 2;
+          Parameters::Filters::LuminosityDiff::rgbd_priority] = 2;
       }
 
-      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+      if (Parameters::Filters::TextureDiff::rgbd_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_texture_diff] = 3;
+          Parameters::Filters::TextureDiff::rgbd_priority] = 3;
       }
 
-      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+      if (Parameters::Filters::TextureBackprojection::rgbd_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_texture_backproject] = 4;
+          Parameters::Filters::TextureBackprojection::rgbd_priority] = 4;
       }
 
-      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+      if (Parameters::Filters::DepthDiff::priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_depth_diff] = 5;
+          Parameters::Filters::DepthDiff::priority] = 5;
       }
 
-      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+      if (Parameters::Filters::RectanglePlaneConstitution::priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_outline_of_rectangle] = 6;
+          Parameters::Filters::RectanglePlaneConstitution::priority] = 6;
       }
 
-      if (Parameters::HoleFusion::run_checker_depth_area > 0)
+      if (Parameters::Filters::DepthArea::priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_depth_area] = 7;
+          Parameters::Filters::DepthArea::priority] = 7;
       }
 
-      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+      if (Parameters::Filters::IntermediatePointsPlaneConstitution::priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle] = 8;
+          Parameters::Filters::IntermediatePointsPlaneConstitution::priority] = 8;
       }
 
-      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+      if (Parameters::Filters::DepthHomogeneity::priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_depth_homogeneity] = 9;
+          Parameters::Filters::DepthHomogeneity::priority] = 9;
       }
     }
     // Depth filtering cannot be applied, hence only RGB filters will
     // be utilized
     else if (filteringMode == RGB_ONLY_MODE)
     {
-      if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+      if (Parameters::Filters::ColourHomogeneity::rgb_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_color_homogeneity_urgent] = 1;
+          Parameters::Filters::ColourHomogeneity::rgb_priority] = 1;
       }
 
-      if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+      if (Parameters::Filters::LuminosityDiff::rgb_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_luminosity_diff_urgent] = 2;
+          Parameters::Filters::LuminosityDiff::rgb_priority] = 2;
       }
 
-      if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+      if (Parameters::Filters::TextureDiff::rgb_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_texture_diff_urgent] = 3;
+          Parameters::Filters::TextureDiff::rgb_priority] = 3;
       }
 
-      if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+      if (Parameters::Filters::TextureBackprojection::rgb_priority > 0)
       {
         filtersOrder[
-          Parameters::HoleFusion::run_checker_texture_backproject_urgent] = 4;
+          Parameters::Filters::TextureBackprojection::rgb_priority] = 4;
       }
     }
     else

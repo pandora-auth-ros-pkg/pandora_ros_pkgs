@@ -264,8 +264,8 @@ namespace pandora_vision
         // Probabilities threshold for merge acceptance.
         // In the assimilation operation, the temp conveyor unconditionally
         // replaces the original conveyor
-        if ((dd >= Parameters::HoleFusion::merger_depth_diff_threshold
-          && da >= Parameters::HoleFusion::merger_depth_area_threshold))
+        if ((dd >= Parameters::HoleFusion::Merger::depth_diff_threshold
+          && da >= Parameters::HoleFusion::Merger::depth_area_threshold))
         {
           // Since the tempHolesConveyor's ithHole has been positively tested,
           // the tempHolesConveyor is now the new rgbdHolesConveyor
@@ -988,7 +988,8 @@ namespace pandora_vision
     // outlines is greater than a distance thrshold,
     // this connectable is not a candidate to be connected with
     // the connector
-    if (minOutlinesDistance > Parameters::HoleFusion::connect_holes_min_distance)
+    if (minOutlinesDistance >
+      Parameters::HoleFusion::Merger::connect_holes_min_distance)
     {
       return false;
     }
@@ -997,7 +998,8 @@ namespace pandora_vision
     // outlines is greater than a distance thrshold,
     // this connectable is not a candidate to be connected with
     // the connector
-    if (maxOutlinesDistance > Parameters::HoleFusion::connect_holes_max_distance)
+    if (maxOutlinesDistance >
+      Parameters::HoleFusion::Merger::connect_holes_max_distance)
     {
       return false;
     }

@@ -179,24 +179,24 @@ namespace pandora_vision
       // that of the mean distance of the vertices of the candidate hole's
       // bounding box by at a minimum of depth_diff_cutoff_min_depth cm and at
       // maximum of depth_diff_cutoff_max_depth cm.
-      if (value > Parameters::HoleFusion::depth_diff_cutoff_min_depth
-        && value < Parameters::HoleFusion::depth_diff_cutoff_max_depth)
+      if (value > Parameters::Filters::DepthDiff::min_depth_cutoff
+        && value < Parameters::Filters::DepthDiff::max_depth_cutoff)
       {
         // The probability is binary. If there is a valid depth difference,
         // this hole is marked as valid.
-        if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 0)
+        if (Parameters::Filters::DepthDiff::probability_assignment_method == 0)
         {
           probabilitiesVector->at(inflatedRectanglesIndices[i]) = 1;
         }
         // The probability is gaussian-based. The validity of a hole is a
         // continuous function based on a normal distribution
-        else if (Parameters::HoleFusion::depth_difference_probability_assignment_method == 1)
+        else if (Parameters::Filters::DepthDiff::probability_assignment_method == 1)
         {
           // The gaussian mean
-          float m = Parameters::HoleFusion::holes_gaussian_mean;
+          float m = Parameters::Filters::DepthDiff::gaussian_mean;
 
           // The gaussian standard deviation
-          float s = Parameters::HoleFusion::holes_gaussian_stddev;
+          float s = Parameters::Filters::DepthDiff::gaussian_stddev;
 
           // The gaussian probability of this hole being valid
           probabilitiesVector->at(inflatedRectanglesIndices[i]) =

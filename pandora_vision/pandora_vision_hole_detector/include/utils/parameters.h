@@ -45,7 +45,7 @@
 #include <pandora_vision_hole_detector/rgb_cfgConfig.h>
 #include <pandora_vision_hole_detector/hole_fusion_cfgConfig.h>
 #include <pandora_vision_hole_detector/debug_cfgConfig.h>
-#include <pandora_vision_hole_detector/filters_order_cfgConfig.h>
+#include <pandora_vision_hole_detector/filters_priority_cfgConfig.h>
 #include <pandora_vision_hole_detector/filters_thresholds_cfgConfig.h>
 #include <pandora_vision_hole_detector/general_cfgConfig.h>
 #include <pandora_vision_hole_detector/validity_cfgConfig.h>
@@ -66,18 +66,18 @@ namespace pandora_vision
     //! Blob detection - specific parameters
     struct Blob
     {
-      static int blob_min_threshold;
-      static int blob_max_threshold;
-      static int blob_threshold_step;
-      static int blob_min_area;
-      static int blob_max_area;
-      static double blob_min_convexity;
-      static double blob_max_convexity;
-      static double blob_min_inertia_ratio;
-      static double blob_max_circularity;
-      static double blob_min_circularity;
-      static bool blob_filter_by_color;
-      static bool blob_filter_by_circularity;
+      static int min_threshold;
+      static int max_threshold;
+      static int threshold_step;
+      static int min_area;
+      static int max_area;
+      static double min_convexity;
+      static double max_convexity;
+      static double min_inertia_ratio;
+      static double max_circularity;
+      static double min_circularity;
+      static bool filter_by_color;
+      static bool filter_by_circularity;
     };
 
 
@@ -85,6 +85,29 @@ namespace pandora_vision
     //! Debug-specific parameters
     struct Debug
     {
+      // Show the depth image that arrives in the depth node
+      static bool show_depth_image;
+
+      // Show the rgb image that arrives in the rgb node
+      static bool show_rgb_image;
+
+      // Show the holes that each of the depth and RGB nodes transmit to the
+      // hole fusion node, on top of their respective origin images
+      static bool show_respective_holes;
+
+      // Show all valid holes, from either the Depth or RGB source, or
+      // the merges between them
+      static bool show_valid_holes;
+
+      // The product of this package: unique, valid holes
+      static bool show_final_holes;
+
+      // In the terminal's window, show the probabilities of candidate holes
+      static bool show_probabilities;
+
+      // Show the texture's watersheded backprojection
+      static bool show_texture;
+
       static bool show_find_holes;
       static int show_find_holes_size;
 
@@ -113,9 +136,6 @@ namespace pandora_vision
     //! Parameters specific to the Depth node
     struct Depth
     {
-      // Show the depth image that arrives in the depth node
-      static bool show_depth_image;
-
       // The interpolation method for noise removal
       // 0 for averaging the pixel's neighbor values
       // 1 for brushfire near
@@ -134,9 +154,6 @@ namespace pandora_vision
       static int canny_low_threshold;
       static int canny_blur_noise_kernel_size;
 
-      static float contrast_enhance_alpha;
-      static float contrast_enhance_beta;
-
       // The opencv edge detection method:
       // 0 for the Canny edge detector
       // 1 for the Scharr edge detector
@@ -154,6 +171,117 @@ namespace pandora_vision
       // 1 for the Scharr edge detector,
       // 2 for the Sobel edge detector
       static int mixed_edges_toggle_switch;
+    };
+
+
+
+    //! Parameters specific to the execution of filters
+    struct Filters
+    {
+      //! Parameters specific to the execution of the
+      //! DepthDiff filter
+      struct DepthDiff
+      {
+        static int priority;
+        static float threshold;
+
+        // 0 for binary probability assignment on positive depth difference
+        // 1 for gaussian probability assignment on positive depth difference
+        static int probability_assignment_method;
+
+        // The mean stardard deviation for the normal distribution
+        // incorporated in the depth diff filter.
+        static float gaussian_mean;
+        static float gaussian_stddev;
+
+        // Min difference in depth between the inside and the outside of a hole
+        static float min_depth_cutoff;
+
+        // Max difference in depth between the inside and the outside of a hole
+        static float max_depth_cutoff;
+      };
+
+      //! Parameters specific to the execution of the
+      //! DepthArea filter
+      struct DepthArea
+      {
+        static int priority;
+        static float threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! DepthHomogeneity filter
+      struct DepthHomogeneity
+      {
+        static int priority;
+        static float threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! RectanglePlaneConstitution filter
+      struct RectanglePlaneConstitution
+      {
+        static int priority;
+        static float threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! IntermediatePointsPlaneConstitution filter
+      struct IntermediatePointsPlaneConstitution
+      {
+        static int priority;
+        static float threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! ColourHomogeneity filter
+      struct ColourHomogeneity
+      {
+        static int rgbd_priority;
+        static int rgb_priority;
+
+        static float rgbd_threshold;
+        static float rgb_threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! LuminosityDiff filter
+      struct LuminosityDiff
+      {
+        static int rgbd_priority;
+        static int rgb_priority;
+
+        static float rgbd_threshold;
+        static float rgb_threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! TextureDiff filter
+      struct TextureDiff
+      {
+        static int rgbd_priority;
+        static int rgb_priority;
+
+        static float rgbd_threshold;
+        static float rgb_threshold;
+
+        // The threshold for texture matching
+        static float match_texture_threshold;
+
+        // The threshold for texture mismatching
+        static float mismatch_texture_threshold;
+      };
+
+      //! Parameters specific to the execution of the
+      //! TextureBackprojection filter
+      struct TextureBackprojection
+      {
+        static int rgbd_priority;
+        static int rgb_priority;
+
+        static float rgbd_threshold;
+        static float rgb_threshold;
+      };
 
     };
 
@@ -173,125 +301,43 @@ namespace pandora_vision
     //! Parameters specific to the Hole Fusion node
     struct HoleFusion
     {
-      // Show the holes that each of the depth and RGB nodes transmit to the
-      // hole fusion node, on top of their respective origin images
-      static bool show_respective_holes;
+      //! Parameters specific to the validation of candidate holes
+      struct Validation
+      {
+        // The holes' validation process identifier
+        static int validation_process;
 
-      // Show all valid holes, from either the Depth or RGB source, or
-      // the merges between them
-      static bool show_valid_holes;
+        // Normal : when depth analysis is applicable
+        static float rgbd_validity_threshold;
 
-      // The product of this package: unique, valid holes
-      static bool show_final_holes;
+        // Urgent : when depth analysis is not applicable, we can only rely
+        // on RGB analysis
+        static float rgb_validity_threshold;
+      };
 
+      //! Parameters specific to detection of planes
+      struct Planes
+      {
+        static float filter_leaf_size;
+        static int max_iterations;
+        static double num_points_to_exclude;
+        static double point_to_plane_distance_threshold;
+      };
 
-      // Hole checkers and their thresholds`
-      static int run_checker_depth_diff;
-      static float checker_depth_diff_threshold;
+      //! Parameters specific to the merging of holes
+      struct Merger
+      {
+        // Holes connection - merger
+        static float connect_holes_min_distance;
+        static float connect_holes_max_distance;
 
-      static int run_checker_depth_area;
-      static float checker_depth_area_threshold;
+        // Merger parameters
+        static float depth_diff_threshold;
+        static float depth_area_threshold;
+      };
 
-      static int run_checker_brushfire_outline_to_rectangle;
-      static float checker_brushfire_outline_to_rectangle_threshold;
-
-      static int run_checker_outline_of_rectangle;
-      static float checker_outline_of_rectangle_threshold;
-
-      static int run_checker_depth_homogeneity;
-      static float checker_depth_homogeneity_threshold;
-
+      // The inflation size of holes' bounding rectangles.
       static int rectangle_inflation_size;
-
-
-      static int run_checker_color_homogeneity;
-      static float checker_color_homogeneity_threshold;
-
-      static int run_checker_color_homogeneity_urgent;
-      static float checker_color_homogeneity_urgent_threshold;
-
-      static int run_checker_luminosity_diff;
-      static float checker_luminosity_diff_threshold;
-
-      static int run_checker_luminosity_diff_urgent;
-      static float checker_luminosity_diff_urgent_threshold;
-
-      static int run_checker_texture_diff;
-      static float checker_texture_diff_threshold;
-
-      static int run_checker_texture_diff_urgent;
-      static float checker_texture_diff_urgent_threshold;
-
-      static int run_checker_texture_backproject;
-      static float checker_texture_backproject_threshold;
-
-      static int run_checker_texture_backproject_urgent;
-      static float checker_texture_backproject_urgent_threshold;
-
-      // In the terminal window, show the probabilities of candidate holes
-      static bool show_probabilities;
-
-      // Show the texture's watersheded backprojection
-      static bool show_texture;
-
-      // The holes' validation process identifier
-      static int validation_process;
-
-      // Depth diff parameters
-
-      // 0 for binary probability assignment on positive depth difference
-      // 1 for gaussian probability assignment on positive depth difference
-      static int depth_difference_probability_assignment_method;
-
-      static float holes_gaussian_mean;
-      static float holes_gaussian_stddev;
-
-      // Min difference in depth between the inside and the outside of a hole
-      static float depth_diff_cutoff_min_depth;
-
-      // Max difference in depth between the inside and the outside of a hole
-      static float depth_diff_cutoff_max_depth;
-
-      // Plane detection
-      static float filter_leaf_size;
-      static int max_iterations;
-      static double num_points_to_exclude;
-      static double point_to_plane_distance_threshold;
-
-      // Holes connection - merger
-      static float connect_holes_min_distance;
-      static float connect_holes_max_distance;
-
-      // Texture parameters
-      // The threshold for texture matching
-      static float match_texture_threshold;
-
-      // The threshold for texture mismatching
-      static float mismatch_texture_threshold;
-
-      // Color homogeneity parameters
-      static int num_bins_threshold;
-      static int non_zero_points_in_box_blob_histogram;
-
-      // Merger parameters
-      static float merger_depth_diff_threshold;
-      static float merger_depth_area_threshold;
-
-      // Holes validity thresholds
-
-      // Normal : when depth analysis is applicable
-      static float holes_validity_threshold_normal;
-
-      // Urgent : when depth analysis is not applicable, we can only rely
-      // on RGB analysis
-      static float holes_validity_threshold_urgent;
-
-      // The depth sensor's horizontal field of view
-      static float horizontal_field_of_view;
-
-      // The depth sensor's vertical field of view
-      static float vertical_field_of_view;
-
     };
 
 
@@ -299,6 +345,12 @@ namespace pandora_vision
     //! Image representation specific parameters
     struct Image
     {
+      // The depth sensor's horizontal field of view
+      static float horizontal_field_of_view;
+
+      // The depth sensor's vertical field of view
+      static float vertical_field_of_view;
+
       // Fallback values. See the input point cloud callback of the
       // synchronizer node
       static int HEIGHT;
@@ -336,7 +388,6 @@ namespace pandora_vision
       // Loose ends connection parameters
       static int AB_to_MO_ratio;
       static int minimum_curve_points;
-
     };
 
 
@@ -344,9 +395,6 @@ namespace pandora_vision
     //! Parameters specific to the RGB node
     struct Rgb
     {
-      // Show the rgb image that arrives in the rgb node
-      static bool show_rgb_image;
-
       // Selects the method for extracting a RGB image's edges.
       // Choices are via segmentation and via backprojection
       static int edges_extraction_method;
@@ -372,7 +420,6 @@ namespace pandora_vision
       static int watershed_foreground_erosion_factor;
       static int watershed_background_dilation_factor;
       static int watershed_background_erosion_factor;
-
     };
 
   };

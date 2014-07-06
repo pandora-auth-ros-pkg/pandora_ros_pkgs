@@ -108,7 +108,7 @@ namespace pandora_vision
       sensor_msgs::image_encodings::TYPE_32FC1);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::Depth::show_depth_image)
+    if (Parameters::Debug::show_depth_image)
     {
       Visualization::showScaled("Depth image", depthImage, 1);
     }
@@ -237,46 +237,50 @@ namespace pandora_vision
 
     //////////////////// Blob detection - specific parameters //////////////////
 
-    Parameters::Blob::blob_min_threshold =
-      config.blob_min_threshold;
-    Parameters::Blob::blob_max_threshold =
-      config.blob_max_threshold;
-    Parameters::Blob::blob_threshold_step =
-      config.blob_threshold_step;
+    Parameters::Blob::min_threshold =
+      config.min_threshold;
+    Parameters::Blob::max_threshold =
+      config.max_threshold;
+    Parameters::Blob::threshold_step =
+      config.threshold_step;
 
     if (Parameters::Image::image_representation_method == 0)
     {
-      Parameters::Blob::blob_min_area =
-        config.blob_min_area;
-      Parameters::Blob::blob_max_area =
-        config.blob_max_area;
+      Parameters::Blob::min_area =
+        config.min_area;
+      Parameters::Blob::max_area =
+        config.max_area;
     }
     // In wavelet mode, the image shrinks by a factor of 4
     else if (Parameters::Image::image_representation_method == 1)
     {
-      Parameters::Blob::blob_min_area =
-        static_cast<int>(config.blob_min_area / 4);
-      Parameters::Blob::blob_max_area =
-        static_cast<int>(config.blob_max_area / 4);
+      Parameters::Blob::min_area =
+        static_cast<int>(config.min_area / 4);
+      Parameters::Blob::max_area =
+        static_cast<int>(config.max_area / 4);
     }
 
-    Parameters::Blob::blob_min_convexity =
-      config.blob_min_convexity;
-    Parameters::Blob::blob_max_convexity =
-      config.blob_max_convexity;
-    Parameters::Blob::blob_min_inertia_ratio =
-      config.blob_min_inertia_ratio;
-    Parameters::Blob::blob_max_circularity =
-      config.blob_max_circularity;
-    Parameters::Blob::blob_min_circularity =
-      config.blob_min_circularity;
-    Parameters::Blob::blob_filter_by_color =
-      config.blob_filter_by_color;
-    Parameters::Blob::blob_filter_by_circularity =
-      config.blob_filter_by_circularity;
+    Parameters::Blob::min_convexity =
+      config.min_convexity;
+    Parameters::Blob::max_convexity =
+      config.max_convexity;
+    Parameters::Blob::min_inertia_ratio =
+      config.min_inertia_ratio;
+    Parameters::Blob::max_circularity =
+      config.max_circularity;
+    Parameters::Blob::min_circularity =
+      config.min_circularity;
+    Parameters::Blob::filter_by_color =
+      config.filter_by_color;
+    Parameters::Blob::filter_by_circularity =
+      config.filter_by_circularity;
 
 
     ////////////////////////////// Debug parameters ////////////////////////////
+
+    // Show the depth image that arrives in the depth node
+    Parameters::Debug::show_depth_image =
+     config.show_depth_image;
 
     Parameters::Debug::show_find_holes =
       config.show_find_holes;
@@ -299,13 +303,6 @@ namespace pandora_vision
       config.show_get_shapes_clear_border_size;
 
 
-    /////////////////// Parameters specific to the Depth node //////////////////
-
-    // Show the depth image that arrives in the depth node
-    Parameters::Depth::show_depth_image =
-     config.show_depth_image;
-
-
     //------------------- Edge detection specific parameters -------------------
 
     // Canny parameters
@@ -317,11 +314,6 @@ namespace pandora_vision
       config.canny_low_threshold;
     Parameters::Edge::canny_blur_noise_kernel_size =
       config.canny_blur_noise_kernel_size;
-
-    Parameters::Edge::contrast_enhance_alpha =
-      config.contrast_enhance_alpha;
-    Parameters::Edge::contrast_enhance_beta =
-      config.contrast_enhance_beta;
 
     Parameters::Edge::edge_detection_method =
       config.edge_detection_method;

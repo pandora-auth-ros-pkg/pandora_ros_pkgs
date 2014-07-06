@@ -112,7 +112,7 @@ namespace pandora_vision
       sensor_msgs::image_encodings::BGR8);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::Rgb::show_rgb_image)
+    if (Parameters::Debug::show_rgb_image)
     {
       Visualization::show("RGB image", rgbImage, 1);
     }
@@ -220,56 +220,60 @@ namespace pandora_vision
 
     //////////////////// Blob detection - specific parameters //////////////////
 
-    Parameters::Blob::blob_min_threshold =
-      config.blob_min_threshold;
+    Parameters::Blob::min_threshold =
+      config.min_threshold;
 
-    Parameters::Blob::blob_max_threshold =
-      config.blob_max_threshold;
+    Parameters::Blob::max_threshold =
+      config.max_threshold;
 
-    Parameters::Blob::blob_threshold_step =
-      config.blob_threshold_step;
+    Parameters::Blob::threshold_step =
+      config.threshold_step;
 
     // In wavelet mode, the image shrinks by a factor of 4
     if (Parameters::Image::image_representation_method == 0)
     {
-      Parameters::Blob::blob_min_area =
-        config.blob_min_area;
+      Parameters::Blob::min_area =
+        config.min_area;
 
-      Parameters::Blob::blob_max_area =
-        config.blob_max_area;
+      Parameters::Blob::max_area =
+        config.max_area;
     }
     else if (Parameters::Image::image_representation_method == 1)
     {
-      Parameters::Blob::blob_min_area =
-        static_cast<int>(config.blob_min_area / 4);
+      Parameters::Blob::min_area =
+        static_cast<int>(config.min_area / 4);
 
-      Parameters::Blob::blob_max_area =
-        static_cast<int>(config.blob_max_area / 4);
+      Parameters::Blob::max_area =
+        static_cast<int>(config.max_area / 4);
     }
 
-    Parameters::Blob::blob_min_convexity =
-      config.blob_min_convexity;
+    Parameters::Blob::min_convexity =
+      config.min_convexity;
 
-    Parameters::Blob::blob_max_convexity =
-      config.blob_max_convexity;
+    Parameters::Blob::max_convexity =
+      config.max_convexity;
 
-    Parameters::Blob::blob_min_inertia_ratio =
-      config.blob_min_inertia_ratio;
+    Parameters::Blob::min_inertia_ratio =
+      config.min_inertia_ratio;
 
-    Parameters::Blob::blob_max_circularity =
-      config.blob_max_circularity;
+    Parameters::Blob::max_circularity =
+      config.max_circularity;
 
-    Parameters::Blob::blob_min_circularity =
-      config.blob_min_circularity;
+    Parameters::Blob::min_circularity =
+      config.min_circularity;
 
-    Parameters::Blob::blob_filter_by_color =
-      config.blob_filter_by_color;
+    Parameters::Blob::filter_by_color =
+      config.filter_by_color;
 
-    Parameters::Blob::blob_filter_by_circularity =
-      config.blob_filter_by_circularity;
+    Parameters::Blob::filter_by_circularity =
+      config.filter_by_circularity;
 
 
     ////////////////////////////// Debug parameters ////////////////////////////
+
+    // Show the rgb image that arrives in the rgb node
+    Parameters::Debug::show_rgb_image =
+      config.show_rgb_image;
 
     Parameters::Debug::show_find_holes =
       config.show_find_holes;
@@ -299,9 +303,6 @@ namespace pandora_vision
 
     //////////////////// Parameters specific to the RGB node ///////////////////
 
-    // Show the rgb image that arrives in the rgb node
-    Parameters::Rgb::show_rgb_image =
-      config.show_rgb_image;
 
     //------------------- Edge detection specific parameters -------------------
 
@@ -329,12 +330,6 @@ namespace pandora_vision
 
     Parameters::Edge::canny_blur_noise_kernel_size =
       config.canny_blur_noise_kernel_size;
-
-    Parameters::Edge::contrast_enhance_beta =
-      config.contrast_enhance_beta;
-
-    Parameters::Edge::contrast_enhance_alpha =
-      config.contrast_enhance_alpha;
 
 
     //------------- Parameters needed for histogram calculation ----------------

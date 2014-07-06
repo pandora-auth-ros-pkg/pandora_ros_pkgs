@@ -112,14 +112,14 @@ namespace pandora_vision
     {
       // The depth diff filter requires only the contruction of the vectors
       // that have to do with the inflation of holes' rectangles
-      if (Parameters::HoleFusion::run_checker_depth_diff > 0)
+      if (Parameters::Filters::DepthDiff::priority > 0)
       {
         enable_inflatedRectanglesVectorAndIndices = true;
       }
 
       // The depth/area filter requires only the construction of sets that
       // hold the indices of points inside holes' outlines
-      if (Parameters::HoleFusion::run_checker_depth_area > 0)
+      if (Parameters::Filters::DepthArea::priority > 0)
       {
         enable_holesMasksSetVector = true;
       }
@@ -128,7 +128,7 @@ namespace pandora_vision
       // the construction of vectors pertaining to holes' inflation and
       // and a vector of sets of indices of points between holes' outline and
       // their respective (inflated) bounding rectangle
-      if (Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle > 0)
+      if (Parameters::Filters::IntermediatePointsPlaneConstitution::priority > 0)
       {
         enable_intermediatePointsSetVector = true;
         enable_inflatedRectanglesVectorAndIndices = true;
@@ -136,21 +136,21 @@ namespace pandora_vision
 
       // The outline of rectangle plane constitution filter requires
       // the construction of vectors pertaining to holes' inflation
-      if (Parameters::HoleFusion::run_checker_outline_of_rectangle > 0)
+      if (Parameters::Filters::RectanglePlaneConstitution::priority > 0)
       {
         enable_inflatedRectanglesVectorAndIndices = true;
       }
 
       // The depth homogeneity filter requires the construction of sets of
       // points' indices; these points are the ones inside holes' outlines
-      if (Parameters::HoleFusion::run_checker_depth_homogeneity > 0)
+      if (Parameters::Filters::DepthHomogeneity::priority > 0)
       {
         enable_holesMasksSetVector = true;
       }
 
       // The color homogeneity filter requires a vector of holes' masks
       // that will be used to extract their histograms
-      if (Parameters::HoleFusion::run_checker_color_homogeneity > 0)
+      if (Parameters::Filters::ColourHomogeneity::rgbd_priority > 0)
       {
         enable_holesMasksImageVector = true;
       }
@@ -161,7 +161,7 @@ namespace pandora_vision
       // but inside its (inflated) bounding rectangle
       // and the inflated rectangles and indices of the respective
       // valid keypoints
-      if (Parameters::HoleFusion::run_checker_luminosity_diff > 0)
+      if (Parameters::Filters::LuminosityDiff::rgbd_priority > 0)
       {
         enable_holesMasksSetVector = true;
         enable_intermediatePointsSetVector = true;
@@ -175,7 +175,7 @@ namespace pandora_vision
       // as it checks for texture metrics difference between the
       // histograms of the points inside a hole's outline and outside
       // the hole's outline but inside its (inflated) bounding rectangle
-      if (Parameters::HoleFusion::run_checker_texture_diff > 0)
+      if (Parameters::Filters::TextureDiff::rgbd_priority > 0)
       {
         enable_holesMasksImageVector = true;
         enable_intermediatePointsImageVector = true;
@@ -186,7 +186,7 @@ namespace pandora_vision
       // the indices of points inside holes' outlines and the indices of points
       // outside holes' outlines but inside their (inflated) bounding rectangle.
       // Hence, we also need the construction of inflated rectangles' vectors
-      if (Parameters::HoleFusion::run_checker_texture_backproject > 0)
+      if (Parameters::Filters::TextureBackprojection::rgbd_priority > 0)
       {
         enable_holesMasksSetVector = true;
         enable_intermediatePointsSetVector = true;
@@ -200,7 +200,7 @@ namespace pandora_vision
     {
       // The color homogeneity filter requires a vector of holes' masks
       // that will be used to extract their histograms
-      if (Parameters::HoleFusion::run_checker_color_homogeneity_urgent > 0)
+      if (Parameters::Filters::ColourHomogeneity::rgb_priority > 0)
       {
         enable_holesMasksImageVector = true;
       }
@@ -211,7 +211,7 @@ namespace pandora_vision
       // but inside its (inflated) bounding rectangle
       // and the inflated rectangles and indices of the respective
       // valid keypoints
-      if (Parameters::HoleFusion::run_checker_luminosity_diff_urgent > 0)
+      if (Parameters::Filters::LuminosityDiff::rgb_priority > 0)
       {
         enable_holesMasksSetVector = true;
         enable_intermediatePointsSetVector = true;
@@ -225,7 +225,7 @@ namespace pandora_vision
       // as it checks for texture metrics difference between the
       // histograms of the points inside a hole's outline and outside
       // the hole's outline but inside its (inflated) bounding rectangle
-      if (Parameters::HoleFusion::run_checker_texture_diff_urgent > 0)
+      if (Parameters::Filters::TextureDiff::rgb_priority > 0)
       {
         enable_holesMasksImageVector = true;
         enable_intermediatePointsImageVector = true;
@@ -236,7 +236,7 @@ namespace pandora_vision
       // the indices of points inside holes' outlines and the indices of points
       // outside holes' outlines but inside their (inflated) bounding rectangle.
       // Hence, we also need the construction of inflated rectangles' vectors
-      if (Parameters::HoleFusion::run_checker_texture_backproject_urgent > 0)
+      if (Parameters::Filters::TextureBackprojection::rgb_priority > 0)
       {
         enable_holesMasksSetVector = true;
         enable_intermediatePointsSetVector = true;
@@ -808,7 +808,7 @@ namespace pandora_vision
       // to obtain the points inside it
       cv::floodFill(holeOutlineFilledImage, seedPoint, cv::Scalar(255));
 
-      // Take a pointer on the mask image
+      // Take a pointer on the hole's mask image
       unsigned char* ptr = holeOutlineFilledImage.ptr();
 
       // The points with non-zero value are the ones inside the i-th hole.
@@ -852,7 +852,7 @@ namespace pandora_vision
       // to obtain the points inside it
       cv::floodFill(rectangleOutlineFilledImage, seedPoint, cv::Scalar(255));
 
-      // Take a pointer on the mask image
+      // Take a pointer on the rectangle's mask image
       ptr = rectangleOutlineFilledImage.ptr();
 
       // The points with non-zero value are the ones inside the i-th hole.

@@ -39,7 +39,7 @@ generate_dynamic_reconfigure_options(
   cfg/depth_node_cfg/depth_cfg.cfg
   cfg/hole_fusion_node_cfg/hole_fusion_cfg.cfg
   cfg/hole_fusion_node_cfg/debug_cfg.cfg
-  cfg/hole_fusion_node_cfg/filters_order_cfg.cfg
+  cfg/hole_fusion_node_cfg/filters_priority_cfg.cfg
   cfg/hole_fusion_node_cfg/filters_thresholds_cfg.cfg
   cfg/hole_fusion_node_cfg/general_cfg.cfg
   cfg/hole_fusion_node_cfg/validity_cfg.cfg

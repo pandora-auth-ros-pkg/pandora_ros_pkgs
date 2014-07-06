@@ -88,8 +88,8 @@ namespace pandora_vision
       // The ROS nodehandle needed by the debug_cfg
       ros::NodeHandle debugNodeHandle_;
 
-      // The ROS nodehandle needed by the filters_order_cfg
-      ros::NodeHandle filtersOrderNodeHandle_;
+      // The ROS nodehandle needed by the filters_priority_cfg
+      ros::NodeHandle filtersPriorityNodeHandle_;
 
       // The ROS nodehandle needed by the filters_thresholds_cfg
       ros::NodeHandle filtersThresholdsNodeHandle_;
@@ -237,14 +237,14 @@ namespace pandora_vision
         debug_cfgConfig>::CallbackType f_debug;
 
 
-      // The dynamic reconfigure server for parameters pertaining to the order
-      // of filters
+      // The dynamic reconfigure server for parameters pertaining to the
+      // prioriority of filters' execution
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
-        filters_order_cfgConfig> serverFiltersOrder;
+        filters_priority_cfgConfig> serverFiltersPriority;
 
       // The dynamic reconfigure callback type for the above server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::
-        filters_order_cfgConfig>::CallbackType f_filters_order;
+        filters_priority_cfgConfig>::CallbackType f_filters_priority;
 
 
       // The dynamic reconfigure server for parameters pertaining to
@@ -391,12 +391,12 @@ namespace pandora_vision
         @brief The function called when a parameter regarding the order
         of filters is changed
         @param[in] config
-        [const pandora_vision_hole_detector::filters_order_cfgConfig&]
+        [const pandora_vision_hole_detector::filters_priority_cfgConfig&]
         @param[in] level [const uint32_t]
         @return void
        **/
-      void parametersCallbackFiltersOrder(
-        const pandora_vision_hole_detector::filters_order_cfgConfig& config,
+      void parametersCallbackFiltersPriority(
+        const pandora_vision_hole_detector::filters_priority_cfgConfig& config,
         const uint32_t& level);
 
       /**

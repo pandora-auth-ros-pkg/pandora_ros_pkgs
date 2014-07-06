@@ -503,8 +503,8 @@ namespace pandora_vision
     HolesConveyorUtils::replace( originConveyor, &conveyor );
 
     // Modify the connection parameters
-    Parameters::HoleFusion::connect_holes_min_distance = 3;
-    Parameters::HoleFusion::connect_holes_max_distance = 20;
+    Parameters::HoleFusion::Merger::connect_holes_min_distance = 3;
+    Parameters::HoleFusion::Merger::connect_holes_max_distance = 20;
 
     HoleMerger::applyMergeOperation(
       &conveyor,
@@ -595,8 +595,8 @@ namespace pandora_vision
 
 
     // Apply preposterous thresholds
-    Parameters::HoleFusion::merger_depth_diff_threshold = 1.0;
-    Parameters::HoleFusion::merger_depth_area_threshold = 1.0;
+    Parameters::HoleFusion::Merger::depth_diff_threshold = 1.0;
+    Parameters::HoleFusion::Merger::depth_area_threshold = 1.0;
 
     // Restore conveyor to its original state
     HolesConveyorUtils::replace( originConveyor, &conveyor );
@@ -899,8 +899,8 @@ namespace pandora_vision
       &holesMasksSetVector );
 
     // Modify the connection parameters
-    Parameters::HoleFusion::connect_holes_min_distance = 3;
-    Parameters::HoleFusion::connect_holes_max_distance = 20;
+    Parameters::HoleFusion::Merger::connect_holes_min_distance = 3;
+    Parameters::HoleFusion::Merger::connect_holes_max_distance = 20;
 
     for ( int i = 1; i < conveyor.size(); i++ )
     {
@@ -927,8 +927,8 @@ namespace pandora_vision
     // Modify the connection parameters so as to test that not only distance
     // plays a role. There has to be mutual exclusion regarding the points
     // inside each hole too
-    Parameters::HoleFusion::connect_holes_min_distance = 10;
-    Parameters::HoleFusion::connect_holes_max_distance = 100;
+    Parameters::HoleFusion::Merger::connect_holes_min_distance = 10;
+    Parameters::HoleFusion::Merger::connect_holes_max_distance = 100;
 
     for ( int i = 1; i < conveyor.size(); i++ )
     {
@@ -955,8 +955,8 @@ namespace pandora_vision
     // Modify the connection parameters so as to test that not only distance
     // plays a role. There has to be mutual exclusion regarding the points
     // inside each hole too
-    Parameters::HoleFusion::connect_holes_min_distance = 100;
-    Parameters::HoleFusion::connect_holes_max_distance = 10;
+    Parameters::HoleFusion::Merger::connect_holes_min_distance = 100;
+    Parameters::HoleFusion::Merger::connect_holes_max_distance = 10;
 
     for ( int i = 1; i < conveyor.size(); i++ )
     {
@@ -975,8 +975,8 @@ namespace pandora_vision
     }
 
     // Default the connection parameters
-    Parameters::HoleFusion::connect_holes_min_distance = 3;
-    Parameters::HoleFusion::connect_holes_max_distance = 20;
+    Parameters::HoleFusion::Merger::connect_holes_min_distance = 3;
+    Parameters::HoleFusion::Merger::connect_holes_max_distance = 20;
   }
 
 
@@ -1029,8 +1029,8 @@ namespace pandora_vision
     int interpolationMethod = 0;
 
     // Apply reasonable thresholds
-    Parameters::HoleFusion::merger_depth_diff_threshold = 0.4;
-    Parameters::HoleFusion::merger_depth_area_threshold = 0.8;
+    Parameters::HoleFusion::Merger::depth_diff_threshold = 0.4;
+    Parameters::HoleFusion::Merger::depth_area_threshold = 0.8;
 
     // Restore conveyor to its original state
     //HolesConveyorUtils::replace( originConveyor, &conveyor );

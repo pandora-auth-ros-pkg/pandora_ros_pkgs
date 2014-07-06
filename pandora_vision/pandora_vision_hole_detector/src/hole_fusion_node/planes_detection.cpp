@@ -62,7 +62,7 @@ namespace pandora_vision
     pcl::VoxelGrid <pcl::PointXYZ> sor;
     sor.setInputCloud (cloudIn);
 
-    float leafSize = Parameters::HoleFusion::filter_leaf_size;
+    float leafSize = Parameters::HoleFusion::Planes::filter_leaf_size;
     sor.setLeafSize (leafSize, leafSize, leafSize);
     sor.filter (*cloudOut);
 
@@ -162,12 +162,12 @@ namespace pandora_vision
     // Mandatory
     seg.setModelType (pcl::SACMODEL_PLANE);
     seg.setMethodType (pcl::SAC_RANSAC);
-    seg.setMaxIterations (Parameters::HoleFusion::max_iterations);
+    seg.setMaxIterations (Parameters::HoleFusion::Planes::max_iterations);
 
     // Maybe a value needs to be set dynamically here, depending on
     // the distance of the kinect to the plane.
     seg.setDistanceThreshold(
-      Parameters::HoleFusion::point_to_plane_distance_threshold);
+      Parameters::HoleFusion::Planes::point_to_plane_distance_threshold);
 
     // Copy the input cloud to a point cloud that we will be processing
     PointCloudXYZPtr pointCloudProcessed (new PointCloudXYZ);
@@ -179,7 +179,7 @@ namespace pandora_vision
     // While 100 x num_points_to_exclude % of the original
     // cloud is still there
     while (pointCloudProcessed->points.size() >
-      Parameters::HoleFusion::num_points_to_exclude * nr_points)
+      Parameters::HoleFusion::Planes::num_points_to_exclude * nr_points)
     {
       // The plane's coefficients
       pcl::ModelCoefficients coefficients;

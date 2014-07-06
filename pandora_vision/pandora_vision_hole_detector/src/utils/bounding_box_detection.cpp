@@ -73,7 +73,7 @@ namespace pandora_vision
     {
       // The area of the blob should be greater than a threshold,
       // so that tiny formations of pixels are not identified as blobs
-      if(blobsArea[i] >= Parameters::Blob::blob_min_area)
+      if(blobsArea[i] >= Parameters::Blob::min_area)
       {
         minRect.push_back(minAreaRect(cv::Mat(blobsOutlineVector[i])));
       }

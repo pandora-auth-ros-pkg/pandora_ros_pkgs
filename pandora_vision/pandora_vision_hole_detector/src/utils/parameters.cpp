@@ -43,23 +43,47 @@
  **/
 namespace pandora_vision
 {
-  // Blob detection - specific parameters
-  int Parameters::Blob::blob_min_threshold = 0;
-  int Parameters::Blob::blob_max_threshold = 1255;
-  int Parameters::Blob::blob_threshold_step = 5;
-  int Parameters::Blob::blob_min_area = 550;
-  int Parameters::Blob::blob_max_area = 300000;
-  double Parameters::Blob::blob_min_convexity = 0;
-  double Parameters::Blob::blob_max_convexity = 100;
-  double Parameters::Blob::blob_min_inertia_ratio = 0;
-  double Parameters::Blob::blob_max_circularity = 1.0;
-  double Parameters::Blob::blob_min_circularity = 0.3;
-  bool Parameters::Blob::blob_filter_by_color = 0;
-  bool Parameters::Blob::blob_filter_by_circularity = 1;
+  //////////////////// Blob detection - specific parameters ////////////////////
+
+  int Parameters::Blob::min_threshold = 0;
+  int Parameters::Blob::max_threshold = 1255;
+  int Parameters::Blob::threshold_step = 5;
+  int Parameters::Blob::min_area = 550;
+  int Parameters::Blob::max_area = 300000;
+  double Parameters::Blob::min_convexity = 0;
+  double Parameters::Blob::max_convexity = 100;
+  double Parameters::Blob::min_inertia_ratio = 0;
+  double Parameters::Blob::max_circularity = 1.0;
+  double Parameters::Blob::min_circularity = 0.3;
+  bool Parameters::Blob::filter_by_color = 0;
+  bool Parameters::Blob::filter_by_circularity = 1;
 
 
+  ///////////////////////// Debug-specific parameters //////////////////////////
 
-  // Debug-specific parameters
+  // Show the depth image that arrives in the depth node
+  bool Parameters::Debug::show_depth_image = false;
+
+  // Show the rgb image that arrives in the rgb node
+  bool Parameters::Debug::show_rgb_image = false;
+
+  // Show the holes that each of the depth and RGB nodes transmit to the
+  // hole fusion node, on top of their respective origin images
+  bool Parameters::Debug::show_respective_holes = false;
+
+  // Show all valid holes, from either the Depth or RGB source, or
+  // the merges between them
+  bool Parameters::Debug::show_valid_holes = false;
+
+  // The product of this package: unique, valid holes
+  bool Parameters::Debug::show_final_holes = false;
+
+  // In the terminal's window, show the probabilities of candidate holes
+  bool Parameters::Debug::show_probabilities = false;
+
+  // Show the texture's watersheded backprojection
+  bool Parameters::Debug::show_texture = false;
+
   bool Parameters::Debug::show_find_holes = false;
   int Parameters::Debug::show_find_holes_size = 1000;
 
@@ -83,11 +107,7 @@ namespace pandora_vision
   int Parameters::Debug::show_merge_holes_size = 1200;
 
 
-
-  // Parameters specific to the Depth node
-
-  // Show the depth image that arrives in the depth node
-  bool Parameters::Depth::show_depth_image = false;
+  /////////////////// Parameters specific to the Depth node ////////////////////
 
   // The interpolation method for noise removal
   // 0 for averaging the pixel's neighbor values
@@ -96,17 +116,13 @@ namespace pandora_vision
   int Parameters::Depth::interpolation_method = 0;
 
 
-
-  // Edge detection specific parameters
+  ///////////////////// Edge detection specific parameters /////////////////////
 
   // canny parameters
   int Parameters::Edge::canny_ratio = 3;
   int Parameters::Edge::canny_kernel_size = 3;
   int Parameters::Edge::canny_low_threshold = 50;
   int Parameters::Edge::canny_blur_noise_kernel_size = 3;
-
-  float Parameters::Edge::contrast_enhance_alpha = 2;
-  float Parameters::Edge::contrast_enhance_beta = 2;
 
   // The opencv edge detection method:
   // 0 for the Canny edge detector
@@ -127,8 +143,8 @@ namespace pandora_vision
   int Parameters::Edge::mixed_edges_toggle_switch = 1;
 
 
+  ///////////////////////  Histogram related parameters ////////////////////////
 
-  // Histogram related parameters
   int Parameters::Histogram::number_of_hue_bins = 30;
   int Parameters::Histogram::number_of_saturation_bins = 32;
   int Parameters::Histogram::number_of_value_bins = 32;
@@ -136,130 +152,123 @@ namespace pandora_vision
 
 
 
-  // HoleFusion-specific parameters
+  ////////////////////////// Filters-related parameters ////////////////////////
 
-  // Show the holes that each of the depth and RGB nodes transmit to the
-  // hole fusion node, on top of their respective origin images
-  bool Parameters::HoleFusion::show_respective_holes = false;
-
-  // Show all valid holes, from either the Depth or RGB source, or
-  // the merges between them
-  bool Parameters::HoleFusion::show_valid_holes = false;
-
-  // The product of this package: unique, valid holes
-  bool Parameters::HoleFusion::show_final_holes = false;
-
-
-  // Hole checkers and their thresholds`
-  int Parameters::HoleFusion::run_checker_depth_diff = 5;
-  float Parameters::HoleFusion::checker_depth_diff_threshold = 0.7;
-
-  int Parameters::HoleFusion::run_checker_depth_area = 6;
-  float Parameters::HoleFusion::checker_depth_area_threshold = 0.8;
-
-  int Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle = 7;
-  float Parameters::HoleFusion::checker_brushfire_outline_to_rectangle_threshold = 0.75;
-
-  int Parameters::HoleFusion::run_checker_outline_of_rectangle = 8;
-  float Parameters::HoleFusion::checker_outline_of_rectangle_threshold = 0.75;
-
-  int Parameters::HoleFusion::run_checker_depth_homogeneity = 9;
-  float Parameters::HoleFusion::checker_depth_homogeneity_threshold = 0.2;
-
-  int Parameters::HoleFusion::rectangle_inflation_size = 20;
-
-
-  int Parameters::HoleFusion::run_checker_color_homogeneity = 1;
-  float Parameters::HoleFusion::checker_color_homogeneity_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_color_homogeneity_urgent = 1;
-  float Parameters::HoleFusion::checker_color_homogeneity_urgent_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_luminosity_diff = 2;
-  float Parameters::HoleFusion::checker_luminosity_diff_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_luminosity_diff_urgent = 2;
-  float Parameters::HoleFusion::checker_luminosity_diff_urgent_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_texture_diff = 3;
-  float Parameters::HoleFusion::checker_texture_diff_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_texture_diff_urgent = 3;
-  float Parameters::HoleFusion::checker_texture_diff_urgent_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_texture_backproject = 4;
-  float Parameters::HoleFusion::checker_texture_backproject_threshold = 0.4;
-
-  int Parameters::HoleFusion::run_checker_texture_backproject_urgent = 4;
-  float Parameters::HoleFusion::checker_texture_backproject_urgent_threshold = 0.4;
-
-
-  // In the terminal window, show the probabilities of candidate holes
-  bool Parameters::HoleFusion::show_probabilities = false;
-
-  // Show the texture's watersheded backprojection
-  bool Parameters::HoleFusion::show_texture = false;
-
-  // The holes' validation process identifier
-  int Parameters::HoleFusion::validation_process = 0;
-
-  // Depth diff parameters
+  // DepthDiff
+  int Parameters::Filters::DepthDiff::priority = 5;
+  float Parameters::Filters::DepthDiff::threshold = 0.7;
 
   // 0 for binary probability assignment on positive depth difference
   // 1 for gaussian probability assignment on positive depth difference
-  int Parameters::HoleFusion::depth_difference_probability_assignment_method = 1;
+  int Parameters::Filters::DepthDiff::probability_assignment_method = 1;
 
-  float Parameters::HoleFusion::holes_gaussian_mean = 0.15;
-  float Parameters::HoleFusion::holes_gaussian_stddev = 0.2;
+  // The mean stardard deviation for the normal distribution
+  // incorporated in the depth diff filter.
+  float Parameters::Filters::DepthDiff::gaussian_mean = 0.15;
+
+  float Parameters::Filters::DepthDiff::gaussian_stddev = 0.2;
 
   // Min difference in depth between the inside and the outside of a hole
-  float Parameters::HoleFusion::depth_diff_cutoff_min_depth = 0.02;
+  float Parameters::Filters::DepthDiff::min_depth_cutoff = 0.02;
 
   // Max difference in depth between the inside and the outside of a hole
-  float Parameters::HoleFusion::depth_diff_cutoff_max_depth = 0.5;
+  float Parameters::Filters::DepthDiff::max_depth_cutoff = 0.5;
+
+
+  // DepthArea
+  int Parameters::Filters::DepthArea::priority = 5;
+  float Parameters::Filters::DepthArea::threshold = 0.7;
+
+  // DepthHomogeneity
+  int Parameters::Filters::DepthHomogeneity::priority = 5;
+  float Parameters::Filters::DepthHomogeneity::threshold = 0.7;
+
+  // RectanglePlaneConstitution
+  int Parameters::Filters::RectanglePlaneConstitution::priority = 5;
+  float Parameters::Filters::RectanglePlaneConstitution::threshold = 0.7;
+
+  // IntermediatePointsPlaneConstitution
+  int Parameters::Filters::IntermediatePointsPlaneConstitution::priority = 5;
+  float Parameters::Filters::IntermediatePointsPlaneConstitution::threshold = 0.7;
+
+  // ColourHomogeneity
+  int Parameters::Filters::ColourHomogeneity::rgbd_priority = 5;
+  int Parameters::Filters::ColourHomogeneity::rgb_priority = 5;
+
+  float Parameters::Filters::ColourHomogeneity::rgbd_threshold = 0.7;
+  float Parameters::Filters::ColourHomogeneity::rgb_threshold = 0.7;
+
+  // LuminosityDiff
+  int Parameters::Filters::LuminosityDiff::rgbd_priority = 5;
+  int Parameters::Filters::LuminosityDiff::rgb_priority = 5;
+
+  float Parameters::Filters::LuminosityDiff::rgbd_threshold = 0.7;
+  float Parameters::Filters::LuminosityDiff::rgb_threshold = 0.7;
+
+  // TextureDiff
+  int Parameters::Filters::TextureDiff::rgbd_priority = 5;
+  int Parameters::Filters::TextureDiff::rgb_priority = 5;
+
+  float Parameters::Filters::TextureDiff::rgbd_threshold = 0.7;
+  float Parameters::Filters::TextureDiff::rgb_threshold = 0.7;
+
+  // The threshold for texture matching regarding the intermediate points
+  float Parameters::Filters::TextureDiff::match_texture_threshold = 0.85;
+
+  // The threshold for texture matching reagrding the points inside the hole
+  float Parameters::Filters::TextureDiff::mismatch_texture_threshold = 0.8;
+
+  // TextureBackprojection
+  int Parameters::Filters::TextureBackprojection::rgbd_priority = 5;
+  int Parameters::Filters::TextureBackprojection::rgb_priority = 5;
+
+  float Parameters::Filters::TextureBackprojection::rgbd_threshold = 0.7;
+  float Parameters::Filters::TextureBackprojection::rgb_threshold = 0.7;
+
+
+  /////////////////////// HoleFusion-specific parameters ///////////////////////
+
+  //-------------------------------- Validation --------------------------------
+
+  // The holes' validation process identifier
+  int Parameters::HoleFusion::Validation::validation_process = 0;
+
+  // When depth analysis is applicable
+  float Parameters::HoleFusion::Validation::rgbd_validity_threshold= 0.54;
+
+  // When depth analysis is not applicable, we can only rely
+  // on RGB analysis
+  float Parameters::HoleFusion::Validation::rgb_validity_threshold = 0.40;
 
 
   // Plane detection parameters
-  float Parameters::HoleFusion::filter_leaf_size = 0.1;
-  int Parameters::HoleFusion::max_iterations = 1000;
-  double Parameters::HoleFusion::num_points_to_exclude = 0.2;
-  double Parameters::HoleFusion::point_to_plane_distance_threshold = 0.08;
+  float Parameters::HoleFusion::Planes::filter_leaf_size = 0.1;
+  int Parameters::HoleFusion::Planes::max_iterations = 1000;
+  double Parameters::HoleFusion::Planes::num_points_to_exclude = 0.2;
+  double Parameters::HoleFusion::Planes::point_to_plane_distance_threshold = 0.08;
 
   // Holes connection - merger
-  float Parameters::HoleFusion::connect_holes_min_distance = 0.1;
-  float Parameters::HoleFusion::connect_holes_max_distance = 0.2;
-
-  // The threshold for texture matching
-  float Parameters::HoleFusion::match_texture_threshold = 0.85;
-  float Parameters::HoleFusion::mismatch_texture_threshold = 0.8;
-
-  // Color homogeneity parameters
-  int Parameters::HoleFusion::num_bins_threshold = 10;
-  int Parameters::HoleFusion::non_zero_points_in_box_blob_histogram = 0;
+  float Parameters::HoleFusion::Merger::connect_holes_min_distance = 0.1;
+  float Parameters::HoleFusion::Merger::connect_holes_max_distance = 0.2;
 
   // Merger parameters
-  float Parameters::HoleFusion::merger_depth_diff_threshold = 0.3;
-  float Parameters::HoleFusion::merger_depth_area_threshold = 1.0;
+  float Parameters::HoleFusion::Merger::depth_diff_threshold = 0.3;
+  float Parameters::HoleFusion::Merger::depth_area_threshold = 1.0;
 
-  // Holes validity thresholds
-  // Normal : when depth analysis is applicable
-  float Parameters::HoleFusion::holes_validity_threshold_normal = 0.94;
+  // The inflation size of holes' bounding rectangles
+  int Parameters::HoleFusion::rectangle_inflation_size = 10;
 
-  // Urgent : when depth analysis is not applicable, we can only rely
-  // on RGB analysis
-  float Parameters::HoleFusion::holes_validity_threshold_urgent = 0.70;
+
+
+  ////////////////// Image representation specific parameters //////////////////
 
   // The depth sensor's horizontal field of view in rads
-  float Parameters::HoleFusion::horizontal_field_of_view =
+  float Parameters::Image::horizontal_field_of_view =
     static_cast<float>(58) / 180 * M_PI;
 
   // The depth sensor's vertical field of view in rads
-  float Parameters::HoleFusion::vertical_field_of_view =
+  float Parameters::Image::vertical_field_of_view =
     static_cast<float>(45) / 180 * M_PI;
-
-
-
-  // Image representation specific parameters
 
   // Fallback values. See the input point cloud callback of the
   // synchronizer node
@@ -279,7 +288,7 @@ namespace pandora_vision
   double Parameters::Image::term_criteria_max_epsilon = 1;
 
 
-  // Outline discovery specific parameters
+  /////////////////// Outline discovery specific parameters ////////////////////
 
   // The detection method used to obtain the outline of a blob
   // 0 for detecting by means of brushfire
@@ -297,11 +306,7 @@ namespace pandora_vision
   int Parameters::Outline::minimum_curve_points = 50;
 
 
-  // Parameters specific to the RGB node
-
-  // Show the rgb image that arrives in the rgb node
-  bool Parameters::Rgb::show_rgb_image = false;
-
+  //////////////////// Parameters specific to the RGB node /////////////////////
 
   // RGB image segmentation parameters
 

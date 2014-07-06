@@ -309,7 +309,7 @@ namespace pandora_vision
       &watersheded);
 
     #ifdef DEBUG_SHOW
-    if (Parameters::HoleFusion::show_texture)
+    if (Parameters::Debug::show_texture)
     {
       Visualization::show("Texture: watersheded backprojection",
         watersheded, 1);
@@ -484,7 +484,7 @@ namespace pandora_vision
       // CAUTION: The use of the CV_COMP_HELLINGER for histogram comparison
       // inverts the inequality checks
       if (blobToModelCorrelation >=
-        Parameters::HoleFusion::mismatch_texture_threshold &&
+        Parameters::Filters::TextureDiff::mismatch_texture_threshold &&
         rectangleToModelCorrelation < blobToModelCorrelation)
       {
         probabilitiesVector->at(rectanglesIndices[i]) =

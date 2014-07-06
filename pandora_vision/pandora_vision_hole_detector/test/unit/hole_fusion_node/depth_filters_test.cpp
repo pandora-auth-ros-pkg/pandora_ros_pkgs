@@ -368,7 +368,7 @@ namespace pandora_vision
 
     for ( int p = 0; p < 2; p++ )
     {
-      Parameters::HoleFusion::depth_difference_probability_assignment_method = p;
+      Parameters::Filters::DepthDiff::probability_assignment_method = p;
 
       // Needed vectors by the DepthFilters::checkHolesDepthDiff method
       std::vector<float> probabilitiesVector_0( 3, 0.0 );
@@ -445,7 +445,7 @@ namespace pandora_vision
 
     for ( int p = 0; p < 2; p++ )
     {
-      Parameters::HoleFusion::depth_difference_probability_assignment_method = p;
+      Parameters::Filters::DepthDiff::probability_assignment_method = p;
 
       // Needed vectors by the DepthFilters::checkHolesDepthDiff method
       std::vector< float > probabilitiesVector_8( 3, 0.0 );

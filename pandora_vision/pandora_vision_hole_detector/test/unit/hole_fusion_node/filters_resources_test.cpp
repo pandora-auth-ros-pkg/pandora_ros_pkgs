@@ -201,39 +201,39 @@ namespace pandora_vision
 
     for ( int a = 0; a < 2; a++ )
     {
-      Parameters::HoleFusion::run_checker_color_homogeneity = a;
+      Parameters::Filters::ColourHomogeneity::rgbd_priority = a;
 
       for ( int b = 0; b < 2; b++ )
       {
-        Parameters::HoleFusion::run_checker_luminosity_diff = b;
+        Parameters::Filters::LuminosityDiff::rgbd_priority = b;
 
         for ( int c = 0; c < 2; c++ )
         {
-          Parameters::HoleFusion::run_checker_texture_diff = c;
+          Parameters::Filters::TextureDiff::rgbd_priority = c;
 
           for ( int d = 0; d < 2; d++ )
           {
-            Parameters::HoleFusion::run_checker_texture_backproject = d;
+            Parameters::Filters::TextureBackprojection::rgbd_priority = d;
 
             for ( int e = 0; e < 2; e++ )
             {
-              Parameters::HoleFusion::run_checker_depth_diff = e;
+              Parameters::Filters::DepthDiff::priority = e;
 
               for ( int f = 0; f < 2; f++ )
               {
-                Parameters::HoleFusion::run_checker_depth_area = f;
+                Parameters::Filters::DepthArea::priority = f;
 
                 for ( int g = 0; g < 2; g++ )
                 {
-                  Parameters::HoleFusion::run_checker_brushfire_outline_to_rectangle = g;
+                  Parameters::Filters::IntermediatePointsPlaneConstitution::priority = g;
 
                   for ( int h = 0; h < 2; h++ )
                   {
-                    Parameters::HoleFusion::run_checker_outline_of_rectangle = h;
+                    Parameters::Filters::RectanglePlaneConstitution::priority = h;
 
                     for ( int i = 0; i < 2; i++ )
                     {
-                      Parameters::HoleFusion::run_checker_depth_homogeneity = i;
+                      Parameters::Filters::DepthHomogeneity::priority = i;
 
                       // Run FiltersResources::createCheckerRequiredVectors
                       FiltersResources::createCheckerRequiredVectors(
@@ -421,19 +421,19 @@ namespace pandora_vision
 
     for ( int a = 0; a < 2; a++ )
     {
-      Parameters::HoleFusion::run_checker_color_homogeneity_urgent = a;
+      Parameters::Filters::ColourHomogeneity::rgb_priority = a;
 
       for ( int b = 0; b < 2; b++ )
       {
-        Parameters::HoleFusion::run_checker_luminosity_diff_urgent = b;
+        Parameters::Filters::LuminosityDiff::rgb_priority = b;
 
         for ( int c = 0; c < 2; c++ )
         {
-          Parameters::HoleFusion::run_checker_texture_diff_urgent = c;
+          Parameters::Filters::TextureDiff::rgb_priority = c;
 
           for ( int d = 0; d < 2; d++ )
           {
-            Parameters::HoleFusion::run_checker_texture_backproject_urgent = d;
+            Parameters::Filters::TextureBackprojection::rgb_priority = d;
 
             // Run FiltersResources::createCheckerRequiredVectors
             FiltersResources::createCheckerRequiredVectors(
