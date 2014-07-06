@@ -186,7 +186,8 @@ namespace pandora_vision
       * (prediction - VictimParameters::depth_svm_prob_translation) );
     //~ Normalize probability to [0,1]
     probability = (1 + probability) / 2.0;
-    ROS_INFO_STREAM("SVM DEPTH pred/prob :" << prediction <<" "<<probability);
+    if(probability > 0)
+      ROS_INFO_STREAM("SVM DEPTH pred/prob :" << prediction <<" "<<probability);
     return probability;
   }
 }// namespace pandora_vision 

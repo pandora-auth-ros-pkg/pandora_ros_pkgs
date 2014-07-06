@@ -156,7 +156,8 @@ namespace pandora_vision
     cv::Mat samples_mat = vectorToMat(_rgbFeatureVector);
     
     ///Normalize the data from [-1,1]
-    cv::normalize(samples_mat, samples_mat, -1.0, 1.0, cv::NORM_MINMAX, -1);    
+    cv::normalize(samples_mat, samples_mat, -1.0, 1.0, cv::NORM_MINMAX, -1); 
+    ROS_INFO_STREAM("RGB_SVM class label :" << _rgbSvm.predict(samples_mat, false));   
     return _rgbSvm.predict(samples_mat, true);
   }
   
@@ -186,12 +187,16 @@ namespace pandora_vision
   float RgbSystemValidator::predictionToProbability(float prediction)
   {
     float probability;
+    
+    if(prediction < 0)
+      prediction = fabs(prediction);
+      
     //~ Normalize probability to [-1,1]
     probability = tanh(VictimParameters::rgb_svm_prob_scaling * 
-      (abs(prediction) - VictimParameters::rgb_svm_prob_translation) );
+      prediction - VictimParameters::rgb_svm_prob_translation);
     //~ Normalize probability to [0,1]
     probability = (1 + probability) / 2.0;
-    ROS_INFO_STREAM("SVM RGB pred/prob :" << abs(prediction) <<" "<<probability);
+    ROS_INFO_STREAM("SVM RGB pred/prob :" << prediction <<" "<<probability);
     return probability;
   }
 }// namespace pandora_vision 

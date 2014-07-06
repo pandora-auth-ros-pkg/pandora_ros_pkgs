@@ -331,31 +331,33 @@ namespace pandora_vision
     //!< Message alert creation
     for(int i = 0;  i < final_victims.size() ; i++)
     {
-      
-      float x = final_victims[i].keypoint.x
-        - static_cast<float>(VictimParameters::frameWidth) / 2;
-      float y = static_cast<float>(VictimParameters::frameHeight) / 2
-        - final_victims[i].keypoint.y;
-          
-      //!< Create message of Victim Detector
-      pandora_common_msgs::GeneralAlertMsg victimMessage;
-                                      
-      victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
-      
-      victimMessage.header.stamp = victimFrameTimestamp;
-      
-      victimMessage.yaw = 
-        atan(2 * x / VictimParameters::frameWidth 
-          * tan(VictimParameters::hfov / 2));
-      
-      victimMessage.pitch = 
-        atan(2 * y / VictimParameters::frameHeight 
-          * tan(VictimParameters::vfov / 2));
-          
-      victimMessage.probability = final_victims[i].probability;
-      
-      _victimDirectionPublisher.publish(victimMessage);
-      
+      if( final_victims[i].probability > 0.0001)
+      {
+       
+        float x = final_victims[i].keypoint.x
+          - static_cast<float>(VictimParameters::frameWidth) / 2;
+        float y = static_cast<float>(VictimParameters::frameHeight) / 2
+          - final_victims[i].keypoint.y;
+            
+        //!< Create message of Victim Detector
+        pandora_common_msgs::GeneralAlertMsg victimMessage;
+                                        
+        victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
+        
+        victimMessage.header.stamp = victimFrameTimestamp;
+        
+        victimMessage.yaw = 
+          atan(2 * x / VictimParameters::frameWidth 
+            * tan(VictimParameters::hfov / 2));
+        
+        victimMessage.pitch = 
+          atan(2 * y / VictimParameters::frameHeight 
+            * tan(VictimParameters::vfov / 2));
+            
+        victimMessage.probability = final_victims[i].probability;
+        
+        _victimDirectionPublisher.publish(victimMessage);
+      }
       //!< Debug purposes
       if(VictimParameters::debug_img || VictimParameters::debug_img_publisher)
       {
@@ -483,7 +485,7 @@ namespace pandora_vision
       }
       {
         std::ostringstream convert;
-        convert << "DEPTH_RGB_SVM : "<< depth_svm_keypoints.size();
+        convert << "DEPTH_SVM : "<< depth_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
           cvPoint(10,80),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
