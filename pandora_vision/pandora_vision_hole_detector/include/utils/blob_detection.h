@@ -55,52 +55,6 @@ namespace pandora_vision
     public:
 
       /**
-        @brief Implements the brushfire algorithm for one blob keypoint
-        in order to find its outline points
-        @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
-        @param[in] edgesImage [cv::Mat*] The input image
-        @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
-        The output vector containing the blob's outline
-        @param[out] blobArea [float*] The area of the blob
-        @return void
-       **/
-      static void brushfireKeypoint(
-        const cv::KeyPoint& inKeyPoint,
-        cv::Mat* edgesImage,
-        std::vector<cv::Point2f>* blobOutlineVector,
-        float* blobArea);
-
-      /**
-        @brief Implements the brushfire algorithm for all blob keypoints
-        in order to find blobs' outlines
-        @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
-        @param[in] edgesImage [cv::Mat*] The input image
-        @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]
-        The output vector containing the blobs' outline
-        @param[out] blobsArea [std::vector<float>*] The area of each blob
-        @return void
-       **/
-      static void brushfireKeypoints(
-        const std::vector<cv::KeyPoint>& inKeyPoints,
-        cv::Mat* edgesImage,
-        std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
-        std::vector<float>* blobsArea);
-
-      /**
-        @brief Implements the brushfire algorithm. Its specific purpose is
-        to find the points between a blob's outline and its bounding box
-        (not necessarily one of least area).
-        @param[in] inPoint [const cv::Point2f&] The input point
-        @param[in] inImage [cv::Mat*] The input image
-        @param[out] visited [std::set<unsigned int>&] The points between
-        areas of non-zero value pixels.
-        @return void
-       **/
-      static void brushfirePoint(const cv::Point2f& inPoint,
-        cv::Mat* inImage,
-        std::set<unsigned int>* visited);
-
-      /**
         @brief Detects blobs in an image
         @param[in] inImage [const cv::Mat&] The input image
         @param[out] keyPointsOut [std::vector<cv::KeyPoint>*] The ouput
@@ -108,53 +62,6 @@ namespace pandora_vision
        **/
       static void detectBlobs(const cv::Mat& inImage,
         std::vector<cv::KeyPoint>* keyPointsOut);
-
-      /**
-        @brief Implements a raycast algorithm for a blob keypoint in order
-        to find its outline points. The output is a vector of connected points.
-        @param[in] inKeyPoint [const cv::KeyPoint&] The keypoint
-        @param[in] edgesImage [cv::Mat*] The input image
-        @param[in] partitions [const int&] The number of directions
-        towards which the outline of the blob will be sought,
-        or the number of partitions in which the blob will be divided by
-        the rays. Same deal.
-        @param[in] findArea [const bool&] Indicates whether to calculate
-        the area of the blob
-        @param[out] blobOutlineVector [std::vector<cv::Point2f>*]
-        The output vector containing the blobs' (rough approximate) outline
-        @param[out] blobArea [float*] The blob's area. Non-zero if @param
-        findArea true
-        @return void
-       **/
-      static void raycastKeypoint(
-        const cv::KeyPoint& inKeyPoint,
-        cv::Mat* edgesImage,
-        const int& partitions,
-        const bool& findArea,
-        std::vector<cv::Point2f>* blobOutlineVector,
-        float* blobArea);
-
-      /**
-        @brief Implements a raycast algorithm for all blob keypoints in order
-        to find blobs' outlines. The output is a vector containing a coherent
-        vector of points.
-        @param[in] inKeyPoints [const std::vector<cv::KeyPoint>&] The keypoints
-        @param[in] edgesImage [cv::Mat*] The input image
-        @param[in] partitions [const int&] The number of directions
-        towards which the outline of the blob will be sought,
-        or the number of partitions in which the blob will be divided by
-        the rays.  Same deal.
-        @param[out] blobsOutlineVector [std::vector<std::vector<cv::Point2f> >*]
-        The output vector containing the blobs' (rough approximate) outline
-        @param[out] blobsArea [std::vector<float>*] The area of each blob
-        @return void
-       **/
-      static void raycastKeypoints(
-        const std::vector<cv::KeyPoint>& inKeyPoints,
-        cv::Mat* edgesImage,
-        const int& partitions,
-        std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
-        std::vector<float>* blobsArea);
 
   };
 

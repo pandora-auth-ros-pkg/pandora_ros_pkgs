@@ -38,6 +38,7 @@
 #ifndef UTILS_EDGE_DETECTION_H
 #define UTILS_EDGE_DETECTION_H
 
+#include "utils/outline_detection.h"
 #include "utils/histogram.h"
 #include "utils/morphological_operators.h"
 
@@ -233,33 +234,6 @@ namespace pandora_vision
         @return void
        **/
       static void floodFillPostprocess(cv::Mat* image);
-
-      /**
-        @brief With an binary input image (quantized in 0 and 255 levels),
-        this function fills closed regions, at first, and then extracts
-        the outline of each region. Used when there is a closed region
-        with garbage pixels with a value of 255 within it.
-Caution: The outline of ALL shapes is computed: if there are
-closed shapes inside other closed shapes, their outline is detected
-and included in the output image.
-@param[in,out] inImage [cv::Mat*] The input image
-@return void
-       **/
-      static void getShapesClearBorder (cv::Mat* inImage);
-
-      /**
-        @brief With an binary input image (quantized in 0 and 255 levels),
-        this function fills closed regions, at first, and then extracts the
-        outermost outline of each region.
-        Used when there is a closed region with garbage pixels with
-        a value of 255 within it.
-Caution: Only the outermost outline of shapes is computed. If there are
-closed shapes inside of other closed shapes, only the latter's outline
-will be computed, as opposed to the getShapesClearBorder function
-@param[in,out] inImage [cv::Mat*] The input image
-@return void
-       **/
-      static void getShapesClearBorderSimple (cv::Mat* inImage);
 
       /**
         @brief This method takes as input a RGB image and uses

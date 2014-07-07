@@ -40,7 +40,7 @@
 
 #include "utils/noise_elimination.h"
 #include "utils/edge_detection.h"
-#include "utils/blob_detection.h"
+#include "utils/outline_detection.h"
 #include "utils/bounding_box_detection.h"
 #include "utils/holes_conveyor.h"
 #include <math.h>

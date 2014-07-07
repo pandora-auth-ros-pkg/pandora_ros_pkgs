@@ -68,12 +68,6 @@ namespace pandora_vision
     // transactionary affairs with
     getTopicNames();
 
-    // Calculate the collective histogram of images of walls needed
-    // for comparing against the one of images of the material surrounding
-    // candidate holes
-    Histogram::getHistogram(&wallsHistogram_,
-      Parameters::Histogram::secondary_channel);
-
     // Initialize the numNodesReady variable.
     // It acts as a counter of nodes that have published their output to the
     // hole fusion node in each execution cycle.
@@ -178,6 +172,12 @@ namespace pandora_vision
     // Initialize the filtering mode variable to an invalid value
     filteringMode_ = -1;
 
+    // Calculate the collective histogram of images of walls needed
+    // for comparing against the one of images of the material surrounding
+    // candidate holes
+    Histogram::getHistogram(&wallsHistogram_,
+      Parameters::Histogram::secondary_channel);
+
     clientInitialize();
 
     ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Initiated");
@@ -190,6 +190,7 @@ namespace pandora_vision
    **/
   HoleFusion::~HoleFusion(void)
   {
+    ros::shutdown();
     ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Terminated");
   }
 

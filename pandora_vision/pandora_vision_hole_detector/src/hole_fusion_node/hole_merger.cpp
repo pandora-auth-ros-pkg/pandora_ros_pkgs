@@ -794,7 +794,7 @@ namespace pandora_vision
     // Locate the outline of the combined hole
     std::vector<cv::Point2f> newAmalgamatorOutline;
     float area;
-    BlobDetection::brushfireKeypoint(
+    OutlineDetection::brushfireKeypoint(
       conveyor->holes[amalgamatorId].keypoint,
       &canvas,
       &newAmalgamatorOutline,
@@ -1106,7 +1106,7 @@ namespace pandora_vision
     // Locate the outline of the combined hole
     std::vector<cv::Point2f> newConnectorOutline;
     float area;
-    BlobDetection::brushfireKeypoint(
+    OutlineDetection::brushfireKeypoint(
       conveyor->holes[connectorId].keypoint,
       &canvas,
       &newConnectorOutline,

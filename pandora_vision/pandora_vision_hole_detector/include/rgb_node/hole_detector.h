@@ -40,6 +40,7 @@
 
 #define SHOW_DEBUG_IMAGE
 
+#include "utils/blob_detection.h"
 #include "utils/defines.h"
 #include "utils/hole_filters.h"
 

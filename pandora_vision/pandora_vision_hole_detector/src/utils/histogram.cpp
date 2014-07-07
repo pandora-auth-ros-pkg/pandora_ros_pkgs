@@ -133,6 +133,18 @@ namespace pandora_vision
     DIR *directory;
 
     directory = opendir(wallPicturesPath.c_str());
+
+    // The directory should exist; otherwise abort.
+    if (directory == NULL)
+    {
+      ROS_FATAL_NAMED(PKG_NAME, "/walls not found. Create it, fill it with "
+        "images of walls and continue..");
+
+      ros::shutdown();
+
+      return;
+    }
+
     if (theDir != NULL)
     {
       while ((readdir_r(directory, theDir, &result)) == 0 && result != NULL)
@@ -144,6 +156,17 @@ namespace pandora_vision
         }
       }
       closedir (directory);
+    }
+
+    // If no images are found in the "walls" directory, shutdown.
+    if (numPictures == 0)
+    {
+      ROS_FATAL_NAMED(PKG_NAME, "/walls empty. Fill it with images of "
+        "walls and continue. Shutting down..");
+
+      ros::shutdown();
+
+      return;
     }
 
     // Read the pictures inside the wallPicturesPath, convert them to HSV

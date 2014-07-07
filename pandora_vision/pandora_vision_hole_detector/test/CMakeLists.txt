@@ -15,9 +15,9 @@ add_definitions(${PCL_DEFINITIONS})
 
 #################################### utils #####################################
 
-catkin_add_gtest(blob_detection_test
-  unit/utils/blob_detection_test.cpp)
-target_link_libraries(blob_detection_test ${catkin_LIBRARIES} utils_lib gtest_main)
+catkin_add_gtest(outline_detection_test
+  unit/utils/outline_detection_test.cpp)
+target_link_libraries(outline_detection_test ${catkin_LIBRARIES} utils_lib gtest_main)
 
 catkin_add_gtest(bounding_box_detection_test
   unit/utils/bounding_box_detection_test.cpp)

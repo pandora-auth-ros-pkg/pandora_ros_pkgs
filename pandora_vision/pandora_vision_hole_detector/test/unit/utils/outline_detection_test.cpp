@@ -35,21 +35,21 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/blob_detection.h"
+#include "utils/outline_detection.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
 {
   /**
-    @class BlobDetectionTest
-    @brief Tests the integrity of methods of class BlobDetecion
+    @class OutlineDetectionTest
+    @brief Tests the integrity of methods of class OutlineDetecion
    **/
-  class BlobDetectionTest : public ::testing::Test
+  class OutlineDetectionTest : public ::testing::Test
   {
     protected:
 
-      BlobDetectionTest() {}
+      OutlineDetectionTest() {}
 
       /**
         @brief Constructs a rectangle of width @param x and height of @param y
@@ -86,7 +86,7 @@ namespace pandora_vision
         square_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
 
         // Construct the square_ image
-        BlobDetectionTest::generateRectangle
+        OutlineDetectionTest::generateRectangle
           ( cv::Point2f ( 100, 100 ), 100, 100, &square_ );
 
         // Locate the outline points of the square in the square_ image
@@ -120,7 +120,7 @@ namespace pandora_vision
         // Construct the lower right square
         cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
 
-        BlobDetectionTest::generateRectangle
+        OutlineDetectionTest::generateRectangle
           ( cv::Point2f ( WIDTH - 100, HEIGHT - 100 ),
             100,
             100,
@@ -225,7 +225,7 @@ namespace pandora_vision
     imprinted on
     return void
    **/
-  void BlobDetectionTest::generateRectangle (
+  void OutlineDetectionTest::generateRectangle (
     const cv::Point2f& upperLeft,
     const int& x,
     const int& y,
@@ -250,8 +250,8 @@ namespace pandora_vision
 
 
 
-  //! Tests BlobDetection::brushfireKeypoint()
-  TEST_F ( BlobDetectionTest, brushfireKeypointTest )
+  //! Tests OutlineDetection::brushfireKeypoint()
+  TEST_F ( OutlineDetectionTest, brushfireKeypointTest )
   {
     /***************************************************************************
      * Test square_
@@ -262,8 +262,8 @@ namespace pandora_vision
     std::vector< cv::Point2f > blobOutlineVectorSquare;
     float blobArea = 0.0;
 
-    // Run BlobDetection::brushfireKeypoint
-    BlobDetection::brushfireKeypoint
+    // Run OutlineDetection::brushfireKeypoint
+    OutlineDetection::brushfireKeypoint
       ( ks, &square_, &blobOutlineVectorSquare, &blobArea );
 
     // As a preliminary test, check if the number of outline points found
@@ -304,8 +304,8 @@ namespace pandora_vision
     std::vector< cv::Point2f > blobOutlineVectorCorner1;
     blobArea = 0.0;
 
-    // Run BlobDetection::brushfireKeypoint
-    BlobDetection::brushfireKeypoint
+    // Run OutlineDetection::brushfireKeypoint
+    OutlineDetection::brushfireKeypoint
       ( kc1, &corners_, &blobOutlineVectorCorner1, &blobArea );
 
     // The square's area should be the number of visited points of the brushfire
@@ -318,8 +318,8 @@ namespace pandora_vision
     std::vector< cv::Point2f > blobOutlineVectorCorner2;
     blobArea = 0.0;
 
-    // Run BlobDetection::brushfireKeypoint
-    BlobDetection::brushfireKeypoint
+    // Run OutlineDetection::brushfireKeypoint
+    OutlineDetection::brushfireKeypoint
       ( kc2, &corners_, &blobOutlineVectorCorner2, &blobArea );
 
     // The square's area should be the number of visited points of the brushfire
@@ -330,8 +330,8 @@ namespace pandora_vision
 
 
 
-  //! Tests BlobDetection::brushfireKeypoints()
-  TEST_F ( BlobDetectionTest, brushfireKeypointsTest )
+  //! Tests OutlineDetection::brushfireKeypoints()
+  TEST_F ( OutlineDetectionTest, brushfireKeypointsTest )
   {
     /***************************************************************************
      * Test squares_
@@ -349,8 +349,8 @@ namespace pandora_vision
     std::vector< std::vector< cv::Point2f > > blobsOutlineVector;
     std::vector< float > blobsArea;
 
-    // Run BlobDetection::brushfireKeypoints
-    BlobDetection::brushfireKeypoints
+    // Run OutlineDetection::brushfireKeypoints
+    OutlineDetection::brushfireKeypoints
       ( inKeyPoints, &squares_, &blobsOutlineVector, &blobsArea );
 
     // As a preliminary test, check if the number of outline points found
@@ -392,8 +392,8 @@ namespace pandora_vision
 
 
 
-  //! Tests BlobDetection::brushfirePoint()
-  TEST_F ( BlobDetectionTest, brushfirePointTest )
+  //! Tests OutlineDetection::brushfirePoint()
+  TEST_F ( OutlineDetectionTest, brushfirePointTest )
   {
     /***************************************************************************
      * Test squares_
@@ -407,8 +407,8 @@ namespace pandora_vision
     std::set< unsigned int > visited_1;
 
 
-    // Run BlobDetection::brushfirePoint for the upper left square
-    BlobDetection::brushfirePoint ( p_0, &squares_, &visited_0 );
+    // Run OutlineDetection::brushfirePoint for the upper left square
+    OutlineDetection::brushfirePoint ( p_0, &squares_, &visited_0 );
 
     // The number of visited points should be the number of visited points
     // of the brushfire algorithm, which,
@@ -416,8 +416,8 @@ namespace pandora_vision
     EXPECT_EQ ( 9996, visited_0.size() );
 
 
-    // Run BlobDetection::brushfirePoint for the upper left square
-    BlobDetection::brushfirePoint ( p_1, &squares_, &visited_1 );
+    // Run OutlineDetection::brushfirePoint for the upper left square
+    OutlineDetection::brushfirePoint ( p_1, &squares_, &visited_1 );
 
     // The number of visited points should be the number of visited points
     // of the brushfire algorithm, which,
@@ -433,8 +433,8 @@ namespace pandora_vision
 
     std::set< unsigned int > visited;
 
-    // Run BlobDetection::brushfireKeypoint
-    BlobDetection::brushfirePoint
+    // Run OutlineDetection::brushfireKeypoint
+    OutlineDetection::brushfirePoint
       ( kc1, &corners_, &visited );
 
     // The square's area should be the number of visited points of the brushfire
@@ -447,8 +447,8 @@ namespace pandora_vision
 
     visited.erase(visited.begin(), visited.end());
 
-    // Run BlobDetection::brushfireKeypoint
-    BlobDetection::brushfirePoint
+    // Run OutlineDetection::brushfireKeypoint
+    OutlineDetection::brushfirePoint
       ( kc2, &corners_, &visited );
 
     // The square's area should be the number of visited points of the brushfire
@@ -459,8 +459,69 @@ namespace pandora_vision
 
 
 
-  //! Tests BlobDetection::raycastKeypoint
-  TEST_F ( BlobDetectionTest, raycastKeypointTest )
+  //! Tests OutlineDetection::getShapesClearBorder
+  TEST_F ( OutlineDetectionTest, getShapesClearBorderTest )
+  {
+    // Construct two squares, one within the other
+    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
+
+    OutlineDetectionTest::generateRectangle
+      ( cv::Point( 10, 10 ), 200, 200, &squares );
+
+    OutlineDetectionTest::generateRectangle
+      ( cv::Point( 100, 100 ), 100, 100, &squares );
+
+    // The number of non-zero pixels before getting the clear borders
+    int nonZerosBefore = cv::countNonZero ( squares );
+
+    // Run EdgeDetection::getShapesClearBorder
+    OutlineDetection::getShapesClearBorder ( &squares );
+
+    // The number of non-zero pixels after getting the clear borders
+    int nonZerosAfter = cv::countNonZero ( squares );
+
+    // The EdgeDetection::getShapesClearBorder method finds all borders,
+    // not caring about shapes being inside other shapes
+    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
+
+  }
+
+
+
+  //! Tests OutlineDetection::getShapesClearBorderSimple
+  TEST_F ( OutlineDetectionTest, getShapesClearBorderSimpleTest )
+  {
+    // Construct two squares, one within the other
+    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
+
+    OutlineDetectionTest::generateRectangle
+      ( cv::Point( 10, 10 ), 200, 200, &squares );
+
+    // The number of non-zero pixels of the shape that encapsulates the one
+    // below
+    int nonZerosBefore = cv::countNonZero ( squares );
+
+    OutlineDetectionTest::generateRectangle
+      ( cv::Point( 100, 100 ), 100, 100, &squares );
+
+
+    // Run EdgeDetection::getShapesClearBorderSimple
+    OutlineDetection::getShapesClearBorderSimple ( &squares );
+
+    // The number of non-zero pixels after getting the clear borders
+    int nonZerosAfter = cv::countNonZero ( squares );
+
+    // The EdgeDetection::getShapesClearBorderSimple method finds borders of
+    // shapes, discarding everything within them: the square does not get
+    // to be detected :(
+    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
+
+  }
+
+
+
+  //! Tests OutlineDetection::raycastKeypoint
+  TEST_F ( OutlineDetectionTest, raycastKeypointTest )
   {
     /***************************************************************************
      * Test squares_
@@ -475,8 +536,8 @@ namespace pandora_vision
     // The blob's area
     float area = 0.0;
 
-    //Run BlobDetection::raycastKeypoint
-    BlobDetection::raycastKeypoint
+    //Run OutlineDetection::raycastKeypoint
+    OutlineDetection::raycastKeypoint
       ( k_1, &squares_, 360, false, &blobOutlineVector_1, &area );
 
     // Due to the approximate nature of the raycastKeypoint algorithm,
@@ -492,8 +553,8 @@ namespace pandora_vision
     // The vector of outline points
     std::vector< cv::Point2f > blobOutlineVector_0;
 
-    //Run BlobDetection::raycastKeypoint
-    BlobDetection::raycastKeypoint
+    //Run OutlineDetection::raycastKeypoint
+    OutlineDetection::raycastKeypoint
       ( k_0, &squares_, 360, false, &blobOutlineVector_0, &area );
 
     // Due to the approximate nature of the raycastKeypoint algorithm,
@@ -506,8 +567,8 @@ namespace pandora_vision
 
 
 
-  //! Tests BlobDetection::raycastKeypoints
-  TEST_F ( BlobDetectionTest, raycastKeypointsTest )
+  //! Tests OutlineDetection::raycastKeypoints
+  TEST_F ( OutlineDetectionTest, raycastKeypointsTest )
   {
     /***************************************************************************
      * Test squares_
@@ -532,8 +593,8 @@ namespace pandora_vision
     // The vector of blobs' areas
     std::vector<float> blobsArea;
 
-    //Run BlobDetection::raycastKeypoints
-    BlobDetection::raycastKeypoints
+    //Run OutlineDetection::raycastKeypoints
+    OutlineDetection::raycastKeypoints
       ( inKeyPoints, &squares_, 360, &blobsOutlineVector, &blobsArea );
 
 
@@ -569,8 +630,8 @@ namespace pandora_vision
     // Clear the areas vector
     blobsArea.clear();
 
-    //Run BlobDetection::raycastKeypoints
-    BlobDetection::raycastKeypoints
+    //Run OutlineDetection::raycastKeypoints
+    OutlineDetection::raycastKeypoints
       ( inKeyPoints, &corners_, 360, &blobsOutlineVector, &blobsArea );
 
     // There will be exactly one keypoint, although the rays hit the edges

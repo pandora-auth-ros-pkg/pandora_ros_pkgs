@@ -38,6 +38,7 @@
 #ifndef DEPTH_NODE_HOLE_DETECTOR_H
 #define DEPTH_NODE_HOLE_DETECTOR_H
 
+#include "utils/blob_detection.h"
 #include "utils/holes_conveyor.h"
 #include "utils/hole_filters.h"
 

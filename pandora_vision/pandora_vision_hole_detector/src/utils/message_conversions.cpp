@@ -412,7 +412,7 @@ namespace pandora_vision
         // if image_representation_method was 0 is to apply the raycast
         // algorithm
         float area = 0.0;
-        BlobDetection::raycastKeypoint(hole.keypoint,
+        OutlineDetection::raycastKeypoint(hole.keypoint,
           &canvas,
           raycastKeypointPartitions,
           false,

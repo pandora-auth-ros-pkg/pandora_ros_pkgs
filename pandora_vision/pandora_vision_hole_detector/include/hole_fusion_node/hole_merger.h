@@ -39,7 +39,7 @@
 
 #include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/depth_filters.h"
-#include "utils/blob_detection.h"
+#include "utils/outline_detection.h"
 #include "utils/defines.h"
 #include "utils/holes_conveyor.h"
 #include "utils/parameters.h"

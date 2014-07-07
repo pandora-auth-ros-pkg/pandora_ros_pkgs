@@ -1132,67 +1132,6 @@ namespace pandora_vision
 
 
 
-  //! Tests EdgeDetection::getShapesClearBorder
-  TEST_F ( EdgeDetectionTest, getShapesClearBorderTest )
-  {
-    // Construct two squares, one within the other
-    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
-
-    EdgeDetectionTest::generateRectangle
-      ( cv::Point( 10, 10 ), 200, 200, &squares );
-
-    EdgeDetectionTest::generateRectangle
-      ( cv::Point( 100, 100 ), 100, 100, &squares );
-
-    // The number of non-zero pixels before getting the clear borders
-    int nonZerosBefore = cv::countNonZero ( squares );
-
-    // Run EdgeDetection::getShapesClearBorder
-    EdgeDetection::getShapesClearBorder ( &squares );
-
-    // The number of non-zero pixels after getting the clear borders
-    int nonZerosAfter = cv::countNonZero ( squares );
-
-    // The EdgeDetection::getShapesClearBorder method finds all borders,
-    // not caring about shapes being inside other shapes
-    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
-
-  }
-
-
-
-  //! Tests EdgeDetection::getShapesClearBorderSimple
-  TEST_F ( EdgeDetectionTest, getShapesClearBorderSimpleTest )
-  {
-    // Construct two squares, one within the other
-    cv::Mat squares = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
-
-    EdgeDetectionTest::generateRectangle
-      ( cv::Point( 10, 10 ), 200, 200, &squares );
-
-    // The number of non-zero pixels of the shape that encapsulates the one
-    // below
-    int nonZerosBefore = cv::countNonZero ( squares );
-
-    EdgeDetectionTest::generateRectangle
-      ( cv::Point( 100, 100 ), 100, 100, &squares );
-
-
-    // Run EdgeDetection::getShapesClearBorderSimple
-    EdgeDetection::getShapesClearBorderSimple ( &squares );
-
-    // The number of non-zero pixels after getting the clear borders
-    int nonZerosAfter = cv::countNonZero ( squares );
-
-    // The EdgeDetection::getShapesClearBorderSimple method finds borders of
-    // shapes, discarding everything within them: the square does not get
-    // to be detected :(
-    EXPECT_EQ ( nonZerosBefore, nonZerosAfter );
-
-  }
-
-
-
   //! Tests EdgeDetection::produceEdgesViaBackprojection
   TEST_F ( EdgeDetectionTest, produceEdgesViaBackprojectionTest)
   {

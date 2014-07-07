@@ -40,7 +40,7 @@
 
 #include <math.h>
 #include "utils/holes_conveyor.h"
-#include "utils/blob_detection.h"
+#include "utils/outline_detection.h"
 #include "utils/edge_detection.h"
 #include "utils/visualization.h"
 #include "hole_fusion_node/planes_detection.h"
