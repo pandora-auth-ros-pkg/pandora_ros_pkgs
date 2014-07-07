@@ -42,11 +42,11 @@
 #include "hole_fusion_node/planes_detection.h"
 #include "hole_fusion_node/depth_filters.h"
 #include "hole_fusion_node/rgb_filters.h"
-#include "utils/outline_detection.h"
 #include "utils/edge_detection.h"
 #include "utils/histogram.h"
 #include "utils/holes_conveyor.h"
 #include "utils/morphological_operators.h"
+#include "utils/outline_discovery.h"
 #include "utils/parameters.h"
 #include "utils/visualization.h"
 

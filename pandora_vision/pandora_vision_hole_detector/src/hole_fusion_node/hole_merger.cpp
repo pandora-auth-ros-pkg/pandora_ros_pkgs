@@ -44,6 +44,120 @@
 namespace pandora_vision
 {
   /**
+    @brief Intended to use after the check of the
+    isCapableOfAmalgamating function, this function modifies the
+    HolesConveyor conveyor[amalgamatorId] entry so that it
+    has absorbed the amalgamatable hole (conveyor[amalgamatableId])
+    in terms of keypoint location, outline unification and bounding
+    rectangle inclusion of the amalgamatable's outline
+    @param[in,out] conveyor [HolesConveyor*] The holes conveyor
+    whose keypoint, outline and bounding rectangle entries
+    will be modified. CAUTION: the amalgamatable is not deleted upon
+    amalgamation, only the internals of the amalgamator are modified
+    @param[in] amalgamatorId [const int&] The identifier of the
+    hole inside the HolesConveyor amalgamator struct
+    @param[in,out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
+    A set that includes the indices of points inside the amalgamator's
+    outline
+    @param[in] amalgamatableHoleMaskSet [const std::set<unsigned int>&]
+    A set that includes the indices of points inside the amalgamatable's
+    outline
+    @param[in] image [const cv::Mat&] An image used for its size
+    @return void
+   **/
+  void HoleMerger::amalgamateOnce(
+    HolesConveyor* conveyor,
+    const int& amalgamatorId,
+    std::set<unsigned int>* amalgamatorHoleMaskSet,
+    const std::set<unsigned int>& amalgamatableHoleMaskSet,
+    const cv::Mat& image)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("amalgamateOnce", "applyMergeOperation");
+    #endif
+
+
+    // Now, we need to find the combined outline points
+    // On an image, draw the holes' masks.
+    // Invert the image and brushfire in the black space in order to
+    // obtain the new outline points
+    cv::Mat canvas = cv::Mat::zeros(image.size(), CV_8UC1);
+
+    unsigned char* ptr = canvas.ptr();
+
+    // Draw the amalgamator's mask onto canvas
+    for (std::set<unsigned int>::iterator it = amalgamatorHoleMaskSet->begin();
+      it != amalgamatorHoleMaskSet->end(); it++)
+    {
+      ptr[*it] = 255;
+    }
+
+    // Draw the amalgamatable's mask onto canvas
+    for (std::set<unsigned int>::iterator it = amalgamatableHoleMaskSet.begin();
+      it != amalgamatableHoleMaskSet.end(); it++)
+    {
+      ptr[*it] = 255;
+
+      // In the meantime, construct the amalgamator's new hole set
+      amalgamatorHoleMaskSet->insert(*it);
+    }
+
+
+    // Locate the outline of the combined hole
+    std::vector<cv::Point2f> newAmalgamatorOutline;
+    OutlineDiscovery::getOutlineOfMask(canvas, &newAmalgamatorOutline);
+
+    // Set the discovered outline as the outline of the combined hole
+    conveyor->holes[amalgamatorId].outline = newAmalgamatorOutline;
+
+
+    // The amalgamator's new least area rotated bounding box will be the
+    // one that encloses the new (merged) outline points
+    cv::RotatedRect substituteRotatedRectangle =
+      cv::minAreaRect(conveyor->holes[amalgamatorId].outline);
+
+    // Obtain the four vertices of the new rotated rectangle
+    cv::Point2f substituteVerticesArray[4];
+    substituteRotatedRectangle.points(substituteVerticesArray);
+
+    // Same as substituteVerticesArray array, but vector
+    std::vector<cv::Point2f> substituteVerticesVector;
+
+    // Store the four vertices to the substituteVerticesVector
+    for(int v = 0; v < 4; v++)
+    {
+      substituteVerticesVector.push_back(substituteVerticesArray[v]);
+    }
+
+    // Replace the amalgamator's vertices with the new vertices
+    conveyor->holes[amalgamatorId].rectangle.erase(
+      conveyor->holes[amalgamatorId].rectangle.begin(),
+      conveyor->holes[amalgamatorId].rectangle.end());
+
+    conveyor->holes[amalgamatorId].rectangle = substituteVerticesVector;
+
+
+    // Set the overall candidate hole's keypoint to the center of the
+    // newly created bounding rectangle
+    float x = 0;
+    float y = 0;
+    for (int k = 0; k < 4; k++)
+    {
+      x += conveyor->holes[amalgamatorId].rectangle[k].x;
+      y += conveyor->holes[amalgamatorId].rectangle[k].y;
+    }
+
+    conveyor->holes[amalgamatorId].keypoint.pt.x = x / 4;
+    conveyor->holes[amalgamatorId].keypoint.pt.y = y / 4;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("amalgamateOnce");
+    #endif
+  }
+
+
+
+  /**
     @brief Applies a merging operation of @param operationId, until
     every candidate hole, even as it changes through the various merges that
     happen, has been merged with every candidate hole that can be merged
@@ -589,63 +703,126 @@ namespace pandora_vision
 
 
   /**
-    @brief Indicates whether a hole assigned the role of the assimilator
-    is capable of assimilating another hole assigned the role of
-    the assimilable. It checks whether the assimilable's outline
-    points reside entirely inside the assimilator's outline.
-    @param[in] assimilatorHoleMaskSet [const std::set<unsigned int>&]
-    A set that includes the indices of points inside the assimilator's
+    @brief Intended to use after the check of the
+    isCapableOfConnecting function, this method modifies the HolesConveyor
+    connector struct entry so that it it has absorbed the connectable hole
+    in terms of keypoint location, outline unification and bounding
+    rectangle inclusion of the connectable's outline
+    @param[in,out] conveyor [HolesConveyor*] The holes conveyor
+    whose keypoint, outline and bounding rectangle entries
+    will be modified. CAUTION: the connectable is not deleted upon
+    connection, only the internals of the connector are modified
+    @param[in] connectorId [const int&] The identifier of the hole inside
+    the HolesConveyor connectables struct
+    @param[in] connectableId [const int&] The identifier of the hole inside
+    the HolesConveyor connectables struct
+    @param[in] connectorHoleMaskSet [const std::set<unsigned int>&]
+    A set that includes the indices of points inside the connector's
     outline
-    @param[in] assimilableHoleMaskSet [const std::set<unsigned int>&]
-    A set that includes the indices of points inside the assimilable's
-    outline
-    @return [bool] True if all of the outline points of the assimilable
-    hole are inside the outline of the assimilator
+    @param[in] image [const cv::Mat&] An image required only for its size
+    @return void
    **/
-  bool HoleMerger::isCapableOfAssimilating(
-    const std::set<unsigned int>& assimilatorHoleMaskSet,
-    const std::set<unsigned int>& assimilableHoleMaskSet)
+  void HoleMerger::connectOnce(
+    HolesConveyor* conveyor,
+    const int& connectorId,
+    const int& connectableId,
+    std::set<unsigned int>* connectorHoleMaskSet,
+    const cv::Mat& image)
   {
     #ifdef DEBUG_TIME
-    Timer::start("isCapableOfAssimilating", "applyMergeOperation");
+    Timer::start("connectOnce", "applyMergeOperation");
     #endif
 
-    // If the assimilable's area is larger than the assimilator's,
-    // this assimilator is not capable of assimilating the assimilatable
-    if (assimilatorHoleMaskSet.size() < assimilableHoleMaskSet.size())
+    // The connection rationale is as follows:
+    // Since the two holes are not overlapping each other,
+    // some sort of connection regime has to be established.
+    // The idea is that the points that consist the outline of each hole
+    // are connected via a cv::line so that the overall connector's outline
+    // is the overall shape's outline
+
+
+    // The image on which the hole's outline connection will be drawn
+    cv::Mat canvas = cv::Mat::zeros(image.size(), CV_8UC1);
+    unsigned char* ptr = canvas.ptr();
+
+    for (int i = 0; i < conveyor->holes[connectorId].outline.size(); i++)
     {
-      return false;
-    }
-
-    // Keep the size of the input assimilatorHoleMaskSet for
-    // comparing against it
-    int assimilatorHoleMaskSetSize = assimilatorHoleMaskSet.size();
-
-    // Clone the assimilator's hole mask set.
-    std::set<unsigned int> summation = assimilatorHoleMaskSet;
-
-    // Try to insert every element of the assimilable hole mask set into
-    // the assimilator's set.
-    // This assimilator can assimilate the assimilable if and only if the
-    // assimilable is inside the assimilator, in other words, if the
-    // assimilator's hole mask set size remains unchanged after the
-    // insertion of the assimilable's elements into it
-    for (std::set<unsigned int>::iterator it = assimilableHoleMaskSet.begin();
-      it != assimilableHoleMaskSet.end(); it++)
-    {
-      summation.insert(*it);
-
-      if (summation.size () != assimilatorHoleMaskSetSize)
+      for (int j = 0; j < conveyor->holes[connectableId].outline.size(); j++)
       {
-        return false;
+        cv::line(canvas,
+          conveyor->holes[connectorId].outline[i],
+          conveyor->holes[connectableId].outline[j],
+          cv::Scalar(255, 0, 0), 1, 8);
       }
     }
 
-    #ifdef DEBUG_TIME
-    Timer::tick("isCapableOfAssimilating");
-    #endif
+    // Construct the connector's new hole mask
+    // First, clear the former one
+    connectorHoleMaskSet->erase(
+      connectorHoleMaskSet->begin(),
+      connectorHoleMaskSet->end());
 
-    return true;
+    for (int rows = 0; rows < canvas.rows; rows++)
+    {
+      for (int cols = 0; cols < canvas.cols; cols++)
+      {
+        unsigned int ind = cols + rows * image.cols;
+        if (ptr[ind] != 0)
+        {
+          connectorHoleMaskSet->insert(ptr[ind]);
+        }
+      }
+    }
+
+
+    // Locate the outline of the combined hole
+    std::vector<cv::Point2f> newConnectorOutline;
+    OutlineDiscovery::getOutlineOfMask(canvas, &newConnectorOutline);
+
+    // Set the discovered outline as the outline of the combined hole
+    conveyor->holes[connectorId].outline = newConnectorOutline;
+
+
+    // The connectable's new least area rotated bounding box will be the
+    // one that encloses the new (merged) outline points
+    cv::RotatedRect substituteRotatedRectangle =
+      cv::minAreaRect(conveyor->holes[connectorId].outline);
+
+    // Obtain the four vertices of the new rotated rectangle
+    cv::Point2f substituteVerticesArray[4];
+    substituteRotatedRectangle.points(substituteVerticesArray);
+
+    // Same as substituteVerticesArray array, but vector
+    std::vector<cv::Point2f> substituteVerticesVector;
+
+    // Store the four vertices to the substituteVerticesVector
+    for(int v = 0; v < 4; v++)
+    {
+      substituteVerticesVector.push_back(substituteVerticesArray[v]);
+    }
+
+    // Replace the connector's vertices with the new vertices
+    conveyor->holes[connectorId].rectangle.erase(
+      conveyor->holes[connectorId].rectangle.begin(),
+      conveyor->holes[connectorId].rectangle.end());
+
+    // Replace the connector's vertices with the new vertices
+    conveyor->holes[connectorId].rectangle = substituteVerticesVector;
+
+
+    // Set the overall candidate hole's keypoint to the mean of the keypoints
+    // of the connector and the connectable
+    conveyor->holes[connectorId].keypoint.pt.x =
+      (conveyor->holes[connectorId].keypoint.pt.x
+       + conveyor->holes[connectableId].keypoint.pt.x) / 2;
+
+    conveyor->holes[connectorId].keypoint.pt.y =
+      (conveyor->holes[connectorId].keypoint.pt.y
+       + conveyor->holes[connectableId].keypoint.pt.y) / 2;
+
+    #ifdef DEBUG_TIME
+    Timer::tick("connectOnce");
+    #endif
   }
 
 
@@ -716,135 +893,63 @@ namespace pandora_vision
 
 
   /**
-    @brief Intended to use after the check of the
-    isCapableOfAmalgamating function, this function modifies the
-    HolesConveyor conveyor[amalgamatorId] entry so that it
-    has absorbed the amalgamatable hole (conveyor[amalgamatableId])
-    in terms of keypoint location, outline unification and bounding
-    rectangle inclusion of the amalgamatable's outline
-    @param[in,out] conveyor [HolesConveyor*] The holes conveyor
-    whose keypoint, outline and bounding rectangle entries
-    will be modified. CAUTION: the amalgamatable is not deleted upon
-    amalgamation, only the internals of the amalgamator are modified
-    @param[in] amalgamatorId [const int&] The identifier of the
-    hole inside the HolesConveyor amalgamator struct
-    @param[in,out] amalgamatorHoleMaskSet [std::set<unsigned int>*]
-    A set that includes the indices of points inside the amalgamator's
+    @brief Indicates whether a hole assigned the role of the assimilator
+    is capable of assimilating another hole assigned the role of
+    the assimilable. It checks whether the assimilable's outline
+    points reside entirely inside the assimilator's outline.
+    @param[in] assimilatorHoleMaskSet [const std::set<unsigned int>&]
+    A set that includes the indices of points inside the assimilator's
     outline
-    @param[in] amalgamatableHoleMaskSet [const std::set<unsigned int>&]
-    A set that includes the indices of points inside the amalgamatable's
+    @param[in] assimilableHoleMaskSet [const std::set<unsigned int>&]
+    A set that includes the indices of points inside the assimilable's
     outline
-    @param[in] image [const cv::Mat&] An image used for its size
-    @return void
+    @return [bool] True if all of the outline points of the assimilable
+    hole are inside the outline of the assimilator
    **/
-  void HoleMerger::amalgamateOnce(
-    HolesConveyor* conveyor,
-    const int& amalgamatorId,
-    std::set<unsigned int>* amalgamatorHoleMaskSet,
-    const std::set<unsigned int>& amalgamatableHoleMaskSet,
-    const cv::Mat& image)
+  bool HoleMerger::isCapableOfAssimilating(
+    const std::set<unsigned int>& assimilatorHoleMaskSet,
+    const std::set<unsigned int>& assimilableHoleMaskSet)
   {
     #ifdef DEBUG_TIME
-    Timer::start("amalgamateOnce", "applyMergeOperation");
+    Timer::start("isCapableOfAssimilating", "applyMergeOperation");
     #endif
 
-
-    // Now, we need to find the combined outline points
-    // On an image, draw the holes' masks.
-    // Invert the image and brushfire in the black space in order to
-    // obtain the new outline points
-    cv::Mat canvas = cv::Mat::zeros(image.size(), CV_8UC1);
-
-    unsigned char* ptr = canvas.ptr();
-
-    // Draw the amalgamator's mask onto canvas
-    for (std::set<unsigned int>::iterator it = amalgamatorHoleMaskSet->begin();
-      it != amalgamatorHoleMaskSet->end(); it++)
+    // If the assimilable's area is larger than the assimilator's,
+    // this assimilator is not capable of assimilating the assimilatable
+    if (assimilatorHoleMaskSet.size() < assimilableHoleMaskSet.size())
     {
-      ptr[*it] = 255;
+      return false;
     }
 
-    // Draw the amalgamatable's mask onto canvas
-    for (std::set<unsigned int>::iterator it = amalgamatableHoleMaskSet.begin();
-      it != amalgamatableHoleMaskSet.end(); it++)
-    {
-      ptr[*it] = 255;
+    // Keep the size of the input assimilatorHoleMaskSet for
+    // comparing against it
+    int assimilatorHoleMaskSetSize = assimilatorHoleMaskSet.size();
 
-      // In the meantime, construct the amalgamator's new hole set
-      amalgamatorHoleMaskSet->insert(*it);
-    }
+    // Clone the assimilator's hole mask set.
+    std::set<unsigned int> summation = assimilatorHoleMaskSet;
 
-    // Invert canvas
-    for (int rows = 0; rows < image.rows; rows++)
+    // Try to insert every element of the assimilable hole mask set into
+    // the assimilator's set.
+    // This assimilator can assimilate the assimilable if and only if the
+    // assimilable is inside the assimilator, in other words, if the
+    // assimilator's hole mask set size remains unchanged after the
+    // insertion of the assimilable's elements into it
+    for (std::set<unsigned int>::iterator it = assimilableHoleMaskSet.begin();
+      it != assimilableHoleMaskSet.end(); it++)
     {
-      for (int cols = 0; cols < image.cols; cols++)
+      summation.insert(*it);
+
+      if (summation.size () != assimilatorHoleMaskSetSize)
       {
-        unsigned int ind = cols + rows * image.cols;
-        if (ptr[ind] == 0)
-        {
-          ptr[ind] = 255;
-        }
-        else
-        {
-          ptr[ind] = 0;
-        }
+        return false;
       }
     }
 
-    // Locate the outline of the combined hole
-    std::vector<cv::Point2f> newAmalgamatorOutline;
-    float area;
-    OutlineDetection::brushfireKeypoint(
-      conveyor->holes[amalgamatorId].keypoint,
-      &canvas,
-      &newAmalgamatorOutline,
-      &area);
-
-    conveyor->holes[amalgamatorId].outline = newAmalgamatorOutline;
-
-
-    // The amalgamator's new least area rotated bounding box will be the
-    // one that encloses the new (merged) outline points
-    cv::RotatedRect substituteRotatedRectangle =
-      cv::minAreaRect(conveyor->holes[amalgamatorId].outline);
-
-    // Obtain the four vertices of the new rotated rectangle
-    cv::Point2f substituteVerticesArray[4];
-    substituteRotatedRectangle.points(substituteVerticesArray);
-
-    // Same as substituteVerticesArray array, but vector
-    std::vector<cv::Point2f> substituteVerticesVector;
-
-    // Store the four vertices to the substituteVerticesVector
-    for(int v = 0; v < 4; v++)
-    {
-      substituteVerticesVector.push_back(substituteVerticesArray[v]);
-    }
-
-    // Replace the amalgamator's vertices with the new vertices
-    conveyor->holes[amalgamatorId].rectangle.erase(
-      conveyor->holes[amalgamatorId].rectangle.begin(),
-      conveyor->holes[amalgamatorId].rectangle.end());
-
-    conveyor->holes[amalgamatorId].rectangle = substituteVerticesVector;
-
-
-    // Set the overall candidate hole's keypoint to the center of the
-    // newly created bounding rectangle
-    float x = 0;
-    float y = 0;
-    for (int k = 0; k < 4; k++)
-    {
-      x += conveyor->holes[amalgamatorId].rectangle[k].x;
-      y += conveyor->holes[amalgamatorId].rectangle[k].y;
-    }
-
-    conveyor->holes[amalgamatorId].keypoint.pt.x = x / 4;
-    conveyor->holes[amalgamatorId].keypoint.pt.y = y / 4;
-
     #ifdef DEBUG_TIME
-    Timer::tick("amalgamateOnce");
+    Timer::tick("isCapableOfAssimilating");
     #endif
+
+    return true;
   }
 
 
@@ -1015,151 +1120,6 @@ namespace pandora_vision
 
 
   /**
-    @brief Intended to use after the check of the
-    isCapableOfConnecting function, this method modifies the HolesConveyor
-    connector struct entry so that it it has absorbed the connectable hole
-    in terms of keypoint location, outline unification and bounding
-    rectangle inclusion of the connectable's outline
-    @param[in,out] conveyor [HolesConveyor*] The holes conveyor
-    whose keypoint, outline and bounding rectangle entries
-    will be modified. CAUTION: the connectable is not deleted upon
-    connection, only the internals of the connector are modified
-    @param[in] connectorId [const int&] The identifier of the hole inside
-    the HolesConveyor connectables struct
-    @param[in] connectableId [const int&] The identifier of the hole inside
-    the HolesConveyor connectables struct
-    @param[in] connectorHoleMaskSet [const std::set<unsigned int>&]
-    A set that includes the indices of points inside the connector's
-    outline
-    @param[in] image [const cv::Mat&] An image required only for its size
-    @return void
-   **/
-  void HoleMerger::connectOnce(
-    HolesConveyor* conveyor,
-    const int& connectorId,
-    const int& connectableId,
-    std::set<unsigned int>* connectorHoleMaskSet,
-    const cv::Mat& image)
-  {
-    #ifdef DEBUG_TIME
-    Timer::start("connectOnce", "applyMergeOperation");
-    #endif
-
-    // The connection rationale is as follows:
-    // Since the two holes are not overlapping each other,
-    // some sort of connection regime has to be established.
-    // The idea is that the points that consist the outline of each hole
-    // are connected via a cv::line so that the overall connector's outline
-    // is the overall shape's outline
-
-
-    // The image on which the hole's outline connection will be drawn
-    cv::Mat canvas = cv::Mat::zeros(image.size(), CV_8UC1);
-    unsigned char* ptr = canvas.ptr();
-
-    for (int i = 0; i < conveyor->holes[connectorId].outline.size(); i++)
-    {
-      for (int j = 0; j < conveyor->holes[connectableId].outline.size(); j++)
-      {
-        cv::line(canvas,
-          conveyor->holes[connectorId].outline[i],
-          conveyor->holes[connectableId].outline[j],
-          cv::Scalar(255, 0, 0), 1, 8);
-      }
-    }
-
-    // Construct the connector's new hole mask
-    // First, clear the former one
-    connectorHoleMaskSet->erase(
-      connectorHoleMaskSet->begin(),
-      connectorHoleMaskSet->end());
-
-    for (int rows = 0; rows < canvas.rows; rows++)
-    {
-      for (int cols = 0; cols < canvas.cols; cols++)
-      {
-        unsigned int ind = cols + rows * image.cols;
-        if (ptr[ind] != 0)
-        {
-          connectorHoleMaskSet->insert(ptr[ind]);
-        }
-      }
-    }
-
-    // Invert canvas
-    for (int rows = 0; rows < image.rows; rows++)
-    {
-      for (int cols = 0; cols < image.cols; cols++)
-      {
-        unsigned int ind = cols + rows * image.cols;
-        if (ptr[ind] == 0)
-        {
-          ptr[ind] = 255;
-        }
-        else
-        {
-          ptr[ind] = 0;
-        }
-      }
-    }
-
-    // Locate the outline of the combined hole
-    std::vector<cv::Point2f> newConnectorOutline;
-    float area;
-    OutlineDetection::brushfireKeypoint(
-      conveyor->holes[connectorId].keypoint,
-      &canvas,
-      &newConnectorOutline,
-      &area);
-
-    conveyor->holes[connectorId].outline = newConnectorOutline;
-
-
-    // The connectable's new least area rotated bounding box will be the
-    // one that encloses the new (merged) outline points
-    cv::RotatedRect substituteRotatedRectangle =
-      cv::minAreaRect(conveyor->holes[connectorId].outline);
-
-    // Obtain the four vertices of the new rotated rectangle
-    cv::Point2f substituteVerticesArray[4];
-    substituteRotatedRectangle.points(substituteVerticesArray);
-
-    // Same as substituteVerticesArray array, but vector
-    std::vector<cv::Point2f> substituteVerticesVector;
-
-    // Store the four vertices to the substituteVerticesVector
-    for(int v = 0; v < 4; v++)
-    {
-      substituteVerticesVector.push_back(substituteVerticesArray[v]);
-    }
-
-    // Replace the connector's vertices with the new vertices
-    conveyor->holes[connectorId].rectangle.erase(
-      conveyor->holes[connectorId].rectangle.begin(),
-      conveyor->holes[connectorId].rectangle.end());
-
-    // Replace the connector's vertices with the new vertices
-    conveyor->holes[connectorId].rectangle = substituteVerticesVector;
-
-
-    // Set the overall candidate hole's keypoint to the mean of the keypoints
-    // of the connector and the connectable
-    conveyor->holes[connectorId].keypoint.pt.x =
-      (conveyor->holes[connectorId].keypoint.pt.x
-       + conveyor->holes[connectableId].keypoint.pt.x) / 2;
-
-    conveyor->holes[connectorId].keypoint.pt.y =
-      (conveyor->holes[connectorId].keypoint.pt.y
-       + conveyor->holes[connectableId].keypoint.pt.y) / 2;
-
-    #ifdef DEBUG_TIME
-    Timer::tick("connectOnce");
-    #endif
-  }
-
-
-
-  /**
     @brief With an input a conveyor of holes, this method, depending on
     the depth image's interpolation method, has holes assimilating,
     amalgamating or being connected with holes that can be assimilated,
@@ -1227,7 +1187,7 @@ namespace pandora_vision
     // Try to merge holes that can be assimilated, amalgamated or connected.
     // If Depth analysis is applicable, {assimilate, amalgamate, connect}
     // conditionally, based on depth filters. In the opposite case,
-    // {assimilate, amalgamate, connect} unconditionally.
+    // {assimilate, amalgamate} unconditionally.
     if (filteringMethod == RGBD_MODE)
     {
       for (int i = 0; i < 3; i++)

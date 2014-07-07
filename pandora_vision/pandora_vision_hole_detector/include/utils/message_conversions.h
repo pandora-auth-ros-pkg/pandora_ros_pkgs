@@ -39,7 +39,7 @@
 #define UTILS_MESSAGE_CONVERSIONS_H
 
 #include "utils/defines.h"
-#include "utils/outline_detection.h"
+#include "utils/outline_discovery.h"
 #include "utils/holes_conveyor.h"
 #include "vision_communications/CandidateHolesVectorMsg.h"
 

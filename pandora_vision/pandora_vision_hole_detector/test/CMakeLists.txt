@@ -15,9 +15,9 @@ add_definitions(${PCL_DEFINITIONS})
 
 #################################### utils #####################################
 
-catkin_add_gtest(outline_detection_test
-  unit/utils/outline_detection_test.cpp)
-target_link_libraries(outline_detection_test ${catkin_LIBRARIES} utils_lib gtest_main)
+catkin_add_gtest(outline_discovery_test
+  unit/utils/outline_discovery_test.cpp)
+target_link_libraries(outline_discovery_test ${catkin_LIBRARIES} utils_lib gtest_main)
 
 catkin_add_gtest(bounding_box_detection_test
   unit/utils/bounding_box_detection_test.cpp)

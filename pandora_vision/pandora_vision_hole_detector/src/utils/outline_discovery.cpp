@@ -35,7 +35,7 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/outline_detection.h"
+#include "utils/outline_discovery.h"
 
 /**
   @namespace pandora_vision
@@ -43,7 +43,6 @@
  **/
 namespace pandora_vision
 {
-
   /**
     @brief Implements the brushfire algorithm for one blob keypoint
     in order to find its outline points
@@ -54,7 +53,7 @@ namespace pandora_vision
     @param[out] blobArea [float*] The area of the blob
     @return void
    **/
-  void OutlineDetection::brushfireKeypoint(
+  void OutlineDiscovery::brushfireKeypoint(
     const cv::KeyPoint& inKeyPoint,
     cv::Mat* edgesImage,
     std::vector<cv::Point2f>* blobOutlineVector,
@@ -181,7 +180,7 @@ namespace pandora_vision
     @param[out] blobsArea [std::vector<float>*] The area of each blob
     @return void
    **/
-  void OutlineDetection::brushfireKeypoints(
+  void OutlineDiscovery::brushfireKeypoints(
     const std::vector<cv::KeyPoint>& inKeyPoints,
     cv::Mat* edgesImage,
     std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
@@ -227,7 +226,7 @@ namespace pandora_vision
     areas of non-zero value pixels.
     @return void
    **/
-  void OutlineDetection::brushfirePoint(
+  void OutlineDiscovery::brushfirePoint(
     const cv::Point2f& inPoint,
     cv::Mat* inImage,
     std::set<unsigned int>* visited)
@@ -323,7 +322,7 @@ namespace pandora_vision
     of the concentration of points
     @return void
    **/
-  void OutlineDetection::getOutlineFromMask(const cv::Mat& image,
+  void OutlineDiscovery::getOutlineOfMask(const cv::Mat& image,
     std::vector<cv::Point2f>* outline)
   {
 
@@ -334,7 +333,7 @@ namespace pandora_vision
     if (image.type() != CV_8UC1)
     {
       ROS_ERROR_NAMED(PKG_NAME,
-        "OutlineDetection::getOutlineFromMask : Inappropriate image type.");
+        "OutlineDiscovery::getOutlineFromMask : Inappropriate image type.");
 
       return;
     }
@@ -378,12 +377,12 @@ namespace pandora_vision
     @param[in,out] inImage [cv::Mat*] The input image
     @return void
    **/
-  void OutlineDetection::getShapesClearBorder (cv::Mat* inImage)
+  void OutlineDiscovery::getShapesClearBorder (cv::Mat* inImage)
   {
     if (inImage->type() != CV_8UC1)
     {
       ROS_ERROR_NAMED(PKG_NAME,
-        "OutlineDetection::getShapesClearBorder : Inappropriate image type.");
+        "OutlineDiscovery::getShapesClearBorder : Inappropriate image type.");
 
       return;
     }
@@ -606,12 +605,12 @@ namespace pandora_vision
     @param[in,out] inImage [cv::Mat*] The input image
     @return void
    **/
-  void OutlineDetection::getShapesClearBorderSimple (cv::Mat* inImage)
+  void OutlineDiscovery::getShapesClearBorderSimple (cv::Mat* inImage)
   {
     if (inImage->type() != CV_8UC1)
     {
       ROS_ERROR_NAMED(PKG_NAME,
-        "OutlineDetection::getShapesClearBorderSimple : Inappropriate image type.");
+        "OutlineDiscovery::getShapesClearBorderSimple : Inappropriate image type.");
 
       return;
     }
@@ -758,7 +757,7 @@ namespace pandora_vision
     findArea true
     @return void
    **/
-  void OutlineDetection::raycastKeypoint(
+  void OutlineDiscovery::raycastKeypoint(
     const cv::KeyPoint& inKeyPoint,
     cv::Mat* edgesImage,
     const int& partitions,
@@ -958,7 +957,7 @@ namespace pandora_vision
     @param[out] blobsArea [std::vector<float>*] The area of each blob
     @return void
    **/
-  void OutlineDetection::raycastKeypoints(
+  void OutlineDiscovery::raycastKeypoints(
     const std::vector<cv::KeyPoint>& inKeyPoints,
     cv::Mat* edgesImage,
     const int& partitions,

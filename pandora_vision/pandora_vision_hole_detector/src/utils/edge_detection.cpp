@@ -1199,7 +1199,7 @@ namespace pandora_vision
     #endif
 
     // Extract only the outer border of closed shapes
-    OutlineDetection::getShapesClearBorderSimple(img);
+    OutlineDiscovery::getShapesClearBorderSimple(img);
 
     #ifdef DEBUG_TIME
     Timer::tick("Sector #4");

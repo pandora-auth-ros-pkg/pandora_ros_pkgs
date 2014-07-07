@@ -79,7 +79,7 @@ add_library(utils_lib
   src/utils/message_conversions.cpp
   src/utils/morphological_operators.cpp
   src/utils/noise_elimination.cpp
-  src/utils/outline_detection.cpp
+  src/utils/outline_discovery.cpp
   src/utils/parameters.cpp
   src/utils/timer.cpp
   src/utils/visualization.cpp
@@ -128,7 +128,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/utils/message_conversions.h
   include/utils/morphological_operators.h
   include/utils/noise_elimination.h
-  include/utils/outline_detection.h
+  include/utils/outline_discovery.h
   include/utils/parameters.h
   #include/utils/timer.h
   include/utils/visualization.h
@@ -144,7 +144,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/utils/message_conversions.cpp
   src/utils/morphological_operators.cpp
   src/utils/noise_elimination.cpp
-  src/utils/outline_detection.cpp
+  src/utils/outline_discovery.cpp
   src/utils/parameters.cpp
   #src/utils/timer.cpp
   src/utils/visualization.cpp
@@ -199,7 +199,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   test/unit/utils/message_conversions_test.cpp
   test/unit/utils/morphological_operators_test.cpp
   test/unit/utils/noise_elimination_test.cpp
-  test/unit/utils/outline_detection_test.cpp
+  test/unit/utils/outline_discovery_test.cpp
   test/unit/utils/wavelets_test.cpp
 
   ################## depth node ###################

@@ -78,7 +78,7 @@ namespace pandora_vision
           std::vector<float> blobsArea;
 
           // Find the outline points of each keypoint
-          OutlineDetection::brushfireKeypoints(keyPoints,
+          OutlineDiscovery::brushfireKeypoints(keyPoints,
             denoisedDepthImageEdges,
             &blobsOutlineVector,
             &blobsArea);
@@ -117,7 +117,7 @@ namespace pandora_vision
           std::vector<float> blobsArea;
 
           // Find the (approximate) outline points of each keypoint
-          OutlineDetection::raycastKeypoints(keyPoints,
+          OutlineDiscovery::raycastKeypoints(keyPoints,
             denoisedDepthImageEdges,
             Parameters::Outline::raycast_keypoint_partitions,
             &blobsOutlineVector,

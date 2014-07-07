@@ -39,7 +39,7 @@
 #define HOLE_FUSION_NODE_FILTERS_RESOURCES_H
 
 #include "utils/defines.h"
-#include "utils/outline_detection.h"
+#include "utils/outline_discovery.h"
 #include "utils/holes_conveyor.h"
 #include "utils/parameters.h"
 

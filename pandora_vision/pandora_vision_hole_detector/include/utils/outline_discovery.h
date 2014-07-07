@@ -35,8 +35,8 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#ifndef UTILS_OUTLINE_DETECTION_H
-#define UTILS_OUTLINE_DETECTION_H
+#ifndef UTILS_OUTLINE_DISCOVERY_H
+#define UTILS_OUTLINE_DISCOVERY_H
 
 #include "utils/morphological_operators.h"
 
@@ -47,10 +47,10 @@
 namespace pandora_vision
 {
   /**
-    @class OutlineDetection
+    @class OutlineDiscovery
     @brief Provides methods for detection of holes' outlines
    **/
-  class OutlineDetection
+  class OutlineDiscovery
   {
     public:
 
@@ -109,7 +109,7 @@ namespace pandora_vision
         of the concentration of points
         @return void
        **/
-      static void getOutlineFromMask(const cv::Mat& image,
+      static void getOutlineOfMask(const cv::Mat& image,
         std::vector<cv::Point2f>* outline);
 
       /**
@@ -190,4 +190,4 @@ namespace pandora_vision
 
 } // namespace pandora_vision
 
-#endif  // UTILS_OUTLINE_DETECTION_H
+#endif  // UTILS_OUTLINE_DISCOVERY_H

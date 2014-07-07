@@ -443,12 +443,12 @@ namespace pandora_vision
       intermediatePointsImageVector,
       &probabilitiesVector2D);
 
-    // All filters have been applied, all probabilities produced
-    return probabilitiesVector2D;
-
     #ifdef DEBUG_TIME
     Timer::tick("filterHoles");
     #endif
+
+    // All filters have been applied, all probabilities produced
+    return probabilitiesVector2D;
   }
 
 

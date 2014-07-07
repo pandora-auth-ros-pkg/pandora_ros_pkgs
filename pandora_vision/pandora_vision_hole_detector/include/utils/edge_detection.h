@@ -38,7 +38,7 @@
 #ifndef UTILS_EDGE_DETECTION_H
 #define UTILS_EDGE_DETECTION_H
 
-#include "utils/outline_detection.h"
+#include "utils/outline_discovery.h"
 #include "utils/histogram.h"
 #include "utils/morphological_operators.h"
 
