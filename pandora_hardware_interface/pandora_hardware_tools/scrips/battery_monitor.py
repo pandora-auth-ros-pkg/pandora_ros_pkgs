@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ''' 
-File Description    Battery monitor node. Beeps when battery under 21 Volts.
+File Description    Battery monitor node. Beeps when battery under 20.5 Volts.
 Author            Chris Zalidis
 '''
 
@@ -32,7 +32,7 @@ class BatteryMonitor:
 
         for i in range(len(data.name)):
 
-            if data.voltage[i] > 18 and self.previous_voltage[i] < 18:
+            if data.voltage[i] > 20.7 and self.previous_voltage[i] < 20.5:
                 self.ok[i] = True
 
             self.highest_voltage[i] = max(data.voltage[i], self.highest_voltage[i])
@@ -43,7 +43,7 @@ class BatteryMonitor:
                     subprocess.Popen(self.beeper)
                 self.ok[i] = False
 
-            self.highest_voltage[i] = data.voltage[i]
+            self.previous_voltage[i] = data.voltage[i]
 
 
 if __name__ == '__main__':
