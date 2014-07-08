@@ -1,5 +1,5 @@
 <launch>
   <node name="bag" type="record" pkg="rosbag"
-    args="-b 0 /sensors/imu /tf /laser/scan /slam/map /sensors/thermal" />
+    args="-b 0 /tf /slam/map /sensors/thermal /vision/holes_direction_alert /vision/victim_direction_alert /victim/qr_alert /victim/motion_alert" />
 </launch>
 

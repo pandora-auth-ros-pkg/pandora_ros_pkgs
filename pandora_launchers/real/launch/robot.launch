@@ -6,7 +6,7 @@
   <arg name="slam" default="true"/>
   <arg name="navigation" default="false"/>
   <arg name="data_fusion" default="true"/>
-  <arg name="kinect_filter" default="false"/>
+  <arg name="kinect_filter" default="true"/>
   <arg name="vision" default="true"/>
   <arg name="bag" default="false"/>
   
@@ -18,7 +18,7 @@
   <arg name="linear" default="true"/>
   <arg name="arm" default="true"/>
   <arg name="battery_monitor" default="true"/>
-  <arg name="state_indicator" default="true"/>
+  <arg name="state_indicator" default="false"/>
 
   <!--Control Arguments -->
   <arg name="stabilizer" default="true"/>
@@ -31,12 +31,13 @@
   <arg name="camera_right" default="true"/>
   <arg name="xtion" default="true"/>
 
-  <arg name="vision_hole" default="true"/>
+  <arg name="vision_hole_detector" default="true"/>
   <arg name="vision_qr" default="true"/>
-  <arg name="vision_hazmat" default="true"/>
+  <arg name="vision_hazmat" default="false"/>
   <arg name="vision_landoltc" default="true"/>
   <arg name="vision_motion" default="true"/>
-  <arg name="vision_landoltc3d" default="true"/>
+  <arg name="vision_landoltc3d" default="false"/>
+  <arg name="vision_victim" default="true"/>
   
   <arg name="vision_datamatrix" default="false"/>
   <arg name="vision_predator" default="false"/>
@@ -119,6 +120,8 @@
     <arg name="vision_datamatrix" value="$(arg vision_datamatrix)"/>
     <arg name="vision_landoltc3d" value="$(arg vision_landoltc3d)"/>
     <arg name="vision_predator" value="$(arg vision_predator)"/>
+    <arg name="vision_hole_detector" value="$(arg vision_hole_detector)"/>
+    <arg name="vision_victim" value="$(arg vision_victim)"/>
   </include>
 
   <group if="$(arg bag)">
