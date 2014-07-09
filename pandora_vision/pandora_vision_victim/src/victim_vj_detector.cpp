@@ -150,7 +150,7 @@ namespace pandora_vision
       float temp_prob = tanh(0.5 * (prediction[i] - 20.0) );
       //~ Normalize probability to [0,1]
       temp_prob = (1 + temp_prob) / 2.0;
-      ROS_INFO_STREAM("Viola pred/prob :" << prediction[i] <<" "<<temp_prob);
+      ROS_INFO_STREAM("Viola pred/prob :" << prediction[i] << " " << temp_prob);
       p.push_back(temp_prob);
     }
     return p;

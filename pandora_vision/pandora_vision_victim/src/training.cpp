@@ -373,7 +373,8 @@ namespace pandora_vision
             << "Test_Depth_Positive_Images/positive" << ii + 1 << ".jpg";
       else
         img_name << path_to_samples << "/data/"
-            << "Test_Depth_Negative_Images/negative" << ii + 1 - TrainingParameters::numOfTestPositiveSamples  << ".jpg";
+            << "Test_Depth_Negative_Images/negative" << ii + 1 - 
+              TrainingParameters::numOfTestPositiveSamples  << ".jpg";
       }
         
       std::cout << img_name.str() << std::endl;
@@ -784,7 +785,8 @@ namespace pandora_vision
     {
       sum = 0;
       for(int jj = 0; jj < training_mat.cols; jj++)
-          sum = sum + pow( training_mat.at<double>(ii, jj) - training_mat.at<double>(ii + TrainingParameters::numOfPositiveSamples), 2);
+          sum = sum + pow( training_mat.at<double>(ii, jj) - 
+            training_mat.at<double>(ii + TrainingParameters::numOfPositiveSamples), 2);
       distance = sqrt(sum);
       std::cout << "distance=" << distance <<" "<< ii << std::endl;
 

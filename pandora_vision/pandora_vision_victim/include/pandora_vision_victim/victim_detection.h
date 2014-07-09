@@ -151,7 +151,7 @@ namespace pandora_vision
     public:
 
       //!< The Constructor
-      VictimDetection(const std::string& ns);
+      explicit VictimDetection(const std::string& ns);
 
       //!< The Destructor
       ~VictimDetection();

@@ -196,7 +196,7 @@ namespace pandora_vision
       prediction - VictimParameters::rgb_svm_prob_translation);
     //~ Normalize probability to [0,1]
     probability = (1 + probability) / 2.0;
-    ROS_INFO_STREAM("SVM RGB pred/prob :" << prediction <<" "<<probability);
+    ROS_INFO_STREAM("SVM RGB pred/prob :" << prediction << " " <<probability);
     return probability;
   }
 }// namespace pandora_vision 

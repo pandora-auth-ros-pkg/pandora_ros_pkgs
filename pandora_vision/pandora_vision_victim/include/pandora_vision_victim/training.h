@@ -248,4 +248,4 @@ public:
   
 };
 }// namespace pandora_vision
-#endif // PANDORA_VISION_VICTIM_TRAINING_H
+#endif  // PANDORA_VISION_VICTIM_TRAINING_H

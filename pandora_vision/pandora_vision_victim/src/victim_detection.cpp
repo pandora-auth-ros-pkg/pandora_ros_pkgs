@@ -466,35 +466,35 @@ namespace pandora_vision
         std::ostringstream convert;
         convert << "RGB_VJ : "<< rgb_vj_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10,20),
+          cvPoint(10, 20),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 0), 1, CV_AA);
       }
       {
         std::ostringstream convert;
         convert << "DEPTH_VJ : "<< depth_vj_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10,40),
+          cvPoint(10, 40),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 0), 1, CV_AA);
       }
       {
         std::ostringstream convert;
         convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10,60),
+          cvPoint(10, 60),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
       }
       {
         std::ostringstream convert;
         convert << "DEPTH_SVM : "<< depth_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10,80),
+          cvPoint(10, 80),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
       }
       {
         std::ostringstream convert;
         convert << "Holes got : "<< msg.enhancedHoles.size();
         cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10,100),
+          cvPoint(10, 100),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 0, 0), 1, CV_AA);
       }
     }
