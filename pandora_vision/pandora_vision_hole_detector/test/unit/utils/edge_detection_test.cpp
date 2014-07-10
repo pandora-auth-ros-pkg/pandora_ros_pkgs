@@ -344,7 +344,7 @@ namespace pandora_vision
       Parameters::Edge::edge_detection_method = p;
 
       // Test the toggle switch
-      for ( int t = 1; t < 3; t++ )
+      for ( int t = 0; t < 2; t++ )
       {
         Parameters::Edge::mixed_edges_toggle_switch = t;
 
@@ -388,7 +388,6 @@ namespace pandora_vision
         EXPECT_LT ( 0, cv::countNonZero( denoisedEdges ) );
       }
     }
-
   }
 
 
@@ -1005,6 +1004,57 @@ namespace pandora_vision
     // Uncomment for visual inspection
     //Visualization::show("ii failure", ii , 0);
 
+  }
+
+
+
+  //! Tests EdgeDetection::detectEdges
+  TEST_F ( EdgeDetectionTest, detectEdgesTest )
+  {
+    // Traverse all available edge detectors
+    for ( int p = 0; p < 5; p++ )
+    {
+      // Test the toggle switch
+      for ( int t = 0; t < 2; t++ )
+      {
+        Parameters::Edge::mixed_edges_toggle_switch = t;
+
+        // Convert squares_ into a CV_32FC1 type image
+        cv::Mat squares_32FC1 = cv::Mat::zeros ( squares_.size(), CV_32FC1 );
+
+        for ( int rows = 0; rows < squares_.rows; rows++ )
+        {
+          for ( int cols = 0; cols < squares_.cols; cols++ )
+          {
+            squares_32FC1.at< float >( rows, cols ) =
+              static_cast< float >(squares_.at< unsigned char >( rows, cols )) / 255;
+          }
+        }
+
+        // Add an unfinished square to the squares_32FC1 image
+        for ( int rows = 300; rows < 400; rows++ )
+        {
+          squares_32FC1.at< float >( rows, 300 ) = 2.0;
+        }
+
+        for ( int cols = 300; cols < 400; cols++ )
+        {
+          squares_32FC1.at< float >( 300, cols ) = 2.0;
+        }
+
+        // The squares_32FC1 image in 8UC1 format, scaled
+        cv::Mat squares_8UC1 =
+          Visualization::scaleImageForVisualization( squares_32FC1, 0);
+
+        // The image of edges
+        cv::Mat edges;
+        EdgeDetection::detectEdges( squares_8UC1, &edges, p );
+
+        ASSERT_EQ ( CV_8UC1, edges.type() );
+
+        EXPECT_LT ( 0, cv::countNonZero( edges ) );
+      }
+    }
   }
 
 

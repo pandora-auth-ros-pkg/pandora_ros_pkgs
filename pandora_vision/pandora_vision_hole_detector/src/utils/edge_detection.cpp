@@ -404,40 +404,12 @@ namespace pandora_vision
     cv::Mat visualizableDepthImage = Visualization::scaleImageForVisualization(
       inImage, Parameters::Image::scale_method);
 
-    // The denoised edges image of the input depth image, in CV_32FC1 format
+    // The image of edges of the denoised depth image, in CV_32FC1 format
     cv::Mat denoisedDepthImageEdges;
 
     // Detect edges in the visualizableDepthImage
-    // From now onwards every image is in the range of 0-255
-    if (Parameters::Edge::edge_detection_method == 0)
-    {
-      applyCanny(visualizableDepthImage, &denoisedDepthImageEdges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 1)
-    {
-      applyScharr(visualizableDepthImage, &denoisedDepthImageEdges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 2)
-    {
-      applySobel(visualizableDepthImage, &denoisedDepthImageEdges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 3)
-    {
-      applyLaplacian(visualizableDepthImage, &denoisedDepthImageEdges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 4) // Mixed mode
-    {
-      if (Parameters::Edge::mixed_edges_toggle_switch == 1)
-      {
-        applyScharr(visualizableDepthImage, &denoisedDepthImageEdges);
-        Parameters::Edge::mixed_edges_toggle_switch = 2;
-      }
-      else if (Parameters::Edge::mixed_edges_toggle_switch == 2)
-      {
-        applySobel(visualizableDepthImage, &denoisedDepthImageEdges);
-        Parameters::Edge::mixed_edges_toggle_switch = 1;
-      }
-    }
+    detectEdges(visualizableDepthImage, &denoisedDepthImageEdges,
+      Parameters::Edge::edge_detection_method);
 
     // Apply a threshold to the image of edges
     // to get rid of low value - insignificant - edges
@@ -1228,6 +1200,61 @@ namespace pandora_vision
   }
 
 
+
+  /**
+    @brief Detects edges depending on a edge detection selection method.
+    @param[in] inImage [const cv::Mat&] The image whose edges one wishes
+    to detect.
+    @param[out] outImage [cv::Mat*] The image of edges, in format CV_8UC1
+    @param[in] detectionMethod [const int&] The edge detection method
+    selector.
+    @return void
+   **/
+  void EdgeDetection::detectEdges(const cv::Mat& inImage, cv::Mat* outImage,
+    const int& detectionMethod)
+  {
+    switch(detectionMethod)
+    {
+      case CANNY :
+        {
+          applyCanny(inImage, outImage);
+          break;
+        }
+      case SCHARR :
+        {
+          applyScharr(inImage, outImage);
+          break;
+        }
+      case SOBEL :
+        {
+          applySobel(inImage, outImage);
+          break;
+        }
+      case LAPLACIAN :
+        {
+          applyLaplacian(inImage, outImage);
+          break;
+        }
+      case MIXED :
+        {
+          if (Parameters::Edge::mixed_edges_toggle_switch == 0)
+          {
+            applyScharr(inImage, outImage);
+            Parameters::Edge::mixed_edges_toggle_switch = 1;
+          }
+          else if (Parameters::Edge::mixed_edges_toggle_switch == 1)
+          {
+            applySobel(inImage, outImage);
+            Parameters::Edge::mixed_edges_toggle_switch = 0;
+          }
+
+          break;
+        }
+    }
+  }
+
+
+
   /**
     @brief Identifies in which curve a point lies on and returns the
     curve's two end points. If a point does not lie on a curve,
@@ -1664,35 +1691,8 @@ namespace pandora_vision
     #endif
 
     // Apply edge detection to the grayscale posterized input RGB image
-    if (Parameters::Edge::edge_detection_method == 0)
-    {
-      EdgeDetection::applyCanny(segmentedHoleFrame8UC1, edges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 1)
-    {
-      EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 2)
-    {
-      EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 3)
-    {
-      EdgeDetection::applyLaplacian(segmentedHoleFrame8UC1, edges);
-    }
-    else if (Parameters::Edge::edge_detection_method == 4) // Mixed mode
-    {
-      if (Parameters::Edge::mixed_edges_toggle_switch == 1)
-      {
-        EdgeDetection::applyScharr(segmentedHoleFrame8UC1, edges);
-        Parameters::Edge::mixed_edges_toggle_switch = 2;
-      }
-      else if (Parameters::Edge::mixed_edges_toggle_switch == 2)
-      {
-        EdgeDetection::applySobel(segmentedHoleFrame8UC1, edges);
-        Parameters::Edge::mixed_edges_toggle_switch = 1;
-      }
-    }
+    detectEdges(segmentedHoleFrame8UC1, edges,
+      Parameters::Edge::edge_detection_method);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_produce_edges)

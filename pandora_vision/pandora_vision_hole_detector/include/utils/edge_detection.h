@@ -42,6 +42,12 @@
 #include "utils/histogram.h"
 #include "utils/morphological_operators.h"
 
+#define CANNY 0
+#define SCHARR 1
+#define SOBEL 2
+#define LAPLACIAN 3
+#define MIXED 4
+
 /**
   @namespace pandora_vision
   @brief The main namespace for PANDORA vision
@@ -209,6 +215,18 @@ namespace pandora_vision
         @return void
        **/
       static void denoiseEdges(cv::Mat* img);
+
+      /**
+        @brief Detects edges depending on a edge detection selection method.
+        @param[in] inImage [const cv::Mat&] The image whose edges one wishes
+        to detect.
+        @param[out] outImage [cv::Mat*] The image of edges, in format CV_8UC1
+        @param[in] detectionMethod [const int&] The edge detection method
+        selector.
+        @return void
+       **/
+      static void detectEdges(const cv::Mat& inImage, cv::Mat* outImage,
+        const int& detectionMethod);
 
       /**
         @brief Identifies in which curve a point lies on and returns the
