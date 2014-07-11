@@ -229,10 +229,17 @@ namespace pandora_vision
         const int& detectionMethod);
 
       /**
+        @brief Fills an image with random colours per image segment
+        @param[in,out] image [cv::Mat*] The image to be processed
+        (see http://docs.opencv.org/modules/imgproc/doc/
+        miscellaneous_transformations.html#floodfill)
+        @return void
+       **/
+      static void floodFillPostprocess(cv::Mat* image);
+
+      /**
         @brief Identifies in which curve a point lies on and returns the
-        curve's two end points. If a point does not lie on a curve,
-        the pair returned has both coordinates (x,y) set to zero, and the
-        size of @param ret is one.
+        curve's two end points.
         @param[in] img [cv::Mat*] The input binary image
         @param[in] x_ [const int&] The x coordinate of the point
         @param[in] y_ [const int&] The y coordinate of the point
@@ -241,17 +248,25 @@ namespace pandora_vision
         @return edgePoints [std::pair<GraphNode, GraphNode>*] The curve's pair
         of end points
        **/
-      static std::pair<GraphNode, GraphNode> findNeighs(cv::Mat* img,
-        const int& x_, const int& y_, std::set<unsigned int>* ret);
+      static std::pair<GraphNode, GraphNode> identifyCurveAndEndpoints(
+        cv::Mat* img, const int& x_, const int& y_, std::set<unsigned int>* ret);
 
       /**
-        @brief Fills an image with random colours per image segment
-        @param[in,out] image [cv::Mat*] The image to be processed
-        (see http://docs.opencv.org/modules/imgproc/doc/
-        miscellaneous_transformations.html#floodfill)
+        @brief Given an image of CV_8UC1 format, this method locates and
+        identifies all continuous curves, along with their end-points.
+        CAUTION: the length of each curve must exceed a certain threshold.
+        @param[in,out] image [cv::Mat*] The image whose curves and their
+        endpoints one wishes to locate and identify. CAUTION: image is cleared
+        at the end of the process.
+        @param[out] lines [std::vector<std::set<unsigned int> >*]
+        A set containing the indices of points that constite
+        @param[out] endPoints [std::vector<std::pair<GraphNode, GraphNode> >*]
+        A vector of endpoints.
         @return void
        **/
-      static void floodFillPostprocess(cv::Mat* image);
+      static void identifyCurvesAndEndpoints(cv::Mat* image,
+        std::vector<std::set<unsigned int> >*,
+        std::vector<std::pair<GraphNode, GraphNode> >* endPoints);
 
       /**
         @brief This method takes as input a RGB image and uses

@@ -1100,62 +1100,6 @@ namespace pandora_vision
 
 
 
-  //! Tests EdgeDetection::findNeighs
-  TEST_F ( EdgeDetectionTest, findNeighsTest )
-  {
-    // A gamma shape
-    cv::Mat gamma = cv::Mat::zeros( squares_.size(), CV_8UC1 );
-
-    for ( int rows = 300; rows < 400; rows++ )
-    {
-      gamma.at< unsigned char >( rows, 300 ) = 255;
-    }
-
-    for ( int cols = 300; cols < 500; cols++ )
-    {
-      gamma.at< unsigned char >( 300, cols ) = 255;
-    }
-
-    std::set< unsigned int > ret;
-
-    // Find the end points of a curve where a point trully lies on
-    std::pair< GraphNode, GraphNode > p_valid =
-      EdgeDetection::findNeighs ( &gamma, 300, 451, &ret);
-
-    // The point should lie on a curve.
-    // The curve should indeed be a curve: it is constituted by points
-    EXPECT_LT ( 0, ret.size() );
-
-    // The first end point's coordinates
-    EXPECT_EQ ( p_valid.first.x, 300 );
-    EXPECT_EQ ( p_valid.first.y, 499 );
-
-    // The second end point's coordinates
-    EXPECT_EQ ( p_valid.second.x, 399 );
-    EXPECT_EQ ( p_valid.second.y, 300 );
-
-
-    ret.clear();
-
-    // Find the end points of a curve where a point trully lies on
-    std::pair< GraphNode, GraphNode > p_invalid =
-      EdgeDetection::findNeighs ( &gamma, 100, 200, &ret);
-
-    // The point should not lie on a curve.
-    EXPECT_EQ ( 1, ret.size() );
-
-    // The first end point's coordinates will be the origin
-    EXPECT_EQ ( p_invalid.first.x, 0 );
-    EXPECT_EQ ( p_invalid.first.y, 0 );
-
-    // The second end point's coordinates will be also be the origin
-    EXPECT_EQ ( p_invalid.second.x, 0 );
-    EXPECT_EQ ( p_invalid.second.y, 0 );
-
-  }
-
-
-
   // Tests EdgeDetection::floodFillPostprocess
   TEST_F ( EdgeDetectionTest, floodFillPortprocess )
   {
@@ -1178,6 +1122,147 @@ namespace pandora_vision
     EdgeDetection::floodFillPostprocess (&squares_8UC3);
 
     ASSERT_EQ ( CV_8UC3, squares_8UC3.type() );
+  }
+
+
+
+  //! Tests EdgeDetection::identifyCurveAndEndpoints
+  TEST_F ( EdgeDetectionTest, identifyCurveAndEndpoints )
+  {
+    // A gamma shape
+    cv::Mat gamma = cv::Mat::zeros( squares_.size(), CV_8UC1 );
+
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      gamma.at< unsigned char >( rows, 300 ) = 255;
+    }
+
+    for ( int cols = 300; cols < 500; cols++ )
+    {
+      gamma.at< unsigned char >( 300, cols ) = 255;
+    }
+
+    std::set< unsigned int > ret;
+
+    // Find the end points of a curve where a point trully lies on
+    std::pair< GraphNode, GraphNode > p_valid =
+      EdgeDetection::identifyCurveAndEndpoints ( &gamma, 300, 451, &ret);
+
+    // The point should lie on a curve.
+    // The curve should indeed be a curve: it is constituted by points
+    EXPECT_LT ( 0, ret.size() );
+
+    // The first end point's coordinates
+    EXPECT_EQ ( p_valid.first.x, 300 );
+    EXPECT_EQ ( p_valid.first.y, 499 );
+
+    // The second end point's coordinates
+    EXPECT_EQ ( p_valid.second.x, 399 );
+    EXPECT_EQ ( p_valid.second.y, 300 );
+
+
+    ret.clear();
+
+    // Find the end points of a curve where a point trully lies on
+    std::pair< GraphNode, GraphNode > p_invalid =
+      EdgeDetection::identifyCurveAndEndpoints ( &gamma, 100, 200, &ret);
+
+    // The point should not lie on a curve.
+    EXPECT_EQ ( 1, ret.size() );
+
+    // The first end point's coordinates will be the origin
+    EXPECT_EQ ( p_invalid.first.x, 0 );
+    EXPECT_EQ ( p_invalid.first.y, 0 );
+
+    // The second end point's coordinates will be also be the origin
+    EXPECT_EQ ( p_invalid.second.x, 0 );
+    EXPECT_EQ ( p_invalid.second.y, 0 );
+  }
+
+
+
+  //! Tests EdgeDetection::identifyCurvesAndEndpoints
+  TEST_F ( EdgeDetectionTest, identifyCurvesAndEndpoints )
+  {
+    // Three gamma shapes
+    cv::Mat gammas = cv::Mat::zeros( squares_.size(), CV_8UC1 );
+
+    // Valid
+    for ( int rows = 10; rows < 40; rows++ )
+    {
+      gammas.at< unsigned char >( rows, 10 ) = 255;
+    }
+
+    for ( int cols = 10; cols < 50; cols++ )
+    {
+      gammas.at< unsigned char >( 10, cols ) = 255;
+    }
+
+    // Invalid
+    for ( int rows = 60; rows < 70; rows++ )
+    {
+      gammas.at< unsigned char >( rows, 60 ) = 255;
+    }
+
+    for ( int cols = 60; cols < 70; cols++ )
+    {
+      gammas.at< unsigned char >( 60, cols ) = 255;
+    }
+
+    // Valid
+    for ( int rows = 300; rows < 400; rows++ )
+    {
+      gammas.at< unsigned char >( rows, 300 ) = 255;
+    }
+
+    for ( int cols = 300; cols < 500; cols++ )
+    {
+      gammas.at< unsigned char >( 300, cols ) = 255;
+    }
+
+
+    std::vector< std::set<unsigned int > > lines;
+    std::vector< std::pair< GraphNode, GraphNode > > endPoints;
+
+    // Run EdgeDetection::identifyCurvesAndEndpoints
+    EdgeDetection::identifyCurvesAndEndpoints( &gammas, &lines, &endPoints );
+
+    // There should be as many lines as there are pairs of end-points
+    ASSERT_EQ (lines.size(), endPoints.size());
+
+    // The gammas image should be processed and turned void
+    int nonZero = cv::countNonZero( gammas );
+    ASSERT_EQ ( 0, nonZero );
+
+    // There should be two curves exceeding the length threshold,
+    // hence there are two different entries for curves and end-points
+    EXPECT_EQ( 2, lines.size() );
+    EXPECT_EQ( 2, endPoints.size() );
+
+    // Every curve found should have a length greater than the threshold set.
+    for ( int i = 0; i < lines.size(); i++ )
+    {
+      ASSERT_LT( Parameters::Outline::minimum_curve_points, lines[i].size() );
+    }
+
+
+    // The coordinates of the end-points found
+    EXPECT_EQ ( endPoints[0].second.x, 10 );
+    EXPECT_EQ ( endPoints[0].second.y, 49 );
+
+    // The second end point's coordinates
+    EXPECT_EQ ( endPoints[0].first.x, 39 );
+    EXPECT_EQ ( endPoints[0].first.y, 10 );
+
+
+    // The first end point's coordinates
+    EXPECT_EQ ( endPoints[1].second.x, 300 );
+    EXPECT_EQ ( endPoints[1].second.y, 499 );
+
+    // The second end point's coordinates
+    EXPECT_EQ ( endPoints[1].first.x, 399 );
+    EXPECT_EQ ( endPoints[1].first.y, 300 );
+
   }
 
 
