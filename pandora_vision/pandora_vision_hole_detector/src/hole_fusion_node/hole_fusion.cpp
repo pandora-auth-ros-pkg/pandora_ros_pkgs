@@ -1149,6 +1149,10 @@ namespace pandora_vision
 
     //--------------------------- Merger parameters ----------------------------
 
+    // Option to enable or disable the merging of holes
+    Parameters::HoleFusion::Merger::merge_holes =
+      config.merge_holes;
+
     // Holes connection - merger parameters
     Parameters::HoleFusion::Merger::connect_holes_min_distance =
       config.connect_holes_min_distance;
@@ -1439,42 +1443,53 @@ namespace pandora_vision
     // Publish an image depicting the holes found by the Depth and RGB nodes
     publishRespectiveHolesFound();
 
-    // Merge the conveyors from the RGB and Depth sources
+    // Merge the conveyors from the RGB and Depth sources into one conveyor
     HolesConveyor rgbdHolesConveyor;
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
       &rgbdHolesConveyor);
 
-    // Keep a backup of the original holes found from both the
-    // RGB and Depth nodes
-    HolesConveyor originalRgbdHolesConveyor;
-    HolesConveyorUtils::copyTo(rgbdHolesConveyor, &originalRgbdHolesConveyor);
+    // The container in which holes will be assembled before validation
+    HolesConveyor preValidatedHoles;
 
-    // Apply the {assimilation, amalgamation, connection} processes
-    HoleMerger::mergeHoles(&rgbdHolesConveyor,
-      filteringMode_,
-      interpolatedDepthImage_,
-      pointCloud_);
+    // Check if merging is enabled
+    if (Parameters::HoleFusion::Merger::merge_holes)
+    {
+      // Keep a backup of the original holes found from both the
+      // RGB and Depth nodes
+      HolesConveyor originalRgbdHolesConveyor;
+      HolesConveyorUtils::copyTo(rgbdHolesConveyor, &originalRgbdHolesConveyor);
 
-    // The original holes and the merged ones now reside under the
-    // rgbdPlusMergedConveyor conveyor
-    HolesConveyor rgbdPlusMergedConveyor;
-    HolesConveyorUtils::merge(originalRgbdHolesConveyor, rgbdHolesConveyor,
-      &rgbdPlusMergedConveyor);
+      // Apply the {assimilation, amalgamation, connection} processes
+      HoleMerger::mergeHoles(&rgbdHolesConveyor,
+        filteringMode_,
+        interpolatedDepthImage_,
+        pointCloud_);
+
+      // The original holes and the merged ones now reside under the
+      // preValidatedHoles conveyor
+      HolesConveyorUtils::merge(originalRgbdHolesConveyor, rgbdHolesConveyor,
+        &preValidatedHoles);
+    }
+    else
+    {
+      HolesConveyorUtils::copyTo(rgbdHolesConveyor, &preValidatedHoles);
+    }
 
     // Apply all active filters and obtain a 2D vector containing the
     // probabilities of validity of each candidate hole, produced by all
     // active filters
     std::vector<std::vector<float> > probabilitiesVector2D;
-    probabilitiesVector2D = filterHoles(rgbdPlusMergedConveyor);
+    probabilitiesVector2D = filterHoles(preValidatedHoles);
 
+    #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_probabilities)
     {
-      for(int i = 0; i < rgbdPlusMergedConveyor.size(); i++)
+      for(int i = 0; i < preValidatedHoles.size(); i++)
       {
         ROS_INFO_NAMED(PKG_NAME, "--------------------------------");
         ROS_INFO_NAMED(PKG_NAME, "Keypoint [%f %f]",
-          rgbdPlusMergedConveyor.holes[i].keypoint.pt.x,
-          rgbdPlusMergedConveyor.holes[i].keypoint.pt.y);
+          preValidatedHoles.holes[i].keypoint.pt.x,
+          preValidatedHoles.holes[i].keypoint.pt.y);
 
         for (int j = 0; j < probabilitiesVector2D.size(); j++)
         {
@@ -1483,6 +1498,7 @@ namespace pandora_vision
         }
       }
     }
+    #endif
 
     // Write the extracted probabilities to a file. These will be used to
     // produce a dataset of values that need to be minimized in order for a
@@ -1521,7 +1537,7 @@ namespace pandora_vision
         HolesConveyor oneHole;
 
         HolesConveyorUtils::append(
-          HolesConveyorUtils::getHole(rgbdPlusMergedConveyor, it->first),
+          HolesConveyorUtils::getHole(preValidatedHoles, it->first),
           &oneHole);
 
         // Project this valid hole onto the rgb image
@@ -1538,16 +1554,16 @@ namespace pandora_vision
     }
     #endif
 
-    // In general, the rgbdPlusMergedConveyor conveyor will contain
+    // In general, the preValidatedHoles conveyor will contain
     // merged and um-merged holes, potentially resulting in multiple entries
     // inside the conveyor for the same physical hole. The method below
     // picks the most probable valid hole among the ones referring to the same
     // physical hole.
-    makeValidHolesUnique(&rgbdPlusMergedConveyor, &validHolesMap);
+    makeValidHolesUnique(&preValidatedHoles, &validHolesMap);
 
-    // Rename the rgbdPlusMergedConveyor to uniqueValidHoles
+    // Rename the preValidatedHoles to uniqueValidHoles
     HolesConveyor uniqueValidHoles;
-    HolesConveyorUtils::copyTo(rgbdPlusMergedConveyor, &uniqueValidHoles);
+    HolesConveyorUtils::copyTo(preValidatedHoles, &uniqueValidHoles);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_final_holes)

@@ -327,6 +327,9 @@ namespace pandora_vision
       //! Parameters specific to the merging of holes
       struct Merger
       {
+        // Option to enable or disable the merging of holes
+        static bool merge_holes;
+
         // Holes connection - merger
         static float connect_holes_min_distance;
         static float connect_holes_max_distance;

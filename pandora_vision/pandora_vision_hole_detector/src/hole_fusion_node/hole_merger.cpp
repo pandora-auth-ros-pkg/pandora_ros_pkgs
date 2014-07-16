@@ -240,23 +240,25 @@ namespace pandora_vision
       {
         // Is the activeId-th candidate hole able to assimilate the
         // passiveId-th candidate hole?
-        isAble = HoleMerger::isCapableOfAssimilating(
+        isAble = isCapableOfAssimilating(
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
+
       if (operationId == AMALGAMATION)
       {
         // Is the activeId-th candidate hole able to amalgamate the
         // passiveId-th candidate hole?
-        isAble = HoleMerger::isCapableOfAmalgamating(
+        isAble = isCapableOfAmalgamating(
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
+
       if (operationId == CONNECTION)
       {
         // Is the passiveId-th candidate hole able to be connected with the
         // activeId-th candidate hole?
-        isAble = HoleMerger::isCapableOfConnecting(*rgbdHolesConveyor,
+        isAble = isCapableOfConnecting(*rgbdHolesConveyor,
           activeId,
           passiveId,
           holesMasksSetVector[activeId],
@@ -291,7 +293,7 @@ namespace pandora_vision
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has amalgamated
           // the passiveId-th candidate hole
-          HoleMerger::amalgamateOnce(&tempHolesConveyor,
+          amalgamateOnce(&tempHolesConveyor,
             activeId,
             &tempHolesMasksSetVector[activeId],
             tempHolesMasksSetVector[passiveId],
@@ -304,7 +306,7 @@ namespace pandora_vision
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has been
           // connected with the passiveId -th candidate hole
-          HoleMerger::connectOnce(&tempHolesConveyor,
+          connectOnce(&tempHolesConveyor,
             activeId, passiveId,
             &tempHolesMasksSetVector[activeId],
             image);
@@ -552,7 +554,7 @@ namespace pandora_vision
       {
         // Is the activeId-th candidate hole able to assimilate the
         // passiveId-th candidate hole?
-        isAble = HoleMerger::isCapableOfAssimilating(
+        isAble = isCapableOfAssimilating(
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
@@ -560,7 +562,7 @@ namespace pandora_vision
       {
         // Is the activeId-th candidate hole able to amalgamate the
         // passiveId-th candidate hole?
-        isAble = HoleMerger::isCapableOfAmalgamating(
+        isAble = isCapableOfAmalgamating(
           holesMasksSetVector[activeId],
           holesMasksSetVector[passiveId]);
       }
@@ -591,7 +593,7 @@ namespace pandora_vision
           // Delete the passiveId-th candidate hole,
           // alter the activeId-th candidate hole so that it has amalgamated
           // the passiveId-th candidate hole
-          HoleMerger::amalgamateOnce(&tempHolesConveyor,
+          amalgamateOnce(&tempHolesConveyor,
             activeId,
             &tempHolesMasksSetVector[activeId],
             tempHolesMasksSetVector[passiveId],
@@ -1192,7 +1194,7 @@ namespace pandora_vision
     {
       for (int i = 0; i < 3; i++)
       {
-        HoleMerger::applyMergeOperation(
+        applyMergeOperation(
           conveyor,
           interpolatedDepthImage,
           pointCloud,
@@ -1203,7 +1205,7 @@ namespace pandora_vision
     {
       for (int i = 0; i < 3; i++)
       {
-        HoleMerger::applyMergeOperationWithoutValidation(
+        applyMergeOperationWithoutValidation(
           conveyor,
           interpolatedDepthImage,
           i);

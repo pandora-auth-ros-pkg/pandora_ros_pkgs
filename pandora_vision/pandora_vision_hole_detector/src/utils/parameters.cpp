@@ -247,6 +247,9 @@ namespace pandora_vision
   double Parameters::HoleFusion::Planes::num_points_to_exclude = 0.2;
   double Parameters::HoleFusion::Planes::point_to_plane_distance_threshold = 0.08;
 
+  // Option to enable or disable the merging of holes
+  bool Parameters::HoleFusion::Merger::merge_holes = true;
+
   // Holes connection - merger
   float Parameters::HoleFusion::Merger::connect_holes_min_distance = 0.1;
   float Parameters::HoleFusion::Merger::connect_holes_max_distance = 0.2;

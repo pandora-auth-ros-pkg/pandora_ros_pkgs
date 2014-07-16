@@ -81,8 +81,8 @@ namespace pandora_vision
       // Use the 0-th (Hue) and secondaryChannel channels
       int channels[] = {0, secondaryChannel};
 
-    cv::calcBackProject(&hsv, 1, channels, modelHistogram,
-      *backprojection, ranges, 1, true);
+      cv::calcBackProject(&hsv, 1, channels, modelHistogram,
+        *backprojection, ranges, 1, true);
     }
     else
     {
