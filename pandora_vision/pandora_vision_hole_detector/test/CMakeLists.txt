@@ -81,7 +81,6 @@ target_link_libraries(rgb_hole_detector_test ${catkin_LIBRARIES} rgb_node_lib ut
 catkin_add_gtest(depth_filters_test
   unit/hole_fusion_node/depth_filters_test.cpp)
 
-
 add_library(depth_filters_lib
   ../src/hole_fusion_node/depth_filters.cpp
   ../src/hole_fusion_node/filters_resources.cpp
@@ -89,7 +88,6 @@ add_library(depth_filters_lib
   )
 
 target_link_libraries(depth_filters_test depth_filters_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
-
 
 ###### hole_merger_test.cpp ######
 catkin_add_gtest(hole_merger_test
@@ -104,10 +102,10 @@ add_library(hole_merger_lib
 
 target_link_libraries(hole_merger_test hole_merger_lib pcl_filters ${PCL_LIBRARIES} ${catkin_LIBRARIES} utils_lib gtest_main)
 
+
 ###### filters_test.cpp ######
 catkin_add_gtest(filters_test
   unit/hole_fusion_node/filters_test.cpp)
-
 
 add_library(filters_lib
   ../src/hole_fusion_node/depth_filters.cpp
@@ -119,7 +117,6 @@ add_library(filters_lib
 target_link_libraries(filters_test filters_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
 
 
-
 ###### filters_resources_test.cpp ######
 catkin_add_gtest(filters_resources_test
   unit/hole_fusion_node/filters_resources_test.cpp)
@@ -129,6 +126,17 @@ add_library(filters_resources_lib
 
 target_link_libraries(filters_resources_test ${catkin_LIBRARIES} filters_resources_lib utils_lib gtest_main)
 
+
+###### hole_validation_test.cpp ######
+catkin_add_gtest(hole_validation_test
+  unit/hole_fusion_node/hole_validation_test.cpp)
+
+add_library(hole_validation_lib
+  ../src/hole_fusion_node/hole_validation.cpp)
+
+target_link_libraries(hole_validation_test ${catkin_LIBRARIES} hole_validation_lib utils_lib gtest_main)
+
+
 ###### planes_detection_test.cpp ######
 catkin_add_gtest(planes_detection_test
   unit/hole_fusion_node/planes_detection_test.cpp)
@@ -137,6 +145,7 @@ add_library(planes_detection_lib
   ../src/hole_fusion_node/planes_detection.cpp)
 
 target_link_libraries(planes_detection_test planes_detection_lib pcl_filters ${PCL_LIBRARIES} utils_lib gtest_main)
+
 
 ###### rgb_filters_test.cpp ######
 catkin_add_gtest(rgb_filters_test

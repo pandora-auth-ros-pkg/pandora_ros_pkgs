@@ -156,6 +156,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   include/hole_fusion_node/depth_filters.h
   include/hole_fusion_node/hole_merger.h
   include/hole_fusion_node/hole_fusion.h
+  include/hole_fusion_node/hole_validation.h
   include/hole_fusion_node/filters.h
   include/hole_fusion_node/filters_resources.h
   include/hole_fusion_node/planes_detection.h
@@ -164,6 +165,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/hole_fusion_node/depth_filters.cpp
   src/hole_fusion_node/hole_merger.cpp
   src/hole_fusion_node/hole_fusion.cpp
+  src/hole_fusion_node/hole_validation.cpp
   src/hole_fusion_node/hole_fusion_node.cpp
   src/hole_fusion_node/filters.cpp
   src/hole_fusion_node/filters_resources.cpp
@@ -212,6 +214,7 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   test/unit/hole_fusion_node/depth_filters_test.cpp
   test/unit/hole_fusion_node/filters_resources_test.cpp
   test/unit/hole_fusion_node/hole_merger_test.cpp
+  test/unit/hole_fusion_node/hole_validation_test.cpp
   test/unit/hole_fusion_node/planes_detection_test.cpp
   test/unit/hole_fusion_node/rgb_filters_test.cpp
 
