@@ -61,6 +61,7 @@
 #include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/rgb_filters.h"
 #include "hole_fusion_node/hole_merger.h"
+#include "hole_fusion_node/hole_uniqueness.h"
 #include "hole_fusion_node/hole_validation.h"
 
 

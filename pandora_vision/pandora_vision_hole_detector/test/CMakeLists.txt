@@ -137,6 +137,16 @@ add_library(hole_validation_lib
 target_link_libraries(hole_validation_test ${catkin_LIBRARIES} hole_validation_lib utils_lib gtest_main)
 
 
+###### hole_uniqueness_test.cpp ######
+catkin_add_gtest(hole_uniqueness_test
+  unit/hole_fusion_node/hole_uniqueness_test.cpp)
+
+add_library(hole_uniqueness_lib
+  ../src/hole_fusion_node/hole_uniqueness.cpp)
+
+target_link_libraries(hole_uniqueness_test ${catkin_LIBRARIES} hole_uniqueness_lib utils_lib gtest_main)
+
+
 ###### planes_detection_test.cpp ######
 catkin_add_gtest(planes_detection_test
   unit/hole_fusion_node/planes_detection_test.cpp)

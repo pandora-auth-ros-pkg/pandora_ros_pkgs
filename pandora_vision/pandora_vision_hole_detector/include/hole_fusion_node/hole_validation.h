@@ -54,8 +54,9 @@
 namespace pandora_vision
 {
   /**
-    @class
-    @brief
+    @class HoleValidation
+    @brief Provides methods for validating filter-extracted validity
+    probabilities about holes
    **/
   class HoleValidation
   {
