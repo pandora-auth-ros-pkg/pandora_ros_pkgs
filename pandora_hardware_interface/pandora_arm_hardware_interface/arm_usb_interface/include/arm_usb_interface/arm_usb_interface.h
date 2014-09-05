@@ -64,9 +64,9 @@ namespace arm
 /**Command to send if you want CO2 data*/
 #define COMMAND_CO2 4
 
-#define CO2_NBYTES 4         ///<Number of bytes of incoming CO2 data
-#define GEYE_NBYTES 64       ///<Number of bytes of incoming GridEYE data
-#define COMMAND_NBYTES 1     ///<Number of bytes of outgoing command
+#define CO2_NBYTES 4         ///< Number of bytes of incoming CO2 data
+#define GEYE_NBYTES 64       ///< Number of bytes of incoming GridEYE data
+#define COMMAND_NBYTES 1     ///< Number of bytes of outgoing command
 
 class ArmUSBInterface : private boost::noncopyable
 {
@@ -74,6 +74,8 @@ public:
   ArmUSBInterface();
 
   ~ArmUSBInterface();
+
+  void openUSBPort();
 
   /**
    * @attention If the uController detects a malfunction in a sensor it returns
@@ -97,10 +99,10 @@ public:
 
 private:
   void reconnectUSB();
-  int fd; ///<File Descriptor
+  int fd;  ///< File Descriptor
 };
 
-} // namespace arm
-} // namespace pandora_hardware_interface
+}  // namespace arm
+}  // namespace pandora_hardware_interface
 
 #endif  // ARM_USB_INTERFACE_ARM_USB_INTERFACE_H

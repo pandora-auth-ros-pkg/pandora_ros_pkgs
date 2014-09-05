@@ -47,9 +47,20 @@ namespace arm
 
 ArmUSBInterface::ArmUSBInterface()
 {
+  openUSBPort();
+}
+
+ArmUSBInterface::~ArmUSBInterface()
+{
+  close(fd);
+  ROS_INFO("[Head]: usb port closed because of program termination\n");
+}
+
+void ArmUSBInterface::openUSBPort()
+{
   int timeout = 0;
-  //To make read non-blocking use the following
-  //  fd = open("/dev/head", O_RDWR | O_NOCTTY | O_NDELAY);
+  // To make read non-blocking use the following:
+  // fd = open("/dev/head", O_RDWR | O_NOCTTY | O_NDELAY);
   while ((fd = open("/dev/head", O_RDWR | O_NOCTTY)) == -1)
   {
     ROS_ERROR("[Head]: cannot open usb port\n");
@@ -67,9 +78,9 @@ ArmUSBInterface::ArmUSBInterface()
    tcflush() didn't work without waiting at least 8 ms*/
   ros::Duration(0.03).sleep();
 
-  //To save time you can see and change terminal settings in command line with stty command,
-  //before implementing in software. Note: stty prefixes disabled flags with a dash.
-  //See:  http://man7.org/linux/man-pages/man3/termios.3.html
+  // To save time you can see and change terminal settings in command line with stty command,
+  // before implementing in software. Note: stty prefixes disabled flags with a dash.
+  // See:  http://man7.org/linux/man-pages/man3/termios.3.html
   struct termios tios;
 
   if (tcgetattr(fd, &tios) < 0)
@@ -87,12 +98,6 @@ ArmUSBInterface::ArmUSBInterface()
   {
     ROS_ERROR("init_serialport: Couldn't set term attributes\n");
   }
-}
-
-ArmUSBInterface::~ArmUSBInterface()
-{
-  close(fd);
-  ROS_INFO("[Head]: usb port closed because of program termination\n");
 }
 
 int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
@@ -117,8 +122,8 @@ int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
       break;
   }
 
-  tcflush(fd, TCIOFLUSH); //flushes both data received but not read,
-                          //-> and data written but not transmitted
+  tcflush(fd, TCIOFLUSH);  // flushes both data received but not read,
+                           // -> and data written but not transmitted
 
   nr = write(fd, (const void *)&bufOUT, COMMAND_NBYTES);
   if (nr != 1)
@@ -128,7 +133,7 @@ int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
     return -1;
   }
 
-  nr = read(fd, values, GEYE_NBYTES); //blocking
+  nr = read(fd, values, GEYE_NBYTES);  // blocking
   if (nr < 0)
   {
     ROS_ERROR("[Head]: Read Error\n");
@@ -143,7 +148,7 @@ int ArmUSBInterface::grideyeValuesGet(const char& grideyeSelect,
   }
   else
   {
-    std::stringstream ss; //TODO(orestis): slow ?
+    std::stringstream ss;  // TODO(orestis): slow ?
 
     ss << "[Head]: " << grideyeSelect << " GridEYE = ";
     for (int i = 0; i < GEYE_NBYTES; ++i)
@@ -167,8 +172,8 @@ float ArmUSBInterface::co2ValueGet()
   int nr;
   uint8_t bufOUT;
 
-  tcflush(fd, TCIOFLUSH); //flushes both data received but not read,
-                          //-> and data written but not transmitted
+  tcflush(fd, TCIOFLUSH);  // flushes both data received but not read,
+                           // -> and data written but not transmitted
 
   bufOUT = COMMAND_CO2;
   nr = write(fd, (const void *)&bufOUT, COMMAND_NBYTES);
@@ -179,7 +184,7 @@ float ArmUSBInterface::co2ValueGet()
     return -1;
   }
 
-  nr = read(fd, CO2bufIN, CO2_NBYTES); //blocking
+  nr = read(fd, CO2bufIN, CO2_NBYTES);  // blocking
   if (nr < 0)
   {
     ROS_ERROR("[Head]: Read Error\n");
@@ -201,25 +206,15 @@ float ArmUSBInterface::co2ValueGet()
 
 void ArmUSBInterface::reconnectUSB()
 {
-  //reconnectUSB() should be called until communication is restored.
+  // reconnectUSB() should be called until communication is restored.
   close(fd);
   ROS_INFO("[Head]: usb port closed\n");
   ros::Duration(1.5).sleep();
 
-  while ((fd = open("/dev/head", O_RDWR | O_NOCTTY)) == -1)
-  {
-    ROS_ERROR("[Head]: failed to reopen usb port\n");
-    ROS_ERROR("[Head]: open() failed with error [%s]\n", strerror(errno));
+  openUSBPort();
 
-    ros::Duration(0.5).sleep();
-  }
-
-  ROS_INFO("[Head]: usb port successfully reopened\n");
-
-  /*Needs some time to initialize, even though it opens succesfully.
-   tcflush() didn't work without waiting at least 8 ms*/
-  ros::Duration(0.03).sleep();
+  ROS_INFO("[Head]: usb port reconnected successfully");
 }
 
-} // namespace arm
-} // namespace pandora_hardware_interface
+}  // namespace arm
+}  // namespace pandora_hardware_interface

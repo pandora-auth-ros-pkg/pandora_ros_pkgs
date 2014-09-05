@@ -60,7 +60,7 @@ add_subdirectory(arm_usb_interface)
 
 # To check lint : catkin_make roslint_pandora_arm_hardware_interface
 set(ROSLINT_CPP_OPTS
-  "--filter=-build/include_what_you_use, -runtime/references, -whitespace/comments")
+  "--filter=-build/include_what_you_use, -runtime/references")
   
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
