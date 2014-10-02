@@ -80,6 +80,9 @@ public:
   /**
    * @attention If the uController detects a malfunction in a sensor it returns
    * zeros in place of its readings.
+   * @note Although the uController can return the most recent reading whenever
+   * it is asked, there is no point asking for data much more frequently than
+   * two times the sensor speed. This sensor's frequency is 10 Hz.
    * @param[in] grideyeSelect 'C' for Center GridEYE, 'L' for left,
    *  'R' for right
    * @param[in,out] values pointer to an uint8[64] array
@@ -91,6 +94,9 @@ public:
   /**
    * @attention If the uController detects a malfunction in a sensor it returns
    * zeros in place of its readings.
+   * @note Although the uController can return the most recent reading whenever
+   * it is asked, there is no point asking for data much more frequently than
+   * two times the sensor speed. This sensor's frequency is 2 Hz.
    * @returns Gas reading in percent volume if read was successful,
    *  -1 for write error, -2 for read error,
    *  -3 for incorrect number of bytes read
