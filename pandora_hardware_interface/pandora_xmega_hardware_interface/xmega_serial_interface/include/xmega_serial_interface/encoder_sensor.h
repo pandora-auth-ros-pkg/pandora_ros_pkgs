@@ -1,3 +1,13 @@
+/** @file encoder_sensor.h
+ *  @brief Encoder sensor header file.
+ *
+ *  This contains encoder sensor prototypes.
+ *
+ *  @author Michael Nicarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -46,15 +56,26 @@ namespace pandora_hardware_interface
 {
 namespace xmega
 {
+
+/** @class EncoderSensor
+ *  @brief Encoder Sensor class.
+ */
 class EncoderSensor : virtual public SensorBase
 {
  public:
+  /** Default constructor */	
   EncoderSensor();
+
+  /** Default destructor */
   ~EncoderSensor();
 
+  /** @brief Handles received rotary encoder data and stores the measured value in degrees.
+	*  @return Void.
+	*/
   virtual void handleData();
 
  public:
+  /** Rotary encoder degrees measurement */
   double degrees;
 };
 

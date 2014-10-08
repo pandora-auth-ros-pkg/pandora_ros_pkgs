@@ -1,3 +1,15 @@
+/** @file battery_sensor.h
+ *  @brief Battery sensor class header file.
+ *
+ *  This contains Battery class and methods used for batteries
+ *  voltage level measurements.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ *  @bug No known bugs.
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -32,8 +44,6 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Michael Niarchos
-* Author: Chris Zalidis
 *********************************************************************/
 
 #ifndef XMEGA_SERIAL_INTERFACE_BATTERY_SENSOR_H
@@ -48,16 +58,28 @@ namespace pandora_hardware_interface
 {
 namespace xmega
 {
+
+/** @class BatterySensor
+ *  @brief Battery sensor class.
+ */
 class BatterySensor : virtual public SensorBase
 {
  public:
+	/** Default constructor */
   BatterySensor();
+
+  /** Default destructor */
   ~BatterySensor();
 
+  /** @brief handles received battery data and stores batteries voltage level value.
+	*  @return Void.
+	*/
   virtual void handleData();
 
  public:
+  /** Electronics battery voltage level measurement */
   double psuVoltage;
+  /** Motors battery voltage level measurement */
   double motorVoltage;
 };
 

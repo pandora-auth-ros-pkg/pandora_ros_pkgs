@@ -1,3 +1,13 @@
+/** @file encoder_sensor.cpp
+ *  @brief Encoder sensor cpp file.
+ *
+ *  This contains encoder sensor class and methods implementations.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -48,7 +58,7 @@ EncoderSensor::EncoderSensor()
 
 void EncoderSensor::handleData()
 {
-  degrees = (static_cast<double>( ((data[0] << 8) |  data[1]) - 223) / 1024) * 360.0;
+  degrees = (static_cast<double>( ((data[0] << 8) |  data[1]) - ROTARY_OFFSET) / 1024) * 360.0;
 }
 
 EncoderSensor::~EncoderSensor()

@@ -1,3 +1,14 @@
+/** @file xmega_serial_interface.cpp
+ *  @brief Serial interface drivers cpp file for xMega uController.
+ *
+ *  This contains xMega serial interface classes and methods implementations.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ *  @bug No known bug.
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -43,29 +54,34 @@ namespace pandora_hardware_interface
 namespace xmega
 {
 
-
-XmegaSerialInterface::XmegaSerialInterface(const std::string& device,
-                                      int speed,
-                                      int timeout) :
-  serialIO_(device, speed, timeout),
+XmegaSerialInterface::XmegaSerialInterface() :
   t1_(0),
   t2_(0),
   dataSize_(0),
   currentState_(IDLE_STATE)
 {
+  serialIO_ = new SerialIO(DEVICE, SPEED, TIMEOUT);
 }
+
 
 void XmegaSerialInterface::init()
 {
-  serialIO_.init();
+  serialIO_->openDevice();
 }
+
 
 void XmegaSerialInterface::read()
 {
   receiveData();
 }
 
+
+XmegaSerialInterface::~XmegaSerialInterface()
+{
+  delete serialIO_;
+}
 //------------- Private Members -------------------//
+
 
 void XmegaSerialInterface::receiveData()
 {
@@ -97,14 +113,15 @@ void XmegaSerialInterface::receiveData()
     {
   /* <IDLE_STATE indicates the state waiting for start of transmission characters> */
     case IDLE_STATE:
-      currentState_ = serialIO_.readMessageType();
+      currentState_ = serialIO_->readMessageType();
       gettimeofday(&current, NULL);
       seconds = current.tv_sec - start.tv_sec;
       useconds = current.tv_usec - start.tv_usec;
       ms_elapsed = ((seconds) * 1000 + useconds / 1000.0) + 0.5;  // +0.5 is used for rounding positive values
       if (ms_elapsed >= 20000)
         throw std::runtime_error(
-          "xmega doesn't seem to respond! Is it connected?");
+          "[xMega]: Error - Not any activity for 20 sec. Fatal!"
+			 );
 
       if (timer_flag == 0)
       {
@@ -120,21 +137,21 @@ void XmegaSerialInterface::receiveData()
     case READ_SIZE_STATE:
       gettimeofday(&tim_, NULL);
       t1_ = tim_.tv_sec + (tim_.tv_usec / 1000000.0);
-      currentState_ = serialIO_.readSize(&dataSize_);
+      currentState_ = serialIO_->readSize(&dataSize_);
       break;
     case READ_DATA_STATE:
       pdataBuffer_ = new unsigned char[dataSize_];
       memset(pdataBuffer_, 0x00, dataSize_);
-      currentState_ = serialIO_.readData(dataSize_, pdataBuffer_);
+      currentState_ = serialIO_->readData(dataSize_, pdataBuffer_);
       break;
     case READ_CRC_STATE:
-      currentState_ = serialIO_.readCRC();
+      currentState_ = serialIO_->readCRC();
       break;
     case ACK_STATE:
       previousState = ACK_STATE;
       timer_flag = 1;
       gettimeofday(&start, NULL);
-      if (!serialIO_.write(ACK, 1))
+      if (!serialIO_->write(ACK, 1))
         ROS_ERROR("[xmega] Failed to write ACK!\n");
       counter_ack++;
       ROS_DEBUG("[xmega] counter_ack: %d \n", counter_ack);
@@ -144,7 +161,7 @@ void XmegaSerialInterface::receiveData()
       previousState = NAK_STATE;
       timer_flag = 1;
       gettimeofday(&start, NULL);
-      if (!serialIO_.write(NAK, 2))
+      if (!serialIO_->write(NAK, 2))
         ROS_ERROR("[xmega] Failed to write NAK!\n");
       currentState_ = IDLE_STATE;
       counter_nak++;
@@ -270,10 +287,10 @@ SerialIO::SerialIO(const std::string& device,
   speed_(speed),
   timeout_(timeout),
   CRC_(0)
-{
-}
+{}
 
-void SerialIO::init()
+ 	
+void SerialIO::openDevice()
 {
   if (serialPtr_ == NULL)
   {
@@ -287,15 +304,38 @@ void SerialIO::init()
     }
     catch (serial::IOException& ex)
     {
-      ROS_FATAL("[xmega-serialIO] Cannot open port!!");
+      ROS_FATAL("[xMega-serialIO]: Cannot open port!!");
       ROS_FATAL("%s", ex.what());
       exit(-1);
     }
   }
   else
   {
-    throw std::logic_error("Init called twice!!");
+    throw std::logic_error("[xMega-serialIO]: Device allready open!");
   }
+  //serialPtr_->flush();	//flush I/O software buffers on startup.
+  serialPtr_->flushInput();	//Flush Input software buffer on startup.
+  serialPtr_->flushOutput();	//Flush Output software buffer on startup.
+}
+
+
+void SerialIO::closeDevice()
+{
+
+  if (serialPtr_->isOpen())	
+  {
+	 //serialPtr_->flush();	//Flush I/O software buffers on termination.
+	 serialPtr_->flushInput();	//Flush Input software buffer on termination.
+	 serialPtr_->flushOutput();	//Flush Output software buffer on termination.
+	 serialPtr_->close();
+	 ROS_INFO("[xMega-serialIO]: Closing Communication.");
+  }
+}
+
+
+SerialIO::~SerialIO()
+{
+  closeDevice();
 }
 
 int SerialIO::readMessageType()
@@ -307,16 +347,16 @@ int SerialIO::readMessageType()
 
   serialPtr_->read(command, size);
 
-  /* <If start of data package chars (0x0C , 0x0A)> */
+  /* <If they match the start of data package char sequence (0x0C , 0x0A)> */
   if (static_cast<int>(command[0]) == 12 && static_cast<int>(command[1]) == 10)
   {
     CRC_ += static_cast<int>(command[0]) + static_cast<int>(command[1]);
     return READ_SIZE_STATE;
-    //return READ_DATA_STATE;
   }
   else
     return IDLE_STATE;
 }
+
 
 int SerialIO::readSize(uint16_t *dataSize_)
 {
@@ -354,10 +394,11 @@ int SerialIO::readSize(uint16_t *dataSize_)
   }
 }
 
+
 int SerialIO::readData(uint16_t dataSize_, unsigned char *dataBuffer)
 {
   if (serialPtr_->read(static_cast<uint8_t*>(dataBuffer), dataSize_ - 5) != dataSize_ - 5)
-    ROS_DEBUG("[xmega-serialIO] ERROR!!\n");
+    ROS_ERROR("[xmega-serialIO]: ERROR writing!");
 
   for (int i = 0; i < dataSize_; i++) {
     ROS_DEBUG("[xmega-serialIO] %c", dataBuffer[i]);
@@ -403,6 +444,7 @@ int SerialIO::readCRC()
   }
 }
 
+
 bool SerialIO::write(const uint8_t *data, size_t size)
 {
   if (serialPtr_->write(data, size) == size)
@@ -411,9 +453,11 @@ bool SerialIO::write(const uint8_t *data, size_t size)
   }
   else
   {
+	 throw std::runtime_error("[xMega]: Error! Failed to write!");
     return false;
   }
 }
+
 
 static unsigned char myatoi(char *array, int size)
 {
@@ -421,15 +465,15 @@ static unsigned char myatoi(char *array, int size)
   int result = 0;
   for (int i = 0; i < size; i++)
   {
-    if ((static_cast<int>(array[i]) >= 65) &&
-      (static_cast<int>(array[i]) <= 70))
-      result += (static_cast<int>(array[i]) - 55) * pow(16, size - i - 1);
-    else if ((static_cast<int>(array[i]) >= 48) &&
-      (static_cast<int>(array[i]) <= 57))
-      result += (static_cast<int>(array[i]) - 48) * pow(16, size - i - 1);
+    if ((static_cast<int>(array[i]) >= 65) && (static_cast<int>(array[i]) <= 70))
+		{result += (static_cast<int>(array[i]) - 55) * pow(16, size - i - 1);}
+    else if ((static_cast<int>(array[i]) >= 48) && (static_cast<int>(array[i]) <= 57))
+		{result += (static_cast<int>(array[i]) - 48) * pow(16, size - i - 1);}
   }
 
   return result;
 }
+
+
 }  // namespace xmega
 }  // namespace pandora_hardware_interface

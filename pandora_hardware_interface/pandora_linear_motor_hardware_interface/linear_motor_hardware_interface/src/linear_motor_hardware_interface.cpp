@@ -47,9 +47,9 @@ namespace linear
   {
     nodeHandle_.getParam("linear_motor_joint", jointName_);
 
-    linear_motor_ = new JrkSerial();
+    serialIO_ = new JrkSerial("/dev/linear",115200,100);
 
-    linear_motor_->init();
+    serialIO_->openDevice();
 
     // connect and register the joint state interface
     position_ = 0;
@@ -73,12 +73,12 @@ namespace linear
 
   LinearMotorHardwareInterface::~LinearMotorHardwareInterface()
   {
-    delete linear_motor_;
+    delete serialIO_;
   }
 
   void LinearMotorHardwareInterface::read()
   {
-    int feedback = linear_motor_->readScaledFeedback();
+    int feedback = serialIO_->readScaledFeedback();
     position_ = static_cast<float>(feedback)/4080*0.23;
     ROS_DEBUG_STREAM("Feedback: " << position_);
   }
@@ -88,7 +88,7 @@ namespace linear
     int target = static_cast<int>(command_/0.23*4080);
     if (target >= 0 && target <= 3215)
     {
-      linear_motor_->setTarget(target);
+      serialIO_->setTarget(target);
     }
     else
     {

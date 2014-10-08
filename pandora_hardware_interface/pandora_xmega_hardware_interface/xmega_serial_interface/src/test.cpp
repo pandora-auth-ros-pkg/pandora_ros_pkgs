@@ -38,7 +38,7 @@
 
 int main(int argc, char** argv)
 {
-  pandora_hardware_interface::xmega::XmegaSerialInterface xmega("/dev/ttyS0", 115200, 10000);
+  pandora_hardware_interface::xmega::XmegaSerialInterface xmega;
   xmega.init();
 
   double psu = 0, motor = 0;

@@ -56,7 +56,7 @@ namespace xmega
   {
     private:
       ros::NodeHandle nodeHandle_;
-      XmegaSerialInterface serialInterface;
+      XmegaSerialInterface* serialInterface;
 
       BatteryInterface batteryInterface_;
       RangeSensorInterface rangeSensorInterface_;

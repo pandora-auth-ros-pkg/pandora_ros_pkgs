@@ -1,3 +1,13 @@
+/** @file enums.h
+ *  @brief Enum types.
+ *
+ *  This contains enum types regarding communication states and sensor types.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -32,8 +42,6 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Michael Niarchos
-* Author: Chris Zalidis
 *********************************************************************/
 
 #ifndef XMEGA_SERIAL_INTERFACE_ENUMS_H
@@ -43,6 +51,9 @@ namespace pandora_hardware_interface
 {
 namespace xmega
 {
+/** @enum state
+ *  @brief Enum type for data package process states.
+ */
 enum state
 {
   IDLE_STATE = 70,
@@ -54,6 +65,9 @@ enum state
   PROCESS_DATA_STATE
 };
 
+/** @enum sensor_type
+ *  @brief Enum type for sensor types (e.g. encoder,sonar...).
+ */
 enum sensor_type
 {
   SRF05_TINY,
@@ -61,6 +75,9 @@ enum sensor_type
   ENCODER
 };
 
+/** @enum read_state
+ *  @brief Enum type for I2C sensors data reading states.
+ */
 enum read_state
 {
   SENSOR_ID,

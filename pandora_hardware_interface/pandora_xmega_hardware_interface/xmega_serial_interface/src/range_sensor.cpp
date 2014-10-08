@@ -1,3 +1,14 @@
+/** @file range_sensor.cpp
+ *  @brief Sonar range sensors cpp file.
+ *
+ *  This contains range sensor class and methods implementations.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ *  @bug No known bug.
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -32,8 +43,6 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Michael Niarchos
-* Author: Chris Zalidis
 *********************************************************************/
 
 #include <xmega_serial_interface/range_sensor.h>

@@ -1,3 +1,15 @@
+/** @file battery_sensor.cpp
+ *  @brief Battery sensor .cpp file
+ *
+ *  This contains battery class and methods implementations used for batteries 
+ *  voltage level measurements.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ *  @bug No known bug
+ */
+
 /*********************************************************************
 *
 * Software License Agreement (BSD License)

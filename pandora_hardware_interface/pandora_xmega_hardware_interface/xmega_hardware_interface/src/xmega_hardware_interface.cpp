@@ -43,11 +43,10 @@ namespace xmega
   XmegaHardwareInterface::XmegaHardwareInterface(
     ros::NodeHandle nodeHandle)
   :
-    nodeHandle_(nodeHandle),
-    serialInterface("/dev/ttyS0", 115200, 100)
+    nodeHandle_(nodeHandle)
   {
-    serialInterface.init();
-
+    serialInterface = new XmegaSerialInterface();
+    serialInterface->init();
     // connect and register power supply interface
     registerBatteryInterface();
 
@@ -60,13 +59,14 @@ namespace xmega
 
   XmegaHardwareInterface::~XmegaHardwareInterface()
   {
+    delete serialInterface;
   }
 
   void XmegaHardwareInterface::read()
   {
-    serialInterface.read();
+    serialInterface->read();
     double measurement[2];
-    serialInterface.getBatteryData(&measurement[0], &measurement[1]);
+    serialInterface->getBatteryData(&measurement[0], &measurement[1]);
     for (int ii = 0; ii < 2; ii++)
     {
       if (measurement[ii] > 0)
@@ -76,7 +76,7 @@ namespace xmega
     }
 
     RangeMap sensorMap;
-    sensorMap = serialInterface.getRangeData();
+    sensorMap = serialInterface->getRangeData();
     bool exists[2] = {false, false};
     for (RangeMap::iterator it = sensorMap.begin(); it != sensorMap.end(); ++it)
     {
@@ -111,7 +111,7 @@ namespace xmega
       }
     }
     double pi = boost::math::constants::pi<double>();
-    double radians = serialInterface.getEncoderDegrees() / 180 * pi;
+    double radians = serialInterface->getEncoderDegrees() / 180 * pi;
     // make radians value between [-pi, pi]
     if (radians > pi)
     {
