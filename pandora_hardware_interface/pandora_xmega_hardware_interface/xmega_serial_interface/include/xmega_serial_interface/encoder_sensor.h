@@ -1,13 +1,3 @@
-/** @file encoder_sensor.h
- *  @brief Encoder sensor header file.
- *
- *  This contains encoder sensor prototypes.
- *
- *  @author Michael Nicarchos
- *  @author Chris Zalidis
- *  @author Konstantinos Panayiotou
- */
-
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -45,11 +35,22 @@
 * Author: Chris Zalidis, Konstantinos Panayiotou
 *********************************************************************/
 
+/*! @file encoder_sensor.h
+ *  @brief Encoder sensor header file.
+ *
+ *  This file contains encoder sensor prototypes.
+ *
+ *  @author Michael Nicarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ */
+
 #ifndef XMEGA_SERIAL_INTERFACE_ENCODER_SENSOR_H
 #define XMEGA_SERIAL_INTERFACE_ENCODER_SENSOR_H
 
 #include <xmega_serial_interface/sensor_base.h>
 
+/** @def ROTARY_OFFSET Rotary encoder offset value. **/
 #define ROTARY_OFFSET 223
 
 namespace pandora_hardware_interface
@@ -57,25 +58,33 @@ namespace pandora_hardware_interface
 namespace xmega
 {
 
-/** @class EncoderSensor
- *  @brief Encoder Sensor class.
+/*!
+ * @class EncoderSensor.
+ * @brief Encoder Sensor class. Inherits from Sensor Base Interface.
  */
 class EncoderSensor : virtual public SensorBase
 {
  public:
-  /** Default constructor */	
+  /*!
+   * @brief Default constructor.
+   * @return Void.
+   */
   EncoderSensor();
 
-  /** Default destructor */
+  /*!
+   * @brief Default destructor.
+   * @return Void.
+   */
   ~EncoderSensor();
 
-  /** @brief Handles received rotary encoder data and stores the measured value in degrees.
-	*  @return Void.
-	*/
+  /*!
+   * @brief Handles received rotary encoder data and stores the measured value in degrees.
+   * @return Void.
+   */
   virtual void handleData();
 
  public:
-  /** Rotary encoder degrees measurement */
+  /*! < Rotary encoder degrees measurement */
   double degrees;
 };
 

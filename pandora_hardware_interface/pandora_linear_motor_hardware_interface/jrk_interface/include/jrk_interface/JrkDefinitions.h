@@ -1,3 +1,12 @@
+/** @file JrkDefinitions.h
+ *  @brief Linear Motor Definitions.
+ *
+ *  This file contains definitions used by Linear Motor Interface.
+ *
+ *  @author Vasilis Bosdelekidis.
+ *  @bug No known bugs.
+ */
+
 #ifndef JRK_INTERFACE_JRKDEFINITIONS_H
 #define JRK_INTERFACE_JRKDEFINITIONS_H
 

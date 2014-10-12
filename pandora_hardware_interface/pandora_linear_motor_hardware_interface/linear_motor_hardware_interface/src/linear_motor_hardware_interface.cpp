@@ -47,7 +47,7 @@ namespace linear
   {
     nodeHandle_.getParam("linear_motor_joint", jointName_);
 
-    serialIO_ = new JrkSerial("/dev/linear",115200,100);
+    serialIO_ = new JrkSerial("/dev/linear", 115200, 100);
 
     serialIO_->openDevice();
 

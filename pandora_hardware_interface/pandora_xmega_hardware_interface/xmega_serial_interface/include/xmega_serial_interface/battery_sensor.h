@@ -1,15 +1,3 @@
-/** @file battery_sensor.h
- *  @brief Battery sensor class header file.
- *
- *  This contains Battery class and methods used for batteries
- *  voltage level measurements.
- *
- *  @author Michael Niarchos
- *  @author Chris Zalidis
- *  @author Konstantinos Panayiotou
- *  @bug No known bugs.
- */
-
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -51,7 +39,10 @@
 
 #include <xmega_serial_interface/sensor_base.h>
 
+/** @def AREF Xmega ADC Reference Voltage. */
 #define AREF 2.92
+
+/** @def VoltageDividerScale Pre-ADC Voltage divider value. */
 #define VoltageDividerScale 10
 
 namespace pandora_hardware_interface
@@ -59,27 +50,37 @@ namespace pandora_hardware_interface
 namespace xmega
 {
 
-/** @class BatterySensor
- *  @brief Battery sensor class.
+/*!
+ * @class BatterySensor
+ * @brief Battery sensor class.
  */
 class BatterySensor : virtual public SensorBase
 {
  public:
-	/** Default constructor */
+  /*!
+   * @brief Default constructor.
+   * @return Void
+   */
   BatterySensor();
 
-  /** Default destructor */
+  /*!
+   * @brief Default destructor.
+   * @return Void
+   */
   ~BatterySensor();
 
-  /** @brief handles received battery data and stores batteries voltage level value.
-	*  @return Void.
-	*/
+  /*!
+   * @brief Handles received battery data and stores batteries
+   * voltage level value.
+   * @return Void.
+   */
   virtual void handleData();
 
  public:
-  /** Electronics battery voltage level measurement */
+  /*! < Electronics battery voltage level measurement. */
   double psuVoltage;
-  /** Motors battery voltage level measurement */
+
+  /*! < Motors battery voltage level measurement. */
   double motorVoltage;
 };
 

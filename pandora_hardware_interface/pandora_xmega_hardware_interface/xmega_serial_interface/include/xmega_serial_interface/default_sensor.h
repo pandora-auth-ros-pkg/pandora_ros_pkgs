@@ -36,6 +36,15 @@
 * Author: Chris Zalidis
 *********************************************************************/
 
+/** @file default_sensor.h
+ *  @brief Default sensors class header file
+ *
+ *  @author Chris Zalidis
+ *  @author Evaggelos Apostolidis
+ *  @bug No known bugs.
+ */
+
+
 #ifndef XMEGA_SERIAL_INTERFACE_DEFAULT_SENSOR_H
 #define XMEGA_SERIAL_INTERFACE_DEFAULT_SENSOR_H
 
@@ -45,10 +54,19 @@ namespace pandora_hardware_interface
 {
 namespace xmega
 {
+
+/*!
+ * @class DefaultSensor
+ * @brief Default Sensor Class.
+ */
 class DefaultSensor : public SensorBase
+
 {
  public:
+  /*! < Default Constructor. */
   DefaultSensor() { }
+
+  /*! < Default Destructor. */
   ~DefaultSensor() { }
 
   virtual void handleData() { }

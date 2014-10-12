@@ -1,13 +1,3 @@
-/** @file encoder_sensor.cpp
- *  @brief Encoder sensor cpp file.
- *
- *  This contains encoder sensor class and methods implementations.
- *
- *  @author Michael Niarchos
- *  @author Chris Zalidis
- *  @author Konstantinos Panayiotou
- */
-
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -44,6 +34,16 @@
 *
 * Author: Chris Zalidis, Konstantinos Panayiotou
 *********************************************************************/
+
+/** @file encoder_sensor.cpp
+ *  @brief Encoder sensor cpp file.
+ *
+ *  This contains encoder sensor class and methods implementations.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ */
 
 #include <xmega_serial_interface/encoder_sensor.h>
 

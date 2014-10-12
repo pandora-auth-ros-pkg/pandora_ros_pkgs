@@ -1,14 +1,3 @@
-/** @file xmega_serial_interface.cpp
- *  @brief Serial interface drivers cpp file for xMega uController.
- *
- *  This contains xMega serial interface classes and methods implementations.
- *
- *  @author Michael Niarchos
- *  @author Chris Zalidis
- *  @author Konstantinos Panayiotou
- *  @bug No known bug.
- */
-
 /*********************************************************************
 *
 * Software License Agreement (BSD License)
@@ -46,6 +35,17 @@
 * Author: Michael Niarchos
 * Author: Chris Zalidis
 *********************************************************************/
+
+/*! @file xmega_serial_interface.cpp
+ *  @brief Serial interface drivers cpp file for xMega uController.
+ *
+ *  This contains xMega serial interface classes and methods implementations.
+ *
+ *  @author Michael Niarchos
+ *  @author Chris Zalidis
+ *  @author Konstantinos Panayiotou
+ *  @bug No known bug.
+ */
 
 #include "xmega_serial_interface/xmega_serial_interface.h"
 
@@ -120,8 +120,7 @@ void XmegaSerialInterface::receiveData()
       ms_elapsed = ((seconds) * 1000 + useconds / 1000.0) + 0.5;  // +0.5 is used for rounding positive values
       if (ms_elapsed >= 20000)
         throw std::runtime_error(
-          "[xMega]: Error - Not any activity for 20 sec. Fatal!"
-			 );
+          "[xMega]: Error - Not any activity for 20 sec. Fatal!");
 
       if (timer_flag == 0)
       {
@@ -289,7 +288,7 @@ SerialIO::SerialIO(const std::string& device,
   CRC_(0)
 {}
 
- 	
+
 void SerialIO::openDevice()
 {
   if (serialPtr_ == NULL)
@@ -313,22 +312,21 @@ void SerialIO::openDevice()
   {
     throw std::logic_error("[xMega-serialIO]: Device allready open!");
   }
-  //serialPtr_->flush();	//flush I/O software buffers on startup.
-  serialPtr_->flushInput();	//Flush Input software buffer on startup.
-  serialPtr_->flushOutput();	//Flush Output software buffer on startup.
+  //serialPtr_->flush(); /* <Flush I/O software buffers on startup.> */
+  serialPtr_->flushInput(); /* <Flush Input software buffer on startup.> */
+  serialPtr_->flushOutput(); /* <Flush Output software buffer on startup.> */
 }
 
 
 void SerialIO::closeDevice()
 {
-
-  if (serialPtr_->isOpen())	
+  if (serialPtr_->isOpen())
   {
-	 //serialPtr_->flush();	//Flush I/O software buffers on termination.
-	 serialPtr_->flushInput();	//Flush Input software buffer on termination.
-	 serialPtr_->flushOutput();	//Flush Output software buffer on termination.
-	 serialPtr_->close();
-	 ROS_INFO("[xMega-serialIO]: Closing Communication.");
+    //serialPtr_->flush(); /* <Flush I/O software buffers on termination.> */
+    serialPtr_->flushInput(); /* <Flush Input software buffer on termination.> */
+    serialPtr_->flushOutput(); /* <Flush Output software buffer on termination.> */
+    serialPtr_->close();
+    ROS_INFO("[xMega-serialIO]: Closing Communication.");
   }
 }
 
@@ -453,7 +451,7 @@ bool SerialIO::write(const uint8_t *data, size_t size)
   }
   else
   {
-	 throw std::runtime_error("[xMega]: Error! Failed to write!");
+    throw std::runtime_error("[xMega]: Error! Failed to write!");
     return false;
   }
 }
@@ -466,9 +464,9 @@ static unsigned char myatoi(char *array, int size)
   for (int i = 0; i < size; i++)
   {
     if ((static_cast<int>(array[i]) >= 65) && (static_cast<int>(array[i]) <= 70))
-		{result += (static_cast<int>(array[i]) - 55) * pow(16, size - i - 1);}
+      {result += (static_cast<int>(array[i]) - 55) * pow(16, size - i - 1);}
     else if ((static_cast<int>(array[i]) >= 48) && (static_cast<int>(array[i]) <= 57))
-		{result += (static_cast<int>(array[i]) - 48) * pow(16, size - i - 1);}
+      {result += (static_cast<int>(array[i]) - 48) * pow(16, size - i - 1);}
   }
 
   return result;
