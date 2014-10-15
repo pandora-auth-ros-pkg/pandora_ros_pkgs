@@ -56,6 +56,12 @@ namespace pandora_vision
   {
     public:
 
+      /**
+        @brief Given a HolesConveyor container, this method detects
+        multiple unique holes and deletes the extra copies.
+        @param[in,out] conveyor [HolesConveyor*] The container of holes
+        @return void
+       **/
       static void makeHolesUnique(HolesConveyor* conveyor);
 
       /**

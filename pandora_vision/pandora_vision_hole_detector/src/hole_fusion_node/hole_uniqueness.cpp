@@ -92,9 +92,9 @@ namespace pandora_vision
         }
       }
 
-      // The i-th hole is part of the overall set
       if (identical.size() > 0)
       {
+        // The i-th hole is part of the overall set
         identical.insert(i);
 
         duplicateIndices.insert(identical);
