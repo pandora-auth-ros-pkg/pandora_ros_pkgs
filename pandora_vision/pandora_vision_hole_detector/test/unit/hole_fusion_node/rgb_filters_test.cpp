@@ -500,8 +500,7 @@ namespace pandora_vision
     EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
     EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
     EXPECT_LT ( 0.8, probabilitiesVector_10[3] );
-    EXPECT_LT ( 0.8, probabilitiesVector_10[4] );
-
+    EXPECT_LT ( 0.0, probabilitiesVector_10[4] );
   }
 
 
@@ -546,7 +545,7 @@ namespace pandora_vision
     std::vector< std::string > msgs;
 
     // Generate the histogram of walls
-    cv::MatND histogram;
+    std::vector<cv::MatND> histogram;
     Histogram::getHistogram
       ( &histogram, Parameters::Histogram::secondary_channel );
 
@@ -621,7 +620,7 @@ namespace pandora_vision
     EXPECT_EQ ( 0.0, probabilitiesVector_10[0] );
     EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
     EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
-    EXPECT_EQ ( 0.0, probabilitiesVector_10[3] );
+    EXPECT_LT ( 0.0, probabilitiesVector_10[3] );
     EXPECT_LT ( 0.0, probabilitiesVector_10[4] );
   }
 
@@ -690,7 +689,7 @@ namespace pandora_vision
       std::vector< std::string > msgs;
 
       // Generate the histogram of walls
-      cv::MatND histogram;
+      std::vector<cv::MatND> histogram;
       Histogram::getHistogram
         ( &histogram, Parameters::Histogram::secondary_channel );
 
@@ -777,7 +776,7 @@ namespace pandora_vision
       Parameters::Filters::TextureDiff::mismatch_texture_threshold = 0.8;
 
       // Generate the histogram of walls
-      cv::MatND histogram;
+      std::vector<cv::MatND> histogram;
       Histogram::getHistogram
         ( &histogram, Parameters::Histogram::secondary_channel );
 

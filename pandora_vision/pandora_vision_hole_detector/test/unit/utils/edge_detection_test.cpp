@@ -418,7 +418,11 @@ namespace pandora_vision
     cv::Mat denoisedEdges_0;
 
     // A dummy histogram
-    cv::MatND histogram = cv::Mat::zeros ( squares_.size(), CV_8UC1 );
+    std::vector<cv::MatND> histogram;
+    for (int i = 0; i < 3; i++)
+    {
+      histogram.push_back( cv::Mat::zeros ( squares_.size(), CV_8UC1 ) );
+    }
 
     // Run EdgeDetection::computeRgbEdges
     EdgeDetection::computeRgbEdges
@@ -1286,7 +1290,12 @@ namespace pandora_vision
     }
 
     // A dummy histogram
-    cv::MatND histogram = cv::Mat::zeros( squares_8UC3.size(), CV_8UC1 );
+    std::vector<cv::MatND> histogram;
+
+    for (int i = 0; i < 3; i++)
+    {
+      histogram.push_back( cv::Mat::zeros( squares_8UC3.size(), CV_8UC1 ) );
+    }
 
     // Uncomment for visual inspection
     /*

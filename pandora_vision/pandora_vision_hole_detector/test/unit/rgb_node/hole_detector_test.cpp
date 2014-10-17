@@ -174,7 +174,7 @@ namespace pandora_vision
   TEST_F ( HoleDetectorTest, findHolesTest )
   {
     // Obtain the histogram of images of walls
-    cv::MatND wallsHistogram;
+    std::vector<cv::MatND> wallsHistogram;
     Histogram::getHistogram(&wallsHistogram,
       Parameters::Histogram::secondary_channel);
 

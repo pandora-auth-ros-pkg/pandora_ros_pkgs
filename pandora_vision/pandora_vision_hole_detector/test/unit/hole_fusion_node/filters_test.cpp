@@ -578,7 +578,7 @@ namespace pandora_vision
       std::vector< std::string > msgs;
 
       // A dummy histogram
-      cv::MatND histogram;
+      std::vector<cv::MatND> histogram;
 
       // Run Filters::applyFilter
       Filters::applyFilter(
@@ -741,7 +741,7 @@ namespace pandora_vision
 
       std::vector< cv::Mat > imgs;
       std::vector< std::string > msgs;
-      cv::MatND histogram;
+      std::vector<cv::MatND> histogram;
 
       // Run Filters::applyFilter
       Filters::applyFilter(
@@ -785,7 +785,7 @@ namespace pandora_vision
         EXPECT_EQ ( 0.0, probabilitiesVector_10[1] );
         EXPECT_EQ ( 0.0, probabilitiesVector_10[2] );
         EXPECT_LT ( 0.8, probabilitiesVector_10[3] );
-        EXPECT_LT ( 0.8, probabilitiesVector_10[4] );
+        EXPECT_LT ( 0.0, probabilitiesVector_10[4] );
       }
 
       // Texture-based filters are not tested yet.
@@ -920,7 +920,7 @@ namespace pandora_vision
       std::vector< float >( conveyor.size(), 0.0 ) );
 
     // A dummy histogram
-    cv::MatND histogram;
+    std::vector<cv::MatND> histogram;
 
     // Test all RGB and Depth filters
     int filteringMode = RGBD_MODE;

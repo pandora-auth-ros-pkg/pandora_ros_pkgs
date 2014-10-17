@@ -201,8 +201,9 @@ namespace pandora_vision
     {
       // The current hole's inside points luminosity sum
       int blobLuminosity = 0;
-      for (std::set<unsigned int>::iterator h_it = holesMasksSetVector[i].begin();
-        h_it != holesMasksSetVector[i].end(); h_it++)
+      for (std::set<unsigned int>::iterator h_it =
+        holesMasksSetVector[rectanglesIndices[i]].begin();
+        h_it != holesMasksSetVector[rectanglesIndices[i]].end(); h_it++)
       {
         blobLuminosity += ptr[*h_it];
       }
@@ -218,10 +219,10 @@ namespace pandora_vision
 
       // Mean luminosity of the inside points of the current hole
       float meanBlobLuminosity = 0.0;
-      if (holesMasksSetVector[i].size() > 0)
+      if (holesMasksSetVector[rectanglesIndices[i]].size() > 0)
       {
         meanBlobLuminosity = static_cast<float> (blobLuminosity)
-          / holesMasksSetVector[i].size();
+          / holesMasksSetVector[rectanglesIndices[i]].size();
       }
 
 
@@ -327,8 +328,9 @@ namespace pandora_vision
     for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
       float blobSum = 0.0;
-      for (std::set<unsigned int>::iterator h_it = holesMasksSetVector[i].begin();
-        h_it != holesMasksSetVector[i].end(); h_it++)
+      for (std::set<unsigned int>::iterator h_it =
+        holesMasksSetVector[rectanglesIndices[i]].begin();
+        h_it != holesMasksSetVector[rectanglesIndices[i]].end(); h_it++)
       {
         blobSum += static_cast<float>(ptr[*h_it]) / 255;
       }
@@ -343,12 +345,21 @@ namespace pandora_vision
 
       // The average probability of the points consisting the inflated
       // rectangle matching the histograms in the inHistogram
-      float rectangleMatchProbability =
-        blobToRectangleSum / intermediatePointsSetVector[i].size();
+      float rectangleMatchProbability = 0.0;
+      if (intermediatePointsSetVector[i].size() > 0)
+      {
+        rectangleMatchProbability =
+          blobToRectangleSum / intermediatePointsSetVector[i].size();
+      }
 
       // The average probability of the points inside the blob's outline
       // matching the histograms in the inHistogram
-      float blobMatchProbability = blobSum / holesMasksSetVector[i].size();
+      float blobMatchProbability = 0.0;
+      if (holesMasksSetVector[rectanglesIndices[i]].size() > 0)
+      {
+        blobMatchProbability =
+          blobSum / holesMasksSetVector[rectanglesIndices[i]].size();
+      }
 
       // This blob is considered valid, with a non zero validity probability,
       // if the points consisting the inflated rectangle have a greater
