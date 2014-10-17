@@ -77,8 +77,8 @@ namespace pandora_vision
       // locates are published to
       std::string candidateHolesTopic_;
 
-      // A histogramm for the texture of walls
-      cv::MatND wallsHistogram_;
+      // A vector of histograms for the texture of walls
+      std::vector<cv::MatND> wallsHistogram_;
 
       // The dynamic reconfigure (RGB) parameters' server
       dynamic_reconfigure::Server<pandora_vision_hole_detector::rgb_cfgConfig>

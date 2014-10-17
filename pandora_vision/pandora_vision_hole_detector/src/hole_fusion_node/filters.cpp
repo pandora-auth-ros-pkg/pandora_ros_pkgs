@@ -50,8 +50,8 @@ namespace pandora_vision
     The interpolated depth image
     @param[in] rgbImage [const cv::Mat&]
     The rgb image
-    @param[in] inHistogram [const cv::MatND&]
-    The model histogram's H and S component
+    @param[in] inHistogram [const std::vector<cv::MatND>&]
+    The vector of model histograms
     @param[in] pointCloud [const PointCloudPtr&]
     The original point cloud that corresponds to the input depth image
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
@@ -92,7 +92,7 @@ namespace pandora_vision
     const int& filteringMethod,
     const cv::Mat& depthImage,
     const cv::Mat& rgbImage,
-    const cv::MatND& inHistogram,
+    const std::vector<cv::MatND>& inHistogram,
     const PointCloudPtr& pointCloud,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<cv::Mat>& holesMasksImageVector,
@@ -321,8 +321,8 @@ namespace pandora_vision
     The interpolated depth image
     @param[in] rgbImage [const cv::Mat&]
     The rgb image
-    @param[in] inHistogram [const cv::MatND&]
-    The model histogram's H and S component
+    @param[in] inHistogram [const std::vector<cv::MatND>&]
+    The vector of model histograms
     @param[in] pointCloud [const PointCloudPtr&]
     The original point cloud that corresponds to the input depth image
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
@@ -358,7 +358,7 @@ namespace pandora_vision
     const int& filteringMode,
     const cv::Mat& depthImage,
     const cv::Mat& rgbImage,
-    const cv::MatND& inHistogram,
+    const std::vector<cv::MatND>& inHistogram,
     const PointCloudPtr& pointCloud,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<cv::Mat>& holesMasksImageVector,

@@ -52,7 +52,7 @@ namespace pandora_vision
     // transactionary affairs with
     getTopicNames();
 
-    // Calculate the collective histogram of images of wooden walls:
+    // Calculate the vector of histograms of images of wooden walls:
     // the rgb node, depending on the procedure of edges extraction of
     // rgb image, is going to need it
     Histogram::getHistogram(&wallsHistogram_,

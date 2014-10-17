@@ -52,12 +52,12 @@ namespace pandora_vision
     boxes of those outlines.
     @param[in] rgbImage [const cv::Mat&] The RGB image to be processed,
     in CV_8UC3 format
-    @param[in] histogram [const cv::MatND&] The collective histogram of
-    images of wooden walls
+    @param[in] histogram [const std::vector<cv::MatND>&]
+    The vector of histograms of images of wooden walls
     @return HolesConveyor The struct that contains the holes found
    **/
   HolesConveyor HoleDetector::findHoles(const cv::Mat& rgbImage,
-    const cv::MatND& histogram)
+    const std::vector<cv::MatND>& histogram)
   {
     #ifdef DEBUG_TIME
     Timer::start("findHoles", "inputRgbImageCallback");

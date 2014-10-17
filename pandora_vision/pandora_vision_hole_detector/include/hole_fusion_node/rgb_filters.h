@@ -129,8 +129,8 @@ namespace pandora_vision
         histograms of the bounding box and the points inside the outline of the
         blob.
         @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
-        @param[in] inHistogram [const cv::MatND&]
-        The model histogram's H and S component
+        @param[in] inHistogram [const std::vector<cv::MatND>&]
+        The vector of model histograms
         @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
         A vector containing masks of the points inside each hole's outline
         @param[in] intermediatePointsImageVector [const std::vector<cv::Mat>&]
@@ -151,7 +151,7 @@ namespace pandora_vision
        **/
       static void checkHolesTextureDiff(
         const cv::Mat& inImage,
-        const cv::MatND& inHistogram,
+        const std::vector<cv::MatND>& inHistogram,
         const std::vector<cv::Mat>& holesMasksImageVector,
         const std::vector<cv::Mat>& intermediatePointsImageVector,
         const std::vector<int>& rectanglesIndices,
@@ -168,8 +168,8 @@ namespace pandora_vision
         in the back project image, and for the points inside the candidate
         hole's outline to have a low probability in the back project image
         @param[in] inImage [const cv::Mat&] The RGB image in CV_8UC3 format
-        @param[in] inHistogram [const cv::MatND&]
-        The model histogram's H and S component
+        @param[in] inHistogram [const std::vector<cv::MatND>&]
+        The vector of model histograms
         @param[in] holesMasksSetVector
         [const std::vector<std::set<unsigned int> >&]
         A vector that holds sets of points; each point is internal to its
@@ -194,7 +194,7 @@ namespace pandora_vision
        **/
       static void checkHolesTextureBackProject(
         const cv::Mat& inImage,
-        const cv::MatND& inHistogram,
+        const std::vector<cv::MatND>& inHistogram,
         const std::vector<std::set<unsigned int> >& holesMasksSetVector,
         const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
         const std::vector<int>& rectanglesIndices,

@@ -264,8 +264,8 @@ namespace pandora_vision
     in the back project image, and for the points inside the candidate
     hole's outline to have a low probability in the back project image
     @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
-    @param[in] inHistogram [const cv::MatND&]
-    The model histogram's H and S component
+    @param[in] inHistogram [const std::vector<cv::MatND>&]
+    The vector of model histograms
     @param[in] holesMasksSetVector [const std::vector<std::set<unsigned int> >&]
     A vector that holds sets of points; each point is internal to its
     respective hole
@@ -287,7 +287,7 @@ namespace pandora_vision
    **/
   void RgbFilters::checkHolesTextureBackProject(
     const cv::Mat& inImage,
-    const cv::MatND& inHistogram,
+    const std::vector<cv::MatND>& inHistogram,
     const std::vector<std::set<unsigned int> >& holesMasksSetVector,
     const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
     const std::vector<int>& rectanglesIndices,
@@ -299,7 +299,7 @@ namespace pandora_vision
     #endif
 
     // Obtain the backprojection of the inImage, according to the inHistogram
-    cv::MatND backProject;
+    cv::Mat backProject = cv::Mat::zeros(inImage.size(), CV_8UC1);
     Histogram::getBackprojection(inImage, inHistogram,
       &backProject, Parameters::Histogram::secondary_channel);
 
@@ -323,7 +323,7 @@ namespace pandora_vision
     // (1) the points between the blob's outline and the edges of the
     // inflated rectangle and
     // (2) the points inside the blob's outline
-    // based on the backProjection cv::MatND
+    // based on the watersheded image
     for (unsigned int i = 0; i < rectanglesIndices.size(); i++)
     {
       float blobSum = 0.0;
@@ -342,12 +342,12 @@ namespace pandora_vision
       }
 
       // The average probability of the points consisting the inflated
-      // rectangle matching the inHistogram
+      // rectangle matching the histograms in the inHistogram
       float rectangleMatchProbability =
         blobToRectangleSum / intermediatePointsSetVector[i].size();
 
       // The average probability of the points inside the blob's outline
-      // matching the inHistogram
+      // matching the histograms in the inHistogram
       float blobMatchProbability = blobSum / holesMasksSetVector[i].size();
 
       // This blob is considered valid, with a non zero validity probability,
@@ -380,8 +380,8 @@ namespace pandora_vision
     histograms of the bounding box and the points inside the outline of the
     blob.
     @param[in] inImage [const cv::Mat&] The input RGB image in CV_8UC3 format
-    @param[in] inHistogram [const cv::MatND&]
-    The model histogram's H and S component
+    @param[in] inHistogram [const std::vector<cv::MatND>&]
+    The vector of the model histograms
     @param[in] holesMasksImageVector [const std::vector<cv::Mat>&]
     A vector containing masks of the points inside each hole's outline
     @param[in] intermediatePointsImageVector [const std::vector<cv::Mat>&]
@@ -401,7 +401,7 @@ namespace pandora_vision
    **/
   void RgbFilters::checkHolesTextureDiff(
     const cv::Mat& inImage,
-    const cv::MatND& inHistogram,
+    const std::vector<cv::MatND>& inHistogram,
     const std::vector<cv::Mat>& holesMasksImageVector,
     const std::vector<cv::Mat>& intermediatePointsImageVector,
     const std::vector<int>& rectanglesIndices,
@@ -464,32 +464,41 @@ namespace pandora_vision
         holesMasksImageVector[rectanglesIndices[i]],
         blobHistogram, 2, histSize, ranges, true, false);
 
+      // For each input histogram compute the largest probability
 
-      // Find the correlation between the model histogram and the histogram
-      // of the inflated rectangle
-      double rectangleToModelCorrelation = cv::compareHist(
-        blobToRectangleHistogram, inHistogram, CV_COMP_HELLINGER);
-
-      // Find the correlation between the model histogram and the histogram
-      // of the points inside the blob
-      double blobToModelCorrelation = cv::compareHist(
-        blobHistogram, inHistogram, CV_COMP_HELLINGER);
-
-      // This blob is considered valid if there is a correlation between
-      // the histogram of the external to the hole's outline points
-      // and the model histogram (inHistogram) greater than a threshold and,
-      // simultaneously, the correlation between the histogram of the points
-      // inside the hole's outline points and the model histogram is lower than
-      // a threshold.
-      // CAUTION: The use of the CV_COMP_HELLINGER for histogram comparison
-      // inverts the inequality checks
-      if (blobToModelCorrelation >=
-        Parameters::Filters::TextureDiff::mismatch_texture_threshold &&
-        rectangleToModelCorrelation < blobToModelCorrelation)
+      float maxProbability = 0.0;
+      for (int h = 0; h < inHistogram.size(); h++)
       {
-        probabilitiesVector->at(rectanglesIndices[i]) =
-          blobToModelCorrelation - rectangleToModelCorrelation;
+        // Find the correlation between the model histogram and the histogram
+        // of the inflated rectangle
+        double rectangleToModelCorrelation = cv::compareHist(
+          blobToRectangleHistogram, inHistogram[h], CV_COMP_HELLINGER);
+
+        // Find the correlation between the model histogram and the histogram
+        // of the points inside the blob
+        double blobToModelCorrelation = cv::compareHist(
+          blobHistogram, inHistogram[h], CV_COMP_HELLINGER);
+
+        // This blob is considered valid if there is a correlation between
+        // the histogram of the external to the hole's outline points
+        // and the model histogram (inHistogram) greater than a threshold and,
+        // simultaneously, the correlation between the histogram of the points
+        // inside the hole's outline points and the model histogram is lower
+        // than a threshold.
+        // CAUTION: The use of the CV_COMP_HELLINGER for histogram comparison
+        // inverts the inequality checks
+        if (blobToModelCorrelation >=
+          Parameters::Filters::TextureDiff::mismatch_texture_threshold &&
+          rectangleToModelCorrelation < blobToModelCorrelation)
+        {
+          if (blobToModelCorrelation - rectangleToModelCorrelation > maxProbability)
+          {
+            maxProbability = blobToModelCorrelation - rectangleToModelCorrelation;
+          }
+        }
       }
+
+      probabilitiesVector->at(rectanglesIndices[i]) = maxProbability;
 
       msgs->push_back(TOSTR(probabilitiesVector->at(rectanglesIndices[i])));
     }

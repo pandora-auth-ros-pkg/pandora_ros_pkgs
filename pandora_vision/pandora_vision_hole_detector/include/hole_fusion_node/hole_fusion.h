@@ -222,8 +222,8 @@ namespace pandora_vision
       // or both the RGB and Depth based filtering is applicable
       int filteringMode_;
 
-      // A histogramm for the texture of walls
-      cv::MatND wallsHistogram_;
+      // A vector of histograms for the texture of walls
+      std::vector<cv::MatND> wallsHistogram_;
 
       // The on/off state of the Hole Detector package
       bool isOn_;

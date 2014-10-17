@@ -62,8 +62,9 @@ namespace pandora_vision
         @brief Function for calculating the backprojection of an image,
         based on the histogram @param modelHistogram
         @param[in] inImage [const cv::Mat&] Current frame to be processed
-        @param[in] modelHistogram [const cv::MatND&] A model histogram
-        based on which the @param backprojection is produced
+        @param[in] modelHistogram [const std::vector<cv::MatND>&]
+        A vector of model histograms based on which
+        the @param backprojection is produced
         @param[out] backprojection [cv::Mat*] Backprojection of the current
         frame
         @param[in] secondaryChannel [const int&] Which channel to use, aside the
@@ -71,20 +72,21 @@ namespace pandora_vision
         @return void
        **/
       static void getBackprojection(const cv::Mat& inImage,
-        const cv::MatND& modelHistogram,
+        const std::vector<cv::MatND>& modelHistogram,
         cv::Mat* backprojection,
         const int& secondaryChannel);
 
       /**
         @brief Computes a cv::MatND histogram from images loaded in directory
         ${pandora_vision_hole_detector}/src/walls
-        @param[out] The calculated histogram
-        @param[in] secondaryChannel [const int&] Which channel to use, aside the
+        @param [out] histogram [std::vector<cv::MatND>*] The calculated vector
+        of histograms
+        @param [in] secondaryChannel [const int&] Which channel to use, aside the
         hue one. 1 for the Saturation channel, 2 for the Value channel
         @return void
        **/
       static void getHistogram (
-        cv::MatND* histogram,
+        std::vector<cv::MatND>* histogram,
         const int& secondaryChannel);
 
   };

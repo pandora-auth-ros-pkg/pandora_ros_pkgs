@@ -159,15 +159,16 @@ namespace pandora_vision
         @param[in] extractionMethod [const int&] Chooses by which process the
         edges will be extracted. 0 for extraction via segmentation,
         1 for extraction via backprojection and watersheding
-        @param[in] inHistogram [const cv::MatND&] The model histogram needed
-        in order to obtain the backprojection of @param inImage
+        @param[in] inHistogram [const std::vector<cv::MatND>&]
+        The vector of model histograms needed in order to obtain the
+        backprojection of @param inImage
         @param[out] edges [cv::Mat*] The final denoised edges image that
         corresponds to the input image
         @return void
        **/
       static void computeRgbEdges(const cv::Mat& inImage,
         const int& extractionMethod,
-        const cv::MatND& inHistogram,
+        const std::vector<cv::MatND>& inHistogram,
         cv::Mat* edges);
 
       /**
@@ -277,14 +278,15 @@ namespace pandora_vision
         of interest, this method extracts their edges and returns the image
         depicting them.
         @param[in] inImage [const cv::Mat&] The input RGB image
-        @param[in] inHistogram [const cv::MatND&] The model histogram needed
+        @param[in] inHistogram [const std::vector<cv::MatND>&]
+        The vector of model histograms needed
         in order to obtain the backprojection of @param inImage
         @param[out] outImage [cv::Mat*] The output edges image, in CV_8UC1
         format
         @return void
        **/
       static void produceEdgesViaBackprojection (const cv::Mat& inImage,
-        const cv::MatND& inHistogram, cv::Mat* outImage);
+        const std::vector<cv::MatND>& inHistogram, cv::Mat* outImage);
 
       /**
         @brief This method takes as input a RGB image, segments it,
