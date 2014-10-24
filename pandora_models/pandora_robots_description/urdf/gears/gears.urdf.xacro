@@ -69,10 +69,10 @@
   <xacro:linear_elevator_joint fixed="${fixed}" />
   <!-- ================================================================== -->
   <xacro:linear_head_base_link />
-  <xacro:linear_head_pitch_joint fixed="${fixed}" />
+  <xacro:linear_head_yaw_joint fixed="${fixed}" />
   <!-- ================================================================== -->
   <xacro:linear_head_main_link />
-  <xacro:linear_head_yaw_joint fixed="${fixed}" />
+  <xacro:linear_head_pitch_joint fixed="${fixed}" />
   <!-- ================================================================== -->
 
 <!-- Load Sensors ######################################################### -->

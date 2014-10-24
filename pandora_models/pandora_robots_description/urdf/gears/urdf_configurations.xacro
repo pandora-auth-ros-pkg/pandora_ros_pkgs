@@ -39,9 +39,9 @@
   <!-- ==================================================================== -->
   <xacro:property name="linear_elevator_joint_type" value="prismatic" />
   <!-- ==================================================================== -->
-  <xacro:property name="linear_head_pitch_joint_type" value="revolute" />
-  <!-- ==================================================================== -->
   <xacro:property name="linear_head_yaw_joint_type" value="revolute" />
+  <!-- ==================================================================== -->
+  <xacro:property name="linear_head_pitch_joint_type" value="revolute" />
   <!-- ==================================================================== -->
   
   <!-- Joint Damping ====================================================== -->
@@ -63,11 +63,11 @@
   <xacro:property name="linear_elevator_joint_min_limit" value="0.0" />
   <xacro:property name="linear_elevator_joint_max_limit" value="0.18" /> <!--FIXME-->
   <!-- ==================================================================== -->
-  <xacro:property name="linear_head_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
-  <xacro:property name="linear_head_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
-  <!-- ==================================================================== -->
   <xacro:property name="linear_head_yaw_joint_min_limit" value="-1.57" /> <!--FIXME-->
   <xacro:property name="linear_head_yaw_joint_max_limit" value="1.57" /> <!--FIXME-->
+  <!-- ==================================================================== -->
+  <xacro:property name="linear_head_pitch_joint_min_limit" value="-1.57" /> <!--FIXME-->
+  <xacro:property name="linear_head_pitch_joint_max_limit" value="1.57" /> <!--FIXME-->
   <!-- ==================================================================== -->
   <xacro:property name="laser_roll_joint_min_limit" value="-1.57" /> <!--FIXME-->
   <xacro:property name="laser_roll_joint_max_limit" value="1.57" /> <!--FIXME-->
