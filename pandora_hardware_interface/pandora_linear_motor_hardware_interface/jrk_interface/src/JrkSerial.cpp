@@ -100,17 +100,49 @@ void JrkSerial::closeDevice()
   serialPtr_->close();
 }
 
+bool JrkSerial::write(const uint8_t *data, size_t size)
+{
+  serialPtr_->flushOutput(); /* <Flush written but not send data> */
+  if (serialPtr_->write(data, size) == size)  {return true;}
+  else  {return false;}
+}
+
+bool JrkSerial::read(uint8_t *data, size_t size)
+{
+  if (serialPtr_->read(data,size) == size)
+  {
+    serialPtr_->flushInput(); /* <Flush received, but unread data> */
+    return true;
+  }
+  else
+  {
+    serialPtr_->flushInput();
+    return false;
+  }
+}
+
+int JrkSerial::setTarget(unsigned short target)
+{
+  uint8_t command[] = {0xB3, 0xC0 + (target & 0x1F), (target >> 5) & 0x7F};
+  if ( !this->write(command, sizeof(command)) )
+  {
+    ROS_ERROR_STREAM("[Linear Motor] Error writing > " << strerror(errno));
+    return -1;
+  }
+  return 0;
+}
+
 
 int JrkSerial::readVariable(const unsigned char command)
 {
   uint8_t message[] = {command};
-  if ( !write(message, 1) )
+  if ( !this->write(message, 1) )
   {
     ROS_ERROR_STREAM("[Linear Motor]: Error writing > " << strerror(errno));
     return -1;
   }
   uint8_t response[2];
-  if ( serialPtr_->read(response, 2) != 2 )
+  if ( !this->read(response, 2) )
   {
     ROS_ERROR_STREAM("[Linear Motor]: Error reading > " << strerror(errno));
     return -1;
@@ -119,45 +151,20 @@ int JrkSerial::readVariable(const unsigned char command)
 }
 
 
-bool JrkSerial::write(const uint8_t *data, size_t size)
-{
-  serialPtr_->flushOutput(); /*Flush written but not send data*/
-  if (serialPtr_->write(data, size) == size)  {return true;}
-  else  {return false;}
-}
-
-
 int JrkSerial::readFeedback()
-{return readVariable(FEEDBACK_VARIABLE);}
+  {return readVariable(FEEDBACK_VARIABLE);}
 
 
 int JrkSerial::readScaledFeedback()
-{
-  return readVariable(SCALED_FEEDBACK_VARIABLE);
-}
+  {return readVariable(SCALED_FEEDBACK_VARIABLE);}
 
 
 int JrkSerial::readDutyCycle()
-{
-  return readVariable(DUTY_CYCLE_VARIABLE);
-}
+  {return readVariable(DUTY_CYCLE_VARIABLE);}
 
 
 int JrkSerial::readTarget()
-{
-  return readVariable(TARGET_VARIABLE);
-}
-
-int JrkSerial::setTarget(unsigned short target)
-{
-  uint8_t command[] = {0xB3, 0xC0 + (target & 0x1F), (target >> 5) & 0x7F};
-  if ( !serialPtr_->write(command, sizeof(command)) )
-  {
-    ROS_ERROR_STREAM("[Linear Motor] Error writing > " << strerror(errno));
-    return -1;
-  }
-  return 0;
-}
+  {return readVariable(TARGET_VARIABLE);}
 
 
 int JrkSerial::getErrors()
@@ -171,13 +178,13 @@ int JrkSerial::getErrors()
 int JrkSerial::readErrors(unsigned char command)
 {
   uint8_t message[] = {command};
-  if ( !write(message, 1) )
+  if ( !this->write(message, 1) )
   {
     ROS_ERROR_STREAM("[Linear Motor] Error writing >" << strerror(errno));
     return -1;
   }
   unsigned char response[2];
-  if ( serialPtr_->read(static_cast<uint8_t*>(response), 2) != 2 )
+  if ( !this->read(static_cast<uint8_t*>(response), 2) )
   {
     ROS_ERROR_STREAM("[Linear Motor] Error reading >" << strerror(errno));
     return -1;
@@ -233,7 +240,7 @@ int JrkSerial::clearErrors()
 {
   /*Gets error flags halting and clears any latched errors*/
   uint8_t command[] = {ERRORS_HALTING_VARIABLE};
-  if ( !write(command, 1) )
+  if ( !this->write(command, 1) )
   {
     ROS_ERROR_STREAM("[Linear Motor] Error writing > " << strerror(errno));
     return -1;

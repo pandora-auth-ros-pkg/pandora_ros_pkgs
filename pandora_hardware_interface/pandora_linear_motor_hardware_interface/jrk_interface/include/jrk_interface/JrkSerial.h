@@ -101,6 +101,16 @@ class JrkSerial: private boost::noncopyable
     bool write(const uint8_t *data, size_t size);
     
     /*!
+     * @fn bool read(const uint8_t *data, size_t size)
+     * @brief Read command to [Linear Motor] controller.
+     * @param [in] data Input Data buffer.
+     * @param [in] size Input Data buffer size. 
+     * @retval TRUE Success on read data from input buffer.
+     * @retval False Error reading from input buffer.
+     */
+    bool read(uint8_t *data, size_t size);
+
+    /*!
      * @fn int readErrors(unsigned char command)
      * @brief Read errors from [Linear Motor] controller.
      * @param [in] command Command for reading errors.
