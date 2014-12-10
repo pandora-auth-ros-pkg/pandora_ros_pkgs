@@ -2,6 +2,7 @@
 
   <arg name="slam" default="true"/>
   <arg name="control" default="true"/>
+  <arg name="gazebo" default="true"/>
   <arg name="navigation" default="false"/>
   <arg name="fusion" default="false"/>
   <arg name="rviz" default="true"/>
@@ -16,12 +17,19 @@
   </group>
 
   <!-- Control -->
-  <group if="$(arg control)">
-    <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
-    <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
-    <node name="move_eef_script" pkg="pandora_end_effector_planner" type="move_eef_script.py" args="1" />
+  <group if="$(arg gazebo)">
+    <group if="$(arg control)">
+      <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+      <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
+      <node name="move_eef_script" pkg="pandora_end_effector_planner" type="move_eef_script.py" args="1" />
+    </group>
   </group>
-  
+
+  <!-- If not using gazebo spawn robot_description -->
+  <group unless="$(arg gazebo)">
+    <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  </group>
+
   <!-- Navigation -->
   <group if="$(arg navigation)">
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
@@ -29,10 +37,15 @@
   </group>
 
   <!-- Visualization -->
-  <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/rviz/rviz.launch" />
+  <group unless="$(arg fusion)">
+    <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/rviz/rviz.launch" />
+  </group>
 
   <!-- Fusion -->
-  <include if="$(arg fusion)" file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+  <group if="$(arg fusion)">
+    <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+    <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/visualization.launch" />
+  </group>
 
 
 </launch>
