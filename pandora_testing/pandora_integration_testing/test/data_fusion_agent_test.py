@@ -51,7 +51,7 @@ from pandora_testing_tools.testing_interface import test_base
 from pandora_testing_tools.testing_interface import integration_tester
 from pandora_data_fusion_msgs.srv import GetObjectsSrv
 from pandora_data_fusion_msgs.srv import GetObjectsSrvResponse
-from state_manager_communications.msg import robotModeMsg
+from state_manager_msgs.msg import RobotModeMsg
 from pandora_end_effector_planner.msg import MoveEndEffectorGoal
 from geometry_msgs.msg import PoseStamped, Point
 
@@ -109,7 +109,7 @@ class DataFusionAgentTest(test_base.TestBase):
         rospy.sleep(2.)
 
         rospy.loginfo("Agent recognises new victim and orders navigation to go to it.")
-        self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.TRACK)
@@ -128,7 +128,7 @@ class DataFusionAgentTest(test_base.TestBase):
         rospy.sleep(1.)
 
         rospy.loginfo("Navigation went to the victim and a face is associated with the victim.")
-        self.assertEqual(robotModeMsg.MODE_DF_HOLD, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_DF_HOLD, self.messageList[0][-1].mode)
         self.mocks.delivery_boy.deliverFaceOrder(orderYaw=0, orderPitch=0, orderProbability=0.85)
         self.mocks.delivery_boy.deliverFaceOrder(orderYaw=0, orderPitch=0, orderProbability=0.9)
         outs = self.get_objects()
@@ -171,7 +171,7 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertTrue(visitedVictims[0].valid)
         self.victimAfter = outs.victimsVisited[0].pose.position
         self.assertEqual(0, test_base.distance(self.victimBefore, self.victimAfter))
-        self.assertEqual(robotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.SCAN)
@@ -199,7 +199,7 @@ class DataFusionAgentTest(test_base.TestBase):
 
         #  Agent is informed and orders navigation to go to it but navigation
         #  aborts the order...
-        self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.TRACK)
         self.assertEqual(self.mocks.end_effector_planner.point_of_interest, 'VICTIM_1')
@@ -225,7 +225,7 @@ class DataFusionAgentTest(test_base.TestBase):
         visitedVictims = self.messageList[1][-1].visitedVictims
         self.assertEqual(0, len(victims))
         self.assertEqual(1, len(visitedVictims))
-        self.assertEqual(robotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertTrue(self.mocks.explorer.entered_exploration)
@@ -248,7 +248,7 @@ class DataFusionAgentTest(test_base.TestBase):
         rospy.sleep(1.)
 
         #  Agent recognises new victim and orders navigation to go to it.
-        self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.TRACK)
@@ -281,7 +281,7 @@ class DataFusionAgentTest(test_base.TestBase):
 
         #  Agent think that displacement cannot be ignored and re-orders navigation.
         #  Navigation target has changed.
-        self.assertEqual(robotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_IDENTIFICATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.TRACK)
@@ -311,7 +311,7 @@ class DataFusionAgentTest(test_base.TestBase):
         self.assertEqual(0, len(victims))
         self.assertEqual(2, len(visitedVictims))
         self.assertFalse(visitedVictims[1].valid)
-        self.assertEqual(robotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
+        self.assertEqual(RobotModeMsg.MODE_EXPLORATION, self.messageList[0][-1].mode)
         rospy.sleep(1.2)
         self.assertTrue(self.mocks.end_effector_planner.moves_end_effector)
         self.assertEqual(self.mocks.end_effector_planner.command, MoveEndEffectorGoal.SCAN)
@@ -324,10 +324,10 @@ if __name__ == '__main__':
     rospy.sleep(5.)
     rospy.init_node(NAME, anonymous=True)
     subscriber_topics = [
-        ("/robot/state/clients", "state_manager_communications", "robotModeMsg"),
+        ("/robot/state/clients", "state_manager_msgs", "RobotModeMsg"),
         ("/data_fusion/world_model", "pandora_data_fusion_msgs", "WorldModelMsg")]
     DataFusionAgentTest.establishMocks()
-    DataFusionAgentTest.connect(subscriber_topics, list(), robotModeMsg.MODE_START_AUTONOMOUS, False)
+    DataFusionAgentTest.connect(subscriber_topics, list(), RobotModeMsg.MODE_START_AUTONOMOUS, False)
     rostest.rosrun(PKG, NAME, DataFusionAgentTest, sys.argv)
     DataFusionAgentTest.disconnect()
     rospy.signal_shutdown("test_finished")

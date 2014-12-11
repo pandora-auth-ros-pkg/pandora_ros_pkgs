@@ -42,16 +42,16 @@ from collections import deque
 import roslib; roslib.load_manifest('pandora_testing_tools')
 import rospy
 
-from vision_communications.msg import HoleDirectionMsg
-from vision_communications.msg import HolesDirectionsVectorMsg
-from vision_communications.msg import HazmatAlertMsg
-from vision_communications.msg import HazmatAlertsVectorMsg
-from vision_communications.msg import QRAlertsVectorMsg
-from vision_communications.msg import QRAlertMsg
-from vision_communications.msg import LandoltcAlertsVectorMsg
-from vision_communications.msg import LandoltcAlertMsg
-from vision_communications.msg import DataMatrixAlertsVectorMsg
-from vision_communications.msg import DataMatrixAlertMsg
+from pandora_vision_msgs.msg import HoleDirectionMsg
+from pandora_vision_msgs.msg import HolesDirectionsVectorMsg
+from pandora_vision_msgs.msg import HazmatAlertMsg
+from pandora_vision_msgs.msg import HazmatAlertsVectorMsg
+from pandora_vision_msgs.msg import QRAlertsVectorMsg
+from pandora_vision_msgs.msg import QRAlertMsg
+from pandora_vision_msgs.msg import LandoltcAlertsVectorMsg
+from pandora_vision_msgs.msg import LandoltcAlertMsg
+from pandora_vision_msgs.msg import DataMatrixAlertsVectorMsg
+from pandora_vision_msgs.msg import DataMatrixAlertMsg
 from pandora_common_msgs.msg import GeneralAlertMsg
 
 class BadBossOrderFile(Exception):

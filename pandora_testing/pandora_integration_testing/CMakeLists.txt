@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   rostest
   roslib
-  vision_communications
+  pandora_vision_msgs
   pandora_data_fusion_msgs
   pandora_navigation_msgs
   pandora_rqt_gui
@@ -20,7 +20,7 @@ catkin_package(
   rospy
   rostest
   roslib
-  vision_communications
+  pandora_vision_msgs
   pandora_data_fusion_msgs
   pandora_navigation_msgs
   pandora_rqt_gui
