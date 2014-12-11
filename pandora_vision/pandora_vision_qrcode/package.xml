@@ -19,9 +19,9 @@
   <build_depend>zbar</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>image_transport</build_depend>
-  <build_depend>vision_communications</build_depend>
+  <build_depend>pandora_vision_msgs</build_depend>
   <build_depend>state_manager</build_depend>
-  <build_depend>state_manager_communications</build_depend>
+  <build_depend>state_manager_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>urdf</build_depend>
@@ -30,9 +30,9 @@
   <run_depend>zbar</run_depend>
   <run_depend>cv_bridge</run_depend>
   <run_depend>image_transport</run_depend>
-  <run_depend>vision_communications</run_depend>
+  <run_depend>pandora_vision_msgs</run_depend>
   <run_depend>state_manager</run_depend>
-  <run_depend>state_manager_communications</run_depend>
+  <run_depend>state_manager_msgs</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roslint</run_depend>
   <run_depend>urdf</run_depend>

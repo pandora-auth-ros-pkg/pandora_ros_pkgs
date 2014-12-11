@@ -66,8 +66,8 @@ namespace pandora_vision
     }
  
     //!< initialize states - robot starts in STATE_OFF
-    curState = state_manager_communications::robotModeMsg::MODE_OFF;
-    prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+    curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    prevState = state_manager_msgs::RobotModeMsg::MODE_OFF;
 
     clientInitialize();
 
@@ -102,7 +102,7 @@ namespace pandora_vision
     if (_nh.getParam("published_topic_names/datamatrix_alert", param))
     {
       _datamatrixCodePublisher =
-        _nh.advertise<vision_communications::DataMatrixAlertsVectorMsg>(param, 10, true);
+        _nh.advertise<pandora_vision_msgs::DataMatrixAlertsVectorMsg>(param, 10, true);
     }
     else
     {
@@ -253,8 +253,8 @@ namespace pandora_vision
       return;
     }
     //!< Create message of DatamatrixCode Detector
-    vision_communications::DataMatrixAlertsVectorMsg datamatrixcodeVectorMsg;
-    vision_communications::DataMatrixAlertMsg datamatrixcodeMsg;
+    pandora_vision_msgs::DataMatrixAlertsVectorMsg datamatrixcodeVectorMsg;
+    pandora_vision_msgs::DataMatrixAlertMsg datamatrixcodeMsg;
     datamatrixcodeVectorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
     datamatrixcodeVectorMsg.header.stamp = datamatrixFrameTimestamp;
 
@@ -311,17 +311,17 @@ namespace pandora_vision
     //!< check if datamatrix algorithm should be running now
     datamatrixNowON =
       (curState ==
-       state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE)
+       state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE)
       || (curState ==
-          state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
+          state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION)
       || (curState ==
-          state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD)
+          state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD)
       || (curState ==
-          state_manager_communications::robotModeMsg::MODE_SENSOR_TEST);
+          state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
 
     //!< shutdown if the robot is switched off
     if (curState ==
-        state_manager_communications::robotModeMsg::MODE_TERMINATING)
+        state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;

@@ -60,8 +60,8 @@
 #include <cv_bridge/cv_bridge.h>
 
 #include "pandora_common_msgs/GeneralAlertMsg.h"
-#include "vision_communications/EnhancedHolesVectorMsg.h"
-#include "vision_communications/EnhancedHoleMsg.h"
+#include "pandora_vision_msgs/EnhancedHolesVectorMsg.h"
+#include "pandora_vision_msgs/EnhancedHoleMsg.h"
 #include "state_manager/state_client.h"
 #include <pandora_vision_victim/victim_dyn_reconfConfig.h>
 

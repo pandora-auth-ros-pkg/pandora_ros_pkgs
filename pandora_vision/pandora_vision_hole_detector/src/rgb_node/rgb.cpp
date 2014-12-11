@@ -65,7 +65,7 @@ namespace pandora_vision
 
     // Advertise the candidate holes found by the rgb node
     candidateHolesPublisher_ = nodeHandle_.advertise
-      <vision_communications::CandidateHolesVectorMsg>(
+      <pandora_vision_msgs::CandidateHolesVectorMsg>(
       candidateHolesTopic_, 1000);
 
     // The dynamic reconfigure (RGB) parameter's callback
@@ -135,7 +135,7 @@ namespace pandora_vision
     HolesConveyor conveyor = HoleDetector::findHoles(rgbImage, wallsHistogram_);
 
     // Create the candidate holes message
-    vision_communications::CandidateHolesVectorMsg rgbCandidateHolesMsg;
+    pandora_vision_msgs::CandidateHolesVectorMsg rgbCandidateHolesMsg;
 
     // Pack information about holes found and the rgb image inside a message.
     // This message will be published to and received by the hole fusion node

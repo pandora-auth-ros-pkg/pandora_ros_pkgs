@@ -10,6 +10,6 @@ target_link_libraries(synchronizer_node
 
 add_dependencies(synchronizer_node
   ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
+  pandora_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
   )

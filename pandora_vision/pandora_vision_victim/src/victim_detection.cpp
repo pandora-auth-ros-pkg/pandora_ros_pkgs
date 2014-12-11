@@ -79,8 +79,8 @@ namespace pandora_vision
       VictimParameters::depth_classifier_path);
     
     /// Initialize states - robot starts in STATE_OFF
-    curState = state_manager_communications::robotModeMsg::MODE_OFF;
-    prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+    curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    prevState = state_manager_msgs::RobotModeMsg::MODE_OFF;
     
     _debugVictimsPublisher = imageTransport_.advertise
       (VictimParameters::victimDebugImg, 1, true);
@@ -139,20 +139,20 @@ namespace pandora_vision
 
   /**
    * @brief Function called when new message appears from hole_detector_node
-   * @param msg [vision_communications::EnhancedHolesVectorMsg&] The message
+   * @param msg [pandora_vision_msgs::EnhancedHolesVectorMsg&] The message
    * @return void
    */
   void VictimDetection::imageCallback(
-      const vision_communications::EnhancedHolesVectorMsg& msg)
+      const pandora_vision_msgs::EnhancedHolesVectorMsg& msg)
   {
     
     if(
       (curState != 
-        state_manager_communications::robotModeMsg::MODE_IDENTIFICATION) &&
+        state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION) &&
       (curState != 
-        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD) && 
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD) && 
       (curState != 
-        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST)
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST)
     )
     {
       return;
@@ -227,7 +227,7 @@ namespace pandora_vision
     bool holesEnabled,
     const cv::Mat& rgbImage,
     const cv::Mat& depthImage,
-    const vision_communications::EnhancedHolesVectorMsg& msg
+    const pandora_vision_msgs::EnhancedHolesVectorMsg& msg
   )
   {
     
@@ -638,7 +638,7 @@ namespace pandora_vision
 
     //!< shutdown if the robot is switched off
     if (curState == 
-      state_manager_communications::robotModeMsg::MODE_TERMINATING)
+      state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;

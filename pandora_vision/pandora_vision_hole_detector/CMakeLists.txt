@@ -22,9 +22,9 @@ set(CMAKE_BUILD_TYPE Release)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  vision_communications
+  pandora_vision_msgs
   state_manager
-  state_manager_communications
+  state_manager_msgs
   cv_bridge
   image_transport
   sensor_msgs
@@ -49,9 +49,9 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   CATKIN_DEPENDS
   roscpp
-  vision_communications
+  pandora_vision_msgs
   state_manager
-  state_manager_communications
+  state_manager_msgs
   cv_bridge
   image_transport
   sensor_msgs

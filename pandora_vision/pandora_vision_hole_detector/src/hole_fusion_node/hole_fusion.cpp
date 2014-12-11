@@ -81,7 +81,7 @@ namespace pandora_vision
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
-      <vision_communications::HolesDirectionsVectorMsg>(
+      <pandora_vision_msgs::HolesDirectionsVectorMsg>(
         validHolesTopic_, 10, true);
 
     // Advertise the topic that information about the final holes,
@@ -103,7 +103,7 @@ namespace pandora_vision
     // Advertise the topic that the image of the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
-      <vision_communications::EnhancedHolesVectorMsg>(
+      <pandora_vision_msgs::EnhancedHolesVectorMsg>(
         enhancedHolesTopic_, 1000, true);
 
     // Advertise the topic where the Hole Fusion node requests from the
@@ -218,13 +218,13 @@ namespace pandora_vision
     the synchronizer and calls for processing of the candidate
     holes.
     @param[in] depthCandidateHolesVector
-    [const vision_communications::CandidateHolesVectorMsg&]
+    [const pandora_vision_msgs::CandidateHolesVectorMsg&]
     The message containing the necessary information acquired through
     the depth node
     @return void
    **/
   void HoleFusion::depthCandidateHolesCallback(
-    const vision_communications::CandidateHolesVectorMsg&
+    const pandora_vision_msgs::CandidateHolesVectorMsg&
     depthCandidateHolesVector)
   {
     #ifdef DEBUG_TIME
@@ -687,13 +687,13 @@ namespace pandora_vision
   bool HoleFusion::isHoleDetectorOn(const int& state)
   {
     return (state ==
-        state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE)
+        state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE)
       || (state ==
-        state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
+        state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION)
       || (state ==
-        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD)
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD)
       || (state ==
-        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST);
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
   }
 
 
@@ -1509,7 +1509,7 @@ namespace pandora_vision
     std::map<int, float>* validHolesMap)
   {
     // The overall message of enhanced holes that will be published
-    vision_communications::EnhancedHolesVectorMsg enhancedHolesMsg;
+    pandora_vision_msgs::EnhancedHolesVectorMsg enhancedHolesMsg;
 
     // Set the rgbImage in the enhancedHolesMsg message to the rgb image
     enhancedHolesMsg.rgbImage = MessageConversions::convertImageToMessage(
@@ -1535,7 +1535,7 @@ namespace pandora_vision
       it != validHolesMap->end(); it++)
     {
       // The enhanced hole message. Used for one hole only
-      vision_communications::EnhancedHoleMsg enhancedHoleMsg;
+      pandora_vision_msgs::EnhancedHoleMsg enhancedHoleMsg;
 
       // Set the hole's keypoint
       enhancedHoleMsg.keypointX = conveyor.holes[it->first].keypoint.pt.x;
@@ -1644,7 +1644,7 @@ namespace pandora_vision
     int width = interpolatedDepthImage_.cols;
 
     // The overall valid holes found message
-    vision_communications::HolesDirectionsVectorMsg holesVectorMsg;
+    pandora_vision_msgs::HolesDirectionsVectorMsg holesVectorMsg;
 
     // Counter for the holes' identifiers
     int holeId = 0;
@@ -1653,7 +1653,7 @@ namespace pandora_vision
       it != map->end(); it++)
     {
       // A single hole's message
-      vision_communications::HoleDirectionMsg holeMsg;
+      pandora_vision_msgs::HoleDirectionMsg holeMsg;
 
       // The hole's keypoint coordinates relative to the center of the frame
       float x = conveyor.holes[it->first].keypoint.pt.x
@@ -1732,13 +1732,13 @@ namespace pandora_vision
     the synchronizer and calls for processing of the candidate
     holes.
     @param[in] rgbCandidateHolesVector
-    [const vision_communications::CandidateHolesVectorMsg&]
+    [const pandora_vision_msgs::CandidateHolesVectorMsg&]
     The message containing the necessary information to filter hole
     candidates acquired through the rgb node
     @return void
    **/
   void HoleFusion::rgbCandidateHolesCallback(
-    const vision_communications::CandidateHolesVectorMsg&
+    const pandora_vision_msgs::CandidateHolesVectorMsg&
     rgbCandidateHolesVector)
   {
     #ifdef DEBUG_TIME

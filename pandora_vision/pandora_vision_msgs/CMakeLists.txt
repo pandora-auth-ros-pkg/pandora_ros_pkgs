@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(vision_communications)
+project(pandora_vision_msgs)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   message_runtime

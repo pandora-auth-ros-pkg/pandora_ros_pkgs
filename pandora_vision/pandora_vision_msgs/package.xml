@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>vision_communications</name>
+  <name>pandora_vision_msgs</name>
   <version>0.0.0</version>
   <description>Msg files for vision</description>
  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>

@@ -66,8 +66,8 @@ namespace pandora_vision
       _frameSubscribers.push_back(frameSubscriber);
     }
     //!< initialize states - robot starts in STATE_OFF
-    curState = state_manager_communications::robotModeMsg::MODE_OFF;
-    prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+    curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    prevState = state_manager_msgs::RobotModeMsg::MODE_OFF;
     
     _lastTimeProcessed = ros::Time::now(); 
     
@@ -100,7 +100,7 @@ namespace pandora_vision
     if (_nh.getParam("published_topic_names/qr_alert", param))
     {
       _qrcodePublisher = 
-        _nh.advertise<vision_communications::QRAlertsVectorMsg>(param, 10, true);
+        _nh.advertise<pandora_vision_msgs::QRAlertsVectorMsg>(param, 10, true);
     }
     else
     {
@@ -318,8 +318,8 @@ namespace pandora_vision
   void QrCodeDetection::qrDetect()
   {
     //!< Create message of QrCode Detector
-    vision_communications::QRAlertsVectorMsg qrcodeVectorMsg;
-    vision_communications::QRAlertMsg qrcodeMsg;
+    pandora_vision_msgs::QRAlertsVectorMsg qrcodeVectorMsg;
+    pandora_vision_msgs::QRAlertMsg qrcodeMsg;
  
     //!< Qrcode message 
     //!< do detection and examine result cases
@@ -399,11 +399,11 @@ namespace pandora_vision
 
     //!< check if QR algorithm should be running now
     qrcodeNowON = (curState !=
-          state_manager_communications::robotModeMsg::MODE_OFF);
+          state_manager_msgs::RobotModeMsg::MODE_OFF);
 
     //!< shutdown if the robot is switched off
     if (curState ==
-        state_manager_communications::robotModeMsg::MODE_TERMINATING)
+        state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;

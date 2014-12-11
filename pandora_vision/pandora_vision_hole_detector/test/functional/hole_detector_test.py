@@ -51,9 +51,9 @@ import rospy
 import cv2
 
 from pandora_testing_tools.testing_interface import test_base
-from vision_communications.msg import HolesDirectionsVectorMsg
-from vision_communications.msg import CandidateHolesVectorMsg
-from vision_communications.msg import EnhancedHolesVectorMsg
+from pandora_vision_msgs.msg import HolesDirectionsVectorMsg
+from pandora_vision_msgs.msg import CandidateHolesVectorMsg
+from pandora_vision_msgs.msg import EnhancedHolesVectorMsg
 
 class HoleDetectorTest(test_base.TestBase):
 
@@ -361,10 +361,10 @@ class HoleDetectorTest(test_base.TestBase):
 if __name__ == '__main__':
 
     subscriber_topics = [
-        ("/vision/holes_direction_alert", "vision_communications", "HolesDirectionsVectorMsg"),
-        ("/pandora_vision/hole_detector/synchronized/depth/candidate_holes", "vision_communications", "CandidateHolesVectorMsg"),
-        ("/pandora_vision/hole_detector/synchronized/rgb/candidate_holes", "vision_communications", "CandidateHolesVectorMsg"),
-        ("/vision/enhanced_holes", "vision_communications", "EnhancedHolesVectorMsg")]
+        ("/vision/holes_direction_alert", "pandora_vision_msgs", "HolesDirectionsVectorMsg"),
+        ("/pandora_vision/hole_detector/synchronized/depth/candidate_holes", "pandora_vision_msgs", "CandidateHolesVectorMsg"),
+        ("/pandora_vision/hole_detector/synchronized/rgb/candidate_holes", "pandora_vision_msgs", "CandidateHolesVectorMsg"),
+        ("/vision/enhanced_holes", "pandora_vision_msgs", "EnhancedHolesVectorMsg")]
 
     rospy.sleep(15)
     rospy.init_node(NAME, anonymous=True, log_level=rospy.DEBUG)

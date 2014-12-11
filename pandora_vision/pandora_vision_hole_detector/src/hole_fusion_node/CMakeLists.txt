@@ -18,6 +18,6 @@ target_link_libraries(hole_fusion_node
 
 add_dependencies(hole_fusion_node
   ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
+  pandora_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
   )

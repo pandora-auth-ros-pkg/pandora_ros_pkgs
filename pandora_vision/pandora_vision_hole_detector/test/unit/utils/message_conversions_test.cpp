@@ -351,7 +351,7 @@ namespace pandora_vision
   TEST_F ( MessageConversionsTest, createCandidateHolesVectorTest )
   {
     // The vector of messages of candidate holes
-    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
+    std::vector<pandora_vision_msgs::CandidateHoleMsg> candidateHolesVector;
 
     // Run MessageConversions::createCandidateHolesVector
     MessageConversions::createCandidateHolesVector( conveyor,
@@ -405,7 +405,7 @@ namespace pandora_vision
     }
 
     // The message of candidate holes
-    vision_communications::CandidateHolesVectorMsg candidateHolesVectorMsg;
+    pandora_vision_msgs::CandidateHolesVectorMsg candidateHolesVectorMsg;
 
     // A dummy image. Needed only for its header.
     sensor_msgs::Image msg;
@@ -547,7 +547,7 @@ namespace pandora_vision
     msgPtr->image = image;
 
     // The message of candidate holes
-    vision_communications::CandidateHolesVectorMsg msg;
+    pandora_vision_msgs::CandidateHolesVectorMsg msg;
     msg.image = *msgPtr->toImageMsg();
 
     // Run MessageConversions::extractImageFromMessageContainer
@@ -579,11 +579,11 @@ namespace pandora_vision
   TEST_F ( MessageConversionsTest, fromCandidateHoleMsgToConveyorTest )
   {
     // The vector of candidate holes
-    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
+    std::vector<pandora_vision_msgs::CandidateHoleMsg> candidateHolesVector;
 
     for ( int i = 0; i < conveyor.size(); i++ )
     {
-      vision_communications::CandidateHoleMsg candidateHole;
+      pandora_vision_msgs::CandidateHoleMsg candidateHole;
 
       // The keypoints
       candidateHole.keypointX = conveyor.holes[i].keypoint.pt.x;
@@ -679,14 +679,14 @@ namespace pandora_vision
   TEST_F ( MessageConversionsTest, unpackMessageTest )
   {
     // The overall message
-    vision_communications::CandidateHolesVectorMsg candidateHolesVectorMsg;
+    pandora_vision_msgs::CandidateHolesVectorMsg candidateHolesVectorMsg;
 
     // The vector of candidate holes
-    std::vector<vision_communications::CandidateHoleMsg> candidateHolesVector;
+    std::vector<pandora_vision_msgs::CandidateHoleMsg> candidateHolesVector;
 
     for ( int i = 0; i < conveyor.size(); i++ )
     {
-      vision_communications::CandidateHoleMsg candidateHole;
+      pandora_vision_msgs::CandidateHoleMsg candidateHole;
 
       // The keypoints
       candidateHole.keypointX = conveyor.holes[i].keypoint.pt.x;

@@ -50,7 +50,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "state_manager/state_client.h"
-#include "vision_communications/LandoltcAlertsVectorMsg.h"
+#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
 #include "pandora_vision_landoltc/landoltc_2d/landoltc_detector.h"
 #include <urdf_parser/urdf_parser.h>
 #include <map>

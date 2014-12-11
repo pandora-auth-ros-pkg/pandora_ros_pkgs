@@ -92,8 +92,8 @@ Predator::Predator(const std::string& ns):
   _inputImageSubscriber = _nh.subscribe(imageTopic, 1, &Predator::imageCallback, this);
   
   //!< initialize states - robot starts in STATE_OFF
-  curState = state_manager_communications::robotModeMsg::MODE_OFF;
-  prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+  curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
+  prevState = state_manager_msgs::RobotModeMsg::MODE_OFF;
 
   clientInitialize();
   
@@ -408,7 +408,7 @@ void Predator::getGeneralParams()
   if (_nh.getParam("published_topic_names/predator_employment_output", param))
   {
     _landoltc3dPredatorPublisher =
-      _nh.advertise<vision_communications::LandoltcPredatorMsg>(param, 1000);
+      _nh.advertise<pandora_vision_msgs::LandoltcPredatorMsg>(param, 1000);
   }
   else
   {
@@ -640,7 +640,7 @@ void Predator::sendMessage(const cv::Rect& rec, const float& posterior,
   
   if( operation_state == true){
     
-    vision_communications::LandoltcPredatorMsg predatorLandoltcMsg;
+    pandora_vision_msgs::LandoltcPredatorMsg predatorLandoltcMsg;
     predatorLandoltcMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
     predatorLandoltcMsg.header.stamp = PredatorFrameTimeStamp;
     predatorLandoltcMsg.x = rec.x;
@@ -690,17 +690,17 @@ void Predator::startTransition(int newState)
   //!< check if predator algorithm should be running now
   predatorNowON =
     (curState ==
-     state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE)
+     state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE)
     || (curState ==
-        state_manager_communications::robotModeMsg::MODE_IDENTIFICATION)
+        state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION)
     || (curState ==
-        state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD)
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD)
     || (curState ==
-        state_manager_communications::robotModeMsg::MODE_SENSOR_TEST);
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
 
   //!< shutdown if the robot is switched off
   if (curState ==
-      state_manager_communications::robotModeMsg::MODE_TERMINATING)
+      state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
   {
     ros::shutdown();
     return;

@@ -90,16 +90,16 @@ namespace pandora_vision
         bool holesEnabled,
         const cv::Mat& rgbImage,
         const cv::Mat& depthImage,
-        const vision_communications::EnhancedHolesVectorMsg& msg
+        const pandora_vision_msgs::EnhancedHolesVectorMsg& msg
       );
 
       /**
        * Function called when new message appears from hole_detector_node
-       * @param msg [vision_communications::EnhancedHolesVectorMsg&] The message
+       * @param msg [pandora_vision_msgs::EnhancedHolesVectorMsg&] The message
        * @return void
       */
       void imageCallback(
-        const vision_communications::EnhancedHolesVectorMsg& msg);
+        const pandora_vision_msgs::EnhancedHolesVectorMsg& msg);
 
       /**
         @brief Function that retrieves the parent to the frame_id

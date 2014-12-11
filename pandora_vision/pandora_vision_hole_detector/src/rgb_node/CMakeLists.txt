@@ -11,6 +11,6 @@ target_link_libraries(rgb_node
 
 add_dependencies(rgb_node
   ${PROJECT_NAME}_gencfg
-  vision_communications_gencpp
+  pandora_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
   )

@@ -36,7 +36,7 @@
 #include <sys/stat.h>
 
 #include "pandora_common_msgs/GeneralAlertMsg.h"
-#include "vision_communications/LandoltcPredatorMsg.h"
+#include "pandora_vision_msgs/LandoltcPredatorMsg.h"
 
 #include "../tld/TLD.h"
 #include <urdf_parser/urdf_parser.h>

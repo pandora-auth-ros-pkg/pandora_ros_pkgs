@@ -49,8 +49,8 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "vision_communications/LandoltcAlertsVectorMsg.h"
-#include "vision_communications/LandoltcPredatorMsg.h"
+#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
+#include "pandora_vision_msgs/LandoltcPredatorMsg.h"
 #include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"
 #include "state_manager/state_client.h"
 #include <urdf_parser/urdf_parser.h>
@@ -135,10 +135,10 @@ private:
   
   /**
   @brief Predator Callback
-  @param msg [const vision_communications::PredatorAlertMsg& msg]
+  @param msg [const pandora_vision_msgs::PredatorAlertMsg& msg]
   @return void
   **/
-  void predatorCallback(const vision_communications::LandoltcPredatorMsg& msg);
+  void predatorCallback(const pandora_vision_msgs::LandoltcPredatorMsg& msg);
   
   /**
   @brief The function called when a parameter is changed

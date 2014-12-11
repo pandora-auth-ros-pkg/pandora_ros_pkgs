@@ -38,7 +38,7 @@
 #ifndef RGB_NODE_RGB_H
 #define RGB_NODE_RGB_H
 
-#include "vision_communications/CandidateHolesVectorMsg.h"
+#include "pandora_vision_msgs/CandidateHolesVectorMsg.h"
 #include "utils/message_conversions.h"
 #include "utils/histogram.h"
 #include "utils/parameters.h"

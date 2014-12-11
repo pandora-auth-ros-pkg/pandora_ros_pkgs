@@ -10,7 +10,7 @@
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_landoltc/html/">pandora_vision_landoltc</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_motion/html/">pandora_vision_motion</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_qrcode/html/">pandora_vision_qrcode</a>
-  - <a href="http://docs.pandora.ee.auth.gr/api/vision_communications/html/">vision_communications</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_msgs/html/">pandora_vision_msgs</a>
 
 
 */

@@ -3,9 +3,9 @@ project(pandora_vision_qrcode)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
-    vision_communications
+    pandora_vision_msgs
     state_manager
-    state_manager_communications
+    state_manager_msgs
     cv_bridge
     image_transport
     sensor_msgs
@@ -20,9 +20,9 @@ catkin_package(
     DEPENDS
     CATKIN_DEPENDS
       roscpp
-      vision_communications
+      pandora_vision_msgs
       state_manager
-      state_manager_communications
+      state_manager_msgs
       cv_bridge
       image_transport
       sensor_msgs
@@ -43,7 +43,7 @@ add_executable(qrcode_node
     src/qrCode_node.cpp
 )
 add_dependencies(qrcode_node 
-    vision_communications_gencpp
+    pandora_vision_msgs_gencpp
     ${catkin_EXPORTED_TARGETS}
 )
 target_link_libraries(qrcode_node ${catkin_LIBRARIES} zbar)

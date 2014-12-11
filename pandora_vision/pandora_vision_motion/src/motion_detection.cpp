@@ -66,8 +66,8 @@ namespace pandora_vision
         &MotionDetection::imageCallback, this );
     
     //!< Initialize states - robot starts in STATE_OFF 
-    curState = state_manager_communications::robotModeMsg::MODE_OFF;
-    prevState = state_manager_communications::robotModeMsg::MODE_OFF;
+    curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    prevState = state_manager_msgs::RobotModeMsg::MODE_OFF;
 
     clientInitialize();
     
@@ -290,13 +290,13 @@ namespace pandora_vision
     curState = newState;
     //!< Check if motion algorithm should be running now
     motionNowON = ( curState == 
-      state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD ) ||
+      state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD ) ||
       ( curState == 
-      state_manager_communications::robotModeMsg::MODE_SENSOR_TEST );
+      state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST );
 
     //!< Shutdown if the robot is switched off
     if (curState == 
-      state_manager_communications::robotModeMsg::MODE_TERMINATING)
+      state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
     {
       ros::shutdown();
       return;

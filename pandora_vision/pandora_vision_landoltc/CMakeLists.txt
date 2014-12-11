@@ -6,9 +6,9 @@ set(CMAKE_BUILD_TYPE Release)
 
 find_package(catkin REQUIRED COMPONENTS 
     roscpp
-    vision_communications
+    pandora_vision_msgs
     state_manager
-    state_manager_communications
+    state_manager_msgs
     cv_bridge
     image_transport
     sensor_msgs
@@ -27,9 +27,9 @@ catkin_package(
     DEPENDS
     CATKIN_DEPENDS
       roscpp
-      vision_communications
+      pandora_vision_msgs
       state_manager
-      state_manager_communications
+      state_manager_msgs
       cv_bridge
       image_transport
       sensor_msgs
@@ -57,7 +57,7 @@ target_link_libraries(landoltc_node ${catkin_LIBRARIES} )
 
 add_dependencies(landoltc_node 
     pandora_vision_landoltc_gencfg
-    vision_communications_gencpp
+    pandora_vision_msgs_gencpp
     ${catkin_EXPORTED_TARGETS}
 )
 
@@ -74,7 +74,7 @@ target_link_libraries(landoltc3d_node ${catkin_LIBRARIES} )
 
 add_dependencies(landoltc3d_node
     pandora_vision_landoltc_gencfg     
-    vision_communications_gencpp
+    pandora_vision_msgs_gencpp
     ${catkin_EXPORTED_TARGETS}
 )
 

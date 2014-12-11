@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     pandora_common_msgs
     state_manager
-    state_manager_communications
+    state_manager_msgs
     cv_bridge
     image_transport
     sensor_msgs
@@ -27,7 +27,7 @@ catkin_package(
       roscpp
       pandora_common_msgs
       state_manager
-      state_manager_communications
+      state_manager_msgs
       cv_bridge
       image_transport
       sensor_msgs
@@ -53,7 +53,7 @@ add_executable(motion_node
 target_link_libraries(motion_node ${catkin_LIBRARIES} )
 add_dependencies(motion_node
     pandora_vision_motion_gencfg
-    vision_communications_gencpp
+    pandora_vision_msgs_gencpp
     ${catkin_EXPORTED_TARGETS}
 )
 

@@ -49,7 +49,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include "state_manager/state_client.h"
 #include <std_srvs/Empty.h>
-#include "vision_communications/QRAlertsVectorMsg.h"
+#include "pandora_vision_msgs/QRAlertsVectorMsg.h"
 #include "pandora_vision_qrcode/qrCode_detector.h"
 #include <urdf_parser/urdf_parser.h>
 #include <map>

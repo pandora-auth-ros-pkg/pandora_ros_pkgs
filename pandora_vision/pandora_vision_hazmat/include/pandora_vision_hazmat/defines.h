@@ -63,7 +63,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include "state_manager/state_client.h"
-#include "vision_communications/HazmatAlertsVectorMsg.h"
+#include "pandora_vision_msgs/HazmatAlertsVectorMsg.h"
 #include <urdf_parser/urdf_parser.h>
 #include <map>
 

@@ -48,7 +48,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include "state_manager/state_client.h"
-#include "vision_communications/DataMatrixAlertsVectorMsg.h"
+#include "pandora_vision_msgs/DataMatrixAlertsVectorMsg.h"
 #include "pandora_vision_datamatrix/datamatrix_detector.h"
 
 #ifndef PANDORA_VISION_DATAMATRIX_DATAMATRIX_DETECTION_H 
