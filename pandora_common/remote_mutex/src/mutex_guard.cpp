@@ -51,28 +51,28 @@ std::string MutexGuard::getHolder() {
 	return holderName;
 }
 
-bool MutexGuard::serviceCallback(remote_mutex_communications::mutexSrv::Request& rq, 
-				 remote_mutex_communications::mutexSrv::Response& rs) {
+bool MutexGuard::serviceCallback(remote_mutex_msgs::mutexSrv::Request& rq, 
+				 remote_mutex_msgs::mutexSrv::Response& rs) {
 	switch (rq.requestType) {
-		case remote_mutex_communications::mutexSrv::Request::TYPE_LOCK :
+		case remote_mutex_msgs::mutexSrv::Request::TYPE_LOCK :
 			if (tryLock(rq.requestor)) {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_LOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_LOCKED;
 			} else {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_UNLOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_UNLOCKED;
 			}
 			break;
-		case remote_mutex_communications::mutexSrv::Request::TYPE_UNLOCK :
+		case remote_mutex_msgs::mutexSrv::Request::TYPE_UNLOCK :
 			if (unlock(rq.requestor)) {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_UNLOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_UNLOCKED;
 			} else {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_LOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_LOCKED;
 			}
 			break;
-		case remote_mutex_communications::mutexSrv::Request::TYPE_POLL :	
+		case remote_mutex_msgs::mutexSrv::Request::TYPE_POLL :	
 			if (getStatus()) {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_LOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_LOCKED;
 			} else {
-				rs.status = remote_mutex_communications::mutexSrv::Response::STATUS_UNLOCKED;
+				rs.status = remote_mutex_msgs::mutexSrv::Response::STATUS_UNLOCKED;
 			}		
 			break;
 		default:

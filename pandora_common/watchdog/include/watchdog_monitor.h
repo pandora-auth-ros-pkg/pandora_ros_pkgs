@@ -17,9 +17,9 @@
 
 
 #include "ros/ros.h"
-#include "watchdog_communications/watchdogSrv.h"
-#include "watchdog_communications/watchdogResetMsg.h"
-#include "watchdog_communications/wdtTimeoutNotificationMsg.h"
+#include "watchdog_msgs/watchdogSrv.h"
+#include "watchdog_msgs/watchdogResetMsg.h"
+#include "watchdog_msgs/wdtTimeoutNotificationMsg.h"
 
 struct wdtInformation {
 	ros::Duration wdtDuration;
@@ -67,13 +67,13 @@ class WatchdogMonitor {
 		/**
 		 * Register the WDT service callback
 		 */
-		bool registerWdtService(watchdog_communications::watchdogSrv::Request&, 
-								watchdog_communications::watchdogSrv::Response&);
+		bool registerWdtService(watchdog_msgs::watchdogSrv::Request&, 
+								watchdog_msgs::watchdogSrv::Response&);
 		
 		/**
 		 * Callback for receiving resets.
 		 */
-		void receiveReset(const watchdog_communications::watchdogResetMsgConstPtr&);
+		void receiveReset(const watchdog_msgs::watchdogResetMsgConstPtr&);
 		
 	public:
 		/**

@@ -16,8 +16,8 @@
    <build_depend>roscpp</build_depend> 
    <run_depend>roscpp</run_depend> 
    
-   <build_depend>watchdog_communications</build_depend> 
-   <run_depend>watchdog_communications</run_depend> 
+   <build_depend>watchdog_msgs</build_depend> 
+   <run_depend>watchdog_msgs</run_depend> 
    
   <export>
   </export>

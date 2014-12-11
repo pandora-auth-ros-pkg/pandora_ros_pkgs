@@ -34,25 +34,25 @@
 # Author: Chris Zalidis <zalidis@gmail.com>
 
 import rospy
-from state_manager_communications.msg import robotModeMsg
-from state_manager_communications.srv import registerNodeSrv, registerNodeSrvRequest
+from state_manager_msgs.msg import RobotModeMsg
+from state_manager_msgs.srv import RegisterNodeSrv, RegisterNodeSrvRequest
 
 class StateClient(object):
 
     def __init__(self, do_register=True):
         self._name = rospy.get_name()
-        self._acknowledge_publisher = rospy.Publisher('/robot/state/server', robotModeMsg, latch=True, queue_size=5)
-        self._state_subscriber = rospy.Subscriber('/robot/state/clients', robotModeMsg, self.server_state_information, queue_size=10)
+        self._acknowledge_publisher = rospy.Publisher('/robot/state/server', RobotModeMsg, latch=True, queue_size=5)
+        self._state_subscriber = rospy.Subscriber('/robot/state/clients', RobotModeMsg, self.server_state_information, queue_size=10)
         if do_register:
             self.client_register()
   
     def client_register(self):
         rospy.wait_for_service('/robot/state/register')
-        self._register_service_client = rospy.ServiceProxy('/robot/state/register', registerNodeSrv)
+        self._register_service_client = rospy.ServiceProxy('/robot/state/register', RegisterNodeSrv)
     
-        req = registerNodeSrvRequest();
+        req = RegisterNodeSrvRequest();
         req.nodeName = self._name
-        req.type = registerNodeSrvRequest.TYPE_STARTED
+        req.type = RegisterNodeSrvRequest.TYPE_STARTED
         try:
             self._register_service_client(req)
         except rospy.ServiceException:
@@ -60,11 +60,11 @@ class StateClient(object):
   
     def client_initialize(self):
         rospy.wait_for_service('/robot/state/register')
-        self._register_service_client = rospy.ServiceProxy('/robot/state/register', registerNodeSrv)
+        self._register_service_client = rospy.ServiceProxy('/robot/state/register', RegisterNodeSrv)
     
-        req = registerNodeSrvRequest();
+        req = RegisterNodeSrvRequest();
         req.nodeName = self._name
-        req.type = registerNodeSrvRequest.TYPE_INITIALIZED
+        req.type = RegisterNodeSrvRequest.TYPE_INITIALIZED
         try:
             self._register_service_client(req)
         except rospy.ServiceException:
@@ -76,10 +76,10 @@ class StateClient(object):
   
     def transition_complete(self, state):
         rospy.loginfo("[%s] Node Transition to state %i Completed", self._name, state)
-        msg = robotModeMsg()
+        msg = RobotModeMsg()
         msg.nodeName = self._name
         msg.mode = state
-        msg.type = robotModeMsg.TYPE_ACK
+        msg.type = RobotModeMsg.TYPE_ACK
     
         self._acknowledge_publisher.publish(msg)
   
@@ -88,19 +88,19 @@ class StateClient(object):
   
     def transition_to_state(self, state):
         rospy.loginfo("[%s] Requesting transition to state %i", self._name, state)
-        msg = robotModeMsg()
+        msg = RobotModeMsg()
         msg.nodeName = self._name
         msg.mode = state
-        msg.type = robotModeMsg.TYPE_REQUEST
+        msg.type = RobotModeMsg.TYPE_REQUEST
     
         self._acknowledge_publisher.publish(msg)
   
     def server_state_information(self, msg):
         rospy.loginfo("[%s] Received new information from state server", self._name)
   
-        if msg.type == robotModeMsg.TYPE_TRANSITION:
+        if msg.type == RobotModeMsg.TYPE_TRANSITION:
             self.start_transition(msg.mode)
-        elif msg.type == robotModeMsg.TYPE_START:
+        elif msg.type == RobotModeMsg.TYPE_START:
             self.complete_transition()
         else:
             rospy.logerr("[%s] StateClient received a new state command, that is not understandable", self._name)

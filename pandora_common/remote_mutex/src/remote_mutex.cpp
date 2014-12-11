@@ -20,17 +20,17 @@ RemoteMutex::RemoteMutex(std::string name) {
 		ros::spinOnce();
 	}
 	
-	_client = _nh.serviceClient<remote_mutex_communications::mutexSrv>(_remoteMutexName);
+	_client = _nh.serviceClient<remote_mutex_msgs::mutexSrv>(_remoteMutexName);
 	
 }
 
 bool RemoteMutex::getStatus() {
-	remote_mutex_communications::mutexSrv srv;
+	remote_mutex_msgs::mutexSrv srv;
 	
 	srv.request.requestor =  ros::this_node::getName();
-	srv.request.requestType = remote_mutex_communications::mutexSrv::Request::TYPE_POLL;
+	srv.request.requestType = remote_mutex_msgs::mutexSrv::Request::TYPE_POLL;
 	if (_client.call(srv)) {
-		return srv.response.status == remote_mutex_communications::mutexSrv::Response::STATUS_LOCKED;
+		return srv.response.status == remote_mutex_msgs::mutexSrv::Response::STATUS_LOCKED;
 	} else {
 		ROS_ERROR("Failed to call mutex %s service",_remoteMutexName.c_str());
 		return false;
@@ -38,12 +38,12 @@ bool RemoteMutex::getStatus() {
 }
 
 bool RemoteMutex::tryLock() {
-	remote_mutex_communications::mutexSrv srv;
+	remote_mutex_msgs::mutexSrv srv;
 	
 	srv.request.requestor =  ros::this_node::getName();
-	srv.request.requestType = remote_mutex_communications::mutexSrv::Request::TYPE_LOCK;
+	srv.request.requestType = remote_mutex_msgs::mutexSrv::Request::TYPE_LOCK;
 	if (_client.call(srv)) {
-		return srv.response.status == remote_mutex_communications::mutexSrv::Response::STATUS_LOCKED;
+		return srv.response.status == remote_mutex_msgs::mutexSrv::Response::STATUS_LOCKED;
 	} else {
 		ROS_ERROR("Failed to call mutex %s service",_remoteMutexName.c_str());
 		return false;
@@ -51,12 +51,12 @@ bool RemoteMutex::tryLock() {
 }
 
 bool RemoteMutex::unlock() {
-	remote_mutex_communications::mutexSrv srv;
+	remote_mutex_msgs::mutexSrv srv;
 	
 	srv.request.requestor =  ros::this_node::getName();
-	srv.request.requestType = remote_mutex_communications::mutexSrv::Request::TYPE_UNLOCK;
+	srv.request.requestType = remote_mutex_msgs::mutexSrv::Request::TYPE_UNLOCK;
 	if (_client.call(srv)) {
-		return srv.response.status == remote_mutex_communications::mutexSrv::Response::STATUS_UNLOCKED;
+		return srv.response.status == remote_mutex_msgs::mutexSrv::Response::STATUS_UNLOCKED;
 	} else {
 		ROS_ERROR("Failed to call mutex %s service",_remoteMutexName.c_str());
 		return false;

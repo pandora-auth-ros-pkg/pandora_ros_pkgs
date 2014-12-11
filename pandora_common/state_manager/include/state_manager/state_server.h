@@ -17,12 +17,12 @@
 #define STATE_SERVER
 
 #include "ros/ros.h"
-#include "state_manager_communications/robotModeMsg.h"
-#include "state_manager_communications/registerNodeSrv.h"
+#include "state_manager_msgs/RobotModeMsg.h"
+#include "state_manager_msgs/RegisterNodeSrv.h"
 #include "diagnostic_updater/diagnostic_updater.h"
 
 #include <actionlib/server/simple_action_server.h>
-#include "state_manager_communications/RobotModeAction.h"
+#include "state_manager_msgs/RobotModeAction.h"
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -33,7 +33,7 @@
  * State Information Internal Structure.
  */
  
-typedef actionlib::SimpleActionServer<state_manager_communications::RobotModeAction> RobotModeActionServer;
+typedef actionlib::SimpleActionServer<state_manager_msgs::RobotModeAction> RobotModeActionServer;
  
  
 struct stateNode {
@@ -93,18 +93,18 @@ class StateServer {
 		/**
 		 * Client State information getter (callback)
 		 */
-		void clientStateInformation(const state_manager_communications::robotModeMsgConstPtr&);
+		void clientStateInformation(const state_manager_msgs::RobotModeMsgConstPtr&);
 		
 		/**
 		 * Register node to a new state
 		 */
-		void registerNodeTransition(const state_manager_communications::robotModeMsgConstPtr& msg);
+		void registerNodeTransition(const state_manager_msgs::RobotModeMsgConstPtr& msg);
 		
 		/**
 		 * Register a node.
 		 */
-		bool registerNode(state_manager_communications::registerNodeSrv::Request& rq, 
-						  state_manager_communications::registerNodeSrv::Response &rs);
+		bool registerNode(state_manager_msgs::RegisterNodeSrv::Request& rq, 
+						  state_manager_msgs::RegisterNodeSrv::Response &rs);
 		
 		/**
 		 * Send a transition request to all nodes
@@ -193,7 +193,7 @@ class StateServer {
 		 */
 		void publishDiagnostics(const ros::TimerEvent&);
 		
-		void stateChangeExecuteCb(const state_manager_communications::RobotModeGoalConstPtr &goal);
+		void stateChangeExecuteCb(const state_manager_msgs::RobotModeGoalConstPtr &goal);
 
 		bool systemTransitioned;
 		

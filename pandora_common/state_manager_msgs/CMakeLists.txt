@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(state_manager_communications)
+project(state_manager_msgs)
 find_package(catkin REQUIRED COMPONENTS message_generation std_msgs actionlib_msgs)
 
 add_message_files(
 	FILES
-	robotModeMsg.msg
+	RobotModeMsg.msg
 	StateMonitorUpdateMsg.msg
 	)
 
 add_service_files(
 	FILES
-	registerNodeSrv.srv
+	RegisterNodeSrv.srv
 	)
 	
 add_action_files(

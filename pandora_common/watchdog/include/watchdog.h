@@ -16,8 +16,8 @@
 #define WATCHDOG_H
 
 #include "ros/ros.h"
-#include "watchdog_communications/watchdogSrv.h"
-#include "watchdog_communications/watchdogResetMsg.h"
+#include "watchdog_msgs/watchdogSrv.h"
+#include "watchdog_msgs/watchdogResetMsg.h"
 
 
 

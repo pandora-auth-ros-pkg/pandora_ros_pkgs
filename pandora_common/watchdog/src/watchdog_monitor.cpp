@@ -21,7 +21,7 @@ WatchdogMonitor::WatchdogMonitor(float checkFrequency) {
 	_registerWDTService = _nh.advertiseService("/robot/watchdogRegistry", 
 						&WatchdogMonitor::registerWdtService, this);
 							
-	_timeoutsPublisher = _nh.advertise<watchdog_communications::wdtTimeoutNotificationMsg>
+	_timeoutsPublisher = _nh.advertise<watchdog_msgs::wdtTimeoutNotificationMsg>
 						("/robot/watchdogResets", 1000);
 						
 	_wdtTimer = _nh.createTimer(ros::Duration(checkFrequency),
@@ -36,7 +36,7 @@ void WatchdogMonitor::checkForTimeouts(const ros::TimerEvent&) {
 		
 		if (info.lastReset + info.wdtDuration < ros::Time::now()) {
 			ROS_ERROR("Watchdog %s timedout",(*currentWdt).first.c_str());
-			watchdog_communications::wdtTimeoutNotificationMsg msg;
+			watchdog_msgs::wdtTimeoutNotificationMsg msg;
 			msg.lastReset = info.lastReset;
 			msg.wdtName = (*currentWdt).first;
 			msg.nodeName = msg.wdtName.substr(0,msg.wdtName.rfind("/"));
@@ -45,10 +45,10 @@ void WatchdogMonitor::checkForTimeouts(const ros::TimerEvent&) {
 	}
 }
 
-bool WatchdogMonitor::registerWdtService(watchdog_communications::watchdogSrv::Request& rq, 
-										 watchdog_communications::watchdogSrv::Response&) {
+bool WatchdogMonitor::registerWdtService(watchdog_msgs::watchdogSrv::Request& rq, 
+										 watchdog_msgs::watchdogSrv::Response&) {
 											 
-	if (rq.type == watchdog_communications::watchdogSrv::Request::TYPE_START) {
+	if (rq.type == watchdog_msgs::watchdogSrv::Request::TYPE_START) {
 		if (_activeWdt.count(rq.watchdogName) > 0) return false; //! WDT already exists
 		wdtInformation info;
 		info.wdtDuration = rq.timeoutDuration;
@@ -64,7 +64,7 @@ bool WatchdogMonitor::registerWdtService(watchdog_communications::watchdogSrv::R
 	}
 }
 
-void WatchdogMonitor::receiveReset(const watchdog_communications::watchdogResetMsgConstPtr& msg) {
+void WatchdogMonitor::receiveReset(const watchdog_msgs::watchdogResetMsgConstPtr& msg) {
 	_activeWdt[msg->watchdogName].lastReset = msg->header.stamp;
 }
 

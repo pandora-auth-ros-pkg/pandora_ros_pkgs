@@ -18,7 +18,7 @@
 
 StateClient::StateClient (bool doRegister) : _nh() {
 	name = ros::this_node::getName();
-	_acknowledgePublisher = _nh.advertise<state_manager_communications::robotModeMsg>
+	_acknowledgePublisher = _nh.advertise<state_manager_msgs::RobotModeMsg>
 	("/robot/state/server", 5, true);
 	
 	_stateSubscriber = _nh.subscribe("/robot/state/clients",10, 
@@ -36,12 +36,12 @@ void StateClient::clientRegister()
 		ROS_ERROR("[%s] Couldn't find service /robot/state/register", name.c_str());
 		ros::spinOnce();
 	}
-	_registerServiceClient = _nh.serviceClient<state_manager_communications::registerNodeSrv>
+	_registerServiceClient = _nh.serviceClient<state_manager_msgs::RegisterNodeSrv>
 	("/robot/state/register");
 	
-	state_manager_communications::registerNodeSrv rq;
+	state_manager_msgs::RegisterNodeSrv rq;
 	rq.request.nodeName = name;
-	rq.request.type = state_manager_communications::registerNodeSrvRequest::TYPE_STARTED;
+	rq.request.type = state_manager_msgs::RegisterNodeSrvRequest::TYPE_STARTED;
 	
 	while (!_registerServiceClient.call(rq) && ros::ok())
 		ROS_ERROR("[%s] Failed to register node. Retrying...", name.c_str());
@@ -56,12 +56,12 @@ void StateClient::clientInitialize()
 		ROS_ERROR("[%s] Couldn't find service /robot/state/register", name.c_str());
 		ros::spinOnce();
 	}
-	_registerServiceClient = _nh.serviceClient<state_manager_communications::registerNodeSrv>
+	_registerServiceClient = _nh.serviceClient<state_manager_msgs::RegisterNodeSrv>
 	("/robot/state/register");
 	
-	state_manager_communications::registerNodeSrv rq;
+	state_manager_msgs::RegisterNodeSrv rq;
 	rq.request.nodeName = name;
-	rq.request.type = state_manager_communications::registerNodeSrvRequest::TYPE_INITIALIZED;
+	rq.request.type = state_manager_msgs::RegisterNodeSrvRequest::TYPE_INITIALIZED;
 	
 	while (!_registerServiceClient.call(rq) && ros::ok())
 		ROS_ERROR("[%s] Failed to register node. Retrying...", name.c_str());
@@ -77,10 +77,10 @@ void StateClient::transitionComplete(int newState){
 
 	ROS_INFO("[%s] Node Transition to state %i Completed",name.c_str(), newState);	
 
-	state_manager_communications::robotModeMsg msg;
+	state_manager_msgs::RobotModeMsg msg;
 	msg.nodeName = name;
 	msg.mode = newState;
-	msg.type = state_manager_communications::robotModeMsg::TYPE_ACK;
+	msg.type = state_manager_msgs::RobotModeMsg::TYPE_ACK;
 	_acknowledgePublisher.publish(msg);
 }
 
@@ -91,21 +91,21 @@ void StateClient::completeTransition(){
 void StateClient::transitionToState(int newState){
 
 	ROS_INFO("[%s] Requesting transition to state %i",name.c_str(), newState);	
-	state_manager_communications::robotModeMsg msg;
+	state_manager_msgs::RobotModeMsg msg;
 	msg.nodeName = name;
 	msg.mode = newState;
-	msg.type = state_manager_communications::robotModeMsg::TYPE_REQUEST;
+	msg.type = state_manager_msgs::RobotModeMsg::TYPE_REQUEST;
 	_acknowledgePublisher.publish(msg);
 	
 }
 
-void StateClient::serverStateInformation(const state_manager_communications::robotModeMsgConstPtr& msg) {
+void StateClient::serverStateInformation(const state_manager_msgs::RobotModeMsgConstPtr& msg) {
 	ROS_INFO("[%s] Received new information from state server",name.c_str());
 	
-	if (msg->type == state_manager_communications::robotModeMsg::TYPE_TRANSITION) {
+	if (msg->type == state_manager_msgs::RobotModeMsg::TYPE_TRANSITION) {
 		startTransition(msg->mode);
 		
-	} else if (msg->type == state_manager_communications::robotModeMsg::TYPE_START) {
+	} else if (msg->type == state_manager_msgs::RobotModeMsg::TYPE_START) {
 		completeTransition();
 		
 	} else {

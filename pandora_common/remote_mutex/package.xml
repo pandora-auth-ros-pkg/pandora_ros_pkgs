@@ -14,10 +14,10 @@
  <buildtool_depend>catkin</buildtool_depend>
 
    <build_depend>roscpp</build_depend> 
-   <build_depend>remote_mutex_communications</build_depend> 
+   <build_depend>remote_mutex_msgs</build_depend> 
    
    <run_depend>roscpp</run_depend> 
-   <build_depend>remote_mutex_communications</build_depend> 
+   <build_depend>remote_mutex_msgs</build_depend> 
    
    
 

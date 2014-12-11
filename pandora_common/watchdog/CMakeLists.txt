@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(watchdog)
-find_package(catkin REQUIRED COMPONENTS roscpp watchdog_communications)
+find_package(catkin REQUIRED COMPONENTS roscpp watchdog_msgs)
 
 catkin_package(
     DEPENDS  
@@ -24,11 +24,11 @@ include_directories(include
 
 add_executable(watchdog_monitor src/watchdog_monitor.cpp)
 target_link_libraries(watchdog_monitor ${catkin_LIBRARIES} )
-add_dependencies(watchdog_monitor watchdog_communications_gencpp)
+add_dependencies(watchdog_monitor watchdog_msgs_gencpp)
 
 add_library(watchdog src/watchdog.cpp)
 target_link_libraries(watchdog ${catkin_LIBRARIES} )
-add_dependencies(watchdog watchdog_communications_gencpp)
+add_dependencies(watchdog watchdog_msgs_gencpp)
 
 
 

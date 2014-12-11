@@ -13,7 +13,7 @@
 #define MUTEX_GUARD_H
 
 #include "ros/ros.h"
-#include "remote_mutex_communications/mutexSrv.h"
+#include "remote_mutex_msgs/mutexSrv.h"
 
 class MutexGuard {
 	private:
@@ -51,7 +51,7 @@ class MutexGuard {
 		 /**
 		  * The ROS Service callback for the mutex.
 		  */
-		 bool serviceCallback(remote_mutex_communications::mutexSrv::Request &, remote_mutex_communications::mutexSrv::Response &);
+		 bool serviceCallback(remote_mutex_msgs::mutexSrv::Request &, remote_mutex_msgs::mutexSrv::Response &);
 		   
 		 /**
 		  * Try to unlock the mutex for the given holder.

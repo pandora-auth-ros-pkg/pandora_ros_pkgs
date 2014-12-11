@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   actionlib
-  state_manager_communications
+  state_manager_msgs
 )
 
 catkin_python_setup()
@@ -16,7 +16,7 @@ catkin_package(
     roscpp
     std_msgs
     actionlib
-    state_manager_communications
+    state_manager_msgs
   LIBRARIES
     state_client 
   DEPENDS 
@@ -29,13 +29,13 @@ include_directories(include
 
 add_executable(state_changer src/state_changer.cpp src/state_client.cpp)
 target_link_libraries(state_changer ${catkin_LIBRARIES} )
-add_dependencies(state_changer state_manager_communications_gencpp)
+add_dependencies(state_changer state_manager_msgs_gencpp)
 
 add_executable(state_server src/state_server.cpp)
 target_link_libraries(state_server ${catkin_LIBRARIES}  )
-add_dependencies(state_server state_manager_communications_gencpp)
+add_dependencies(state_server state_manager_msgs_gencpp)
 
 add_library(state_client src/state_client.cpp)
 target_link_libraries(state_client ${catkin_LIBRARIES} )
-add_dependencies(state_client state_manager_communications_gencpp)
+add_dependencies(state_client state_manager_msgs_gencpp)
 

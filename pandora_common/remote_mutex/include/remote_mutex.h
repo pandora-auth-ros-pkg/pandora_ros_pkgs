@@ -15,7 +15,7 @@
 #define REMOTE_MUTEX_H
 
 #include "ros/ros.h"
-#include "remote_mutex_communications/mutexSrv.h"
+#include "remote_mutex_msgs/mutexSrv.h"
 
 class RemoteMutex {
 	private:

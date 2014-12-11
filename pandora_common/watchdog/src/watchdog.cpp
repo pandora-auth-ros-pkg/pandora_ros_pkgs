@@ -19,7 +19,7 @@ Watchdog::Watchdog(std::string wdtName, ros::Duration duration) {
 	_wdtCounter = duration;
 	_started = false;
 	
-	_watchdogResetPublisher = _nh.advertise<watchdog_communications::watchdogResetMsg>
+	_watchdogResetPublisher = _nh.advertise<watchdog_msgs::watchdogResetMsg>
 								("/robot/watchdog", 100);
 	
 	int retries = 0;
@@ -29,7 +29,7 @@ Watchdog::Watchdog(std::string wdtName, ros::Duration duration) {
 			ROS_ERROR("Couldn't find service watchdogRegistry.");
 		ros::spinOnce();
 	}
-	_registerService = _nh.serviceClient<watchdog_communications::watchdogSrv>
+	_registerService = _nh.serviceClient<watchdog_msgs::watchdogSrv>
 						("/robot/watchdogRegistry");
 }
 
@@ -42,9 +42,9 @@ Watchdog::~Watchdog() {
 
 void Watchdog::start() {
 	if (_started) return;
-	watchdog_communications::watchdogSrv srv;
+	watchdog_msgs::watchdogSrv srv;
 	srv.request.watchdogName = _name;
-	srv.request.type = watchdog_communications::watchdogSrv::Request::TYPE_START;
+	srv.request.type = watchdog_msgs::watchdogSrv::Request::TYPE_START;
 	srv.request.timeoutDuration = _wdtCounter;
 	if (_registerService.call(srv)) {
 		_started = true;
@@ -56,9 +56,9 @@ void Watchdog::start() {
 
 void Watchdog::stop() {
 	if (!_started) return;
-	watchdog_communications::watchdogSrv srv;
+	watchdog_msgs::watchdogSrv srv;
 	srv.request.watchdogName = _name;
-	srv.request.type = watchdog_communications::watchdogSrv::Request::TYPE_STOP;
+	srv.request.type = watchdog_msgs::watchdogSrv::Request::TYPE_STOP;
 	if (_registerService.call(srv)) {
 		_started = false;
 		ROS_INFO("Watchdog %s stopped",_name.c_str());
@@ -68,7 +68,7 @@ void Watchdog::stop() {
 }
 
 void Watchdog::reset() {
-		watchdog_communications::watchdogResetMsg msg;
+		watchdog_msgs::watchdogResetMsg msg;
 		msg.watchdogName = _name;
 		msg.header.stamp = ros::Time::now();
 		_watchdogResetPublisher.publish(msg);
