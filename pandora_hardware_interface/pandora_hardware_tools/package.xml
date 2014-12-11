@@ -16,11 +16,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>rospy</build_depend>
-  <build_depend>state_manager_communications</build_depend>
+  <build_depend>state_manager_msgs</build_depend>
   <build_depend>pandora_xmega_hardware_interface</build_depend>
 
   <run_depend>rospy</run_depend>
-  <run_depend>state_manager_communications</run_depend>
+  <run_depend>state_manager_msgs</run_depend>
   <run_depend>pandora_xmega_hardware_interface</run_depend>
 
   <export>

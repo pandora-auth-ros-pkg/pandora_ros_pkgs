@@ -9,14 +9,14 @@ import rospy
 import serial
 import sys
 from pandora_xmega_hardware_interface.msg import BatteryMsg
-from state_manager_communications.msg import robotModeMsg
+from state_manager_msgs.msg import RobotModeMsg
 
 
 class StateIndicator:
     
     def __init__(self):
         rospy.Subscriber('/sensors/battery', BatteryMsg, self.butterfly_callback)
-        rospy.Subscriber('/robot/state/clients', robotModeMsg, self.state_callback)
+        rospy.Subscriber('/robot/state/clients', RobotModeMsg, self.state_callback)
         self.ser = serial.Serial("/dev/state_indicator", 38400)
 
         
