@@ -3,7 +3,7 @@ project(pandora_interface_diagnostics)
 find_package(catkin REQUIRED COMPONENTS 
             roscpp 
             state_manager 
-            state_manager_communications 
+            state_manager_msgs 
             diagnostic_updater 
             interface_tester
             cmake_modules
@@ -25,7 +25,7 @@ catkin_package(
     DEPENDS TinyXML
     CATKIN-DEPENDS roscpp 
                    state_manager 
-                   state_manager_communications 
+                   state_manager_msgs 
                    diagnostic_updater 
                    interface_tester
     INCLUDE_DIRS 
@@ -50,7 +50,7 @@ target_link_libraries(node_diagnostics
       interfaces_xml_parser
       interface_tester
       )
-add_dependencies(node_diagnostics state_manager_communications_gencpp)
+add_dependencies(node_diagnostics state_manager_msgs_gencpp)
 
 add_library(interface_diagnostics src/interface_diagnostics.cpp)
 target_link_libraries(interface_diagnostics   
@@ -61,7 +61,7 @@ target_link_libraries(interface_diagnostics
       interface_tester
       tf_monitor
       )
-add_dependencies(interface_diagnostics state_manager_communications_gencpp)
+add_dependencies(interface_diagnostics state_manager_msgs_gencpp)
 
 add_executable(interface_diagnostics_node src/interface_diagnostics_node.cpp)
 target_link_libraries(interface_diagnostics_node   
@@ -74,5 +74,5 @@ target_link_libraries(interface_diagnostics_node
       interface_tester
       tf_monitor
       )
-add_dependencies(interface_diagnostics_node state_manager_communications_gencpp)
+add_dependencies(interface_diagnostics_node state_manager_msgs_gencpp)
 
