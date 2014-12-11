@@ -1,7 +1,7 @@
 import rospy
 
 from state_manager.state_client import StateClient
-from state_manager_communications.msg import robotModeMsg
+from state_manager_msgs.msg import RobotModeMsg
 
 
 class GuiStateClient(StateClient):
@@ -10,18 +10,18 @@ class GuiStateClient(StateClient):
 
        super(GuiStateClient,self).__init__()
 
-       self.state_ = robotModeMsg.MODE_OFF
+       self.state_ = RobotModeMsg.MODE_OFF
        self.int_to_state_dict = {
-           robotModeMsg.MODE_OFF: "MODE_OFF",
-           robotModeMsg.MODE_START_AUTONOMOUS: "MODE_START_AUTONOMOUS",
-           robotModeMsg.MODE_EXPLORATION_RESCUE: "MODE_EXPLORATION_RESCUE",
-           robotModeMsg.MODE_IDENTIFICATION: "MODE_IDENTIFICATION",
-           robotModeMsg.MODE_SENSOR_HOLD: "MODE_SENSOR_HOLD",
-           robotModeMsg.MODE_SEMI_AUTONOMOUS: "MODE_SEMI_AUTONOMOUS",
-           robotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "MODE_TELEOPERATED_LOCOMOTION",
-           robotModeMsg.MODE_SENSOR_TEST: "MODE_SENSOR_TEST",
-           robotModeMsg.MODE_EXPLORATION_MAPPING:"MODE_EXPLORATION_MAPPING",
-           robotModeMsg.MODE_TERMINATING: "MODE_TERMINATING"
+           RobotModeMsg.MODE_OFF: "MODE_OFF",
+           RobotModeMsg.MODE_START_AUTONOMOUS: "MODE_START_AUTONOMOUS",
+           RobotModeMsg.MODE_EXPLORATION_RESCUE: "MODE_EXPLORATION_RESCUE",
+           RobotModeMsg.MODE_IDENTIFICATION: "MODE_IDENTIFICATION",
+           RobotModeMsg.MODE_SENSOR_HOLD: "MODE_SENSOR_HOLD",
+           RobotModeMsg.MODE_SEMI_AUTONOMOUS: "MODE_SEMI_AUTONOMOUS",
+           RobotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "MODE_TELEOPERATED_LOCOMOTION",
+           RobotModeMsg.MODE_SENSOR_TEST: "MODE_SENSOR_TEST",
+           RobotModeMsg.MODE_EXPLORATION_MAPPING:"MODE_EXPLORATION_MAPPING",
+           RobotModeMsg.MODE_TERMINATING: "MODE_TERMINATING"
                                   }
 
 
