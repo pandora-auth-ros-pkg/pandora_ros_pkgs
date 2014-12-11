@@ -123,27 +123,27 @@ namespace pandora_sensor_processing
     {
       switch (newState)
       {
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE:
+        case state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE:
           ROS_INFO("[%s] Entering Exploration mode.", name_.c_str());
           toggleSubscriber(EXPLORATION_STATE);
           break;
-        case state_manager_communications::robotModeMsg::MODE_IDENTIFICATION:
+        case state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION:
           ROS_INFO("[%s] Entering Identification mode.", name_.c_str());
           toggleSubscriber(IDENTIFICATION_STATE);
           break;
-        case state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD:
+        case state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD:
           ROS_ERROR("[%s] Terminating node.", name_.c_str());
           toggleSubscriber(SENSOR_HOLD_STATE);
           break;
-        case state_manager_communications::robotModeMsg::MODE_SEMI_AUTONOMOUS:
-        case state_manager_communications::robotModeMsg::MODE_TELEOPERATED_LOCOMOTION:
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_MAPPING:
+        case state_manager_msgs::RobotModeMsg::MODE_SEMI_AUTONOMOUS:
+        case state_manager_msgs::RobotModeMsg::MODE_TELEOPERATED_LOCOMOTION:
+        case state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING:
           toggleSubscriber(false);
           break;
-        case state_manager_communications::robotModeMsg::MODE_SENSOR_TEST:
+        case state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST:
           toggleSubscriber(true);
           break;
-        case state_manager_communications::robotModeMsg::MODE_TERMINATING:
+        case state_manager_msgs::RobotModeMsg::MODE_TERMINATING:
           ROS_ERROR("[%s] Terminating node.", name_.c_str());
           exit(0);
           break;

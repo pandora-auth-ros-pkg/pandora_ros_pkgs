@@ -331,7 +331,7 @@ namespace pandora_data_fusion
     /*  Alert-concerned Callbacks  */
 
     void AlertHandler::holeDirectionAlertCallback(
-        const vision_communications::HolesDirectionsVectorMsg& msg)
+        const pandora_vision_msgs::HolesDirectionsVectorMsg& msg)
     {
       if (map_->data.size() == 0)
         return;
@@ -358,7 +358,7 @@ namespace pandora_data_fusion
     }
 
     void AlertHandler::hazmatAlertCallback(
-        const vision_communications::HazmatAlertsVectorMsg& msg)
+        const pandora_vision_msgs::HazmatAlertsVectorMsg& msg)
     {
       if (map_->data.size() == 0)
         return;
@@ -381,7 +381,7 @@ namespace pandora_data_fusion
     }
 
     void AlertHandler::qrAlertCallback(
-        const vision_communications::QRAlertsVectorMsg& msg)
+        const pandora_vision_msgs::QRAlertsVectorMsg& msg)
     {
       if (map_->data.size() == 0)
         return;
@@ -404,7 +404,7 @@ namespace pandora_data_fusion
     }
 
     void AlertHandler::landoltcAlertCallback(
-        const vision_communications::LandoltcAlertsVectorMsg& msg)
+        const pandora_vision_msgs::LandoltcAlertsVectorMsg& msg)
     {
       if (map_->data.size() == 0)
         return;
@@ -427,7 +427,7 @@ namespace pandora_data_fusion
     }
 
     void AlertHandler::dataMatrixAlertCallback(
-        const vision_communications::DataMatrixAlertsVectorMsg& msg)
+        const pandora_vision_msgs::DataMatrixAlertsVectorMsg& msg)
     {
       if (map_->data.size() == 0)
         return;

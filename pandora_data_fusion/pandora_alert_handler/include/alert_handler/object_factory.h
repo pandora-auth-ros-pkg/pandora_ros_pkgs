@@ -46,12 +46,12 @@
 
 #include <nav_msgs/OccupancyGrid.h>
 
-#include "vision_communications/HolesDirectionsVectorMsg.h"
-#include "vision_communications/FaceDirectionMsg.h"
-#include "vision_communications/QRAlertsVectorMsg.h"
-#include "vision_communications/HazmatAlertsVectorMsg.h"
-#include "vision_communications/LandoltcAlertsVectorMsg.h"
-#include "vision_communications/DataMatrixAlertsVectorMsg.h"
+#include "pandora_vision_msgs/HolesDirectionsVectorMsg.h"
+#include "pandora_vision_msgs/FaceDirectionMsg.h"
+#include "pandora_vision_msgs/QRAlertsVectorMsg.h"
+#include "pandora_vision_msgs/HazmatAlertsVectorMsg.h"
+#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
+#include "pandora_vision_msgs/DataMatrixAlertsVectorMsg.h"
 #include "pandora_common_msgs/GeneralAlertMsg.h"
 
 #include "alert_handler/pose_finder.h"
@@ -69,15 +69,15 @@ namespace pandora_data_fusion
         ObjectFactory(const MapPtr& map, const std::string& mapType);
 
         HolePtrVectorPtr makeHoles(
-            const vision_communications::HolesDirectionsVectorMsg& msg);
+            const pandora_vision_msgs::HolesDirectionsVectorMsg& msg);
         HazmatPtrVectorPtr makeHazmats(
-            const vision_communications::HazmatAlertsVectorMsg& msg);
+            const pandora_vision_msgs::HazmatAlertsVectorMsg& msg);
         QrPtrVectorPtr makeQrs(
-            const vision_communications::QRAlertsVectorMsg& msg);
+            const pandora_vision_msgs::QRAlertsVectorMsg& msg);
         LandoltcPtrVectorPtr makeLandoltcs(
-            const vision_communications::LandoltcAlertsVectorMsg& msg);
+            const pandora_vision_msgs::LandoltcAlertsVectorMsg& msg);
         DataMatrixPtrVectorPtr makeDataMatrices(
-            const vision_communications::DataMatrixAlertsVectorMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlertsVectorMsg& msg);
         template <class ObjectType>
           typename ObjectType::PtrVectorPtr makeObjects(
               const pandora_common_msgs::GeneralAlertMsg& msg);
@@ -101,16 +101,16 @@ namespace pandora_data_fusion
          * @return void
          */
         void setUpHole(const HolePtr& holePtr,
-            const vision_communications::HoleDirectionMsg& msg);
+            const pandora_vision_msgs::HoleDirectionMsg& msg);
         void setUpHazmat(const HazmatPtr& hazmatPtr,
-            const vision_communications::HazmatAlertMsg& msg);
+            const pandora_vision_msgs::HazmatAlertMsg& msg);
         void setUpQr(const QrPtr& qrPtr,
-            const vision_communications::QRAlertMsg& msg,
+            const pandora_vision_msgs::QRAlertMsg& msg,
             ros::Time timeFound);
         void setUpLandoltc(const LandoltcPtr& landoltcPtr,
-            const vision_communications::LandoltcAlertMsg& msg);
+            const pandora_vision_msgs::LandoltcAlertMsg& msg);
         void setUpDataMatrix(const DataMatrixPtr& dataMatrixPtr,
-            const vision_communications::DataMatrixAlertMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlertMsg& msg);
         template <class ObjectType>
           void setUpObject(
               const typename ObjectType::Ptr& objectPtr,

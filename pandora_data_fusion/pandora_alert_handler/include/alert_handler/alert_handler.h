@@ -61,12 +61,12 @@
 #include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
 #include "pandora_data_fusion_msgs/GetMarkersSrv.h"
 
-#include "vision_communications/HolesDirectionsVectorMsg.h"
-#include "vision_communications/FaceDirectionMsg.h"
-#include "vision_communications/QRAlertsVectorMsg.h"
-#include "vision_communications/HazmatAlertsVectorMsg.h"
-#include "vision_communications/DataMatrixAlertsVectorMsg.h"
-#include "vision_communications/LandoltcAlertsVectorMsg.h"
+#include "pandora_vision_msgs/HolesDirectionsVectorMsg.h"
+#include "pandora_vision_msgs/FaceDirectionMsg.h"
+#include "pandora_vision_msgs/QRAlertsVectorMsg.h"
+#include "pandora_vision_msgs/HazmatAlertsVectorMsg.h"
+#include "pandora_vision_msgs/DataMatrixAlertsVectorMsg.h"
+#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
 #include "pandora_common_msgs/GeneralAlertMsg.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
@@ -123,16 +123,16 @@ namespace pandora_data_fusion
         /*  Alert-concerned Subscribers  */
 
         void holeDirectionAlertCallback(
-            const vision_communications::HolesDirectionsVectorMsg& msg);
+            const pandora_vision_msgs::HolesDirectionsVectorMsg& msg);
         void thermalDirectionAlertCallback(
             const pandora_common_msgs::GeneralAlertMsg& msg);
         void hazmatAlertCallback(
-            const vision_communications::HazmatAlertsVectorMsg& msg);
-        void qrAlertCallback(const vision_communications::QRAlertsVectorMsg& msg);
+            const pandora_vision_msgs::HazmatAlertsVectorMsg& msg);
+        void qrAlertCallback(const pandora_vision_msgs::QRAlertsVectorMsg& msg);
         void landoltcAlertCallback(
-            const vision_communications::LandoltcAlertsVectorMsg& msg);
+            const pandora_vision_msgs::LandoltcAlertsVectorMsg& msg);
         void dataMatrixAlertCallback(
-            const vision_communications::DataMatrixAlertsVectorMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlertsVectorMsg& msg);
         template <class ObjectType>
           void objectDirectionAlertCallback(
               const pandora_common_msgs::GeneralAlertMsg& msg);

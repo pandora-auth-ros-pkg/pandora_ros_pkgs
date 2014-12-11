@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   roscpp
   state_manager
-  state_manager_communications
+  state_manager_msgs
   dynamic_reconfigure
   roslint
   pandora_arm_hardware_interface
@@ -28,7 +28,7 @@ catkin_package(
     cmake_modules
     roscpp
     state_manager
-    state_manager_communications
+    state_manager_msgs
     dynamic_reconfigure
     roslint
     pandora_arm_hardware_interface
@@ -63,7 +63,7 @@ target_link_libraries(co2_processor
 add_dependencies(co2_processor
   pandora_sensor_processing_gencfg
   pandora_arm_hardware_interface_gencpp
-  pandora_state_manager_communications_gencpp
+  pandora_state_manager_msgs_gencpp
   pandora_common_msgs_gencpp
   )
 
@@ -94,7 +94,7 @@ target_link_libraries(thermal_processor
 add_dependencies(thermal_processor
   pandora_sensor_processing_gencfg
   pandora_arm_hardware_interface_gencpp
-  pandora_state_manager_communications_gencpp
+  pandora_state_manager_msgs_gencpp
   pandora_common_msgs_gencpp
   )
 

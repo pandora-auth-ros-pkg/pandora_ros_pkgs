@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
   pandora_data_fusion_msgs 
   pandora_common_msgs
-  vision_communications
+  pandora_vision_msgs
   )
 
 find_package(PkgConfig)
@@ -41,7 +41,7 @@ catkin_package(
     roslint
     pandora_data_fusion_msgs 
     pandora_common_msgs
-    vision_communications
+    pandora_vision_msgs
   INCLUDE_DIRS 
     include
     ${BFL_INCLUDE_DIRS}
@@ -153,7 +153,7 @@ target_link_libraries(object_factory
   )
 add_dependencies(object_factory 
   pandora_data_fusion_msgs_gencpp
-  vision_communications_gencpp
+  pandora_vision_msgs_gencpp
   pandora_common_msgs_gencpp
   ) 
          
@@ -206,7 +206,7 @@ target_link_libraries(alert_handler
   )
 add_dependencies(alert_handler 
   pandora_alert_handler_gencfg 
-  vision_communications_gencpp
+  pandora_vision_msgs_gencpp
   pandora_data_fusion_msgs_gencpp
   pandora_common_msgs_gencpp
   ) 

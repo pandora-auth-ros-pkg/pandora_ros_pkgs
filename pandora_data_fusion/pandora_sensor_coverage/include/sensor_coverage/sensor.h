@@ -42,7 +42,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "state_manager_communications/robotModeMsg.h"
+#include "state_manager_msgs/RobotModeMsg.h"
 
 #include "alert_handler/tf_finder.h"
 #include "alert_handler/tf_listener.h"

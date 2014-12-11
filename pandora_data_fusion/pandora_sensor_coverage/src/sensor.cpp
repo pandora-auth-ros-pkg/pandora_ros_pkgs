@@ -81,16 +81,16 @@ namespace pandora_data_fusion
     {
       switch (newState)
       {
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_RESCUE:
+        case state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE:
           sensorWorking_ = EXPLORATION_STATE;
           break;
-        case state_manager_communications::robotModeMsg::MODE_IDENTIFICATION:
+        case state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION:
           sensorWorking_ = IDENTIFICATION_STATE;
           break;
-        case state_manager_communications::robotModeMsg::MODE_SENSOR_HOLD:
+        case state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD:
           sensorWorking_ = HOLD_STATE;
           break;
-        case state_manager_communications::robotModeMsg::MODE_EXPLORATION_MAPPING:
+        case state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING:
           sensorWorking_ = true;
           break;
         default:

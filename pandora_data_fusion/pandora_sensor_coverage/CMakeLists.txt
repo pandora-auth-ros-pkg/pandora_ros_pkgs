@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
   pandora_alert_handler
   state_manager
-  state_manager_communications
+  state_manager_msgs
   octomap_msgs
   octomap_ros
   )
@@ -24,7 +24,7 @@ catkin_package(
   roslint
   pandora_alert_handler
   state_manager
-  state_manager_communications
+  state_manager_msgs
   INCLUDE_DIRS 
   include
   LIBRARIES 
