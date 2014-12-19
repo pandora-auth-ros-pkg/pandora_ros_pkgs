@@ -1,18 +1,22 @@
+# Continuous integration configuration file, used by Jenkins
+# Author: Chris Zalidis
 install:
   - export ROS_DISTRO=hydro
+  - export CI_SOURCE_PATH=$(pwd)
   - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros
   - sudo rosdep init
   - rosdep update
-  - mkdir -p catkin_ws/src
-  - cd catkin_ws/src
-  - ln -s /vagrant/pandora_ros_pkgs
+  # Create workspace
+  - mkdir -p $BUILD_HOME/catkin_ws/src
+  - cd $BUILD_HOME/catkin_ws/src
+  - ln -s $CI_SOURCE_PATH
   - cd ..
   - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
   - source /opt/ros/$ROS_DISTRO/setup.bash
-script:
+script: # All commands must exit with code 0 on success. Anything else is considered failure.
   - catkin_make
   - source devel/setup.bash
   - catkin_make roslint
