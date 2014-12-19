@@ -1,0 +1,20 @@
+install:
+  - export ROS_DISTRO=hydro
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros
+  - sudo rosdep init
+  - rosdep update
+  - mkdir -p catkin_ws/src
+  - cd catkin_ws/src
+  - ln -s /vagrant/pandora_ros_pkgs
+  - cd ..
+  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
+  - source /opt/ros/$ROS_DISTRO/setup.bash
+script:
+  - catkin_make
+  - source devel/setup.bash
+  - catkin_make roslint
+  - catkin_make run_tests
+  - catkin_test_results build
