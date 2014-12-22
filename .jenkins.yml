@@ -11,9 +11,9 @@ install:
   - rosdep update
   # Create workspace
   - mkdir -p $BUILD_HOME/catkin_ws/src
-  - cd $BUILD_HOME/catkin_ws/src
-  - ln -s $CI_SOURCE_PATH
-  - cd ..
+  # Add this folder to the workspace
+  - ln -s $CI_SOURCE_PATH $BUILD_HOME/catkin_ws/src
+  - cd $BUILD_HOME/catkin_ws
   - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
   - source /opt/ros/$ROS_DISTRO/setup.bash
 script: # All commands must exit with code 0 on success. Anything else is considered failure.
