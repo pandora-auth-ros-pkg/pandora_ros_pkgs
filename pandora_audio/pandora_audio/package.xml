@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+<name>pandora_audio</name>
+  <version>0.0.0</version>
+  <description>The pandora_audio metapackage</description>
+
+  <maintainer email="nicktgr15@gmail.com">Nikolaos Tsipas</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_audio/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_audio</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>pandora_audio_msgs</run_depend>
+  <run_depend>pandora_kinect_audio_capture</run_depend>
+  <run_depend>pandora_kinect_audio_processing</run_depend>
+
+  <export>
+      <metapackage/>
+  </export>
+
+</package>
+
+
+
+
+

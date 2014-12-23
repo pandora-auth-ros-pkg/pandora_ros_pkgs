@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+<name>pandora_audio_msgs</name>
+  <version>0.0.0</version>
+  <description>Contains common audio msgs</description>
+
+  <maintainer email="nicktgr15@gmail.com">Nikolaos Tsipas</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_audio/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_audio</url>
+
+  <author>Nikolaos Tsipas</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <export>
+  </export>
+
+</package>
+

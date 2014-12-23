@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<package>
+<name>pandora_kinect_audio_processing</name>
+  <version>0.0.0</version>
+  <description>Processing code for microsoft Kinect</description>
+
+  <maintainer email="nicktgr15@gmail.com">Nikolaos Tsipas</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_audio/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_audio</url>
+
+  <author>Nikolaos Tsipas</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <run_depend>rospy</run_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <build_depend>pandora_audio_msgs</build_depend>
+  <run_depend>pandora_audio_msgs</run_depend>
+
+  <build_depend>pandora_common_msgs</build_depend>
+  <run_depend>pandora_common_msgs</run_depend>
+
+  <run_depend>python-numpy</run_depend>
+
+  <build_depend>state_manager</build_depend>
+  <run_depend>state_manager</run_depend>
+
+  <build_depend>state_manager_msgs</build_depend>
+  <run_depend>state_manager_msgs</run_depend>
+
+  <export>
+  </export>
+
+</package>
+
+
+
+
+

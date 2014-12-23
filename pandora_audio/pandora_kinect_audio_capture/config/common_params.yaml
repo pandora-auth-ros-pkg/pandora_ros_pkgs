@@ -1,0 +1,8 @@
+sample_rate: 8000
+window_size: 1024
+bit_depth: 16
+capture_channels: 4
+buffer_size: 512
+record_buffers: 2
+monitor_channels: 2
+wav_file_location: /tmp/wave.wav

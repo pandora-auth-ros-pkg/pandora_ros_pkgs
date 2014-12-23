@@ -1,0 +1,5 @@
+<launch>
+  <node name="processing" pkg="pandora_kinect_audio_processing" type="processing.py" ns="pandora_audio" output="screen"/>
+  <rosparam file="$(find pandora_kinect_audio_processing)/config/processing_topics.yaml" command="load" ns="pandora_audio"/>
+  <rosparam file="$(find pandora_kinect_audio_processing)/config/processing_params.yaml" command="load" ns="pandora_audio"/>
+</launch>

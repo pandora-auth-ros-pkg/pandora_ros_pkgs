@@ -1,0 +1,5 @@
+<launch>
+  <node name="capture" pkg="pandora_kinect_audio_capture" type="capture.py" ns="pandora_audio" output="screen"/>
+  <rosparam file="$(find pandora_kinect_audio_capture)/config/capture_topics.yaml" command="load" ns="pandora_audio"/>
+  <rosparam file="$(find pandora_kinect_audio_capture)/config/common_params.yaml" command="load" ns="pandora_audio"/>
+</launch>

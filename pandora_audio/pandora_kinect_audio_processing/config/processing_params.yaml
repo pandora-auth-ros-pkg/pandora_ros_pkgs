@@ -1,0 +1,4 @@
+window_size: 1024
+noise_floor_buffer_length: 64
+source_loc_buffer_length: 16
+similarity_distance: 0.523
