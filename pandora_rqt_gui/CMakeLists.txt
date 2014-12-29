@@ -34,7 +34,7 @@ catkin_package(
 
 ################ RosLint ###################################################
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
-            ${PROJECT_SOURCE_DIR} 
+            ${PROJECT_SOURCE_DIR}
             src/pandora_rqt_gui/battery_widget.py
             src/pandora_rqt_gui/co2_widget.py
             src/pandra_rqt_gui/gui_state_client.py
