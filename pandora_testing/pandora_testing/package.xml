@@ -13,7 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>pandora_intergation_testing</run_depend>
+  <run_depend>pandora_integration_testing</run_depend>
 
   <export>
     <metapackage/>
