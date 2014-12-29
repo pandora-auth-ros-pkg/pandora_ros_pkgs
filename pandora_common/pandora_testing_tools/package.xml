@@ -1,16 +1,15 @@
-<?xml version="1.0"?>
 <package format="2">
-  <name>pandora_common_msgs</name>
-  <version>0.0.0</version>
-  <description>Common messages, used by various packages.</description>
-
-  <maintainer email="chritsir@auth.gr">Tsirigotis Christos</maintainer>
+  <name>pandora_testing_tools</name>
+  <version>0.0.1</version>
+  <description>pandora's testing tools</description>
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
 
+  <author>Afouras Triantafyllos</author>
   <author>Tsirigotis Christos</author>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -18,10 +17,18 @@
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
 
+  <build_depend>pkg-config</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>tf</depend>
+  <depend>rosbag</depend>
+  <depend>map_server</depend>
   <depend>std_msgs</depend>
   <depend>actionlib_msgs</depend>
+  <depend>actionlib</depend>
+  <depend>yaml-cpp</depend>
 
   <export>
   </export>
-
 </package>

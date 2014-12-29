@@ -1,24 +1,20 @@
-<package>
+<package format="2">
   <name>watchdog</name>
   <version>0.0.0</version>
   <description>watchdog</description>
-  <!-- <maintainer>MSoftware Architecture Team</maintainer> -->
-  <maintainer email="afourast@gmail.com">Afouras Triantafyllos</maintainer> 
+  <maintainer email="afourast@gmail.com">Afouras Triantafyllos</maintainer>
   <license>BSD</license>
 
-  <url type="website">http://ros.org/wiki/watchdog</url>
-  <!-- <url type="bugtracker"></url> -->
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
 
-  <author>MSoftware Architecture Team</author>
+  <author>Software Architecture Team</author>
 
- <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin</buildtool_depend>
 
-   <build_depend>roscpp</build_depend> 
-   <run_depend>roscpp</run_depend> 
-   
-   <build_depend>watchdog_msgs</build_depend> 
-   <run_depend>watchdog_msgs</run_depend> 
-   
+  <depend>roscpp</depend>
+  <depend>watchdog_msgs</depend>
+
   <export>
   </export>
 </package>

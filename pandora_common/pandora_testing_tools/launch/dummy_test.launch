@@ -1,0 +1,11 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <node pkg="pandora_testing_tools" type="dummy_node.py"
+      name="dummy_node" />
+
+  <test test-name="DummyNodeTester" pkg="pandora_testing_tools"
+      type="test_dummy_node.py" />
+
+</launch>

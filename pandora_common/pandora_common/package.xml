@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_common</name>
   <version>0.0.0</version>
   <description>Containts pandora common packages</description>
@@ -9,22 +8,21 @@
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
 
-  <author>afourast</author>
-  
   <buildtool_depend>catkin</buildtool_depend>
-  
-  <run_depend>state_manager</run_depend>
-  <run_depend>state_manager_msgs</run_depend>
-  <run_depend>watchdog</run_depend>
-  <run_depend>watchdog_msgs</run_depend>
-  <run_depend>remote_mutex</run_depend>
-  <run_depend>remote_mutex_msgs</run_depend>
-  <run_depend>pandora_common_msgs</run_depend>
-  <run_depend>kinect_movement_filter</run_depend>
+
+  <exec_depend>state_manager</exec_depend>
+  <exec_depend>state_manager_msgs</exec_depend>
+  <exec_depend>watchdog</exec_depend>
+  <exec_depend>watchdog_msgs</exec_depend>
+  <exec_depend>remote_mutex</exec_depend>
+  <exec_depend>remote_mutex_msgs</exec_depend>
+  <exec_depend>pandora_common_msgs</exec_depend>
+  <exec_depend>kinect_movement_filter</exec_depend>
+  <exec_depend>pandora_testing_tools</exec_depend>
 
   <export>
     <metapackage/>
-  </export>  
+  </export>
 </package>

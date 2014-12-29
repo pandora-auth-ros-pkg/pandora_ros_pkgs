@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   actionlib
+  diagnostic_updater
   state_manager_msgs
 )
 
@@ -16,26 +17,27 @@ catkin_package(
     roscpp
     std_msgs
     actionlib
+    diagnostic_updater
     state_manager_msgs
   LIBRARIES
-    state_client 
-  DEPENDS 
+    state_client
+  #DEPENDS
 )
 
-include_directories(include
+include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
-  ${boost_INCLUDE_DIRS}
 )
 
 add_executable(state_changer src/state_changer.cpp src/state_client.cpp)
 target_link_libraries(state_changer ${catkin_LIBRARIES} )
-add_dependencies(state_changer state_manager_msgs_gencpp)
+add_dependencies(state_changer ${catkin_EXPORTED_TARGETS})
 
 add_executable(state_server src/state_server.cpp)
 target_link_libraries(state_server ${catkin_LIBRARIES}  )
-add_dependencies(state_server state_manager_msgs_gencpp)
+add_dependencies(state_server ${catkin_EXPORTED_TARGETS})
 
 add_library(state_client src/state_client.cpp)
 target_link_libraries(state_client ${catkin_LIBRARIES} )
-add_dependencies(state_client state_manager_msgs_gencpp)
+add_dependencies(state_client ${catkin_EXPORTED_TARGETS})
 
