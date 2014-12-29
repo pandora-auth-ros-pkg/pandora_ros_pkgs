@@ -2,7 +2,7 @@
   <name>pandora_integration_testing</name>
   <version>0.0.0</version>
   <description>pandora's integration tests</description>
-  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -10,22 +10,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>rospy</build_depend> 
-  <build_depend>rostest</build_depend> 
-  <build_depend>roslib</build_depend> 
-
-  <build_depend>state_manager_msgs</build_depend>
-  <build_depend>pandora_vision_msgs</build_depend>
-  <build_depend>pandora_data_fusion_msgs</build_depend>
-  <build_depend>pandora_arm_hardware_interface</build_depend>
-  <build_depend>pandora_common_msgs</build_depend>
-  <build_depend>pandora_navigation_msgs</build_depend>
-  <build_depend>pandora_rqt_gui</build_depend>
-  <build_depend>pandora_testing_tools</build_depend>
-  
-  <run_depend>rospy</run_depend> 
-  <run_depend>rostest</run_depend> 
-  <run_depend>roslib</run_depend> 
+  <run_depend>rospy</run_depend>
+  <run_depend>rostest</run_depend>
+  <run_depend>roslib</run_depend>
 
   <run_depend>state_manager</run_depend>
   <run_depend>state_manager_msgs</run_depend>
@@ -44,6 +31,5 @@
   <run_depend>pandora_testing_tools</run_depend>
 
   <export>
-
   </export>
 </package>

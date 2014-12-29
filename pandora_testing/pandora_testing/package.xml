@@ -10,14 +10,13 @@
 
   <author>Tsirigotis Christos</author>
   <author>Afouras Triantafyllos</author>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
-  
-  <run_depend>pandora_testing_tools</run_depend>
-  <run_depend>pandora_dummy_motor_controller</run_depend>
+
+  <run_depend>pandora_intergation_testing</run_depend>
 
   <export>
     <metapackage/>
-  </export>  
+  </export>
 </package>
 

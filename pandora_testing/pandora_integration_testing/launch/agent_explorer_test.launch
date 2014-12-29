@@ -14,6 +14,7 @@
   <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
 
   <include file="$(find pandora_exploration)/launch/explorer.launch" /> 
+  <rosparam param="static/map_topic" ns="explore_costmap">/map</rosparam>
 
   <node pkg="pandora_fsm" type="robocup_agent.py" name="agent" output="screen" />
 

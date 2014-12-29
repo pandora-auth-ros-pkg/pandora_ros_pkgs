@@ -1,35 +1,19 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_integration_testing)
 
-set(CMAKE_BUILD_TYPE Debug)
-
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  rostest
-  roslib
-  pandora_vision_msgs
-  pandora_data_fusion_msgs
-  pandora_navigation_msgs
-  pandora_rqt_gui
-  pandora_testing_tools
-  )
+find_package(catkin REQUIRED)
 
 catkin_package(
-  DEPENDS
-  CATKIN_DEPENDS
-  rospy
-  rostest
-  roslib
-  pandora_vision_msgs
-  pandora_data_fusion_msgs
-  pandora_navigation_msgs
-  pandora_rqt_gui
-  pandora_testing_tools
-  INCLUDE_DIRS
-  LIBRARIES
+  #DEPENDS
+  #CATKIN_DEPENDS
+  #INCLUDE_DIRS
+  #LIBRARIES
   )
 
 ########################  Integration Tests  ########################
 
-#add_rostest(launch/data_fusion_agent_test.launch)
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  #add_rostest(launch/data_fusion_agent_test.launch)
+endif()
 
