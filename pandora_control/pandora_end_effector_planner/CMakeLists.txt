@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_end_effector_planner)
 
-find_package(catkin REQUIRED COMPONENTS 
-  roscpp 
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
   std_msgs
   sensor_msgs
   actionlib
@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   urdf
   roslint
 )
+
+catkin_python_setup()
 
 set(THIS_PACKAGE_INCLUDE_DIRS
     sensor_orientation_planner/include
@@ -34,8 +36,8 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
 #  LIBRARIES rrbot_plugin
-  CATKIN_DEPENDS 
-    roscpp 
+  CATKIN_DEPENDS
+    roscpp
     std_msgs
     sensor_msgs
     actionlib
@@ -53,7 +55,7 @@ include_directories(
 )
 
 #~ set(CMAKE_BUILD_TYPE Debug)
-  
+
 add_subdirectory(sensor_orientation_planner)
 add_subdirectory(linear_movement_planner)
 

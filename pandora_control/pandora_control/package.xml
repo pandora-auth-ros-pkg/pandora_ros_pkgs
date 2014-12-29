@@ -16,6 +16,7 @@
   <run_depend>pandora_stabilizer</run_depend>
   <run_depend>pandora_end_effector_planner</run_depend>
   <run_depend>pandora_motor_control</run_depend>
+  <run_depend>pandora_dummy_motor_controller</run_depend>
 
   <export>
     <metapackage/>

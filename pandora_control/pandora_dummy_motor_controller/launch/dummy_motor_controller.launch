@@ -1,0 +1,7 @@
+<launch>
+  <node
+    name="dummy_motor_controller"
+    pkg="pandora_dummy_motor_controller"
+    type="dummy_motor_controller"
+    output="screen"/>
+</launch>
