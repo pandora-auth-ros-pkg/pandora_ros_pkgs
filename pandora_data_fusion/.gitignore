@@ -9,6 +9,7 @@ srv_gen/
 ROS_NOBUILD
 CATKIN_IGNORE
 bags/
+*.bag
 
 *Action.msg
 *Feedback.msg

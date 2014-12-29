@@ -1,13 +1,14 @@
-<package>
+<package format="2">
   <name>pandora_alert_handler</name>
   <version>0.0.0</version>
   <description>Data Fusion Alert Handler</description>
-   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
 
   <author>Afouras Triantafyllos</author>
   <author>Chris Zalidis</author>
@@ -15,43 +16,24 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-   <build_depend>roscpp</build_depend> 
-   <build_depend>tf</build_depend> 
-   <build_depend>pandora_data_fusion_msgs</build_depend> 
-   <build_depend>pandora_vision_msgs</build_depend> 
-   <build_depend>pandora_common_msgs</build_depend>
-   <build_depend>actionlib</build_depend> 
-   <build_depend>visualization_msgs</build_depend> 
-   <build_depend>roslint</build_depend> 
-   <build_depend>dynamic_reconfigure</build_depend> 
-   <build_depend>bfl</build_depend> 
-   
-   <run_depend>roscpp</run_depend>
-   <run_depend>tf</run_depend>
-   <run_depend>pandora_data_fusion_msgs</run_depend> 
-   <run_depend>pandora_vision_msgs</run_depend> 
-   <run_depend>pandora_common_msgs</run_depend>
-   <run_depend>actionlib</run_depend> 
-   <run_depend>visualization_msgs</run_depend> 
-   <run_depend>roslint</run_depend> 
-   <run_depend>dynamic_reconfigure</run_depend> 
-   <run_depend>bfl</run_depend> 
+  <build_depend>roslint</build_depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>actionlib</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>visualization_msgs</depend>
+  <depend>pandora_data_fusion_msgs</depend>
+  <depend>pandora_vision_msgs</depend>
+  <depend>pandora_common_msgs</depend>
+  <depend>bfl</depend>
 
-   <!--  Test Dependencies  -->
-
-   <build_depend>map_server</build_depend>
-   <build_depend>rostest</build_depend>
-   <build_depend>roslib</build_depend>
-   <build_depend>python-numpy</build_depend>
-   <build_depend>pandora_testing_tools</build_depend>
-
-   <run_depend>map_server</run_depend>
-   <run_depend>rostest</run_depend>
-   <run_depend>roslib</run_depend>
-   <run_depend>python-numpy</run_depend>
-   <run_depend>pandora_testing_tools</run_depend>
+  <!--  Test Dependencies  -->
+  <test_depend>rosunit</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>roslib</test_depend>
+  <test_depend>python-numpy</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
 
   <export>
-
   </export>
 </package>

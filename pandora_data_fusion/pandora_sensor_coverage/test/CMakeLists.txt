@@ -1,6 +1,3 @@
-find_package(catkin REQUIRED COMPONENTS
-  rostest
-  roslib 
-  )
+find_package(rostest REQUIRED)
 
 ########################  Tests  ####################################

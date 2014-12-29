@@ -1,52 +1,36 @@
-<package>
+<package format="2">
   <name>pandora_sensor_coverage</name>
   <version>0.0.0</version>
   <description>Data Fusion Sensor Coverage</description>
-   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
 
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
 
   <author>Tsirigotis Christos</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-   <build_depend>roscpp</build_depend> 
-   <build_depend>tf</build_depend> 
-   <build_depend>roslint</build_depend> 
-   <build_depend>pandora_alert_handler</build_depend>
-   <!--<build_depend>pandora_vision_hole_detector</build_depend>-->
-   <build_depend>state_manager</build_depend>
-   <build_depend>state_manager_msgs</build_depend>
-   <build_depend>octomap</build_depend>
-   <build_depend>octomap_msgs</build_depend>
-   <build_depend>octomap_ros</build_depend>
-   
-   <run_depend>roscpp</run_depend>
-   <run_depend>tf</run_depend>
-   <run_depend>roslint</run_depend> 
-   <run_depend>pandora_alert_handler</run_depend>
-   <!--<run_depend>pandora_vision_hole_detector</run_depend>-->
-   <run_depend>state_manager</run_depend>
-   <run_depend>state_manager_msgs</run_depend>
-   <run_depend>octomap</run_depend>
-   <run_depend>octomap_msgs</run_depend>
-   <run_depend>octomap_ros</run_depend>
+  <depend>roscpp</depend> 
+  <depend>tf</depend> 
+  <depend>pandora_alert_handler</depend>
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+  <depend>octomap</depend>
+  <depend>octomap_msgs</depend>
+  <depend>octomap_ros</depend>
+  <build_depend>roslint</build_depend> 
+  <!--<build_depend>pandora_vision_hole_detector</build_depend>-->
 
-   <!--  Test Dependencies  -->
-
-   <build_depend>rostest</build_depend>
-   <build_depend>roslib</build_depend>
-   <build_depend>pandora_testing_tools</build_depend>
-
-   <run_depend>rostest</run_depend>
-   <run_depend>roslib</run_depend>
-   <run_depend>pandora_testing_tools</run_depend>
+  <!--  Test Dependencies  -->
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
+  <test_depend>roslib</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
 
   <export>
-
   </export>
 </package>
 

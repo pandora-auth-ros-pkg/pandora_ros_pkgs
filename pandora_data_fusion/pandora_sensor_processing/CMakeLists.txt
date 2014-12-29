@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_sensor_processing)
 
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
   cmake_modules
@@ -25,18 +25,15 @@ catkin_package(
   DEPENDS
     Eigen
   CATKIN_DEPENDS
-    cmake_modules
     roscpp
     state_manager
     state_manager_msgs
     dynamic_reconfigure
-    roslint
     pandora_arm_hardware_interface
     pandora_common_msgs
     sensor_msgs
   INCLUDE_DIRS
     include
-    ${EIGEN_INCLUDE_DIRS}
   LIBRARIES
   )
 
@@ -61,10 +58,8 @@ target_link_libraries(co2_processor
   sensor_utils
   )
 add_dependencies(co2_processor
-  pandora_sensor_processing_gencfg
-  pandora_arm_hardware_interface_gencpp
-  pandora_state_manager_msgs_gencpp
-  pandora_common_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
   )
 
 ########################  co2_node  #################################
@@ -92,10 +87,8 @@ target_link_libraries(thermal_processor
   clusterer
   )
 add_dependencies(thermal_processor
-  pandora_sensor_processing_gencfg
-  pandora_arm_hardware_interface_gencpp
-  pandora_state_manager_msgs_gencpp
-  pandora_common_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
   )
 
 ########################  thermal_node  #############################

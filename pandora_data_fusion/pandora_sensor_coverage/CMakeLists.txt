@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_sensor_coverage)
 
-set(DCMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 find_package(catkin REQUIRED COMPONENTS 
   roscpp
@@ -19,14 +19,15 @@ find_package(octomap REQUIRED)
 catkin_package(
   DEPENDS
   CATKIN_DEPENDS 
-  roscpp
-  tf 
-  roslint
-  pandora_alert_handler
-  state_manager
-  state_manager_msgs
+    roscpp
+    tf 
+    pandora_alert_handler
+    state_manager
+    state_manager_msgs
+    octomap_msgs
+    octomap_ros
   INCLUDE_DIRS 
-  include
+    include
   LIBRARIES 
   )
 
@@ -67,11 +68,11 @@ target_link_libraries(surface_checker
 
 ########################  sensor  ###################################
 
-add_library(sensor
+add_library(${PROJECT_NAME}_sensor
   src/sensor.cpp)
-target_link_libraries(sensor
+add_dependencies(${PROJECT_NAME}_sensor ${catkin_EXPORTED_TARGETS})
+target_link_libraries(${PROJECT_NAME}_sensor
   ${catkin_LIBRARIES}
-  ros_tf_listener
   surface_checker
   )
 
@@ -81,7 +82,7 @@ add_library(sensor_coverage
   src/sensor_coverage.cpp)
 target_link_libraries(sensor_coverage
   ${catkin_LIBRARIES}
-  sensor
+  ${PROJECT_NAME}_sensor
   )
 
 ########################  sensor_coverage_node  #####################

@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>pandora_sensor_processing</name>
   <version>0.0.0</version>
   <description>Processors of raw sensor input produced by hardware interface</description>
@@ -7,37 +7,26 @@
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
 
   <author>Tsirigotis Christos</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-   <build_depend>cmake_modules</build_depend> 
-   <build_depend>roscpp</build_depend> 
-   <build_depend>pandora_common_msgs</build_depend>
-   <build_depend>pandora_arm_hardware_interface</build_depend>
-   <build_depend>sensor_msgs</build_depend> 
-   <build_depend>state_manager</build_depend>
-   <build_depend>state_manager_msgs</build_depend>
-   <build_depend>roslint</build_depend> 
-   <build_depend>dynamic_reconfigure</build_depend> 
-   
-   <run_depend>cmake_modules</run_depend> 
-   <run_depend>roscpp</run_depend>
-   <run_depend>pandora_common_msgs</run_depend>
-   <run_depend>pandora_arm_hardware_interface</run_depend>
-   <run_depend>sensor_msgs</run_depend> 
-   <run_depend>state_manager</run_depend>
-   <run_depend>state_manager_msgs</run_depend>
-   <run_depend>roslint</run_depend> 
-   <run_depend>dynamic_reconfigure</run_depend> 
+  <build_depend>cmake_modules</build_depend> 
+  <build_depend>roslint</build_depend> 
+  <depend>roscpp</depend> 
+  <depend>pandora_common_msgs</depend>
+  <depend>pandora_arm_hardware_interface</depend>
+  <depend>sensor_msgs</depend> 
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+  <depend>dynamic_reconfigure</depend> 
 
-   <!-- Test dependencies -->
-   <build_depend>rostest</build_depend>
-   <run_depend>rostest</run_depend>
+  <!-- Test dependencies -->
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
 
   <export>
-
   </export>
 </package>

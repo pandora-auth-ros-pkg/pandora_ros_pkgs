@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib 
   dynamic_reconfigure
   roslint
+  visualization_msgs
   pandora_data_fusion_msgs 
   pandora_common_msgs
   pandora_vision_msgs
@@ -28,7 +29,7 @@ generate_dynamic_reconfigure_options(
 # in CMakeLists.txt.
 set(CMAKE_CXX_FLAGS_COVERAGE "-fprofile-arcs -ftest-coverage")
 
-set(DCMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 catkin_package(
   DEPENDS
@@ -38,7 +39,7 @@ catkin_package(
     tf 
     actionlib 
     dynamic_reconfigure
-    roslint
+    visualization_msgs
     pandora_data_fusion_msgs 
     pandora_common_msgs
     pandora_vision_msgs
@@ -47,6 +48,7 @@ catkin_package(
     ${BFL_INCLUDE_DIRS}
   LIBRARIES 
     utils
+    ros_tf_listener
   )
 
 include_directories(
@@ -151,12 +153,8 @@ target_link_libraries(object_factory
   pose_finder
   objects
   )
-add_dependencies(object_factory 
-  pandora_data_fusion_msgs_gencpp
-  pandora_vision_msgs_gencpp
-  pandora_common_msgs_gencpp
-  ) 
-         
+add_dependencies(object_factory ${catkin_EXPORTED_TARGETS})
+
 ########################  victim_clusterer  #########################
 
 add_library(victim_clusterer 
@@ -189,9 +187,7 @@ target_link_libraries(object_handler
   objects
   victim_list
   )
-add_dependencies(object_handler 
-  pandora_data_fusion_msgs_gencpp
-  ) 
+add_dependencies(object_handler ${catkin_EXPORTED_TARGETS})
 
 ########################  alert_handler  ############################
 
@@ -205,10 +201,8 @@ target_link_libraries(alert_handler
   victim_list
   )
 add_dependencies(alert_handler 
-  pandora_alert_handler_gencfg 
-  pandora_vision_msgs_gencpp
-  pandora_data_fusion_msgs_gencpp
-  pandora_common_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ) 
 
 ########################  alert_handler_node  #######################
