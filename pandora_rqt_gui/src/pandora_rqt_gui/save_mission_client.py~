@@ -14,14 +14,14 @@ class SaveMissionClient():
         try:
            save_mission = rospy.ServiceProxy('pandora_geotiff_node/saveMission',SaveMission)
            resp = save_mission(msg)
+           return True
         except rospy.ServiceException, e:
           print "Service call failed: %s"%e
           
-        print "Service call succeded"
-        return True
+        print "Service call did not fail"
    
 if __name__ == "__main__":
   
     print "Requesting save Mission Named Eleana"
-    SMC = SaveMissionClient()
+    SaveMisionClient SMC
     SMC.save_mission_client("Testing")

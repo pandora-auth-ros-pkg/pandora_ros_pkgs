@@ -33,8 +33,9 @@ catkin_package(
 )
 
 ################ RosLint ###################################################
-FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
-            ${PROJECT_SOURCE_DIR}
+FILE(GLOB_RECURSE ${PROJECT_NAME}
+            #~ _LINT_SRCS 
+            #~ RELATIVE ${PROJECT_SOURCE_DIR}
             src/pandora_rqt_gui/battery_widget.py
             src/pandora_rqt_gui/co2_widget.py
             src/pandra_rqt_gui/gui_state_client.py
@@ -47,5 +48,6 @@ FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
             src/pandora_rqt_gui/victim_found_server.py
             src/pandora_rqt_gui/widget_info.py
             )
-roslint_python(${${PROJECT_NAME}_LINT_PYTHON})
+            #~ _LINT_PYTHON
+roslint_python(${${PROJECT_NAME}})
 

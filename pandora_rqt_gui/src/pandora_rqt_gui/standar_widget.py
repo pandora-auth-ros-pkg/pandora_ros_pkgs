@@ -251,7 +251,7 @@ class StandarWidget(QWidget):
 
     def save_geotiff_button_clicked(self):
             mission_name = self.mission_name_text.toPlainText()
-            self.SaveMissionClient.save_mission_client("ELEANA")
+            self.SaveMissionClient.save_mission_client(mission_name)
 
     def teleop_state_button_clicked(self):
         self.yellow_arena_radio_button.setEnabled(True)
