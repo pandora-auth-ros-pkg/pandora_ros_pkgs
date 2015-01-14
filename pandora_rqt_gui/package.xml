@@ -28,7 +28,6 @@
   
   <build_depend>actionlib_msgs</build_depend>
   <run_depend>actionlib_msgs</run_depend>
-  <run_depend>pandora_geotiff</run_depend>
   <run_depend>pandora_data_fusion_msgs</run_depend>
   <run_depend>pandora_arm_hardware_interface</run_depend>
   <run_depend>pandora_xmega_hardware_interface</run_depend>
