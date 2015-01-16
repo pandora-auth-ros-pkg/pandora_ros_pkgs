@@ -2,7 +2,8 @@
 <package format="2">
   <name>pandora_data_fusion_msgs</name>
   <version>0.0.0</version>
-  <description>pandora_data_fusion_msgs</description>
+  <description>Provides messages, services and actions used to interface with
+    pandora_alert_handler and other packages.</description>
   <maintainer email="tsirif@gmail.com">Tsirigotis Christos</maintainer>
 
   <author>Chris Zalidis</author>

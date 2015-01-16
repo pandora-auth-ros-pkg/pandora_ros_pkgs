@@ -16,7 +16,7 @@ include_directories(
 catkin_add_gtest(utils_test unit/utils_test.cpp)
 target_link_libraries(utils_test
   ${catkin_LIBRARIES}
-  utils
+  ${PROJECT_NAME}_utils
   gtest_main
   )
 
@@ -25,8 +25,8 @@ target_link_libraries(utils_test
 catkin_add_gtest(objects_test unit/objects_test.cpp)
 target_link_libraries(objects_test
   ${catkin_LIBRARIES}
-  utils
-  objects
+  ${PROJECT_NAME}_utils
+  ${PROJECT_NAME}_objects
   gtest_main
   )
 
@@ -35,8 +35,8 @@ target_link_libraries(objects_test
 catkin_add_gtest(object_list_test unit/object_list_test.cpp)
 target_link_libraries(object_list_test
   ${catkin_LIBRARIES}
-  objects
-  utils
+  ${PROJECT_NAME}_objects
+  ${PROJECT_NAME}_utils
   gtest_main
   )
 
@@ -47,7 +47,7 @@ target_link_libraries(object_factory_test
   ${catkin_LIBRARIES}
   ${roslib_LIBRARIES}
   ${pandora_testing_tools_LIBRARIES}
-  object_factory
+  ${PROJECT_NAME}_object_factory
   gtest_main
   )
 
@@ -58,7 +58,7 @@ target_link_libraries(pose_finder_test
   ${catkin_LIBRARIES}
   ${roslib_LIBRARIES}
   ${pandora_testing_tools_LIBRARIES}
-  pose_finder
+  ${PROJECT_NAME}_pose_finder
   gtest_main
   )
 
@@ -67,8 +67,8 @@ target_link_libraries(pose_finder_test
 catkin_add_gtest(victim_test unit/victim_test.cpp)
 target_link_libraries(victim_test
   ${catkin_LIBRARIES}
-  objects
-  victim
+  ${PROJECT_NAME}_objects
+  ${PROJECT_NAME}_victim
   gtest_main
   )
 
@@ -77,8 +77,8 @@ target_link_libraries(victim_test
 catkin_add_gtest(victim_list_test unit/victim_list_test.cpp)
 target_link_libraries(victim_list_test
   ${catkin_LIBRARIES}
-  objects
-  victim_list
+  ${PROJECT_NAME}_objects
+  ${PROJECT_NAME}_victim_list
   gtest_main
   )
 
@@ -86,9 +86,9 @@ target_link_libraries(victim_list_test
 
 catkin_add_gtest(victim_clusterer_test unit/victim_clusterer_test.cpp)
 target_link_libraries(victim_clusterer_test ${catkin_LIBRARIES}
-  victim_clusterer
-  objects
-  victim
+  ${PROJECT_NAME}_victim_clusterer
+  ${PROJECT_NAME}_objects
+  ${PROJECT_NAME}_victim
   gtest_main
   )
 

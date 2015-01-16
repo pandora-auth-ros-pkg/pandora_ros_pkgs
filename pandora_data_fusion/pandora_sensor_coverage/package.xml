@@ -2,7 +2,7 @@
   <name>pandora_sensor_coverage</name>
   <version>0.0.0</version>
   <description>Data Fusion Sensor Coverage</description>
-  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -13,15 +13,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>roscpp</depend> 
-  <depend>tf</depend> 
+  <depend>roscpp</depend>
+  <depend>tf</depend>
   <depend>pandora_alert_handler</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>octomap</depend>
   <depend>octomap_msgs</depend>
   <depend>octomap_ros</depend>
-  <build_depend>roslint</build_depend> 
+  <build_depend>roslint</build_depend>
   <!--<build_depend>pandora_vision_hole_detector</build_depend>-->
 
   <!--  Test Dependencies  -->

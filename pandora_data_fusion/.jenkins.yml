@@ -3,6 +3,7 @@
 install:
   - export ROS_DISTRO=hydro
   - export CI_SOURCE_PATH=$(pwd)
+  - export REPOSITORY_NAME=${PWD##*/}
   - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
@@ -19,19 +20,15 @@ install:
   - wstool merge deps.rosinstall
   - wstool update
   # Delete the .rosinstall version of this repo and use the one of the branch we are testing
-  - rm -rf pandora_data_fusion
+  - rm -rf $REPOSITORY_NAME
   - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace
   - cd ..
   # Install debian dependencies
   - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
   - source /opt/ros/$ROS_DISTRO/setup.bash
 script: # All commands must exit with code 0 on success. Anything else is considered failure.
-  - catkin_make --only-pkg-with-deps pandora_data_fusion
+  - catkin_make --only-pkg-with-deps $REPOSITORY_NAME
   - source devel/setup.bash
-  - catkin_make roslint_pandora_alert_handler
-  - catkin_make roslint_pandora_sensor_processing
-  - catkin_make roslint_pandora_sensor_coverage
-  - catkin_make tests # Build all tests, even from other packages. Its not optimal, but...
-  - catkin_make run_tests_pandora_alert_handler
-  - catkin_make run_tests_pandora_sensor_processing
+  - catkin_make roslint
+  - catkin_make run_tests
   - catkin_test_results build
