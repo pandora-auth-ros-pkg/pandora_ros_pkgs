@@ -3,7 +3,6 @@ project(pandora_testing_tools)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
   tf
   rosbag
@@ -61,3 +60,20 @@ add_executable(bag_player_for_tests
   )
 target_link_libraries(bag_player_for_tests ${catkin_LIBRARIES})
 add_dependencies(bag_player_for_tests ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+
+## Install targets
+
+# Install headers
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
+# Install libraries
+install(TARGETS ${PROJECT_NAME}_map_loader
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+
+# Install executables
+install(TARGETS bag_player_for_tests
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

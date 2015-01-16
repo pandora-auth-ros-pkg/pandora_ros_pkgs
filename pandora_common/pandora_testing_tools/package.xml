@@ -20,7 +20,6 @@
   <build_depend>pkg-config</build_depend>
 
   <depend>roscpp</depend>
-  <depend>rospy</depend>
   <depend>tf</depend>
   <depend>rosbag</depend>
   <depend>map_server</depend>
@@ -29,6 +28,7 @@
   <depend>actionlib</depend>
   <depend>yaml-cpp</depend>
 
+  <exec_depend>rospy</exec_depend>
   <export>
   </export>
 </package>
