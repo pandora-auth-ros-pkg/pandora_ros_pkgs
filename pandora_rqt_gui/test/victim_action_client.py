@@ -8,6 +8,8 @@ import actionlib
 from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIGoal
 
 validate_victim_service_name = '/gui/validate_victim'
+
+
 def victim_validation_client():
     # Creates the SimpleActionClient, passing the type of the action
 
@@ -32,7 +34,7 @@ def victim_validation_client():
     client.wait_for_result()
 
     # Prints out the result of executing the action
-    return client.get_result()  
+    return client.get_result()
 
 if __name__ == '__main__':
     try:
