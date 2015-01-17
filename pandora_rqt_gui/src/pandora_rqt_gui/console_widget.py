@@ -33,7 +33,8 @@
 import os
 
 from python_qt_binding import loadUi
-from python_qt_binding.QtGui import QApplication, QCursor, QFileDialog, QHeaderView,QIcon, QMenu, QMessageBox, QTableView, QWidget
+from python_qt_binding.QtGui import QApplication, QCursor, QFileDialog,\
+    QHeaderView, QIcon, QMenu, QMessageBox, QTableView, QWidget
 from python_qt_binding.QtCore import QRegExp, Qt, qWarning
 
 import time
@@ -62,13 +63,16 @@ from rqt_console.text_browse_dialog import TextBrowseDialog
 
 
 class ConsoleWidget(QWidget):
+
     """
     Primary widget for the rqt_console plugin.
     """
+
     def __init__(self, proxy_model, rospack, minimal=False):
         """
         :param proxymodel: the proxy model to display in the widget,''QSortFilterProxyModel''
-        :param minimal: if true the load, save and column buttons will be hidden as well as the filter splitter, ''bool''
+        :param minimal: if true the load,
+          save and column buttons will be hidden as well as the filter splitter, ''bool''
         """
         super(ConsoleWidget, self).__init__()
         self._proxy_model = proxy_model
@@ -80,10 +84,11 @@ class ConsoleWidget(QWidget):
         self._exclude_filters = []
         self._highlight_filters = []
 
-        ui_file = os.path.join(self._rospack.get_path('rqt_console'), 'resource', 'console_widget.ui')
+        ui_file = os.path.join(
+            self._rospack.get_path('rqt_console'), 'resource', 'console_widget.ui')
         loadUi(ui_file, self)
-        #~ self.exclude_group_box.close()
-        #~ self.highlight_group_box.close()
+        # self.exclude_group_box.close()
+        # self.highlight_group_box.close()
         if minimal:
             self.load_button.hide()
             self.save_button.hide()
@@ -138,15 +143,22 @@ class ConsoleWidget(QWidget):
 
         # Filter factory dictionary:
         # index 0 is a label describing the widget, index 1 is the class that provides filtering logic
-        # index 2 is the widget that sets the data in the filter class, index 3 are the arguments for the widget class constructor
+        # index 2 is the widget that sets the data in the filter class,
+        # index 3 are the arguments for the widget class constructor
         self._filter_factory_order = ['message', 'severity', 'node', 'time', 'topic', 'location', 'custom']
-        self.filter_factory = {'message': (self.tr('...containing'), MessageFilter, TextFilterWidget),
-                               'severity': (self.tr('...with severities'), SeverityFilter, ListFilterWidget, self._model.get_severity_dict),
-                               'node': (self.tr('...from node'), NodeFilter, ListFilterWidget, self._model.get_unique_nodes),
-                               'time': (self.tr('...from time range'), TimeFilter, TimeFilterWidget, self.get_time_range_from_selection),
-                               'topic': (self.tr('...from topic'), TopicFilter, ListFilterWidget, self._model.get_unique_topics),
-                               'location': (self.tr('...from location'), LocationFilter, TextFilterWidget),
-                               'custom': (self.tr('Custom'), CustomFilter, CustomFilterWidget, [self._model.get_severity_dict, self._model.get_unique_nodes, self._model.get_unique_topics])}
+        self.filter_factory = {
+            'message': (self.tr('...containing'), MessageFilter, TextFilterWidget),
+            'severity': (self.tr('...with severities'),
+                         SeverityFilter,
+                         ListFilterWidget,
+                         self._model.get_severity_dict),
+            'node': (self.tr('...from node'), NodeFilter, ListFilterWidget, self._model.get_unique_nodes),
+            'time': (self.tr('...from time range'), TimeFilter, TimeFilterWidget, self.get_time_range_from_selection),
+            'topic': (self.tr('...from topic'), TopicFilter, ListFilterWidget, self._model.get_unique_topics),
+            'location': (self.tr('...from location'), LocationFilter, TextFilterWidget),
+            'custom': (self.tr('Custom'), CustomFilter, CustomFilterWidget, [self._model.get_severity_dict,
+                                                                             self._model.get_unique_nodes,
+                                                                             self._model.get_unique_topics])}
         self._model.rowsInserted.connect(self.update_status)
         self._model.rowsRemoved.connect(self.update_status)
         self._proxy_model.rowsInserted.connect(self.update_status)
@@ -249,7 +261,8 @@ class ConsoleWidget(QWidget):
 
     def _add_highlight_filter(self, filter_index=False):
         """
-        :param filter_index: if false then this function shows a QMenu to allow the user to choose a type of message filter. ''bool''
+        :param filter_index: if false then this function shows a QMenu
+            to allow the user to choose a type of message filter. ''bool''
         OR
         :param filter_index: the index of the filter to be added, ''int''
         :return: if a filter was added then the index is returned, ''int''
@@ -261,8 +274,10 @@ class ConsoleWidget(QWidget):
             filter_select_menu = QMenu()
             for index in self._filter_factory_order:
                 # flattens the _highlight filters list and only adds the item if it doesn't already exist
-                if index in ['message', 'location'] or not self.filter_factory[index][1] in [type(item) for sublist in self._highlight_filters for item in sublist]:
-                    filter_select_menu.addAction(self.filter_factory[index][0])
+                if index in ['message', 'location'] or \
+                    not self.filter_factory[index][1] in \
+                        [type(item)for sublist in self._highlight_filters for item in sublist]:
+                            filter_select_menu.addAction(self.filter_factory[index][0])
             action = filter_select_menu.exec_(QCursor.pos())
             if action is None:
                 return
@@ -275,12 +290,20 @@ class ConsoleWidget(QWidget):
         index = len(self._highlight_filters)
         newfilter = self.filter_factory[filter_index][1]()
         if len(self.filter_factory[filter_index]) >= 4:
-            newwidget = self.filter_factory[filter_index][2](newfilter, self._rospack, self.filter_factory[filter_index][3])
+            newwidget = self.filter_factory[filter_index][2](
+                newfilter,
+                self._rospack,
+                self.filter_factory[filter_index][3])
         else:
             newwidget = self.filter_factory[filter_index][2](newfilter, self._rospack)
 
         # pack the new filter tuple onto the filter list
-        self._highlight_filters.append((newfilter, FilterWrapperWidget(newwidget, self.filter_factory[filter_index][0]), filter_index))
+        self._highlight_filters.append(
+            (newfilter,
+             FilterWrapperWidget(
+                 newwidget,
+                 self.filter_factory[filter_index][0]),
+                filter_index))
         self._proxy_model.add_highlight_filter(newfilter)
         newfilter.filter_changed_signal.connect(self._proxy_model.handle_highlight_filters_changed)
         self._highlight_filters[index][1].delete_button.clicked.connect(self._delete_highlight_filter)
@@ -296,7 +319,8 @@ class ConsoleWidget(QWidget):
 
     def _add_exclude_filter(self, filter_index=False):
         """
-        :param filter_index: if false then this function shows a QMenu to allow the user to choose a type of message filter. ''bool''
+        :param filter_index: if false then this function shows a QMenu
+         to allow the user to choose a type of message filter. ''bool''
         OR
         :param filter_index: the index of the filter to be added, ''int''
         :return: if a filter was added then the index is returned, ''int''
@@ -308,7 +332,8 @@ class ConsoleWidget(QWidget):
             filter_select_menu = QMenu()
             for index in self._filter_factory_order:
                 # flattens the _exclude filters list and only adds the item if it doesn't already exist
-                if index in ['message', 'location'] or not self.filter_factory[index][1] in [type(item) for sublist in self._exclude_filters for item in sublist]:
+                if index in ['message', 'location'] or not self.filter_factory[index][1] in [
+                        type(item) for sublist in self._exclude_filters for item in sublist]:
                     filter_select_menu.addAction(self.filter_factory[index][0])
             action = filter_select_menu.exec_(QCursor.pos())
             if action is None:
@@ -322,12 +347,20 @@ class ConsoleWidget(QWidget):
         index = len(self._exclude_filters)
         newfilter = self.filter_factory[filter_index][1]()
         if len(self.filter_factory[filter_index]) >= 4:
-            newwidget = self.filter_factory[filter_index][2](newfilter, self._rospack, self.filter_factory[filter_index][3])
+            newwidget = self.filter_factory[filter_index][2](
+                newfilter,
+                self._rospack,
+                self.filter_factory[filter_index][3])
         else:
             newwidget = self.filter_factory[filter_index][2](newfilter, self._rospack)
 
         # pack the new filter tuple onto the filter list
-        self._exclude_filters.append((newfilter, FilterWrapperWidget(newwidget, self.filter_factory[filter_index][0]), filter_index))
+        self._exclude_filters.append(
+            (newfilter,
+             FilterWrapperWidget(
+                 newwidget,
+                 self.filter_factory[filter_index][0]),
+                filter_index))
         self._proxy_model.add_exclude_filter(newfilter)
         newfilter.filter_changed_signal.connect(self._proxy_model.handle_exclude_filters_changed)
         self._exclude_filters[index][1].delete_button.clicked.connect(self._delete_exclude_filter)
@@ -367,36 +400,48 @@ class ConsoleWidget(QWidget):
                 message = message.replace('.', '\\.')
                 if exclude:
                     filter_index = self._add_exclude_filter(selectiontype.lower())
-                    filter_widget = self._exclude_filters[filter_index][1].findChildren(QWidget, QRegExp('.*FilterWidget.*'))[0]
+                    filter_widget = self._exclude_filters[filter_index][1].findChildren(
+                        QWidget,
+                        QRegExp('.*FilterWidget.*'))[0]
                 else:
                     filter_index = self._add_highlight_filter(col)
-                    filter_widget = self._highlight_filters[filter_index][1].findChildren(QWidget, QRegExp('.*FilterWidget.*'))[0]
+                    filter_widget = self._highlight_filters[filter_index][1].findChildren(
+                        QWidget,
+                        QRegExp('.*FilterWidget.*'))[0]
                 filter_widget.set_regex(True)
                 filter_widget.set_text('^' + message + '$')
 
         else:
             if exclude:
                 # Test if the filter we are adding already exists if it does use the existing filter
-                if self.filter_factory[selectiontype.lower()][1] not in [type(item) for sublist in self._exclude_filters for item in sublist]:
-                    filter_index = self._add_exclude_filter(selectiontype.lower())
+                if self.filter_factory[selectiontype.lower()][1]\
+                    not in [type(item)for sublist in self._exclude_filters
+                            for item in sublist]:
+                                filter_index = self._add_exclude_filter(selectiontype.lower())
                 else:
                     for index, item in enumerate(self._exclude_filters):
-                        if type(item[0]) == self.filter_factory[selectiontype.lower()][1]:
+                        if isinstance(item[0], self.filter_factory[selectiontype.lower()][1]):
                             filter_index = index
             else:
                 # Test if the filter we are adding already exists if it does use the existing filter
-                if self.filter_factory[selectiontype.lower()][1] not in [type(item) for sublist in self._highlight_filters for item in sublist]:
-                    filter_index = self._add_highlight_filter(col)
+                if self.filter_factory[selectiontype.lower()][1]\
+                    not in [type(item) for sublist in self._highlight_filters
+                            for item in sublist]:
+                                filter_index = self._add_highlight_filter(col)
                 else:
                     for index, item in enumerate(self._highlight_filters):
-                        if type(item[0]) == self.filter_factory[selectiontype.lower()][1]:
+                        if isinstance(item[0], self.filter_factory[selectiontype.lower()][1]):
                             filter_index = index
 
             if exclude:
-                filter_widget = self._exclude_filters[filter_index][1].findChildren(QWidget, QRegExp('.*FilterWidget.*'))[0]
+                filter_widget = self._exclude_filters[filter_index][1].findChildren(
+                    QWidget,
+                    QRegExp('.*FilterWidget.*'))[0]
                 filter_widget.select_item(selection)
             else:
-                filter_widget = self._highlight_filters[filter_index][1].findChildren(QWidget, QRegExp('.*FilterWidget.*'))[0]
+                filter_widget = self._highlight_filters[filter_index][1].findChildren(
+                    QWidget,
+                    QRegExp('.*FilterWidget.*'))[0]
                 filter_widget.select_item(selection)
 
     def _rightclick_menu(self, event):
@@ -414,8 +459,22 @@ class ConsoleWidget(QWidget):
 
         # menutext entries turned into
         menutext = []
-        menutext.append([self.tr('Exclude'), [[self.tr('Severity'), severities], [self.tr('Node'), nodes], [self.tr('Topic'), topics], [self.tr('Selected Message(s)')]]])
-        menutext.append([self.tr('Highlight'), [[self.tr('Severity'), severities], [self.tr('Node'), nodes], [self.tr('Topic'), topics], [self.tr('Selected Message(s)')]]])
+        menutext.append([self.tr('Exclude'),
+                         [[self.tr('Severity'),
+                           severities],
+                          [self.tr('Node'),
+                           nodes],
+                          [self.tr('Topic'),
+                           topics],
+                          [self.tr('Selected Message(s)')]]])
+        menutext.append([self.tr('Highlight'),
+                         [[self.tr('Severity'),
+                           severities],
+                          [self.tr('Node'),
+                           nodes],
+                          [self.tr('Topic'),
+                           topics],
+                          [self.tr('Selected Message(s)')]]])
         menutext.append([self.tr('Copy Selected')])
         menutext.append([self.tr('Browse Selected')])
 
@@ -504,7 +563,11 @@ class ConsoleWidget(QWidget):
         Message._next_id = 1
 
     def _handle_load_clicked(self, checked):
-        filename = QFileDialog.getOpenFileName(self, self.tr('Load from File'), '.', self.tr('rqt_console message file {.csv} (*.csv)'))
+        filename = QFileDialog.getOpenFileName(
+            self,
+            self.tr('Load from File'),
+            '.',
+            self.tr('rqt_console message file {.csv} (*.csv)'))
         if filename[0] != '':
             try:
                 with open(filename[0], 'r') as h:
@@ -591,7 +654,9 @@ class ConsoleWidget(QWidget):
                 if msg:
                     messages.append(msg)
             if skipped:
-                qWarning('Skipped %d rows since they do not appear to be in rqt_console message file format:\n- %s' % (len(skipped), '\n- '.join(skipped)))
+                qWarning(
+                    'Skipped %d rows since they do not appear to be in rqt_console message file format:\n- %s' %
+                    (len(skipped), '\n- '.join(skipped)))
 
             if messages:
                 self._model.insert_rows(messages)
@@ -605,7 +670,11 @@ class ConsoleWidget(QWidget):
             return False
 
     def _handle_save_clicked(self, checked):
-        filename = QFileDialog.getSaveFileName(self, 'Save to File', '.', self.tr('rqt_console msg file {.csv} (*.csv)'))
+        filename = QFileDialog.getSaveFileName(
+            self,
+            'Save to File',
+            '.',
+            self.tr('rqt_console msg file {.csv} (*.csv)'))
         if filename[0] != '':
             filename = filename[0]
             if filename[-4:] != '.csv':
@@ -666,7 +735,12 @@ class ConsoleWidget(QWidget):
         if event.key() == Qt.Key_Delete and len(self._model._messages) > 0:
             delete = QMessageBox.Yes
             if len(self.table_view.selectionModel().selectedIndexes()) == 0:
-                delete = QMessageBox.question(self, self.tr('Message'), self.tr("Are you sure you want to delete all messages?"), QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                delete = QMessageBox.question(
+                    self,
+                    self.tr('Message'),
+                    self.tr("Are you sure you want to delete all messages?"),
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No)
             if delete == QMessageBox.Yes and event.key() == Qt.Key_Delete and event.modifiers() == Qt.NoModifier:
                 if self._delete_selected_rows():
                     event.accept()

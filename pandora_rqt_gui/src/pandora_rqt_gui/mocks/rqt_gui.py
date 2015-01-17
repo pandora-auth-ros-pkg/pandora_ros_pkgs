@@ -41,25 +41,27 @@ from actionlib import SimpleActionServer
 
 from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIResult
 
+
 class MockGui():
 
     def __init__(self, gui_validation_topic):
 
         self.reply = False
         self.preempted = 0
-        
+
         self.victimValid = True
 
         self.victimFoundx = 0
         self.victimFoundy = 0
         self.probability = 0
         self.sensorIDsFound = []
-        
+
         self.gui_validate_victim_as_ = SimpleActionServer(
-            gui_validation_topic, 
+            gui_validation_topic,
             ValidateVictimGUIAction,
-            execute_cb = self.gui_validate_victim_cb, 
-            auto_start = False)
+            execute_cb=self.gui_validate_victim_cb,
+            auto_start=False)
+
         self.gui_validate_victim_as_.start()
 
     def __del__(self):
@@ -70,7 +72,7 @@ class MockGui():
         rospy.loginfo('gui_validate_victim_cb')
 
         self.reply = False
-        
+
         self.victimFoundx = goal.victimFoundx
         self.victimFoundy = goal.victimFoundy
         self.probability = goal.probability
@@ -85,11 +87,11 @@ class MockGui():
                 break
         else:
             self.preempted = 0
-            result = ValidateVictimGUIResult(victimValid = self.victimValid) 
+            result = ValidateVictimGUIResult(victimValid=self.victimValid)
             self.gui_validate_victim_as_.set_succeeded(result)
 
 if __name__ == '__main__':
 
     rospy.sleep(0.5)
     rospy.init_node('MockGui', anonymous=True)
-    gui = MockGui(gui_validation_topic = '/gui/validate_victim')
+    gui = MockGui(gui_validation_topic='/gui/validate_victim')

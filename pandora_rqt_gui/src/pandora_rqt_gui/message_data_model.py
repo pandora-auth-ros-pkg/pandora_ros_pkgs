@@ -40,7 +40,7 @@ from rqt_console.message_list import MessageList
 class MessageDataModel(QAbstractTableModel):
 
     # the column names must match the message attributes
-    columns = ['message','node']
+    columns = ['message', 'node']
 
     severity_colors = {
         Message.DEBUG: QBrush(Qt.darkCyan),
@@ -94,7 +94,7 @@ class MessageDataModel(QAbstractTableModel):
                     if role == Qt.UserRole:
                         # append row number to define strict order
                         # shortest string representation to compare stamps
-                        #print(column, data, str(index.row()).zfill(len(str(len(self._messages)))))
+                        # print(column, data, str(index.row()).zfill(len(str(len(self._messages)))))
                         data = str(data) + ' %08x' % index.row()
                     return data
 
@@ -108,7 +108,7 @@ class MessageDataModel(QAbstractTableModel):
                         return self._error_icon
 
                 # colorize severity label
-                if role == Qt.ForegroundRole and column =='severity':
+                if role == Qt.ForegroundRole and column == 'severity':
                     assert msg.severity in MessageDataModel.severity_colors, 'Unknown severity type: %s' % msg.severity
                     return MessageDataModel.severity_colors[msg.severity]
 
@@ -135,7 +135,9 @@ class MessageDataModel(QAbstractTableModel):
                 if section == 0:
                     return self.tr('Sort the rows by serial number in descendig order')
                 else:
-                    return self.tr('Sorting the table by a column other then the serial number slows down the interaction especially when recording high frequency data')
+                    return self.tr(
+                        'Sorting the table by a column other then the serial number slows\
+                           down the interaction especially when recording high frequency data')
 
     # END Required implementations of QAbstractTableModel functions
 
@@ -217,7 +219,8 @@ class MessageDataModel(QAbstractTableModel):
     def get_time_range(self, rowlist):
         """
         :param rowlist: a list of row indexes, ''list''
-        :returns: a tuple of min and max times in a rowlist in '(unix timestamp).(fraction of second)' format, ''tuple(str,str)''
+        :returns: a tuple of min and max times in a rowlist in '
+          (unix timestamp).(fraction of second)' format, ''tuple(str,str)''
         """
         min_ = float("inf")
         max_ = float("-inf")
@@ -261,7 +264,7 @@ class MessageDataModel(QAbstractTableModel):
         """
         msgs = []
         for message in self._messages:
-            msg_time = message.stamp[0] + float(message.stamp[1]) / 10**9
+            msg_time = message.stamp[0] + float(message.stamp[1]) / 10 ** 9
             if msg_time >= float(start_time) and (end_time is None or msg_time <= float(end_time)):
                 msgs.append(message)
         return msgs
