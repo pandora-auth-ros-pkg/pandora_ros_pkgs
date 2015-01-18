@@ -2,23 +2,23 @@
 
   <node pkg="map_server" type="map_server" name="static_map_publisher"
     args="$(find pandora_alert_handler)/test/test_maps/map1.yaml"/>
-  
-  <node pkg="tf" type="static_transform_publisher" 
+
+  <node pkg="tf" type="static_transform_publisher"
     name="world2headCamera" args="1 2 1 -1.574 0 0 /map headCamera 100" />
 
-  <node pkg="tf" type="static_transform_publisher" 
+  <node pkg="tf" type="static_transform_publisher"
     name="world2map" args="0 0 0 0 0 0 /world /map 100" />
 
-  <env name="ROSCONSOLE_CONFIG_FILE"                                                             
-    value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg" />                
-  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_standalone.launch" /> 
+  <env name="ROSCONSOLE_CONFIG_FILE"
+    value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg" />
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_standalone.launch" />
   <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
 
-  <include file="$(find pandora_visualization)/launch/visualization.launch" />
-  
+  <include file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
+
   <node name="mass_alert_publisher" type="mass_alert_publisher.py"
     pkg="pandora_alert_handler" respawn="true" args="headCamera" />
-    
+
   <node name="data_fusion_object_visualization" type="rqt_gui" pkg="rqt_gui" />
-  
+
 </launch>
