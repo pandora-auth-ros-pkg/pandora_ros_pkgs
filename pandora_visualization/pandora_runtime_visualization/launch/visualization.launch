@@ -1,0 +1,11 @@
+<launch>
+
+  <node name="data_fusion_object_visualization" type="data_fusion_object_visualization"
+    pkg="pandora_runtime_visualization" respawn="true" ns="data_fusion" />
+
+  <node name="thermal_visualization" type="temprature_visualization"
+      pkg="pandora_runtime_visualization" respawn="true" ns="visualization"/>
+
+  <include file="$(find pandora_runtime_visualization)/launch/rviz/rviz.launch" />
+
+</launch>

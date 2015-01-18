@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_runtime_visualization</name>
+  <version>0.0.0</version>
+  <description>pandora_runtime_visualization package contains code for visualization and launchers</description>
+
+  <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_visualization/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization</url>
+
+  <author>Triantafyllos Afouras, Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>pandora_data_fusion_msgs</depend>
+  <depend>sensor_msgs</depend>
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_visualization</name>
+  <version>0.0.0</version>
+  <description>Contains packages used for visualization and introspection</description>
+
+  <maintainer email="zalidis@gmail.com">Chris Zalidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_visualization/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>pandora_runtime_visualization</exec_depend>
+  <exec_depend>pandora_interactive_markers</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

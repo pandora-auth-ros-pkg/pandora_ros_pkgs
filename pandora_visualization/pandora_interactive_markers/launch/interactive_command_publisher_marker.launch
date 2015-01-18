@@ -3,11 +3,11 @@
   <rosparam
     command="load"
     ns="visualization"
-    file="$(find pandora_visualization)/config/interactive_command_publisher_marker.yaml"/>
+    file="$(find pandora_interactive_markers)/config/interactive_command_publisher_marker.yaml"/>
 
   <node
     name="interactive_kinect_command_publisher_marker"
-    pkg="pandora_visualization"
+    pkg="pandora_interactive_markers"
     type="interactive_command_publisher_marker"
     respawn="false"
     output="screen"
@@ -16,7 +16,7 @@
 
   <node
     name="interactive_head_command_publisher_marker"
-    pkg="pandora_visualization"
+    pkg="pandora_interactive_markers"
     type="interactive_command_publisher_marker"
     respawn="false"
     output="screen"
@@ -25,7 +25,7 @@
 
   <node
     name="interactive_linear_command_publisher_marker"
-    pkg="pandora_visualization"
+    pkg="pandora_interactive_markers"
     type="interactive_command_publisher_marker"
     respawn="false"
     output="screen"

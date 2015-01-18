@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_interactive_markers</name>
+  <version>0.0.0</version>
+  <description>pandora_interactive_markers package enables interactive marker
+    capabilities for end-effectors.</description>
+
+  <maintainer email="apostoee@gmail.com">Evangelos Apostolidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_visualization/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization</url>
+
+  <author>Evangelos Apostolidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>visualization_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>interactive_markers</depend>
+
+  <export>
+  </export>
+</package>
