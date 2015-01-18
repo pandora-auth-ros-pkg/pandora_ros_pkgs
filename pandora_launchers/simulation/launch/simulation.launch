@@ -38,13 +38,13 @@
 
   <!-- Visualization -->
   <group unless="$(arg fusion)">
-    <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/rviz/rviz.launch" />
+    <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/rviz/rviz.launch" />
   </group>
 
   <!-- Fusion -->
   <group if="$(arg fusion)">
     <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
-    <include if="$(arg rviz)" file="$(find pandora_visualization)/launch/visualization.launch" />
+    <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
   </group>
 
 

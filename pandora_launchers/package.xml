@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_launchers</name>
   <version>0.0.0</version>
   <description>Contains launchers for easy bringup</description>
@@ -11,23 +11,20 @@
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_launchers/issues</url>
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_launchers</url>
 
-  
   <author>Chris Zalidis</author>
-  
-  <buildtool_depend>catkin</buildtool_depend>
-  
- <run_depend>pandora_common</run_depend> 
- <run_depend>pandora_visualization</run_depend> 
- <run_depend>pandora_navigation</run_depend> 
- <run_depend>pandora_slam</run_depend> 
- <run_depend>pandora_vision</run_depend> 
- <run_depend>pandora_data_fusion</run_depend> 
- <run_depend>pandora_control</run_depend> 
- <run_depend>pandora_hardware_interface</run_depend> 
- <run_depend>pandora_models</run_depend> 
 
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>pandora_common</exec_depend>
+  <exec_depend>pandora_runtime_visualization</exec_depend>
+  <exec_depend>pandora_navigation</exec_depend>
+  <exec_depend>pandora_slam</exec_depend>
+  <exec_depend>pandora_vision</exec_depend>
+  <exec_depend>pandora_data_fusion</exec_depend>
+  <exec_depend>pandora_control</exec_depend>
+  <exec_depend>pandora_hardware_interface</exec_depend>
+  <exec_depend>pandora_models</exec_depend>
 
   <export>
-
   </export>
 </package>
