@@ -40,12 +40,12 @@
 #include <controller_interface/controller.h>
 #include <arm_hardware_interface/co2_sensor_interface.h>
 #include <pluginlib/class_list_macros.h>
-#include <pandora_arm_hardware_interface/Co2Msg.h>
+#include <pandora_sensor_msgs/Co2Msg.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <boost/shared_ptr.hpp>
 
 typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
-  pandora_arm_hardware_interface::Co2Msg> > Co2RealtimePublisher;
+  pandora_sensor_msgs::Co2Msg> > Co2RealtimePublisher;
 
 namespace pandora_hardware_interface
 {

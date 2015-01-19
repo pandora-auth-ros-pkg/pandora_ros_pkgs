@@ -73,7 +73,7 @@ namespace arm
 
       ThermalMeanRealtimePublisher meanPublisher(
         new realtime_tools::RealtimePublisher<
-        pandora_arm_hardware_interface::ThermalMeanMsg>(
+        pandora_sensor_msgs::ThermalMeanMsg>(
           rootNodeHandle, "/sensors/thermal_mean", 4));
       meanPublishers_.push_back(meanPublisher);
     }

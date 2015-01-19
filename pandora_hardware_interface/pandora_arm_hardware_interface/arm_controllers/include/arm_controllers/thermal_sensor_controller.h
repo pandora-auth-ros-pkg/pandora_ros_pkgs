@@ -42,7 +42,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include <pandora_arm_hardware_interface/ThermalMeanMsg.h>
+#include <pandora_sensor_msgs/ThermalMeanMsg.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <boost/shared_ptr.hpp>
 
@@ -50,7 +50,7 @@ typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
   sensor_msgs::Image> > ImageRealtimePublisher;
 
 typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
-  pandora_arm_hardware_interface::ThermalMeanMsg> >
+  pandora_sensor_msgs::ThermalMeanMsg> >
   ThermalMeanRealtimePublisher;
 
 namespace pandora_hardware_interface

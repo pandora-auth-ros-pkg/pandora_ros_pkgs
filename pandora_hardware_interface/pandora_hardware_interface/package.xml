@@ -20,6 +20,7 @@
   <run_depend>pandora_arm_hardware_interface</run_depend>
   <run_depend>pandora_linear_motor_hardware_interface</run_depend>
   <run_depend>pandora_hardware_tools</run_depend>
+  <run_depend>pandora_sensor_msgs</run_depend>
 
   <export>
     <metapackage/>

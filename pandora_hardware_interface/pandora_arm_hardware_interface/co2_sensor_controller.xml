@@ -5,7 +5,7 @@
     base_class_type="controller_interface::ControllerBase">
   <description>
     This controller publishes the readings of all available co2 sensors as
-    pandora_arm_hardware_interface/Co2Msg.
+    pandora_sensor_msgs/Co2Msg.
   </description>
   </class>
 </library>

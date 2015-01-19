@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_xmega_hardware_interface)
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
   roscpp
   roslint
   controller_manager
   controller_interface
   serial
   sensor_msgs
+  pandora_sensor_msgs
   pluginlib
 )
 
@@ -17,29 +17,19 @@ set(THIS_PACKAGE_INCLUDE_DIRS
   xmega_serial_interface/include
 )
 
-add_message_files(
-  FILES
-  BatteryMsg.msg
-  )
-
-generate_messages(
-  DEPENDENCIES
-    sensor_msgs
-)
-
 catkin_package(
   INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
   LIBRARIES
     battery_controller
     range_sensor_controller
   CATKIN_DEPENDS
-    message_generation
     roscpp
     roslint
     controller_manager
     controller_interface
     serial
     std_msgs
+    pandora_sensor_msgs
     pluginlib
 #  DEPENDS
 )

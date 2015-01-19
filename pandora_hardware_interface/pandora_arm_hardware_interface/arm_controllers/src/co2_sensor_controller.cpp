@@ -67,7 +67,7 @@ namespace arm
       // Create publisher for each controller
       Co2RealtimePublisher publisher(
         new realtime_tools::RealtimePublisher<
-          pandora_arm_hardware_interface::Co2Msg>(
+          pandora_sensor_msgs::Co2Msg>(
             rootNodeHandle, "/sensors/co2", 4));
       realtimePublishers_.push_back(publisher);
     }

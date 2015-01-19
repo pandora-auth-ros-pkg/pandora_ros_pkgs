@@ -3,7 +3,7 @@ project(pandora_hardware_tools)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   state_manager_msgs
-  pandora_xmega_hardware_interface
+  pandora_sensor_msgs
 )
 
 catkin_package(
@@ -12,7 +12,7 @@ catkin_package(
   CATKIN_DEPENDS
     rospy
     state_manager_msgs
-    pandora_xmega_hardware_interface
+    pandora_sensor_msgs
 #  DEPENDS
 )
 

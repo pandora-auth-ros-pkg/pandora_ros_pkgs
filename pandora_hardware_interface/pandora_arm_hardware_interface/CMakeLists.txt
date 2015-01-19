@@ -3,13 +3,11 @@ project(pandora_arm_hardware_interface)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  message_generation
-  message_runtime
-  roscpp
   roslint
   controller_manager
   controller_interface
   sensor_msgs
+  pandora_sensor_msgs
   pluginlib
 )
 
@@ -19,17 +17,6 @@ set(THIS_PACKAGE_INCLUDE_DIRS
   arm_usb_interface/include
 )
 
-add_message_files(
-  FILES
-  Co2Msg.msg
-  ThermalMeanMsg.msg
-)
-
-generate_messages(
-  DEPENDENCIES
-    sensor_msgs
-)
-
 catkin_package(
   INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
   LIBRARIES
@@ -37,12 +24,11 @@ catkin_package(
     thermal_sensor_controller
   CATKIN_DEPENDS
     roscpp
-    message_generation
-    roscpp
     roslint
     controller_manager
     controller_interface
     sensor_msgs
+    pandora_sensor_msgs
     pluginlib
 )
 

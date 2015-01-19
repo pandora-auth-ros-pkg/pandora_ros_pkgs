@@ -40,12 +40,12 @@
 #include <controller_interface/controller.h>
 #include <xmega_hardware_interface/battery_interface.h>
 #include <pluginlib/class_list_macros.h>
-#include <pandora_xmega_hardware_interface/BatteryMsg.h>
+#include <pandora_sensor_msgs/BatteryMsg.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <boost/shared_ptr.hpp>
 
 typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
-  pandora_xmega_hardware_interface::BatteryMsg> > BatteryRealtimePublisher;
+  pandora_sensor_msgs::BatteryMsg> > BatteryRealtimePublisher;
 
 namespace pandora_hardware_interface
 {

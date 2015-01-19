@@ -67,7 +67,7 @@ namespace xmega
       // Create publisher
       realtimePublisher_.reset(
         new realtime_tools::RealtimePublisher<
-          pandora_xmega_hardware_interface::BatteryMsg>(
+          pandora_sensor_msgs::BatteryMsg>(
           rootNodeHandle, "/sensors/battery", 4));
     }
 

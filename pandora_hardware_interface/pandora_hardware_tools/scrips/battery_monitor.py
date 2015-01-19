@@ -8,7 +8,7 @@ Author            Chris Zalidis
 import rospy
 import subprocess
 import sys
-from pandora_xmega_hardware_interface.msg import BatteryMsg
+from pandora_sensor_msgs.msg import BatteryMsg
 
 
 class BatteryMonitor:
