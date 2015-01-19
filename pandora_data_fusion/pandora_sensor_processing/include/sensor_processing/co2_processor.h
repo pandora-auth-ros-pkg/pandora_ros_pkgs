@@ -42,7 +42,7 @@
 #include <string>
 #include <limits>
 
-#include "pandora_arm_hardware_interface/Co2Msg.h"
+#include "pandora_sensor_msgs/Co2Msg.h"
 #include "sensor_processing/utils.h"
 #include "sensor_processing/sensor_processor.h"
 
@@ -62,12 +62,12 @@ namespace pandora_sensor_processing
 
       /**
        * @brief callback to co2SensorSubscriber_
-       * @param msg [pandora_arm_hardware_interface::Co2MsgConstPtr const&] contains
+       * @param msg [pandora_sensor_msgs::Co2MsgConstPtr const&] contains
        * co2 percentage (v/v) in the air
        * @return void
        */
       void sensorCallback(
-          const pandora_arm_hardware_interface::Co2Msg& msg);
+          const pandora_sensor_msgs::Co2Msg& msg);
 
       void dynamicReconfigCallback(
           const SensorProcessingConfig& config, uint32_t level);

@@ -49,7 +49,7 @@ import rostest
 import rospy
 
 from pandora_testing_tools.testing_interface import test_base
-from pandora_arm_hardware_interface.msg import Co2Msg
+from pandora_sensor_msgs.msg import Co2Msg
 from pandora_common_msgs.msg import GeneralAlertMsg 
 
 class Co2ProcessorTest(test_base.TestBase):
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
     rospy.sleep(5.)
     rospy.init_node(NAME, anonymous=True)
-    publisher_topics = [("/test/raw_input", "pandora_arm_hardware_interface", "Co2Msg")]
+    publisher_topics = [("/test/raw_input", "pandora_sensor_msgs", "Co2Msg")]
     subscriber_topics = [("/test/alert_ouput", "pandora_common_msgs", "GeneralAlertMsg")]
     Co2ProcessorTest.connect(subscriber_topics, publisher_topics, 1, False)
     rostest.rosrun(PKG, NAME, Co2ProcessorTest, sys.argv)

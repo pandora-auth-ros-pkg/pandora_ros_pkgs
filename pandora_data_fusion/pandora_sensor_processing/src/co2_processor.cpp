@@ -56,7 +56,7 @@ namespace pandora_sensor_processing
    * @details Weibull distribution is used for calculating probability.
    */
   void Co2Processor::sensorCallback(
-      const pandora_arm_hardware_interface::Co2Msg& msg)
+      const pandora_sensor_msgs::Co2Msg& msg)
   {
     ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Incoming co2 raw info.", name_.c_str());
     alert_.yaw = 0;

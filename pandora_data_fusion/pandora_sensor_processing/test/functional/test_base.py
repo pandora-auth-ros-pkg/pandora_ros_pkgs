@@ -45,7 +45,7 @@ import rospy
 from state_manager.state_client import StateClient
 from geometry_msgs.msg import Point
 from pandora_common_msgs.msg import GeneralAlertMsg 
-from pandora_arm_hardware_interface.msg import Co2Msg
+from pandora_sensor_msgs.msg import Co2Msg
 from sensor_msgs.msg import Image
 
 def distance(a, b):

@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   state_manager_msgs
   dynamic_reconfigure
   roslint
-  pandora_arm_hardware_interface
+  pandora_sensor_msgs
   pandora_common_msgs
   sensor_msgs
   )
@@ -27,7 +27,7 @@ catkin_package(
     state_manager
     state_manager_msgs
     dynamic_reconfigure
-    pandora_arm_hardware_interface
+    pandora_sensor_msgs
     pandora_common_msgs
     sensor_msgs
   #INCLUDE_DIRS
