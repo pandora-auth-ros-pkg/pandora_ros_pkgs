@@ -45,7 +45,7 @@ from python_qt_binding.QtCore import Slot, QTimer
 from python_qt_binding.QtGui import QWidget
 
 from .widget_info import WidgetInfo
-from pandora_arm_hardware_interface.msg import Co2Msg
+from pandora_sensor_msgs.msg import Co2Msg
 
 co2_topic = "sensors/co2"
 

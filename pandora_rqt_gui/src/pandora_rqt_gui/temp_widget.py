@@ -46,7 +46,7 @@ from python_qt_binding.QtGui import QWidget
 
 from std_msgs.msg import Int16
 from .widget_info import WidgetInfo
-from pandora_arm_hardware_interface.msg import ThermalMeanMsg
+from pandora_sensor_msgs.msg import ThermalMeanMsg
 
 
 class TempWidget(QWidget):

@@ -44,7 +44,7 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Slot, QTimer
 from python_qt_binding.QtGui import QWidget
 from rospy.exceptions import ROSException
-from pandora_xmega_hardware_interface.msg import BatteryMsg
+from pandora_sensor_msgs.msg import BatteryMsg
 from .widget_info import WidgetInfo
 
 battery_topic = "sensors/battery"

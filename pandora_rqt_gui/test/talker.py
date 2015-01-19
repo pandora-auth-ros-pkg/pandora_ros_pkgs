@@ -3,8 +3,8 @@ import rospy
 import random
 from std_msgs.msg import Int16
 from sensor_msgs.msg import Range
-from pandora_arm_hardware_interface.msg import Co2Msg
-from pandora_xmega_hardware_interface.msg import BatteryMsg
+from pandora_sensor_msgs.msg import Co2Msg
+from pandora_sensor_msgs.msg import BatteryMsg
 from std_msgs.msg import Int32
 from pandora_data_fusion_msgs.msg import WorldModelMsg
 from pandora_data_fusion_msgs.msg import VictimInfoMsg
