@@ -13,6 +13,8 @@ notifications:
       - pandora_ci@olympus.ee.auth.gr
     on_success: change #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
+  slack:
+    secure: XIqMZu84WOlTYe/YkcTa6wy7Uus6EqKXIzHu4OeshmzOFsZwNg7TjsgLjpHx+fa0GHTUzCg9yVh1rE28kbjnnuvJhN1rwb3xYVrghzzB0neNGW/+qbLiaJyLtiAewnKT0CDOcLdydw+dGGaZnjbiq6dfYypO7lDu3Mh61zu4TmY=
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   # Define some config vars
   - export ROS_DISTRO=hydro
