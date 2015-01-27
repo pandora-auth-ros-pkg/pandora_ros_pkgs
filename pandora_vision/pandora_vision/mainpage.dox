@@ -3,14 +3,17 @@
   \mainpage PANDORA Vision packages code API
   
   \section packages_sec Packages API
-  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_kinect/html/">pandora_vision_kinect</a>
-  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_face/html/">pandora_vision_face</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_datamatrix/html/">pandora_vision_datamatrix</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_hazmat/html/">pandora_vision_hazmat</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_hole_detector/html/">pandora_vision_hole_detector</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_landoltc/html/">pandora_vision_landoltc</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_launchers/html/">pandora_vision_launchers</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_motion/html/">pandora_vision_motion</a>
-  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_qrcode/html/">pandora_vision_qrcode</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_msgs/html/">pandora_vision_msgs</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_predator/html/">pandora_vision_predator</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_qrcode/html/">pandora_vision_qrcode</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_support/html/">pandora_vision_support</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_victim/html/">pandora_vision_victim</a>
 
 
 */

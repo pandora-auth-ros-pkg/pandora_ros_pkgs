@@ -12,20 +12,28 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
 
   <author>Despoina Paschalidou</author>
-  
+  <author>Miltiadis-Alexios Papadopoulos</author>
+  <author>Alexandros Philotheou</author>
+  <author>Manos Tsardoulias</author>
+  <author>Victor Daropoulos</author>
+  <author>Marios Protopapas</author>
+
   <buildtool_depend>catkin</buildtool_depend>
-  
-  
-  <run_depend>pandora_vision_face</run_depend>
-  <run_depend>pandora_vision_qrcode</run_depend>
-  <run_depend>pandora_vision_landoltc</run_depend>
+
+  <run_depend>pandora_vision_datamatrix</run_depend>
   <run_depend>pandora_vision_hazmat</run_depend>
   <run_depend>pandora_vision_hole_detector</run_depend>
-  <run_depend>pandora_vision_motion</run_depend>
+  <run_depend>pandora_vision_landoltc</run_depend>
   <run_depend>pandora_vision_launchers</run_depend>
-    
+  <run_depend>pandora_vision_motion</run_depend>
+  <run_depend>pandora_vision_msgs</run_depend>
+  <run_depend>pandora_vision_predator</run_depend>
+  <run_depend>pandora_vision_qrcode</run_depend>
+  <run_depend>pandora_vision_support</run_depend>
+  <run_depend>pandora_vision_victim</run_depend>
+
 
   <export>
     <metapackage/>
-  </export>  
+  </export>
 </package>
