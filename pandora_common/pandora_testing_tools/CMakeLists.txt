@@ -44,7 +44,9 @@ catkin_package(
     ${PROJECT_NAME}_map_loader
   )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(
+  include/${PROJECT_NAME}
+  ${catkin_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}_map_loader
   src/map_loader/map_loader.cpp
