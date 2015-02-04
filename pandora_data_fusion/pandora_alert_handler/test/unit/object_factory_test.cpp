@@ -42,7 +42,7 @@
 #include <ros/package.h>
 
 #include "gtest/gtest.h"
-#include "map_loader/map_loader.h"
+#include <pandora_testing_tools/map_loader/map_loader.h>
 
 #include "alert_handler/object_factory.h"
 #include "alert_handler/defines.h"

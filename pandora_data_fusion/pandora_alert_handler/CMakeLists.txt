@@ -19,7 +19,7 @@ pkg_check_modules(BFL REQUIRED bfl)
 
 generate_dynamic_reconfigure_options(
   config/alert_handler/AlertHandler.cfg
-  config/alert_handler/mass_alert_publisher_dymamic.cfg
+  config/alert_handler/MassAlertPublisher.cfg
   )
 
 # Cmake does not support Coverage option by default,
@@ -254,7 +254,7 @@ endif()
 ##################### Install targets ###############################
 
 ### Install headers
-install(DIRECTORY include/${PROJECT_NAME}/
+install(DIRECTORY include/alert_handler/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 ## Install exported libraries

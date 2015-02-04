@@ -43,8 +43,8 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
+#include <pandora_testing_tools/map_loader/map_loader.h>
 #include "alert_handler/pose_finder.h"
-#include "map_loader/map_loader.h"
 #include "gtest/gtest.h"
 
 namespace pandora_data_fusion
