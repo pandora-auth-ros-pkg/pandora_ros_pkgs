@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_vision</name>
   <version>0.1.0</version>
   <description>Containts vision algorithm implementations.</description>
@@ -20,17 +20,17 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>pandora_vision_datamatrix</run_depend>
-  <run_depend>pandora_vision_hazmat</run_depend>
-  <run_depend>pandora_vision_hole_detector</run_depend>
-  <run_depend>pandora_vision_landoltc</run_depend>
-  <run_depend>pandora_vision_launchers</run_depend>
-  <run_depend>pandora_vision_motion</run_depend>
-  <run_depend>pandora_vision_msgs</run_depend>
-  <run_depend>pandora_vision_predator</run_depend>
-  <run_depend>pandora_vision_qrcode</run_depend>
-  <run_depend>pandora_vision_support</run_depend>
-  <run_depend>pandora_vision_victim</run_depend>
+  <exec_depend>pandora_vision_datamatrix</exec_depend>
+  <exec_depend>pandora_vision_hazmat</exec_depend>
+  <exec_depend>pandora_vision_hole</exec_depend>
+  <exec_depend>pandora_vision_landoltc</exec_depend>
+  <exec_depend>pandora_vision_launchers</exec_depend>
+  <exec_depend>pandora_vision_motion</exec_depend>
+  <exec_depend>pandora_vision_msgs</exec_depend>
+  <exec_depend>pandora_vision_predator</exec_depend>
+  <exec_depend>pandora_vision_qrcode</exec_depend>
+  <exec_depend>pandora_vision_support</exec_depend>
+  <exec_depend>pandora_vision_victim</exec_depend>
 
 
   <export>

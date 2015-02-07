@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_vision_launchers</name>
   <version>0.1.0</version>
   <description>Containts launchers for bringup.</description>
@@ -12,12 +12,25 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
 
   <author>Despoina Paschalidou</author>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
-  
-  <run_depend>usb_cam</run_depend>
-  
+
+  <exec_depend>usb_cam</exec_depend>
+  <exec_depend>state_manager</exec_depend>
+  <exec_depend>pandora_vision_datamatrix</exec_depend>
+  <exec_depend>pandora_vision_hazmat</exec_depend>
+  <exec_depend>pandora_vision_hole</exec_depend>
+  <exec_depend>pandora_vision_landoltc</exec_depend>
+  <exec_depend>pandora_vision_motion</exec_depend>
+  <exec_depend>pandora_vision_predator</exec_depend>
+  <exec_depend>pandora_vision_qrcode</exec_depend>
+  <exec_depend>pandora_vision_victim</exec_depend>
+
+
+  <!--Optional dependency, commented on purpose-->
+  <!--<exec_depend>pandora_robots_description</exec_depend>-->
+
   <export>
   </export>
-  
+
 </package>

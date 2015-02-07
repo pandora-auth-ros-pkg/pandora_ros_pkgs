@@ -57,7 +57,7 @@
     <include if="$(arg vision_predator)"
       file="$(find pandora_vision_predator)/launch/predator_node.launch" />
     <include if="$(arg vision_hole_detector)"
-      file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector.launch" />
+      file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
     <include if="$(arg vision_victim)"
       file="$(find pandora_vision_victim)/launch/victim_node.launch" />
 

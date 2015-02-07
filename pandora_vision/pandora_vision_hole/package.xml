@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_vision_hole</name>
+  <version>0.1.0</version>
+  <description>Containts hole detection node using kinect sensor.</description>
+
+  <maintainer email="alexandros.filotheou@gmail.com">Alexandros Philotheou</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Alexandros Philotheou</author>
+  <author>Manos Tsardoulias</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
+  <depend>pandora_vision_msgs</depend>
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>pcl_ros</depend>
+  <depend>message_filters</depend>
+  <depend>urdf</depend>
+
+  <exec_depend>openni2_launch</exec_depend>
+
+  <!-- Test Depends -->
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
+
+  <export>
+  </export>
+
+</package>

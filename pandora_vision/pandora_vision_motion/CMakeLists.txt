@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_motion)
 
-set(CMAKE_BUILD_TYPE Debug)
 
-find_package(catkin REQUIRED COMPONENTS 
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     pandora_common_msgs
     state_manager
@@ -32,11 +31,10 @@ catkin_package(
       image_transport
       sensor_msgs
       dynamic_reconfigure
-      roslint
       urdf
     INCLUDE_DIRS
       include
-    LIBRARIES 
+    LIBRARIES
 )
 
 include_directories(include
@@ -52,18 +50,17 @@ add_executable(motion_node
 )
 target_link_libraries(motion_node ${catkin_LIBRARIES} )
 add_dependencies(motion_node
-    pandora_vision_motion_gencfg
-    pandora_vision_msgs_gencpp
     ${catkin_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 #~ To check lint : catkin_make roslint_pandora_vision_motion
-set(ROSLINT_CPP_OPTS 
+set(ROSLINT_CPP_OPTS
     "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
-    
-FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS 
-  RELATIVE ${PROJECT_SOURCE_DIR} 
-            
+
+file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
+  RELATIVE ${PROJECT_SOURCE_DIR}
+
   include/motion_detection.h
   include/motion_detector.h
   include/motion_parameters.h

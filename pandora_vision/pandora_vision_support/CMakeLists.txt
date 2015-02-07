@@ -15,6 +15,8 @@ catkin_package(CATKIN_DEPENDS
   sensor_msgs
 )
 
+include_directories(${catkin_INCLUDE_DIRS})
+
 add_executable(image_saver_by_topic_node
   src/image_saver_by_topic.cpp
 )

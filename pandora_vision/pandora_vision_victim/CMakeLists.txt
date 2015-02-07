@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_victim)
 
-#~ set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
-
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     pandora_common_msgs
@@ -23,7 +20,7 @@ generate_dynamic_reconfigure_options(
   )
 
 catkin_package(
-    DEPENDS
+    #DEPENDS
     CATKIN_DEPENDS
       roscpp
       pandora_common_msgs
@@ -34,11 +31,9 @@ catkin_package(
       image_transport
       dynamic_reconfigure
       sensor_msgs
-      roslint
       urdf
-    INCLUDE_DIRS
-      include
-    LIBRARIES
+    #INCLUDE_DIRS
+    #LIBRARIES
 )
 
 include_directories(include
@@ -51,23 +46,22 @@ add_executable(victim_node
     src/rgb_system_validator.cpp
     src/depth_system_validator.cpp
     src/victim_vj_detector.cpp
-    
+
     src/utilities/channels_statistics_extractor.cpp
     src/utilities/edge_orientation_extractor.cpp
     src/utilities/haralickfeature_extractor.cpp
-    
+
     src/feature_extractors/mean_std_dev.cpp
     src/feature_extractors/dominant_color.cpp
     src/feature_extractors/dft_coeffs.cpp
     src/feature_extractors/color_angles.cpp
-    
+
     src/victim_parameters.cpp
 )
 target_link_libraries(victim_node ${catkin_LIBRARIES} )
 add_dependencies(victim_node
-    pandora_vision_msgs_gencpp
-    pandora_vision_victim_gencfg
     ${catkin_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 ########################### victimTrainer ############################
@@ -79,12 +73,12 @@ if(VICTIM_ENABLE_TRAIN)
                   src/utilities/channels_statistics_extractor.cpp
                   src/utilities/edge_orientation_extractor.cpp
                   src/utilities/haralickfeature_extractor.cpp
-                  
+
                   src/feature_extractors/mean_std_dev.cpp
                   src/feature_extractors/dominant_color.cpp
                   src/feature_extractors/dft_coeffs.cpp
                   src/feature_extractors/color_angles.cpp
-                  
+
                   src/victim_parameters.cpp
                   src/training_parameters.cpp
   )
@@ -102,10 +96,10 @@ endif()
 #~ To check lint : catkin_make roslint_pandora_vision_victim
 set(ROSLINT_CPP_OPTS
     "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string")
-    
+
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  
+
   include/victim_detection.h
   include/face_detector.h
   include/rgb_system_validator.h

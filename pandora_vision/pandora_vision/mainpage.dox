@@ -5,7 +5,7 @@
   \section packages_sec Packages API
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_datamatrix/html/">pandora_vision_datamatrix</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_hazmat/html/">pandora_vision_hazmat</a>
-  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_hole_detector/html/">pandora_vision_hole_detector</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_hole/html/">pandora_vision_hole</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_landoltc/html/">pandora_vision_landoltc</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_launchers/html/">pandora_vision_launchers</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_vision_motion/html/">pandora_vision_motion</a>

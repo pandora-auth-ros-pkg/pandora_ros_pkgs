@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_msgs)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  message_runtime
   std_msgs
   geometry_msgs
   sensor_msgs
@@ -39,7 +38,6 @@ generate_messages(
 
 catkin_package(
   CATKIN_DEPENDS
-    message_generation
     message_runtime
     std_msgs
     geometry_msgs

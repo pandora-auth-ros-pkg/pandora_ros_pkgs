@@ -38,7 +38,7 @@
 #include "pandora_common_msgs/GeneralAlertMsg.h"
 #include "pandora_vision_msgs/LandoltcPredatorMsg.h"
 
-#include "../tld/TLD.h"
+#include <tld/TLD.h>
 #include <urdf_parser/urdf_parser.h>
 #include <map>
 #include "state_manager/state_client.h"
