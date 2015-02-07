@@ -3,7 +3,7 @@
   <param name="/use_sim_time" value="true"/> 
 
   <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> 
-  <include file="$(find pandora_vision_hole_detector)/launch/pandora_vision_hole_detector_standalone.launch" />
+  <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole_standalone.launch" />
   <rosparam command="load" ns="/pandora_vision/hole_detector/synchronizer_node" param="subscribed_topics/input_topic">
     /kinect/depth_registered/points
   </rosparam>
