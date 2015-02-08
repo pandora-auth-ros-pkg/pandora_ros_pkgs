@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_cmake_tools</name>
+  <version>0.0.0</version>
+  <description>Contains cmake functions, to be used by other packages.</description>
+
+  <maintainer email="zalidis@gmail.com">Zalidis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
+
+  <author>Zalidis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>python-argparse</depend>
+  <depend>python-yaml</depend>
+
+  <export>
+    <architecture_independent/>
+  </export>
+
+</package>

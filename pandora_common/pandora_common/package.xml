@@ -21,6 +21,7 @@
   <exec_depend>pandora_common_msgs</exec_depend>
   <exec_depend>kinect_movement_filter</exec_depend>
   <exec_depend>pandora_testing_tools</exec_depend>
+  <exec_depend>pandora_cmake_tools</exec_depend>
 
   <export>
     <metapackage/>
