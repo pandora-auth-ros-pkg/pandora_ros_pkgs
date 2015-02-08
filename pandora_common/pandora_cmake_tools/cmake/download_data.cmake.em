@@ -78,7 +78,7 @@ function(download_data target url)
 endfunction()
 
 #
-# Download multiple files using a 'extra_files.py' for convinience.
+# Download multiple files using a 'extra_files.yaml' for convinience.
 #
 # it is commonly used to download larger data files which should not be
 # stored in the repository, and which are not required as part of the build
@@ -88,7 +88,7 @@ endfunction()
 #
 # :param target: the target name
 # :type target: string
-# :param extra_files: paths to 'extra_files.py'
+# :param extra_files: paths to 'extra_files.yaml'
 # :type url: string
 #
 # :param EXCLUDE_FROM_ALL: exclude this download from the 'all' build target
