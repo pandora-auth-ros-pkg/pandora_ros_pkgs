@@ -22,7 +22,7 @@ install:
   # Find and download dependencies of the dependencies we fetched above.
   # We believe 2 times are enough to resolve recursive deps
   - pandoradep scan . >> deps.rosinstall
-  - wstool merge deps.roinstall
+  - wstool merge deps.rosinstall
   - wstool update
   # Delete the .rosinstall version of this repo and use the one of the branch we are testing
   - rm -rf $REPOSITORY_NAME
