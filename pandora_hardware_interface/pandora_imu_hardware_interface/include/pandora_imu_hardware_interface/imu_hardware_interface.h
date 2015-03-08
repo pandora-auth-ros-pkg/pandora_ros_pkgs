@@ -49,23 +49,42 @@ namespace pandora_hardware_interface
 {
 namespace imu
 {
+  /**
+   @class ImuHardwareInterface
+   @brief Allows the controller manager to communicate with the IMU
+  **/
   class ImuHardwareInterface : public hardware_interface::RobotHW
   {
-    private:
-      ros::NodeHandle nodeHandle_;
-
-      ImuSerialInterface imuSerialInterface;
-      hardware_interface::ImuSensorInterface imuSensorInterface_;
-      hardware_interface::ImuSensorHandle::Data imuData_;
-      double imuOrientation_[4];
-      double rollOffset_;
-      double pitchOffset_;
-
     public:
+      /**
+       @brief Default Contstructor
+       @details Initializes class variables and registers handle and interface
+       @param nodeHandle [ros::NodeHandle] : node handle instance
+      **/
       explicit ImuHardwareInterface(
         ros::NodeHandle nodeHandle);
+
+      /**
+       @brief Default Destructor
+      **/
       ~ImuHardwareInterface();
+
+      /**
+       @brief Reads yaw,pitch,roll and creates a quaternion orientation msg
+       @return void
+      **/
       void read();
+
+    private:
+      ros::NodeHandle nodeHandle_;  //!< node handle
+      ImuSerialInterface imuSerialInterface;  //!< imu serial interface
+      hardware_interface::ImuSensorInterface
+        imuSensorInterface_;  //!< imu sensor interface
+      hardware_interface::ImuSensorHandle::Data
+        imuData_;  //!< imu sensor handle
+      double imuOrientation_[4];  //!< quaternion orientaion
+      double rollOffset_;  //!< offset to be applied to roll measurements
+      double pitchOffset_;  //!< offset to be applied to pitch measurements
   };
 }  // namespace imu
 }  // namespace pandora_hardware_interface

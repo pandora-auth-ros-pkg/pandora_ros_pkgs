@@ -52,31 +52,71 @@ namespace pandora_hardware_interface
 {
 namespace imu
 {
+  /**
+   @class ImuSerialInterface
+   @brief Class used for serial communication with Compass OS-4000 (IMU)
+  **/
   class ImuSerialInterface : private boost::noncopyable
   {
    public:
+    /**
+     @brief Default Constructor
+     @param device [std::string &] : IMU device com port name
+     @param speed [int] : Serial communication speed (baud rate)
+     @param timeout [int] : Connection response timeout
+    **/
     ImuSerialInterface(
-      const std::string& device,
-      int speed,
-      int timeout);
+       const std::string& device,
+        int speed,
+        int timeout);
 
+    /**
+     @brief Establishes serial communication
+     @return void
+    **/
     void init();
 
+    /**
+     @brief Reads raw data from the IMU and calculates yaw, pitch and roll 
+     @details Init must be called first to establish serial communication
+     @return void
+    **/
     void read();
 
+    /**
+     @brief Get roll value
+     @return float roll
+    **/
     inline float getRoll() const
     {
       return roll_;
     }
+
+    /**
+     @brief Get pitch latest meausurement
+     @return float pitch
+    **/
     inline float getPitch() const
     {
       return pitch_;
     }
+
+    /**
+     @brief Get yaw latest measurement
+     @return float yaw
+    **/
     inline float getYaw() const
     {
       return yaw_;
     }
 
+    /**
+     @brief Get yaw, pitch and roll
+     @param yaw [float*] : used to return latest yaw measurement
+     @param pitch [float*] : used to return latest pitch measurement
+     @param roll [float*] : used to return latest roll measurement
+     @return void 
+    **/
     inline void getData(
       float* yaw,
       float* pitch,
@@ -88,21 +128,31 @@ namespace imu
     }
 
    private:
+    /**
+     @brief Transform raw IMU data to yaw, pitch and roll meausurements
+     @param packet [std::string&] : packet containing the raw imu data
+     @return void
+    **/
     void parse(const std::string& packet);
+
+    /**
+     @brief Check size of latest received IMU data packet
+     @return bool
+    **/
     bool check(const std::string& packet, int crc);
 
    private:
-    float yaw_;
-    float pitch_;
-    float roll_;
+    float yaw_;  //!< latest yaw measurement
+    float pitch_;  //!< latest pitch measurement
+    float roll_;  //!< latest roll measurement
 
-    const std::string device_;
-    const int speed_;
-    const int timeout_;
+    const std::string device_;  //!< IMU device com port name
+    const int speed_;  //!< serial communication speed (baud rate)
+    const int timeout_;  //!< Connection response timeout
 
-    const boost::regex regex_;
+    const boost::regex regex_;  //!< expression used to calculate yaw,pitch,roll
 
-    boost::scoped_ptr<serial::Serial> serialPtr_;
+    boost::scoped_ptr<serial::Serial> serialPtr_;  //!< serial communication class instance
   };
 }  // namespace imu
 }  // namespace pandora_hardware_interface

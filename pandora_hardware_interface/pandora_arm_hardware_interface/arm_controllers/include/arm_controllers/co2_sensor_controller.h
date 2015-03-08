@@ -51,26 +51,68 @@ namespace pandora_hardware_interface
 {
 namespace arm
 {
+  /**
+   @class Co2SensorController
+   @brief Controller used to publish CO2 meausurements with fixed frequency
+  **/
   class Co2SensorController :
     public controller_interface::Controller<Co2SensorInterface>
   {
-    private:
-      std::vector<Co2SensorHandle> sensorHandles_;
-      std::vector<Co2RealtimePublisher> realtimePublishers_;
-      std::vector<ros::Time> lastTimePublished_;
-      double publishRate_;
-
     public:
+      /**
+       @brief Default Constructor
+      **/
       Co2SensorController();
+
+      /**
+       @brief Default Constructor
+      **/
       ~Co2SensorController();
+
+      /**
+       @brief Initializes controller
+       @param co2SsensorInterface [Co2SensorInterface*] : CO2 sensor interface
+       @param rootNodeHandle [ros::NodeHandle&] : Node handle at root namespace
+       @param controllerNodeHandle [ros::NodeHandle&] : Node handle inside the 
+         controller namespace
+       @return bool
+      **/
       virtual bool init(
-        Co2SensorInterface*
-          co2SensorInterface,
+        Co2SensorInterface* co2SensorInterface,
         ros::NodeHandle& rootNodeHandle,
         ros::NodeHandle& controllerNodeHandle);
+
+      /**
+       @brief Starts CO2 controller
+       @param time [ros::Time&] : Current time
+       @return void
+      **/
       virtual void starting(const ros::Time& time);
+
+      /**
+       @brief Updates the CO2 Controller and publishes new CO2 measurements
+       @param time [ros::Time&] : Current time
+       @param period [ros::Duration&] : Time since last update
+       @return void
+      **/
       virtual void update(const ros::Time& time, const ros::Duration& period);
+
+      /**
+       @brief Stops the CO2 controller
+       @param time [ros::Time&] : Current time
+       @return void
+      **/
       virtual void stopping(const ros::Time& time);
+
+    private:
+      //!< CO2 sensor handle
+      std::vector<Co2SensorHandle> sensorHandles_;
+      //!< CO2 msg publisher
+      std::vector<Co2RealtimePublisher> realtimePublishers_;
+      //!< Time since last publishing
+      std::vector<ros::Time> lastTimePublished_;
+      //!< CO2 msg publishing frequency
+      double publishRate_;
   };
 }  // namespace arm
 }  // namespace pandora_hardware_interface

@@ -49,38 +49,57 @@ namespace pandora_hardware_interface
 {
 namespace arm
 {
+  /**
+   @class ArmHardwareInterface
+   @brief Allows the controller manager to communicate with the arm board
+  **/
   class ArmHardwareInterface : public hardware_interface::RobotHW
   {
-    private:
-      ros::NodeHandle nodeHandle_;
-      ArmUSBInterface* arm_;
-
-      Co2SensorInterface co2SensorInterface_;
-      ThermalSensorInterface thermalSensorInterface_;
-      std::vector<Co2SensorHandle::Data>
-        co2SensorData_;
-      std::vector<ThermalSensorHandle::Data>
-        thermalSensorData_;
-
-      std::vector<std::string> co2SensorName_;
-      std::vector<std::string> co2SensorFrameId_;
-      float* co2Percentage_;
-
-      std::vector<std::string> thermalSensorName_;
-      std::vector<std::string> thermalFrameId_;
-      int* height_;
-      int* width_;
-      int* step_;
-      uint8_t** thermalData_;
-      std::vector<std::string> address_;  // not stored in handle
-
-      void registerCo2SensorInterface();
-      void registerThermalSensorInterface();
     public:
+      /**
+       @brief Default Constructor
+       @details Establishes communication and registers thermal and CO2 interfaces
+       @param nodeHandle [ros::NodeHandle] : handle of arm_hardware_interface_node
+      **/
       explicit ArmHardwareInterface(
         ros::NodeHandle nodeHandle);
+
+      /**
+       @brief Default Constructor
+       @details Frees ArmUSBInterface instance
+      **/
       ~ArmHardwareInterface();
+
+      /**
+       @brief Reads CO2 percentage and grideyes' values
+       @return void
+      **/
       void read();
+
+    private:
+     ros::NodeHandle nodeHandle_;
+     ArmUSBInterface* arm_;
+
+     Co2SensorInterface co2SensorInterface_;
+     std::vector<Co2SensorHandle::Data>
+       co2SensorData_;
+     std::vector<std::string> co2SensorName_;
+     std::vector<std::string> co2SensorFrameId_;
+     float* co2Percentage_;
+
+     ThermalSensorInterface thermalSensorInterface_;
+     std::vector<ThermalSensorHandle::Data>
+       thermalSensorData_;
+     std::vector<std::string> thermalSensorName_;
+     std::vector<std::string> thermalFrameId_;
+     int* height_;
+     int* width_;
+     int* step_;
+     uint8_t** thermalData_;
+     std::vector<std::string> address_;  // {L,C,R} not stored in handle
+
+     void registerCo2SensorInterface();
+     void registerThermalSensorInterface();
   };
 }  // namespace arm
 }  // namespace pandora_hardware_interface
