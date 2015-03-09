@@ -24,7 +24,6 @@ catkin_package(
     range_sensor_controller
   CATKIN_DEPENDS
     roscpp
-    roslint
     controller_manager
     controller_interface
     serial

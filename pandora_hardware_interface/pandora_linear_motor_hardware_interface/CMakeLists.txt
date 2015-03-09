@@ -17,7 +17,6 @@ catkin_package(
   INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
   CATKIN_DEPENDS
     roscpp
-    roslint
     controller_manager
     controller_interface
     serial

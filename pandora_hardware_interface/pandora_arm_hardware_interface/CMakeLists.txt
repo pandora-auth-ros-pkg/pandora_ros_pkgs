@@ -24,7 +24,6 @@ catkin_package(
     thermal_sensor_controller
   CATKIN_DEPENDS
     roscpp
-    roslint
     controller_manager
     controller_interface
     sensor_msgs

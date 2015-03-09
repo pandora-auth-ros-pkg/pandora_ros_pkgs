@@ -12,7 +12,6 @@ catkin_package(
 #  LIBRARIES
   CATKIN_DEPENDS
     roscpp
-    roslint
     sensor_msgs
     dynamixel_msgs
 #  DEPENDS

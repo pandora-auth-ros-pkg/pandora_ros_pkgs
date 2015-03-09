@@ -13,7 +13,6 @@ catkin_package(
 #  LIBRARIES
   CATKIN_DEPENDS
     roscpp
-    roslint
     tf
     controller_manager
     serial
