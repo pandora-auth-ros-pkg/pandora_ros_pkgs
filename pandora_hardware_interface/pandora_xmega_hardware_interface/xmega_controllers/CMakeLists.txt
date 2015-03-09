@@ -3,7 +3,7 @@ add_library(
   src/battery_controller.cpp)
 add_dependencies(
   battery_controller
-  ${PROJECT_NAME}_gencpp)
+  ${catkin_EXPORTED_TARGETS})
 target_link_libraries(
   battery_controller
   ${catkin_LIBRARIES})

@@ -3,19 +3,17 @@ add_library(
   src/co2_sensor_controller.cpp)
 add_dependencies(
   co2_sensor_controller
-  ${PROJECT_NAME}_gencpp
-  pandora_sensor_msgs_gencpp)
+  ${catkin_EXPORTED_TARGETS)
 target_link_libraries(
   co2_sensor_controller
   ${catkin_LIBRARIES})
-  
+
 add_library(
   thermal_sensor_controller
   src/thermal_sensor_controller.cpp)
 add_dependencies(
   thermal_sensor_controller
-  ${PROJECT_NAME}_gencpp
-  pandora_sensor_msgs_gencpp)
+  ${catkin_EXPORTED_TARGETS)
 target_link_libraries(
   thermal_sensor_controller
   ${catkin_LIBRARIES})
