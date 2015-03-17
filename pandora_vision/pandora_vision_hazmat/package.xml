@@ -14,6 +14,8 @@
   <author>Despoina Paschalidou</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
@@ -23,7 +25,6 @@
   <depend>state_manager_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>dynamic_reconfigure</depend>
-  <depend>roslint</depend>
   <depend>urdf</depend>
 
   <export>

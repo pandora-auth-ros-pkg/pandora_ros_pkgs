@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
     dynamic_reconfigure
     roslint
     urdf
+    pandora_cmake_tools
 )
 
 generate_dynamic_reconfigure_options(
@@ -54,6 +55,10 @@ add_dependencies(hazmat_node
     ${catkin_EXPORTED_TARGETS}
     ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
+
+# Download necessary data to run
+download_extra_data(${PROJECT_NAME}_download_training_data
+                    EXTRA_FILES patterns/extra_files.yaml)
 
 ########################### hazmatTrainNode ############################
 if(HAZMAT_ENABLE_TRAIN)
