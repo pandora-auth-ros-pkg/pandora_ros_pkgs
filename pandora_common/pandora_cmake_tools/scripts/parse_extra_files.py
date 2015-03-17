@@ -62,7 +62,7 @@ def main():
                 arguments.append(remote_file['md5'])
 
             if remote_file.has_key('optional') and remote_file['optional']:
-                arguments.append('--ignore_error')
+                arguments.append('--ignore-error')
 
             #print(arguments)
             download_checkmd5.main(arguments)
