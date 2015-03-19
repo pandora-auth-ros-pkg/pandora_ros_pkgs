@@ -48,7 +48,6 @@ target_link_libraries(node_diagnostics
       ${TinyXML_LIBRARIES}
       generic_diagnostic
       interfaces_xml_parser
-      interface_tester
       )
 add_dependencies(node_diagnostics state_manager_msgs_gencpp)
 
@@ -58,8 +57,6 @@ target_link_libraries(interface_diagnostics
       ${TinyXML_LIBRARIES}
       generic_diagnostic
       interfaces_xml_parser
-      interface_tester
-      tf_monitor
       )
 add_dependencies(interface_diagnostics state_manager_msgs_gencpp)
 
@@ -71,8 +68,6 @@ target_link_libraries(interface_diagnostics_node
       interface_diagnostics
       generic_diagnostic
       interfaces_xml_parser
-      interface_tester
-      tf_monitor
       )
 add_dependencies(interface_diagnostics_node state_manager_msgs_gencpp)
 
