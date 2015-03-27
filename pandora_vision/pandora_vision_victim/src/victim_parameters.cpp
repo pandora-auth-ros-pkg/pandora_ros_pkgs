@@ -91,11 +91,11 @@ namespace pandora_vision
     getVictimDetectorParameters();
   }
   
-    /**
-    @brief The function called when a parameter is changed
-    @param[in] config [const pandora_vision_motion::motion_cfgConfig&]
-    @param[in] level [const uint32_t] The level 
-    @return void
+  /**
+  @brief The function called when a parameter is changed
+  @param[in] config [const pandora_vision_motion::motion_cfgConfig&]
+  @param[in] level [const uint32_t] The level 
+  @return void
   **/
   void VictimParameters::parametersCallback(
     const pandora_vision_victim::victim_dyn_reconfConfig& config,
@@ -113,9 +113,9 @@ namespace pandora_vision
   }
   
   /**
-   @brief Get parameters referring to the view and
-   *frame characteristics
-   @return void
+  @brief Get parameters referring to the view and
+  frame characteristics
+  @return void
   **/
   void VictimParameters::getGeneralParams(void)
   {
@@ -327,8 +327,8 @@ namespace pandora_vision
   
 
   /**
-    @brief Get parameters referring to the face detection algorithm
-    @return void
+  @brief Get parameters referring to the face detection algorithm
+  @return void
   **/
   void VictimParameters::getVictimDetectorParameters(void)
   {

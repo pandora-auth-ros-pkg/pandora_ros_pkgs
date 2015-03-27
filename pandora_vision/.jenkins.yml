@@ -39,4 +39,5 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - catkin_make roslint_pandora_vision_victim
   - catkin_make tests # Build all tests, even from other packages. Its not optimal, but...
   - catkin_make run_tests_pandora_vision_hole
+  - catkin_make run_tests_pandora_vision_victim
   - catkin_test_results build

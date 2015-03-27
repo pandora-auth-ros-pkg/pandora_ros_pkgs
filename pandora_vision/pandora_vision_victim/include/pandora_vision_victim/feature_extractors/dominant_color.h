@@ -32,11 +32,11 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Despoina Paschalidou
+* Author: Marios Protopapas
 *********************************************************************/
 
-#ifndef PANDORA_VISION_VICTIM_DOMINANT_COLOR_H 
-#define PANDORA_VISION_VICTIM_DOMINANT_COLOR_H 
+#ifndef PANDORA_VISION_VICTIM_DOMINANT_COLOR_H
+#define PANDORA_VISION_VICTIM_DOMINANT_COLOR_H
 
 #include "pandora_vision_victim/feature_extractors/base_feature_extractor.h"
 
@@ -46,11 +46,11 @@ namespace pandora_vision
   class DominantColorExtractor : public BaseFeatureExtractor
   {
     private:
-      
+
     public:
-      
+
       DominantColorExtractor(cv::Mat* img);
-      
+
       virtual std::vector<double> extract(void);
 
   };

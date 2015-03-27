@@ -1,0 +1,9 @@
+files:
+- md5: 5398eb20e130f7342079b250c35746fe
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/version2013-2014/rgb_cascade.xml
+- md5: dd0b225bee934ca0f9e8f8b43d3d4d9a
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/version2013-2014/rgb_svm_classifier6.xml
+- md5: ce40825481f65716610929b6c3238d5e
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/version2013-2014/model_dolls.xml
+- md5: 3b321c52b97bf9a1303a399060ef6dde
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/version2013-2014/depth_svm_classifier.xml

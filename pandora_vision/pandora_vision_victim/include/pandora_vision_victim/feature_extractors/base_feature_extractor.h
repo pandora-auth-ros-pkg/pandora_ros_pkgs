@@ -32,11 +32,11 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Despoina Paschalidou
+* Author: Marios Protopapas
 *********************************************************************/
 
-#ifndef PANDORA_VISION_VICTIM_BASE_FEATURE_EXTRACTOR_H 
-#define PANDORA_VISION_VICTIM_BASE_FEATURE_EXTRACTOR_H 
+#ifndef PANDORA_VISION_VICTIM_BASE_FEATURE_EXTRACTOR_H
+#define PANDORA_VISION_VICTIM_BASE_FEATURE_EXTRACTOR_H
 
 #include "pandora_vision_victim/victim_parameters.h"
 
@@ -46,21 +46,21 @@ namespace pandora_vision
   class BaseFeatureExtractor
   {
     protected:
-      
+
       //! In case the extractor is not purely functional, multiple
       //! sub-extractors exist
       std::vector<BaseFeatureExtractor*> extractors;
-    
+
       cv::Mat* _img;
-      
+
     public:
-    
+
       //! Default constructor
       BaseFeatureExtractor(cv::Mat* img)
       {
         _img = img;
       }
-      
+
       virtual std::vector<double> extract(void) = 0;
 
   };

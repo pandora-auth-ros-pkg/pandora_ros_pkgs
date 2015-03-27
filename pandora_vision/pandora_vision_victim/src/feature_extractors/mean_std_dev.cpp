@@ -32,7 +32,7 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Despoina Paschalidou
+* Author: Marios Protopapas
 *********************************************************************/
 
 #include "pandora_vision_victim/feature_extractors/mean_std_dev.h"
@@ -40,12 +40,20 @@
 
 namespace pandora_vision
 {
+  /**
+  brief Constructor
+  **/
   MeanStdDevExtractor::MeanStdDevExtractor(cv::Mat* img)
     :BaseFeatureExtractor(img)
   {
-    
+
   }
   
+  /**
+  @brief this function extracts the mean and std value of a color
+  component
+  @returns meanStd Vector
+  **/
   std::vector<double> MeanStdDevExtractor::extract(void)
   {
     std::vector<double> ret;
@@ -58,6 +66,5 @@ namespace pandora_vision
     }
     return ret;
   }
-}
-
+}// namespace pandora_vision
 

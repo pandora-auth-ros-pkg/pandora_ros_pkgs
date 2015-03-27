@@ -4,7 +4,7 @@
   <version>0.1.0</version>
   <description>Containts victim detection node.</description>
 
-  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+  <maintainer email="protopapas_marios@hotmail.com">Marios Protopapas</maintainer>
 
   <license>BSD</license>
 
@@ -12,8 +12,12 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
 
   <author>Despoina Paschalidou</author>
+  <author>Marios Protopapas</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
@@ -23,10 +27,11 @@
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>roslint</depend>
   <depend>urdf</depend>
   <depend>dynamic_reconfigure</depend>
 
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
   <export>
   </export>
 

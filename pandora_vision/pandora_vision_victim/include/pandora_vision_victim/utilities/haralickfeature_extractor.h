@@ -44,16 +44,8 @@ namespace pandora_vision
   class HaralickFeaturesExtractor
   {
     
-    private:
-    
-    //!<Vector containing 13 Haralick Features
-    std::vector<double> _haralickFeatures;
-    
     public:
-    
-    //!<Constructor
-    HaralickFeaturesExtractor();
-    
+
     /**
     @brief Function for calculating the normalized GLCM matrix, considering an
     horizontal relationship between pixels with offset equal to 1. The returned 
@@ -61,7 +53,7 @@ namespace pandora_vision
     @param in [cv::Mat&] A grayscale image with 8 bit values.
     @return [cv::Mat] The GLCM matrix.
     **/
-    cv::Mat calculateGLCM(const cv::Mat& in);
+   static cv::Mat calculateGLCM(const cv::Mat& in);
     
     /**
     @brief Function for updating the values of the GLCM matrix.
@@ -73,7 +65,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The GLCM matrix
     @return void
     **/  
-    void updateGLCM(int y1, int x1, int y2, int x2, 
+   static void updateGLCM(int y1, int x1, int y2, int x2, 
         cv::Mat* out, const cv::Mat& in);
     
     /**
@@ -81,7 +73,7 @@ namespace pandora_vision
     @param in [cv::Mat*] The matrix to be normalized
     @return [cv::Mat] The normalized matrix
     **/  
-    cv::Mat normalizeGLCM(cv::Mat* in);
+   static cv::Mat normalizeGLCM(cv::Mat* in);
     
     /**
     @brief Function for calculating the Angular Second Moment,
@@ -89,7 +81,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/    
-    void getAngularSecondMoment(const cv::Mat& in);
+    static double getAngularSecondMoment(const cv::Mat& in);
     
     /**
     @brief Function for calculating entropy,
@@ -97,7 +89,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/      
-    void getEntropy(const cv::Mat& in);
+    static double getEntropy(const cv::Mat& in);
     
     /**
     @brief Function for calculating contrast,
@@ -105,7 +97,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/      
-    void getContrast(const cv::Mat& in);
+    static double getContrast(const cv::Mat& in);
     
     /**
     @brief Function for calculating variance,
@@ -113,7 +105,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/        
-    void getVariance(const cv::Mat& in);
+    static double getVariance(const cv::Mat& in);
     
     /**
     @brief Function for calculating correlation,
@@ -121,7 +113,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getCorrelation(const cv::Mat& in);
+    static double getCorrelation(const cv::Mat& in);
     
     /**
     @brief Function for calculating homogeneity,
@@ -129,7 +121,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getHomogeneity(const cv::Mat& in);
+    static double getHomogeneity(const cv::Mat& in);
     
     /**
     @brief Function for calculating sum average,
@@ -137,7 +129,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getSumAverage(const cv::Mat& in);
+    static double getSumAverage(const cv::Mat& in);
     
     /**
     @brief Function for calculating sum variance,
@@ -145,7 +137,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getSumVariance(const cv::Mat& in);
+    static double getSumVariance(const cv::Mat& in, const double& sumAverage);
     
     /**
     @brief Function for calculating sum entropy,
@@ -153,7 +145,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getSumEntropy(const cv::Mat& in);
+    static double getSumEntropy(const cv::Mat& in);
     
     /**
     @brief Function for calculating difference variance,
@@ -161,7 +153,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getDifferenceVariance(const cv::Mat& in);
+    static double getDifferenceVariance(const cv::Mat& in);
     
     /**
     @brief Function for calculating difference entropy,
@@ -169,7 +161,7 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getDifferenceEntropy(const cv::Mat& in);
+    static double getDifferenceEntropy(const cv::Mat& in);
     
     /**
     @brief Function for calculating Info Measure of Correlation 1 and 2,
@@ -177,28 +169,22 @@ namespace pandora_vision
     @param in [cv::Mat&] The normalized GLCM matrix
     @return void
     **/          
-    void getInfoMeasuresCorr(const cv::Mat& in);
+    static void getInfoMeasuresCorr(const cv::Mat& in, double*feat1, double* feat2);
     
     /**
     @brief Function returning the haralick feature vector,
     http://murphylab.web.cmu.edu/publications/boland/boland_node26.html  
     @return std::vector [float] The vector containing the haralick features
     **/          
-    std::vector<double> getFeatures();
+    //std::vector<double> getFeatures();
     
     /**
     @brief This is the main function called to extract haralick features
     @param image [cv::Mat] The current frame to be processed
     @param void return
     */ 
-    void findHaralickFeatures(cv::Mat image);
+    static void findHaralickFeatures(const cv::Mat& image, std::vector<double>* haralickFeatures);
     
-    /**
-    @brief Function that cleans up haralickFeatureVector, to add
-    new elements for next frame
-    @return void
-    */ 
-    void emptyCurrentFrameFeatureVector();
   };
 }// namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_HARALICKFEATURE_EXTRACTOR_H

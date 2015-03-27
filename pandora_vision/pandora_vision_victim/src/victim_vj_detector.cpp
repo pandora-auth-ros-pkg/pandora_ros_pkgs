@@ -40,16 +40,16 @@
 namespace pandora_vision
 {
   /**
-   @brief Class Constructor
-   Initializes cascade_name and constants
-   and allocates memory for sequence of elements
-   @param cascade_path [std::string] the name of
-           the cascade to be loaded
-   @param model_path [std::string] the path to the model
-           to be loaded
-   @param bufferSize [int] number of frames in the frame buffer
-   @return void
-  */
+  @brief Class Constructor
+  Initializes cascade_name and constants
+  and allocates memory for sequence of elements
+  @param cascade_path [std::string] : the name of
+  the cascade to be loaded
+  @param model_path [std::string] : the path to the model
+  to be loaded
+  @param bufferSize [int] number : of frames in the frame buffer
+  @return void
+  **/
   VictimVJDetector::VictimVJDetector(
     std::string cascade_path, 
     std::string model_path)
@@ -67,22 +67,22 @@ namespace pandora_vision
   }
 
   /**
-   @brief Class Destructor
-   Deallocates all memory used for storing sequences of faces,
-   matrices and images
-  */
+  @brief Class Destructor
+  Deallocates all memory used for storing sequences of faces,
+  matrices and images
+  **/
   VictimVJDetector::~VictimVJDetector()
   {
   }
 
 
   /**
-    @brief Detects number of faces found in current frame.
-    The image buffer contributs to probability.
-    @param frame [cv::Mat] The frame to be scanned for faces
-    @return Integer of the sum of faces found in all
-    rotations of the frame
-  */
+  @brief Detects number of faces found in current frame.
+  The image buffer contributs to probability.
+  @param frame [cv::Mat] The frame to be scanned for faces
+  @return Integer of the sum of faces found in all
+  rotations of the frame
+  **/
   std::vector<DetectedVictim> VictimVJDetector::findFaces(cv::Mat frame)
   {
     cv::Mat tmp;
@@ -114,10 +114,10 @@ namespace pandora_vision
   }
 
   /**
-    @brief Creates the continuous table of faces found that contains
-    information for each face in every set of 4 values:
-    @return int[] table of face positions and sizes
-  */
+  @brief Creates the continuous table of faces found that contains
+  information for each face in every set of 4 values:
+  @return int[] table of face positions and sizes
+  **/
   std::vector<BoundingBox> VictimVJDetector::getAlertKeypoints()
   {
     std::vector<BoundingBox> table;
@@ -137,8 +137,8 @@ namespace pandora_vision
   }
 
   /**
-    @brief Returns the probability of the faces detected in the frame
-    @return [float] probability value
+  @brief Returns the probability of the faces detected in the frame
+  @return [float] probability value
   */  
   std::vector<float> VictimVJDetector::predictionToProbability
     (std::vector<float> prediction)
@@ -157,11 +157,11 @@ namespace pandora_vision
   }
 
   /**
-    @brief Calls detectMultiscale to scan frame for faces and drawFace
-      to create rectangles around the faces found in each frame
-    @param img [cv::Mat] the frame to be scaned.
-    @return [int] the number of faces found in each frame
-  */
+  @brief Calls detectMultiscale to scan frame for faces and drawFace
+  to create rectangles around the faces found in each frame
+  @param img [cv::Mat] the frame to be scaned.
+  @return [int] the number of faces found in each frame
+  **/
   std::vector<float> VictimVJDetector::detectFace(cv::Mat img)
   {
     std::vector<float> predictions;

@@ -39,6 +39,7 @@
 #define PANDORA_VISION_VICTIM_VICTIM_DETECTION_H 
 
 #include "pandora_vision_victim/victim_vj_detector.h"
+//#include "pandora_vision_victim/victim_parameters.h"
 #include "pandora_vision_victim/rgb_system_validator.h"
 #include "pandora_vision_victim/depth_system_validator.h"
 
@@ -75,16 +76,12 @@ namespace pandora_vision
       /// Instance of class face_detector
       VictimVJDetector _rgbViolaJonesDetector;
       //~ VictimVJDetector _victimDetector;
-      ///Instance of class rgbSystemValidator
-      RgbSystemValidator _rgbSystemValidator;
-      ///Instance of class depthSystemValidator
-      DepthSystemValidator _depthSystemValidator;
 
       /**
-       * @brief This method check in which state we are, according to
-       * the information sent from hole_detector_node
-       * @return void
-      */
+      @brief This method check in which state we are, according to
+      the information sent from hole_detector_node
+      @return void
+      **/
       void detectVictims(
         bool depthEnabled, 
         bool holesEnabled,
@@ -92,19 +89,33 @@ namespace pandora_vision
         const cv::Mat& depthImage,
         const pandora_vision_msgs::EnhancedHolesVectorMsg& msg
       );
-
+      
       /**
-       * Function called when new message appears from hole_detector_node
-       * @param msg [pandora_vision_msgs::EnhancedHolesVectorMsg&] The message
-       * @return void
-      */
+      @brief This method check in which state we are, according to
+      the information sent from hole_detector_node
+      @return void
+      **/
+      void dummyDetectVictims(bool depthEnabled, const cv::Mat& rgbImage, const sensor_msgs::Image& msg);
+      
+      /**
+      @brief Function called when new ROS message appears, for camera
+      @param msg [const sensor_msgs::Image&] The message
+      @return void
+      **/
+      void dummyimageCallback(const sensor_msgs::Image& msg);
+      
+      /**
+      Function called when new message appears from hole_detector_node
+      @param msg [pandora_vision_msgs::EnhancedHolesVectorMsg&] The message
+      @return void
+      **/
       void imageCallback(
         const pandora_vision_msgs::EnhancedHolesVectorMsg& msg);
 
       /**
-        @brief Function that retrieves the parent to the frame_id
-        @return bool Returns true is frame_id found or false if not 
-      */ 
+      @brief Function that retrieves the parent to the frame_id
+      @return bool Returns true is frame_id found or false if not 
+      **/ 
       bool getParentFrameId();
       
       std::map<std::string, std::string> _frame_ids_map;
@@ -136,13 +147,14 @@ namespace pandora_vision
       
       //----------------------------------------------------------------------//
       DetectionImages dImages;
+
       /**
-       *@brief Function that enables suitable subsystems, according
-       * to the current State 
-       * @param [std::vector<cv::Mat>] vector of images to be processed. Size of
-       * vector can be either 2 or 1, if we have both rgbd information or not
-       * @return void
-      */ 
+      @brief Function that enables suitable subsystems, according
+      to the current State 
+      @param [std::vector<cv::Mat>] vector of images to be processed. Size of
+      vector can be either 2 or 1, if we have both rgbd information or not
+      @return void
+      **/ 
       std::vector<DetectedVictim> victimFusion( 
         DetectionImages imgs, 
         DetectionMode detectionMode 
@@ -157,16 +169,16 @@ namespace pandora_vision
       ~VictimDetection();
 
       /**
-       * @brief Node's state manager
-       * @param newState [int] The robot's new state
-       * @return void
-      */
+      @brief Node's state manager
+      @param newState [int] The robot's new state
+      @return void
+     * */
       void startTransition(int newState);
 
       /**
-       * @brief After completion of state transition
-       * @return void
-      */
+      @brief After completion of state transition
+      @return void
+      **/
       void completeTransition(void);
 
   };

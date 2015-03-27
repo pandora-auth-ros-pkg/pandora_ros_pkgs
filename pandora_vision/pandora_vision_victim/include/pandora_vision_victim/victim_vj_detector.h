@@ -35,8 +35,8 @@
 * Author: Despoina Paschalidou
 *********************************************************************/
 
-#ifndef PANDORA_VISION_VICTIM_FACE_DETECTOR_H
-#define PANDORA_VISION_VICTIM_FACE_DETECTOR_H 
+#ifndef PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H
+#define PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H
 
 #include "pandora_vision_victim/victim_parameters.h"
 
@@ -46,7 +46,7 @@ namespace pandora_vision
   class VictimVJDetector
   {
     private:
-   
+
     std::vector<std::vector<cv::Rect_<int> > > faces;
 
     std::vector<cv::Rect_<int> > faces_total;
@@ -58,14 +58,14 @@ namespace pandora_vision
     cv::Ptr<cv::FaceRecognizer> trained_model;
 
     /**
-      @brief Calls detectMultiscale to scan frame for faces and drawFace
-        to create rectangles around the faces found in each frame
-      @param frame [cv::Mat] the frame to be scaned.
-      @return [int] the number of faces found in each frame
-    */
+    @brief Calls detectMultiscale to scan frame for faces and drawFace
+    to create rectangles around the faces found in each frame
+    @param frame [cv::Mat] the frame to be scaned.
+    @return [int] the number of faces found in each frame
+    **/
     std::vector<float> detectFace(cv::Mat frame);
 
-  public:
+    public:
 
     //! The Constructor
     VictimVJDetector(std::string cascade_path, std::string model_path);
@@ -76,25 +76,25 @@ namespace pandora_vision
     ~VictimVJDetector();
 
     /**
-      @brief Searches for faces in current frame.
-      @param frame [cv::Mat] The current frame
-      @return number [int] of faces found in current frame
+    @brief Searches for faces in current frame.
+    @param frame [cv::Mat] The current frame
+    @return number [int] of faces found in current frame
     **/
     std::vector<DetectedVictim> findFaces(cv::Mat frame);
 
     /**
-      @brief Creates the continuous table of faces found that contains
-      information for each face in every set of 4 values.
-      @return int[] table of face positions and sizes
-    */
+    @brief Creates the continuous table of faces found that contains
+    information for each face in every set of 4 values.
+    @return int[] table of face positions and sizes
+    **/
     std::vector<BoundingBox> getAlertKeypoints();
 
     /**
-      @brief Returns the probability of the faces detected in the frame
-      @return [float] probability value
-    */
+    @brief Returns the probability of the faces detected in the frame
+    @return [float] probability value
+    **/
     std::vector<float> predictionToProbability(std::vector<float> predictions);
 
   };
 }// namespace pandora_vision
-#endif  // PANDORA_VISION_VICTIM_FACE_DETECTOR_H
+#endif  // PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H

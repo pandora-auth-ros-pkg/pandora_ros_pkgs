@@ -67,7 +67,7 @@
 
 namespace pandora_vision
 {
-  
+
   enum VictimSource
   {
     RGB_VJ,
@@ -75,7 +75,7 @@ namespace pandora_vision
     RGB_SVM,
     DEPTH_RGB_SVM
   };
-  
+
   struct DetectedVictim
   {
     cv::Point2f keypoint;
@@ -85,13 +85,13 @@ namespace pandora_vision
   };
 
   enum DetectionMode
-  { 
+  {
     GOT_RGB = 1,
     GOT_HOLES_AND_DEPTH = 4,
     GOT_HOLES = 2,
     GOT_DEPTH = 3
   };
-  
+
   struct EnhancedMat
   {
     cv::Mat img;
@@ -106,29 +106,29 @@ namespace pandora_vision
     std::vector<EnhancedMat> rgbMasks;
     std::vector<EnhancedMat> depthMasks;
   };
-  
+
   struct BoundingBox
   {
     cv::Rect bounding_box;
     cv::Point2f keypoint;
   };
-  
+
   class VictimParameters
   {
     private:
-    
+
       ros::NodeHandle _nh;
-    
+
       void getGeneralParams(void);
       void getVictimDetectorParameters(void);
-    
+
     public:
       //!< Weight parameters for the victim subsystems
       static double rgb_vj_weight;
       static double depth_vj_weight;
       static double rgb_svm_weight;
       static double depth_svm_weight;
-      
+
       //!< Parameters for debug purposes
       static bool debug_img;
       static bool debug_img_publisher;
@@ -146,14 +146,14 @@ namespace pandora_vision
       static int modelImageWidth;
       static double hfov;
       static double vfov;
-      
+
       //!< parameters referring to the face detection algorithm
       static std::string cascade_path;
       static std::string model_url;
       static std::string model_path;
       static std::string rgb_classifier_path;
       static std::string depth_classifier_path;
-      
+
       //! parameters for svms
       static double rgb_svm_C;
       static double rgb_svm_gamma;
@@ -163,22 +163,22 @@ namespace pandora_vision
       static double depth_svm_gamma;
       static double depth_svm_prob_scaling;
       static double depth_svm_prob_translation;
-      
+
       //----------------------------------------------------------------------//
       //!< The dynamic reconfigure (motion's) parameters' server
       dynamic_reconfigure::Server
         <pandora_vision_victim::victim_dyn_reconfConfig>server;
       //!< The dynamic reconfigure (depth) parameters' callback
       dynamic_reconfigure::Server
-        <pandora_vision_victim::victim_dyn_reconfConfig>::CallbackType f;  
-      
+        <pandora_vision_victim::victim_dyn_reconfConfig>::CallbackType f;
+
       //!< Default contructor
-      VictimParameters(const std::string& ns);
-        
+      explicit VictimParameters(const std::string& ns);
+
       /**
         @brief The function called when a parameter is changed
         @param[in] config [const pandora_vision_motion::motion_cfgConfig&]
-        @param[in] level [const uint32_t] The level 
+        @param[in] level [const uint32_t] The level
         @return void
       **/
       void parametersCallback(
