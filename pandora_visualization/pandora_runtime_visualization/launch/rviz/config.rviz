@@ -94,7 +94,7 @@ Visualization Manager:
       Value: false
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /explorer/frontier_markers
+      Marker Topic: /explorer/explore_frontier_markers
       Name: Frontiers
       Namespaces:
         {}
