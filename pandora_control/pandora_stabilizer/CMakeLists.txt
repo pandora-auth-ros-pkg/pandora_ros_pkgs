@@ -3,6 +3,7 @@ project(pandora_stabilizer)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   tf
   std_msgs
   geometry_msgs
@@ -14,12 +15,12 @@ catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES rrbot_plugin
   CATKIN_DEPENDS
+    rospy
     roscpp
     tf
     std_msgs
     geometry_msgs
     sensor_msgs
-    roslint
 #  DEPENDS system_lib
 )
 
