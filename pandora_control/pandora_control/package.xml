@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_control</name>
   <version>0.0.0</version>
-  <description>Containts pandora control packages</description>
+  <description>Contains pandora control packages</description>
 
   <maintainer email="gkourosg@yahoo.gr">George Kouros</maintainer>
 
@@ -11,17 +11,17 @@
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_control/issues</url>
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_control</url>
 
-  <author>Dimitris Panayiotis Geromihalos</author>
+  <author>Dimitris Panayiotis Geromichalos</author>
   <author>Evangelos Apostolidis</author>
   <author>George Kouros</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>pandora_stabilizer</run_depend>
-  <run_depend>pandora_end_effector_planner</run_depend>
-  <run_depend>pandora_motor_control</run_depend>
+  <exec_depend>pandora_stabilizer</exec_depend>
+  <exec_depend>pandora_end_effector_planner</exec_depend>
+  <exec_depend>pandora_motor_control</exec_depend>
 
   <export>
     <metapackage/>
-  </export>  
+  </export>
 </package>
