@@ -33,7 +33,7 @@ add_executable(
   src/stabilizer_control.cpp
   src/stabilizer_control_node.cpp)
 target_link_libraries(
-  stabilizer_control_node 
+  stabilizer_control_node
   ${catkin_LIBRARIES} )
 
 # To check lint : catkin_make roslint_pandora_control

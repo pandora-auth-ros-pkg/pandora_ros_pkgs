@@ -44,7 +44,6 @@ catkin_package(
     actionlib_msgs
     tf
     urdf
-    roslint
     message_runtime
 #  DEPENDS system_lib
 )
