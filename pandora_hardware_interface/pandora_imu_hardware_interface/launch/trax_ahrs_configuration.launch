@@ -1,0 +1,8 @@
+<launch>
+  <node
+    name="trax_ahrs_configuration_node"
+    pkg="pandora_imu_hardware_interface"
+    type="trax_ahrs_configuration_node"
+    output="screen"
+    ns = "/imu"/>
+</launch>

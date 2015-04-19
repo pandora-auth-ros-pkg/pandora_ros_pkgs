@@ -33,6 +33,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  George Kouros
 *********************************************************************/
 #include "pandora_imu_hardware_interface/imu_hardware_interface.h"
 
@@ -44,25 +45,50 @@ namespace imu
     ros::NodeHandle nodeHandle)
   :
     nodeHandle_(nodeHandle),
-    imuSerialInterface(
-      "/dev/imu",
-      38400,
-      100)
-
+    imuSerialInterface("/dev/imu", 38400, 100),
+    ahrsSerialInterface("/dev/imu", 38400, 100)
   {
-    imuSerialInterface.init();
+    std::string device_type;
+    if (nodeHandle_.getParam("device_type", device_type))
+    {
+      if (device_type == "imu")
+      {
+        nodeHandle_.param("imu_roll_offset", rollOffset_, 0.0);
+        nodeHandle_.param("imu_pitch_offset", pitchOffset_, 0.0);
 
-    nodeHandle_.param("roll_offset", rollOffset_, 0.0);
-    nodeHandle_.param("pitch_offset", pitchOffset_, 0.0);
+        imuSerialInterface.init();
+        serialInterface = &imuSerialInterface;
+      }
+      else if (device_type == "ahrs")
+      {
+        nodeHandle_.param("ahrs_roll_offset", rollOffset_, 0.0);
+        nodeHandle_.param("ahrs_pitch_offset", pitchOffset_, 0.0);
 
-    // connect and register imu sensor interface
-    imuOrientation_[0] = 0;
-    imuOrientation_[1] = 0;
-    imuOrientation_[2] = 0;
+        ahrsSerialInterface.init();
+        serialInterface = &ahrsSerialInterface;
+      }
+      else
+      {
+        ROS_FATAL("[ERROR]: device_type not set in parameter server.");
+        exit(-1);
+      }
+    }
+
+    // initialize to zero imu data arrays
+    for (int ii = 0; ii < 3; ii++)
+    {
+      imuOrientation_[ii] = 0;
+      imuAngularVelocity_[ii] = 0;
+      imuLinearAcceleration_[ii] = 0;
+    }
     imuOrientation_[3] = 1;
+
     imuData_.orientation = imuOrientation_;
-    imuData_.name="/sensors/imu";  // /sensors might become namespace
+    imuData_.angular_velocity = imuAngularVelocity_;
+    imuData_.linear_acceleration = imuLinearAcceleration_;
+    imuData_.name="/sensors/imu";
     imuData_.frame_id="base_link";
+
     hardware_interface::ImuSensorHandle imuSensorHandle(imuData_);
     imuSensorInterface_.registerHandle(imuSensorHandle);
     registerInterface(&imuSensorInterface_);
@@ -74,9 +100,14 @@ namespace imu
 
   void ImuHardwareInterface::read()
   {
-    float yaw, pitch, roll;
-    imuSerialInterface.read();
-    imuSerialInterface.getData(&yaw, &pitch, &roll);
+    float yaw, pitch, roll, aV[3], lA[3];
+    serialInterface->read();
+    serialInterface->getData(
+      &yaw,
+      &pitch,
+      &roll,
+      aV,
+      lA);
 
     yaw = (yaw - 180) * (2*boost::math::constants::pi<double>()) / 360;
     pitch = -pitch * (2*boost::math::constants::pi<double>()) / 360;
@@ -89,6 +120,12 @@ namespace imu
     imuOrientation_[1] = orientation.y;
     imuOrientation_[2] = orientation.z;
     imuOrientation_[3] = orientation.w;
+
+    for (int ii = 0; ii < 3; ii++)
+    {
+      imuAngularVelocity_[ii] = static_cast<double>(aV[ii]);
+      imuLinearAcceleration_[ii] = static_cast<double>(lA[ii]);
+    }
   }
 }  // namespace imu
 }  // namespace pandora_hardware_interface

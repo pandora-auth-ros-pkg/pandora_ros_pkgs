@@ -33,6 +33,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  George Kouros
 *********************************************************************/
 #ifndef PANDORA_IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
 #define PANDORA_IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
@@ -43,7 +44,9 @@
 #include <hardware_interface/imu_sensor_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include <pandora_imu_hardware_interface/imu_serial_interface.h>
+#include "pandora_imu_hardware_interface/imu_serial_interface.h"
+#include "pandora_imu_hardware_interface/ahrs_serial_interface.h"
+#include "pandora_imu_hardware_interface/abstract_imu_serial_interface.h"
 
 namespace pandora_hardware_interface
 {
@@ -77,12 +80,18 @@ namespace imu
 
     private:
       ros::NodeHandle nodeHandle_;  //!< node handle
+
+      AbstractImuSerialInterface *serialInterface;  //!< ptr to abstract imu serial interface
       ImuSerialInterface imuSerialInterface;  //!< imu serial interface
+      AhrsSerialInterface ahrsSerialInterface;  //!< ahrs serial interface
+
       hardware_interface::ImuSensorInterface
         imuSensorInterface_;  //!< imu sensor interface
       hardware_interface::ImuSensorHandle::Data
         imuData_;  //!< imu sensor handle
       double imuOrientation_[4];  //!< quaternion orientaion
+      double imuAngularVelocity_[3];  //!< angular velocity
+      double imuLinearAcceleration_[3];  //!< linear acceleration
       double rollOffset_;  //!< offset to be applied to roll measurements
       double pitchOffset_;  //!< offset to be applied to pitch measurements
   };
