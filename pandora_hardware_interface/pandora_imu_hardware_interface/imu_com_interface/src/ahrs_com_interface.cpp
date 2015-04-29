@@ -35,18 +35,18 @@
 * Author: George Kouros
 *********************************************************************/
 
-#include <pandora_imu_hardware_interface/ahrs_serial_interface.h>
+#include <imu_com_interface/ahrs_com_interface.h>
 
 namespace pandora_hardware_interface
 {
 namespace imu
 {
-  AhrsSerialInterface::AhrsSerialInterface(
+  AhrsComInterface::AhrsComInterface(
     const std::string& device,
     int speed,
     int timeout)
   :
-    AbstractImuSerialInterface(device, speed, timeout),
+    AbstractImuComInterface(device, speed, timeout),
     regex_(
       ".*\x05(.{4})\x18(.{4})\x19(.{4})"
       "\x15(.{4})\x16(.{4})\x17(.{4})"
@@ -56,7 +56,7 @@ namespace imu
   }
 
 
-  void AhrsSerialInterface::init()
+  void AhrsComInterface::init()
   {
     if (serialPtr_ == NULL || !serialPtr_->isOpen())
     {
@@ -82,7 +82,7 @@ namespace imu
   }
 
 
-  void AhrsSerialInterface::read()
+  void AhrsComInterface::read()
   {
     if (serialPtr_ == NULL){
       ROS_ERROR("read() called before init(). Calling init() now...");
@@ -116,7 +116,7 @@ namespace imu
   }
 
 
-  void AhrsSerialInterface::write(char* commandCode, size_t length)
+  void AhrsComInterface::write(char* commandCode, size_t length)
   {
     unsigned char command[4+length];
     command[0] = (4 + length) & 0xFF00;
@@ -135,7 +135,7 @@ namespace imu
   }
 
 
-  bool AhrsSerialInterface::check(const std::string& packet, int crc)
+  bool AhrsComInterface::check(const std::string& packet, int crc)
   {
     int crcInPacket =
       ((packet[packet.size()-2] << 8) & 0xFF00) |
@@ -148,7 +148,7 @@ namespace imu
   }
 
 
-  uint16_t AhrsSerialInterface::calcCrc(
+  uint16_t AhrsComInterface::calcCrc(
     unsigned char* packet, size_t packetSize, bool storeCrcInPacket)
   {
     uint16_t crc = 0;
@@ -167,7 +167,7 @@ namespace imu
   }
 
 
-  void AhrsSerialInterface::parse(const std::string& packet)
+  void AhrsComInterface::parse(const std::string& packet)
   {
     boost::match_results<std::string::const_iterator> data;
 
@@ -196,16 +196,6 @@ namespace imu
           data[ii + 7].str().c_str(),
           sizeof(float));
       }
-
-      ROS_DEBUG(" yaw: %f   pitch: %f   roll: %f", yaw_, pitch_, roll_);
-/*      ROS_DEBUG(
-        "yaw[%f], pitch[%f], roll[%f], "
-        "Ax[%f], Ay[%x], Az[%f], "
-        "Gx[%f], Gy[%x], Gz[%f]",
-        yaw_, pitch_, roll_,
-        linearAcceleration_[0], linearAcceleration_[1], linearAcceleration_[0],
-        angularVelocity_[0], angularVelocity_[1], angularVelocity_[2]);
-*/
     }
     else
       ROS_ERROR("Did not match received packet to desirable pattern");

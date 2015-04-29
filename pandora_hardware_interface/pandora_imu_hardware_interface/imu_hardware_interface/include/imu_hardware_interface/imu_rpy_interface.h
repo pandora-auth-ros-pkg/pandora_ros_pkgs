@@ -35,65 +35,74 @@
 * Author:  George Kouros
 *********************************************************************/
 
-#include "pandora_imu_hardware_interface/ahrs_serial_interface.h"
+#ifndef IMU_HARDWARE_INTERFACE_IMU_RPY_INTERFACE_H
+#define IMU_HARDWARE_INTERFACE_IMU_RPY_INTERFACE_H
 
-/*
- * Node Used for the setup of the PNI Trax AHRS, so that the device can be used
- * with the imu_hardware_interface_node
- */
+#include <hardware_interface/internal/hardware_resource_manager.h>
+#include <string>
 
-int main(int argc, char **argv)
+namespace pandora_hardware_interface
 {
-  ros::init(argc, argv, "trax_ahrs_configuration_node");
-  ros::NodeHandle nodeHandle;
+namespace imu
+{
+  /**
+  @brief A handle used to read the state of a IMU sensor.
+  @details Depending on the sensor, not all readings exposed by the handle class
+  might be available
+  **/
+  class ImuRPYHandle
+  {
+  public:
+    struct Data
+    {
+      Data()
+        : name(""),
+          frame_id(""),
+          roll(0),
+          pitch(0),
+          yaw(0)
+      {
+      }
 
-  pandora_hardware_interface::imu::AhrsSerialInterface
-    serial("/dev/imu", 38400, 100);
+      std::string name;  //!< The name of the sensor
+      std::string frame_id;  //!< The reference frame to which this sensor is associated
+      double* roll;  //!< roll ptr
+      double* pitch;  //!< pitch ptr
+      double* yaw;  //!< yaw ptr
+    };
 
-  serial.init();
-  ROS_INFO("Starting Configuration:");
-  ROS_INFO("=======================");
+    ImuRPYHandle(const Data& data = Data())
+      : name_(data.name),
+        frame_id_(data.frame_id),
+        roll_(data.roll),
+        pitch_(data.pitch),
+        yaw_(data.yaw)
+    {
+    }
 
-  // configure device for ahrs mode (not compass mode)
-  char setFunctionalModeCmd[2] = {K_SET_FUNCTIONAL_MODE, K_AHRS_MODE};
-  serial.write(setFunctionalModeCmd, 2);
-  ROS_INFO("Functional Mode of device set to AHRS mode");
+    std::string getName() const {return name_;}
+    std::string getFrameId() const {return frame_id_;}
+    inline const double* getRoll() const {return roll_;}
+    inline const double* getPitch() const {return pitch_;}
+    inline const double* getYaw() const {return yaw_;}
 
-  // configure endianess of data in ahrs packet
-  char endianessCmd[3] = {
-    K_SET_CONFIG,
-    K_BIG_ENDIAN,
-    K_FALSE};
-  serial.write(endianessCmd, 3);
-  ROS_INFO("Endianess of data in packets set to little endian");
+  private:
+    std::string name_;
+    std::string frame_id_;
 
-  // configure packet composition of ahrs
-  char pkgCompositionCmd[11] = {
-    K_SET_DATA_COMPONENTS,
-    0x09,
-    K_HEADING,
-    K_PITCH,
-    K_ROLL,
-    K_ACCEL_X,
-    K_ACCEL_Y,
-    K_ACCEL_Z,
-    K_GYRO_X,
-    K_GYRO_Y,
-    K_GYRO_Z};
-  serial.write(pkgCompositionCmd, 11);
-  ROS_INFO("Data composition configured as: Y,P,R,Ax,Ay,Az,Gx,Gy,Gz");
+    double* roll_;
+    double* pitch_;
+    double* yaw_;
+  };
 
-  // configure ahrs for polling mode
-  char setNonContinuousModeCmd = K_STOP_CONTINUOUS_MODE;
-  serial.write(&setNonContinuousModeCmd, 1);
-  ROS_INFO("Acquisition Mode set to polling");
-
-
-  // tell ahrs to save the configurations
-  char saveConfigurationsCmd = K_SAVE;
-  serial.write(&saveConfigurationsCmd, 1);
-  ROS_INFO("=====================");
-  ROS_INFO("Configurations saved!");
-
-  return 0;
-}
+  /**
+  @class ImuRPYInterface
+  @briefHardware interface to support reading the state of an IMU sensor
+  **/
+  class ImuRPYInterface :
+    public hardware_interface::HardwareResourceManager<ImuRPYHandle>
+  {
+  };
+}  // namespace imu
+}  // namespace pandora_hardware_interface
+#endif  // IMU_HARDWARE_INTERFACE_IMU_RPY_INTERFACE_H

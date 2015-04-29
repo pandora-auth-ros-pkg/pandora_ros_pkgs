@@ -35,8 +35,8 @@
 * Author: George Kouros
 *********************************************************************/
 
-#ifndef PANDORA_IMU_HARDWARE_INTERFACE_ABSTRACT_IMU_SERIAL_INTERFACE_H
-#define PANDORA_IMU_HARDWARE_INTERFACE_ABSTRACT_IMU_SERIAL_INTERFACE_H
+#ifndef IMU_COM_INTERFACE_ABSTRACT_IMU_COM_INTERFACE_H
+#define IMU_COM_INTERFACE_ABSTRACT_IMU_COM_INTERFACE_H
 
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
@@ -50,11 +50,10 @@ namespace pandora_hardware_interface
 namespace imu
 {
   /**
-   @class AbstractImuSerialInterface
-   @brief Abstract Serial Interface class inherited by Compass OS-4000 
-   serial interface and Trax AHRS serial interface 
+   @class AbstractComSerialInterface
+   @brief Abstract IMU Communication Interface
   **/
-  class AbstractImuSerialInterface : private boost::noncopyable
+  class AbstractImuComInterface : private boost::noncopyable
   {
    public:
     /**
@@ -63,7 +62,7 @@ namespace imu
      @param speed [int] : Serial communication speed (baud rate)
      @param timeout [int] : Connection response timeout
     **/
-    AbstractImuSerialInterface(
+    AbstractImuComInterface(
        const std::string& device,
         int speed,
         int timeout)
@@ -196,4 +195,4 @@ namespace imu
 }  // namespace imu
 }  // namespace pandora_hardware_interface
 
-#endif  // PANDORA_IMU_HARDWARE_INTERFACE_ABSTRACT_IMU_SERIAL_INTERFACE_H
+#endif  // IMU_COM_INTERFACE_ABSTRACT_IMU_COM_INTERFACE_H

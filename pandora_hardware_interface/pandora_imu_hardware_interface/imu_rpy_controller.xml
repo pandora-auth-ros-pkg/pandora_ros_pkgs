@@ -1,0 +1,11 @@
+<library path="lib/libimu_rpy_controller">
+  <class
+    name="pandora_imu/ImuRPYController"
+    type="pandora_hardware_interface::imu::ImuRPYController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes roll, pitch, yaw readings from the imu sensor as
+    pandora_sensor_msgs/ImuRPY.
+  </description>
+  </class>
+</library>

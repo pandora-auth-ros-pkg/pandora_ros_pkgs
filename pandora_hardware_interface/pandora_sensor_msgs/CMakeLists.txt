@@ -12,6 +12,7 @@ add_message_files(
     BatteryMsg.msg
     ThermalMeanMsg.msg
     Co2Msg.msg
+    ImuRPY.msg
   )
 
 generate_messages(

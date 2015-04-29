@@ -2,7 +2,7 @@
 *
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+*  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -32,40 +32,68 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  Evangelos Apostolidis
+* Author:  George Kouros
 *********************************************************************/
-#include "pandora_imu_hardware_interface/imu_hardware_interface.h"
+
+#include "imu_com_interface/ahrs_com_interface.h"
+
+/*
+ * Node Used for the setup of the PNI Trax AHRS sensor, so that the device can 
+ * be used with the imu_hardware_interface_node
+ */
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "imu_hardware_interface_node");
+  ros::init(argc, argv, "trax_ahrs_configuration_node");
   ros::NodeHandle nodeHandle;
 
-  pandora_hardware_interface::imu::ImuHardwareInterface imuHardwareInterface(
-    nodeHandle);
-  controller_manager::ControllerManager controllerManager(
-    &imuHardwareInterface,
-    nodeHandle);
+  pandora_hardware_interface::imu::AhrsComInterface
+    serial("/dev/imu", 38400, 100);
 
-  ros::Time
-    last,
-    now;
-  now = last = ros::Time::now();
-  ros::Duration period(1.0);
+  serial.init();
+  ROS_INFO("Starting Configuration:");
+  ROS_INFO("=======================");
 
-  ros::AsyncSpinner spinner(2);
-  spinner.start();
+  // configure device for ahrs mode (not compass mode)
+  char setFunctionalModeCmd[2] = {K_SET_FUNCTIONAL_MODE, K_AHRS_MODE};
+  serial.write(setFunctionalModeCmd, 2);
+  ROS_INFO("Functional Mode of device set to AHRS mode");
 
-  while ( ros::ok() )
-  {
-    now = ros::Time::now();
-    period = now - last;
-    last = now;
+  // configure endianess of data in ahrs packet
+  char endianessCmd[3] = {
+    K_SET_CONFIG,
+    K_BIG_ENDIAN,
+    K_FALSE};
+  serial.write(endianessCmd, 3);
+  ROS_INFO("Endianess of data in packets set to little endian");
 
-    imuHardwareInterface.read();
-    controllerManager.update(now, period);
-    // ~ ros::Duration(0.1).sleep();
-  }
-  spinner.stop();
+  // configure packet composition of ahrs
+  char pkgCompositionCmd[11] = {
+    K_SET_DATA_COMPONENTS,
+    0x09,
+    K_HEADING,
+    K_PITCH,
+    K_ROLL,
+    K_ACCEL_X,
+    K_ACCEL_Y,
+    K_ACCEL_Z,
+    K_GYRO_X,
+    K_GYRO_Y,
+    K_GYRO_Z};
+  serial.write(pkgCompositionCmd, 11);
+  ROS_INFO("Data composition configured as: Y,P,R,Ax,Ay,Az,Gx,Gy,Gz");
+
+  // configure ahrs for polling mode
+  char setNonContinuousModeCmd = K_STOP_CONTINUOUS_MODE;
+  serial.write(&setNonContinuousModeCmd, 1);
+  ROS_INFO("Acquisition Mode set to polling");
+
+
+  // tell ahrs to save the configurations
+  char saveConfigurationsCmd = K_SAVE;
+  serial.write(&saveConfigurationsCmd, 1);
+  ROS_INFO("=====================");
+  ROS_INFO("Configurations saved!");
+
   return 0;
 }

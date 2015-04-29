@@ -2,7 +2,7 @@
 *
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+*  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -35,66 +35,89 @@
 * Author:  Evangelos Apostolidis
 * Author:  George Kouros
 *********************************************************************/
-#ifndef PANDORA_IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
-#define PANDORA_IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
+
+#ifndef IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
+#define IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
 
 #include "ros/ros.h"
 #include "tf/tf.h"
+#include <dynamic_reconfigure/server.h>
+#include <pandora_imu_hardware_interface/ImuHardwareInterfaceConfig.h>
 #include <boost/math/constants/constants.hpp>
 #include <hardware_interface/imu_sensor_interface.h>
+#include <imu_hardware_interface/imu_rpy_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include "pandora_imu_hardware_interface/imu_serial_interface.h"
-#include "pandora_imu_hardware_interface/ahrs_serial_interface.h"
-#include "pandora_imu_hardware_interface/abstract_imu_serial_interface.h"
+#include "imu_com_interface/imu_com_interface.h"
+#include "imu_com_interface/ahrs_com_interface.h"
+#include "imu_com_interface/abstract_imu_com_interface.h"
 
 namespace pandora_hardware_interface
 {
 namespace imu
 {
   /**
-   @class ImuHardwareInterface
-   @brief Allows the controller manager to communicate with the IMU
+  @class ImuHardwareInterface
+  @brief Allows the controller manager to communicate with the IMU
   **/
   class ImuHardwareInterface : public hardware_interface::RobotHW
   {
     public:
       /**
-       @brief Default Contstructor
-       @details Initializes class variables and registers handle and interface
-       @param nodeHandle [ros::NodeHandle] : node handle instance
+      @brief Default Contstructor
+      @details Initializes class variables and registers handle and interface
+      @param nodeHandle [ros::NodeHandle] : node handle instance
       **/
-      explicit ImuHardwareInterface(
-        ros::NodeHandle nodeHandle);
+      explicit ImuHardwareInterface(ros::NodeHandle nodeHandle);
 
       /**
-       @brief Default Destructor
+      @brief Default Destructor
       **/
       ~ImuHardwareInterface();
 
       /**
-       @brief Reads yaw,pitch,roll and creates a quaternion orientation msg
-       @return void
+      @brief Reads yaw,pitch,roll and creates a quaternion orientation msg
+      @return void
       **/
       void read();
+
+      /**
+      @brief Roll and Pitch dynamic reconfigure callback
+      @return void
+      **/
+      void dynamicReconfigureCallback(
+        const pandora_imu_hardware_interface::ImuHardwareInterfaceConfig &config,
+        uint32_t level);
 
     private:
       ros::NodeHandle nodeHandle_;  //!< node handle
 
-      AbstractImuSerialInterface *serialInterface;  //!< ptr to abstract imu serial interface
-      ImuSerialInterface imuSerialInterface;  //!< imu serial interface
-      AhrsSerialInterface ahrsSerialInterface;  //!< ahrs serial interface
+      AbstractImuComInterface *comInterface_;  //!< ptr to abstract imu communication interface
 
       hardware_interface::ImuSensorInterface
         imuSensorInterface_;  //!< imu sensor interface
       hardware_interface::ImuSensorHandle::Data
-        imuData_;  //!< imu sensor handle
+        imuData_;  //!< imu sensor handle data
+
+      pandora_hardware_interface::imu::ImuRPYInterface
+        imuRPYInterface_;  //!< imu rpy interface
+      pandora_hardware_interface::imu::ImuRPYHandle::Data
+        imuRPYData_;  //!< imu rpy handle data
+
+      dynamic_reconfigure::Server<
+        pandora_imu_hardware_interface::ImuHardwareInterfaceConfig>
+          server_;  //!< dynamic reconfigure server
+
       double imuOrientation_[4];  //!< quaternion orientaion
       double imuAngularVelocity_[3];  //!< angular velocity
       double imuLinearAcceleration_[3];  //!< linear acceleration
+      double* imuRoll_;  //!< roll
+      double* imuPitch_;  //!< pitch
+      double* imuYaw_;  //!< yaw
+
       double rollOffset_;  //!< offset to be applied to roll measurements
       double pitchOffset_;  //!< offset to be applied to pitch measurements
   };
 }  // namespace imu
 }  // namespace pandora_hardware_interface
-#endif  // PANDORA_IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H
+#endif  // IMU_HARDWARE_INTERFACE_IMU_HARDWARE_INTERFACE_H

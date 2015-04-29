@@ -13,6 +13,7 @@
 
   <author>Chris Zalidis</author>  
   <author>Evangelos Apostolidis</author>
+  <author>George Kouros</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   
@@ -21,10 +22,15 @@
   <depend>roscpp</depend>
   <depend>tf</depend>
   <depend>controller_manager</depend>
+  <depend>controller_interface</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>pandora_sensor_msgs</depend>
   <depend>serial</depend>
+  <depend>pluginlib</depend>
 
   <exec_depend>ros_controllers</exec_depend>
 
   <export>
+    <controller_interface plugin="${prefix}/imu_rpy_controller.xml"/>
   </export>
 </package>

@@ -32,71 +32,40 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Chris Zalidis
+* Author:  Evangelos Apostolidis
 *********************************************************************/
+#include "imu_hardware_interface/imu_hardware_interface.h"
 
-#ifndef PANDORA_IMU_HARDWARE_INTERFACE_IMU_SERIAL_INTERFACE_H
-#define PANDORA_IMU_HARDWARE_INTERFACE_IMU_SERIAL_INTERFACE_H
-
-#include <boost/utility.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
-
-#include "pandora_imu_hardware_interface/abstract_imu_serial_interface.h"
-
-namespace pandora_hardware_interface
+int main(int argc, char **argv)
 {
-namespace imu
-{
-  /**
-   @class ImuSerialInterface
-   @brief Class used for serial communication with Compass OS-4000 IMU
-  **/
-  class ImuSerialInterface : public AbstractImuSerialInterface
+  ros::init(argc, argv, "imu_hardware_interface_node");
+  ros::NodeHandle nodeHandle;
+
+  pandora_hardware_interface::imu::ImuHardwareInterface imuHardwareInterface(
+    nodeHandle);
+  controller_manager::ControllerManager controllerManager(
+    &imuHardwareInterface,
+    nodeHandle);
+
+  ros::Time
+    last,
+    now;
+  now = last = ros::Time::now();
+  ros::Duration period(1.0);
+
+  ros::AsyncSpinner spinner(2);
+  spinner.start();
+
+  while ( ros::ok() )
   {
-   public:
-    /**
-     @brief Default Constructor
-     @param device [std::string &] : IMU device com port name
-     @param speed [int] : Serial communication speed (baud rate)
-     @param timeout [int] : Connection response timeout
-    **/
-    ImuSerialInterface(
-      const std::string& device,
-      int speed,
-      int timeout);
+    now = ros::Time::now();
+    period = now - last;
+    last = now;
 
-    /**
-     @brief Establishes serial communication
-     @return void
-    **/
-    void init();
-
-    /**
-     @brief Reads raw data from the IMU and calculates yaw, pitch and roll 
-     @details Init must be called first to establish serial communication
-     @return void
-    **/
-    void read();
-
-   private:
-    /**
-     @brief Transform raw IMU data to yaw, pitch and roll meausurements
-     @param packet [std::string&] : packet containing the raw imu data
-     @return void
-    **/
-    void parse(const std::string& packet);
-
-    /**
-     @brief Check size of latest received IMU data packet
-     @return bool
-    **/
-    bool check(const std::string& packet, int crc);
-
-    //!< expression used to extract data from imu packet
-    const boost::regex regex_;
-  };
-}  // namespace imu
-}  // namespace pandora_hardware_interface
-
-#endif  // PANDORA_IMU_HARDWARE_INTERFACE_IMU_SERIAL_INTERFACE_H
+    imuHardwareInterface.read();
+    controllerManager.update(now, period);
+    // ~ ros::Duration(0.1).sleep();
+  }
+  spinner.stop();
+  return 0;
+}

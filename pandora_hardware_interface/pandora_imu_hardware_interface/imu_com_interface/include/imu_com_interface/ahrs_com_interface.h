@@ -35,15 +35,15 @@
 * Author: George Kouros
 *********************************************************************/
 
-#ifndef PANDORA_IMU_HARDWARE_INTERFACE_AHRS_SERIAL_INTERFACE_H
-#define PANDORA_IMU_HARDWARE_INTERFACE_AHRS_SERIAL_INTERFACE_H
+#ifndef IMU_COM_INTERFACE_AHRS_COM_INTERFACE_H
+#define IMU_COM_INTERFACE_AHRS_COM_INTERFACE_H
 
 #include <boost/utility.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <stdlib.h>
 
-#include "pandora_imu_hardware_interface/abstract_imu_serial_interface.h"
+#include "imu_com_interface/abstract_imu_com_interface.h"
 
 #define K_SET_DATA_COMPONENTS 0x03
 #define K_GET_DATA 0x04
@@ -75,10 +75,10 @@ namespace pandora_hardware_interface
 namespace imu
 {
   /**
-   @class AhrsSerialInterface
-   @brief Class used for serial communication with a Trax AHRS
+   @class AhrsComInterface
+   @brief Class used for serial communication with a Trax AHRS sensor
   **/
-  class AhrsSerialInterface : public AbstractImuSerialInterface
+  class AhrsComInterface : public AbstractImuComInterface
   {
    public:
     /**
@@ -87,7 +87,7 @@ namespace imu
      @param speed [int] : Serial communication speed (baud rate)
      @param timeout [int] : Connection response timeout
     **/
-    AhrsSerialInterface(
+    AhrsComInterface(
       const std::string& device,
       int speed,
       int timeout);
@@ -148,4 +148,4 @@ namespace imu
 }  // namespace imu
 }  // namespace pandora_hardware_interface
 
-#endif  // PANDORA_IMU_HARDWARE_INTERFACE_AHRS_SERIAL_INTERFACE_H
+#endif  // IMU_COM_INTERFACE_AHRS_COM_INTERFACE_H

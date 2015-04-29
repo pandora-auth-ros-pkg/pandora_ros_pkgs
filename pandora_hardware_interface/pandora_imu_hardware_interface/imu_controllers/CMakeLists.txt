@@ -1,0 +1,9 @@
+add_library(
+  imu_rpy_controller
+  src/imu_rpy_controller.cpp)
+add_dependencies(
+  imu_rpy_controller
+  ${catkin_EXPORTED_TARGETS})
+target_link_libraries(
+  imu_rpy_controller
+  ${catkin_LIBRARIES})

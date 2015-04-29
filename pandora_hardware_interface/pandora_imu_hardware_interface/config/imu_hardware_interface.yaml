@@ -1,5 +1,0 @@
-device_type: 'ahrs'
-imu_roll_offset: -0.0628
-imu_pitch_offset: 0.01047
-ahrs_roll_offset: 0.0
-ahrs_pitch_offset: 0.0

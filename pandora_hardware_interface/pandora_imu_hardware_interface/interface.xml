@@ -3,6 +3,7 @@
     /imu_hardware_interface_node
 
     <publisher>/sensors/imu</publisher>
+    <publisher>/sensors/imu_rpy</publisher>
   </node>
 
   <node>

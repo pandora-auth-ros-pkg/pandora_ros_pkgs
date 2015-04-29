@@ -1,0 +1,3 @@
+imu_rpy_controller:
+  type: pandora_imu/ImuRPYController
+  publish_rate: 50

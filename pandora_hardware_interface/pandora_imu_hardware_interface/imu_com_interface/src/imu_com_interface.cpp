@@ -35,26 +35,25 @@
 * Author: Chris Zalidis
 *********************************************************************/
 
-#include <pandora_imu_hardware_interface/imu_serial_interface.h>
+#include <imu_com_interface/imu_com_interface.h>
 
 namespace pandora_hardware_interface
 {
 namespace imu
 {
-  ImuSerialInterface::ImuSerialInterface(
+  ImuComInterface::ImuComInterface(
       const std::string& device,
       int speed,
       int timeout)
   :
-    AbstractImuSerialInterface(device, speed, timeout),
-    // TODO(czalidis): add accel
+    AbstractImuComInterface(device, speed, timeout),
     regex_(
       "C([0-9]+\\.[0-9]+)P([-]*[0-9]+\\.[0-9]+)R([-]*[0-9]+\\.[0-9]+)"
       "Ax([-]*[0-9]+\\.[0-9]+)Ay([-]*[0-9]+\\.[0-9]+)Az([-]*[0-9]+\\.[0-9]+).*")
   {
   }
 
-  void ImuSerialInterface::init()
+  void ImuComInterface::init()
   {
     if (serialPtr_ == NULL)
     {
@@ -79,7 +78,7 @@ namespace imu
     }
   }
 
-  void ImuSerialInterface::read()
+  void ImuComInterface::read()
   {
     if (serialPtr_ == NULL)
       throw std::logic_error("read() called before init()!");
@@ -118,7 +117,7 @@ namespace imu
       parse(packet);
   }
 
-  bool ImuSerialInterface::check(const std::string& packet, int crc)
+  bool ImuComInterface::check(const std::string& packet, int crc)
   {
     char sum = 0;
 
@@ -134,7 +133,7 @@ namespace imu
     return false;
   }
 
-  void ImuSerialInterface::parse(const std::string& packet)
+  void ImuComInterface::parse(const std::string& packet)
   {
     boost::match_results<std::string::const_iterator> data;
 
@@ -149,11 +148,6 @@ namespace imu
           9.81 * boost::lexical_cast<float>(data[ii + 4]);
       }
     }
-/*
-    ROS_INFO("yaw[%f], pitch[%f], roll[%f], Ax[%f], Ay[%f], Az[%f]", 
-      yaw_, pitch_, roll_, linearAcceleration_[0], linearAcceleration_[1], 
-      linearAcceleration_[2]);
-*/
   }
 }  // namespace imu
 }  // namespace pandora_hardware_interface
