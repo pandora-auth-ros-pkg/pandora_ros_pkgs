@@ -32,45 +32,22 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  Evangelos Apostolidis
+* Author: Vasilis Bosdelekidis
 *********************************************************************/
 
-#include "linear_motor_hardware_interface/linear_motor_hardware_interface.h"
+#ifndef LINEAR_MOTOR_COM_INTERFACE_JRK_DEFINITIONS_H
+#define LINEAR_MOTOR_COM_INTERFACE_JRK_DEFINITIONS_H
 
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "linear_motor_hardware_interface_node");
-  ros::NodeHandle nodeHandle;
+#define INPUT_VARIABLE 0xA1
+#define TARGET_VARIABLE 0xA3
+#define FEEDBACK_VARIABLE 0xA5
+#define SCALED_FEEDBACK_VARIABLE 0xA7
+#define ERROR_SUM_VARIABLE 0xA9
+#define DUTY_CYCLE_TARGET_VARIABLE 0xAB
+#define DUTY_CYCLE_VARIABLE 0xAD
+#define CURRENT_VARIABLE 0x8F
+#define PID_PERIOD_COUNT_VARIABLE 0xB1
+#define ERRORS_FLAG_VARIABLE 0xB5
+#define ERRORS_HALTING_VARIABLE 0xB3
 
-  pandora_hardware_interface::linear::LinearMotorHardwareInterface
-    linearMotorHardwareInterface(
-      nodeHandle);
-  controller_manager::ControllerManager controllerManager(
-    &linearMotorHardwareInterface,
-    nodeHandle);
-
-  ros::Time
-    last,
-    now;
-  now = last = ros::Time::now();
-  ros::Duration period(1.0);
-
-  ros::AsyncSpinner spinner(2);
-  spinner.start();
-
-  ros::Rate rate(10);
-
-  while ( ros::ok() )
-  {
-    now = ros::Time::now();
-    period = now - last;
-    last = now;
-
-    linearMotorHardwareInterface.read();
-    controllerManager.update(now, period);
-    linearMotorHardwareInterface.write();
-    rate.sleep();
-  }
-  spinner.stop();
-  return 0;
-}
+#endif  // LINEAR_MOTOR_COM_INTERFACE_JRK_DEFINITIONS_H

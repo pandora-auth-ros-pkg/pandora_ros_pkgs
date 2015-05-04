@@ -42,7 +42,8 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include <jrk_interface/JrkSerial.h>
+#include "linear_motor_com_interface/jrk_com_interface.h"
+#include "linear_motor_com_interface/firgelli_com_interface.h"
 
 namespace pandora_hardware_interface
 {
@@ -50,10 +51,16 @@ namespace linear
 {
   class LinearMotorHardwareInterface : public hardware_interface::RobotHW
   {
+    public:
+      explicit LinearMotorHardwareInterface(
+        ros::NodeHandle nodeHandle);
+      ~LinearMotorHardwareInterface();
+      void read();
+      void write();
+
     private:
       ros::NodeHandle nodeHandle_;
-      JrkSerial* serialIO_;
-
+      AbstractLinearMotorComInterface* comInterfacePtr_;
       hardware_interface::JointStateInterface jointStateInterface_;
       hardware_interface::PositionJointInterface positionJointInterface_;
       std::string jointName_;
@@ -61,13 +68,6 @@ namespace linear
       double position_;
       double velocity_;
       double effort_;
-
-    public:
-      explicit LinearMotorHardwareInterface(
-        ros::NodeHandle nodeHandle);
-      ~LinearMotorHardwareInterface();
-      void read();
-      void write();
   };
 }  // namespace linear
 }  // namespace pandora_hardware_interface

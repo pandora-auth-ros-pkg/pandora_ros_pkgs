@@ -1,5 +1,7 @@
 linear_motor_joint: &linear_motor_joint linear_elevator_joint
 
+elevator_type: firgelli
+
 joint_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50

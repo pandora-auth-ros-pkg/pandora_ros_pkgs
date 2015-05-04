@@ -1,0 +1,23 @@
+add_library(
+  jrk_com_interface
+  src/jrk_com_interface.cpp
+  )
+add_executable(
+  pololu_jrk_communicator_node
+  src/jrk_communicator.cpp
+  )
+target_link_libraries(
+  pololu_jrk_communicator_node
+  jrk_com_interface
+  ${catkin_LIBRARIES}
+  )
+
+add_library(
+  firgelli_com_interface
+  src/firgelli_com_interface.cpp
+  )
+target_link_libraries(
+  firgelli_com_interface
+  ${LIBUSB_1_LIBRARIES}
+  ${catkin_LIBRARIES}
+  )

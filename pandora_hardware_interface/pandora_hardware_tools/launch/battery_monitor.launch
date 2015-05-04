@@ -1,0 +1,7 @@
+<launch>
+  <node
+    name="battery_monitor"
+    pkg="pandora_hardware_tools"
+    type="battery_monitor.py"
+    output="screen"/>
+</launch>

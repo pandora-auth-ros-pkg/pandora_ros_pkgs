@@ -2,7 +2,7 @@
 *
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+*  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -32,45 +32,30 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  Evangelos Apostolidis
+* Author: Petros Evangelakos
 *********************************************************************/
 
-#include "linear_motor_hardware_interface/linear_motor_hardware_interface.h"
+#ifndef LINEAR_MOTOR_COM_INTERFACE_FIRGELLI_DEFINITIONS_H
+#define LINEAR_MOTOR_COM_INTERFACE_FIRGELLI_DEFINITIONS_H
 
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "linear_motor_hardware_interface_node");
-  ros::NodeHandle nodeHandle;
-
-  pandora_hardware_interface::linear::LinearMotorHardwareInterface
-    linearMotorHardwareInterface(
-      nodeHandle);
-  controller_manager::ControllerManager controllerManager(
-    &linearMotorHardwareInterface,
-    nodeHandle);
-
-  ros::Time
-    last,
-    now;
-  now = last = ros::Time::now();
-  ros::Duration period(1.0);
-
-  ros::AsyncSpinner spinner(2);
-  spinner.start();
-
-  ros::Rate rate(10);
-
-  while ( ros::ok() )
-  {
-    now = ros::Time::now();
-    period = now - last;
-    last = now;
-
-    linearMotorHardwareInterface.read();
-    controllerManager.update(now, period);
-    linearMotorHardwareInterface.write();
-    rate.sleep();
-  }
-  spinner.stop();
-  return 0;
-}
+#define  SET_ACCURACY 0x01
+#define  SET_RETRACT_LIMIT 0x02
+#define  SET_EXTEND_LIMIT 0x03
+#define  SET_MOVEMENT_THRESHOLD 0x04
+#define   SET_STALL_TIME 0x05
+#define  SET_PWM_THRESHOLD 0x06
+#define  SET_DERIVATIVE_THRESHOLD   0x07
+#define   SET_DERIVATIVE_MAXIMUM     0x08
+#define  SET_DERIVATIVE_MINIMUM   0x09
+#define SET_PWM_MAXIMUM   0x0A
+#define SET_PWM_MINIMUM  0x0B
+#define  SET_PROPORTIONAL_GAIN  0x0C
+#define  SET_DERIVATIVE_GAIN 0x0D
+#define  SET_AVERAGE_RC  0x0E
+#define  SET_AVERAGE_ADC   0x0F
+#define GET_FEEDBACK  0x10
+#define SET_POSITION  0x20
+#define SET_SPEED  0x21
+#define DISABLE_MANUAL   0x30
+#define RESET 0xFF
+#endif  // LINEAR_MOTOR_COM_INTERFACE_FIRGELLI_DEFINITIONS_H

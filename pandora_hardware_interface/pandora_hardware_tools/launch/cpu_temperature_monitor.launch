@@ -1,0 +1,7 @@
+<launch>
+  <node
+    name="cpu_temperature_monitor"
+    pkg="pandora_hardware_tools"
+    type="cpu_temperature_monitor.py"
+    output="screen"/>
+</launch>

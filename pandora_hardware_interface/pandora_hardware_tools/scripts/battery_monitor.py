@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-''' 
-File Description    Battery monitor node. Beeps when battery under 20.5 Volts.
+'''
+File Description  Battery monitor node. Beeps when a battery is under 20.5 Volts.
 Author            Chris Zalidis
 '''
 

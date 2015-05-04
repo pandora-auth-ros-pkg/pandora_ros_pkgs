@@ -1,0 +1,7 @@
+<launch>
+  <node
+    name="state_indicator"
+    pkg="pandora_hardware_tools"
+    type="state_indicator.py"
+    output="screen"/>
+</launch>

@@ -22,6 +22,7 @@
   <depend>controller_manager</depend>
   <depend>controller_interface</depend>
   <depend>serial</depend>
+  <depend>libusb-1.0</depend>
 
   <export>
   </export>

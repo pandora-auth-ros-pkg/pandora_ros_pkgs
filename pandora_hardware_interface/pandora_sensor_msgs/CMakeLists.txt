@@ -10,10 +10,11 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
     BatteryMsg.msg
-    ThermalMeanMsg.msg
     Co2Msg.msg
     ImuRPY.msg
-  )
+    Temperature.msg
+    ThermalMeanMsg.msg
+    )
 
 generate_messages(
   DEPENDENCIES

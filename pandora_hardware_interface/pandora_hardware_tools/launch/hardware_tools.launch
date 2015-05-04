@@ -1,0 +1,7 @@
+<launch>
+  <!-- Launch Battery Monitor Script -->
+  <include file="$(find pandora_hardware_tools)/launch/battery_monitor.launch"/> 
+  
+  <!-- Launch CPU temperature monitor script -->
+  <include file="$(find pandora_hardware_tools)/launch/cpu_temperature_monitor.launch"/>
+</launch>

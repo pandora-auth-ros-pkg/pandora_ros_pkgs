@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-''' 
+'''
 File Description    State indicator node.
 Author            Chris Zalidis
 '''

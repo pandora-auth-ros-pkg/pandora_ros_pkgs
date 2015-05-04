@@ -1,8 +1,12 @@
+add_library(
+  linear_motor_hardware_interface
+  src/linear_motor_hardware_interface.cpp)
 add_executable(
   linear_motor_hardware_interface_node
-  src/linear_motor_hardware_interface.cpp
   src/linear_motor_hardware_interface_node.cpp)
 target_link_libraries(
   linear_motor_hardware_interface_node
-  jrk_serial
+  linear_motor_hardware_interface
+  jrk_com_interface
+  firgelli_com_interface
   ${catkin_LIBRARIES})

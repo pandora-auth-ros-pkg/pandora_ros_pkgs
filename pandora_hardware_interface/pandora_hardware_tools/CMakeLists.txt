@@ -7,12 +7,9 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES
   CATKIN_DEPENDS
     rospy
     state_manager_msgs
     pandora_sensor_msgs
-#  DEPENDS
 )
 
