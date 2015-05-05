@@ -14,8 +14,8 @@ import fileinput
 from pandora_sensor_msgs.msg import Temperature
 
 class CpuTemperatureMonitor:
-    beeper = ['beep', '-f', '1000', '-r', '2']
-    temperature_threshold = 60
+    beeper = ['beep', '-f', '1000', '-r', '1']
+    temperature_threshold = 70
     temperature_buffer = []
     buffer_size = 5
     num_cores = 0

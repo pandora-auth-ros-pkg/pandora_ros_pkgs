@@ -56,10 +56,11 @@ set(ROSLINT_CPP_OPTS
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
 
-  include/*.h
-  include/*.h
-  src/*.cpp
-  src/*.cpp
-  src/*.cpp
+  imu_com_interface/include/*.h
+  imu_hardware_interface/include/*.h
+  imu_controllers/include/*.h
+  imu_com_interface/src/*.cpp
+  imu_hardware_interface/src/*.cpp
+  imu_controllers/src/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
