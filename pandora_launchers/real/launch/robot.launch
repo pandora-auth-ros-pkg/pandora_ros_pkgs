@@ -1,4 +1,7 @@
 <launch>
+
+  <arg name="robot" default="woody"/>
+
   <arg name="state_manager" default="true"/>
   <arg name="robot_description" default="true"/>
   <arg name="hardware_interface" default="true"/>
@@ -47,7 +50,8 @@
     file="$(find state_manager)/launch/stateManager.launch"/>
 
   <!--Robot Description -->
-  <include if="$(arg robot_description)" file="$(find pandora_robots_description)/launch/gears/gears_description.launch"/>
+  <include if="$(arg robot_description)"
+    file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch"/>
 
   <group if="$(arg hardware_interface)">
     <!--Hardware Interface -->

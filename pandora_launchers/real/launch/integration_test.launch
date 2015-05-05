@@ -1,0 +1,47 @@
+<launch>
+
+  <arg name="robot" default="woody"/>
+  
+  <!-- Raspberry -->
+  <!-- TODO: Flir launcher with ip -->
+
+  <!-- Robot description -->
+  <include file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch"/>
+
+  <!-- State manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch"/>
+  
+  <!-- Hardware interface -->
+  <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface_and_controllers.launch" >
+    <arg name="robot" value="$(arg robot)" />
+  </include>
+  <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" />
+  <include file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface_and_controllers.launch" />
+
+  <!-- Control -->
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+  <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
+
+  <!-- Slam -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+  <!-- Navigation -->
+  <include file="$(find pandora_move_base)/launch/move_base.launch" />
+  <include file="$(find pandora_exploration)/launch/explorer.launch" />
+
+  <!-- Kinect -->
+  <include file="$(find openni2_launch)/launch/openni2.launch">
+    <arg name="camera" value="kinect" />
+    <arg name="depth_registration" value="true" />
+    <arg name="publish_tf" value="false" />
+  </include>
+  
+  <!-- Vision -->
+  <!--  <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" /> -->
+  
+  <!-- Data fusion -->
+  <!-- <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> -->
+  
+</launch>
