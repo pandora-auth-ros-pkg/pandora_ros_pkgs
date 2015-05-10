@@ -1,8 +1,10 @@
-imu_topic: /sensors/imu
+imu_topic: /sensors/imu_rpy
 roll_command_topic: /laser_roll_controller/command
 pitch_command_topic: /laser_pitch_controller/command
 buffer_size: 5
 min_roll: -1.57
 min_pitch: -1.57
 max_roll: 1.57
-max_pitch:  0.785
+max_pitch:  1.57
+roll_offset: 0
+pitch_offset: 0

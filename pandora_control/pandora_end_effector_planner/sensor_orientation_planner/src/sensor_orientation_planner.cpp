@@ -127,6 +127,8 @@ namespace pandora_control
     nodeHandle_.param(actionName_ + "/min_yaw", minYaw_, -1.0);
     nodeHandle_.param(actionName_ + "/max_pitch", maxPitch_, 1.0);
     nodeHandle_.param(actionName_ + "/max_yaw", maxYaw_, 1.0);
+    nodeHandle_.param(actionName_ + "/offset_pitch", offsetPitch_, 0.0);
+    nodeHandle_.param(actionName_ + "/offset_yaw", offsetYaw_, 0.0);
     nodeHandle_.param(actionName_ + "/command_timeout", commandTimeout_, 3.0);
     nodeHandle_.param(actionName_ + "/movement_threshold", movementThreshold_, 0.017);
     nodeHandle_.param(actionName_ + "/lax_movement_threshold", laxMovementThreshold_, 0.2);
@@ -253,8 +255,8 @@ namespace pandora_control
     if (position_ != START  || position_ != CENTER)
     {
       std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-      pitchTargetPosition.data = 0;
-      yawTargetPosition.data = 0;
+      pitchTargetPosition.data = offsetPitch_;
+      yawTargetPosition.data = offsetYaw_;
       lastPitchTarget_ = pitchTargetPosition.data;
       lastYawTarget_ = yawTargetPosition.data;
       sensorPitchPublisher_.publish(pitchTargetPosition);
@@ -327,9 +329,10 @@ namespace pandora_control
           position_ = START;
           break;
       }
-      pitchTargetPosition.data = pitchTargetPosition.data - basePitch;
+      pitchTargetPosition.data += offsetPitch_ - basePitch;
       checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
       lastPitchTarget_ = pitchTargetPosition.data;
+      yawTargetPosition.data += offsetYaw_;
       lastYawTarget_ = yawTargetPosition.data;
       sensorPitchPublisher_.publish(pitchTargetPosition);
       sensorYawPublisher_.publish(yawTargetPosition);
@@ -410,8 +413,8 @@ namespace pandora_control
       double roll, pitch, yaw;
       desiredCameraBasis.getRPY(roll, pitch, yaw);
 
-      pitchTargetPosition.data = pitch;
-      yawTargetPosition.data = yaw;
+      pitchTargetPosition.data = pitch + offsetPitch_;
+      yawTargetPosition.data = yaw + offsetYaw_;
       checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
       if (fabs(lastPitchTarget_ - pitchTargetPosition.data) > movementThreshold
         || fabs(lastYawTarget_ - yawTargetPosition.data) > movementThreshold)

@@ -8,7 +8,7 @@
   <node
     name="stabilizer_control_node"
     pkg="pandora_stabilizer"
-    type="stabilizer_control_node" 
+    type="stabilizer_control_node"
     respawn="false"
     ns="control"
     output="screen"/>

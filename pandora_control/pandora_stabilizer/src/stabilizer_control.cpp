@@ -41,6 +41,7 @@ namespace pandora_control
   StabilizerController::StabilizerController(void)
   {
     std::string imuTopic;
+
     if ( nodeHandle_.hasParam("imu_topic") )
     {
       nodeHandle_.getParam("imu_topic", imuTopic);
@@ -54,7 +55,9 @@ namespace pandora_control
         "[stabilizer_control_node] : Parameter imu_topic not found. Using Default");
       imuTopic = "/sensors/imu";
     }
+
     std::string rollCommandTopic;
+
     if ( nodeHandle_.hasParam("roll_command_topic") )
     {
       nodeHandle_.getParam("roll_command_topic", rollCommandTopic);
@@ -68,7 +71,9 @@ namespace pandora_control
         "[stabilizer_control_node] : Parameter roll_command_topic not found. Using Default");
       rollCommandTopic = "/laser_roll_controller/command";
     }
+
     std::string pitchCommandTopic;
+
     if ( nodeHandle_.hasParam("pitch_command_topic") )
     {
       nodeHandle_.getParam("pitch_command_topic", pitchCommandTopic);
@@ -87,6 +92,8 @@ namespace pandora_control
     nodeHandle_.param("min_pitch", minPitch_, -1.57);
     nodeHandle_.param("max_roll", maxRoll_, 1.57);
     nodeHandle_.param("max_pitch", maxPitch_, 0.785);
+    nodeHandle_.param("roll_offset", rollOffset_, -1.57);
+    nodeHandle_.param("pitch_offset", pitchOffset_, 0.0);
 
     imuSubscriber_ = nodeHandle_.subscribe(
       imuTopic,
@@ -110,21 +117,14 @@ namespace pandora_control
   }
 
   void StabilizerController::serveImuMessage(
-    const sensor_msgs::ImuConstPtr& msg)
+    const pandora_sensor_msgs::ImuRPYConstPtr& msg)
   {
-    double imuYaw;
-    double imuPitch;
     double imuRoll;
+    double imuPitch;
     std_msgs::Float64 str;
 
-    tf::Matrix3x3 matrix(
-      tf::Quaternion(
-        msg->orientation.x,
-        msg->orientation.y,
-        msg->orientation.z,
-        msg->orientation.w));
-
-    matrix.getRPY(imuRoll, imuPitch, imuYaw);
+    imuRoll = msg->roll;
+    imuPitch = msg->pitch;
 
     rollBuffer_[bufferCounter_] = imuRoll;
     pitchBuffer_[bufferCounter_] = imuPitch;
@@ -155,9 +155,9 @@ namespace pandora_control
     {
       command[1] = maxPitch_;
     }
-    str.data = command[0];
+    str.data = command[0] + rollOffset_;
     laserRollPublisher_.publish(str);
-    str.data = command[1];
+    str.data = command[1] + pitchOffset_;
     laserPitchPublisher_.publish(str);
   }
 }  // namespace pandora_control

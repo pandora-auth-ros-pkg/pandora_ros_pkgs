@@ -42,8 +42,7 @@ import threading
 import smach_ros
 
 from smach import StateMachine, Concurrence
-from states import EndEffectorPlannerState, KinectOrientationState, \
-    HeadOrientationState, LinearMovementState
+from states import EndEffectorPlannerState, KinectOrientationState
 from pandora_end_effector_planner.msg import MoveEndEffectorAction, \
     MoveEndEffectorGoal
 from topics import move_end_effector_planner_topic
@@ -66,7 +65,7 @@ def main():
             EndEffectorPlannerState(),
             transitions={
                 'TEST_PARK_TRACK': 'TEST_PARK_TRACK',
-                'SCAN': 'LOWER_LINEAR'
+                'SCAN': 'SCAN'
             },
             remapping={'move_end_effector_msg': 'move_end_effector_msg'}
         )
@@ -88,12 +87,12 @@ def main():
             Concurrence.add('KINECT_ORIENTATION', KinectOrientationState(),
                             remapping={'move_end_effector_msg':
                                        'move_end_effector_msg'})
-            Concurrence.add('HEAD_ORIENTATION', HeadOrientationState(),
-                            remapping={'move_end_effector_msg':
-                                       'move_end_effector_msg'})
-            Concurrence.add('LINEAR_MOVEMENT', LinearMovementState(),
-                            remapping={'move_end_effector_msg':
-                                       'move_end_effector_msg'})
+            # Concurrence.add('HEAD_ORIENTATION', HeadOrientationState(),
+            #                 remapping={'move_end_effector_msg':
+            #                            'move_end_effector_msg'})
+            # Concurrence.add('LINEAR_MOVEMENT', LinearMovementState(),
+            #                 remapping={'move_end_effector_msg':
+            #                            'move_end_effector_msg'})
 
         StateMachine.add(
             'TEST_PARK_TRACK',
@@ -106,27 +105,27 @@ def main():
             remapping={'move_end_effector_msg': 'move_end_effector_msg'}
         )
 
-        StateMachine.add(
-            'LOWER_LINEAR',
-            LinearMovementState(),
-            transitions={
-                'succeeded': 'CENTER_HEAD',
-                'aborted': 'aborted',
-                'preempted': 'preempted'
-            },
-            remapping={'move_end_effector_msg': 'reset_head_linear'}
-        )
+        # StateMachine.add(
+        #     'LOWER_LINEAR',
+        #     LinearMovementState(),
+        #     transitions={
+        #         'succeeded': 'CENTER_HEAD',
+        #         'aborted': 'aborted',
+        #         'preempted': 'preempted'
+        #     },
+        #     remapping={'move_end_effector_msg': 'reset_head_linear'}
+        # )
 
-        StateMachine.add(
-            'CENTER_HEAD',
-            HeadOrientationState(),
-            transitions={
-                'succeeded': 'SCAN',
-                'aborted': 'aborted',
-                'preempted': 'preempted'
-            },
-            remapping={'move_end_effector_msg': 'reset_head_linear'}
-        )
+        # StateMachine.add(
+        #     'CENTER_HEAD',
+        #     HeadOrientationState(),
+        #     transitions={
+        #         'succeeded': 'SCAN',
+        #         'aborted': 'aborted',
+        #         'preempted': 'preempted'
+        #     },
+        #     remapping={'move_end_effector_msg': 'reset_head_linear'}
+        # )
 
         StateMachine.add(
             'SCAN',
@@ -157,17 +156,17 @@ def main():
 
 
 def out_cb(outcome_map):
-    if outcome_map['KINECT_ORIENTATION'] == 'succeeded' and \
-            outcome_map['HEAD_ORIENTATION'] == 'succeeded' and \
-            outcome_map['LINEAR_MOVEMENT'] == 'succeeded':
+    if outcome_map['KINECT_ORIENTATION'] == 'succeeded':  # and \
+        # outcome_map['HEAD_ORIENTATION'] == 'succeeded' and \
+        # outcome_map['LINEAR_MOVEMENT'] == 'succeeded':
         rospy.sleep(0.1)
         return 'succeeded'
     if outcome_map['KINECT_ORIENTATION'] == 'aborted':
         return 'aborted'
-    elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
-        return 'aborted'
-    elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
-        return 'aborted'
+    # elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
+    #     return 'aborted'
+    # elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
+    #     return 'aborted'
     else:
         return 'preempted'
 
@@ -175,10 +174,10 @@ def out_cb(outcome_map):
 def termination_cb(outcome_map):
     if outcome_map['KINECT_ORIENTATION'] == 'aborted':
         return True
-    elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
-        return True
-    elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
-        return True
+    # elif outcome_map['HEAD_ORIENTATION'] == 'aborted':
+    #     return True
+    # elif outcome_map['LINEAR_MOVEMENT'] == 'aborted':
+    #     return True
     else:
         return False
 

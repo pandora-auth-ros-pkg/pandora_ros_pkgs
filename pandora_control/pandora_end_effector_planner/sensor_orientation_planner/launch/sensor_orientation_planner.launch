@@ -14,13 +14,13 @@
     ns="control"
     args="move_kinect_action"/>
 
-  <node
-    name="head_orientation_planner"
-    pkg="pandora_end_effector_planner"
-    type="sensor_orientation_planner"
-    respawn="false"
-    output="screen"
-    ns="control"
-    args="move_head_action"/>
+  <!-- <node                                -->
+  <!--   name="head_orientation_planner"    -->
+  <!--   pkg="pandora_end_effector_planner" -->
+  <!--   type="sensor_orientation_planner"  -->
+  <!--   respawn="false"                    -->
+  <!--   output="screen"                    -->
+  <!--   ns="control"                       -->
+  <!--   args="move_head_action"/>          -->
 
 </launch>

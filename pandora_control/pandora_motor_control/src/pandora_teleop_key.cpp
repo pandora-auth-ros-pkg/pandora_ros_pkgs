@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <iostream>
 
+#define KEYCODE_SPACE 0x20
 #define KEYCODE_RIGHT 0x43
 #define KEYCODE_LEFT 0x44
 #define KEYCODE_UP 0x41
@@ -194,6 +195,7 @@ void Teleoperation::keyLoop(void)
         linear_ = -1.0;
         dirty = true;
         break;
+      case KEYCODE_SPACE:
       case KEYCODE_H:
         ROS_DEBUG("HALT");
         linear_ = 0.0;
@@ -214,9 +216,9 @@ void Teleoperation::keyLoop(void)
         angular_ = - 1.0;
 
       std::cout << "Linear  : " << linear_ * 100 << " % , "
-        << linear_ * linear_scale_ << " m/s\n";
+                << linear_ * linear_scale_ << " m/s\n";
       std::cout << "Angular : " << angular_ * 100 << " % , "
-        << angular_ * angular_scale_ << " r/s\n";
+                << angular_ * angular_scale_ << " r/s\n";
       std::cout << "########################" << '\n';
 
       dirty = false;

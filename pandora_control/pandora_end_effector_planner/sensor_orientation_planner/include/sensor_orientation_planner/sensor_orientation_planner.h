@@ -75,6 +75,8 @@ namespace pandora_control
       double minYaw_;
       double maxPitch_;
       double maxYaw_;
+      double offsetPitch_;
+      double offsetYaw_;
       double scanRate_;
       double commandTimeout_;
       double movementThreshold_;

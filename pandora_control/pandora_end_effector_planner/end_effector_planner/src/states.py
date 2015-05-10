@@ -80,42 +80,42 @@ class KinectOrientationState(SimpleActionState):
         return goal
 
 
-class HeadOrientationState(SimpleActionState):
+# class HeadOrientationState(SimpleActionState):
 
-    def __init__(self):
-        SimpleActionState.__init__(self, move_head_topic,
-                                   MoveSensorAction,
-                                   goal_cb=self.goal_cb,
-                                   outcomes=['succeeded',
-                                             'aborted',
-                                             'preempted'],
-                                   input_keys=['move_end_effector_msg'],
-                                   output_keys=['move_end_effector_msg'])
+#     def __init__(self):
+#         SimpleActionState.__init__(self, move_head_topic,
+#                                    MoveSensorAction,
+#                                    goal_cb=self.goal_cb,
+#                                    outcomes=['succeeded',
+#                                              'aborted',
+#                                              'preempted'],
+#                                    input_keys=['move_end_effector_msg'],
+#                                    output_keys=['move_end_effector_msg'])
 
-    def goal_cb(self, userdata, goal):
-        goal = MoveSensorGoal()
-        goal.command = userdata.move_end_effector_msg.command
-        goal.point_of_interest = \
-            userdata.move_end_effector_msg.point_of_interest
-        return goal
+#     def goal_cb(self, userdata, goal):
+#         goal = MoveSensorGoal()
+#         goal.command = userdata.move_end_effector_msg.command
+#         goal.point_of_interest = \
+#             userdata.move_end_effector_msg.point_of_interest
+#         return goal
 
 
-class LinearMovementState(SimpleActionState):
+# class LinearMovementState(SimpleActionState):
 
-    def __init__(self):
-        SimpleActionState.__init__(self, linear_movement_topic,
-                                   MoveLinearAction,
-                                   goal_cb=self.goal_cb,
-                                   outcomes=['succeeded',
-                                             'aborted',
-                                             'preempted'],
-                                   input_keys=['move_end_effector_msg'],
-                                   output_keys=['move_end_effector_msg'])
+#     def __init__(self):
+#         SimpleActionState.__init__(self, linear_movement_topic,
+#                                    MoveLinearAction,
+#                                    goal_cb=self.goal_cb,
+#                                    outcomes=['succeeded',
+#                                              'aborted',
+#                                              'preempted'],
+#                                    input_keys=['move_end_effector_msg'],
+#                                    output_keys=['move_end_effector_msg'])
 
-    def goal_cb(self, userdata, goal):
-        goal = MoveLinearGoal()
-        goal.command = userdata.move_end_effector_msg.command
-        goal.point_of_interest = \
-            userdata.move_end_effector_msg.point_of_interest
-        goal.center_point = userdata.move_end_effector_msg.center_point
-        return goal
+    # def goal_cb(self, userdata, goal):
+    #     goal = MoveLinearGoal()
+    #     goal.command = userdata.move_end_effector_msg.command
+    #     goal.point_of_interest = \
+    #         userdata.move_end_effector_msg.point_of_interest
+    #     goal.center_point = userdata.move_end_effector_msg.center_point
+    #     return goal

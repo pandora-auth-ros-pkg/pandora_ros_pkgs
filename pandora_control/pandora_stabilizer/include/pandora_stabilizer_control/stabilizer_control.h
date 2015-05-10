@@ -37,8 +37,7 @@
 #ifndef PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
 #define PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
 
-#include <sensor_msgs/Imu.h>
-#include <geometry_msgs/Quaternion.h>
+#include <pandora_sensor_msgs/ImuRPY.h>
 #include <std_msgs/Float64.h>
 #include "ros/ros.h"
 #include <tf/tf.h>
@@ -54,7 +53,7 @@ namespace pandora_control
       ros::Publisher laserRollPublisher_;
       ros::Publisher laserPitchPublisher_;
 
-      void serveImuMessage(const sensor_msgs::ImuConstPtr& msg);
+      void serveImuMessage(const pandora_sensor_msgs::ImuRPYConstPtr& msg);
       std::vector<double> rollBuffer_;
       std::vector<double> pitchBuffer_;
       int bufferSize_;
@@ -63,6 +62,8 @@ namespace pandora_control
       double maxRoll_;
       double minPitch_;
       double maxPitch_;
+      double rollOffset_;
+      double pitchOffset_;
 
     public:
       StabilizerController(void);
