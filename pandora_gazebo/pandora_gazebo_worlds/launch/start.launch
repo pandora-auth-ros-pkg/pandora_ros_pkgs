@@ -6,23 +6,23 @@
   
   <arg name="world" default="empty"/>
   
-  <arg name="robot" default="gears"/>
+  <arg name="robot" default="woody"/>
   
   <arg name="x" default="0"/>
   <arg name="y" default="0"/>
-  <arg name="z" default="0"/>
+  <arg name="z" default="0.175"/>
   <arg name="Y" default="0"/>
   
   <arg name="simplified" default="true"/>
   
-  <arg name="control" default="true"/>
-  <arg name="interface" default="true"/>
+  <arg name="control" default="false"/>
+  <arg name="interface" default="false"/>
   <arg name="sensors_viz" default="false" />
     
 <!-- ###################################################################### -->
 
   <group if="$(arg simplified)">
-    <include file="$(find pandora_gazebo_description)/launch/gears/gears_simplified_gazebo_description.launch" />
+    <include file="$(find pandora_gazebo_description)/launch/$(arg robot)/$(arg robot)_simplified_gazebo_description.launch" />
   </group>
   
   <group unless="$(arg simplified)">

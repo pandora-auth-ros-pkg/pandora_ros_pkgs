@@ -4,14 +4,14 @@
 
 <!-- ###################################################################### -->
 
-  <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_position_controllers.launch" >
-    <arg name="robot" value="gears" />
+  <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_effort_controllers.launch" >
+    <arg name="robot" value="woody" />
   </include>
       
 <!-- ###################################################################### -->
 
   <param name="robot_description"
-         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/gears/gears_simplified.gazebo.xacro'" />
+         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/woody/woody_simplified.gazebo.xacro'" />
     
 <!-- ###################################################################### -->
 
