@@ -1,9 +1,11 @@
 <launch>
+  <arg name="robot" default="woody" />
+
   <!-- Launch controller manager with pandora hardware interface-->
-  <include
-    file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />
+  <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />
 
   <!-- spawn controllers -->
-  <include
-    file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/motor_controller.launch" />
+  <include file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/motor_controller.launch" >
+    <arg name="robot" value="$(arg robot)" />
+  </include>
 </launch>

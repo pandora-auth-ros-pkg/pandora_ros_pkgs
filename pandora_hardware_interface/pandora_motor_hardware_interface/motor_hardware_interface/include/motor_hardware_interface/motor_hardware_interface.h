@@ -33,7 +33,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
-*********************************************************************/
+* Author: Konstantinos Panayiotou
+**********************************************************************/
 #ifndef MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
 #define MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
 
@@ -42,7 +43,10 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include "epos_handler/serial_epos_handler.h"
+#include "epos2_handler/serial_epos2_handler.h"
+#include <pandora_sensor_msgs/MotorCurrents.h>
+
+typedef pandora_sensor_msgs::MotorCurrents MotorCurrentsMsg;
 
 namespace pandora_hardware_interface
 {
@@ -54,6 +58,9 @@ namespace motor
       AbstractEposHandler *motors_;
 
       ros::NodeHandle nodeHandle_;
+      ros::Publisher currentPub_;
+
+      MotorCurrentsMsg motorCurrentsMsg_;
 
       hardware_interface::JointStateInterface jointStateInterface_;
       hardware_interface::VelocityJointInterface velocityJointInterface_;
@@ -62,6 +69,7 @@ namespace motor
       double position_[4];
       double velocity_[4];
       double effort_[4];
+      double current_[4];
       double maxRPM_;
       double gearboxRatio_;
 

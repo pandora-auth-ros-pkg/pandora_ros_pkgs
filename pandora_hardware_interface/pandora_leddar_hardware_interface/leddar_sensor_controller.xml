@@ -1,0 +1,11 @@
+<library path="lib/libleddar_sensor_controller">
+  <class
+    name="pandora_leddar/LeddarSensorController"
+    type="pandora_hardware_interface::leddar::LeddarSensorController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the readings of the leddar sensor as
+    pandora_leddar_hardware_interface/LeddarMsg.
+  </description>
+  </class>
+</library>

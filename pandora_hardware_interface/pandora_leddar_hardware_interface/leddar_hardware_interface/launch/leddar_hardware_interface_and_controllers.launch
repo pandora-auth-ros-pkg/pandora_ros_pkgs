@@ -1,0 +1,9 @@
+<launch>
+  <!-- Launch controller manager with pandora hardware interface-->
+  <include
+    file="$(find pandora_leddar_hardware_interface)/leddar_hardware_interface/launch/leddar_hardware_interface.launch" />
+  
+  <!-- spawn leddar controllers -->
+  <include
+    file="$(find pandora_leddar_hardware_interface)/leddar_controllers/launch/leddar_sensor_controller.launch" />
+</launch>

@@ -1,0 +1,11 @@
+<package>
+  <node>
+    /leddar_hardware_interface_node
+    
+    <publisher>/sensors/leddar</publisher>
+  </node>
+  
+  <node>
+    /leddar_sensor_controller_spawner
+  </node>
+</package>

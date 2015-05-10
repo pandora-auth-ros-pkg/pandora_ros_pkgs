@@ -1,0 +1,18 @@
+<launch>
+  <arg name="namespace" default="leddar"/>
+  
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_leddar_hardware_interface)/leddar_controllers/config/leddar_sensor_controller.yaml"
+    ns="$(arg namespace)"/>
+  
+  <!-- spawn controller -->
+  <node
+    name="leddar_sensor_controller_spawner"
+    pkg="controller_manager"
+    type="controller_manager"
+    output="screen"
+    args="spawn leddar_sensor_controller"
+    ns="$(arg namespace)"/>
+</launch>

@@ -29,9 +29,9 @@ namespace motor
 EposSerialGateway::EposSerialGateway(
   const std::string& device, unsigned int baudRate, unsigned int timeout)
 {
-  //gateway is not initialized until we actually connect to the RS232 port
+  // gateway is not initialized until we actually connect to the RS232 port
   initialized = false;
-  //initialize POSIX thread mutex, for use during read/write operations
+  // initialize POSIX thread mutex, for use during read/write operations
   pthread_mutex_init(&gatewayMutex, NULL);
 
   try
@@ -44,12 +44,12 @@ EposSerialGateway::EposSerialGateway(
   }
   catch (serial::IOException& ex)
   {
-    //failed to connect to serial port
+    // failed to connect to serial port
     std::cerr << "error: EposRs232Gateway: " << ex.what() << std::endl;
     return;
   }
 
-  //we are connected, set object as initialized
+  // we are connected, set object as initialized
   initialized = true;
 }
 
@@ -57,20 +57,20 @@ epos::CommandStatus EposSerialGateway::getACK(void)
 {
   uint8_t c;
 
-  //read a single character from the RS232 port
+  // read a single character from the RS232 port
   size_t n = serialPtr_->read(&c, 1);
 
-  //check the number of characters that were actually read
-  if (n == 0) //no characters read, timeout
+  // check the number of characters that were actually read
+  if (n == 0)  // no characters read, timeout
     return epos::TIMEOUT;
-  else if (n == 1 && c == 'F') //one character read, it's a NACK
+  else if (n == 1 && c == 'F')  // one character read, it's a NACK
     return epos::NACK;
-  else if (n == 1 && c != 'O') //Should never happen, violates EPOS Communication Guide
+  else if (n == 1 && c != 'O')  // Should never happen, violates EPOS Communication Guide
     return epos::RESYNC;
-  else if (n != 1)  //RS232 error
+  else if (n != 1)  // RS232 error
     return epos::RS232;
 
-  //1 character read, equal to 'O' (ACK)
+  // 1 character read, equal to 'O' (ACK)
   return epos::SUCCESS;
 }
 
@@ -79,10 +79,10 @@ epos::CommandStatus EposSerialGateway::ACK(void)
   // ACK signal is a single character equal to 'O'
   size_t n = serialPtr_->write("O");
 
-  //Rs232 write method should return 0, if all went well
+  // Rs232 write method should return 0, if all went well
   if (n != 1) return epos::RS232;
 
-  //Allright
+  // Allright
   return epos::SUCCESS;
 }
 
@@ -90,26 +90,26 @@ epos::CommandStatus EposSerialGateway::sendFrame(
   unsigned char opCode, epos::Word *data, uint8_t length,
     epos::Word *response)
 {
-  //In order to debug the actual communication between the PC and the RS232 port
-  //you can define the DEBUG_EposRs232Gateway macro. This will enable debugging
-  //code that prints the communication to the standard output. This generates
-  //allot of output, and should be used only for debugging purposes. Having the
-  //printout of the communication is sometimes the only to way to debug since
-  //underlying synchronization issues exist (i.e. timeouts)
+  // In order to debug the actual communication between the PC and the RS232 port
+  // you can define the DEBUG_EposRs232Gateway macro. This will enable debugging
+  // code that prints the communication to the standard output. This generates
+  // allot of output, and should be used only for debugging purposes. Having the
+  // printout of the communication is sometimes the only to way to debug since
+  // underlying synchronization issues exist (i.e. timeouts)
 
-  //#define DEBUG_EposRs232Gateway
+  // #define DEBUG_EposRs232Gateway
 
-  //check to see if gateway is initialized
+  // check to see if gateway is initialized
   if (!initialized)
   {
-    //cannot use the gateway if the object is not initialized first
+    // cannot use the gateway if the object is not initialized first
     std::cerr << "error: EposRs232Gateway: sendFrame: cannot send frame, " <<
       "EPOS is not connected. Please use EposRs232Gateway::connect" << std::endl;
     return epos::API;
   }
 
-  //frame size must be a positive integer no greater than 255. This restriction
-  //is enforced by hardware, and protocol specifications
+  // frame size must be a positive integer no greater than 255. This restriction
+  // is enforced by hardware, and protocol specifications
   if (length > 255 || !length)
   {
     std::cout << "error: EposRs232Gateway: sendFrame: invalid frame data size: " << length << std::endl;
@@ -119,23 +119,23 @@ epos::CommandStatus EposSerialGateway::sendFrame(
   // *** input arguments are valid *** //
   // *** Calculate CRC *** //
 
-  //CRC is calculated on the transmition data + the op code and the data length
-  //The op code and the data length are stuffed in a single EPOS word
+  // CRC is calculated on the transmition data + the op code and the data length
+  // The op code and the data length are stuffed in a single EPOS word
   epos::Word crcData[length + 1];
 
-  //load the first word of the data input for the CRC method, opcode + length
+  // load the first word of the data input for the CRC method, opcode + length
   crcData[0] = (opCode << 8) | (length - 1);
 
-  //EPOS CRC calculation requires data to be Big-Endian (MSB first)
+  // EPOS CRC calculation requires data to be Big-Endian (MSB first)
   for (unsigned int i = 1; i < length + 1; ++i)
   {
     crcData[i] = ((data[i - 1] / 256) << 8) | (data[i - 1] % 256);
   }
-  //get CRC
+  // get CRC
   epos::Word crc = crc16CCITT(&crcData[0], length + 1);
 
-  //Load the transmition buffer
-  //Frame data are sent LSB first
+  // Load the transmition buffer
+  // Frame data are sent LSB first
   uint8_t outData[2 * length];
   for (unsigned int i = 0; i < length; ++i)
   {
@@ -143,13 +143,13 @@ epos::CommandStatus EposSerialGateway::sendFrame(
     outData[2 * i + 1] = data[i] / 256;
   }
 
-  //Communication variables
+  // Communication variables
   uint8_t c;
   size_t n;
   uint8_t buffer[128];
   epos::CommandStatus state;
 
-  //We are about to start transmiting data, lock the communication mutex
+  // We are about to start transmiting data, lock the communication mutex
   pthread_mutex_lock(&gatewayMutex);
 
 #ifdef DEBUG_EposRs232Gateway
@@ -457,27 +457,27 @@ epos::CommandStatus EposSerialGateway::writeObject(
 
 epos::Word EposSerialGateway::crc16CCITT(epos::Word* data, unsigned int length)
 {
-  //Append a zero-word to packet
+  // Append a zero-word to packet
   uint16_t *packet, *temp;
   temp = packet = new uint16_t[length + 1];
   memcpy(packet, data, length * 2);
   packet[length] = 0;
   ++length;
-  //Calculate CRC using polyonym: x^16+x^12+x^5+x^0
+  // Calculate CRC using polyonym: x^16+x^12+x^5+x^0
   uint16_t shifter, c;
   uint16_t carry;
   uint16_t CRC = 0;
   while (length--)
   {
-    shifter = 0x8000;                 //Initialize BitX to Bit15
-    c = *packet++;                //Copy next Data uint16_t to c
+    shifter = 0x8000;                 // Initialize BitX to Bit15
+    c = *packet++;                // Copy next Data uint16_t to c
     do
     {
-      carry = CRC & 0x8000; //Check if Bit15 of CRC is set
-      CRC <<= 1;             //CRC = CRC * 2
-      if (c & shifter) ++CRC; //CRC = CRC + 1, if BitX is set in c
-      if (carry) CRC ^= 0x1021; //CRC = CRC XOR G(x), if carry is true
-      shifter >>= 1;         //Set BitX to next lower Bit, shifter = shifter/2
+      carry = CRC & 0x8000;  // Check if Bit15 of CRC is set
+      CRC <<= 1;             // CRC = CRC * 2
+      if (c & shifter) ++CRC;  // CRC = CRC + 1, if BitX is set in c
+      if (carry) CRC ^= 0x1021;  // CRC = CRC XOR G(x), if carry is true
+      shifter >>= 1;         // Set BitX to next lower Bit, shifter = shifter/2
     }
     while (shifter);
   }

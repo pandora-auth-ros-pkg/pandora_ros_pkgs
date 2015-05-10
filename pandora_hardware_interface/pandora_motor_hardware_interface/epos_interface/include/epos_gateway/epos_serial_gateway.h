@@ -104,7 +104,7 @@ namespace motor
 class EposSerialGateway : public AbstractEposGateway, private boost::noncopyable
 {
  public:
-  ///Construct an EposRs232Gateway object and open EPOS device for read/write
+  // Construct an EposRs232Gateway object and open EPOS device for read/write
   /**
    *
    * \param[in] device the device name of the serial port the EPOS device is
@@ -215,7 +215,7 @@ class EposSerialGateway : public AbstractEposGateway, private boost::noncopyable
       char data);
 
 private:
-    ///Rs232 object used to access underlaying hardware
+    // Rs232 object used to access underlaying hardware
     boost::scoped_ptr<serial::Serial> serialPtr_;
     /** POSIX mutex to lock when a transmition is ongoing. Since the RS232 EPOS
      * protocol requires a handshake, transmitions are not unary operations. */

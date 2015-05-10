@@ -37,6 +37,9 @@
  * Author: Evangelos Apostolidis
  */
 
+#ifndef MOTOR_CONTROLLERS_SKID_STEER_DRIVE_CONTROLLER_H
+#define MOTOR_CONTROLLERS_SKID_STEER_DRIVE_CONTROLLER_H
+
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <pluginlib/class_list_macros.h>
@@ -187,7 +190,6 @@ namespace motor
     void setOdomPubFields(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh);
 
     double getAngularMultiplier(double velocity);
-
   };
 
   PLUGINLIB_EXPORT_CLASS(
@@ -195,3 +197,4 @@ namespace motor
     controller_interface::ControllerBase);
 }  // namespace motor
 }  // namespace pandora_hardware_interface
+#endif  // MOTOR_CONTROLLERS_SKID_STEER_DRIVE_CONTROLLER_H

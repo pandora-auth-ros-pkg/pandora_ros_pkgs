@@ -11,14 +11,15 @@
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface/issues</url>
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface</url>
-  
+
   <author>Chris Zalidis</author>
   <author>Evangelos Apostolidis</author>
   <author>Konstantinos Panayiotou</author>
-  
+
   <buildtool_depend>catkin</buildtool_depend>
-  
+
   <build_depend>roslint</build_depend>
+  <build_depend>pandora_cmake_tools</build_depend>
 
   <depend>roscpp</depend>
   <depend>controller_manager</depend>
@@ -31,6 +32,8 @@
   <depend>tf</depend>
   <depend>urdf</depend>
   <depend>angles</depend>
+  <depend>std_msgs</depend>
+  <depend>pandora_sensor_msgs</depend>
 
   <export>
     <controller_interface plugin="${prefix}/skid_steer_drive_controller_plugins.xml"/>

@@ -1,0 +1,15 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_leddar_hardware_interface)/leddar_hardware_interface/config/leddar_hardware_interface.yaml"
+    ns = "leddar"/>
+  
+  <!-- Launch controller manager with pandora hardware interface-->
+  <node
+    name="leddar_hardware_interface_node"
+    pkg="pandora_leddar_hardware_interface"
+    type="leddar_hardware_interface_node"
+    output="screen"
+    ns = "leddar"/>
+</launch>

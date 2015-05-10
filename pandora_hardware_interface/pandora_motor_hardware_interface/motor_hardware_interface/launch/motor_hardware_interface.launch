@@ -7,11 +7,20 @@
     file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/config/motor_hardware_interface.yaml"
     ns="$(arg namespace)"/>
 
+
   <!-- Launch controller manager with pandora hardware interface-->
   <node
     name="motor_hardware_interface_node"
     pkg="pandora_motor_hardware_interface"
     type="motor_hardware_interface_node"
     output="screen"
-    ns="$(arg namespace)"/>
+    ns="$(arg namespace)">
+
+    <!-- Load epos2Gateway interface configuration parameters -->
+    <rosparam
+    command="load"
+    file="$(find pandora_motor_hardware_interface)/epos_interface/config/epos2_gateway.yaml"
+    ns="epos2config"/>
+  </node>
+
 </launch>

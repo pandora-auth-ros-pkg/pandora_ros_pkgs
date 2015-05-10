@@ -1,0 +1,3 @@
+leddar_sensor:
+  - name: '/sensors/leddar'
+    frame_id: 'leddar_frame'

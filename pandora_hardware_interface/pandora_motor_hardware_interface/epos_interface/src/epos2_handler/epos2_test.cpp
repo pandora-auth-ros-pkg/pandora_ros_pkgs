@@ -2,7 +2,7 @@
 *
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+*  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,21 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author:  Chris Zalidis
+* Author:     Konstantinos Panayiotou   <klpanagi@gmail.com>
+* Maintainer: Konstantinos Panayiotou   <klpanagi@gmail.com>
 *********************************************************************/
-#include "orangutan_interface/orangutan_serial_interface.h"
 
-int main(int argc, char* argv[])
+#include "epos_handler/serial_epos2_handler.h"
+
+int main()
 {
-  pandora_hardware_interface::motor::OrangutanSerialInterface motors("/dev/motors", 9600, 100);
+  pandora_hardware_interface::motor::SerialEpos2Handler
+    s2("/dev/ttyS0", 115200, 1000);
 
-  if (argc != 3) {
-    std::cerr << "Error: I need 2 speeds!!" << std::endl;
-    exit(-1);
-  }
+  s2.activate_profileVelocityMode(0);
+  s2.moveWithVelocity(0, 1000);
 
-  motors.init();
+  while (true){}
 
-  int speedLeft = atoi(argv[1]);
-  int speedRight = atoi(argv[2]);
-
-  motors.setSpeeds(speedLeft, speedRight);
-
-  return 0;
+  return 1;
 }

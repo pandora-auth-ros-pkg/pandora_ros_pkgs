@@ -1,4 +1,5 @@
 <launch>
+  <arg name="robot" default="woody" />
   <arg name="namespace" default="motor" />
 
   <rosparam
@@ -8,7 +9,7 @@
 
   <param
     name="robot_description"
-    command="$(find xacro)/xacro.py '$(find pandora_robots_description)/urdf/gears/bringup.urdf.xacro'"/>
+    command="$(find xacro)/xacro.py '$(find pandora_robots_description)/urdf/$(arg robot)/bringup.urdf.xacro'"/>
 
   <!-- spawn controller -->
   <node

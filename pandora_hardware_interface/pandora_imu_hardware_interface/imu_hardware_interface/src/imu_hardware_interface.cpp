@@ -52,7 +52,7 @@ namespace imu
       if (device_type == "imu")
         comInterface_ = new ImuComInterface("/dev/imu", 38400, 100);
       else if (device_type == "ahrs")
-        comInterface_ = new AhrsComInterface("/dev/imu", 38400, 100);
+        comInterface_ = new AhrsComInterface("/dev/ahrs", 38400, 100);
       else
       {
           ROS_FATAL(

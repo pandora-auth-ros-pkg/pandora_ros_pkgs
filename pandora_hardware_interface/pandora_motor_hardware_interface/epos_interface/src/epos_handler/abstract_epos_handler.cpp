@@ -24,30 +24,11 @@ namespace pandora_hardware_interface
 namespace motor
 {
 
-Current::Current()
-{
-}
-
-Current::Current(const uint32_t left, const uint32_t right)
-{
-  this->left = left;
-  this->right = right;
-}
-Current::~Current()
-{
-}
-
 Error::Error()
 {
 }
 Error::~Error()
 {
-}
-
-Error::Error(const uint32_t left, const uint32_t right)
-{
-  this->left = left;
-  this->right = right;
 }
 
 AbstractEposHandler::AbstractEposHandler() : gatewayImpl_(NULL)

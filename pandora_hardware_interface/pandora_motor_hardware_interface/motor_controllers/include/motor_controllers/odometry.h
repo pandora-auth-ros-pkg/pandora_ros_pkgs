@@ -37,8 +37,8 @@
  * Author: Bence Magyar
  */
 
-#ifndef ODOMETRY_H_
-#define ODOMETRY_H_
+#ifndef MOTOR_CONTROLLERS_ODOMETRY_H_
+#define MOTOR_CONTROLLERS_ODOMETRY_H_
 
 #include <ros/time.h>
 #include <boost/accumulators/accumulators.hpp>
@@ -58,8 +58,7 @@ namespace motor
    */
   class Odometry
   {
-  public:
-
+   public:
     /// Integration function, used to integrate the odometry:
     typedef boost::function<void(double, double)> IntegrationFunction;
 
@@ -69,7 +68,7 @@ namespace motor
      * Value will be set to zero
      * \param velocity_rolling_window_size Rolling window size used to compute the velocity mean
      */
-    Odometry(size_t velocity_rolling_window_size = 10);
+    explicit Odometry(size_t velocity_rolling_window_size = 10);
 
     /**
      * \brief Updates the odometry class with latest wheels position
@@ -136,8 +135,7 @@ namespace motor
      */
     void setWheelParams(double wheel_separation, double wheel_radius);
 
-  private:
-
+   private:
     /// Rolling mean accumulator and window:
     typedef bacc::accumulator_set<double, bacc::stats<bacc::tag::rolling_mean> > RollingMeanAcc;
     typedef bacc::tag::rolling_window RollingWindow;
@@ -182,4 +180,4 @@ namespace motor
 }  // namespace motor
 }  // namespace pandora_hardware_interface
 
-#endif /* ODOMETRY_H_ */
+#endif  // MOTOR_CONTROLLERS_ODOMETRY_H_

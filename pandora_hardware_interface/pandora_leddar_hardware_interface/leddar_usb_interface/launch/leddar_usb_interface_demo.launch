@@ -1,0 +1,6 @@
+<launch>
+  <node 
+    name="leddar_usb_interface_demo" 
+    pkg="pandora_leddar_hardware_interface"
+    type="leddar_usb_interface_demo"/>
+</launch>

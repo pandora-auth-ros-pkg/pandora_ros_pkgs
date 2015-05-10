@@ -1,0 +1,27 @@
+interface:
+  deviceName: "EPOS2"
+  protocolStackName: "MAXON SERIAL V2"
+  interfaceName: "USB"
+  portName: "USB0"
+  baudrate: 1000000
+  timeout: 500
+controllers:
+  num: 4
+  epos2Gateway_id: 1
+  node1: 
+    id: 1
+    index: "right_front_motor_controller"
+  node2: 
+    id: 2
+    index: "right_rear_motor_controller"
+  node3: 
+    id: 3
+    index: "left_front_motor_controller"
+  node4: 
+    id: 4
+    index: "left_rear_motor_controller"
+
+    
+
+
+

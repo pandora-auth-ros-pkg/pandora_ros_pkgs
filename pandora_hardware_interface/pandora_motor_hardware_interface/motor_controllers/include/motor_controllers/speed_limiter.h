@@ -36,8 +36,8 @@
  * Author: Enrique Fernández
  */
 
-#ifndef SPEED_LIMITER_H
-#define SPEED_LIMITER_H
+#ifndef MOTOR_CONTROLLERS_SPEED_LIMITER_H
+#define MOTOR_CONTROLLERS_SPEED_LIMITER_H
 
 namespace pandora_hardware_interface
 {
@@ -46,7 +46,6 @@ namespace motor
   class SpeedLimiter
   {
   public:
-
     /**
      * \brief Constructor
      * \param [in] has_velocity_limits     if true, applies velocity limits
@@ -62,8 +61,7 @@ namespace motor
       double min_velocity = 0.0,
       double max_velocity = 0.0,
       double min_acceleration = 0.0,
-      double max_acceleration = 0.0
-    );
+      double max_acceleration = 0.0);
 
     /**
      * \brief Limit the velocity and acceleration
@@ -104,4 +102,4 @@ namespace motor
 }  // namespace motor
 }  // namespace pandora_hardware_interface
 
-#endif // SPEED_LIMITER_H
+#endif  // MOTOR_CONTROLLERS_SPEED_LIMITER_H

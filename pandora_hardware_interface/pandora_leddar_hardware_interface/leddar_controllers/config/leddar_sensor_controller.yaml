@@ -1,0 +1,9 @@
+leddar_sensor_controller:
+  type: pandora_leddar/LeddarSensorController
+  publish_rate: 50
+  angle_min: -pi/8
+  angle_max: pi/8
+  angle_increment: 2.8  
+  scan_time: 0.02
+  range_min: 0.0
+  range_max: 50.0

@@ -47,9 +47,10 @@
 
 static double euclideanOfVectors(const urdf::Vector3& vec1, const urdf::Vector3& vec2)
 {
-  return std::sqrt(std::pow(vec1.x-vec2.x,2) +
-                   std::pow(vec1.y-vec2.y,2) +
-                   std::pow(vec1.z-vec2.z,2));
+  return std::sqrt(
+    std::pow(vec1.x-vec2.x, 2) +
+    std::pow(vec1.y-vec2.y, 2) +
+    std::pow(vec1.z-vec2.z, 2));
 }
 
 /*
@@ -59,25 +60,29 @@ static double euclideanOfVectors(const urdf::Vector3& vec1, const urdf::Vector3&
  */
 static bool isCylinder(const boost::shared_ptr<const urdf::Link>& link)
 {
-  if(!link)
+  if (!link)
   {
     ROS_ERROR("Link == NULL.");
     return false;
   }
 
-  if(!link->collision)
+  if (!link->collision)
   {
-    ROS_ERROR_STREAM("Link " << link->name << " does not have collision description. Add collision description for link to urdf.");
+    ROS_ERROR_STREAM("Link " << link->name <<
+      " does not have collision description."
+      "Add collision description for link to urdf.");
     return false;
   }
 
-  if(!link->collision->geometry)
+  if (!link->collision->geometry)
   {
-    ROS_ERROR_STREAM("Link " << link->name << " does not have collision geometry description. Add collision geometry description for link to urdf.");
+    ROS_ERROR_STREAM("Link " << link->name <<
+      " does not have collision geometry description."
+      "Add collision geometry description for link to urdf.");
     return false;
   }
 
-  if(link->collision->geometry->type != urdf::Geometry::CYLINDER)
+  if (link->collision->geometry->type != urdf::Geometry::CYLINDER)
   {
     ROS_DEBUG_STREAM("Link " << link->name << " does not have cylinder geometry");
     return false;
@@ -94,7 +99,7 @@ static bool isCylinder(const boost::shared_ptr<const urdf::Link>& link)
  */
 static bool getWheelRadius(const boost::shared_ptr<const urdf::Link>& wheel_link, double& wheel_radius)
 {
-  if(!isCylinder(wheel_link))
+  if (!isCylinder(wheel_link))
   {
     ROS_DEBUG_STREAM("Wheel link " << wheel_link->name << " is NOT modeled as a cylinder!");
     return false;
@@ -133,32 +138,32 @@ namespace motor
     std::string left_rear_wheel_name, right_rear_wheel_name;
 
     bool res = controller_nh.hasParam("left_front_wheel");
-    if(!res || !controller_nh.getParam("left_front_wheel", left_front_wheel_name))
+    if (!res || !controller_nh.getParam("left_front_wheel", left_front_wheel_name))
     {
       ROS_ERROR_NAMED(name_, "Couldn't retrieve left front wheel name from param server.");
       return false;
     }
     res = controller_nh.hasParam("right_front_wheel");
-    if(!res || !controller_nh.getParam("right_front_wheel", right_front_wheel_name))
+    if (!res || !controller_nh.getParam("right_front_wheel", right_front_wheel_name))
     {
       ROS_ERROR_NAMED(name_, "Couldn't retrieve right front wheel name from param server.");
       return false;
     }
     res = controller_nh.hasParam("left_rear_wheel");
-    if(!res || !controller_nh.getParam("left_rear_wheel", left_rear_wheel_name))
+    if (!res || !controller_nh.getParam("left_rear_wheel", left_rear_wheel_name))
     {
       ROS_ERROR_NAMED(name_, "Couldn't retrieve left rear wheel name from param server.");
       return false;
     }
     res = controller_nh.hasParam("right_rear_wheel");
-    if(!res || !controller_nh.getParam("right_rear_wheel", right_rear_wheel_name))
+    if (!res || !controller_nh.getParam("right_rear_wheel", right_rear_wheel_name))
     {
       ROS_ERROR_NAMED(name_, "Couldn't retrieve right rear wheel name from param server.");
       return false;
     }
-    
+
     res = controller_nh.hasParam("wheel_radius");
-    if(!res || !controller_nh.getParam("wheel_radius", wheel_radius_))
+    if (!res || !controller_nh.getParam("wheel_radius", wheel_radius_))
     {
       ROS_WARN_NAMED(name_, "Couldn't retrieve left front wheel radius from param server.");
       wheel_radius_ = -1;
@@ -186,21 +191,33 @@ namespace motor
     ROS_INFO_STREAM_NAMED(name_, "Base frame_id set to " << base_frame_id_);
 
     // Velocity and acceleration limits:
-    controller_nh.param("linear/x/has_velocity_limits"    , limiter_lin_.has_velocity_limits    , limiter_lin_.has_velocity_limits    );
-    controller_nh.param("linear/x/has_acceleration_limits", limiter_lin_.has_acceleration_limits, limiter_lin_.has_acceleration_limits);
-    controller_nh.param("linear/x/max_velocity"           , limiter_lin_.max_velocity           ,  limiter_lin_.max_velocity          );
-    controller_nh.param("linear/x/min_velocity"           , limiter_lin_.min_velocity           , -limiter_lin_.max_velocity          );
-    controller_nh.param("linear/x/max_acceleration"       , limiter_lin_.max_acceleration       ,  limiter_lin_.max_acceleration      );
-    controller_nh.param("linear/x/min_acceleration"       , limiter_lin_.min_acceleration       , -limiter_lin_.max_acceleration      );
+    controller_nh.param("linear/x/has_velocity_limits",
+      limiter_lin_.has_velocity_limits, limiter_lin_.has_velocity_limits);
+    controller_nh.param("linear/x/has_acceleration_limits",
+      limiter_lin_.has_acceleration_limits, limiter_lin_.has_acceleration_limits);
+    controller_nh.param("linear/x/max_velocity",
+      limiter_lin_.max_velocity,  limiter_lin_.max_velocity);
+    controller_nh.param("linear/x/min_velocity",
+      limiter_lin_.min_velocity, -limiter_lin_.max_velocity);
+    controller_nh.param("linear/x/max_acceleration",
+      limiter_lin_.max_acceleration,  limiter_lin_.max_acceleration);
+    controller_nh.param("linear/x/min_acceleration",
+      limiter_lin_.min_acceleration, -limiter_lin_.max_acceleration);
 
-    controller_nh.param("angular/z/has_velocity_limits"    , limiter_ang_.has_velocity_limits    , limiter_ang_.has_velocity_limits    );
-    controller_nh.param("angular/z/has_acceleration_limits", limiter_ang_.has_acceleration_limits, limiter_ang_.has_acceleration_limits);
-    controller_nh.param("angular/z/max_velocity"           , limiter_ang_.max_velocity           ,  limiter_ang_.max_velocity          );
-    controller_nh.param("angular/z/min_velocity"           , limiter_ang_.min_velocity           , -limiter_ang_.max_velocity          );
-    controller_nh.param("angular/z/max_acceleration"       , limiter_ang_.max_acceleration       ,  limiter_ang_.max_acceleration      );
-    controller_nh.param("angular/z/min_acceleration"       , limiter_ang_.min_acceleration       , -limiter_ang_.max_acceleration      );
+    controller_nh.param("angular/z/has_velocity_limits",
+      limiter_ang_.has_velocity_limits, limiter_ang_.has_velocity_limits);
+    controller_nh.param("angular/z/has_acceleration_limits",
+      limiter_ang_.has_acceleration_limits, limiter_ang_.has_acceleration_limits);
+    controller_nh.param("angular/z/max_velocity",
+      limiter_ang_.max_velocity,  limiter_ang_.max_velocity);
+    controller_nh.param("angular/z/min_velocity",
+      limiter_ang_.min_velocity, -limiter_ang_.max_velocity);
+    controller_nh.param("angular/z/max_acceleration",
+      limiter_ang_.max_acceleration,  limiter_ang_.max_acceleration);
+    controller_nh.param("angular/z/min_acceleration",
+      limiter_ang_.min_acceleration, -limiter_ang_.max_acceleration);
 
-    if(!setOdomParamsFromUrdf(root_nh, left_front_wheel_name, right_front_wheel_name))
+    if (!setOdomParamsFromUrdf(root_nh, left_front_wheel_name, right_front_wheel_name))
       return false;
 
     setOdomPubFields(root_nh, controller_nh);
@@ -220,7 +237,7 @@ namespace motor
 
     XmlRpc::XmlRpcValue slippageList;
     res = controller_nh.hasParam("angular_slippage");
-    if(res && controller_nh.getParam("angular_slippage", slippageList))
+    if (res && controller_nh.getParam("angular_slippage", slippageList))
     {
       hasSlippage_ = true;
       ROS_ASSERT(
@@ -260,7 +277,7 @@ namespace motor
     odometry_.update(left_front_wheel_joint_.getPosition(), right_front_wheel_joint_.getPosition(), time, slipFactor_);
 
     // Publish odometry message
-    if(last_state_publish_time_ + publish_period_ < time)
+    if (last_state_publish_time_ + publish_period_ < time)
     {
       last_state_publish_time_ += publish_period_;
       // Compute and store orientation info
@@ -268,7 +285,7 @@ namespace motor
             tf::createQuaternionMsgFromYaw(odometry_.getHeading()));
 
       // Populate odom message and publish
-      if(odom_pub_->trylock())
+      if (odom_pub_->trylock())
       {
         odom_pub_->msg_.header.stamp = time;
         odom_pub_->msg_.pose.pose.position.x = odometry_.getX();
@@ -280,15 +297,15 @@ namespace motor
       }
 
       // Publish tf /odom frame
-      //~ if(tf_odom_pub_->trylock())
-      //~ {
-        //~ odom_frame_.header.stamp = time;
-        //~ odom_frame_.transform.translation.x = odometry_.getX();
-        //~ odom_frame_.transform.translation.y = odometry_.getY();
-        //~ odom_frame_.transform.rotation = orientation;
-        //~ tf_odom_pub_->msg_.transforms[0] = odom_frame_;
-        //~ tf_odom_pub_->unlockAndPublish();
-      //~ }
+      // ~ if(tf_odom_pub_->trylock())
+      // ~ {
+        // ~ odom_frame_.header.stamp = time;
+        // ~ odom_frame_.transform.translation.x = odometry_.getX();
+        // ~ odom_frame_.transform.translation.y = odometry_.getY();
+        // ~ odom_frame_.transform.rotation = orientation;
+        // ~ tf_odom_pub_->msg_.transforms[0] = odom_frame_;
+        // ~ tf_odom_pub_->unlockAndPublish();
+      // ~ }
     }
 
     // MOVE ROBOT
@@ -351,12 +368,12 @@ namespace motor
 
   void SkidSteerDriveController::cmdVelCallback(const geometry_msgs::Twist& command)
   {
-    if(isRunning())
+    if (isRunning())
     {
       command_struct_.ang   = command.angular.z;
       command_struct_.lin   = command.linear.x;
       command_struct_.stamp = ros::Time::now();
-      command_.writeFromNonRT (command_struct_);
+      command_.writeFromNonRT(command_struct_);
       ROS_DEBUG_STREAM_NAMED(name_,
                              "Added values to command. "
                              << "Ang: "   << command_struct_.ang << ", "
@@ -377,7 +394,7 @@ namespace motor
     const std::string model_param_name = "/robot_description";
     bool res = root_nh.hasParam(model_param_name);
     std::string robot_model_str="";
-    if(!res || !root_nh.getParam(model_param_name,robot_model_str))
+    if (!res || !root_nh.getParam(model_param_name, robot_model_str))
     {
       ROS_ERROR_NAMED(name_, "Robot descripion couldn't be retrieved from param server.");
       return false;
@@ -388,7 +405,7 @@ namespace motor
     // Get wheel separation
     boost::shared_ptr<const urdf::Joint>
       left_front_wheel_joint(model->getJoint(left_front_wheel_name));
-    if(!left_front_wheel_joint)
+    if (!left_front_wheel_joint)
     {
       ROS_ERROR_STREAM_NAMED(name_, left_front_wheel_name
                              << " couldn't be retrieved from model description");
@@ -403,7 +420,7 @@ namespace motor
       boost::shared_ptr<const urdf::Joint>
         parent_joint(model->getLink(
           left_front_wheel_joint->parent_link_name)->parent_joint);
-      if(!parent_joint)
+      if (!parent_joint)
       {
         ROS_ERROR_STREAM_NAMED(name_, left_front_wheel_joint->parent_link_name
                                << " couldn't be retrieved from model description");
@@ -415,7 +432,7 @@ namespace motor
     }
 
     boost::shared_ptr<const urdf::Joint> right_front_wheel_joint(model->getJoint(right_front_wheel_name));
-    if(!right_front_wheel_joint)
+    if (!right_front_wheel_joint)
     {
       ROS_ERROR_STREAM_NAMED(name_, right_front_wheel_name
                              << " couldn't be retrieved from model description");
@@ -430,7 +447,7 @@ namespace motor
       boost::shared_ptr<const urdf::Joint>
         parent_joint(model->getLink(
           right_front_wheel_joint->parent_link_name)->parent_joint);
-      if(!parent_joint)
+      if (!parent_joint)
       {
         ROS_ERROR_STREAM_NAMED(name_, right_front_wheel_joint->parent_link_name
                                << " couldn't be retrieved from model description");
@@ -452,7 +469,8 @@ namespace motor
                                            right_position);
 
     // Get wheel radius
-    if(!getWheelRadius(model->getLink(left_front_wheel_joint->child_link_name), wheel_radius_)
+    if (!getWheelRadius(model->getLink(left_front_wheel_joint->child_link_name),
+      wheel_radius_)
       && wheel_radius_ == -1)
     {
       ROS_ERROR_STREAM_NAMED(name_, "Couldn't retrieve " << left_front_wheel_name << " wheel radius");

@@ -1,4 +1,4 @@
-/***************************************************************************
+  /***************************************************************************
  *   Copyright (C) 2008-2011 by Charalampos Serenis <info@devel.serenis.gr>*
  *   Author: Charalampos Serenis <info@devel.serenis.gr>                   *
  *                                                                         *
@@ -133,19 +133,19 @@ namespace epos
      *
      */
     BUSY,
-    ///Device replied with NACK
+    /// Device replied with NACK
     NACK,
-    ///Time out
+    /// Time out
     TIMEOUT,
-    ///RS232 port error. Usually port disconnected
+    /// RS232 port error. Usually port disconnected
     RS232,
-    ///Invalid API usage. Read documentation
+    /// Invalid API usage. Read documentation
     API,
-    ///Unexpected responce during handshake. Please disconnect and
-    ///reconnect to resyncronize gateway
+    /// Unexpected responce during handshake. Please disconnect and
+    /// reconnect to resyncronize gateway
     RESYNC,
-    ///Responce from device violates protocol. Check for changes in
-    ///updated firmware
+    /// Responce from device violates protocol. Check for changes in
+    /// updated firmware
     PROTOCOL,
     DEFAULT
   };

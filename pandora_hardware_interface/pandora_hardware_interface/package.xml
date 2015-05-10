@@ -24,6 +24,7 @@
   <exec_depend>pandora_linear_motor_hardware_interface</exec_depend>
   <exec_depend>pandora_hardware_tools</exec_depend>
   <exec_depend>pandora_sensor_msgs</exec_depend>
+  <exec_depend>pandora_leddar_hardware_interface</exec_depend>
 
   <export>
     <metapackage/>

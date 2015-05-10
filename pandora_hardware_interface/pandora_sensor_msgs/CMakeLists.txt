@@ -12,6 +12,7 @@ add_message_files(
     BatteryMsg.msg
     Co2Msg.msg
     ImuRPY.msg
+    MotorCurrents.msg
     Temperature.msg
     ThermalMeanMsg.msg
     )

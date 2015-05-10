@@ -34,3 +34,4 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - catkin_make roslint_pandora_imu_hardware_interface
   - catkin_make roslint_pandora_linear_motor_hardware_interface
   - catkin_make roslint_pandora_motor_hardware_interface
+  - catkin_make roslint_pandora_leddar_hardware_interface

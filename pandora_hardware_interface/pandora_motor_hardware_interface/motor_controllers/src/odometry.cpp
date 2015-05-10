@@ -78,7 +78,7 @@ namespace motor
     right_wheel_old_pos_ = right_wheel_cur_pos;
 
     /// Compute linear and angular diff:
-    const double linear  = (right_wheel_est_vel + left_wheel_est_vel) * 0.5 ;
+    const double linear  = (right_wheel_est_vel + left_wheel_est_vel) * 0.5;
     const double angular = (right_wheel_est_vel - left_wheel_est_vel) /
       wheel_separation_ / slipFactor;
 
@@ -87,8 +87,8 @@ namespace motor
 
     /// We cannot estimate the speed with very small time intervals:
     const double dt = (time - timestamp_).toSec();
-    if(dt < 0.0001)
-      return false; // Interval too small to integrate with
+    if (dt < 0.0001)
+      return false;  // Interval too small to integrate with
 
     timestamp_ = time;
 
@@ -135,7 +135,7 @@ namespace motor
    */
   void Odometry::integrateExact(double linear, double angular)
   {
-    if(fabs(angular) < 10e-3)
+    if (fabs(angular) < 10e-3)
       integrateRungeKutta2(linear, angular);
     else
     {
