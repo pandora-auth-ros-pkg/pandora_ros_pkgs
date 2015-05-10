@@ -46,23 +46,25 @@ namespace imu
   :
     nodeHandle_(nodeHandle)
   {
-    std::string device_type;
-    if (nodeHandle_.getParam("device_type", device_type))
+    std::string device;
+    if (nodeHandle_.getParam("device", device))
     {
-      if (device_type == "imu")
+      ROS_INFO("Selected Device: %s", device.c_str());
+
+      if (device == "imu")
         comInterface_ = new ImuComInterface("/dev/imu", 38400, 100);
-      else if (device_type == "ahrs")
+      else if (device == "ahrs")
         comInterface_ = new AhrsComInterface("/dev/ahrs", 38400, 100);
       else
       {
           ROS_FATAL(
-            "[ERROR]: device_type not set correctly in parameter server.");
+            "device not set correctly in parameter server.");
           exit(-1);
       }
     }
     else
     {
-      ROS_FATAL("[ERROR]: device_type not set in parameter server.");
+      ROS_FATAL("device not set in parameter server.");
       exit(-1);
     }
 
