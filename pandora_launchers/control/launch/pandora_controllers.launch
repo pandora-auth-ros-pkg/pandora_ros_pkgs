@@ -21,7 +21,7 @@
 
   <!-- IMU -->
   <include if="$(arg imu)"
-    file="$(find pandora_imu_hardware_interface)/launch/imu_controller.launch" />
+    file="$(find pandora_imu_hardware_interface)/imu_controllers/launch/imu_controllers.launch" />
 
   <!-- Linear -->
  <include if="$(arg linear)"

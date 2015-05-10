@@ -18,6 +18,7 @@
   <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
   <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" />
   <include file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface_and_controllers.launch" />
+  <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
 
   <!-- Control -->
   <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
@@ -30,18 +31,20 @@
   <!-- Navigation -->
   <include file="$(find pandora_move_base)/launch/move_base.launch" />
   <include file="$(find pandora_exploration)/launch/explorer.launch" />
+  
+  <!-- Vision -->
+  <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
+  
+  <!-- Data fusion -->
+  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
 
   <!-- Kinect -->
+  <!--
   <include file="$(find openni2_launch)/launch/openni2.launch">
     <arg name="camera" value="kinect" />
     <arg name="depth_registration" value="true" />
     <arg name="publish_tf" value="false" />
   </include>
-  
-  <!-- Vision -->
-  <!--  <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" /> -->
-  
-  <!-- Data fusion -->
-  <!-- <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" /> -->
+  -->
   
 </launch>

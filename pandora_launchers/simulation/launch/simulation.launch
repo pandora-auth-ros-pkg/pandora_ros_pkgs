@@ -27,7 +27,7 @@
 
   <!-- If not using gazebo spawn robot_description -->
   <group unless="$(arg gazebo)">
-    <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+    <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
   </group>
 
   <!-- Navigation -->
