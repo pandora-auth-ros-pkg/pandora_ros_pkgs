@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- ==================================================================== -->
+  <xacro:include filename="$(find pandora_sensors_description)/urdf/microphone.urdf.xacro" />
+  <!-- ==================================================================== -->
+
+<!-- ###################################################################### -->
+
+  <xacro:macro name="microphone_sensor" >
+  
+    <xacro:microphone_caster parent="linear_head_main_link" >
+
+      <origin xyz="-0.02175 -0.0374 0.09643"
+              rpy="${zero}" />
+
+    </xacro:microphone_caster>
+    
+  </xacro:macro>
+
+<!-- ###################################################################### -->
+
+</robot>

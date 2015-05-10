@@ -38,7 +38,7 @@
                 rpy="0.0 0.0 0.0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_robots_description/meshes/gears/visual/linear/head/servo_motor.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/laser/pitch_servo_motor.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>
