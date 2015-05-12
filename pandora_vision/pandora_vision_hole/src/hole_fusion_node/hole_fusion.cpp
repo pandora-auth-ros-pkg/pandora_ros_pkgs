@@ -81,7 +81,7 @@ namespace pandora_vision
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_msgs::HolesDirectionsVectorMsg>(
+      <pandora_vision_msgs::HoleDirectionAlertVector>(
         validHolesTopic_, 10, true);
 
     // Advertise the topic that information about the final holes,
@@ -103,7 +103,7 @@ namespace pandora_vision
     // Advertise the topic that the image of the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_msgs::EnhancedHolesVectorMsg>(
+      <pandora_vision_msgs::EnhancedImage>(
         enhancedHolesTopic_, 1000, true);
 
     // Advertise the topic where the Hole Fusion node requests from the
@@ -218,13 +218,13 @@ namespace pandora_vision
     the synchronizer and calls for processing of the candidate
     holes.
     @param[in] depthCandidateHolesVector
-    [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+    [const pandora_vision_hole::CandidateHolesVectorMsg&]
     The message containing the necessary information acquired through
     the depth node
     @return void
    **/
   void HoleFusion::depthCandidateHolesCallback(
-    const pandora_vision_msgs::CandidateHolesVectorMsg&
+    const pandora_vision_hole::CandidateHolesVectorMsg&
     depthCandidateHolesVector)
   {
     #ifdef DEBUG_TIME
@@ -1055,8 +1055,8 @@ namespace pandora_vision
     ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
 
     // The validation process
-    Parameters::HoleFusion::Validation::validation_process =
-      config.validation_process;
+    Parameters::HoleFusion::Validation::validation_process = 1;
+      //config.validation_process;
 
 
     // When depth analysis is applicable
@@ -1509,7 +1509,7 @@ namespace pandora_vision
     std::map<int, float>* validHolesMap)
   {
     // The overall message of enhanced holes that will be published
-    pandora_vision_msgs::EnhancedHolesVectorMsg enhancedHolesMsg;
+    pandora_vision_msgs::EnhancedImage enhancedHolesMsg;
 
     // Set the rgbImage in the enhancedHolesMsg message to the rgb image
     enhancedHolesMsg.rgbImage = MessageConversions::convertImageToMessage(
@@ -1535,27 +1535,32 @@ namespace pandora_vision
       it != validHolesMap->end(); it++)
     {
       // The enhanced hole message. Used for one hole only
-      pandora_vision_msgs::EnhancedHoleMsg enhancedHoleMsg;
+      pandora_vision_msgs::AreaOfInterest enhancedHoleMsg;
 
       // Set the hole's keypoint
-      enhancedHoleMsg.keypointX = conveyor.holes[it->first].keypoint.pt.x;
-      enhancedHoleMsg.keypointY = conveyor.holes[it->first].keypoint.pt.y;
+      enhancedHoleMsg.center.x = conveyor.holes[it->first].keypoint.pt.x;
+      enhancedHoleMsg.center.y = conveyor.holes[it->first].keypoint.pt.y;
 
-      // Set the hole's bounding box vertices
+      // Set the hole's bounding box width and height
+      int minx = conveyor.holes[it->first].rectangle[0].x;
+      int maxx = conveyor.holes[it->first].rectangle[0].x;
+      int miny = conveyor.holes[it->first].rectangle[0].y;
+      int maxy = conveyor.holes[it->first].rectangle[0].y;
+      
       for (int r = 0; r < conveyor.holes[it->first].rectangle.size(); r++)
       {
-        enhancedHoleMsg.verticesX.push_back(
-          conveyor.holes[it->first].rectangle[r].x);
-        enhancedHoleMsg.verticesY.push_back(
-          conveyor.holes[it->first].rectangle[r].y);
+        int xx = conveyor.holes[it->first].rectangle[r].x;
+        int yy = conveyor.holes[it->first].rectangle[r].y;
+        minx = xx < minx ? xx : minx;
+        maxx = xx > maxx ? xx : maxx;
+        miny = yy < miny ? yy : miny;
+        maxy = yy > maxy ? yy : maxy;
       }
-
-      // Set the message's header
-      enhancedHoleMsg.header.stamp = timestamp_;
-      enhancedHoleMsg.header.frame_id = frame_id_;
+      enhancedHoleMsg.width = maxx - minx;
+      enhancedHoleMsg.height = maxy - miny;
 
       // Push back into the enhancedHolesMsg message
-      enhancedHolesMsg.enhancedHoles.push_back(enhancedHoleMsg);
+      enhancedHolesMsg.areasOfInterest.push_back(enhancedHoleMsg);
     }
 
     // Publish the overall message
@@ -1644,7 +1649,7 @@ namespace pandora_vision
     int width = interpolatedDepthImage_.cols;
 
     // The overall valid holes found message
-    pandora_vision_msgs::HolesDirectionsVectorMsg holesVectorMsg;
+    pandora_vision_msgs::HoleDirectionAlertVector holesVectorMsg;
 
     // Counter for the holes' identifiers
     int holeId = 0;
@@ -1653,7 +1658,7 @@ namespace pandora_vision
       it != map->end(); it++)
     {
       // A single hole's message
-      pandora_vision_msgs::HoleDirectionMsg holeMsg;
+      pandora_vision_msgs::HoleDirectionAlert holeMsg;
 
       // The hole's keypoint coordinates relative to the center of the frame
       float x = conveyor.holes[it->first].keypoint.pt.x
@@ -1666,9 +1671,9 @@ namespace pandora_vision
       float pitch = atan(2 * y / height * tan(vfov / 2));
 
       // Setup everything needed by the single hole's message
-      holeMsg.yaw = yaw;
-      holeMsg.pitch = pitch;
-      holeMsg.probability = it->second;
+      holeMsg.info.yaw = yaw;
+      holeMsg.info.pitch = pitch;
+      holeMsg.info.probability = it->second;
       holeMsg.holeId = holeId;
 
       // Fill the overall holes found message with the current hole message
@@ -1732,13 +1737,13 @@ namespace pandora_vision
     the synchronizer and calls for processing of the candidate
     holes.
     @param[in] rgbCandidateHolesVector
-    [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+    [const pandora_vision_hole::CandidateHolesVectorMsg&]
     The message containing the necessary information to filter hole
     candidates acquired through the rgb node
     @return void
    **/
   void HoleFusion::rgbCandidateHolesCallback(
-    const pandora_vision_msgs::CandidateHolesVectorMsg&
+    const pandora_vision_hole::CandidateHolesVectorMsg&
     rgbCandidateHolesVector)
   {
     #ifdef DEBUG_TIME

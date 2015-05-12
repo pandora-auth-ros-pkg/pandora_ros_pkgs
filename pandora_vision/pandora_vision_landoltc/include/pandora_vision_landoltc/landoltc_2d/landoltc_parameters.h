@@ -37,21 +37,29 @@
 
 #ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_PARAMETERS_H
 #define PANDORA_VISION_LANDOLTC_LANDOLTC_PARAMETERS_H
-#include <dynamic_reconfigure/server.h>
-#include <pandora_vision_landoltc/landoltc_cfgConfig.h>
+#include <iostream>
+#include <cstdlib>
+
+#include "dynamic_reconfigure/server.h"
+#include "pandora_vision_landoltc/landoltc_cfgConfig.h"
+
+#include "ros/ros.h"
+#include "ros/package.h"
+#include "opencv2/opencv.hpp"
 
 namespace pandora_vision
 {
   struct LandoltcParameters
   {
     //!< Threshold parameters
-    static double gradientThreshold;
-    static double centerThreshold;
-    static double huMomentsPrec;
-    static int adaptiveThresholdSubtractSize;
-    static bool visualization;
-    static double timerThreshold;
+    double gradientThreshold;
+    double centerThreshold;
+    double huMomentsPrec;
+    int adaptiveThresholdSubtractSize;
+    bool visualization;
+    double timerThreshold;
     
+    void configLandoltC(const ros::NodeHandle& nh);
   };
 
 } // namespace pandora_vision

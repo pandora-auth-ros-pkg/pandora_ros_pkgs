@@ -1,0 +1,25 @@
+%YAML:1.0
+extract_channels_statistics_features: true
+extract_edge_orientation_features: true
+extract_haralick_features: true
+extract_sift_features: false
+extract_hog_features: false
+
+dictionary_size: 10
+visualization: false
+save_descriptors: false
+load_descriptors: false
+
+training_set_feature_extraction: true
+test_set_feature_extraction: true
+load_classifier_model: false
+
+do_pca_analysis: false
+# Normalization Types
+# 0: No Normalization
+# 1: Min-Max Normalization
+# 2: Z-Score Normalization
+type_of_normalization: 2
+
+training_annotations_file: depth_training_annotations.txt
+test_annotations_file: depth_test_annotations.txt

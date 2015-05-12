@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
+catkin_python_setup()
+
 catkin_package(CATKIN_DEPENDS
   roscpp
   cv_bridge
@@ -24,4 +26,3 @@ add_executable(image_saver_by_topic_node
 target_link_libraries(image_saver_by_topic_node
   ${catkin_LIBRARIES}
 )
-

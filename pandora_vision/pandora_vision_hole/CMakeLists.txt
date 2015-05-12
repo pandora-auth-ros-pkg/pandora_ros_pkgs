@@ -19,11 +19,13 @@ project(pandora_vision_hole)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  message_generation
   pandora_vision_msgs
   state_manager
   state_manager_msgs
   cv_bridge
   image_transport
+  std_msgs
   sensor_msgs
   dynamic_reconfigure
   pcl_ros
@@ -44,14 +46,28 @@ generate_dynamic_reconfigure_options(
   cfg/rgb_node_cfg/rgb_cfg.cfg
   )
 
+add_message_files(
+  FILES
+  CandidateHoleMsg.msg
+  CandidateHolesVectorMsg.msg
+  )
+  
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
+  )
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
+    message_runtime
     pandora_vision_msgs
     state_manager
     state_manager_msgs
     cv_bridge
     image_transport
+    std_msgs
     sensor_msgs
     dynamic_reconfigure
     pcl_ros

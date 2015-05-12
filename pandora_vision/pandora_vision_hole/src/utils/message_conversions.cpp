@@ -134,14 +134,14 @@ namespace pandora_vision
     vectors of the holes' keypoints, bounding rectangles' vertices
     and blobs' outlines
     @param[out] candidateHolesVector
-    [std::vector<pandora_vision_msgs::CandidateHolesVectorMsg>*]
+    [std::vector<pandora_vision_hole::CandidateHolesVectorMsg>*]
     The vector containing the conveyor's holes in
-    pandora_vision_msgs::CandidateHolesVectorMsg format
+    pandora_vision_hole::CandidateHolesVectorMsg format
     @return void
    **/
   void MessageConversions::createCandidateHolesVector(
     const HolesConveyor& conveyor,
-    std::vector<pandora_vision_msgs::CandidateHoleMsg>* candidateHolesVector)
+    std::vector<pandora_vision_hole::CandidateHoleMsg>* candidateHolesVector)
   {
     #ifdef DEBUG_TIME
     Timer::start("createCandidateHolesVector");
@@ -151,7 +151,7 @@ namespace pandora_vision
     // candidateHoles vector
     for (unsigned int i = 0; i < conveyor.size(); i++)
     {
-      pandora_vision_msgs::CandidateHoleMsg holeMsg;
+      pandora_vision_hole::CandidateHoleMsg holeMsg;
 
       // Push back the keypoint
       holeMsg.keypointX = conveyor.holes[i].keypoint.pt.x;
@@ -190,7 +190,7 @@ namespace pandora_vision
     and blobs' outlines
     @param[in] image [cv::Mat&] The image to be packed in the message
     @param[out] candidateHolesVectorMsg
-    [pandora_vision_msgs::CandidateHolesVectorMsg*] The output message
+    [pandora_vision_hole::CandidateHolesVectorMsg*] The output message
     @param[in] encoding [std::string&] The image's encoding
     @param[in] msg [const sensor_msgs::Image&] Needed to extract
     its header and place it as the header of the output message
@@ -199,7 +199,7 @@ namespace pandora_vision
   void MessageConversions::createCandidateHolesVectorMessage(
     const HolesConveyor& conveyor,
     const cv::Mat& image,
-    pandora_vision_msgs::CandidateHolesVectorMsg* candidateHolesVectorMsg,
+    pandora_vision_hole::CandidateHolesVectorMsg* candidateHolesVectorMsg,
     const std::string& encoding,
     const sensor_msgs::Image& msg)
   {
@@ -207,9 +207,9 @@ namespace pandora_vision
     Timer::start("createCandidateHolesVectorMessage");
     #endif
 
-    // Fill the pandora_vision_msgs::CandidateHolesVectorMsg's
+    // Fill the pandora_vision_hole::CandidateHolesVectorMsg's
     // candidateHoles vector
-    std::vector<pandora_vision_msgs::CandidateHoleMsg> candidateHolesVector;
+    std::vector<pandora_vision_hole::CandidateHoleMsg> candidateHolesVector;
     createCandidateHolesVector(conveyor, &candidateHolesVector);
 
     candidateHolesVectorMsg->candidateHoles = candidateHolesVector;
@@ -262,7 +262,7 @@ namespace pandora_vision
 
   /**
     @brief Extracts a cv::Mat image from a custom ROS message of type
-    pandora_vision_msgs::CandidateHolesVectorMsg
+    pandora_vision_hole::CandidateHolesVectorMsg
     containing the interpolated depth image
     @param[in] msg [const sensor_msgs::ImageConstPtr&] The input ROS message
     @param[out] image [cv::Mat*] The output image
@@ -270,7 +270,7 @@ namespace pandora_vision
     @return void
    **/
   void MessageConversions::extractImageFromMessageContainer(
-    const pandora_vision_msgs::CandidateHolesVectorMsg& msg,
+    const pandora_vision_hole::CandidateHolesVectorMsg& msg,
     cv::Mat* image, const std::string& encoding)
   {
     #ifdef DEBUG_TIME
@@ -289,9 +289,9 @@ namespace pandora_vision
 
   /**
     @brief Recreates the HolesConveyor struct for the candidate holes
-    from the pandora_vision_msgs::CandidateHolerMsg message
+    from the pandora_vision_hole::CandidateHolerMsg message
     @param[in] candidateHolesVector
-    [const std::vector<pandora_vision_msgs::CandidateHoleMsg>&]
+    [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
     The input candidate holes
     @param[out] conveyor [HolesConveyor*] The output conveyor
     struct
@@ -306,7 +306,7 @@ namespace pandora_vision
     @return void
    **/
   void MessageConversions::fromCandidateHoleMsgToConveyor(
-    const std::vector<pandora_vision_msgs::CandidateHoleMsg>&
+    const std::vector<pandora_vision_hole::CandidateHoleMsg>&
     candidateHolesVector,
     HolesConveyor* conveyor,
     const cv::Mat& inImage,
@@ -435,9 +435,9 @@ namespace pandora_vision
   /**
     @brief Unpacks the the HolesConveyor struct for the
     candidate holes, the interpolated depth image or the RGB image
-    from the pandora_vision_msgs::CandidateHolesVectorMsg message
+    from the pandora_vision_hole::CandidateHolesVectorMsg message
     @param[in] holesMsg
-    [pandora_vision_msgs::CandidateHolesVectorMsg&] The input
+    [pandora_vision_hole::CandidateHolesVectorMsg&] The input
     candidate holes message obtained through the depth node
     @param[out] conveyor [HolesConveyor*] The output conveyor
     struct
@@ -451,7 +451,7 @@ namespace pandora_vision
     @return void
    **/
   void MessageConversions::unpackMessage(
-    const pandora_vision_msgs::CandidateHolesVectorMsg& holesMsg,
+    const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
     HolesConveyor* conveyor,
     cv::Mat* image,
     const int& representationMethod,

@@ -43,9 +43,9 @@ namespace pandora_vision
     @brief Constructor
   **/
   VictimDetection::VictimDetection(const std::string& ns) :
-    _nh(ns),
-    params(ns),
-    imageTransport_(_nh)
+      _nh(ns),
+      params(ns),
+      imageTransport_(_nh)
   {
      //!< Set initial value of parent frame id to null
     _parent_frame_id = "";
@@ -58,7 +58,7 @@ namespace pandora_vision
     //! Declare publisher and advertise topic
     //! where algorithm results are posted
     _victimDirectionPublisher =
-      _nh.advertise<pandora_common_msgs::GeneralAlertMsg>(
+      _nh.advertise<pandora_common_msgs::GeneralAlert>(
         VictimParameters::victimAlertTopic, 10, true);
 
     /// Subscribe to input image's topic
@@ -70,16 +70,14 @@ namespace pandora_vision
         VictimParameters::enhancedHolesTopic,
           1, &VictimDetection::imageCallback, this);
 
+
+
+    rgbSvmValidator_.reset(new RgbSvmValidator(VictimParameters::rgb_classifier_path));
+    depthSvmValidator_.reset(new DepthSvmValidator(VictimParameters::depth_classifier_path));
     /// Initialize the face detector and the svm classifiers
-    _rgbViolaJonesDetector = VictimVJDetector(
-      VictimParameters::cascade_path,
-      VictimParameters::model_path);
-
-    RgbSystemValidator::initialize(
-      VictimParameters::rgb_classifier_path);
-
-    DepthSystemValidator::initialize(
-      VictimParameters::depth_classifier_path);
+    //_rgbViolaJonesDetector = VictimVJDetector(
+      //VictimParameters::cascade_path,
+      //VictimParameters::model_path);
 
     /// Initialize states - robot starts in STATE_OFF
     curState = state_manager_msgs::RobotModeMsg::MODE_OFF;
@@ -118,8 +116,7 @@ namespace pandora_vision
 
     if(!res || !_nh.getParam(model_param_name, robot_description))
     {
-      ROS_ERROR("[Motion_node]:Robot description couldn't be \
-        retrieved from the parameter server.");
+      ROS_ERROR("[Motion_node]:Robot description couldn't be retrieved from the parameter server.");
       return false;
     }
 
@@ -128,7 +125,8 @@ namespace pandora_vision
 
     // Get current link and its parent
     boost::shared_ptr<const urdf::Link> currentLink = model->getLink(_frame_id);
-    if(currentLink){
+    if(currentLink)
+    {
       boost::shared_ptr<const urdf::Link> parentLink = currentLink->getParent();
       // Set the parent frame_id to the parent of the frame_id
       _parent_frame_id = parentLink->name;
@@ -188,7 +186,7 @@ namespace pandora_vision
   void VictimDetection::imageCallback(
       const pandora_vision_msgs::EnhancedHolesVectorMsg& msg)
   {
-
+    ROS_INFO_STREAM("ENTER CALLBACK");
     if(
       (curState !=
         state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION) &&
@@ -211,7 +209,8 @@ namespace pandora_vision
       _frame_id = _frame_id.substr(1);
 
 
-    if (rgbImage.empty()){
+    if (rgbImage.empty())
+    {
       ROS_FATAL("[victim_node] : No more frames ");
       ROS_BREAK();
     }
@@ -380,21 +379,21 @@ namespace pandora_vision
           - final_victims[i].keypoint.y;
 
         //!< Create message of Victim Detector
-        pandora_common_msgs::GeneralAlertMsg victimMessage;
+        pandora_common_msgs::GeneralAlert victimMessage;
 
         victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
 
         victimMessage.header.stamp = victimFrameTimestamp;
 
-        victimMessage.yaw =
+        victimMessage.info.yaw =
           atan(2 * x / VictimParameters::frameWidth
             * tan(VictimParameters::hfov / 2));
 
-        victimMessage.pitch =
+        victimMessage.info.pitch =
           atan(2 * y / VictimParameters::frameHeight
             * tan(VictimParameters::vfov / 2));
 
-        victimMessage.probability = final_victims[i].probability;
+        victimMessage.info.probability = final_victims[i].probability;
 
         _victimDirectionPublisher.publish(victimMessage);
       }
@@ -569,7 +568,7 @@ namespace pandora_vision
     const pandora_vision_msgs::EnhancedHolesVectorMsg& msg
   )
   {
-
+    ROS_INFO("Detect Victims");
     if(VictimParameters::debug_img || VictimParameters::debug_img_publisher)
     {
       rgbImage.copyTo(debugImage);
@@ -679,21 +678,21 @@ namespace pandora_vision
           - final_victims[i].keypoint.y;
 
         //!< Create message of Victim Detector
-        pandora_common_msgs::GeneralAlertMsg victimMessage;
+        pandora_common_msgs::GeneralAlert victimMessage;
 
         victimMessage.header.frame_id = _frame_ids_map.find(_frame_id)->second;
 
         victimMessage.header.stamp = victimFrameTimestamp;
 
-        victimMessage.yaw =
+        victimMessage.info.yaw =
           atan(2 * x / VictimParameters::frameWidth
             * tan(VictimParameters::hfov / 2));
 
-        victimMessage.pitch =
+        victimMessage.info.pitch =
           atan(2 * y / VictimParameters::frameHeight
             * tan(VictimParameters::vfov / 2));
 
-        victimMessage.probability = final_victims[i].probability;
+        victimMessage.info.probability = final_victims[i].probability;
 
         _victimDirectionPublisher.publish(victimMessage);
       }
@@ -876,7 +875,7 @@ namespace pandora_vision
     DetectedVictim temp;
 
     ///Enable Viola Jones for rgb image
-    rgb_vj_probabilities = _rgbViolaJonesDetector.findFaces(imgs.rgb.img);
+    //rgb_vj_probabilities = _rgbViolaJonesDetector.findFaces(imgs.rgb.img);
 
     if(detectionMode == GOT_HOLES_AND_DEPTH || detectionMode == GOT_DEPTH)
     {
@@ -886,8 +885,8 @@ namespace pandora_vision
     {
       for(int i = 0 ; i < imgs.rgbMasks.size(); i++)
       {
-        temp.probability = RgbSystemValidator::calculateSvmRgbProbability(
-          imgs.rgbMasks.at(i).img);
+        temp.probability = rgbSvmValidator_->calculatePredictionProbability(
+            imgs.rgbMasks.at(i).img);
         temp.keypoint = imgs.rgbMasks[i].keypoint;
         temp.source = RGB_SVM;
         temp.boundingBox = imgs.rgbMasks[i].bounding_box;
@@ -898,8 +897,8 @@ namespace pandora_vision
     {
       for(int i = 0 ; i < imgs.depthMasks.size(); i++)
       {
-        temp.probability = DepthSystemValidator::calculateSvmDepthProbability(
-          imgs.depthMasks.at(i).img);
+        temp.probability = depthSvmValidator_->calculatePredictionProbability(
+            imgs.depthMasks.at(i).img);
         temp.keypoint = imgs.depthMasks[i].keypoint;
         temp.source = DEPTH_RGB_SVM;
         temp.boundingBox = imgs.depthMasks[i].bounding_box;

@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "pandora_vision")
+set(pandora_vision_MAINTAINER "Despoina Paschalidou <paschalidoud@gmail.com>")
+set(pandora_vision_DEPRECATED "")
+set(pandora_vision_VERSION "0.1.0")
+set(pandora_vision_BUILD_DEPENDS )
+set(pandora_vision_RUN_DEPENDS "pandora_vision_face" "pandora_vision_qrcode" "pandora_vision_landoltc" "pandora_vision_hazmat" "pandora_vision_hole_detector" "pandora_vision_motion" "pandora_vision_launchers")
+set(pandora_vision_BUILDTOOL_DEPENDS "catkin")

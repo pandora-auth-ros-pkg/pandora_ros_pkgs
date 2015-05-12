@@ -47,7 +47,9 @@
 #include "ros/ros.h"
 #include <ros/package.h>
 
-static void read_csv(const std::string& filename, std::vector<cv::Mat>& images, std::vector<int>& labels, char separator = ';')
+static void read_csv(const std::string& filename,
+    const std::vector<cv::Mat>& images, const std::vector<int>& labels,
+    char separator = ';')
 {
   boost::filesystem::path filePath(filename);
   std::ifstream file(filename.c_str(), std::ifstream::in);
@@ -77,7 +79,7 @@ static void read_csv(const std::string& filename, std::vector<cv::Mat>& images, 
       system(cmd.c_str());
     }
 
-    if(!path.empty() && !classlabel.empty())
+    if (!path.empty() && !classlabel.empty())
     {
       images.push_back(cv::imread(abs.string(), 0));
       labels.push_back(atoi(classlabel.c_str()));
@@ -129,5 +131,4 @@ int main()
   std::cout << "Saving model to " << outFile << std::endl;
 
   model->save(outFile);
-
 }

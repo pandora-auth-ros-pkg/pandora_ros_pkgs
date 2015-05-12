@@ -1,0 +1,4 @@
+Header header
+pandora_vision_msgs/AreaOfInterest areaOfInterest
+sensor_msgs/Image image
+float32 posterior

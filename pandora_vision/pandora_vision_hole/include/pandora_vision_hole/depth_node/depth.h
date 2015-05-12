@@ -42,7 +42,7 @@
 #include "utils/parameters.h"
 #include "utils/message_conversions.h"
 #include "utils/wavelets.h"
-#include "pandora_vision_msgs/CandidateHolesVectorMsg.h"
+#include "pandora_vision_hole/CandidateHolesVectorMsg.h"
 
 
 /**

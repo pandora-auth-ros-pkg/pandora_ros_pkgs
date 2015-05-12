@@ -18,9 +18,12 @@
 
   <build_depend>roslint</build_depend>
   <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>message_generation</build_depend>
+
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
+  <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>pandora_vision_msgs</depend>
   <depend>state_manager</depend>
@@ -29,7 +32,8 @@
   <depend>pcl_ros</depend>
   <depend>message_filters</depend>
   <depend>urdf</depend>
-
+  
+  <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni2_launch</exec_depend>
 
   <!-- Test Depends -->

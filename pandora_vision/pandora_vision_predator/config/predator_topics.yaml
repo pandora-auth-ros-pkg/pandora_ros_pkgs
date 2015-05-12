@@ -1,3 +1,5 @@
 published_topic_names:  
   predator_alert : /vision/predator_alert
-  predator_employment_output : /vision/predator_landoltc_output  
+  predator_employment_output : /vision/predator_landoltc_output
+subscribed_topic_names:
+  annotator_topic_name : /vision/annotator_output  

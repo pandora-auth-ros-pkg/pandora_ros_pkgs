@@ -1,0 +1,35 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
+  <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+
+  
+  <rosparam file="$(find pandora_vision_support)/config/camera_kinect_params.yaml" 
+    command="load" ns="hazmat"/>
+
+  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
+      command="load"/>
+
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
+  <param name="left_camera/topic_name" value="/camera/image_raw"/>
+  <param name="right_camera/topic_name" value="/usb1/image_raw"/>
+
+  <param name="subscriberTopic" value="/vision/hazmat_alert" />
+  <param name="subscriberMessagePackage" value="pandora_vision_msgs" />
+  <param name="subscriberMessageType" value="HazmatAlertsVectorMsg"/>
+  <param name="publisherMessagePackage" value="sensor_msgs" />
+  <param name="publisherMessageType" value="Image"/>
+  
+  <param name="algorithm" value="Hazmat"/>
+
+  <param name="dataset_camera" value="kinect"/>
+  <param name="dataset_path" value="/test/benchmark/images/images_480p"/>
+  
+  <test test-name="HazmatBenchmarkTest" pkg="pandora_vision_hazmat"
+    type="hazmat_benchmark_test.py" time-limit="1000.0"/>
+  
+</launch>

@@ -15,17 +15,28 @@
   <author>Despoina Paschalidou</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
+  <depend>sensor_processor</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
+  <depend>pandora_common_msgs</depend>
   <depend>pandora_vision_msgs</depend>
+  <depend>pandora_vision_common</depend>
   <depend>sensor_msgs</depend>
   <depend>dynamic_reconfigure</depend>
-  <depend>roslint</depend>
   <depend>urdf</depend>
+  
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>rostest</test_depend>
+
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>rostest</test_depend>
 
   <export>
   </export>

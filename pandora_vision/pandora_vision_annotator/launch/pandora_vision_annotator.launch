@@ -1,0 +1,10 @@
+<launch>
+
+     <node name="$(anon pandora_vision_annotator_node)" pkg="pandora_vision_annotator" type="pandora_vision_annotator_node" output="screen"/>
+     <include file="$(find pandora_vision_predator)/launch/predator_node.launch" />
+ <include file="$(find state_manager)/launch/stateManager.launch" />
+ 
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+
+</launch>

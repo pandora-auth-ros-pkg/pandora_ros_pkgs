@@ -13,6 +13,10 @@
 
   <author>Despoina Paschalidou</author>
   <author>Marios Protopapas</author>
+  <author>Miltiadis Kofinas</author>
+  <author>Eirini Chatzieleftheriou</author>
+  <author>Manos Tsardoulias</author>
+  <author>Vasilis Choutas</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -24,6 +28,8 @@
   <depend>image_transport</depend>
   <depend>pandora_common_msgs</depend>
   <depend>pandora_vision_msgs</depend>
+  <depend>pandora_vision_common</depend>
+  <depend>sensor_processor</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>sensor_msgs</depend>

@@ -1,0 +1,24 @@
+<launch>
+  <arg name="robot" default="woody" />
+  
+  <!-- Robot Description -->
+  <include file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch" />
+
+  <!-- State Manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!-- Vision all nodes -->
+  <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
+
+  <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" />
+
+  <!-- Control -->
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+  <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
+
+  <!-- Slam -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+</launch>

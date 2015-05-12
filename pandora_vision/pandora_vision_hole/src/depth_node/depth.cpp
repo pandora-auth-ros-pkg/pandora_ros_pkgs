@@ -60,7 +60,7 @@ namespace pandora_vision
 
     // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_msgs::CandidateHolesVectorMsg>(
+      <pandora_vision_hole::CandidateHolesVectorMsg>(
       candidateHolesTopic_, 1000);
 
     // The dynamic reconfigure (depth) parameter's callback
@@ -148,7 +148,7 @@ namespace pandora_vision
     HolesConveyor holes = HoleDetector::findHoles(interpolatedDepthImage);
 
     // Create the candidate holes message
-    pandora_vision_msgs::CandidateHolesVectorMsg depthCandidateHolesMsg;
+    pandora_vision_hole::CandidateHolesVectorMsg depthCandidateHolesMsg;
 
     // Pack information about holes found and the interpolated depth image
     // inside a message.

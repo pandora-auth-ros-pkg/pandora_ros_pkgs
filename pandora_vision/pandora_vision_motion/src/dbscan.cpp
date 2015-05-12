@@ -51,7 +51,6 @@ namespace pandora_vision
   
   DBSCAN::~DBSCAN()
   {
-    
   }
   
    /**
@@ -63,7 +62,7 @@ namespace pandora_vision
   */ 
   void DBSCAN::init(unsigned int num_of_points)
   {
-    for(int i = 0; i < num_of_points; i++)
+    for (int i = 0; i < num_of_points; i++)
     {
       _labels[i] = -99;
       _visitedPoints.push_back(false);
@@ -80,7 +79,7 @@ namespace pandora_vision
   */ 
   bool DBSCAN::isVisited(int iterator)
   {
-    if(_visitedPoints.at(iterator) == false)
+    if (_visitedPoints.at(iterator) == false)
       return false;
     else
       return true;
@@ -94,7 +93,7 @@ namespace pandora_vision
   */ 
   double DBSCAN::dist2d(cv::Point2d pt1, cv::Point2d pt2)
   {
-      return sqrt(pow(pt1.x-pt2.x, 2) + pow(pt1.y-pt2.y, 2));
+    return sqrt(pow(pt1.x-pt2.x, 2) + pow(pt1.y-pt2.y, 2));
   }
   
   /**
@@ -105,10 +104,10 @@ namespace pandora_vision
   std::vector<int> DBSCAN::regionQuery(int p)
   {
     std::vector<int> res;
-    for(int i = 0; i < _data.size(); i++)
+    for (int i = 0; i < _data.size(); i++)
     {
-        if(calculateDistanceMatrix(p, i) <= _eps)
-            res.push_back(i);
+      if (calculateDistanceMatrix(p, i) <= _eps)
+          res.push_back(i);
     }
     return res;
   }
@@ -126,13 +125,13 @@ namespace pandora_vision
   void DBSCAN::expandCluster(int p, std::vector<int> neighbours)
   {
     _labels[p] = _cluster_id;
-    ///For each point in P' neighbor
-    for(int i = 0; i < neighbours.size(); i++)
+    /// For each point in P' neighbor
+    for (int i = 0; i < neighbours.size(); i++)
     {
-      ///If P' is not visited
-      if(!isVisited(neighbours[i]))
+      /// If P' is not visited
+      if (!isVisited(neighbours[i]))
       {
-        ///Mark P' as visited
+        /// Mark P' as visited
         _visitedPoints.at(neighbours[i]) = true;
         
         _labels[neighbours[i]] = _cluster_id;
@@ -151,14 +150,14 @@ namespace pandora_vision
   std::vector<std::vector<cv::Rect> > DBSCAN::getGroups()
   {
     std::vector<std::vector<cv::Rect> > clusters;
-    for(int i = 0; i <= _cluster_id; i++)
+    for (int i = 0; i <= _cluster_id; i++)
     {
-        clusters.push_back(std::vector<cv::Rect>());
-        for(int j = 0; j < _data.size(); j++)
-        {
-            if(_labels[j] == i)
-              clusters[clusters.size()-1].push_back(_data[j]);
-        }
+      clusters.push_back(std::vector<cv::Rect>());
+      for (int j = 0; j < _data.size(); j++)
+      {
+        if (_labels[j] == i)
+          clusters[clusters.size()-1].push_back(_data[j]);
+      }
     }
     return clusters;
   }
@@ -166,31 +165,31 @@ namespace pandora_vision
   void DBSCAN::dbscan_cluster()
   {
     DP = new double[_data.size()* _data.size()];
-    for(int i = 0; i < _data.size(); i++)
+    for (int i = 0; i < _data.size(); i++)
     {
-        for(int j = 0; j < _data.size(); j++)
-        {
-            if(i == j)
-                DP[i, j]=0;
-            else
-                DP[i, j]=-1;
-        }
-    }
-    for(int i = 0; i < _data.size(); i++){
-      if(isVisited(i) == false)
+      for (int j = 0; j < _data.size(); j++)
       {
-        ///Mark current point as visited
+        if (i == j)
+            DP[i, j]=0;
+        else
+            DP[i, j]=-1;
+      }
+    }
+    for (int i = 0; i < _data.size(); i++){
+      if (isVisited(i) == false)
+      {
+        /// Mark current point as visited
         _visitedPoints.at(i) = true;
         std::vector<int> neighbours = regionQuery(i);
-          if(neighbours.size() < _minPts)
+          if (neighbours.size() < _minPts)
           {
-            ///Mark P as noise
+            /// Mark P as noise
             _labels[i] = -1;
             _noise.push_back(i);
           }
           else
           {
-            ///Expand cluster
+            /// Expand cluster
             _cluster_id++;
             expandCluster(i, neighbours);
           }
@@ -201,9 +200,9 @@ namespace pandora_vision
   
   double DBSCAN::calculateDistanceMatrix(int pt1, int pt2)
   {
-    if(DP[pt1, pt2] != -1.0)
-        return DP[pt1, pt2];
-        
+    if (DP[pt1, pt2] != -1.0)
+      return DP[pt1, pt2];
+    
     cv::Rect a = _data[pt1];
     cv::Rect b = _data[pt2];
    
@@ -243,6 +242,4 @@ namespace pandora_vision
     DP[pt2, pt1] = minDist;
     return DP[pt1, pt2];
   }
-  
-  
-}// namespace pandora_vision
+}  // namespace pandora_vision

@@ -1,0 +1,8 @@
+prefix=/home/vchoutas/Programming/pandora_ws/install
+
+Name: pandora_vision_launchers
+Description: Description of pandora_vision_launchers
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/vchoutas/Programming/pandora_ws/install/lib 
+Requires: 

@@ -5,28 +5,29 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   sensor_msgs
+  pandora_common_msgs
 )
 
 add_message_files(
   FILES
-  CandidateHoleMsg.msg
-  CandidateHolesVectorMsg.msg
-  HoleDirectionMsg.msg
-  HolesDirectionsVectorMsg.msg
-  FaceDirectionMsg.msg
-  HolePositionMsg.msg
-  HolesPositionsVectorMsg.msg
-  EnhancedHoleMsg.msg
-  EnhancedHolesVectorMsg.msg
-  HazmatAlertMsg.msg
-  HazmatAlertsVectorMsg.msg
-  QRAlertMsg.msg
-  QRAlertsVectorMsg.msg
-  DataMatrixAlertMsg.msg
-  DataMatrixAlertsVectorMsg.msg
-  LandoltcAlertMsg.msg
-  LandoltcAlertsVectorMsg.msg
-  LandoltcPredatorMsg.msg
+  AreaOfInterest.msg
+  Blob.msg
+  BlobVector.msg
+  DataMatrixAlert.msg
+  DataMatrixAlertVector.msg
+  EnhancedImage.msg
+  HazmatAlert.msg
+  HazmatAlertVector.msg
+  HoleDirectionAlert.msg
+  HoleDirectionAlertVector.msg
+  HolePositionAlert.msg
+  HolePositionAlertVector.msg
+  Keypoint.msg
+  LandoltcAlert.msg
+  LandoltcAlertVector.msg
+  QRAlert.msg
+  QRAlertVector.msg
+  Predator.msg
   )
 
 generate_messages(
@@ -34,6 +35,7 @@ generate_messages(
     std_msgs
     geometry_msgs
     sensor_msgs
+    pandora_common_msgs
   )
 
 catkin_package(

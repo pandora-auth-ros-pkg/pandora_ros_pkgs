@@ -1,0 +1,29 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <include file="$(find pandora_vision_victim)/launch/victim_node.launch" />
+  
+  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
+    command="load"/>
+
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+  <param name="publisherTopic" value="/camera/depth_registered/points" />
+  <param name="publisherMessagePackage" value="sensor_msgs" />
+  <param name="publisherMessageType" value="PointCloud2"/>
+  
+  <param name="subscriberTopic" value="/vision/qr_alert" />
+  <param name="subscriberMessagePackage" value="pandora_common_msgs" />
+  <param name="subscriberMessageType" value="GeneralAlertMsg"/>
+  
+  <remap from="/camera/depth_registered/points" to="/kinect/depth_registered/points" />
+  
+  <param name="algorithm" value="Victim"/>
+  <param name="dataset_camera" value="kinect"/>
+  <param name="dataset_path" value="/home/miltos/Documents/pandora_supplementary_material/vision/benchmark_dataset/bags_pcl"/>
+  
+  <test test-name="VictimBenchmarkTest" pkg="pandora_vision_victim"
+    type="victim_benchmark_test.py" time-limit="2000.0"/>
+  
+</launch>

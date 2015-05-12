@@ -37,26 +37,34 @@
 
 #ifndef PANDORA_VISION_MOTION_MOTION_PARAMETERS_H
 #define PANDORA_VISION_MOTION_MOTION_PARAMETERS_H
+
 #include <dynamic_reconfigure/server.h>
+#include <ros/ros.h>
 #include <pandora_vision_motion/motion_cfgConfig.h>
 
 namespace pandora_vision
 {
+  // TODO remove static variables and define/implement methods to get params
+  // from yaml
   struct MotionParameters
   {
     //!< Background segmentation parameters
-    static int history;
-    static int varThreshold;
-    static bool bShadowDetection;
-    static int nmixtures;
-    
+    int history;
+    int varThreshold;
+    bool bShadowDetection;
+    int nmixtures;
     //!< Threshold parameters
-    static int diff_threshold;
-    static double motion_high_thres;
-    static double motion_low_thres;
-    static bool visualization;
+    int diff_threshold;
+    double motion_high_thres;
+    double motion_low_thres;
+    bool visualization;
+    bool show_image;
+    bool show_background;
+    bool show_diff_image;
+    bool show_moving_objects_contours;
     
+    void configMotion(const ros::NodeHandle& nh);
   };
+}  // namespace pandora_vision
 
-} // namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_PARAMETERS_H

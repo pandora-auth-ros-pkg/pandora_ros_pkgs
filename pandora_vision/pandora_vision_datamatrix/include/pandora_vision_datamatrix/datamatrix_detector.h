@@ -40,92 +40,85 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <dmtx.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <dmtx.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/image_encodings.h>
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
+#include "pandora_vision_datamatrix/datamatrix_poi.h"
 
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 namespace pandora_vision 
-{
-  struct DataMatrixQode
+{  
+  class DatamatrixDetector : public VisionProcessor
   {
-    cv::Point2f datamatrix_center;
-    std::string message;
-  };
-  
-  class DatamatrixDetector
-  {
-    private:
-    
-    ros::NodeHandle _nh;
-    
-    DmtxMessage *msg;
-    DmtxImage *img;
-    DmtxDecode *dec;
-    DmtxRegion *reg;
-    
-    cv::Mat datamatrix_frame;
-    cv::Mat debug_frame;
-    
-    DataMatrixQode detected_datamatrix;
-    
-    //!< List of detected datamatrixes
-    std::vector<DataMatrixQode> datamatrix_list;  
-    
     public:
-    
-    image_transport::Publisher _datamatrixPublisher;
-    /**
-      @brief Default Constructor
-      @return void
-    **/
-    DatamatrixDetector();
-    
-    /**
-      @brief Default Destructor
-      @return void
-    **/
-    ~DatamatrixDetector();
-    
-    /**
-      @brief Detects datamatrixes and stores them in a vector.
+      /**
+        @brief Default Constructor
+        @return void
+      **/
+      DatamatrixDetector(const std::string& ns, sensor_processor::Handler* handler);
+      
+      /**
+        @brief Constructor
+      **/
+      DatamatrixDetector();
+      
+      /**
+        @brief Default Destructor
+        @return void
+      **/
+      virtual ~DatamatrixDetector();
+      
+      /**
+        @brief Detects datamatrixes and stores them in a vector.
+        @param image [cv::Mat] The image in which the datamatrixes are detected
+        @return void
+      **/
+      std::vector<POIPtr> detect_datamatrix(cv::Mat image);
+      
+      /**
+      @brief Function that finds the position of datamatrixe's center
       @param image [cv::Mat] The image in which the datamatrixes are detected
       @return void
-    **/
-    void detect_datamatrix(cv::Mat image);
-    
-    /**
-    @brief Function that finds the position of datamatrixe's center
-    @param image [cv::Mat] The image in which the datamatrixes are detected
-    @return void
-    */
-    void locate_datamatrix(cv::Mat image);
-    
-    /**
-    @brief Function that creates view for debugging purposes.
-    @param image [cv::Mat] The image in which the datamatrixes are detected
-    @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners 
-    of datamatrix image, according to which i draw lines for debug reasons
-    @return debug_frcame [cv::Mat], frame with rotated rectangle
-    and center of it
-    */
-    void debug_show(cv::Mat image, std::vector<cv::Point2f> datamatrixVector);
-    
-    /**
-    @brief Function that returns a list of all detected
-    datamatrixes in current frame.
-    @return vector of DataMatrixQode reffering to
-    all detected datamatrixes in current frame
-    */
-    std::vector<DataMatrixQode> get_detected_datamatrix();
-  };  
-}// namespace pandora_vision
+      */
+      void locate_datamatrix(cv::Mat image);
+      
+      /**
+      @brief Function that creates view for debugging purposes.
+      @param image [cv::Mat] The image in which the datamatrixes are detected
+      @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners 
+      of datamatrix image, according to which i draw lines for debug reasons
+      @return debug_frcame [cv::Mat], frame with rotated rectangle
+      and center of it
+      */
+      void debug_show(cv::Mat image, std::vector<cv::Point2f> datamatrixVector);
+      
+      virtual bool process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
+      
+    private:
+      DmtxMessage *msg;
+      DmtxImage *img;
+      DmtxDecode *dec;
+      DmtxRegion *reg;
+      DmtxTime timeout;
+      
+      cv::Mat datamatrix_frame;
+      cv::Mat debug_frame;
+      
+      image_transport::Publisher _datamatrixPublisher;
+      
+      DataMatrixPOIPtr detected_datamatrix;
+      
+      //!< List of detected datamatrixes
+      std::vector<POIPtr> datamatrix_list;  
+  };
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_DATAMATRIX_DATAMATRIX_DETECTOR_H

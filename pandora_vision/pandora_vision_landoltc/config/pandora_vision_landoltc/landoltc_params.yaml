@@ -1,0 +1,6 @@
+gradientThreshold: 60
+centerThreshold: 90
+huMomentsPrec: 0.3
+adaptiveThresholdSubtractSize: 2
+visualization: false
+timerThreshold: 0.16

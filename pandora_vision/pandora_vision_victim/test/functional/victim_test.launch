@@ -1,0 +1,8 @@
+<launch>
+
+<include file="$(find state_manager)/launch/stateManager.launch" />
+<include file="$(find pandora_vision_victim)/launch/victim_node.launch" />
+
+<test test-name="VictimAccuracyTest" pkg="pandora_vision_victim" type="accuracy_test.py"/>
+
+</launch>

@@ -1,0 +1,11 @@
+<launch>
+
+<include file="$(find state_manager)/launch/stateManager.launch" />
+<include file="$(find pandora_vision_landoltc)/launch/landoltc_node.launch" />
+<param name="kinect/topic_name" value="/kinect/image"/>
+<include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+<test test-name="LandoltcAccuracyTest" pkg="pandora_vision_landoltc"
+  type="accuracy_test.py" time-limit="60.0"/>
+
+</launch>

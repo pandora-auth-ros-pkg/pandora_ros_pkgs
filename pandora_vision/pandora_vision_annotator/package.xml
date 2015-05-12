@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_vision_annotator</name>
+  <version>0.1.0</version>
+  <description>A gui in Qt for annotation purposes for the PANDORA vision packages.</description>
+
+  <maintainer email="protopapas_marios@hotmail.com">Marios Protopapas</maintainer>
+
+  <license>GPLv3</license>
+
+  <author>Manos Tsardoulias</author>
+  <author>Marios Protopapas</author>
+
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>roslib</depend>
+  <depend>rosbag</depend>
+  <depend>pcl_ros</depend>
+  <depend>camera_calibration_parsers</depend>
+  <depend>sensor_msgs</depend>
+ <depend>pandora_vision_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>libqt4-dev</depend>
+
+  <export>
+  </export>
+</package>

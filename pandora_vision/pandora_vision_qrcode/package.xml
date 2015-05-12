@@ -1,10 +1,9 @@
-<?xml version="1.0"?>
 <package format="2">
   <name>pandora_vision_qrcode</name>
   <version>0.1.0</version>
   <description>Containts qrcode detection node.</description>
 
-  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+  <maintainer email="vasilis1bos@gmail.com">Vasilis Bosdelekidis</maintainer>
 
   <license>BSD</license>
 
@@ -12,19 +11,28 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
 
   <author>Despoina Paschalidou</author>
+  <author>Vasilis Bosdelekidis</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslint</build_depend>
+  <build_depend>pandora_cmake_tools</build_depend>
 
   <depend>roscpp</depend>
   <depend>zbar</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
+  <depend>pandora_common_msgs</depend>
   <depend>pandora_vision_msgs</depend>
+  <depend>pandora_vision_common</depend>
+  <depend>sensor_processor</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>roslint</depend>
   <depend>urdf</depend>
+
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
 
   <export>
   </export>

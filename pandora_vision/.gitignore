@@ -55,9 +55,16 @@ Thumbs.db
 .*.swp
 *.log
 core*
+*~
 
 # Vim-specific #
 ################
 tags
 cscope.out
 cscope.files
+
+# Images #
+##########
+*.png
+*.jp*g
+*.bmp

@@ -1,0 +1,2 @@
+pandora_common_msgs/GeneralAlertInfo info
+uint64 holeId

@@ -39,16 +39,13 @@
 
 namespace pandora_vision
 {
-  
-  double LandoltcParameters::gradientThreshold = 60;
-  
-  double LandoltcParameters::centerThreshold = 90;
-  
-  double LandoltcParameters::huMomentsPrec = 0.3;
-  
-  int LandoltcParameters::adaptiveThresholdSubtractSize = 2;
-  
-  bool LandoltcParameters::visualization = false;
-  
-  double LandoltcParameters::timerThreshold = 0.16;
-}// namespace pandora_vision
+  void LandoltcParameters::configLandoltC(const ros::NodeHandle& nh)
+  {
+    nh.param("/gradientThreshold", gradientThreshold, 60.);
+    nh.param("/centerThreshold", centerThreshold, 90.);
+    nh.param("/huMomentsPrec", huMomentsPrec, 0.3);
+    nh.param("/adaptiveThresholdSubtractSize", adaptiveThresholdSubtractSize, 2);
+    nh.param("/visualization", visualization, false);
+    nh.param("/timerThreshold", timerThreshold, 0.16);
+  }
+}  // namespace pandora_vision

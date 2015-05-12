@@ -1,8 +1,3 @@
-camera_name: kinect
-hfov: 58.0
-vfov: 45.0
-image_width: 640
-image_height: 480
 history: 10
 varThreshold: 16
 bShadowDetection: true
@@ -10,3 +5,8 @@ nmixtures: 3
 diff_threshold: 45
 motion_high_thres: 7500
 motion_low_thres: 200
+visualization: false
+show_image: false
+show_background: false
+show_diff_image: false
+show_moving_objects_contours: false

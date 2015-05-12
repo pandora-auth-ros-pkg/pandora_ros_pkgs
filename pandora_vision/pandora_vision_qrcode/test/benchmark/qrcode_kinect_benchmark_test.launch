@@ -1,0 +1,39 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <node name="qrcode_node" type="qrcode_node" pkg="pandora_vision_qrcode" respawn="False" />
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+
+  <rosparam file="$(find pandora_vision_support)/config/camera_kinect_params.yaml" 
+        command="load" ns="qrcode"/>
+          
+  <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_topics.yaml" 
+        command="load" ns="qrcode"/>
+    
+  <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_params.yaml" 
+        command="load" ns="qrcode"/>
+        
+  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
+      command="load"/>
+      
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
+  <param name="left_camera/topic_name" value="/camera/image_raw"/>
+  <param name="right_camera/topic_name" value="/usb1/image_raw"/>
+
+  <param name="subscriberTopic" value="/vision/qr_alert" />
+  <param name="subscriberMessagePackage" value="pandora_vision_msgs" />
+  <param name="subscriberMessageType" value="QRAlertsVectorMsg"/>
+  <param name="publisherMessagePackage" value="sensor_msgs" />
+  <param name="publisherMessageType" value="Image"/>
+  
+  <param name="algorithm" value="QR"/>
+  <param name="dataset_camera" value="kinect"/>
+  <param name="dataset_path" value="/test/benchmark/images/images_480p"/>
+  
+  <test test-name="QrBenchmarkTest" pkg="pandora_vision_qrcode"
+    type="qrcode_benchmark_test.py" time-limit="2000.0"/>
+  
+</launch>

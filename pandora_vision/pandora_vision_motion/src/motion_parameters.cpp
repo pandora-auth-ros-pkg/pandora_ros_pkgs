@@ -39,28 +39,37 @@
 
 namespace pandora_vision
 {
-  
-  //!< Background segmentation parameters
-  /// Length of the history according to which we calculate background image
-  int MotionParameters::history = 10;
-  /// Threshold of the sqaured Mahalanobis distance to decide whether
-  /// it is well described by the background model
-  int MotionParameters::varThreshold = 16;
-  /// Parameter defining whether shadow detection should be enabled
-  bool MotionParameters::bShadowDetection = true;
-  /// Maximum allowed number of mixture components
-  int MotionParameters::nmixtures = 3;
-  
-  //!< Threshold parameters  
-  /// Threshold between pixel (grayscale) values to be considered "different" 
-  /// between 2 frames
-  int MotionParameters::diff_threshold = 45;
-  /// Evaluation threshold: higher value means a lot of movement
-  double MotionParameters::motion_high_thres = 7500;
-  /// Evaluation threshold: higher value means a little movement - 
-  /// less means no movement at all
-  double MotionParameters::motion_low_thres = 200;
-  
-  bool MotionParameters::visualization = false;
-  
-}// namespace pandora_vision
+  void MotionParameters::configMotion(const ros::NodeHandle& nh)
+  {
+    //!< Background segmentation parameters
+    /// Length of the history according to which we calculate background image
+    nh.param("/history", history, 10);
+    
+    /// Threshold of the sqaured Mahalanobis distance to decide whether
+    /// it is well described by the background model
+    nh.param("/varThreshold", varThreshold, 16);
+    
+    /// Parameter defining whether shadow detection should be enabled
+    nh.param("/bShadowDetection", bShadowDetection, true);
+    
+    /// Maximum allowed number of mixture components
+    nh.param("/nmixtures", nmixtures, 3);
+    
+    //!< Threshold parameters
+    /// Threshold between pixel (grayscale) values to be considered "different"
+    /// between 2 frames
+    nh.param("/diff_threshold", diff_threshold, 45);
+    
+    /// Evaluation threshold: higher value means a lot of movement
+    nh.param("/motion_high_thres", motion_high_thres, 7500.);
+    
+    /// Evaluation threshold: higher value means a little movement -
+    /// less means no movement at all
+    nh.param("/motion_low_thres", motion_low_thres, 200.);
+    nh.param("/visualization", visualization, false);
+    nh.param("/show_image", show_image, false);
+    nh.param("/show_background", show_background, false);
+    nh.param("/show_diff_image", show_diff_image, false);
+    nh.param("/show_moving_objects_contours", show_moving_objects_contours, false);
+  }
+}  // namespace pandora_vision

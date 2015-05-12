@@ -1,0 +1,8 @@
+
+# Ignore Image files.
+*.png
+
+# Ignore sift training data.
+*.png.sift
+
+

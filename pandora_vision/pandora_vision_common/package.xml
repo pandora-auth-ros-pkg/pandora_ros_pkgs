@@ -1,0 +1,30 @@
+<package format="2">
+  <name>pandora_vision_common</name>
+  <version>0.1.0</version>
+  <description>Contains structures, methods and interface common to all vision nodes.</description>
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Despoina Paschalidou</author>
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
+  <depend>pandora_common_msgs</depend>
+  <depend>sensor_processor</depend>
+  <depend>urdf</depend>
+
+  <export>
+  </export>
+</package>

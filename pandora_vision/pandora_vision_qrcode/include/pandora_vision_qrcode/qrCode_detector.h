@@ -35,27 +35,54 @@
  * Author: Miltiadis-Alexios Papadopoulos
  *********************************************************************/
 
-#ifndef PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H 
-#define PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H 
+#ifndef PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H
+#define PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H
 
 #include <iostream>
-#include <opencv2/opencv.hpp>
+#include <string>
+#include <vector>
 #include <zbar.h>
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <image_transport/image_transport.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include "pandora_vision_common/cv_mat_stamped.h"
+#include "pandora_vision_common/pois_stamped.h"
+#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
+#include "pandora_vision_qrcode/qrcode_poi.h"
 
-namespace pandora_vision {
-
-  struct QrCode
+namespace pandora_vision
+{
+  class QrCodeDetector : public VisionProcessor
   {
-    cv::Point qrcode_center;
-    std::string qrcode_desc;
-  };
+    public:
+      typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
 
-  class QrCodeDetector
-  {
+      QrCodeDetector(const std::string& ns, sensor_processor::Handler* handler);
+      QrCodeDetector();
+      virtual ~QrCodeDetector() {}
+
+      virtual bool
+        process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
+
+      void set_debug(bool flag)
+      {
+        debugQrcode_ = flag;
+      };
+
+      cv::Mat get_debug_frame()
+      {
+        return debug_frame;
+      };
+
     private:
+      //!< Filter Parameters
+      int gaussiansharpenblur;
+      double gaussiansharpenweight;
 
       //!< Debug images publisher flag
-      bool debug_publish;
+      bool debugQrcode_;
 
       //!< Input frame
       cv::Mat input_frame;
@@ -70,7 +97,23 @@ namespace pandora_vision {
       zbar::ImageScanner scanner;
 
       //!< List of detected qrcodes
-      std::vector<QrCode> qrcode_list;
+      std::vector<POIPtr> qrcode_list;
+      
+      //!< Debug publisher for QrCodeDetector
+      image_transport::Publisher debugPublisher_;
+
+      /**
+       * @brief Get parameters referring to Qrcode detection algorithm
+       * @return void
+       */
+      void getQrCodeParams();
+
+      /**
+        @brief Detects qrcodes and stores them in a vector.
+        @param frame [cv::Mat] The image in which the QRs are detected
+        @return void
+       **/
+      std::vector<POIPtr> detectQrCode(cv::Mat input_frame);
 
       /**
         @brief Creates view for debugging purposes.
@@ -78,37 +121,9 @@ namespace pandora_vision {
         @return void
        **/
       void debug_show(const zbar::Image&);
-
-
-    public:
-
-      int gaussiansharpenblur;
-
-      double gaussiansharpenweight;
-
-      QrCodeDetector();
-
-      /**
-        @brief Detects qrcodes and stores them in a vector.
-        @param frame [cv::Mat] The image in which the QRs are detected
-        @return void
-       **/
-      void detect_qrcode(cv::Mat input_frame);
-
-      void set_debug (bool flag)
-      {
-        debug_publish = flag;
-      };
-
-      cv::Mat get_debug_frame()
-      {
-        return debug_frame;
-      };
-
-      std::vector<QrCode> get_detected_qr()
-      {
-        return qrcode_list;
-      };
+      
+      friend class QrCodeDetectorTest;
   };
-}// namespace pandora_vision
+}  // namespace pandora_vision
+
 #endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H

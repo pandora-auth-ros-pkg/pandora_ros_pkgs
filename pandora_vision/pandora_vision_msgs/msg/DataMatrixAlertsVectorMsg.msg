@@ -1,2 +1,0 @@
-Header header
-pandora_vision_msgs/DataMatrixAlertMsg[] dataMatrixAlerts

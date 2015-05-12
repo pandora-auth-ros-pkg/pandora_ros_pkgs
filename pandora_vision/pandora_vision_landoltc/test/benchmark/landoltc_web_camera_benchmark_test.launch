@@ -1,0 +1,34 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <node name="landoltc_node" type="landoltc_node" pkg="pandora_vision_landoltc" respawn="False" />
+
+  <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_topics.yaml" 
+    command="load" ns="landoltc"/>
+
+  <rosparam file="$(find pandora_vision_landoltc)/cfg/landoltc_720p_params.yaml" 
+    command="load" ns="landoltc"/>
+
+  <param name="patternPath" type="str" value="$(find pandora_vision_landoltc)/bold.jpg"/>
+
+  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
+    command="load"/>
+
+  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
+  <param name="publisherMessagePackage" value="sensor_msgs" />
+  <param name="publisherMessageType" value="Image"/>
+
+  <param name="subscriberTopic" value="/vision/landoltc_alert" />
+  <param name="subscriberMessagePackage" value="pandora_vision_msgs" />
+  <param name="subscriberMessageType" value="LandoltcAlertsVectorMsg"/>
+
+  <param name="algorithm" value="LandoltC"/>
+  <param name="dataset_camera" value="web_camera"/>
+  <param name="dataset_path" value="/test/benchmark/images/images_720p"/>
+
+  <test test-name="LandoltcBenchmarkTest" pkg="pandora_vision_landoltc"
+    type="landoltc_benchmark_test.py" time-limit="1000.0"/>
+
+</launch>

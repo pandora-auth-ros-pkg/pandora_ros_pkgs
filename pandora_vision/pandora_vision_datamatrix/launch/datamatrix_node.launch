@@ -1,13 +1,13 @@
 <launch>
     
-  <node name="datamatrix_node" type="datamatrix_node" pkg="pandora_vision_datamatrix" 
-    respawn="False" />
+  <node name="datamatrix_node" type="pandora_vision_datamatrix_node" pkg="pandora_vision_datamatrix" 
+    respawn="False" ns="pandora_vision" />
   <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   
   <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_topics.yaml" 
-    command="load" ns="datamatrixcode"/>
+    command="load" ns="pandora_vision/pandora_vision_datamatrix"/>
     
   <rosparam file="$(find pandora_vision_support)/config/camera_params.yaml" 
-    command="load" ns="datamatrixcode"/>
+    command="load" ns="pandora_vision/pandora_vision_datamatrix"/>
         
 </launch>

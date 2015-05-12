@@ -31,6 +31,7 @@
   <exec_depend>pandora_vision_qrcode</exec_depend>
   <exec_depend>pandora_vision_support</exec_depend>
   <exec_depend>pandora_vision_victim</exec_depend>
+  <exec_depend>pandora_vision_annotator</exec_depend>
 
 
   <export>

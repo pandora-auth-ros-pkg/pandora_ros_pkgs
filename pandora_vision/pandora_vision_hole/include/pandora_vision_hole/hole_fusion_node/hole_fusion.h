@@ -44,12 +44,12 @@
 #include <urdf_parser/urdf_parser.h>
 #include <image_transport/image_transport.h>
 #include "state_manager/state_client.h"
-#include "pandora_vision_msgs/CandidateHolesVectorMsg.h"
-#include "pandora_vision_msgs/CandidateHoleMsg.h"
-#include "pandora_vision_msgs/HolesDirectionsVectorMsg.h"
-#include "pandora_vision_msgs/HoleDirectionMsg.h"
-#include "pandora_vision_msgs/EnhancedHolesVectorMsg.h"
-#include "pandora_vision_msgs/EnhancedHoleMsg.h"
+#include "pandora_vision_hole/CandidateHolesVectorMsg.h"
+#include "pandora_vision_hole/CandidateHoleMsg.h"
+#include "pandora_vision_msgs/HoleDirectionAlertVector.h"
+#include "pandora_vision_msgs/HoleDirectionAlert.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
+#include "pandora_vision_msgs/AreaOfInterest.h"
 #include "utils/defines.h"
 #include "utils/histogram.h"
 #include "utils/message_conversions.h"
@@ -287,13 +287,13 @@ namespace pandora_vision
         the synchronizer and calls for processing of the candidate
         holes.
         @param[in] depthCandidateHolesVector
-        [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+        [const pandora_vision_hole::CandidateHolesVectorMsg&]
         The message containing the necessary information acquired through
         the depth node
         @return void
        **/
       void depthCandidateHolesCallback(
-        const pandora_vision_msgs::CandidateHolesVectorMsg&
+        const pandora_vision_hole::CandidateHolesVectorMsg&
         depthCandidateHolesVector);
 
       /**
@@ -315,9 +315,9 @@ namespace pandora_vision
       /**
         @brief Recreates the HolesConveyor struct for the
         candidate holes from the
-        pandora_vision_msgs::CandidateHolerMsg message
+        pandora_vision_hole::CandidateHolerMsg message
         @param[in]candidateHolesVector
-        [const std::vector<pandora_vision_msgs::CandidateHoleMsg>&]
+        [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
         The input candidate holes
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
@@ -327,7 +327,7 @@ namespace pandora_vision
         @return void
        **/
       void fromCandidateHoleMsgToConveyor(
-        const std::vector<pandora_vision_msgs::CandidateHoleMsg>&
+        const std::vector<pandora_vision_hole::CandidateHoleMsg>&
         candidateHolesVector,
         HolesConveyor* conveyor,
         const cv::Mat& inImage);
@@ -519,13 +519,13 @@ namespace pandora_vision
         the synchronizer and calls for processing of the candidate
         holes.
         @param[in] rgbCandidateHolesVector
-        [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+        [const pandora_vision_hole::CandidateHolesVectorMsg&]
         The message containing the necessary information to filter hole
         candidates acquired through the rgb node
         @return void
        **/
       void rgbCandidateHolesCallback(
-        const pandora_vision_msgs::CandidateHolesVectorMsg&
+        const pandora_vision_hole::CandidateHolesVectorMsg&
         rgbCandidateHolesVector);
 
       /**
@@ -555,9 +555,9 @@ namespace pandora_vision
       /**
         @brief Unpacks the the HolesConveyor struct for the
         candidate holes, the interpolated depth image and the point cloud
-        from the pandora_vision_msgs::CandidateHolesVectorMsg message
+        from the pandora_vision_hole::CandidateHolesVectorMsg message
         @param[in] holesMsg
-        [pandora_vision_msgs::CandidateHolesVectorMsg&] The input
+        [pandora_vision_hole::CandidateHolesVectorMsg&] The input
         candidate holes message obtained through the depth node
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
@@ -566,7 +566,7 @@ namespace pandora_vision
         @return void
        **/
       void unpackMessage(
-        const pandora_vision_msgs::CandidateHolesVectorMsg& holesMsg,
+        const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
         HolesConveyor* conveyor,
         cv::Mat* image,
         const std::string& encoding);

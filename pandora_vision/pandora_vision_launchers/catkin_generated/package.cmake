@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "pandora_vision_launchers")
+set(pandora_vision_launchers_MAINTAINER "Despoina Paschalidou <paschalidoud@gmail.com>")
+set(pandora_vision_launchers_DEPRECATED "")
+set(pandora_vision_launchers_VERSION "0.1.0")
+set(pandora_vision_launchers_BUILD_DEPENDS )
+set(pandora_vision_launchers_RUN_DEPENDS "usb_cam")
+set(pandora_vision_launchers_BUILDTOOL_DEPENDS "catkin")

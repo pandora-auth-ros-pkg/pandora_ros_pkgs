@@ -32,31 +32,45 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Despoina Paschalidou
+* Author: Despoina Paschalidou, Vasilis Bosdelekidis
 *********************************************************************/
 
 #include "pandora_vision_datamatrix/datamatrix_detector.h"
 
-namespace pandora_vision 
+namespace pandora_vision
 {
-  
   /**
    *@brief Constructor
   **/
-  DatamatrixDetector::DatamatrixDetector()
+  DatamatrixDetector::DatamatrixDetector(const std::string& ns, sensor_processor::Handler* handler) :
+    VisionProcessor(ns, handler)
   {
     img = NULL;
     dec = NULL;
     reg = NULL;
     msg = NULL;
     
-    _datamatrixPublisher = 
-        image_transport::ImageTransport(_nh).advertise("debugDatamatrix", 1);
-    detected_datamatrix.message = "";
+    #ifdef DEBUG_MODE
+      std::string debugTopic;
+      if (this->accessPublicNh()->getParam("debug_topic", debugTopic))
+      ROS_DEBUG_STREAM("debugTopic : " << debugTopic);
+      else
+      {
+        ROS_WARN("Cannot find datamatrix debug show topic");
+      }
+      _datamatrixPublisher = image_transport::ImageTransport(
+        *this->accessProcessorNh()).advertise(debugTopic, 1);
+    #endif
+    
+    detected_datamatrix->setContent("");
     ROS_INFO("[Datamatrix_node] : Datamatrix_Detector instance created");
   }
   
-
+  /**
+    @brief Constructor
+  **/
+  DatamatrixDetector::DatamatrixDetector() : VisionProcessor() {}
+  
   /**
     @brief Destructor
    */
@@ -65,55 +79,64 @@ namespace pandora_vision
     //!< Deallocate memory
     dmtxMessageDestroy(&msg);
     dmtxDecodeDestroy(&dec);
-    dmtxImageDestroy(&img);  
+    dmtxImageDestroy(&img);
     dmtxRegionDestroy(&reg);
     ROS_INFO("[Datamatrix_node] : Datamatrix_Detector instance destroyed");
   }
-  
-  
+
   /**
-    @brief Detects datamatrixes and stores them in a vector. 
+    @brief Detects datamatrixes and stores them in a vector.
     @param image [cv::Mat] The image in which the QRs are detected
     @return void
    */
-  void DatamatrixDetector::detect_datamatrix(cv::Mat image)
+  std::vector<POIPtr> DatamatrixDetector::detect_datamatrix(cv::Mat image)
   {
+    if (image.channels() < 3)
+      cv::cvtColor(image, image, CV_GRAY2BGR);
+
     datamatrix_list.clear();
-    
+
     img = NULL;
     dec = NULL;
     reg = NULL;
     msg = NULL;
-    //!< creates and initializes a new DmtxImage structure using pixel 
-    //!< data provided  by  the calling application. 
-    img = dmtxImageCreate(image.data, image.cols, image.rows, 
-        DmtxPack24bppBGR);
-    ROS_ASSERT(img != NULL);    
     
-    //!< creates  and  initializes a new DmtxDecode struct, which 
-    //!< designates the image to be scanned and initializes the scan 
-    //!< grid pattern.    
+    //!< creates and initializes a new DmtxImage structure using pixel
+    //!< data provided  by  the calling application.
+    img = dmtxImageCreate(image.data, image.cols, image.rows,
+        DmtxPack24bppBGR);
+    ROS_ASSERT(img != NULL);
+
+    //!< creates and initializes a new DmtxDecode struct, which
+    //!< designates the image to be scanned and initializes the scan
+    //!< grid pattern.
     dec = dmtxDecodeCreate(img, 1);
     ROS_ASSERT(dec != NULL);
-    
-    //!< searches  every  pixel location in a grid pattern looking 
-    //!< for potential barcode regions. A DmtxRegion is returned 
-    //!< whenever a potential  barcode region  is found, or if the final 
+
+    //!< add msecs to timeout
+    timeout = dmtxTimeAdd(dmtxTimeNow(), 1000);
+
+    //!< searches every pixel location in a grid pattern looking
+    //!< for potential barcode regions. A DmtxRegion is returned
+    //!< whenever a potential barcode region is found, or if the final
     //!< pixel location has been scanned.
-    reg = dmtxRegionFindNext(dec, NULL);
-    if(reg != NULL) 
+    reg = dmtxRegionFindNext(dec, &timeout);
+    if (reg != NULL)
     {
       msg = dmtxDecodeMatrixRegion(dec, reg, DmtxUndefined);
-      if(msg != NULL) 
+      if (msg != NULL)
       {
-        detected_datamatrix.message.assign((const char*) msg->output, msg->outputIdx);
+        detected_datamatrix->getContent().assign((const char*) msg->output, 
+          msg->outputIdx);
+        
         //!< Find datamatrixe's center exact position
         locate_datamatrix(image);
         datamatrix_list.push_back(detected_datamatrix);
       }
     }
+    return datamatrix_list;
   }
-  
+
   /**
     @brief Function that finds the position of datamatrixe's center
     @param image [cv::Mat] The image in which the QRs are detected
@@ -123,7 +146,7 @@ namespace pandora_vision
   {
     DmtxVector2 p00, p10, p11, p01;
     std::vector<cv::Point2f> datamatrixVector;
-    
+
     p00.X = p00.Y = p01.X = p10.Y = 0.0;
     p01.Y = p10.X = p11.X = p11.Y = 1.0;
 
@@ -136,27 +159,26 @@ namespace pandora_vision
     cv::Point2f corner2(p10.X, image.rows - p10.Y);
     cv::Point2f corner3(p11.X, image.rows - p11.Y);
     cv::Point2f corner4(p01.X, image.rows - p01.Y);
-    
+
     datamatrixVector.push_back(corner1);
     datamatrixVector.push_back(corner2);
     datamatrixVector.push_back(corner4);
     datamatrixVector.push_back(corner3);
-    
+
     cv::RotatedRect calculatedRect;
     calculatedRect = minAreaRect(datamatrixVector);
-    
-    detected_datamatrix.datamatrix_center.y = calculatedRect.center.y;
-    detected_datamatrix.datamatrix_center.x = calculatedRect.center.x;
-    
-    #if DEBUG_MODE
+
+    detected_datamatrix->setPoint(calculatedRect.center);
+
+    #ifdef DEBUG_MODE
       debug_show(image, datamatrixVector);
     #endif
   }
-  
+
   /**
     @brief Function that creates view for debugging purposes.
     @param image [cv::Mat] The image in which the datamatrixes are detected
-    @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners 
+    @param datamatrixVector [std::vector<cv::Point2f>] The vector of 4 corners
     of datamatrix image, according to which i draw lines for debug reasons
     @return debug_frcame [cv::Mat], frame with rotated rectangle
     and center of it
@@ -168,12 +190,12 @@ namespace pandora_vision
     cv::line(debug_frame, datamatrixVector.at(1), datamatrixVector.at(2), cv::Scalar(255, 0, 0), 3);
     cv::line(debug_frame, datamatrixVector.at(2), datamatrixVector.at(3), cv::Scalar(0, 0, 255), 3);
     cv::line(debug_frame, datamatrixVector.at(3), datamatrixVector.at(0), cv::Scalar(255, 255, 0), 3);
-    
+
     cv::RotatedRect calculatedRect;
     calculatedRect = minAreaRect(datamatrixVector);
     for (int i = 0; i < 4; i++)
     {
-      line(debug_frame, datamatrixVector[i], datamatrixVector[(i+1)%4], cv::Scalar(255, 0, 0));
+      line(debug_frame, datamatrixVector[i], datamatrixVector[(i + 1) % 4], cv::Scalar(255, 0, 0));
     }
     cv::circle(debug_frame, calculatedRect.center, 4, cv::Scalar(0, 0, 255), 8, 8);
     ROS_INFO_STREAM("Angle given by minAreaRect:" << calculatedRect.angle);
@@ -181,18 +203,27 @@ namespace pandora_vision
     cv_bridge::CvImage datamatrixMSg;
     datamatrixMSg.encoding  = sensor_msgs::image_encodings::MONO8;
     datamatrixMSg.image = debug_frame.clone();
-    _datamatrixPublisher.publish( datamatrixMSg.toImageMsg());
     
+    #ifdef DEBUG_MODE
+      _datamatrixPublisher.publish(datamatrixMSg.toImageMsg());
+    #endif
   }
   
-   /**
-    @brief Function that returns a list of all detected
-    datamatrixes in current frame.
-    @return vector of DataMatrixQode reffering to
-    all detected datamatrixes in current frame
-    */
-    std::vector<DataMatrixQode> DatamatrixDetector::get_detected_datamatrix()
+  /**
+   * @brief
+   **/ 
+  bool DatamatrixDetector::process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output)
+  {
+    output->header = input->getHeader();
+    output->frameWidth = input->getImage().cols;
+    output->frameHeight = input->getImage().rows;
+    
+    output->pois = detect_datamatrix(input->getImage());
+
+    if (output->pois.empty())
     {
-      return datamatrix_list;
+      return false;
     }
-}// namespace pandora_vision
+    return true;
+  }
+}  // namespace pandora_vision

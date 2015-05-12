@@ -38,99 +38,115 @@
 #ifndef PANDORA_VISION_MOTION_MOTION_DETECTOR_H
 #define PANDORA_VISION_MOTION_MOTION_DETECTOR_H
 
-#include "ros/ros.h"
-#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
+#include <opencv2/opencv.hpp>
+#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
+#include "pandora_vision_common/cv_mat_stamped.h"
+#include "pandora_vision_common/pois_stamped.h"
+#include "pandora_vision_common/bbox_poi.h"
 #include "pandora_vision_motion/motion_parameters.h"
 
-namespace pandora_vision 
+namespace pandora_vision
 {
-  class MotionDetector
+  class MotionDetector : public VisionProcessor
   {
-    private:
-    //!< Current frame to be processed
-    cv::Mat frame;
-    //!< Background image
-    cv::Mat background;
-    //!< Foreground mask
-    cv::Mat foreground;
-    
-    //!< Class instance for Gaussian Mixture-based backgound 
-    //!< and foreground segmentation 
-    cv::BackgroundSubtractorMOG2 bg;
-    
-    ///!< Erode kernel
-    cv::Mat kernel_erode;
     public:
-    
-    //!< Number of pixels, that differ from current frame and background 
-    int countDiff;
-    //!< Identifier of motion type
-    int typeOfMovement;
-    
-    int max_deviation;
-    
-    cv::Mat result;
-    
-    cv::Rect_<int> _bounding_box;
-    /**
-      @brief Class Constructor
-      Initializes all varialbes for thresholding
-    */
-    MotionDetector();
-    
-    /**
-      @brief Class Destructor
-      Deallocates memory used for storing images
-    */
-    ~MotionDetector();
-    
-    /**
-      @brief Function that detects motion, according to substraction
-      between background image and current frame. According to predifined 
-      thresholds motion is detected. According to the type of motion
-      the suitable value is returned.
-      @param _frame [cv::Mat] current frame to be processed 
-      @return [int] Index of evaluation of Motion in current frame.
-    */
-    int detectMotion(cv::Mat _frame);
-    
-    /**
-      @brief Returns the number of different pixels found
-      in a (thresholded) difference between background image and current frame.
-      @return [int] countDiff 
-    */
-    int getCount();
-    
-    /**
-      @brief Function that defines the type of movement 
-      according to the number of pixels, that differ from current
-      frame and background. In case insignificant motion 0 is detected
-      0 is returned. If there is slight motion 1 is returned and last
-      bust not least in case extensive motion is detected 2 is returned
-      @return void
-    */ 
-    void motionIdentification(cv::Mat diff);
-    
-    /**
-      @brief Function used for debug reasons, that shows background
-      foreground and contours of motion trajectories in current frame
-      @return void
-    */ 
-    void debugShow(cv::Mat diff);
-    
-    /**
-     @brief Function that calculates motion's postion
-     @param
-     @return void 
-    */
-    void detectMotionPosition(cv::Mat diff); 
-    
-    /**@brief Creates the continuous table of motion in current frame
-    @return int[] table of motion position and size
-    */
-    int* getMotionPosition();
+      /**
+        @brief Class Constructor
+        Initializes all varialbes for thresholding
+      */
+      MotionDetector(const std::string& ns, sensor_processor::Handler* handler);
+      MotionDetector(void);
+
+      /**
+        @brief Class Destructor
+      */
+      virtual ~MotionDetector();
+
+    protected:
+
+      BBoxPOIPtr getMotionPosition(void);
+
+      void setUpMotionDetector(void);
+
+      /**
+        @brief Function that detects motion, according to substraction
+        between background image and current frame. According to predifined
+        thresholds motion is detected. According to the type of motion
+        the suitable value is returned.
+        @param frame [&cv::Mat] current frame to be processed
+        @return [int] Index of evaluation of Motion in current frame.
+      */
+      int detectMotion(const cv::Mat& frame);
+
+      /**
+       * @brief
+       **/
+      void findMotionParameters(const cv::Mat& frame);
+
+      /**
+        @brief Function that defines the type of movement
+        according to the number of pixels, that differ from current
+        frame and background. In case insignificant motion 0 is detected
+        0 is returned. If there is slight motion 1 is returned and last
+        but not least in case extensive motion is detected 2 is returned
+        @param thresholdedDifference: [&cv::Mat] frame that represents
+          the thresholded difference between current frame and computed
+          background
+        @return typeOfMovement [int], where 2 corresponds to moving objects
+        with greater probability whereas 0 corresponds to stationary objects
+      */
+      int motionIdentification(const cv::Mat& thresholdedDifference);
+
+      /**
+        @brief Function used for debug reasons, that shows background
+        foreground and contours of motion trajectories in current frame
+        @param thresholdedDifference: [&cv::Mat] frame that represents
+          the thresholded difference between current frame and computed
+          background.
+        @param frame: [&cv::Mat] current frame, captured from camera
+        @return void
+      */
+      void debugShow(const cv::Mat& thresholdedDifference,
+        const cv::Mat &frame);
+
+      /**
+        @brief Function that calculates motion's position
+        @param diff: [&cv::Mat] frame that represents
+        the thresholded difference between current frame and computed
+        background.
+        @return void
+      */
+      void detectMotionPosition(const cv::Mat& diff);
+
+      /**
+       * @brief
+       **/
+      virtual bool
+        process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
+
+    private:
+      //!< Current frame to be processed
+      cv::Mat frame_;
+      //!< Background image
+      cv::Mat background_;
+      //!< Foreground mask
+      cv::Mat foreground_;
+      cv::Mat movingObjects_;
+      //!< Class instance for Gaussian Mixture-based backgound
+      //!< and foreground segmentation
+      cv::BackgroundSubtractorMOG2 bg_;
+      //!< Erode kernel
+      cv::Mat kernel_erode_;
+      //!< Maximum deviation for calculation position of moving objects;
+      int max_deviation_;
+      //!< Bounding box of moving objects.
+      BBoxPOIPtr bounding_box_;
+      
+      MotionParameters params;
+
+      friend class MotionDetectorTest;
   };
-}// namespace pandora_vision
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_DETECTOR_H

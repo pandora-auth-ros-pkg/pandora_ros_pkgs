@@ -34,8 +34,8 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H 
-#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H 
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
 
 #include "ros/ros.h"
 #include <ros/package.h>
@@ -49,8 +49,8 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
-#include "pandora_vision_msgs/LandoltcPredatorMsg.h"
+#include "pandora_vision_msgs/LandoltcAlertVector.h"
+#include "pandora_vision_msgs/Predator.h"
 #include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"
 #include "state_manager/state_client.h"
 #include <urdf_parser/urdf_parser.h>
@@ -64,86 +64,86 @@ class LandoltC3dDetection : public StateClient {
 private:
   //!<Subscriber of RGB Image
   ros::Subscriber _inputImageSubscriber;
-  
+
   //!<Subscriber for Predator
   ros::Subscriber _landoltc3dPredator;
-  
+
   //!<Node Handler
   ros::NodeHandle _nh;
-  
+
   //!< Current frame to be processed
   cv::Mat landoltCFrame;
-  
+
   //!< Landoltc3d frame timestamp
   ros::Time landoltc3dFrameTimestamp;
-  
+
   //!<Landoltc3d Detector object
   LandoltC3dDetector _landoltc3dDetector;
-  
+
   //!<Current package path
   std::string packagePath;
-  
+
   //!<Current pattern path
   std::string patternPath;
-  
+
   //!<Frame Height
   int frameHeight;
-  
+
   //!<Frame Width
   int frameWidth;
-  
+
   //!< Horizontal Field Of View (rad)
   double hfov;
 
   //!< Vertical Field Of View (rad)
   double vfov;
-  
+
   //!<Camera Name
   std::string cameraName;
-  
+
   std::string _frame_id;
   std::string _parent_frame_id;
 
   //!< The topic subscribed to for the front camera
   std::string imageTopic;
-  
+
   //!< The topic subscribed to if it works with predator
   std::string predator_topic_name;
-  
+
   //!< Variable used for State Managing
   bool landoltc3dNowON;
-  
+
   //!< Publishers for LandoltcDetector result messages
   ros::Publisher _landoltc3dPublisher;
-  
+
   //!< Variable for checking if Predator is On
   bool PredatorOn;
-  
+
   ros::Time _lastTimeProcessed;
-    
+
   //!< The dynamic reconfigure (landoltc3d) parameters' server
   dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc3d_cfgConfig> server;
-  
+
   dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc3d_cfgConfig>::CallbackType f;
-  
+
   /**
   @brief Callback for the RGB Image
   @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image
   @return void
   **/
   void imageCallback(const sensor_msgs::ImageConstPtr& msg);
-  
+
   /**
   @brief Predator Callback
   @param msg [const pandora_vision_msgs::PredatorAlertMsg& msg]
   @return void
   **/
-  void predatorCallback(const pandora_vision_msgs::LandoltcPredatorMsg& msg);
-  
+  void predatorCallback(const pandora_vision_msgs::Predator& msg);
+
   /**
   @brief The function called when a parameter is changed
   @param[in] config [const pandora_vision_landoltc::landoltc3d_cfgConfig&]
-  @param[in] level [const uint32_t] The level 
+  @param[in] level [const uint32_t] The level
   @return void
   **/
   void parametersCallback(const pandora_vision_landoltc::landoltc3d_cfgConfig& config, const uint32_t& level);
@@ -156,13 +156,13 @@ private:
   @return void
   **/
   void landoltc3dCallback();
-  
+
   /**
     @brief Function that retrieves the parent to the frame_id
-    @return bool Returns true is frame_id found or false if not 
-  */ 
+    @return bool Returns true is frame_id found or false if not
+  */
   bool getParentFrameId();
-  
+
   std::map<std::string, std::string> _frame_ids_map;
 
 public:
@@ -185,7 +185,7 @@ public:
   @return void
   **/
   void getGeneralParams();
-  
+
   /**
   @brief Node's state manager
   @param newState [int] The robot's new state
@@ -198,12 +198,12 @@ public:
   @return void
   **/
   void completeTransition(void);
-    
+
   int curState;
   int prevState;
-  
+
   std::string param;
-  
+
 };
 } // namespace pandora_vision
 #endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H

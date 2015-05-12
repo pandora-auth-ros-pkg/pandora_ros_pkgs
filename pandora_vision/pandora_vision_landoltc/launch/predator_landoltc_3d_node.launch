@@ -1,0 +1,10 @@
+<launch>
+
+  <include file="$(find pandora_vision_landoltc)/launch/landoltc_3d_node.launch"/>
+
+  <include file="$(find pandora_vision_predator)/launch/predator_node.launch" >
+    <arg name="name" value="landoltc3d_predator"/>
+  </include>
+
+</launch>
+

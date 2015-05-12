@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+  <name>pandora_vision_launchers</name>
+  <version>0.1.0</version>
+  <description>Containts launchers for bringup.</description>
+
+  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Despoina Paschalidou</author>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  
+  <run_depend>usb_cam</run_depend>
+  
+  <export>
+  </export>
+  
+</package>
