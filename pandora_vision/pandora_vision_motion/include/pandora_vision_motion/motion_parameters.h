@@ -44,7 +44,7 @@
 
 namespace pandora_vision
 {
-  // TODO remove static variables and define/implement methods to get params
+  // TODO(Vassilis) remove static variables and define/implement methods to get params
   // from yaml
   struct MotionParameters
   {

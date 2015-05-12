@@ -56,7 +56,6 @@ namespace pandora_vision
 
   bool QrCodePostProcessor::postProcess(const POIsStampedConstPtr& input, const QRAlertVectorPtr& output)
   {
-    //ROS_INFO("yo!");
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
     output->header = alertVector.header;
 

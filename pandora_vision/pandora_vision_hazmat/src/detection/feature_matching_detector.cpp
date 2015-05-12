@@ -304,7 +304,7 @@ namespace pandora_vision
       // Check if the keypoints for pattern #patternID have been loaded.
       if (patternKeyPoints.size() <= 0)
       {
-        ROS_WARN_STREAM_NAMED("detection", "[Hazmat Detection]: No keypoints"
+        ROS_DEBUG_STREAM_NAMED("detection", "[Hazmat Detection]: No keypoints"
                               " stored for pattern " << patternID);
         return false;
       }
@@ -312,21 +312,21 @@ namespace pandora_vision
       // Check if we have stored the descriptors for pattern #patternID.
       if (patternDescriptors.data == NULL)
       {
-        ROS_WARN_STREAM_NAMED("detection", "[Hazmat Detection]: No descriptors"
+        ROS_DEBUG_STREAM_NAMED("detection", "[Hazmat Detection]: No descriptors"
                               " stored for pattern " << patternID);
         return false;
       }
       // No keypoints detected in the scene so the matching cannot continue.
       if (sceneKeyPoints.size() <=0 )
       {
-        ROS_WARN_STREAM_NAMED("detection", "[Hazmat Detection]: No keypoints"
+        ROS_DEBUG_STREAM_NAMED("detection", "[Hazmat Detection]: No keypoints"
                               <<  " were detected in the current scene!");
         return false;
       }
       // No descriptors calculated for the current frame.
       if (frameDescriptors.data == NULL)
       {
-        ROS_WARN_STREAM_NAMED("detection", "[Hazmat Detection]: No "
+        ROS_DEBUG_STREAM_NAMED("detection", "[Hazmat Detection]: No "
                               << "descriptors were calculated in the current" 
                               << " scene!");
         return false;

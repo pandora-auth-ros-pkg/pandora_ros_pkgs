@@ -155,7 +155,7 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST
   RELATIVE ${PROJECT_SOURCE_DIR}
-    test/unit/*
+    test/unit/*.cpp
     )
 roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 

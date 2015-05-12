@@ -59,13 +59,14 @@ namespace pandora_vision
       MotionDetector(const std::string& ns, sensor_processor::Handler* handler);
       MotionDetector(void);
 
+      explicit MotionDetector(const MotionParameters& parameters);
+
       /**
         @brief Class Destructor
       */
       virtual ~MotionDetector();
 
     protected:
-
       BBoxPOIPtr getMotionPosition(void);
 
       void setUpMotionDetector(void);

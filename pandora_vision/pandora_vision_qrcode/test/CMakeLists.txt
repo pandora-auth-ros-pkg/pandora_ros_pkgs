@@ -12,13 +12,13 @@ ${catkin_INCLUDE_DIRS})
 #                               Functional Tests                               #
 ################################################################################
 
-download_extra_data(
-  ${PROJECT_NAME}_qr_test_images
-  EXTRA_FILES test/functional/images/extra_files.yaml
-  )
-add_dependencies(${PROJECT_NAME}_qr_test_images tests)
+# download_extra_data(
+  # ${PROJECT_NAME}_qr_test_images
+  # EXTRA_FILES test/functional/images/extra_files.yaml
+  # )
+# add_dependencies(${PROJECT_NAME}_qr_test_images tests)
 
-add_rostest(functional/qr_test.launch)
+# add_rostest(functional/qr_test.launch)
 
 
 ################# Unit Tests #################

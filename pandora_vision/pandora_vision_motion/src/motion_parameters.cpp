@@ -45,7 +45,7 @@ namespace pandora_vision
     /// Length of the history according to which we calculate background image
     nh.param("/history", history, 10);
     
-    /// Threshold of the sqaured Mahalanobis distance to decide whether
+    /// Threshold of the squared Mahalanobis distance to decide whether
     /// it is well described by the background model
     nh.param("/varThreshold", varThreshold, 16);
     
@@ -70,6 +70,7 @@ namespace pandora_vision
     nh.param("/show_image", show_image, false);
     nh.param("/show_background", show_background, false);
     nh.param("/show_diff_image", show_diff_image, false);
-    nh.param("/show_moving_objects_contours", show_moving_objects_contours, false);
+    nh.param("/show_moving_objects_contours", show_moving_objects_contours,
+        false);
   }
 }  // namespace pandora_vision

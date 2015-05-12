@@ -12,14 +12,14 @@ ${catkin_INCLUDE_DIRS})
 #                               Unit Tests                                     #
 ################################################################################
 
-catkin_add_gtest(${PROJECT_NAME}_2d_detector_test
-  unit/landoltc_2d/landoltc_detector_test.cpp
-)
-target_link_libraries(${PROJECT_NAME}_2d_detector_test
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_2d_detector
-  gtest_main
-)
+# catkin_add_gtest(${PROJECT_NAME}_2d_detector_test
+  # unit/landoltc_2d/landoltc_detector_test.cpp
+# )
+# target_link_libraries(${PROJECT_NAME}_2d_detector_test
+  # ${catkin_LIBRARIES}
+  # ${PROJECT_NAME}_2d_detector
+  # gtest_main
+# )
 
 ################################################################################
 #                               Functional Tests                               #

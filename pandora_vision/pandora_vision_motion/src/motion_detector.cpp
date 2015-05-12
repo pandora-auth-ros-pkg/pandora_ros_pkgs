@@ -57,6 +57,13 @@ namespace pandora_vision
     setUpMotionDetector();
   }
 
+  MotionDetector::MotionDetector(const MotionParameters& parameters) :
+    VisionProcessor()
+  {
+    params = parameters;
+    setUpMotionDetector();
+  }
+
   /**
     @brief Class Destructor
     Deallocates memory used for storing images
@@ -82,6 +89,7 @@ namespace pandora_vision
     bounding_box_->setPoint(cv::Point(0, 0));
     bounding_box_->setWidth(0);
     bounding_box_->setHeight(0);
+    bounding_box_->setProbability(0.0f);
 
     max_deviation_ = 50;
     ROS_INFO("Created MotionDetector instance");
@@ -208,9 +216,9 @@ namespace pandora_vision
           cv::Point _tlcorner(min_x, min_y);
           cv::Point _brcorner(max_x, max_y);
           rectangle(movingObjects_, _tlcorner, _brcorner, cv::Scalar(0, 255, 255), 1);
-          bounding_box_->setPoint(_tlcorner);
           bounding_box_->setWidth(max_x - min_x + 1);
           bounding_box_->setHeight(max_y - min_y + 1);
+          bounding_box_->setPoint(_tlcorner);
         }
       }
     }

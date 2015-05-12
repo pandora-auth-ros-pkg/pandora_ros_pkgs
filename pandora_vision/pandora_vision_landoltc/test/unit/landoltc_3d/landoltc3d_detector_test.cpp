@@ -47,10 +47,14 @@ namespace pandora_vision
   class Landoltc3dDetectorTest : public ::testing::Test
   {
     protected:
-      Landoltc3dDetectorTest() {}
-  };    
+      Landoltc3dDetectorTest()
+      {
+      }
+  }
   
   
   TEST_F(Landoltc3dDetectorTest, test1)
-  {}
-} // namespace pandora_vision
+  {
+  }
+
+}  // namespace pandora_vision

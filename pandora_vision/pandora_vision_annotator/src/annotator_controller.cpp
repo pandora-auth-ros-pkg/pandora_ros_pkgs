@@ -276,13 +276,19 @@ namespace pandora_vision
   void CController::predatorCallback(const pandora_vision_msgs::Predator& msg)
   { 
  
-    if(msg.header.stamp == msgHeader_[currentFrameNo_ ].stamp && msg.areaOfInterest.center.x != 0 && msg.areaOfInterest.center.y != 0 
+    if(msg.header.stamp == 
+        msgHeader_[currentFrameNo_ ].stamp && msg.areaOfInterest.center.x
+        != 0 && msg.areaOfInterest.center.y != 0 
       && msg.areaOfInterest.width != 0 && msg.areaOfInterest.height != 0 )
     {
       if(currentFrameNo_ == baseFrame)
-       connector_.setPredatorValues(msg.areaOfInterest.center.x, msg.areaOfInterest.center.y, msg.areaOfInterest.width, msg.areaOfInterest.height, true);
+       connector_.setPredatorValues(msg.areaOfInterest.center.x,
+           msg.areaOfInterest.center.y, msg.areaOfInterest.width,
+           msg.areaOfInterest.height, true);
       else
-        connector_.setPredatorValues(msg.areaOfInterest.center.x, msg.areaOfInterest.center.y, msg.areaOfInterest.width, msg.areaOfInterest.height, false);
+        connector_.setPredatorValues(msg.areaOfInterest.center.x,
+            msg.areaOfInterest.center.y, msg.areaOfInterest.width,
+            msg.areaOfInterest.height, false);
        ROS_INFO_STREAM("predator alert for frame " << currentFrameNo_);
      
     }

@@ -37,6 +37,10 @@ target_link_libraries(haralickfeature_extractor_test
     ${PROJECT_NAME}_victim_parameters
     gtest_main)
 
+download_extra_data(
+  ${PROJECT_NAME}_sift_test_image
+  EXTRA_FILES data/test_data.yaml)
+
 catkin_add_gtest(sift_feature_extractor_test 
   unit/feature_extractors/sift_extractor_test.cpp)
 target_link_libraries(sift_feature_extractor_test

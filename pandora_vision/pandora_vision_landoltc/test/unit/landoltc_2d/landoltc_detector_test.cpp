@@ -52,24 +52,25 @@ namespace pandora_vision
       {
         packagePath = ros::package::getPath("pandora_vision_landoltc");
       }
-      virtual ~LandoltcDetectorTest(){}
+      virtual ~LandoltcDetectorTest()
+      {
+      }
       void fillGrad(const cv::Mat& input);
       void getCenter(cv::Point *point, const int& index);
       int giveVotingData(cv::Point a, cv::Point b, int y, int i);
 
     protected:
-      
       LandoltCDetector landoltCDetector;
       std::string packagePath; 
-  }; 
+  };
 
-  //process input and call findcenters
+  // process input and call findcenters
   void LandoltcDetectorTest::fillGrad(const cv::Mat& input)
   {
     cv::Mat gradX, gradY;
     cv::Mat gray;
    
-    cv::cvtColor(input, gray, CV_BGR2GRAY );
+    cv::cvtColor(input, gray, CV_BGR2GRAY);
 
     cv::Sobel(gray, gradX, CV_32F, 1, 0, 3);
     cv::Sobel(gray, gradY, CV_32F, 0, 1, 3);
