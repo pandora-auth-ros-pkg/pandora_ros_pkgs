@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Hazmat::Hazmat() {}
 
     bool Hazmat::isSameObject(const ObjectConstPtr& object) const
@@ -52,14 +51,6 @@ namespace pandora_data_fusion
         boost::dynamic_pointer_cast<const Hazmat>(object)->getPattern();
 
       return cond;
-    }
-
-    void Hazmat::fillGeotiff(pandora_data_fusion_msgs::
-        DatafusionGeotiffSrv::Response* res) const
-    {
-      res->hazmatx.push_back(pose_.position.x);
-      res->hazmaty.push_back(pose_.position.y);
-      res->pattern.push_back(pattern_);
     }
 
     void Hazmat::getVisualization(visualization_msgs::

@@ -64,7 +64,9 @@ namespace pandora_data_fusion
         static Point point2DAndHeight2Point3D(Point position, float height);
         static float distanceBetweenPoints2D(Point a, Point b);
         static float distanceBetweenPoints3D(Point a, Point b);
-        static bool arePointsInRange(Point pointA, Point pointB, float sensor_range);
+        static float distanceBetweenPoints(Point a, Point b, bool is3D);
+        static bool arePointsInRange(Point pointA, Point pointB,
+            bool is3D, float sensor_range);
         static geometry_msgs::Quaternion calculateQuaternion(Point a,
             Point b);
         static Point vector3ToPoint(tf::Vector3 vector);
@@ -72,7 +74,7 @@ namespace pandora_data_fusion
         static float stdDevFromProbability(float boundingRadius, float probability);
     };
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_UTILS_H

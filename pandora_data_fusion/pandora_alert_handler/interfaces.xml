@@ -17,11 +17,11 @@
     <publisher>/data_fusion/alert_hander/victims</publisher>
     <publisher>/data_fusion/alert_hander/qr_notification</publisher>
     <publisher>/data_fusion/alert_hander/robocup_score</publisher>
-    
+
     <actionServer>/data_fusion/alert_handler/delete_victim</actionServer>
     <actionServer>/data_fusion/alert_handler/validate_victim</actionServer>
 
   </node>
-  
+
 </package>
 

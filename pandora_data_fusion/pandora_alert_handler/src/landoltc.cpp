@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Landoltc::Landoltc() {}
 
     void Landoltc::getVisualization(visualization_msgs::MarkerArray* markers) const

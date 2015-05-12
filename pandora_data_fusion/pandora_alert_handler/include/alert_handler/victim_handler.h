@@ -53,7 +53,7 @@
 #include "pandora_data_fusion_msgs/VictimInfoMsg.h"
 #include "pandora_data_fusion_msgs/WorldModelMsg.h"
 #include "pandora_data_fusion_msgs/GlobalProbabilitiesMsg.h"
-#include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
+#include "pandora_data_fusion_msgs/GeotiffSrv.h"
 
 #include "alert_handler/victim.h"
 #include "alert_handler/victim_clusterer.h"
@@ -148,12 +148,12 @@ namespace pandora_data_fusion
         /**
          * @brief Fill in the geotiff info with the victims details
          * @param res
-         * [pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response*]
+         * [pandora_data_fusion_msgs::GeotiffSrv::Response*]
          * The output service response param
          * @return void
          */
         void fillGeotiff(
-            pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response* res);
+            pandora_data_fusion_msgs::GeotiffSrv::Response* res);
 
         /**
          * @brief Get the victims visualization
@@ -188,6 +188,7 @@ namespace pandora_data_fusion
 
         //!< Radius within which all legit objects are associated with a victim.
         float CLUSTER_RADIUS;
+
     };
 
     typedef boost::scoped_ptr<VictimHandler> VictimHandlerPtr;

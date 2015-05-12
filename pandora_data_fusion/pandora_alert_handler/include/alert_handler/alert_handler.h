@@ -41,6 +41,7 @@
 
 #include <string>
 #include <boost/utility.hpp>
+#include <map>
 
 #include <ros/ros.h>
 
@@ -58,16 +59,15 @@
 #include "pandora_data_fusion_msgs/DeleteVictimAction.h"
 #include "pandora_data_fusion_msgs/ValidateVictimAction.h"
 #include "pandora_data_fusion_msgs/GetObjectsSrv.h"
-#include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
+#include "pandora_data_fusion_msgs/GeotiffSrv.h"
 #include "pandora_data_fusion_msgs/GetMarkersSrv.h"
 
-#include "pandora_vision_msgs/HolesDirectionsVectorMsg.h"
-#include "pandora_vision_msgs/FaceDirectionMsg.h"
-#include "pandora_vision_msgs/QRAlertsVectorMsg.h"
-#include "pandora_vision_msgs/HazmatAlertsVectorMsg.h"
-#include "pandora_vision_msgs/DataMatrixAlertsVectorMsg.h"
-#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
-#include "pandora_common_msgs/GeneralAlertMsg.h"
+#include "pandora_vision_msgs/HoleDirectionAlertVector.h"
+#include "pandora_vision_msgs/QRAlertVector.h"
+#include "pandora_vision_msgs/HazmatAlertVector.h"
+#include "pandora_vision_msgs/DataMatrixAlertVector.h"
+#include "pandora_vision_msgs/LandoltcAlertVector.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
 #include "alert_handler/defines.h"
@@ -120,24 +120,33 @@ namespace pandora_data_fusion
             uint32_t level);
 
       private:
+        /**
+         * @brief Templated subscriber for all objects
+         */
+        template <class MsgType, class ClassType>
+          void setSubscriber(const std::string name,
+            void (ClassType::*callback)(MsgType));
+
         /*  Alert-concerned Subscribers  */
 
-        void holeDirectionAlertCallback(
-            const pandora_vision_msgs::HolesDirectionsVectorMsg& msg);
-        void thermalDirectionAlertCallback(
-            const pandora_common_msgs::GeneralAlertMsg& msg);
         void hazmatAlertCallback(
-            const pandora_vision_msgs::HazmatAlertsVectorMsg& msg);
-        void qrAlertCallback(const pandora_vision_msgs::QRAlertsVectorMsg& msg);
+            const pandora_vision_msgs::HazmatAlertVector& msg);
+        void qrAlertCallback(
+            const pandora_vision_msgs::QRAlertVector& msg);
         void landoltcAlertCallback(
-            const pandora_vision_msgs::LandoltcAlertsVectorMsg& msg);
+            const pandora_vision_msgs::LandoltcAlertVector& msg);
         void dataMatrixAlertCallback(
-            const pandora_vision_msgs::DataMatrixAlertsVectorMsg& msg);
-        template <class ObjectType>
-          void objectDirectionAlertCallback(
-              const pandora_common_msgs::GeneralAlertMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlertVector& msg);
 
         /*  Victim-concerned Subscribers  */
+
+        void holeAlertCallback(
+            const pandora_vision_msgs::HoleDirectionAlertVector& msg);
+        void thermalAlertCallback(
+            const pandora_common_msgs::GeneralAlertVector& msg);
+        template <class ObjectType>
+          void victimAlertCallback(
+              const pandora_common_msgs::GeneralAlertVector& msg);
 
         /*  Map Subsriber Callback - Communication with SLAM  */
 
@@ -150,19 +159,19 @@ namespace pandora_data_fusion
 
         /*  Map Visualization Callbacks  */
 
-        bool getObjectsServiceCb(
-            pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
-            pandora_data_fusion_msgs::GetObjectsSrv::Response &rs);
-
         bool geotiffServiceCb(
-            pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request &req,
-            pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response &res);
+            pandora_data_fusion_msgs::GeotiffSrv::Request &req,
+            pandora_data_fusion_msgs::GeotiffSrv::Response &res);
 
         bool getMarkersServiceCb(
             pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
             pandora_data_fusion_msgs::GetMarkersSrv::Response &rs);
 
         /*  Services Callbacks  */
+
+        bool getObjectsServiceCb(
+            pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
+            pandora_data_fusion_msgs::GetObjectsSrv::Response &rs);
 
         bool flushQueues(
             std_srvs::Empty::Request& rq,
@@ -195,23 +204,14 @@ namespace pandora_data_fusion
       private:
         NodeHandlePtr nh_;
 
-        ros::Subscriber holeDirectionSubscriber_;
-        ros::Subscriber faceDirectionSubscriber_;
-        ros::Subscriber co2DirectionSubscriber_;
-        ros::Subscriber motionDirectionSubscriber_;
-        ros::Subscriber thermalDirectionSubscriber_;
-        ros::Subscriber soundDirectionSubscriber_;
-        ros::Subscriber qrSubscriber_;
-        ros::Subscriber hazmatSubscriber_;
-        ros::Subscriber landoltcSubscriber_;
-        ros::Subscriber dataMatrixSubscriber_;
+        //!< Holds the subscribers using a key
+        std::map<std::string, ros::Subscriber> subscribers_;
 
-        ros::Subscriber mapSubscriber_;
+        ros::ServiceServer getMarkersService_;
+        ros::ServiceServer geotiffService_;
 
         ros::ServiceServer flushService_;
         ros::ServiceServer getObjectsService_;
-        ros::ServiceServer geotiffService_;
-        ros::ServiceServer getMarkersService_;
 
         ros::Publisher worldModelPublisher_;
 
@@ -231,16 +231,17 @@ namespace pandora_data_fusion
         int prevyMin;
 
         //!< The alerts list
-        HoleListPtr holes_;
         QrListPtr qrs_;
-        MotionListPtr motions_;
-        FaceListPtr faces_;
-        SoundListPtr sounds_;
-        Co2ListPtr co2s_;
         HazmatListPtr hazmats_;
-        ThermalListPtr thermals_;
         LandoltcListPtr landoltcs_;
         DataMatrixListPtr dataMatrices_;
+
+        HoleListPtr holes_;
+        ThermalListPtr thermals_;
+        MotionListPtr motions_;
+        VictimImageListPtr victimImages_;
+        SoundListPtr sounds_;
+        Co2ListPtr co2s_;
 
         //!< The unvisited victims list
         VictimListPtr victimsToGo_;
@@ -250,11 +251,12 @@ namespace pandora_data_fusion
         ObjectFactoryPtr objectFactory_;
         ObjectHandlerPtr objectHandler_;
         VictimHandlerPtr victimHandler_;
+
     };
 
-    template <class ObjectType>
-      void AlertHandler::objectDirectionAlertCallback(
-          const pandora_common_msgs::GeneralAlertMsg& msg)
+      template <class ObjectType>
+        void AlertHandler::victimAlertCallback(
+            const pandora_common_msgs::GeneralAlertVector& msg)
       {
         if (map_->data.size() == 0)
           return;
@@ -280,7 +282,34 @@ namespace pandora_data_fusion
         publishVictims();
       }
 
-}  // namespace pandora_alert_handler
+      /**
+       * @brief tamplated function responsible for initialising each one of the
+       * node's subscribers.
+       * @param name [std::string] string with the name of the subscriber and
+       * of the yaml param
+       * @param callback [void] pointer to the Callback of the subscriber
+       * @return void
+       */
+      template <class MsgType, class ClassType>
+        void AlertHandler::setSubscriber(const std::string name,
+          void (ClassType::*callback)(MsgType))
+        {
+          std::string param;
+          if (nh_->getParam("subscribed_topic_names/" + name, param))
+          {
+            ros::Subscriber sub;
+            sub = nh_->subscribe(param, 1, callback, this);
+            //!< Store the subscriber to the std::map
+            subscribers_[name] = sub;
+          }
+          else
+          {
+            ROS_FATAL("[ALERT_HANDLER] %s topic name param not found", name.c_str());
+            ROS_BREAK();
+          }
+        }
+
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_ALERT_HANDLER_H

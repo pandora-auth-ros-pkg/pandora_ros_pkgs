@@ -66,6 +66,24 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr< const ObjectList<DerivedObject> > ListConstPtr;
 
       public:
+        static bool is3D;
+
+      protected:
+        //!< Variable with objects' min distance.
+        static float distanceThres_;
+        //!< Variable with objects' merge distance.
+        static float mergeDistance_;
+        //!< Variable containing object type's score.
+        static int objectScore_;
+        //!< Variable containing object type's probability threshold for an
+        //!< object to become legitimate.
+        static float probabilityThres_;
+        //!< A string indicating the type of object
+        static std::string type_;
+        //!< Pointer to list that contains Objects with type DerivedObject;
+        static ListPtr listPtr_;
+
+      public:
         /**
          * @brief Constructor
          */
@@ -137,6 +155,15 @@ namespace pandora_data_fusion
         float getProbability() const
         {
           return probability_;
+        }
+
+        /**
+         * @brief Getter for member timeFound_
+         * @return ros::Time The QR's timeFound
+         */
+        ros::Time getTimeFound() const
+        {
+          return timeFound_;
         }
 
         /**
@@ -244,6 +271,15 @@ namespace pandora_data_fusion
         }
 
         /**
+         * @brief Setter for member timeFound_
+         * @return void
+         */
+        void setTimeFound(const ros::Time& timeFound)
+        {
+          timeFound_ = timeFound;
+        }
+
+        /**
          * @brief Setter for member pose_
          * @param pose [const geometry_msgs::Pose&] The new pose value
          * @return void
@@ -313,26 +349,15 @@ namespace pandora_data_fusion
         bool legit_;
         //!< The Objects's probability
         float probability_;
+        //!< The time when this object was first found
+        ros::Time timeFound_;
 
         //!< The object's pose in 3d space
         Pose pose_;
 
-        //!< Variable with objects' min distance.
-        static float distanceThres_;
-        //!< Variable with objects' merge distance.
-        static float mergeDistance_;
-        //!< Variable containing object type's score.
-        static int objectScore_;
-        //!< Variable containing object type's probability threshold for an
-        //!< object to become legitimate.
-        static float probabilityThres_;
-        //!< A string indicating the type of object
-        static std::string type_;
-        //!< Pointer to list that contains Objects with type DerivedObject;
-        static ListPtr listPtr_;
-
       private:
         friend class ObjectListTest;
+
     };
 
     template <class DerivedObject>
@@ -341,6 +366,8 @@ namespace pandora_data_fusion
         legit_ = false;
       }
 
+    template <class DerivedObject>
+      bool Object<DerivedObject>::is3D = true;
     template <class DerivedObject>
       float Object<DerivedObject>::distanceThres_ = 0.5;
     template <class DerivedObject>
@@ -369,9 +396,9 @@ namespace pandora_data_fusion
       {
         if (type_ != object->getType())
           return false;
-        return Utils::distanceBetweenPoints3D(
-            pose_.position, object->getPose().position)
-          < distanceThres_;
+        return Utils::arePointsInRange(
+            pose_.position, object->getPose().position,
+            DerivedObject::is3D, distanceThres_);
       }
 
     template <class DerivedObject>
@@ -389,7 +416,7 @@ namespace pandora_data_fusion
         }
       }
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_H

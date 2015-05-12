@@ -53,37 +53,16 @@ namespace pandora_data_fusion
     {
       std::string param;
 
-      nh->param<std::string>("object_names/hole", param, std::string("HOLE"));
-      Hole::setObjectType(param);
-      nh->param<std::string>("object_names/hazmat", param, std::string("HAZMAT"));
-      Hazmat::setObjectType(param);
-      nh->param<std::string>("object_names/qr", param, std::string("QR"));
-      Qr::setObjectType(param);
-      nh->param<std::string>("object_names/thermal", param, std::string("THERMAL"));
-      Thermal::setObjectType(param);
-      nh->param<std::string>("object_names/face", param, std::string("FACE"));
-      Face::setObjectType(param);
-      nh->param<std::string>("object_names/motion", param, std::string("MOTION"));
-      Motion::setObjectType(param);
-      nh->param<std::string>("object_names/sound", param, std::string("SOUND"));
-      Sound::setObjectType(param);
-      nh->param<std::string>("object_names/co2", param, std::string("CO2"));
-      Co2::setObjectType(param);
-      nh->param<std::string>("object_names/landoltc", param, std::string("LANDOLTC"));
-      Landoltc::setObjectType(param);
-      nh->param<std::string>("object_names/datamatrix", param, std::string("DATAMATRIX"));
-      DataMatrix::setObjectType(param);
-
       roboCupScore_ = 0;
 
       if (nh->getParam("published_topic_names/qr_notification", param))
       {
-        qrPublisher_ = nh->
-          advertise<pandora_data_fusion_msgs::QrNotificationMsg>(param, 10);
+        qrPublisher_ = nh->advertise<
+          pandora_data_fusion_msgs::QrNotificationMsg>(param, 10);
       }
       else
       {
-        ROS_FATAL("qr_notification topic name param not found");
+        ROS_FATAL("[ALERT_HANDLER] qr_notification topic name param not found");
         ROS_BREAK();
       }
 
@@ -93,7 +72,7 @@ namespace pandora_data_fusion
       }
       else
       {
-        ROS_FATAL("robocup_score topic name param not found");
+        ROS_FATAL("[ALERT_HANDLER] robocup_score topic name param not found");
         ROS_BREAK();
       }
     }
@@ -117,6 +96,7 @@ namespace pandora_data_fusion
         {
           pandora_data_fusion_msgs::QrNotificationMsg newQrNofifyMsg;
           newQrNofifyMsg.header.stamp = newQrs->at(ii)->getTimeFound();
+          newQrNofifyMsg.header.frame_id = newQrs->at(ii)->getFrameId();
           newQrNofifyMsg.x = newQrs->at(ii)->getPose().position.x;
           newQrNofifyMsg.y = newQrs->at(ii)->getPose().position.y;
           newQrNofifyMsg.content = newQrs->at(ii)->getContent();
@@ -140,12 +120,14 @@ namespace pandora_data_fusion
       while (iter != holesPtr->end())
       {
         bool invalid = !Utils::arePointsInRange((*iter)->getPose().position,
-            framePosition, SENSOR_RANGE);
+            framePosition, Hole::is3D, SENSOR_RANGE);
 
         if (invalid)
         {
-          ROS_DEBUG_NAMED("OBJECT_HANDLER",
+          ROS_DEBUG_NAMED("ALERT_HANDLER",
               "[OBJECT_HANDLER %d] Deleting not valid hole...", __LINE__);
+          ROS_DEBUG_NAMED("ALERT_HANDLER",
+              "[OBJECT_HANDLER %d] SENSOR_RANGE = %f", __LINE__, SENSOR_RANGE);
           iter = holesPtr->erase(iter);
         }
         else
@@ -161,6 +143,5 @@ namespace pandora_data_fusion
       VICTIM_CLUSTER_RADIUS = victim_cluster_radius;
     }
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-

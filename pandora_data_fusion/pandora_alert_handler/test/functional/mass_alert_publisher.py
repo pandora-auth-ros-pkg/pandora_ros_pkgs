@@ -46,11 +46,11 @@ from dynamic_reconfigure.server import Server
 from pandora_alert_handler.cfg import MassAlertPublisherConfig
 
 class MassPublisher:
-    
-    def __init__(self,frame_id):
+
+    def __init__(self, frame_id):
 
         self.alertDeliveryBoy = alert_delivery.AlertDeliveryBoy(frame_id)
-        
+
         self.dyn_reconf_srv = Server(MassAlertPublisherConfig, self.dyn_reconf_callback)
 
         self.qr_post = False
@@ -60,22 +60,22 @@ class MassPublisher:
         self.hole_1_post = False
         self.hole_2_post = False
         self.thermal_post = False
-        self.face_post = False
+        self.victimImage_post = False
         self.motion_post = False
         self.sound_post = False
         self.co2_post = False
 
         self.config = None
-                
+
         self.publish_stuff()
 
     def dyn_reconf_callback(self, config, level):
 
         self.config = config
         return config
-    
+
     def publish_stuff(self):
-        
+
         while not rospy.is_shutdown():
             if self.config is not None:
                 if self.config.hazmat_post:
@@ -120,11 +120,11 @@ class MassPublisher:
                         self.config.sound_pitch,
                         self.config.sound_probability)
 
-                if self.config.face_post:
-                    self.alertDeliveryBoy.deliverFaceOrder(
-                        self.config.face_yaw,
-                        self.config.face_pitch,
-                        self.config.face_probability)
+                if self.config.victimImage_post:
+                    self.alertDeliveryBoy.deliverVictimImageOrder(
+                        self.config.victimImage_yaw,
+                        self.config.victimImage_pitch,
+                        self.config.victimImage_probability)
 
                 if self.config.thermal_post:
                     self.alertDeliveryBoy.deliverThermalOrder(

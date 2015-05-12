@@ -44,7 +44,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Co2::Co2() {}
 
     void Co2::getVisualization(visualization_msgs::

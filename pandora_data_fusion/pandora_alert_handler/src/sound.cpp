@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Sound::Sound() {}
 
     void Sound::getVisualization(visualization_msgs::

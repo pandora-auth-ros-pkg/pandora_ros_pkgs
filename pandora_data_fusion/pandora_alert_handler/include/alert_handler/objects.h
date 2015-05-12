@@ -43,7 +43,7 @@
 #include "alert_handler/hazmat.h"
 #include "alert_handler/qr.h"
 #include "alert_handler/thermal.h"
-#include "alert_handler/face.h"
+#include "alert_handler/victim_image.h"
 #include "alert_handler/motion.h"
 #include "alert_handler/sound.h"
 #include "alert_handler/co2.h"

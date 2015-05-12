@@ -98,11 +98,11 @@ namespace pandora_data_fusion
         /**
          * @override
          * @brief Getter for geotiff information about the victim
-         * @param res [data_fusion...::DatafusionGeotiffSrv::Response*]
+         * @param res [data_fusion...::GeotiffSrv::Response*]
          * @return void
          */
         virtual void fillGeotiff(pandora_data_fusion_msgs::
-            DatafusionGeotiffSrv::Response* res) const;
+            GeotiffSrv::Response* res) const;
 
         /**
          * @override
@@ -111,15 +111,6 @@ namespace pandora_data_fusion
          * @return void
          */
         virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
-
-        /**
-         * @brief Getter for member timeFound_
-         * @return ros::Time Victim's timeFound
-         */
-        ros::Time getTimeFound() const
-        {
-          return timeFound_;
-        }
 
         /**
          * @brief Getter for member valid_
@@ -183,15 +174,6 @@ namespace pandora_data_fusion
           visited_ = visited;
         }
 
-        /**
-         * @brief Setter for member timeFound_
-         * @return void
-         */
-        void setTimeFound(ros::Time timeFound)
-        {
-          timeFound_ = timeFound;
-        }
-
       private:
         /**
          * @brief Updates the representative object and consequently the pose
@@ -221,13 +203,11 @@ namespace pandora_data_fusion
         bool valid_;
         //!< True if the victim was visited false otherwise
         bool visited_;
-        //!< The time when this victim was made
-        ros::Time timeFound_;
 
         //!< Index pointing to representative object
         int selectedObjectIndex_;
 
-        //!< Victim's characteristic group of objects (Hole or Thermal)
+        //!< Victim's characteristic group of objects
         ObjectConstPtrVector objects_;
 
       private:
@@ -235,6 +215,7 @@ namespace pandora_data_fusion
 
       private:
         friend class VictimTest;
+
     };
 
     typedef Victim::Ptr VictimPtr;
@@ -243,41 +224,41 @@ namespace pandora_data_fusion
     typedef Victim::PtrVectorPtr VictimPtrVectorPtr;
 
     template <class ObjectType>
-      void Victim::findRepresentativeObject(const ObjectConstPtrVector& objects)
+    void Victim::findRepresentativeObject(const ObjectConstPtrVector& objects)
+    {
+      ObjectConstPtrVector::const_iterator objectIt = objects.end();
+      float maxObjectProbability = 0;
+
+      for (ObjectConstPtrVector::const_iterator it = objects.begin();
+          it != objects.end(); it++)
       {
-        ObjectConstPtrVector::const_iterator objectIt = objects.end();
-        float maxObjectProbability = 0;
-
-        for (ObjectConstPtrVector::const_iterator it = objects.begin();
-            it != objects.end(); it++)
+        if ((*it)->getType() == ObjectType::getObjectType() &&
+            (*it)->getProbability() > maxObjectProbability)
         {
-          if ((*it)->getType() == ObjectType::getObjectType() &&
-              (*it)->getProbability() > maxObjectProbability)
-          {
-            maxObjectProbability = (*it)->getProbability();
-            objectIt = it;
-          }
+          maxObjectProbability = (*it)->getProbability();
+          objectIt = it;
         }
-
-        typename ObjectType::Ptr representativeObject(new ObjectType);
-
-        if (objectIt != objects.end())
-          *representativeObject = *(boost::dynamic_pointer_cast<const ObjectType>(*objectIt));
-
-        for (ObjectConstPtrVector::const_iterator it = objects.begin();
-            it != objects.end(); it++)
-        {
-          if ((*it)->getType() == ObjectType::getObjectType() && it != objectIt)
-          {
-            representativeObject->update((*it));
-          }
-        }
-
-        if (objectIt != objects.end())
-          objects_.push_back(representativeObject);
       }
 
-}  // namespace pandora_alert_handler
+      typename ObjectType::Ptr representativeObject(new ObjectType);
+
+      if (objectIt != objects.end())
+        *representativeObject = *(boost::dynamic_pointer_cast<const ObjectType>(*objectIt));
+
+      for (ObjectConstPtrVector::const_iterator it = objects.begin();
+          it != objects.end(); it++)
+      {
+        if ((*it)->getType() == ObjectType::getObjectType() && it != objectIt)
+        {
+          representativeObject->update((*it));
+        }
+      }
+
+      if (objectIt != objects.end())
+        objects_.push_back(representativeObject);
+    }
+
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_VICTIM_H

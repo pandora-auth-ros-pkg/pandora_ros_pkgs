@@ -68,6 +68,20 @@ namespace pandora_data_fusion
       return sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
     }
 
+    float Utils::distanceBetweenPoints(Point a, Point b, bool is3D)
+    {
+      float distance = 0;
+      if (is3D)
+      {
+        distance = Utils::distanceBetweenPoints3D(a, b);
+      }
+      else
+      {
+        distance = Utils::distanceBetweenPoints2D(a, b);
+      }
+      return distance;
+    }
+
     geometry_msgs::Quaternion Utils::calculateQuaternion(Point a, Point b)
     {
       tfScalar yaw;
@@ -87,9 +101,10 @@ namespace pandora_data_fusion
       return point;
     }
 
-    bool Utils::arePointsInRange(Point pointA, Point pointB, float sensor_range)
+    bool Utils::arePointsInRange(Point pointA, Point pointB,
+        bool is3D, float sensor_range)
     {
-      float dist = distanceBetweenPoints2D(pointA, pointB);
+      float dist = distanceBetweenPoints(pointA, pointB, is3D);
 
       if (dist > sensor_range)
         return false;
@@ -128,4 +143,3 @@ namespace pandora_data_fusion
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-

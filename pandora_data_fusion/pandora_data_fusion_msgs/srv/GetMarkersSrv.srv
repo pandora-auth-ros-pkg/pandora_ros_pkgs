@@ -6,7 +6,7 @@ visualization_msgs/MarkerArray hazmats
 visualization_msgs/MarkerArray landoltcs
 visualization_msgs/MarkerArray qrs
 visualization_msgs/MarkerArray thermals
-visualization_msgs/MarkerArray faces
+visualization_msgs/MarkerArray victimImages
 visualization_msgs/MarkerArray motions
 visualization_msgs/MarkerArray sounds
 visualization_msgs/MarkerArray co2s

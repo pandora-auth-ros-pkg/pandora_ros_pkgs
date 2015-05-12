@@ -21,7 +21,8 @@ add_message_files(
 add_service_files(
   FILES
   GetObjectsSrv.srv
-  DatafusionGeotiffSrv.srv
+  GeotiffSrv.srv
+  QrCsvSrv.srv
   GetMarkersSrv.srv
   )
 

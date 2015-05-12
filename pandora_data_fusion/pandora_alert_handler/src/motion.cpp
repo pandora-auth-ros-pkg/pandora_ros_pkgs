@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Motion::Motion() {}
 
     void Motion::getVisualization(visualization_msgs::

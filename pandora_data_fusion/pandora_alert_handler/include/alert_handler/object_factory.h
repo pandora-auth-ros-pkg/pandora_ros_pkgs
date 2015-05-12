@@ -46,13 +46,12 @@
 
 #include <nav_msgs/OccupancyGrid.h>
 
-#include "pandora_vision_msgs/HolesDirectionsVectorMsg.h"
-#include "pandora_vision_msgs/FaceDirectionMsg.h"
-#include "pandora_vision_msgs/QRAlertsVectorMsg.h"
-#include "pandora_vision_msgs/HazmatAlertsVectorMsg.h"
-#include "pandora_vision_msgs/LandoltcAlertsVectorMsg.h"
-#include "pandora_vision_msgs/DataMatrixAlertsVectorMsg.h"
-#include "pandora_common_msgs/GeneralAlertMsg.h"
+#include "pandora_vision_msgs/HoleDirectionAlertVector.h"
+#include "pandora_vision_msgs/QRAlertVector.h"
+#include "pandora_vision_msgs/HazmatAlertVector.h"
+#include "pandora_vision_msgs/DataMatrixAlertVector.h"
+#include "pandora_vision_msgs/LandoltcAlertVector.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
 
 #include "alert_handler/pose_finder.h"
 #include "alert_handler/objects.h"
@@ -69,22 +68,22 @@ namespace pandora_data_fusion
         ObjectFactory(const MapPtr& map, const std::string& mapType);
 
         HolePtrVectorPtr makeHoles(
-            const pandora_vision_msgs::HolesDirectionsVectorMsg& msg);
+            const pandora_vision_msgs::HoleDirectionAlertVector& msg);
         HazmatPtrVectorPtr makeHazmats(
-            const pandora_vision_msgs::HazmatAlertsVectorMsg& msg);
+            const pandora_vision_msgs::HazmatAlertVector& msg);
         QrPtrVectorPtr makeQrs(
-            const pandora_vision_msgs::QRAlertsVectorMsg& msg);
+            const pandora_vision_msgs::QRAlertVector& msg);
         LandoltcPtrVectorPtr makeLandoltcs(
-            const pandora_vision_msgs::LandoltcAlertsVectorMsg& msg);
+            const pandora_vision_msgs::LandoltcAlertVector& msg);
         DataMatrixPtrVectorPtr makeDataMatrices(
-            const pandora_vision_msgs::DataMatrixAlertsVectorMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlertVector& msg);
         template <class ObjectType>
           typename ObjectType::PtrVectorPtr makeObjects(
-              const pandora_common_msgs::GeneralAlertMsg& msg);
+              const pandora_common_msgs::GeneralAlertVector& msg);
 
-        const tf::Transform& getTransform() const
+        tf::Transform getCurrentHoleTransform() const
         {
-          return currentTransform_;
+          return currentHoleTransform_;
         }
 
         void dynamicReconfigForward(float occupiedCellThres,
@@ -101,38 +100,53 @@ namespace pandora_data_fusion
          * @return void
          */
         void setUpHole(const HolePtr& holePtr,
-            const pandora_vision_msgs::HoleDirectionMsg& msg);
+            const pandora_vision_msgs::HoleDirectionAlert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
         void setUpHazmat(const HazmatPtr& hazmatPtr,
-            const pandora_vision_msgs::HazmatAlertMsg& msg);
+            const pandora_vision_msgs::HazmatAlert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
         void setUpQr(const QrPtr& qrPtr,
-            const pandora_vision_msgs::QRAlertMsg& msg,
-            ros::Time timeFound);
+            const pandora_vision_msgs::QRAlert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
         void setUpLandoltc(const LandoltcPtr& landoltcPtr,
-            const pandora_vision_msgs::LandoltcAlertMsg& msg);
+            const pandora_vision_msgs::LandoltcAlert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
         void setUpDataMatrix(const DataMatrixPtr& dataMatrixPtr,
-            const pandora_vision_msgs::DataMatrixAlertMsg& msg);
+            const pandora_vision_msgs::DataMatrixAlert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
         template <class ObjectType>
           void setUpObject(
               const typename ObjectType::Ptr& objectPtr,
-              const pandora_common_msgs::GeneralAlertMsg& msg);
+              const pandora_common_msgs::GeneralAlertInfo& msg,
+              const ros::Time& timeFound,
+              const tf::Transform& transform);
 
       private:
-        tf::Transform currentTransform_;
+        tf::Transform currentHoleTransform_;
 
         PoseFinderPtr poseFinder_;
+
     };
 
     template <class ObjectType>
-      typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
-          const pandora_common_msgs::GeneralAlertMsg& msg)
-      {
-        currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
+    typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
+        const pandora_common_msgs::GeneralAlertVector& msg)
+    {
+      tf::Transform transform;
+      transform = poseFinder_->lookupTransformFromWorld(msg.header);
 
-        typename ObjectType::PtrVectorPtr objectsVectorPtr(new typename ObjectType::PtrVector);
+      typename ObjectType::PtrVectorPtr objectsVectorPtr(
+          new typename ObjectType::PtrVector);
+      for (int ii = 0; ii < msg.generalAlerts.size(); ++ii) {
         try
         {
-          typename ObjectType::Ptr newObject(new ObjectType);
-          setUpObject<ObjectType>(newObject, msg);
+          typename ObjectType::Ptr newObject( new ObjectType );
+          setUpObject<ObjectType>(newObject, msg.generalAlerts[ii], msg.header.stamp, transform);
           objectsVectorPtr->push_back(newObject);
         }
         catch (AlertException ex)
@@ -140,24 +154,28 @@ namespace pandora_data_fusion
           ROS_WARN_NAMED("ALERT_HANDLER",
               "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
         }
-
-        return objectsVectorPtr;
       }
+
+      return objectsVectorPtr;
+    }
 
     template <class ObjectType>
-      void ObjectFactory::setUpObject(
-          const typename ObjectType::Ptr& objectPtr,
-          const pandora_common_msgs::GeneralAlertMsg& msg)
-      {
-        objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
-              msg.pitch, currentTransform_));
-        objectPtr->setProbability(msg.probability);
-        objectPtr->initializeObjectFilter();
-      }
+    void ObjectFactory::setUpObject(
+        const typename ObjectType::Ptr& objectPtr,
+        const pandora_common_msgs::GeneralAlertInfo& msg,
+        const ros::Time& timeFound,
+        const tf::Transform& transform)
+    {
+      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+            msg.pitch, transform));
+      objectPtr->setProbability(msg.probability);
+      objectPtr->setTimeFound(timeFound);
+      objectPtr->initializeObjectFilter();
+    }
 
     typedef boost::scoped_ptr<ObjectFactory> ObjectFactoryPtr;
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_FACTORY_H

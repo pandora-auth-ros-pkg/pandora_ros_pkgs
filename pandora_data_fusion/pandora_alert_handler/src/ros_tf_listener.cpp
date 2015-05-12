@@ -49,10 +49,10 @@ namespace pandora_data_fusion
     {
       tf::StampedTransform tfTransform;
 
-      waitForTransform("/map", "/map",
+      waitForTransform("/world", "/map",
           ros::Time(0), ros::Duration(1));
 
-      lookupTransform("/map", "/map",
+      lookupTransform("/world", "/map",
           ros::Time(0), tfTransform);
     }
 

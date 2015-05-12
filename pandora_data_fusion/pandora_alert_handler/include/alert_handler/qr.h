@@ -73,9 +73,6 @@ namespace pandora_data_fusion
 
         virtual bool isSameObject(const ObjectConstPtr& object) const;
 
-        virtual void fillGeotiff(pandora_data_fusion_msgs::
-            DatafusionGeotiffSrv::Response* res) const;
-
         virtual void getVisualization(visualization_msgs::
             MarkerArray* markers) const;
 
@@ -97,29 +94,10 @@ namespace pandora_data_fusion
           content_ = content;
         }
 
-        /**
-         * @brief Getter for member timeFound_
-         * @return ros::Time The QR's timeFound
-         */
-        ros::Time getTimeFound() const
-        {
-          return timeFound_;
-        }
-
-        /**
-         * @brief Setter for member timeFound_
-         * @return void
-         */
-        void setTimeFound(ros::Time timeFound)
-        {
-          timeFound_ = timeFound;
-        }
-
       private:
         //!< The qr's content
         std::string content_;
-        //!< The time when this qr was first found
-        ros::Time timeFound_;
+
     };
 
     typedef Qr::Ptr QrPtr;

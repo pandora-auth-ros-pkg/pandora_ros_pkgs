@@ -221,7 +221,7 @@ namespace pandora_data_fusion
       transform.setOrigin(origin);
       position.x = 5.76;
       position.y = 5.76;
-      position.z = 0.9119;
+      position.z = 0.9235;
       expected.position = position;
       orientation.z = -0.70711;
       orientation.w = 0.70711;
@@ -262,8 +262,8 @@ namespace pandora_data_fusion
       startPoint.x = 5;
       startPoint.y = 5;
       angle = 0.785398;
-      expected.x = 5.7495;
-      expected.y = 5.7495;
+      expected.x = 5.7636;
+      expected.y = 5.7636;
       ROS_INFO_STREAM_NAMED("pose_finder_test", "PositionOnWallTest 2: x = "
           << startPoint.x << " y = " << startPoint.y << " angle = " << angle);
       result = positionOnWall(startPoint, angle);

@@ -101,6 +101,7 @@ catkin_download_test_data(
   MD5 01603ce158575da859b8afff5b676bf9
   )
 
+add_rostest(functional/subscriber_test.launch)
 add_rostest(functional/alert_handler_static_test.launch)
 add_rostest(functional/alert_handler_test.launch)
 

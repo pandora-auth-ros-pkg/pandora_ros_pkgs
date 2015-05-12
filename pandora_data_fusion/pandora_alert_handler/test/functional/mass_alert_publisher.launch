@@ -1,0 +1,4 @@
+<launch>
+  <node name="mass_alert_publisher" type="mass_alert_publisher.py"
+    pkg="pandora_alert_handler" respawn="true" args="kinect_frame" />
+</launch>

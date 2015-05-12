@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Victim::Victim()
     {
       lastVictimId_++;
@@ -114,12 +113,11 @@ namespace pandora_data_fusion
     }
 
     void Victim::fillGeotiff(pandora_data_fusion_msgs::
-        DatafusionGeotiffSrv::Response* res) const
+        GeotiffSrv::Response* res) const
     {
       if (valid_)
       {
-        res->victimsx.push_back(pose_.position.x);
-        res->victimsy.push_back(pose_.position.y);
+        res->victims.push_back(getPoseStamped());
       }
     }
 
@@ -129,7 +127,7 @@ namespace pandora_data_fusion
       bool victimVisionFound = false;
       for (int ii = 0; ii < objects_.size(); ++ii)
       {
-        if (objects_[ii]->getType() == Face::getObjectType())
+        if (objects_[ii]->getType() == VictimImage::getObjectType())
         {
           setProbability(objects_[ii]->getProbability());
           victimVisionFound = true;
@@ -162,7 +160,7 @@ namespace pandora_data_fusion
 
       findRepresentativeObject<Hole>(objects);
       findRepresentativeObject<Thermal>(objects);
-      findRepresentativeObject<Face>(objects);
+      findRepresentativeObject<VictimImage>(objects);
       findRepresentativeObject<Motion>(objects);
       findRepresentativeObject<Sound>(objects);
       findRepresentativeObject<Co2>(objects);
@@ -170,6 +168,7 @@ namespace pandora_data_fusion
     }
 
     /**
+     * TODO
      * @details As for now, hole objects are prefered over thermal objects,
      * because it is more likely to verify a victim though vision means
      * rather than thermal sensors. In a future implementation of the robot

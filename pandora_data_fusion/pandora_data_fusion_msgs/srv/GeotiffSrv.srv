@@ -1,0 +1,4 @@
+---
+geometry_msgs/PoseStamped[] victims
+geometry_msgs/PoseStamped[] hazmats
+geometry_msgs/PoseStamped[] qrs

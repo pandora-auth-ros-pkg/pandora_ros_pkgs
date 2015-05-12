@@ -50,7 +50,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 
-#include "pandora_data_fusion_msgs/DatafusionGeotiffSrv.h"
+#include "pandora_data_fusion_msgs/GeotiffSrv.h"
 #include "visualization_msgs/MarkerArray.h"
 
 #include "alert_handler/utils.h"

@@ -93,7 +93,7 @@ add_library(${PROJECT_NAME}_objects
   src/data_matrix.cpp
   src/qr.cpp
   src/thermal.cpp
-  src/face.cpp
+  src/victim_image.cpp
   src/motion.cpp
   src/sound.cpp
   src/co2.cpp
@@ -245,9 +245,9 @@ roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 
 ########################  testing  ##################################
 
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
-endif()
+# if(CATKIN_ENABLE_TESTING)
+#   add_subdirectory(test)
+# endif()
 
 
 

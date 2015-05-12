@@ -87,19 +87,19 @@ namespace pandora_data_fusion
         {
           holeDirVect1.header.seq = 1;
           holeDirVect1.header.frame_id = "Maria";
-          holeDir1.yaw = -PI/4;
-          holeDir1.pitch = PI/6;
-          holeDir1.probability = 0.3;
+          holeDir1.info.yaw = -PI/4;
+          holeDir1.info.pitch = PI/6;
+          holeDir1.info.probability = 0.3;
           holeDir1.holeId = 1;
           holeDirVect1.holesDirections.push_back(holeDir1);
-          holeDir2.yaw = -PI/2;
-          holeDir2.pitch = 0;
-          holeDir2.probability = 0.5;
+          holeDir2.info.yaw = -PI/2;
+          holeDir2.info.pitch = 0;
+          holeDir2.info.probability = 0.5;
           holeDir2.holeId = 2;
           holeDirVect1.holesDirections.push_back(holeDir2);
-          holeDir3.yaw = 0;
-          holeDir3.pitch = PI/2;
-          holeDir3.probability = 0.8;
+          holeDir3.info.yaw = 0;
+          holeDir3.info.pitch = PI/2;
+          holeDir3.info.probability = 0.8;
           holeDir3.holeId = 3;
           holeDirVect1.holesDirections.push_back(holeDir3);
         }
@@ -107,18 +107,18 @@ namespace pandora_data_fusion
         // Creating 3 QrAlerts two on Walls and one very High
         void createQrAlertVector()
         {
-          qrAlert1.yaw = -PI/4;
-          qrAlert1.pitch = PI/6;
+          qrAlert1.info.yaw = -PI/4;
+          qrAlert1.info.pitch = PI/6;
           qrAlert1.QRcontent =
             "No one can make you feel inferior without your consent.";
           qrAlertVect1.qrAlerts.push_back(qrAlert1);
-          qrAlert2.yaw = -PI/2;
-          qrAlert2.pitch = 0;
+          qrAlert2.info.yaw = -PI/2;
+          qrAlert2.info.pitch = 0;
           qrAlert2.QRcontent =
             "Let him who would enjoy a good future waste none of his present.";
           qrAlertVect1.qrAlerts.push_back(qrAlert2);
-          qrAlert3.yaw = 0;
-          qrAlert3.pitch = PI/2;
+          qrAlert3.info.yaw = 0;
+          qrAlert3.info.pitch = PI/2;
           qrAlert3.QRcontent =
             "Live as if you were to die tomorrow. Learn as if you were to live forever.";
           qrAlertVect1.qrAlerts.push_back(qrAlert3);
@@ -127,16 +127,16 @@ namespace pandora_data_fusion
         // Creating 3 HazmatAlerts two on Walls and one very High
         void createHazmatAlertVector()
         {
-          hazmatAlert1.yaw = -PI/4;
-          hazmatAlert1.pitch = PI/6;
+          hazmatAlert1.info.yaw = -PI/4;
+          hazmatAlert1.info.pitch = PI/6;
           hazmatAlert1.patternType = 1;
           hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert1);
-          hazmatAlert2.yaw = -PI/2;
-          hazmatAlert2.pitch = 0;
+          hazmatAlert2.info.yaw = -PI/2;
+          hazmatAlert2.info.pitch = 0;
           hazmatAlert2.patternType = 2;
           hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert2);
-          hazmatAlert3.yaw = 0;
-          hazmatAlert3.pitch = PI/2;
+          hazmatAlert3.info.yaw = 0;
+          hazmatAlert3.info.pitch = PI/2;
           hazmatAlert3.patternType = 3;
           hazmatAlertVect1.hazmatAlerts.push_back(hazmatAlert3);
         }
@@ -174,7 +174,7 @@ namespace pandora_data_fusion
     };
 
     // The tf that is used is created in mock object tfFinder
-    // With origin (5,5,0.3) and (roll,pitch,yaw)=(0,0,0)
+    // With origin (5,5,0.3) and (roll.info.pitch.info.yaw)=(0,0,0)
 
     /* Test Cases */
 
@@ -242,8 +242,8 @@ namespace pandora_data_fusion
 
       HazmatPtr hazmatPtr1 = (*hazmatsVectorPtr)[0];
       EXPECT_EQ(1, hazmatPtr1->getPattern());
-      EXPECT_NEAR(5.75, hazmatPtr1->getPose().position.x, 0.01);
-      EXPECT_NEAR(5.75, hazmatPtr1->getPose().position.y, 0.01);
+      EXPECT_NEAR(5.76, hazmatPtr1->getPose().position.x, 0.01);
+      EXPECT_NEAR(5.76, hazmatPtr1->getPose().position.y, 0.01);
       EXPECT_NEAR(0.9205, hazmatPtr1->getPose().position.z, 0.01);
       EXPECT_NEAR(0, hazmatPtr1->getPose().orientation.x, 0.1);
       EXPECT_NEAR(0, hazmatPtr1->getPose().orientation.y, 0.1);
@@ -267,8 +267,8 @@ namespace pandora_data_fusion
       thermalsVectorPtr = objectFactoryPtr->makeObjects<Thermal>(thermalDir1);
       EXPECT_EQ(1, thermalsVectorPtr->size());
       ThermalPtr thermalPtr1 = (*thermalsVectorPtr)[0];
-      EXPECT_NEAR(5.75, thermalPtr1->getPose().position.x, 0.01);
-      EXPECT_NEAR(5.75, thermalPtr1->getPose().position.y, 0.01);
+      EXPECT_NEAR(5.76, thermalPtr1->getPose().position.x, 0.01);
+      EXPECT_NEAR(5.76, thermalPtr1->getPose().position.y, 0.01);
       EXPECT_NEAR(0.9205, thermalPtr1->getPose().position.z, 0.01);
       EXPECT_NEAR(0, thermalPtr1->getPose().orientation.x, 0.1);
       EXPECT_NEAR(0, thermalPtr1->getPose().orientation.y, 0.1);

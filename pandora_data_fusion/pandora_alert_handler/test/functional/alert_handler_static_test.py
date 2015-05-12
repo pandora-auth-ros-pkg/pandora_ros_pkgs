@@ -66,7 +66,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         pose = outs[0].hazmats.pop().pose
 
         self.assertAlmostEqual(pose.position.x, 0.99525856, 3)
-        self.assertAlmostEqual(pose.position.y, 0.52000838, 3)
+        self.assertAlmostEqual(pose.position.y, 0.54000830, 3)
         self.assertAlmostEqual(pose.position.z, 1)
         self.assertAlmostEqual(pose.orientation.x, 0)
         self.assertAlmostEqual(pose.orientation.y, 0)

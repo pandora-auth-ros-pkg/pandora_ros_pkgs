@@ -307,7 +307,7 @@ namespace pandora_data_fusion
               int coords = static_cast<int>(round((xn + yn * coveredSpace_->info.width)
                     / coveredSpace_->info.resolution));
               coveredSpace_->data[coords] = oldCoverage[ii + jj * oldMetaData.width];
-              coverageDilation(2, COORDS(xn, yn, coveredSpace_));
+              coverageDilation(2, coords);
             }
           }
         }

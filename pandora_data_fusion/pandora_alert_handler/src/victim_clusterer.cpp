@@ -116,7 +116,8 @@ namespace pandora_data_fusion
             {
               groupedObjects[ii].push_back(currentObj);
               isAdded = true;
-              if (currentObj->getType() != Sound::getObjectType())
+              if (currentObj->getType() != Sound::getObjectType() &&
+                  currentObj->getType() != Co2::getObjectType())
                 break;
             }
           }

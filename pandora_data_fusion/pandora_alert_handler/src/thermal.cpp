@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Thermal::Thermal() {}
 
     void Thermal::getVisualization(visualization_msgs::

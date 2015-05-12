@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     DataMatrix::DataMatrix() {}
 
     bool DataMatrix::isSameObject(const ObjectConstPtr& object) const

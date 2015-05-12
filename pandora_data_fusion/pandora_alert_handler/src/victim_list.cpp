@@ -116,15 +116,14 @@ namespace pandora_data_fusion
     {
       victimsMsg->clear();
 
-      ros::Time now = ros::Time::now();
-
       for (const_iterator it = this->begin(); it != this->end(); ++it)
       {
         pandora_data_fusion_msgs::VictimInfoMsg victimInfo;
 
         victimInfo.id = (*it)->getId();
         victimInfo.victimFrameId = (*it)->getFrameId();
-        victimInfo.victimPose.header.stamp = now;
+        // mby replace with timeFound and its own frame_id
+        victimInfo.victimPose.header.stamp = ros::Time(0);
         victimInfo.victimPose.header.frame_id = Victim::getGlobalFrame();
         victimInfo.victimPose.pose = (*it)->getPose();
         victimInfo.probability = (*it)->getProbability();
@@ -202,4 +201,3 @@ namespace pandora_data_fusion
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-

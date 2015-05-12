@@ -1,31 +1,31 @@
 map_type: SLAM
 global_frame: /map
 object_names:
-  hole: HOLE
-  hazmat: HAZMAT
-  qr: QR
-  thermal: THERMAL
-  face: FACE
-  motion: MOTION
-  sound: SOUND
-  co2: CO2
-  landoltc: LANDOLTC
-  datamatrix: DATAMATRIX
-  victim: VICTIM
+  hole: hole
+  hazmat: hazmat
+  qr: qr
+  thermal: thermal
+  victim_image: victim_image
+  motion: motion
+  sound: sound
+  co2: co2
+  landoltc: landoltc
+  datamatrix: datamatrix
+  victim: victim
 
 subscribed_topic_names:
-  holeDirection: /vision/holes_direction_alert
-  thermalDirection: /sensor_processing/thermal_direction_alert
+  hole: /vision/holes_direction_alert
+  thermal: /sensor_processing/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
   landoltc: /vision/landoltc_alert
-  dataMatrix: /vision/dataMatrix_alert
-  faceDirection: /vision/victim_direction_alert
-  co2Direction: /sensor_processing/co2_alert
-  motionDirection: /vision/motion_alert
-  soundDirection: /sensor_processing/sound_direction_alert
+  data_matrix: /vision/dataMatrix_alert
+  victim_image: /vision/victim_direction_alert
+  co2: /sensor_processing/co2_alert
+  motion: /vision/motion_alert
+  sound: /sensor_processing/sound_direction_alert
   map: /slam/map
-published_topic_names:  
+published_topic_names:
   world_model: /data_fusion/world_model
   qr_notification: /data_fusion/qr_notification
   robocup_score: /data_fusion/robocup_score
@@ -38,4 +38,4 @@ service_server_names:
   get_markers: /data_fusion/get_markers
   geotiff: /data_fusion/geotiffSrv
   flush_queues: /data_fusion/flush_queues
-  
+

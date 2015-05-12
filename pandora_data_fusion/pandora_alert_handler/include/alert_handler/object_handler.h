@@ -88,8 +88,8 @@ namespace pandora_data_fusion
          * @return void
          */
         template <class ObjectType>
-          void handleObjects(
-              const typename ObjectType::PtrVectorPtr& objectsPtr);
+        void handleObjects(
+            const typename ObjectType::PtrVectorPtr& objectsPtr);
 
         /**
          * @brief parameter updating from dynamic reconfiguration
@@ -127,67 +127,74 @@ namespace pandora_data_fusion
 
         float SENSOR_RANGE;
         float VICTIM_CLUSTER_RADIUS;
+
     };
 
+    /**
+     * @details keepValidVerificationObjects should not be called for
+     * symbol pois (qr, hazmat, landoltc, datamatrix) as well as thermal
+     */
     template <class ObjectType>
-      void ObjectHandler::handleObjects(
-          const typename ObjectType::PtrVectorPtr& newObjects)
-      {
-        if (ObjectType::getObjectType() != Thermal::getObjectType() &&
-            ObjectType::getObjectType() != Hazmat::getObjectType() &&
-            ObjectType::getObjectType() != Landoltc::getObjectType() &&
-            ObjectType::getObjectType() != DataMatrix::getObjectType())
-        {
-          keepValidVerificationObjects<ObjectType>(newObjects);
-        }
-        for (int ii = 0; ii < newObjects->size(); ++ii)
-        {
-          if (ObjectType::getList()->add(newObjects->at(ii)))
-          {
-            std_msgs::Int32 updateScoreMsg;
-            roboCupScore_ += ObjectType::getObjectScore();
-            updateScoreMsg.data = roboCupScore_;
-            scorePublisher_.publish(updateScoreMsg);
-          }
+    void ObjectHandler::handleObjects(
+        const typename ObjectType::PtrVectorPtr& newObjects)
+    {
+      if (ObjectType::getObjectType() != Thermal::getObjectType() &&
+          ObjectType::getObjectType() != Hazmat::getObjectType() &&
+          ObjectType::getObjectType() != Landoltc::getObjectType() &&
+          ObjectType::getObjectType() != DataMatrix::getObjectType()) {
+        keepValidVerificationObjects<ObjectType>(newObjects);
+      }
+      for (int ii = 0; ii < newObjects->size(); ++ii) {
+        if (ObjectType::getList()->add(newObjects->at(ii))) {
+          std_msgs::Int32 updateScoreMsg;
+          roboCupScore_ += ObjectType::getObjectScore();
+          updateScoreMsg.data = roboCupScore_;
+          scorePublisher_.publish(updateScoreMsg);
         }
       }
+    }
 
+    /**
+     * TODO
+     * @details Sound and CO2 pois give us spatial information in a 2d
+     * surface on their sensors' tf frame's plane. We should not search for them
+     * in a sphere but in a cylinder.
+     */
     template <class ObjectType>
-      void ObjectHandler::keepValidVerificationObjects(
-          const typename ObjectType::PtrVectorPtr& objectsPtr)
-      {
-        typename ObjectType::PtrVector::iterator iter = objectsPtr->begin();
+    void ObjectHandler::keepValidVerificationObjects(
+        const typename ObjectType::PtrVectorPtr& objectsPtr)
+    {
+      typename ObjectType::PtrVector::iterator iter = objectsPtr->begin();
 
-        while (iter != objectsPtr->end())
+      while (iter != objectsPtr->end()) {
+        bool valid = false;
+        if (ObjectType::getObjectType() == Sound::getObjectType() ||
+            ObjectType::getObjectType() == Co2::getObjectType()) {
+          valid = victimsToGoList_->isObjectPoseInList(
+              (*iter), VICTIM_CLUSTER_RADIUS);
+        }
+        else {
+          valid = victimsToGoList_->isObjectPoseInList(
+              (*iter), VICTIM_CLUSTER_RADIUS);
+        }
+        // valid = valid ||
+        //   victimsVisitedList_->isObjectPoseInList((*iter), VICTIM_CLUSTER_RADIUS);
+        if (!valid)
         {
-          bool valid = false;
-          if (ObjectType::getObjectType() == Sound::getObjectType() ||
-              ObjectType::getObjectType() == Co2::getObjectType())
-          {
-            valid = victimsToGoList_->isObjectPoseInList(
-                (*iter), VICTIM_CLUSTER_RADIUS, false);
-          }
-          else
-            valid = victimsToGoList_->isObjectPoseInList(
-                (*iter), VICTIM_CLUSTER_RADIUS);
-          // valid = valid ||
-          //   victimsVisitedList_->isObjectPoseInList((*iter), VICTIM_CLUSTER_RADIUS);
-          if (!valid)
-          {
-            ROS_DEBUG_NAMED("OBJECT_HANDLER",
-                "[OBJECT_HANDLER %d] Deleting not valid object...", __LINE__);
-            iter = objectsPtr->erase(iter);
-          }
-          else
-          {
-            ++iter;
-          }
+          ROS_DEBUG_NAMED("OBJECT_HANDLER",
+              "[OBJECT_HANDLER %d] Deleting not valid object...", __LINE__);
+          iter = objectsPtr->erase(iter);
+        }
+        else
+        {
+          ++iter;
         }
       }
+    }
 
     typedef boost::scoped_ptr< ObjectHandler >  ObjectHandlerPtr;
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_HANDLER_H

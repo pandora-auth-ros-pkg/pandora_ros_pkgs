@@ -56,8 +56,9 @@ namespace pandora_data_fusion
     {
       std::string param;
 
-      nh->param<std::string>("object_names/victim", param, std::string("VICTIM"));
+      nh->param<std::string>("object_names/victim", param, std::string("victim"));
       Victim::setObjectType(param);
+      Victim::is3D = true;
 
       clusterer_.reset(new VictimClusterer(0.2));
 
@@ -92,8 +93,7 @@ namespace pandora_data_fusion
         bool victimIsNew = victimsToGoList_->add(newVictimVector[ii]);
         if (victimIsNew)
         {
-          ROS_INFO_NAMED("victim_handler",
-              "[VICTIM_HANDLER %d] New victim found ", __LINE__);
+          ROS_INFO("[ALERT_HANDLER] New victim found!!!");
         }
       }
     }
@@ -125,7 +125,7 @@ namespace pandora_data_fusion
         ObjectConstPtrVector currentVictimsObjects = (*currentVictim)->getObjects();
         for (int ii = 0; ii < currentVictimsObjects.size(); ++ii)
         {
-          if (currentVictimsObjects[ii]->getType() == Face::getObjectType())
+          if (currentVictimsObjects[ii]->getType() == VictimImage::getObjectType())
             probabilities.victim = currentVictimsObjects[ii]->getProbability();
           if (currentVictimsObjects[ii]->getType() == Thermal::getObjectType())
             probabilities.thermal = currentVictimsObjects[ii]->getProbability();
@@ -151,7 +151,7 @@ namespace pandora_data_fusion
 
       Hole::getList()->getAllLegitObjects(result);
       Thermal::getList()->getAllLegitObjects(result);
-      Face::getList()->getAllLegitObjects(result);
+      VictimImage::getList()->getAllLegitObjects(result);
       Motion::getList()->getAllLegitObjects(result);
       Sound::getList()->getAllLegitObjects(result);
       Co2::getList()->getAllLegitObjects(result);
@@ -180,7 +180,7 @@ namespace pandora_data_fusion
       {
         Hole::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
         Thermal::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
-        Face::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
+        VictimImage::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
         Motion::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
         Sound::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
         Co2::getList()->removeInRangeOfObject(deletedVictim, CLUSTER_RADIUS);
@@ -216,7 +216,7 @@ namespace pandora_data_fusion
      * @details
      */
     void VictimHandler::fillGeotiff(
-        pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response* res)
+        pandora_data_fusion_msgs::GeotiffSrv::Response* res)
     {
       victimsVisitedList_->fillGeotiff(res);
     }

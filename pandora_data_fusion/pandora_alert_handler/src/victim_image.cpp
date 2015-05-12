@@ -36,20 +36,19 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include "alert_handler/face.h"
+#include "alert_handler/victim_image.h"
 
 namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
+    VictimImage::VictimImage() {}
 
-    Face::Face() {}
-
-    void Face::getVisualization(visualization_msgs::
+    void VictimImage::getVisualization(visualization_msgs::
         MarkerArray* markers) const
     {
       visualization_msgs::Marker marker;
-      marker.header.frame_id = Face::getGlobalFrame();
+      marker.header.frame_id = VictimImage::getGlobalFrame();
       marker.header.stamp = ros::Time::now();
       marker.ns = type_;
       marker.id = id_;
@@ -65,7 +64,7 @@ namespace pandora_data_fusion
       markers->markers.push_back(marker);
 
       visualization_msgs::Marker description;
-      description.header.frame_id = Face::getGlobalFrame();
+      description.header.frame_id = VictimImage::getGlobalFrame();
       description.header.stamp = ros::Time::now();
       description.ns = type_ + "_BRIEF";
       description.id = id_;
@@ -81,6 +80,5 @@ namespace pandora_data_fusion
       markers->markers.push_back(description);
     }
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-

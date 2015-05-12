@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_FACE_H
-#define ALERT_HANDLER_FACE_H
+#ifndef ALERT_HANDLER_VICTIM_IMAGE_H
+#define ALERT_HANDLER_VICTIM_IMAGE_H
 
 #include <vector>
 
@@ -49,39 +49,39 @@ namespace pandora_data_fusion
   {
 
     /**
-     * @class Face
-     * @brief Concrete class representing a Face Object. Inherits from Object
+     * @class VictimImage
+     * @brief Concrete class representing a VictimImage Object. Inherits from Object
      */
-    class Face : public KalmanObject<Face>
+    class VictimImage : public KalmanObject<VictimImage>
     {
       public:
         //!< Type Definitions
-        typedef boost::shared_ptr<Face> Ptr;
-        typedef boost::shared_ptr<Face const> ConstPtr;
+        typedef boost::shared_ptr<VictimImage> Ptr;
+        typedef boost::shared_ptr<VictimImage const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef ObjectList<Face> List;
+        typedef ObjectList<VictimImage> List;
         typedef boost::shared_ptr<List> ListPtr;
-        typedef boost::shared_ptr< const ObjectList<Face> > ListConstPtr;
+        typedef boost::shared_ptr< const ObjectList<VictimImage> > ListConstPtr;
 
       public:
         /**
          * @brief Constructor
          */
-        Face();
+        VictimImage();
 
         virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
     };
 
-    typedef Face::Ptr FacePtr;
-    typedef Face::ConstPtr FaceConstPtr;
-    typedef Face::PtrVector FacePtrVector;
-    typedef Face::PtrVectorPtr FacePtrVectorPtr;
-    typedef Face::List FaceList;
-    typedef Face::ListPtr FaceListPtr;
-    typedef Face::ListConstPtr FaceListConstPtr;
+    typedef VictimImage::Ptr VictimImagePtr;
+    typedef VictimImage::ConstPtr VictimImageConstPtr;
+    typedef VictimImage::PtrVector VictimImagePtrVector;
+    typedef VictimImage::PtrVectorPtr VictimImagePtrVectorPtr;
+    typedef VictimImage::List VictimImageList;
+    typedef VictimImage::ListPtr VictimImageListPtr;
+    typedef VictimImage::ListConstPtr VictimImageListConstPtr;
 
-}  // namespace pandora_alert_handler
+  }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_FACE_H
+#endif  // ALERT_HANDLER_VICTIM_IMAGE_H

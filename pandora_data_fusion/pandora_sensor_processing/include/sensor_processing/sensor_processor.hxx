@@ -132,7 +132,7 @@ namespace pandora_sensor_processing
           toggleSubscriber(IDENTIFICATION_STATE);
           break;
         case state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD:
-          ROS_ERROR("[%s] Terminating node.", name_.c_str());
+          ROS_INFO("[%s] Entering Sensor Hold.", name_.c_str());
           toggleSubscriber(SENSOR_HOLD_STATE);
           break;
         case state_manager_msgs::RobotModeMsg::MODE_SEMI_AUTONOMOUS:

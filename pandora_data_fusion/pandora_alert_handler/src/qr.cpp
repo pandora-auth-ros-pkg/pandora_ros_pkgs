@@ -42,7 +42,6 @@ namespace pandora_data_fusion
 {
   namespace pandora_alert_handler
   {
-
     Qr::Qr() {}
 
     bool Qr::isSameObject(const ObjectConstPtr& object) const
@@ -54,16 +53,6 @@ namespace pandora_data_fusion
       return cond;
     }
 
-    void Qr::fillGeotiff(pandora_data_fusion_msgs::
-        DatafusionGeotiffSrv::Response* res) const
-    {
-      res->qrx.push_back(pose_.position.x);
-      res->qry.push_back(pose_.position.y);
-      res->qrworldx.push_back(pose_.position.x);
-      res->qrworldy.push_back(pose_.position.y);
-      res->qrcontent.push_back(content_);
-      res->qrtimestamp.push_back(timeFound_);
-    }
 
     void Qr::getVisualization(visualization_msgs::
         MarkerArray* markers) const
