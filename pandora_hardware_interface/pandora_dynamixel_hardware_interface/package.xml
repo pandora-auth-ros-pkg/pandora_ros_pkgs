@@ -17,6 +17,8 @@
 
   <build_depend>roslint</build_depend>
 
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
   <depend>dynamixel_msgs</depend>
   <depend>dynamixel_controllers</depend>
   <depend>dynamixel_driver</depend>

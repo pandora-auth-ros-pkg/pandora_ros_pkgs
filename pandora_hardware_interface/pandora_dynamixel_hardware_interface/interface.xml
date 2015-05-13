@@ -16,4 +16,15 @@
   <node>
     /dynamixel_controller_spawner
   </node>
+
+  <node>
+    /dynamixel_joint_state_wrapper
+
+    <subscriber>/laser_roll_controller/state</subscriber>
+    <subscriber>/laser_pitch_controller/state</subscriber>
+    <subscriber>/kinect_pitch_controller/state</subscriber>
+    <subscriber>/kinect_yaw_controller/state</subscriber>
+
+    <publisher>/dynamixel/joint_states</publisher>
+  </node>
 </package>

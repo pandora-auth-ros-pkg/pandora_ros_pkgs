@@ -1,0 +1,6 @@
+<launch>
+  <node
+    name="dynamixel_joint_state_wrapper"
+    pkg="pandora_dynamixel_hardware_interface"
+    type="joint_states_wrapper"/>
+</launch>
