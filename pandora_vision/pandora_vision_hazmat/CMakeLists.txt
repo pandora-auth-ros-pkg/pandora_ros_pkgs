@@ -134,6 +134,8 @@ add_library(${PROJECT_NAME}_preprocessor
 target_link_libraries(${PROJECT_NAME}_preprocessor
   ${catkin_LIBRARIES}
 )
+add_dependencies(${PROJECT_NAME}_preprocessor
+  ${catkin_EXPORTED_TARGETS})
 
 ################# hazmat postprocessor #################
 add_library(${PROJECT_NAME}_postprocessor
@@ -142,6 +144,8 @@ add_library(${PROJECT_NAME}_postprocessor
 target_link_libraries(${PROJECT_NAME}_postprocessor
   ${catkin_LIBRARIES}
 )
+add_dependencies(${PROJECT_NAME}_postprocessor
+  ${catkin_EXPORTED_TARGETS})
 
 ################# hazmat handler #################
 add_library(${PROJECT_NAME}_handler

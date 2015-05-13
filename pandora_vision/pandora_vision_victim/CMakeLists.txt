@@ -138,6 +138,8 @@ target_link_libraries(${PROJECT_NAME}_hole_preprocessor
   ${PROJECT_NAME}_victim_parameters
 )
 
+add_dependencies(${PROJECT_NAME}_hole_preprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# victim image processor #################
 #~ add_library(${PROJECT_NAME}_image_processor
   #~ src/victim_image_processor.cpp
@@ -163,6 +165,8 @@ target_link_libraries(${PROJECT_NAME}_postprocessor
   ${catkin_LIBRARIES}
 )
 
+add_dependencies(${PROJECT_NAME}_postprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# victim handler #################
 add_library(${PROJECT_NAME}_handler
   src/victim_handler.cpp

@@ -60,6 +60,8 @@ target_link_libraries(${PROJECT_NAME}_preprocessor
   ${catkin_LIBRARIES}
 )
 
+add_dependencies(${PROJECT_NAME}_preprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# qrcode postprocessor #################
 add_library(${PROJECT_NAME}_postprocessor
   src/qrcode_postprocessor.cpp
@@ -68,6 +70,8 @@ target_link_libraries(${PROJECT_NAME}_postprocessor
   ${catkin_LIBRARIES}
 )
 
+add_dependencies(${PROJECT_NAME}_postprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# qrcode handler #################
 add_library(${PROJECT_NAME}_handler
   src/qrcode_handler.cpp

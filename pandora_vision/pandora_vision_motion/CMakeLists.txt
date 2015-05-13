@@ -65,6 +65,8 @@ target_link_libraries(${PROJECT_NAME}_preprocessor
   ${catkin_LIBRARIES}
 )
 
+add_dependencies(${PROJECT_NAME}_preprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# motion postprocessor #################
 add_library(${PROJECT_NAME}_postprocessor
   src/motion_postprocessor.cpp
@@ -73,6 +75,8 @@ target_link_libraries(${PROJECT_NAME}_postprocessor
   ${catkin_LIBRARIES}
 )
 
+add_dependencies(${PROJECT_NAME}_postprocessor
+  ${catkin_EXPORTED_TARGETS})
 ################# motion handler #################
 add_library(${PROJECT_NAME}_handler
   src/motion_handler.cpp
