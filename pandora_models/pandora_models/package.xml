@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_models</name>
   <version>0.1.0</version>
   <description>Containts urdf models for pandora robots, sensors, etc.</description>
@@ -15,10 +15,8 @@
   
   <buildtool_depend>catkin</buildtool_depend>
   
-  
-  <run_depend>pandora_sensors_description</run_depend>
-  <run_depend>pandora_robots_description</run_depend>
-    
+  <exec_depend>pandora_sensors_description</exec_depend>
+  <exec_depend>pandora_robots_description</exec_depend>
 
   <export>
     <metapackage/>
