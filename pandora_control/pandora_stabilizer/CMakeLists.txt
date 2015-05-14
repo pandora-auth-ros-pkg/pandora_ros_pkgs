@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   std_msgs
   geometry_msgs
-  sensor_msgs
+  pandora_sensor_msgs
   roslint
 )
 
@@ -20,7 +20,7 @@ catkin_package(
     tf
     std_msgs
     geometry_msgs
-    sensor_msgs
+    pandora_sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -35,6 +35,12 @@ add_executable(
 target_link_libraries(
   stabilizer_control_node
   ${catkin_LIBRARIES} )
+
+
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest(launch/stabilizer_test.launch)
+endif()
 
 # To check lint : catkin_make roslint_pandora_control
 set(ROSLINT_CPP_OPTS

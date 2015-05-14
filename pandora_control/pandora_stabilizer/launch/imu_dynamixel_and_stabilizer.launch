@@ -1,0 +1,10 @@
+<launch>
+  <!-- Launch imu hardware interfface and controllers -->
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" />
+
+  <!-- Launch dynamixel hardware interface and controllers -->
+  <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface.launch" />
+
+  <!-- Launch stabilizer -->
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+</launch>

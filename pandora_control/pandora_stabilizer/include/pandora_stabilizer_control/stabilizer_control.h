@@ -41,6 +41,7 @@
 #include <std_msgs/Float64.h>
 #include "ros/ros.h"
 #include <tf/tf.h>
+#include <boost/math/constants/constants.hpp>
 
 namespace pandora_control
 {
