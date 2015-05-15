@@ -188,11 +188,11 @@ namespace imu
       for (int ii = 0; ii < 3; ii++)
       {
         memcpy(
-          angularVelocity_ + ii,
+          linearAcceleration_ + ii,
           data[ii + 4].str().c_str(),
           sizeof(float));
         memcpy(
-          linearAcceleration_ + ii,
+          angularVelocity_ + ii,
           data[ii + 7].str().c_str(),
           sizeof(float));
       }
