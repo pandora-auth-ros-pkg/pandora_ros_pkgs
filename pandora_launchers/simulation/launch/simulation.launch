@@ -2,8 +2,8 @@
 
   <arg name="slam" default="true"/>
   <arg name="control" default="true"/>
-  <arg name="gazebo" default="true"/>
-  <arg name="navigation" default="false"/>
+  <arg name="gazebo" default="false"/>
+  <arg name="navigation" default="true"/>
   <arg name="fusion" default="false"/>
   <arg name="rviz" default="true"/>
 

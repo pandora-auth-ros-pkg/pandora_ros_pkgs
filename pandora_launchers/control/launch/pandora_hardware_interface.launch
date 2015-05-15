@@ -1,14 +1,13 @@
 <launch>
+
   <arg name="motor" default="true"/>
   <arg name="dynamixel" default="true"/>
-  <arg name="xmega" default="true"/>
   <arg name="imu" default="true"/>
+  <arg name="imu_device" default="ahrs"/>
   <arg name="linear" default="true"/>
   <arg name="arm" default="true"/>
-  <arg name="battery_monitor" default="true"/>
-  <arg name="state_indicator" default="true"/>
+  <arg name="hardware_tools" default="true"/>
 
-  <!-- Launcher for every hardware interface-->
   <!-- Motors -->
   <include if="$(arg motor)"
     file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />
@@ -17,13 +16,12 @@
   <include if="$(arg dynamixel)"
     file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_controller_manager.launch" />
 
-  <!-- XMega -->
-  <include if="$(arg xmega)"
-    file="$(find pandora_xmega_hardware_interface)/xmega_hardware_interface/launch/xmega_hardware_interface.launch" />
-
   <!-- IMU -->
-  <include if="$(arg imu)"
-    file="$(find pandora_imu_hardware_interface)/launch/imu_hardware_interface.launch" />
+  <group if="$(arg imu)">
+    <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" >
+      <arg name="device" value="$(arg imu_device)" />
+    </include>
+  </group>
 
   <!-- Linear -->
   <include if="$(arg linear)"
@@ -32,10 +30,9 @@
   <!-- Arm -->
   <include if="$(arg arm)"
     file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface.launch" />
+    
+  <!-- Hardware tools -->
+  <include if="$(arg hardware_tools)"
+    file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
 
-  <!-- Battery monitor node -->
-  <node  if="$(arg battery_monitor)" pkg="pandora_hardware_tools" type="battery_monitor.py" name="battery_monitor" />
-
-  <!-- State Indicator node -->
-  <node  if="$(arg state_indicator)" pkg="pandora_hardware_tools" type="state_indicator.py" name="state_indicator" />
 </launch>

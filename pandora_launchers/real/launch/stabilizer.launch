@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="imu_device" default="ahrs"/>
+  
+  <arg name="bag" default="false"/>
+  
+  <!-- ##################################################################### -->
+  
+  <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
+  
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" >
+    <arg name="device" value="$(arg imu_device)" />
+  </include>
+  
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+
+  <group if="$(arg bag)">
+    <node name="bag" type="record" pkg="rosbag"
+      args="-b 0 /sensors/imu_rpy" />
+  </group>
+  
+</launch>
