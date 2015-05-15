@@ -33,7 +33,6 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
-* Author:  George Kouros
 *********************************************************************/
 #include "arm_hardware_interface/arm_hardware_interface.h"
 
@@ -48,7 +47,7 @@ namespace arm
   {
     try
     {
-      arm_ = new ArmUsbInterface();
+      arm_ = new ArmUSBInterface();
     }
     catch(std::exception& ex)
     {
@@ -60,15 +59,6 @@ namespace arm
 
     // connect and register thermal sensor interface
     registerThermalSensorInterface();
-
-    // connect and register range sensor interface
-    registerRangeSensorInterface();
-
-    // connect and register battery interface
-    registerBatteryInterface();
-
-    // connect and register joint state interface
-    registerJointStateInterface();
   }
 
   ArmHardwareInterface::~ArmHardwareInterface()
@@ -78,66 +68,16 @@ namespace arm
 
   void ArmHardwareInterface::read()
   {
-    uint16_t value;
-    ROS_INFO("Will read CO2/n");
-    // read CO2 percentage from CO2 sensors
     for (int ii = 0; ii < co2SensorName_.size(); ii++)
     {
-      arm_->readCo2Value(co2Percentage_ + ii);
+      co2Percentage_[ii] = arm_->co2ValueGet();
     }
 
-    // read thermal image from grideye sensors
     for (int ii = 0; ii < thermalSensorName_.size(); ii++)
     {
-      bool validReading = true;
-
-      while (true)
-      {
-        // ROS_INFO("Will read GEYE loop/n");
-        arm_->readGrideyeValues(thermalSensorCode_[ii], thermalData_[ii]);
-
-        for (int jj = 0; jj < GEYE_NBYTES; jj++)
-        {
-          if (thermalData_[ii][jj] == 0)
-          {
-            validReading = false;
-            break;
-          }
-        }
-
-        if (validReading)
-          break;
-      }
+      arm_->grideyeValuesGet(*address_[ii].c_str(), thermalData_[ii]);
     }
-
-    ROS_INFO("Will read SONARS/n");
-    // read distances from range sensors
-    for (int ii = 0; ii < rangeSensorName_.size(); ii++)
-    {
-      arm_->readSonarValues(rangeSensorCode_[ii], &value);
-      range_[ii] = static_cast<double>(value) / 100;
-    }
-    ROS_INFO("Will read BATTERIES/n");
-    // read voltage of batteries
-    for (int ii = 0; ii < batteryName_.size(); ii++)
-    {
-        arm_->readBatteryValues(batteryCode_[ii], &value);
-        voltage_[ii] = value / 4096.0 * 33.0;
-    }
-    // read encoder degrees
-    double pi = boost::math::constants::pi<double>();
-    arm_->readEncoderValue(&value);
-    double degrees = static_cast<double>(value) * 360.0 / 1024.0;
-    double radians = degrees / 180.0 * pi + encoder_offset_;
-
-    // make radians value between [-pi, pi]
-    if (radians > pi)
-      radians = radians - 2 * pi;
-
-    position_[0] = radians;
-    position_[1] = -radians;
   }
-
 
   void ArmHardwareInterface::registerCo2SensorInterface()
   {
@@ -179,7 +119,6 @@ namespace arm
     registerInterface(&co2SensorInterface_);
   }
 
-
   void ArmHardwareInterface::registerThermalSensorInterface()
   {
     XmlRpc::XmlRpcValue thermalSensorList;
@@ -191,7 +130,6 @@ namespace arm
     width_ = new int[thermalSensorList.size()];
     step_ = new int[thermalSensorList.size()];
     thermalData_ = new uint8_t*[thermalSensorList.size()];
-    thermalSensorCode_ = new char[thermalSensorList.size()];
 
     std::string key;
     for (int ii = 0; ii < thermalSensorList.size(); ii++)
@@ -201,24 +139,15 @@ namespace arm
 
       key = "name";
       ROS_ASSERT(
-        thermalSensorList[ii][key].getType() ==
-          XmlRpc::XmlRpcValue::TypeString);
+        thermalSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
       thermalSensorName_.push_back(
         static_cast<std::string>(thermalSensorList[ii][key]));
 
       key = "frame_id";
       ROS_ASSERT(
-        thermalSensorList[ii][key].getType() ==
-          XmlRpc::XmlRpcValue::TypeString);
+        thermalSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
       thermalFrameId_.push_back(
         static_cast<std::string>(thermalSensorList[ii][key]));
-
-      key = "code";
-      ROS_ASSERT(
-        thermalSensorList[ii][key].getType() ==
-          XmlRpc::XmlRpcValue::TypeString);
-      thermalSensorCode_[ii] =
-        static_cast<std::string>(thermalSensorList[ii][key]).at(0);
 
       key = "height";
       ROS_ASSERT(
@@ -241,6 +170,12 @@ namespace arm
         thermalData_[ii][jj] = 0;
       }
 
+      key = "address";
+      ROS_ASSERT(
+        thermalSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
+      address_.push_back(
+        static_cast<std::string>(thermalSensorList[ii][key]));
+
       ThermalSensorHandle::Data data;
       data.name = thermalSensorName_[ii];
       data.frameId = thermalFrameId_[ii];
@@ -255,156 +190,5 @@ namespace arm
     }
     registerInterface(&thermalSensorInterface_);
   }
-
-
-  void ArmHardwareInterface::registerRangeSensorInterface()
-  {
-    XmlRpc::XmlRpcValue rangeSensorList;
-    nodeHandle_.getParam("range_sensors", rangeSensorList);
-    ROS_ASSERT(
-      rangeSensorList.getType() == XmlRpc::XmlRpcValue::TypeArray);
-    rangeSensorCode_ = new char[rangeSensorList.size()];
-    radiationType_ = new int[rangeSensorList.size()];
-    fieldOfView_ = new double[rangeSensorList.size()];
-    minRange_ = new double[rangeSensorList.size()];
-    maxRange_ = new double[rangeSensorList.size()];
-    range_ = new double[rangeSensorList.size()];
-
-    std::string key;
-    for (int ii = 0; ii < rangeSensorList.size(); ii++)
-    {
-      ROS_ASSERT(
-        rangeSensorList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
-
-      key = "name";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
-      rangeSensorName_.push_back(
-        static_cast<std::string>(rangeSensorList[ii][key]));
-
-      key = "frame_id";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
-      rangeSensorFrameId_.push_back(
-        static_cast<std::string>(rangeSensorList[ii][key]));
-
-      key = "code";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
-      rangeSensorCode_[ii] =
-        static_cast<std::string>(rangeSensorList[ii][key]).at(0);
-
-      key = "radiation_type";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeInt);
-      radiationType_[ii] = static_cast<int>(rangeSensorList[ii][key]);
-
-      key = "field_of_view";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-      fieldOfView_[ii] = static_cast<double>(rangeSensorList[ii][key]);
-
-      key = "min_range";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-      minRange_[ii] = static_cast<double>(rangeSensorList[ii][key]);
-
-      key = "max_range";
-      ROS_ASSERT(
-        rangeSensorList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-      maxRange_[ii] = static_cast<double>(rangeSensorList[ii][key]);
-
-      RangeSensorHandle::Data data;
-      data.name = rangeSensorName_[ii];
-      data.frameId = rangeSensorFrameId_[ii];
-      data.radiationType = &radiationType_[ii];
-      data.fieldOfView = &fieldOfView_[ii];
-      data.minRange = &minRange_[ii];
-      data.maxRange = &maxRange_[ii];
-      data.range = &range_[ii];
-      rangeSensorData_.push_back(data);
-      RangeSensorHandle handle(rangeSensorData_[ii]);
-      rangeSensorInterface_.registerHandle(handle);
-    }
-    registerInterface(&rangeSensorInterface_);
-  }
-
-  void ArmHardwareInterface::registerBatteryInterface()
-  {
-    XmlRpc::XmlRpcValue batteryList;
-    nodeHandle_.getParam("batteries", batteryList);
-    ROS_ASSERT(
-      batteryList.getType() == XmlRpc::XmlRpcValue::TypeArray);
-
-    batteryCode_ = new char[batteryList.size()];
-    voltage_ = new double[batteryList.size()];
-
-    std::vector<BatteryHandle>
-      batteryHandle;
-    std::string key;
-    for (int ii = 0; ii < batteryList.size(); ii++)
-    {
-      ROS_ASSERT(
-        batteryList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
-
-      key = "name";
-      ROS_ASSERT(
-        batteryList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
-      batteryName_.push_back(static_cast<std::string>(batteryList[ii][key]));
-
-      key = "code";
-      ROS_ASSERT(
-        batteryList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeString);
-      batteryCode_[ii] = (static_cast<std::string>(batteryList[ii][key])).at(0);
-
-      key = "max_voltage";
-      ROS_ASSERT(
-        batteryList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-      voltage_[ii] = static_cast<double>(batteryList[ii][key]);
-
-      BatteryHandle::Data data;
-      data.name = batteryName_[ii];
-      data.voltage = &voltage_[ii];
-      batteryData_.push_back(data);
-      BatteryHandle handle(batteryData_[ii]);
-      batteryInterface_.registerHandle(handle);
-    }
-    registerInterface(&batteryInterface_);
-  }
-
-
-  void ArmHardwareInterface::registerJointStateInterface()
-  {
-    // read joint names from param server
-    std::string name;
-    nodeHandle_.getParam(
-      "differential_joints/left_joint",
-      name);
-    jointNames_.push_back(name);
-    nodeHandle_.getParam(
-      "differential_joints/right_joint",
-      name);
-    jointNames_.push_back(name);
-
-    nodeHandle_.getParam(
-      "differential_joints/encoder_offset",
-      encoder_offset_);
-
-    // connect and register the joint state interface
-    for (int ii = 0; ii < jointNames_.size(); ii++)
-    {
-      position_[ii] = 0;
-      velocity_[ii] = 0;
-      effort_[ii] = 0;
-      hardware_interface::JointStateHandle jointStateHandle(
-        jointNames_[ii],
-        &position_[ii],
-        &velocity_[ii],
-        &effort_[ii]);
-      jointStateInterface_.registerHandle(jointStateHandle);
-    }
-    registerInterface(&jointStateInterface_);
-  }
-
 }  // namespace arm
 }  // namespace pandora_hardware_interface

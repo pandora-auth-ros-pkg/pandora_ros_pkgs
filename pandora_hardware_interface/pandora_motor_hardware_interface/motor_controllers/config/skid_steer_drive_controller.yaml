@@ -41,27 +41,5 @@ skid_steer_drive_controller:
     - 1.0
     - 1.0
   angular_slippage:
-    - expected: 1.25
-      actual: 0.60531
-    - expected: 1.00
-      actual: 0.49087
-    - expected: 0.75
-      actual: 0.36950
-    - expected: 0.50
-      actual: 0.24500
-    - expected: 0.30
-      actual: 0.14279
-    - expected: 0.25
-      actual: 0.12022
-    - expected: 0.20
-      actual: 0.09239
-    - expected: 0.15
-      actual: 0.07139
-    - expected: 0.10
-      actual: 0.04759
-    - expected: 0.05
-      actual: 0.02345
-    - expected: 0.02
-      actual: 0.00937
-    - expected: 0.00
-      actual: 0.0000
+    - expected: 0.0
+      actual: 0.0

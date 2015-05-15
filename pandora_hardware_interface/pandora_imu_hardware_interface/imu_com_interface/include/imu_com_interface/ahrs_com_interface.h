@@ -55,7 +55,6 @@
 #define K_STOP_CONTINUOUS_MODE 0x16
 #define K_SET_FUNCTIONAL_MODE 0x4F
 #define K_AHRS_MODE 0x01
-#define K_SET_RESET_REF 0x6E
 
 #define K_HEADING 0x05
 #define K_PITCH 0x18
@@ -145,9 +144,6 @@ namespace imu
    private:
     //!< expression used to extract yaw, pitch, roll from packet
     const boost::regex regex_;
-
-    // current time and last_time trax was reset
-    ros::Time now_, last_reset_;
   };
 }  // namespace imu
 }  // namespace pandora_hardware_interface

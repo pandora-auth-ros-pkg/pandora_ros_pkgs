@@ -1,4 +1,4 @@
-<library path="lib/libarm_thermal_sensor_controller">
+<library path="lib/libthermal_sensor_controller">
   <class
     name="pandora_arm/ThermalSensorController"
     type="pandora_hardware_interface::arm::ThermalSensorController"

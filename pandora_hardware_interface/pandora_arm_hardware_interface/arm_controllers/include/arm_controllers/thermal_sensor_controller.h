@@ -64,69 +64,69 @@ namespace arm
   class ThermalSensorController :
     public controller_interface::Controller<ThermalSensorInterface>
   {
-   public:
-    /**
-     @brief Default Constructor
-    **/
-    ThermalSensorController();
+    public:
+      /**
+       @brief Default Constructor
+      **/
+      ThermalSensorController();
 
-    /**
-     @brief Default Destructor
-    **/
-    ~ThermalSensorController();
+      /**
+       @brief Default Destructor
+      **/
+      ~ThermalSensorController();
 
-    /**
-     @brief Initializes thermal controller
-     @param thermalSensorInterface [ThermalSensorInterface*] : thermal 
-       sensor interface
-     @param rootNodeHandle [ros::NodeHandle&] : Node handle at root namespace
-     @param controllerNodeHandle [ros::NodeHandle&] : Node handle inside the 
-       controller namespace
-     @return bool
-    **/
-    virtual bool init(
-      ThermalSensorInterface* thermalSensorInterface,
-      ros::NodeHandle& rootNodeHandle,
-      ros::NodeHandle& controllerNodeHandle);
+      /**
+       @brief Initializes thermal controller
+       @param thermalSensorInterface [ThermalSensorInterface*] : thermal 
+         sensor interface
+       @param rootNodeHandle [ros::NodeHandle&] : Node handle at root namespace
+       @param controllerNodeHandle [ros::NodeHandle&] : Node handle inside the 
+         controller namespace
+       @return bool
+      **/
+      virtual bool init(
+        ThermalSensorInterface* thermalSensorInterface,
+        ros::NodeHandle& rootNodeHandle,
+        ros::NodeHandle& controllerNodeHandle);
 
-    /**
-     @brief Starts thermal controller
-     @param time [ros::Time&] : Current time
-     @return void
-    **/
-    virtual void starting(const ros::Time& time);
+      /**
+       @brief Starts thermal controller
+       @param time [ros::Time&] : Current time
+       @return void
+      **/
+      virtual void starting(const ros::Time& time);
 
-     /**
-     @brief Updates the thermal Controller and publishes new thermal
-       measurements
-     @param time [ros::Time&] : Current time
-     @param period [ros::Duration&] : Time since last update
-     @return void
-    **/
-    virtual void update(const ros::Time& time, const ros::Duration& period);
+       /**
+       @brief Updates the thermal Controller and publishes new thermal
+         measurements
+       @param time [ros::Time&] : Current time
+       @param period [ros::Duration&] : Time since last update
+       @return void
+      **/
+      virtual void update(const ros::Time& time, const ros::Duration& period);
 
-    /**
-     @brief Stops the CO2 controller
-     @param time [ros::Time&] : Current time
-     @return void
-    **/
-    virtual void stopping(const ros::Time& time);
+      /**
+       @brief Stops the CO2 controller
+       @param time [ros::Time&] : Current time
+       @return void
+      **/
+      virtual void stopping(const ros::Time& time);
 
-   private:
-    //!< Thermal sensor handle
-    std::vector<ThermalSensorHandle> sensorHandles_;
-    //!< Thermal image publisher
-    std::vector<ImageRealtimePublisher> imagePublishers_;
-    //!< Thermal image average temperature publisher
-    std::vector<ThermalMeanRealtimePublisher> meanPublishers_;
-    //!< Time since last thermal image was published
-    std::vector<ros::Time> lastTimePublishedImage_;
-    //!< Time since last average temperature of thermal image was published
-    std::vector<ros::Time> lastTimePublishedMean_;
-    //!< Thermal sensor interface
-    ThermalSensorInterface* thermalSensorInterface_;
-    //!< thermal image and image average temperature publishing frequency
-    double publishRate_;
+    private:
+      //!< Thermal sensor handle
+      std::vector<ThermalSensorHandle> sensorHandles_;
+      //!< Thermal image publisher
+      std::vector<ImageRealtimePublisher> imagePublishers_;
+      //!< Thermal image average temperature publisher
+      std::vector<ThermalMeanRealtimePublisher> meanPublishers_;
+      //!< Time since last thermal image was published
+      std::vector<ros::Time> lastTimePublishedImage_;
+      //!< Time since last average temperature of thermal image was published
+      std::vector<ros::Time> lastTimePublishedMean_;
+      //!< Thermal sensor interface
+      ThermalSensorInterface* thermalSensorInterface_;
+      //!< thermal image and image average temperature publishing frequency
+      double publishRate_;
   };
 }  // namespace arm
 }  // namespace pandora_hardware_interface
