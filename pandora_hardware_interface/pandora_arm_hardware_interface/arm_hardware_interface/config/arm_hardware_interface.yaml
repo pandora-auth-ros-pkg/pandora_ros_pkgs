@@ -2,21 +2,35 @@ co2_sensors:
   - name: '/sensors/co2'
     frame_id: 'co2_frame'
 thermal_sensors:
-  - name: '/sensors/left_thermal'
-    frame_id: 'left_thermal_optical_frame'
-    height: 8
-    width: 8
-    step: 8
-    address: 'L'
   - name: '/sensors/center_thermal'
     frame_id: 'middle_thermal_optical_frame'
+    code: 'C'
     height: 8
     width: 8
     step: 8
-    address: 'C'
-  - name: '/sensors/right_thermal'
-    frame_id: 'right_thermal_optical_frame'
-    height: 8
-    width: 8
-    step: 8
-    address: 'R'
+range_sensors:
+  - name: '/sensors/left_sonar'
+    frame_id: 'left_sonar_frame'
+    code: 'L'
+    radiation_type: 0
+    field_of_view: 60.0
+    min_range: 0.2
+    max_range: 4.0
+  - name: '/sensors/right_sonar'
+    frame_id: 'right_sonar_frame'
+    code: 'R'
+    radiation_type: 0
+    field_of_view: 60.0
+    min_range: 0.2
+    max_range: 4.0
+batteries:
+  - name: '/PSU_battery'
+    code: 'S'
+    max_voltage: 24.0
+  - name: '/motors_battery'
+    code: 'M'
+    max_voltage: 24.0
+differential_joints:
+  left_joint: left_side_joint
+  right_joint: right_side_joint
+  encoder_offset: -0.8 

@@ -32,31 +32,83 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Orestis Zachariadis
+ * Author: George Kouros
  *********************************************************************/
+
 #include "arm_usb_interface/arm_usb_interface.h"
 
 int main(int argc, char** argv)
 {
   ros::Time::init();
 
-  pandora_hardware_interface::arm::ArmUSBInterface arm;
+  pandora_hardware_interface::arm::ArmUsbInterface arm;
 
+  uint16_t range[2];
+  float co2Percentage;
+  uint16_t encoderDegrees;
+  uint16_t tempVoltage[2];
+  double voltage[2];
   uint8_t temperature[64];
+  std::stringstream ss;
 
-  while (1)
+  while (true)
   {
-    arm.grideyeValuesGet('C', temperature);
+    arm.readSonarValues('L', range);
+    ROS_INFO("1");
+    arm.readSonarValues('R', range + 1);
+    ROS_INFO("2");
+    arm.readCo2Value(&co2Percentage);
+    ROS_INFO("3");
+    arm.readEncoderValue(&encoderDegrees);
+    ROS_INFO("4");
+    arm.readBatteryValues('M', tempVoltage);
+    ROS_INFO("5");
+    arm.readBatteryValues('S', tempVoltage + 1);
+    ROS_INFO("6");
+    arm.readGrideyeValues('C', temperature);
+    ROS_INFO("7");
 
-    arm.grideyeValuesGet('L', temperature);
+    encoderDegrees = encoderDegrees * 360 / 1024;
 
-    arm.grideyeValuesGet('R', temperature);
+    for (int ii = 0; ii < 2; ii++)
+      voltage[ii] = (tempVoltage[ii] / 4096.) * 33.0;
 
-    arm.co2ValueGet();
+    ROS_INFO("============================================");
+    ROS_INFO("Left Sonar measurement: %d", range[0]);
+    ROS_INFO("Right Sonar measurement: %d", range[1]);
+    ROS_INFO("CO2 measurement: %f", co2Percentage);
+    ROS_INFO("Encoder measurement: %d", encoderDegrees);
+    ROS_INFO("Motor Battery Voltage measurement: %f", voltage[0]);
+    ROS_INFO("Supply Batter Voltage measurement: %f", voltage[1]);
+    ROS_INFO("============================================");
 
-    ros::Duration(0.1).sleep();
+
+    ss << "\n============== Thermal Image ===============\n";
+    for (int ii = 0; ii < 8; ii++)
+    {
+      for (int jj = 0; jj < 8; jj++)
+      {
+        ss << " " << static_cast<int>(temperature[ii * 8 + jj]);
+      }
+      ss << "\n";
+    }
+    ss << "============================================";
+
+    ROS_INFO("%s", ss.str().c_str());
+
+    for (int ii = 0; ii < 64; ii++){
+      // 0 in temperature indicates communication problem
+      if (temperature[ii] < 1 || temperature[ii] > 255)
+        {
+          ROS_INFO("GridEye values were not read correctly.");
+          break;
+        }
+    }
+
+    ss.str(std::string());
+
+    ros::Duration(1.0).sleep();
   }
-
   return 0;
 }
 

@@ -1,0 +1,11 @@
+<library path="lib/libarm_battery_controller">
+  <class
+    name="pandora_arm/BatteryController"
+    type="pandora_hardware_interface::arm::BatteryController"
+    base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes the voltage levels of all available batteries as
+    pandora_sensor_msgs/BatteryMsg message.
+  </description>
+  </class>
+</library>

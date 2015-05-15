@@ -33,16 +33,22 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  George Kouros 
 *********************************************************************/
 #ifndef ARM_HARDWARE_INTERFACE_ARM_HARDWARE_INTERFACE_H
 #define ARM_HARDWARE_INTERFACE_ARM_HARDWARE_INTERFACE_H
 
+
+#include <boost/math/constants/constants.hpp>
 #include "ros/ros.h"
 #include "tf/tf.h"
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
 #include <arm_hardware_interface/co2_sensor_interface.h>
 #include <arm_hardware_interface/thermal_sensor_interface.h>
+#include <arm_hardware_interface/range_sensor_interface.h>
+#include <arm_hardware_interface/battery_interface.h>
+#include <hardware_interface/joint_state_interface.h>
 #include <arm_usb_interface/arm_usb_interface.h>
 
 namespace pandora_hardware_interface
@@ -58,8 +64,10 @@ namespace arm
     public:
       /**
        @brief Default Constructor
-       @details Establishes communication and registers thermal and CO2 interfaces
-       @param nodeHandle [ros::NodeHandle] : handle of arm_hardware_interface_node
+       @details Establishes communication and registers thermal and CO2 
+       interfaces
+       @param nodeHandle [ros::NodeHandle] : handle of 
+       arm_hardware_interface_node
       **/
       explicit ArmHardwareInterface(
         ros::NodeHandle nodeHandle);
@@ -77,9 +85,41 @@ namespace arm
       void read();
 
     private:
-     ros::NodeHandle nodeHandle_;
-     ArmUSBInterface* arm_;
+     /**
+      @brief Registers CO2 sensors interface
+      @return void
+     **/
+     void registerCo2SensorInterface();
 
+     /**
+      @brief Registers CO2 sensors interface
+      @return void
+     **/
+     void registerThermalSensorInterface();
+
+     /**
+      @brief Registers CO2 sensors interface
+      @return void
+     **/
+     void registerRangeSensorInterface();
+
+     /**
+      @brief Registers CO2 sensors interface
+      @return void
+     **/
+     void registerJointStateInterface();
+
+     /**
+      @brief Registers CO2 sensors interface
+      @return void
+     **/
+     void registerBatteryInterface();
+
+    private:
+     ros::NodeHandle nodeHandle_;
+     ArmUsbInterface* arm_;
+
+     /* CO2 sensor */
      Co2SensorInterface co2SensorInterface_;
      std::vector<Co2SensorHandle::Data>
        co2SensorData_;
@@ -87,6 +127,7 @@ namespace arm
      std::vector<std::string> co2SensorFrameId_;
      float* co2Percentage_;
 
+     /* thermal sensors */
      ThermalSensorInterface thermalSensorInterface_;
      std::vector<ThermalSensorHandle::Data>
        thermalSensorData_;
@@ -96,10 +137,35 @@ namespace arm
      int* width_;
      int* step_;
      uint8_t** thermalData_;
-     std::vector<std::string> address_;  // {L,C,R} not stored in handle
+     char* thermalSensorCode_;  // not stored in handle
 
-     void registerCo2SensorInterface();
-     void registerThermalSensorInterface();
+     /* range sensors */
+     RangeSensorInterface rangeSensorInterface_;
+     std::vector<RangeSensorHandle::Data> rangeSensorData_;
+     std::vector<std::string> rangeSensorName_;
+     std::vector<std::string> rangeSensorFrameId_;
+     int* radiationType_;
+     double* fieldOfView_;
+     double* minRange_;
+     double* maxRange_;
+     double* range_;
+     int* bufferCounter_;
+     char* rangeSensorCode_;  // not stored in handle
+
+     /* battery interface */
+     BatteryInterface batteryInterface_;
+     std::vector<BatteryHandle::Data> batteryData_;
+     std::vector<std::string> batteryName_;
+     double* voltage_;
+     char* batteryCode_;  // not stored in handle
+
+     /* encoder interface */
+     hardware_interface::JointStateInterface jointStateInterface_;
+     std::vector<std::string> jointNames_;
+     double position_[2];
+     double velocity_[2];
+     double effort_[2];
+     double encoder_offset_;
   };
 }  // namespace arm
 }  // namespace pandora_hardware_interface

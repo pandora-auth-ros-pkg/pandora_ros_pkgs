@@ -5,9 +5,12 @@
     <publisher>/sensors/co2</publisher>
     <publisher>/sensors/thermal</publisher>
     <publisher>/sensors/thermal_mean</publisher>
+    <publisher>/sensors/range</publisher>
+    <publisher>/sensors/battery</publisher>
+    <publisher>/sensors/joint_states</publisher>
   </node>
   
   <node>
-    /thermal_sensor_controller_spawner
+    /arm_controllers_spawner
   </node>
 </package>

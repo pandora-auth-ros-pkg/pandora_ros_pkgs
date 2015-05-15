@@ -79,6 +79,10 @@ namespace imu
     {
       ROS_ERROR("Init called twice!!");
     }
+
+    now_ = last_reset_ = ros::Time::now();
+    char resetCmd = K_SET_RESET_REF;
+    write(&resetCmd, 1);
   }
 
 
@@ -112,6 +116,14 @@ namespace imu
     else
     {
       ROS_ERROR("Check CRC failed");
+    }
+
+    now_ = ros::Time::now();
+    if (now_ - last_reset_ > ros::Duration(1.0 * 60.0))
+    {
+      last_reset_ = now_;
+      char resetCmd = K_SET_RESET_REF;
+      write(&resetCmd, 1);
     }
   }
 

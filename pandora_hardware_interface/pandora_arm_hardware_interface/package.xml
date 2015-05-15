@@ -32,5 +32,7 @@
   <export>
     <controller_interface plugin="${prefix}/co2_sensor_controller.xml"/>
     <controller_interface plugin="${prefix}/thermal_sensor_controller.xml"/>
+    <controller_interface plugin="${prefix}/range_sensor_controller.xml"/>
+    <controller_interface plugin="${prefix}/battery_controller.xml"/>
   </export>
 </package>

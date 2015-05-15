@@ -12,11 +12,33 @@
     file="$(find pandora_arm_hardware_interface)/arm_controllers/config/thermal_sensor_controller.yaml"
     ns = "$(arg namespace)"/>
 
+  <rosparam
+    command="load"
+    file="$(find pandora_arm_hardware_interface)/arm_controllers/config/range_sensor_controller.yaml"
+    ns = "$(arg namespace)"/>
+  
+  <rosparam
+    command="load"
+    file="$(find pandora_arm_hardware_interface)/arm_controllers/config/battery_controller.yaml"
+    ns = "$(arg namespace)"/>
+
+  <rosparam
+    command="load"
+    file="$(find pandora_arm_hardware_interface)/arm_controllers/config/joint_state_controller.yaml"
+    ns = "$(arg namespace)"/>
+
+
   <!-- spawn controllers -->
   <node
     name="arm_controller_spawner"
     pkg="controller_manager"
     type="controller_manager" output="screen"
-    args="spawn co2_sensor_controller thermal_sensor_controller"
+    args="
+      spawn
+      arm_co2_sensor_controller
+      arm_thermal_sensor_controller
+      arm_range_sensor_controller
+      arm_battery_controller
+      joint_state_controller"
     ns = "$(arg namespace)"/>
 </launch>

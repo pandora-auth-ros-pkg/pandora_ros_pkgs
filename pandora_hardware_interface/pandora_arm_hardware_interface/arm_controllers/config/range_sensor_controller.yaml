@@ -1,0 +1,3 @@
+arm_range_sensor_controller:
+  type: pandora_arm/RangeSensorController
+  publish_rate: 50
