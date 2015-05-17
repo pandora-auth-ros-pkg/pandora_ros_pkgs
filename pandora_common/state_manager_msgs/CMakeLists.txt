@@ -15,6 +15,7 @@ add_message_files(
 add_service_files(
   FILES
     RegisterNodeSrv.srv
+    GetStateInfo.srv
   )
 
 add_action_files(

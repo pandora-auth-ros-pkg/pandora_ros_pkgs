@@ -21,7 +21,7 @@ class DummyNodeTester(test_base.TestBase):
     def test_trivial_test_infrastructure(self):
 
         rospy.logdebug("Now test publishing...")
-        self.mockPublish("/test/listen", "/test/answer", Int32(10))
+        self.mockPublish("/test/listen", "/test/answer", Int32(0))
 
         rospy.logdebug("Now test asserting...")
         self.assertTrue(self.repliedList["/test/answer"])

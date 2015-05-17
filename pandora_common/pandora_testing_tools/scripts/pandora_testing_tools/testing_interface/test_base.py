@@ -36,6 +36,8 @@ __maintainer__ = "Tsirigotis Christos"
 __email__ = "tsirif@gmail.com"
 
 from collections import defaultdict
+import threading
+import time
 
 import unittest
 
@@ -54,17 +56,22 @@ class TestBase(unittest.TestCase):
 
     @classmethod
     def mockCallback(cls, data, output_topic):
-        #rospy.logdebug("Got message from topic : "+str(output_topic))
-        #rospy.logdebug(data)
+        rospy.logdebug("Got message from topic : " + str(output_topic))
+        rospy.logdebug(data)
         cls.messageList[output_topic].append(data)
         cls.repliedList[output_topic] = True
+        cls.block.set()
 
     def mockPublish(self, input_topic, output_topic, data):
+        self.block.clear()
         self.repliedList[output_topic] = False
+        self.messageList[output_topic] = list()
         if not isinstance(data, self.publishedTypes[input_topic]):
             rospy.logerr("[mockPublish] Publishes wrong message type.")
         self.publishers[input_topic].publish(data)
-        rospy.sleep(self.publish_wait_duration)
+        if not self.benchmarking:
+            rospy.sleep(self.publish_wait_duration)
+        self.block.wait()
 
     def playFromBag(self, block):
 
@@ -79,6 +86,14 @@ class TestBase(unittest.TestCase):
         self.assertEqual(len(self.messageList[output_topic]), 1)
         output_data = self.messageList[output_topic][0]
         self.assertEqual(output_data, assert_data)
+
+    def simpleBenchmark(self, input_topic, output_topic, data, N=10):
+        duration = time.time()
+        for _ in xrange(N):
+            self.mockPublish(input_topic, output_topic, data)
+        duration = time.time() - duration
+        duration /= N
+        return duration * 1000
 
     @classmethod
     def connect(cls, subscriber_topics, publisher_topics, state, with_bag):
@@ -102,6 +117,8 @@ class TestBase(unittest.TestCase):
             cls.subscribers[topic] = mock_subscriber
 
         cls.publish_wait_duration = rospy.Duration(2)
+        cls.block = threading.Event()
+        cls.benchmarking = False
         for topic, messagePackage, messageType in publisher_topics:
             _temp = __import__(messagePackage+'.msg', globals(), locals(), messageType, -1)
             messageTypeObj = getattr(_temp, messageType)
@@ -114,7 +131,7 @@ class TestBase(unittest.TestCase):
             cls.bag_client.wait_for_server()
             cls.goal = ReplayBagsGoal()
             cls.goal.start = True
-        rospy.sleep(2.)
+        rospy.sleep(1)
 
     @classmethod
     def disconnect(cls):

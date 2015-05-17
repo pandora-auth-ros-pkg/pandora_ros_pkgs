@@ -1,0 +1,10 @@
+
+# Request the current or the previous state.
+uint8 option
+
+uint8 CURRENT_STATE = 0
+uint8 PREVIOUS_STATE = 1
+---
+
+# Current state.
+int8 state

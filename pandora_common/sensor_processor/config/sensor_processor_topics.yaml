@@ -1,0 +1,2 @@
+subscribed_topics: [/test/listen]
+published_topics: /test/answer

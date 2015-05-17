@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <node pkg="sensor_processor" type="dummy_processor_node" name="sensor_processor_test" />
+  <rosparam file="$(find sensor_processor)/config/sensor_processor_topics.yaml"
+      command="load" ns="/sensor_processor/dummy_processor_node"/>
+  <test test-name="SensorProcessorTester" pkg="sensor_processor"
+      type="sensor_processor_test.py" />
+</launch>

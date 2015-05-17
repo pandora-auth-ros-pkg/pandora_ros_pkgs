@@ -1,0 +1,31 @@
+<package format="2">
+  <name>sensor_processor</name>
+  <version>0.0.1</version>
+  <description>Contains an interface that wraps ROS node with various runtime behaviour.</description>
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
+
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <exec_depend>message_runtime</exec_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+
+  <test_depend>rostest</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
+
+  <export>
+  </export>
+</package>
