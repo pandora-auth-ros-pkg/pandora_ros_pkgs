@@ -116,7 +116,7 @@ class TestBase(unittest.TestCase):
                 topic, messageTypeObj, cls.mockCallback, topic)
             cls.subscribers[topic] = mock_subscriber
 
-        cls.publish_wait_duration = rospy.Duration(2)
+        cls.publish_wait_duration = rospy.Duration(0.2)
         cls.block = threading.Event()
         cls.benchmarking = False
         for topic, messagePackage, messageType in publisher_topics:

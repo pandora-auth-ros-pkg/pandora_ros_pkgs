@@ -3,7 +3,6 @@ project(pandora_testing_tools)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
   tf
   rosbag
   message_generation
