@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nodeHandle;
 
   pandora_hardware_interface::imu::AhrsComInterface
-    serial("/dev/imu", 38400, 100);
+    serial("/dev/ahrs", 38400, 100);
 
   serial.init();
   ROS_INFO("Starting Configuration:");
