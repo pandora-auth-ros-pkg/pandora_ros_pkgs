@@ -83,7 +83,7 @@ namespace motor
     }
     else
     {
-      ROS_FATAL("[Motors]: Opened communicaiton port, %s",
+      ROS_INFO("[Motors]: Opened communicaiton port, %s",
         comInterface_->portName);
     }
     /*--<Set and evaluate communication interface>--*/
@@ -99,7 +99,7 @@ namespace motor
   {
     if (VCS_CloseDevice(comHandler_, &error_) !=0 && error_ == 0)
     {
-      ROS_FATAL("[Motors]: Device communication port closed succesfully");
+      ROS_INFO("[Motors]: Device communication port closed succesfully");
     }
     else
     {
@@ -143,7 +143,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isEnableState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -161,7 +161,7 @@ namespace motor
     if (VCS_SetEnableState(comHandler_, nodeId, &_errorCode) == 0)
     {
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- setEnableState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -182,7 +182,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isEnableState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -210,7 +210,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- setDisableState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -230,7 +230,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isDisableState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -258,7 +258,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isFaultState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -278,7 +278,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isFaultState, nodeId=%d",
         _errorCode, nodeId);
     }
@@ -307,7 +307,7 @@ namespace motor
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      ROS_FATAL("[Epos2-Gateway]: Received error {%d} on command "
+      ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
         "execution -- isQuickStopState, nodeId=%d",
         _errorCode, nodeId);
     }
