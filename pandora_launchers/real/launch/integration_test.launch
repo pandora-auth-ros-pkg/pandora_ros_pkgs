@@ -8,7 +8,7 @@
   <arg name="motors" default="true"/>
   <arg name="dynamixel" default="true"/>
   <arg name="imu" default="true"/>
-  <arg name="imu_device" default="ahrs"/>
+  <arg name="imu_device" default="trax"/>
   <arg name="arm" default="false"/>
   <arg name="hardware_tools" default="true"/>
   
