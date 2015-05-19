@@ -51,10 +51,10 @@ namespace imu
     {
       ROS_INFO("Selected Device: %s", device.c_str());
 
-      if (device == "imu")
-        comInterface_ = new ImuComInterface("/dev/imu", 38400, 100);
-      else if (device == "ahrs")
-        comInterface_ = new AhrsComInterface("/dev/ahrs", 38400, 100);
+      if (device == "compass")
+        comInterface_ = new ImuComInterface("/dev/compass", 38400, 100);
+      else if (device == "trax")
+        comInterface_ = new AhrsComInterface("/dev/trax", 38400, 100);
       else
       {
           ROS_FATAL(
