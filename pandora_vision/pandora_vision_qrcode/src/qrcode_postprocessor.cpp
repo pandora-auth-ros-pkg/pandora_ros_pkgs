@@ -46,7 +46,7 @@ namespace pandora_vision
   QrCodePostProcessor::QrCodePostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
     VisionPostProcessor<pandora_vision_msgs::QRAlertVector>(ns, handler)
   {
-    ROS_INFO_STREAM("["+this->getName()+"] postprocessor nh processor : "+
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
         this->accessProcessorNh()->getNamespace());
   }
 

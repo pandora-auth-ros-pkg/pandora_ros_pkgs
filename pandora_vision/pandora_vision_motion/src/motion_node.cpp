@@ -45,7 +45,7 @@ using pandora_vision::MotionHandler;
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "motion_node");
-  MotionHandler qrCodeHandler("motion");
+  MotionHandler motionDetectionHandler("motion");
   ros::spin();
   return 0;
 }

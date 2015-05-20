@@ -41,12 +41,14 @@
 
 namespace pandora_vision
 {
-  LandoltCPreProcessor::LandoltCPreProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionPreProcessor(ns, handler)
+  LandoltCPreProcessor::LandoltCPreProcessor(const std::string& ns, 
+    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
+    sensor_msgs::image_encodings::BGR8) 
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
   
-  LandoltCPreProcessor::~LandoltCPreProcessor()
-  {
-  }
+  LandoltCPreProcessor::~LandoltCPreProcessor() {}
+
 }  // namespace pandora_vision

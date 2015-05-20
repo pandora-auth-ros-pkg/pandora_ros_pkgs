@@ -62,26 +62,29 @@ target_link_libraries(color_histogram_feature_extractor_test
 
 ############## Functional Tests ###############
 
-#catkin_download_test_data(
-#    hole_detector_test.bag
-#    https://pandora.ee.auth.gr/rosbags/2014_bags/hole_detector_test.bag
-#    DESTINATION functional
-#    )
-#add_rostest(functional/hole_detector_test.launch)
+#if(${PROJECT_NAME}_functional)
+  #catkin_download_test_data(
+    #hole_detector_test.bag
+    #https://pandora.ee.auth.gr/rosbags/2014_bags/hole_detector_test.bag
+    #DESTINATION functional
+    #)
+  #add_rostest(functional/hole_detector_test.launch)
 
-#add_rostest(functional/victim_test.launch)
+  #add_rostest(functional/victim_test.launch)
+#endif()
 
-################################################################################
-#                               Benchmark Tests                                #
-################################################################################
+#################################################################################
+##                               Benchmark Tests                                #
+#################################################################################
 
-#download_extra_data(
-  #${PROJECT_NAME}_benchmark_images_bags_pcl
-  #EXTRA_FILES test/benchmark/images/bags_pcl/extra_files.yaml
-  ##EXCLUDE_FROM_ALL
-  #)
-#add_dependencies(${PROJECT_NAME}_benchmark_images_bags_pcl tests)
+#if(${PROJECT_NAME}_benchmark)
+  #download_extra_data(
+    #${PROJECT_NAME}_benchmark_images_bags_pcl
+    #EXTRA_FILES test/benchmark/images/bags_pcl/extra_files.yaml
+    ##EXCLUDE_FROM_ALL
+    #)
+  #add_dependencies(${PROJECT_NAME}_benchmark_images_bags_pcl tests)
 
-#add_rostest(benchmark/victim_benchmark_test.launch)
-# add_rostest(benchmark/victim_benchmark_test.launch DEPENDENCIES
-            # ${PROJECT_NAME}_benchmark_images_bags_pcl)
+  #add_rostest(benchmark/victim_benchmark_test.launch DEPENDENCIES
+            #${PROJECT_NAME}_benchmark_images_bags_pcl)
+#endif()

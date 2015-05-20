@@ -65,18 +65,16 @@ namespace file_utilities
   {
     std::string filesDirectory = packagePath + "/data/";
 
-    std::string featuresMatFilePath = filesDirectory + featuresFileName;
     std::string varName = prefix + "features_mat";
-    saveToFile(featuresMatFilePath, varName, featuresMat);
+    saveToFile(featuresFileName, varName, featuresMat);
 
-    std::cout << featuresMatFilePath << std::endl;
+    std::cout << featuresFileName << std::endl;
     std::cout << "Size = " << featuresMat.size() << std::endl;
 
-    std::string labelsMatFilePath = filesDirectory + labelsFileName;
     varName = prefix + "labels_mat";
-    saveToFile(labelsMatFilePath, varName, labelsMat);
+    saveToFile(labelsFileName, varName, labelsMat);
 
-    std::cout << labelsMatFilePath << std::endl;
+    std::cout << labelsFileName << std::endl;
     std::cout << "Size = " << labelsMat.size() << std::endl;
 
     std::string featuresMatrixCsvFile = prefix + imageType + "matrix.csv";
@@ -335,6 +333,46 @@ namespace file_utilities
     }
     inFile.close();
     return true;
+  }
+
+  /**
+   * @brief
+   */
+  int findNumberOfAnnotations(const std::string& filename)
+  {
+    std::ifstream inFile;
+    std::string line, imgName, temp, x1, y1, x2, y2;
+    cv::Rect rect;
+    int category;
+    int ii = 0;
+
+    std::vector<std::string> imageNamesVec;
+    inFile.open(filename.c_str());
+    if (!inFile)
+    {
+      ROS_ERROR("Cannot load Annotations file");
+      return 0;
+    }
+    else
+    {
+      if (inFile.is_open())
+      {
+        while (std::getline(inFile, line))
+        {
+          std::stringstream ss(line);
+          getline(ss, imgName, ',');
+          getline(ss, temp, ',');
+          getline(ss, x1, ',');
+          getline(ss, y1, ',');
+          getline(ss, x2, ',');
+          getline(ss, y2);
+
+          imageNamesVec.push_back(imgName);
+        }
+      }
+    }
+    inFile.close();
+    return imageNamesVec.size();
   }
 }  // namespace file_utilities
 }  // namespace pandora_vision

@@ -55,7 +55,7 @@ class RandomDatasetCreator(object):
     def __init__(self, srcImagePath, srcAnnotationsPath,
                  srcAnnotationsFileName, dstImagePath, dstAnnotationsPath,
                  dstAnnotationsFileName, desiredDatasetSize,
-                 saveRemainingImages = False):
+                 saveRemainingImages =False, positivesPercentage=0):
         """ Initialize class member variables.
 
             Parameters
@@ -74,6 +74,8 @@ class RandomDatasetCreator(object):
             desiredDatasetSize: Size of the desired dataset.
             saveRemainingImages: Flag indicating whether the non chosen images
             from the initial dataset will be saved. Default value = False.
+            positivesPercentage: The percentage of the positives images of the
+            new dataset.
         """
 
         self.annotationsDict = defaultdict(list)
@@ -85,8 +87,8 @@ class RandomDatasetCreator(object):
         self.newNegativeImageNames = []
         self.numPositives = 0
         self.numNegatives = 0
-        self.positivesPercentage = 0
         self.desiredDatasetSize = int(desiredDatasetSize)
+        self.positivesPercentage = float(positivesPercentage)
 
         self.srcImagePath = srcImagePath
         self.srcAnnotationsPath = srcAnnotationsPath
@@ -140,8 +142,9 @@ class RandomDatasetCreator(object):
             print "ERROR: Not enough images to create a dataset"
             print "Available Images:", totalNumImages
             exit(1)
-        self.positivesPercentage = (float(self.numPositives) /
-                                    totalNumImages)
+        if self.positivesPercentage == 0:
+            self.positivesPercentage = (float(self.numPositives) /
+                                        totalNumImages)
         annotationsFile.close()
 
     def createAnnotationsFile(self):
@@ -184,6 +187,7 @@ class RandomDatasetCreator(object):
 
             # Save new annotations in file.
             for (frameName, dictValues) in self.remainingAnnotationsDict.iteritems():
+
                 annotationsFile.write(frameName)
                 annotationsFile.write(",")
                 annotationsFile.write(str(dictValues[0][0][0]))
@@ -266,32 +270,61 @@ class RandomDatasetCreator(object):
         self.createAnnotationsFile()
         self.copyDatasetImages()
 
+    def createNewDatasetAnnotations(self):
+        """ This function creates a random dataset's annotations."""
+        self.readAnnotationsFile()
+        self.chooseRandomSubset()
+        self.createAnnotationsFile()
+
 
 if __name__ == "__main__":
     print "Initialize process"
     print "Type the absolute path to the initial dataset:"
+    print "e.g. /home/user/foo"
     srcImagePath = raw_input("-->")
     print "Type the absolute path to the initial annotations file:"
+    print "e.g. /home/user/bar"
     srcAnnotationsPath = raw_input("-->")
     print "Type the name of the initial annotations file:"
+    print "e.g. annotations.txt"
     srcAnnotationsFileName = raw_input("-->")
-    print "Type the absolute path to the new dataset:"
-    dstImagePath = raw_input("-->")
+    print "Would you like to copy the new dataset images? If so, press [y]." \
+          "In any other case, a new annotations file will only be created."
+    copyNewDatasetImages = raw_input("-->")
+    if copyNewDatasetImages == "y":
+        print "Type the absolute path to the new dataset:"
+        dstImagePath = raw_input("-->")
+    else:
+        dstImagePath = ""
+
     print "Type the absolute path to the new annotations file:"
+    print "e.g. /home/user/baz"
     dstAnnotationsPath = raw_input("-->")
     print "Type the name of the new annotations file:"
+    print "e.g. new_annotations.txt"
     dstAnnotationsFileName = raw_input("-->")
     print "Type the desired dataset size"
     desiredDatasetSize = raw_input("-->")
+    print "Would you like to retain the positive/negative image ratio? If "\
+          "so, press [y]."
+    imageRatio = raw_input("-->")
+    if imageRatio != "y":
+        print "Type the ratio of the positive images in regard to the new "\
+                "dataset size"
+        positivesPercentage = raw_input("-->")
+    else:
+        positivesPercentage = 0
+
     print "(Optional) Do you want to save the remaining images?"
     print "If so, press [y]. Every other key will be considered as a no."
     saveRemainingImages = raw_input("-->")
     if saveRemainingImages == "y":
-        print "The remaining images will be stored in a folder named "\
-               "'Remaining' inside the new dataset folder. The annotations "\
-               "file for the remaining images will be stored in the same "\
-               "directory as the new annotations file and its name will have "\
-               "the prefix 'remaining_'."
+        if copyNewDatasetImages == "y":
+            print "The remaining images will be stored in a folder named "\
+                    "'Remaining' inside the new dataset folder."
+        print "The annotations file for the remaining images will be stored "\
+              "in the same directory as the new annotations file and its "\
+              "name will have the prefix 'remaining_'."
         flag = True
     else:
         print "Very well. The remaining images won't be stored."
@@ -301,6 +334,7 @@ if __name__ == "__main__":
                                        srcAnnotationsFileName, dstImagePath,
                                        dstAnnotationsPath,
                                        dstAnnotationsFileName,
-                                       desiredDatasetSize, flag)
-    randDataset.createDataset()
+                                       desiredDatasetSize, flag,
+                                       positivesPercentage)
+    randDataset.createNewDatasetAnnotations()
     print "Process is finished successfully!"

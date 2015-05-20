@@ -41,12 +41,14 @@
 
 namespace pandora_vision
 {
-  MotionPreProcessor::MotionPreProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionPreProcessor(ns, handler)
+  MotionPreProcessor::MotionPreProcessor(const std::string& ns, 
+    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
+    sensor_msgs::image_encodings::BGR8)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
-  MotionPreProcessor::~MotionPreProcessor()
-  {
-  }
+  MotionPreProcessor::~MotionPreProcessor() {}
+
 }  // namespace pandora_vision

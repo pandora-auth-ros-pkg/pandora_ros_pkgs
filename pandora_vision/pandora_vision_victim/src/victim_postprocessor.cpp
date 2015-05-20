@@ -47,11 +47,11 @@ namespace pandora_vision
     VisionPostProcessor<pandora_common_msgs::GeneralAlert>(
     ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
   
-  VictimPostProcessor::~VictimPostProcessor()
-  {
-  }
+  VictimPostProcessor::~VictimPostProcessor() {}
   
   bool VictimPostProcessor::postProcess(const POIsStampedConstPtr& input, 
     const GeneralAlertPtr& output)

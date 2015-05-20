@@ -30,12 +30,11 @@
     <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
       <arg name="camID" value="/dev/video1"/>
       <arg name="name" value="kinect"/>
-      <arg name="topic_name" value="/kinect/image"/>
-      <arg name="frame_id" value="kinect_link"/>
+      <arg name="topic_name" value="/kinect/rgb/image_raw"/>
     </include>
   </group>
   
   <include file="$(find pandora_vision_motion)/launch/pandora_vision_motion_node.launch" />
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
   
 </launch>

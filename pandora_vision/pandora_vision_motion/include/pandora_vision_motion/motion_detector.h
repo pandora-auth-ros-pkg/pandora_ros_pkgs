@@ -41,30 +41,49 @@
 #include <iostream>
 #include <vector>
 #include <opencv2/opencv.hpp>
-#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
+#include <ros/ros.h>
 #include "pandora_vision_common/cv_mat_stamped.h"
 #include "pandora_vision_common/pois_stamped.h"
 #include "pandora_vision_common/bbox_poi.h"
-#include "pandora_vision_motion/motion_parameters.h"
 
 namespace pandora_vision
 {
-  class MotionDetector : public VisionProcessor
+  class MotionDetector  
   {
     public:
+      //!< Background segmentation parameters
+      int history;
+      int varThreshold;
+      bool bShadowDetection;
+      int nmixtures;
+
+      //!< Threshold parameters
+      int diff_threshold;
+      double motion_high_thres;
+      double motion_low_thres;
+      bool visualization;
+      bool show_image;
+      bool show_background;
+      bool show_diff_image;
+      bool show_moving_objects_contours;
+
       /**
         @brief Class Constructor
         Initializes all varialbes for thresholding
       */
-      MotionDetector(const std::string& ns, sensor_processor::Handler* handler);
       MotionDetector(void);
-
-      explicit MotionDetector(const MotionParameters& parameters);
 
       /**
         @brief Class Destructor
       */
       virtual ~MotionDetector();
+
+      /**
+      * @brief
+      **/
+      void findMotionParameters(const cv::Mat& frame);
+
+      BBoxPOIPtr getBoundingBox();
 
     protected:
       BBoxPOIPtr getMotionPosition(void);
@@ -80,11 +99,6 @@ namespace pandora_vision
         @return [int] Index of evaluation of Motion in current frame.
       */
       int detectMotion(const cv::Mat& frame);
-
-      /**
-       * @brief
-       **/
-      void findMotionParameters(const cv::Mat& frame);
 
       /**
         @brief Function that defines the type of movement
@@ -121,12 +135,6 @@ namespace pandora_vision
       */
       void detectMotionPosition(const cv::Mat& diff);
 
-      /**
-       * @brief
-       **/
-      virtual bool
-        process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
-
     private:
       //!< Current frame to be processed
       cv::Mat frame_;
@@ -144,10 +152,8 @@ namespace pandora_vision
       int max_deviation_;
       //!< Bounding box of moving objects.
       BBoxPOIPtr bounding_box_;
-      
-      MotionParameters params;
 
-      friend class MotionDetectorTest;
+     friend class MotionDetectorTest;
   };
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_MOTION_DETECTOR_H

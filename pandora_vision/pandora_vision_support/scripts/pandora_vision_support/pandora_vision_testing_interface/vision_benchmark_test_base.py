@@ -54,6 +54,7 @@ from sensor_msgs.msg import PointCloud2
 
 class VisionBenchmarkTestBase(test_base.TestBase):
     def readImages(self, imagePath):
+        rosimage = Image()
         self.images = []
         self.names = []
         imageTypes = [".png", ".jpg", ".bmp", ".pgm"]
@@ -89,8 +90,17 @@ class VisionBenchmarkTestBase(test_base.TestBase):
 
                 continue
             # Store the image.
-            self.images.append(bridge.cv2_to_imgmsg(currentImg, "bgr8"))
+            rosimage = bridge.cv2_to_imgmsg(currentImg, "bgr8")
+            rosimage.header.frame_id = "/kinect_optical_frame"
+            rosimage.header.stamp = rospy.Time.now()
+            self.images.append(rosimage)
             self.names.append(fileName)
+            
+            self.imageWidth = currentImg.shape[1]
+            self.imageHeight = currentImg.shape[0]
+
+            self.imageWidth = currentImg.shape[1]
+            self.imageHeight = currentImg.shape[0]
 
     def readRosBags(self, imagePath):
         self.images = []
@@ -131,6 +141,9 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                 tempPointCloud.is_dense = msg.is_dense
 
                 self.images.append(tempPointCloud)
+
+                self.imageWidth = tempPointCloud.width
+                self.imageHeight = tempPointCloud.height
 
             self.names.append(fileName)
             currentBag.close()
@@ -356,6 +369,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
     def benchmarkTest(self, imagePath, inputTopic, outputTopic):
         # Read a Set of Images
         rospy.loginfo("Reading Images")
+        print outputTopic
         if self.algorithm == "Hole" or self.algorithm == "Victim":
             self.readRosBags(imagePath)
         else:
@@ -387,6 +401,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             suffix = "Alerts"
 
         queueIndex = 0
+        count  = 0
+
         # Publish image files sequentially and wait for an alert.
         # Confirm the authenticity of the alert using the annotator
         # groundtruth set.
@@ -395,27 +411,39 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             timeFlag = False
             startTime = time.clock()
             self.mockPublish(inputTopic, outputTopic, image)
-            while not timeFlag:
-                elapsedTime = time.clock() - startTime
-                timeFlag = (elapsedTime > maxWaitTime or
-                            (self.repliedList[outputTopic] and
-                             len(self.messageList[outputTopic]) >= 1))
+            print outputTopic
+            #self.mockPublish(inputTopic, outputTopic[1], image)
+            elapsedTime = time.clock() - startTime
 
-            if ((self.repliedList[outputTopic]) and
-               (len(self.messageList[outputTopic]) >= 1)):
+            # while not timeFlag:
+                #elapsedTime = time.clock() - startTime
+                #timeFlag = (elapsedTime > maxWaitTime or
+                            #(self.repliedList[outputTopic[0]] and
+                             #len(self.messageList[outputTopic[0]]) >= 1))
+
+            response = self.messageList[outputTopic][0]
+            print self.messageList[outputTopic]
+            print "response"
+            print response.success
+            print count
+            print self.messageList.keys()
+            outputTopic2 = self.subscribers.keys()[0]
+            count += 1
+            if response.success == "ERROR":
+                continue
+            if response.success == True and len(self.messageList) == 2 :
                 rospy.logdebug("Alert found in Image %s", imageName)
                 rospy.logdebug("Time passed: %f seconds", elapsedTime)
                 truePositivesInImage = 0
-                # Estimate alert center point from message parameters
-                print self.messageList[outputTopic][queueIndex]
+                #Estimate alert center point from message parameters
                 alerts = getattr(
-                        self.messageList[outputTopic][queueIndex],
+                        self.messageList[outputTopic2][queueIndex],
                         self.algorithm.lower()+suffix)
                 print len(alerts)
                 queueIndex += 1
                 for iiAlert in xrange(len(alerts)):
-                    imageYaw = float(alerts[iiAlert].yaw)
-                    imagePitch = float(alerts[iiAlert].pitch)
+                    imageYaw = float(alerts[iiAlert].info.yaw)
+                    imagePitch = float(alerts[iiAlert].info.pitch)
                     rospy.logdebug("Yaw: %f Degrees",
                                    imageYaw * 180 / math.pi)
                     rospy.logdebug("Pitch: %f Degrees",
@@ -450,7 +478,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                     self.falseNegatives += numberOfFalseNegatives
                 else:
                     self.trueNegatives += 1
-
+        
+        
         # Calculate the Benchmarking Results.
         self.calculateBenchmarkResults()
         # Estimate Recall values for each set of

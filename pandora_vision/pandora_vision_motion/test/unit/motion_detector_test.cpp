@@ -57,24 +57,7 @@ namespace pandora_vision
       {
         WIDTH = 640;
         HEIGHT = 480;
-        setUpParams(); 
-        motionDetectorPtr_ = new MotionDetector(params);
-      }
-
-      void setUpParams(void)
-      {
-        params.history = 10;
-        params.varThreshold = 16;
-        params.bShadowDetection = true;
-        params.nmixtures = 3;
-        params.diff_threshold = 45;
-        params.motion_high_thres = 7500;
-        params.motion_low_thres = 200;
-        params.visualization = false;
-        params.show_image = false;
-        params.show_background = false;
-        params.show_diff_image = false;
-        params.show_moving_objects_contours = false;
+        motionDetectorPtr_ = new MotionDetector();
       }
 
       /* accessors to private functions */
@@ -87,9 +70,6 @@ namespace pandora_vision
     protected:
       int WIDTH;
       int HEIGHT;
-
-    private:
-      MotionParameters params;
   };
 
   BBoxPOIPtr MotionDetectorTest::detectMotionPosition(const cv::Mat& frame)
@@ -98,7 +78,7 @@ namespace pandora_vision
     BBoxPOIPtr topLeft = motionDetectorPtr_->getMotionPosition();
     cv::Point center(topLeft->getPoint().x + topLeft->getWidth() / 2, 
         topLeft->getPoint().y + topLeft->getHeight() / 2);
-    // motionDetectorPtr_->detectMotion(frame);
+     // motionDetectorPtr_->detectMotion(frame);
     topLeft->setPoint(center);
     return motionDetectorPtr_->getMotionPosition();
   }

@@ -52,7 +52,8 @@ namespace pandora_vision
     rgbSvmValidatorPtr_.reset(new RgbSvmValidator(params_));
     depthSvmValidatorPtr_.reset(new DepthSvmValidator(params_));
 
-    ROS_INFO("[victim_node] : Created Victim Image Processor instance");
+    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
   VictimImageProcessor::VictimImageProcessor() : VisionProcessor() {}

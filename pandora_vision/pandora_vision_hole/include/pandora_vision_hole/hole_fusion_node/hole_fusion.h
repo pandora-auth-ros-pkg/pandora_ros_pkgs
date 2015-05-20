@@ -49,7 +49,7 @@
 #include "pandora_vision_msgs/HoleDirectionAlertVector.h"
 #include "pandora_vision_msgs/HoleDirectionAlert.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
-#include "pandora_vision_msgs/AreaOfInterest.h"
+#include "pandora_vision_msgs/RegionOfInterest.h"
 #include "utils/defines.h"
 #include "utils/histogram.h"
 #include "utils/message_conversions.h"

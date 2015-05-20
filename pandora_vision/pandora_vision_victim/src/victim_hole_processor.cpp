@@ -57,7 +57,8 @@ namespace pandora_vision
     rgbSvmValidatorPtr_.reset(new RgbSvmValidator(params_));
     depthSvmValidatorPtr_.reset(new DepthSvmValidator(params_));
 
-    ROS_INFO("[victim_node] : Created Victim Hole Processor instance");
+    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
   VictimHoleProcessor::VictimHoleProcessor() : sensor_processor::Processor<EnhancedImageStamped, 
@@ -89,7 +90,7 @@ namespace pandora_vision
     }
 
     DetectionImages imgs;
-    int stateIndicator = 2; //* input->getDepth() + (input->getAreas().size() > 0) + 1;
+    int stateIndicator = 2; //* input->getDepth() + (input->getRegions().size() > 0) + 1;
 
     DetectionMode detectionMode;
     switch (stateIndicator)
@@ -107,11 +108,11 @@ namespace pandora_vision
         detectionMode = GOT_HOLES_AND_DEPTH;
         break;
     }
-    for (unsigned int i = 0 ; i < input->getAreas().size(); i++)
+    for (unsigned int i = 0 ; i < input->getRegions().size(); i++)
     {
-      cv::Rect rect(input->getArea(i).x - input->getArea(i).width / 2,
-        input->getArea(i).y - input->getArea(i).height / 2, input->getArea(i).width, 
-        input->getArea(i).height);
+      cv::Rect rect(input->getRegion(i).x - input->getRegion(i).width / 2,
+        input->getRegion(i).y - input->getRegion(i).height / 2, input->getRegion(i).width, 
+        input->getRegion(i).height);
       holes_bounding_boxes.push_back(rect);
 
       EnhancedMat emat;
@@ -119,7 +120,7 @@ namespace pandora_vision
       // cv::resize(emat.img, emat.img,
         // cv::Size(params_.frameWidth, params_.frameHeight));
       emat.bounding_box = rect;
-      emat.keypoint = cv::Point2f(input->getArea(i).x, input->getArea(i).y);
+      emat.keypoint = cv::Point2f(input->getRegion(i).x, input->getRegion(i).y);
       imgs.rgbMasks.push_back(emat);
 
       if (GOT_HOLES_AND_DEPTH || GOT_DEPTH)
@@ -219,7 +220,7 @@ namespace pandora_vision
       }
       {
         std::ostringstream convert;
-        convert << "Holes got : "<< input->getAreas().size();
+        convert << "Holes got : "<< input->getRegions().size();
         cv::putText(debugImage, convert.str().c_str(),
           cvPoint(10, 100),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 0, 0), 1, CV_AA);
@@ -368,7 +369,7 @@ namespace pandora_vision
     input->getDepthImage().copyTo(msgPtr->image);
 
     // Publish the image message
-    //interpolatedDepthPublisher_.publish(*msgPtr->toImageMsg());
+    interpolatedDepthPublisher_.publish(*msgPtr->toImageMsg());
 
     if (output->pois.empty())
     {

@@ -45,11 +45,11 @@ namespace pandora_vision
   LandoltCPostProcessor::LandoltCPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
     VisionPostProcessor<pandora_vision_msgs::LandoltcAlertVector>(ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
-  LandoltCPostProcessor::~LandoltCPostProcessor()
-  {
-  }
+  LandoltCPostProcessor::~LandoltCPostProcessor() {}
 
   bool LandoltCPostProcessor::postProcess(const POIsStampedConstPtr& input, const LandoltcAlertVectorPtr& output)
   {

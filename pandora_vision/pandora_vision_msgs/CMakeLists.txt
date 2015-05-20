@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
-  AreaOfInterest.msg
   Blob.msg
   BlobVector.msg
   DataMatrixAlert.msg
@@ -25,9 +24,11 @@ add_message_files(
   Keypoint.msg
   LandoltcAlert.msg
   LandoltcAlertVector.msg
+  Predator.msg
   QRAlert.msg
   QRAlertVector.msg
-  Predator.msg
+  RegionOfInterest.msg
+  RegionOfInterestVector.msg
   )
 
 generate_messages(

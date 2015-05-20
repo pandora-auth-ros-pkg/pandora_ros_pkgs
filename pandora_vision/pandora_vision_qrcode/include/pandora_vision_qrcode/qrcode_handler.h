@@ -44,11 +44,11 @@
 #include "pandora_vision_common/vision_handler.h"
 #include "pandora_vision_qrcode/qrcode_preprocessor.h"
 #include "pandora_vision_qrcode/qrcode_postprocessor.h"
-#include "pandora_vision_qrcode/qrCode_detector.h"
+#include "pandora_vision_qrcode/qrcode_processor.h"
 
 namespace pandora_vision
 {
-  class QrCodeHandler : public VisionHandler<QrCodePreProcessor, QrCodeDetector, 
+  class QrCodeHandler : public VisionHandler<QrCodePreProcessor, QrCodeProcessor, 
     QrCodePostProcessor>
   {
     public:

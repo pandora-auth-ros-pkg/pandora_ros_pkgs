@@ -417,14 +417,14 @@ namespace pandora_vision
       tld->detectorCascade->imgHeight = grey.rows;
       tld->detectorCascade->imgWidthStep = grey.step; 
 
-      if (msg.areaOfInterest.center.x != -1 && msg.areaOfInterest.center.y != -1 
-        && msg.areaOfInterest.width != -1 && msg.areaOfInterest.height !=-1) 
+      if (msg.regionOfInterest.center.x != -1 && msg.regionOfInterest.center.y != -1 
+        && msg.regionOfInterest.width != -1 && msg.regionOfInterest.height !=-1) 
       {
-        ROS_INFO_STREAM("Starting at: " << msg.areaOfInterest.center.x << " " 
-          << msg.areaOfInterest.center.y << " " << msg.areaOfInterest.width << " " 
-          << msg.areaOfInterest.height);
-        bbox = cv::Rect(msg.areaOfInterest.center.x, msg.areaOfInterest.center.y,
-          msg.areaOfInterest.width, msg.areaOfInterest.height);
+        ROS_INFO_STREAM("Starting at: " << msg.regionOfInterest.center.x << " " 
+          << msg.regionOfInterest.center.y << " " << msg.regionOfInterest.width << " " 
+          << msg.regionOfInterest.height);
+        bbox = cv::Rect(msg.regionOfInterest.center.x, msg.regionOfInterest.center.y,
+          msg.regionOfInterest.width, msg.regionOfInterest.height);
         tld->selectObject(grey, &bbox); 
         tld->learningEnabled = true;
         sendAnnotation(*tld->currBB, tld->currConf);
@@ -763,16 +763,16 @@ namespace pandora_vision
       pandora_vision_msgs::Predator predatorMsg;
       predatorMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
       predatorMsg.header.stamp = PredatorFrameTimeStamp;
-      predatorMsg.areaOfInterest.center.x = rec.x;
-      predatorMsg.areaOfInterest.center.y = rec.y;
-      predatorMsg.areaOfInterest.width = rec.width;
-      predatorMsg.areaOfInterest.height = rec.height;
+      predatorMsg.regionOfInterest.center.x = rec.x;
+      predatorMsg.regionOfInterest.center.y = rec.y;
+      predatorMsg.regionOfInterest.width = rec.width;
+      predatorMsg.regionOfInterest.height = rec.height;
       predatorMsg.posterior = posterior;
 
      ROS_INFO_STREAM("send predator alert " << predatorMsg.header.frame_id << " " 
-                    << predatorMsg.header.stamp << " "  << predatorMsg.areaOfInterest.center.x << " " 
-                    << predatorMsg.areaOfInterest.center.y << " "<< predatorMsg.areaOfInterest.width << " "
-                    << predatorMsg.areaOfInterest.height <<  " " << predatorMsg.posterior);
+                    << predatorMsg.header.stamp << " "  << predatorMsg.regionOfInterest.center.x << " " 
+                    << predatorMsg.regionOfInterest.center.y << " "<< predatorMsg.regionOfInterest.width << " "
+                    << predatorMsg.regionOfInterest.height <<  " " << predatorMsg.posterior);
       _predatorPublisher.publish(predatorMsg);
     }
   }
@@ -791,10 +791,10 @@ namespace pandora_vision
       pandora_vision_msgs::Predator predatorLandoltcMsg;
       predatorLandoltcMsg.header.frame_id = _frame_ids_map.find(_frame_id)->second;
       predatorLandoltcMsg.header.stamp = PredatorFrameTimeStamp;
-      predatorLandoltcMsg.areaOfInterest.center.x = rec.x;
-      predatorLandoltcMsg.areaOfInterest.center.y = rec.y;
-      predatorLandoltcMsg.areaOfInterest.width = rec.width;
-      predatorLandoltcMsg.areaOfInterest.height = rec.height;
+      predatorLandoltcMsg.regionOfInterest.center.x = rec.x;
+      predatorLandoltcMsg.regionOfInterest.center.y = rec.y;
+      predatorLandoltcMsg.regionOfInterest.width = rec.width;
+      predatorLandoltcMsg.regionOfInterest.height = rec.height;
       predatorLandoltcMsg.posterior = posterior;
       predatorLandoltcMsg.image = *frame;
       

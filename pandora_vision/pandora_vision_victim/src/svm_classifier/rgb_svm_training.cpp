@@ -88,60 +88,48 @@ namespace pandora_vision
    */
   void RgbSvmTraining::trainSubSystem()
   {
-    const std::string trainingFeaturesMatrixFile = imageType_ + "training_features_matrix.xml";
-    const std::string testFeaturesMatrixFile = imageType_ + "test_features_matrix.xml";
-    const std::string trainingLabelsMatrixFile = imageType_ + "training_labels_matrix.xml";
-    const std::string testLabelsMatrixFile = imageType_ + "test_labels_matrix.xml";
-    const std::string resultsFile = imageType_ + "results.xml";
-    const std::string svmClassifierFile = imageType_ + "svm_classifier.xml";
     const std::string filesDirectory = package_path + "/data/";
 
-    std::stringstream in_file_stream;
-    std::stringstream in_test_file_stream;
-    std::stringstream labels_mat_file_stream;
-    std::stringstream test_labels_mat_file_stream;
-    std::stringstream svm_file_stream;
-    std::stringstream results_file_stream;
+    const std::string trainingFeaturesMatrixFile = filesDirectory + imageType_ + "training_features_matrix.xml";
+    const std::string testFeaturesMatrixFile = filesDirectory + imageType_ + "test_features_matrix.xml";
+    const std::string trainingLabelsMatrixFile = filesDirectory + imageType_ + "training_labels_matrix.xml";
+    const std::string testLabelsMatrixFile = filesDirectory + imageType_ + "test_labels_matrix.xml";
+    const std::string resultsFile = filesDirectory + imageType_ + "results.xml";
+    const std::string svmClassifierFile = filesDirectory + imageType_ + "svm_classifier.xml";
 
-    in_file_stream << filesDirectory << trainingFeaturesMatrixFile;
-    in_test_file_stream << filesDirectory << testFeaturesMatrixFile;
-    labels_mat_file_stream << filesDirectory << trainingLabelsMatrixFile;
-    test_labels_mat_file_stream << filesDirectory << testLabelsMatrixFile;
-    svm_file_stream << filesDirectory << svmClassifierFile;
-    results_file_stream << filesDirectory << resultsFile;
-
-    const std::string trainingDatasetPath = path_to_samples + "/data/Training_Images";
+    const std::string trainingDatasetPath = path_to_samples + "/data";
     boost::filesystem::path trainingDirectory(trainingDatasetPath);
-    int numTrainingFiles = file_utilities::countFilesInDirectory(trainingDirectory);
 
-    const std::string testDatasetPath = path_to_samples + "/data/Test_Images";
+    const std::string trainingAnnotationsFile = filesDirectory + imageType_ + "training_annotations.txt";
+    int numTrainingFiles = file_utilities::findNumberOfAnnotations(trainingAnnotationsFile);
+
+    const std::string testDatasetPath = path_to_samples + "/data";
     boost::filesystem::path testDirectory(testDatasetPath);
-    int numTestFiles = file_utilities::countFilesInDirectory(testDirectory);
+
+    const std::string testAnnotationsFile = filesDirectory + imageType_ + "test_annotations.txt";
+    int numTestFiles = file_utilities::findNumberOfAnnotations(testAnnotationsFile);
 
     cv::Mat trainingFeaturesMat = cv::Mat::zeros(numTrainingFiles, numFeatures_, CV_64FC1);
     cv::Mat trainingLabelsMat = cv::Mat::zeros(numTrainingFiles, 1, CV_64FC1);
     cv::Mat testFeaturesMat = cv::Mat::zeros(numTestFiles, numFeatures_, CV_64FC1);
     cv::Mat testLabelsMat = cv::Mat::zeros(numTestFiles, 1, CV_64FC1);
 
-    if (loadClassifierModel_ && file_utilities::exist(svm_file_stream.str().c_str()))
+    if (loadClassifierModel_ && file_utilities::exist(svmClassifierFile.c_str()))
     {
-      SVM.load(svm_file_stream.str().c_str());
+      SVM.load(svmClassifierFile.c_str());
     }
     else
     {
-      if (file_utilities::exist(in_file_stream.str().c_str()) == false ||
+      if (file_utilities::exist(trainingFeaturesMatrixFile.c_str()) == false ||
           trainingSetFeatureExtraction_)
       {
         std::cout << "Create necessary training matrix" << std::endl;
         std::string prefix = "training_";
 
-        const std::string trainingAnnotationsFile = imageType_ + "training_annotations.txt";
-        const std::string trainingAnnotationsFilePath = filesDirectory + trainingAnnotationsFile;
-
         bool vocabularyNeeded = constructBagOfWordsVocabulary(trainingDirectory,
-            trainingAnnotationsFilePath);
+            trainingAnnotationsFile);
 
-        constructFeaturesMatrix(trainingDirectory, trainingAnnotationsFilePath,
+        constructFeaturesMatrix(trainingDirectory, trainingAnnotationsFile,
             &trainingFeaturesMat, &trainingLabelsMat);
 
         std::cout << "Normalize features" << std::endl;
@@ -162,55 +150,52 @@ namespace pandora_vision
           file_utilities::saveToFile(bagOfWordsFilePath, "bag_of_words",
               featureExtraction_->getBagOfWordsVocabulary());
         }
-
-        // Start Training Process
-        std::cout << "Starting training process for the rgb images" << std::endl;
-        if (USE_OPENCV_GRID_SEARCH_AUTOTRAIN)
-        {
-          std::cout << "(SVM 'grid search' => may take some time!)" << std::endl;
-          SVM.train_auto(trainingFeaturesMat, trainingLabelsMat, cv::Mat(), cv::Mat(),
-                         params, 10, CvSVM::get_default_grid(CvSVM::C),
-                         CvSVM::get_default_grid(CvSVM::GAMMA),
-                         CvSVM::get_default_grid(CvSVM::P),
-                         CvSVM::get_default_grid(CvSVM::NU),
-                         CvSVM::get_default_grid(CvSVM::COEF),
-                         CvSVM::get_default_grid(CvSVM::DEGREE),
-                         true);
-
-          params = SVM.get_params();
-          std::cout << "Using optimal Parameters" << std::endl;
-          std::cout << "degree=" << params.degree << std::endl;
-          std::cout << "gamma=" << params.gamma << std::endl;
-          std::cout << "coef0=" << params.coef0 << std::endl;
-          std::cout << "C=" << params.C << std::endl;
-          std::cout << "nu=" << params.nu << std::endl;
-          std::cout << "p=" << params.p << std::endl;
-        }
-        else
-        {
-          SVM.train(trainingFeaturesMat, trainingLabelsMat, cv::Mat(), cv::Mat(), params);
-        }
-        SVM.save(svm_file_stream.str().c_str());
-        std::cout << "Finished training process" << std::endl;
       }
       else
       {
         trainingFeaturesMat = file_utilities::loadFiles(
-            in_file_stream.str(), "training_features_mat");
+            trainingFeaturesMatrixFile, "training_features_mat");
         trainingLabelsMat = file_utilities::loadFiles(
-            labels_mat_file_stream.str(), "training_labels_mat");
+            trainingLabelsMatrixFile, "training_labels_mat");
       }
+
+      // Start Training Process
+      std::cout << "Starting training process for the rgb images" << std::endl;
+      if (USE_OPENCV_GRID_SEARCH_AUTOTRAIN)
+      {
+        std::cout << "(SVM 'grid search' => may take some time!)" << std::endl;
+        SVM.train_auto(trainingFeaturesMat, trainingLabelsMat, cv::Mat(), cv::Mat(),
+                       params, 10, CvSVM::get_default_grid(CvSVM::C),
+                       CvSVM::get_default_grid(CvSVM::GAMMA),
+                       CvSVM::get_default_grid(CvSVM::P),
+                       CvSVM::get_default_grid(CvSVM::NU),
+                       CvSVM::get_default_grid(CvSVM::COEF),
+                       CvSVM::get_default_grid(CvSVM::DEGREE),
+                       true);
+
+        params = SVM.get_params();
+        std::cout << "Using optimal Parameters" << std::endl;
+        std::cout << "degree=" << params.degree << std::endl;
+        std::cout << "gamma=" << params.gamma << std::endl;
+        std::cout << "coef0=" << params.coef0 << std::endl;
+        std::cout << "C=" << params.C << std::endl;
+        std::cout << "nu=" << params.nu << std::endl;
+        std::cout << "p=" << params.p << std::endl;
+      }
+      else
+      {
+        SVM.train(trainingFeaturesMat, trainingLabelsMat, cv::Mat(), cv::Mat(), params);
+      }
+      SVM.save(svmClassifierFile.c_str());
+      std::cout << "Finished training process" << std::endl;
     }
-    if (file_utilities::exist(in_test_file_stream.str().c_str()) == false ||
+    if (file_utilities::exist(testFeaturesMatrixFile.c_str()) == false ||
         testSetFeatureExtraction_)
     {
       std::cout << "Create necessary test matrix" << std::endl;
       std::string prefix = "test_";
 
-      const std::string testAnnotationsFile = imageType_ + "test_annotations.txt";
-      const std::string testAnnotationsFilePath = filesDirectory + testAnnotationsFile;
-
-      constructFeaturesMatrix(testDirectory, testAnnotationsFilePath,
+      constructFeaturesMatrix(testDirectory, testAnnotationsFile,
           &testFeaturesMat, &testLabelsMat);
 
       loadNormalizationParametersAndNormalizeFeatures(&testFeaturesMat);
@@ -224,9 +209,9 @@ namespace pandora_vision
     else
     {
       testFeaturesMat = file_utilities::loadFiles(
-          in_test_file_stream.str(), "test_features_mat");
+          testFeaturesMatrixFile, "test_features_mat");
       testLabelsMat = file_utilities::loadFiles(
-          test_labels_mat_file_stream.str(), "test_labels_mat");
+          testLabelsMatrixFile, "test_labels_mat");
     }
 
     // uncomment to produce the platt probability
@@ -249,9 +234,8 @@ namespace pandora_vision
     cv::Mat results = cv::Mat::zeros(numTestFiles, 1, CV_64FC1);
     SVM.predict(testFeaturesMat, results);
     // std::cout << "results" << results.size() << std::endl << results <<std::endl <<std::endl;
-    file_utilities::saveToFile(results_file_stream.str(), "results", results);
+    file_utilities::saveToFile(resultsFile, "results", results);
     evaluate(results, testLabelsMat);
   }
 }  // namespace pandora_vision
-
 

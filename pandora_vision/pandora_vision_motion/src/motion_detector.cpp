@@ -45,25 +45,13 @@ namespace pandora_vision
     @brief Class Constructor
     Initializes all varialbes for thresholding
   */
-  MotionDetector::MotionDetector(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionProcessor(ns, handler)
-  {
-    params.configMotion(*this->accessPublicNh());
-    setUpMotionDetector();
-  }
-
-  MotionDetector::MotionDetector(void) : VisionProcessor()
+  
+  MotionDetector::MotionDetector(void)   
   {
     setUpMotionDetector();
   }
 
-  MotionDetector::MotionDetector(const MotionParameters& parameters) :
-    VisionProcessor()
-  {
-    params = parameters;
-    setUpMotionDetector();
-  }
-
+  
   /**
     @brief Class Destructor
     Deallocates memory used for storing images
@@ -72,8 +60,7 @@ namespace pandora_vision
   {
     ROS_INFO("Destroying MotionDetector instance");
   }
-
-
+  
   BBoxPOIPtr MotionDetector::getMotionPosition(void)
   {
     return bounding_box_;
@@ -83,19 +70,30 @@ namespace pandora_vision
   {
     bounding_box_.reset( new BBoxPOI() );
     kernel_erode_ = getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2));
-    bg_ = cv::BackgroundSubtractorMOG2(params.history,
-      params.varThreshold, params.bShadowDetection);
+    bg_ = cv::BackgroundSubtractorMOG2(history, varThreshold, bShadowDetection);
 
     bounding_box_->setPoint(cv::Point(0, 0));
     bounding_box_->setWidth(0);
     bounding_box_->setHeight(0);
     bounding_box_->setProbability(0.0f);
+    history = 10;
+    varThreshold = 16;
+    bShadowDetection = true;
+    nmixtures = 3;
+    diff_threshold = 45;
+    motion_high_thres = 7500;
+    motion_low_thres = 200;
+    visualization = false;
+    show_image = false;
+    show_background = false;
+    show_diff_image = false;
+    show_moving_objects_contours = false;
 
     max_deviation_ = 50;
     ROS_INFO("Created MotionDetector instance");
   }
 
-  /**
+   /**
     @brief Function that detects motion, according to substraction
     between background image and current frame. According to predifined
     thresholds motion is detected. According to the type of motion
@@ -109,7 +107,7 @@ namespace pandora_vision
     if (frame.data && frame.channels() == 3)
     {
       movingObjects_ = frame.clone();
-      /// Upadate the background model and create
+      /// Update the background model and create
       /// binary mask for foreground objects
       bg_.operator()(frame, foreground_);
       bg_.getBackgroundImage(background_);
@@ -119,7 +117,7 @@ namespace pandora_vision
       cv::cvtColor(thresholdedDifference, thresholdedDifference, CV_BGR2GRAY);
 
       cv::threshold(thresholdedDifference, thresholdedDifference,
-        params.diff_threshold, 255, cv::THRESH_BINARY);
+        diff_threshold, 255, cv::THRESH_BINARY);
 
       int typeOfMovement = motionIdentification(thresholdedDifference);
 
@@ -135,9 +133,9 @@ namespace pandora_vision
         floor(bounding_box_->getPoint().y + bounding_box_->getHeight() * 0.5));
       bounding_box_->setPoint(boxCenter);
 
-      if (params.visualization || params.show_image ||
-        params.show_background || params.show_diff_image ||
-        params.show_moving_objects_contours)
+      if (visualization || show_image ||
+        show_background || show_diff_image ||
+        show_moving_objects_contours)
       {
         debugShow(thresholdedDifference, frame);
       }
@@ -152,6 +150,7 @@ namespace pandora_vision
   /**
    * @brief
    **/
+ 
   void MotionDetector::findMotionParameters(const cv::Mat& frame)
   {
     switch (detectMotion(frame))
@@ -169,6 +168,11 @@ namespace pandora_vision
         bounding_box_->setProbability(-1);
         break;
     }
+  }
+ 
+  BBoxPOIPtr MotionDetector::getBoundingBox()
+  {
+    return bounding_box_;
   }
 
   /**
@@ -242,9 +246,9 @@ namespace pandora_vision
     //!< to find the exact number of pixels, that differ from current
     //!< frame and background
     int countDiff = countNonZero(thresholdedDifference);
-    if (countDiff > params.motion_high_thres)
+    if (countDiff > motion_high_thres)
       return 2;
-    else if (countDiff > params.motion_low_thres)
+    else if (countDiff > motion_low_thres)
       return 1;
     else
       return 0;
@@ -271,33 +275,16 @@ namespace pandora_vision
     cv::findContours(foreground_, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
     cv::drawContours(frame, contours, -1, cv::Scalar(0, 0, 255), 2);
 
-    if (params.visualization || params.show_image)
+    if (visualization || show_image)
       cv::imshow("Frame", frame);
-    if (params.visualization || params.show_background)
+    if (visualization || show_background)
       cv::imshow("Background", background_);
-    if (params.visualization || params.show_diff_image)
+    if (visualization || show_diff_image)
       cv::imshow("Thresholded difference between background and current frame", thresholdedDifference);
-    if (params.visualization || params.show_moving_objects_contours)
+    if (visualization || show_moving_objects_contours)
       cv::imshow("Moving objects in current frame", movingObjects_);
     cv::waitKey(10);
 
     contours.clear();
-  }
-
-  /**
-   * @brief
-   **/
-  bool MotionDetector::process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output)
-  {
-    output->header = input->getHeader();
-    findMotionParameters(input->getImage());
-    output->frameWidth = input->getImage().cols;
-    output->frameHeight = input->getImage().rows;
-    if (bounding_box_->getProbability() > 0.1)
-    {
-      output->pois.push_back(bounding_box_);
-      return true;
-    }
-    return false;
   }
 }  // namespace pandora_vision

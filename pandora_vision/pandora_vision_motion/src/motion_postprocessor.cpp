@@ -46,11 +46,11 @@ namespace pandora_vision
     VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>(
     ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
-  MotionPostProcessor::~MotionPostProcessor()
-  {
-  }
+  MotionPostProcessor::~MotionPostProcessor() {}
 
   bool MotionPostProcessor::postProcess(const POIsStampedConstPtr& input, 
     const GeneralAlertVectorPtr& output)

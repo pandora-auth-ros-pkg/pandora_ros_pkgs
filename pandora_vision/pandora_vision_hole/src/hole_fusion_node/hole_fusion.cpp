@@ -1535,7 +1535,7 @@ namespace pandora_vision
       it != validHolesMap->end(); it++)
     {
       // The enhanced hole message. Used for one hole only
-      pandora_vision_msgs::AreaOfInterest enhancedHoleMsg;
+      pandora_vision_msgs::RegionOfInterest enhancedHoleMsg;
 
       // Set the hole's keypoint
       enhancedHoleMsg.center.x = conveyor.holes[it->first].keypoint.pt.x;
@@ -1560,7 +1560,7 @@ namespace pandora_vision
       enhancedHoleMsg.height = maxy - miny;
 
       // Push back into the enhancedHolesMsg message
-      enhancedHolesMsg.areasOfInterest.push_back(enhancedHoleMsg);
+      enhancedHolesMsg.regionsOfInterest.push_back(enhancedHoleMsg);
     }
 
     // Publish the overall message

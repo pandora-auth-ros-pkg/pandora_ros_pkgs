@@ -16,4 +16,4 @@ sensor_msgs/Image rgbImage
 # flag that indicates if depth analysis is possible
 bool isDepth
 
-pandora_vision_msgs/AreaOfInterest[] areasOfInterest
+pandora_vision_msgs/RegionOfInterest[] regionsOfInterest

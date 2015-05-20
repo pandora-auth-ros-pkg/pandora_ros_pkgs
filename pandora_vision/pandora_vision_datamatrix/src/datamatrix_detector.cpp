@@ -63,7 +63,9 @@ namespace pandora_vision
     #endif
     
     detected_datamatrix->setContent("");
-    ROS_INFO("[Datamatrix_node] : Datamatrix_Detector instance created");
+    
+    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
   
   /**

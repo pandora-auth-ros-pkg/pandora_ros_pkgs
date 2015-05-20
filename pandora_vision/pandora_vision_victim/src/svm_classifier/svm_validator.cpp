@@ -151,14 +151,14 @@ namespace pandora_vision
    */
   float SvmValidator::predictionToProbability(float prediction)
   {
-    if (prediction < 0)
+    if (prediction < 0.0f)
       prediction = fabs(prediction);
 
     // Normalize probability to [-1,1]
     float probability = tanh(probabilityScaling_ * prediction -
         probabilityTranslation_);
     // Normalize probability to [0,1]
-    probability = (1.0 + probability) / 2.0;
+    probability = (1.0f + probability) / 2.0f;
     ROS_INFO_STREAM("SVM probability: " << probability);
     return probability;
   }

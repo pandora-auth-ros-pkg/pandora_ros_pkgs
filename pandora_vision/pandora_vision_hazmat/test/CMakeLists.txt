@@ -13,14 +13,6 @@ include_directories(
   ${pandora_testing_tools_INCLUDE_DIRS}
   ${roslib_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS})
-#~ 
-#~ catkin_add_gtest(histogram_mask_test unit/histogram_mask_test.cpp)
-#~ target_link_libraries(histogram_mask_test
-  #~ ${catkin_LIBRARIES}
-  #~ ${PROJECT_NAME}_filters
-  #~ gtest_main
-  #~ )
-#add_rostest(functional/hazmat_benchmark_test.launch)
 
 catkin_add_gtest(feature_detector_test unit/feature_matching_test.cpp)
 target_link_libraries(feature_detector_test
@@ -45,34 +37,42 @@ target_link_libraries(image_signature_test
 #                               Functional Tests                             #
 ##############################################################################
 
-# download_extra_data(
-  # ${PROJECT_NAME}_hazmat_test_images
-  # EXTRA_FILES test/functional/images/extra_files.yaml
-# )
-# add_dependencies(${PROJECT_NAME}_hazmat_test_images tests)
+#if(${PROJECT_NAME}_functional)
+  #download_extra_data(
+    #${PROJECT_NAME}_hazmat_test_images
+    #EXTRA_FILES test/functional/images/extra_files.yaml
+    #)
+  #add_dependencies(${PROJECT_NAME}_hazmat_test_images tests)
 
-# add_rostest(functional/hazmat_test.launch)
+  #add_rostest(functional/hazmat_test.launch
+    #DEPENDENCIES ${PROJECT_NAME}_hazmat_test_images)
+#endif()
 
 ################################################################################
 #                               Benchmark Tests                                #
 ################################################################################
 
-# download_extra_data(
-  # ${PROJECT_NAME}_benchmark_images_480p
-  # EXTRA_FILES test/benchmark/images/images_480p/extra_files.yaml
-  # EXCLUDE_FROM_ALL
-  # )
-# add_dependencies(${PROJECT_NAME}_benchmark_images_480p tests)
+#if (${PROJECT_NAME}_benchmark)
 
-# download_extra_data(
-  # ${PROJECT_NAME}_benchmark_images_720p
-  # EXTRA_FILES test/benchmark/images/images_720p/extra_files.yaml
-  # EXCLUDE_FROM_ALL
-  # )
-# add_dependencies(${PROJECT_NAME}_benchmark_images_720p tests)
+  ## Download the images for the kinect/xtion benchmarking.
+  #download_extra_data(
+    #${PROJECT_NAME}_benchmark_images_480p
+    #EXTRA_FILES test/benchmark/images/images_480p/extra_files.yaml
+    #EXCLUDE_FROM_ALL
+    #)
+  #add_dependencies(${PROJECT_NAME}_benchmark_images_480p tests)
 
-# add_rostest(benchmark/hazmat_kinect_benchmark_test.launch)
-# add_rostest(benchmark/hazmat_web_camera_benchmark_test.launch)
+  ## Download the images for the high definition web images.
+  #download_extra_data(
+    #${PROJECT_NAME}_benchmark_images_720p
+    #EXTRA_FILES test/benchmark/images/images_720p/extra_files.yaml
+    #EXCLUDE_FROM_ALL
+    #)
+  #add_dependencies(${PROJECT_NAME}_benchmark_images_720p tests)
 
-# add_rostest(benchmark/hazmat_kinect_benchmark_test.launch DEPENDENCIES ${PROJECT_NAME}_benchmark_images_480p)
-# add_rostest(benchmark/hazmat_web_camera_benchmark_test.launch DEPENDENCIES ${PROJECT_NAME}_benchmark_images_720p)
+  #add_rostest(benchmark/landoltc_kinect_benchmark_test.launch
+    #DEPENDENCIES ${PROJECT_NAME}_benchmark_images_480p)
+  #add_rostest(benchmark/landoltc_web_camera_benchmark_test.launch
+    #DEPENDENCIES ${PROJECT_NAME}_benchmark_images_720p)
+
+#endif()

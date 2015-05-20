@@ -64,8 +64,11 @@ namespace pandora_vision
        * @param ns [const std::string&] The namespace of this preprocessor's nodeHandle
        * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
        * handles this preprocessor
+       * @param encoding [int] The image encoding using to transform the image message to 
+       * an OpenCV matrix
        **/ 
-      VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler);
+      VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler, 
+        const std::string& encoding);
       
       /**
        * @brief Virtual Destructor
@@ -84,12 +87,17 @@ namespace pandora_vision
        **/ 
       virtual bool
         preProcess(const ImageConstPtr& input, const CVMatStampedPtr& output);
+    
+    protected:
+      std::string encoding_;
   };
 
   VisionPreProcessor::
-  VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    sensor_processor::PreProcessor<sensor_msgs::Image, CVMatStamped>(ns, handler)
+  VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler,
+    const std::string& encoding) : sensor_processor::PreProcessor<sensor_msgs::Image, 
+    CVMatStamped>(ns, handler)
   {
+    encoding_ = encoding;
   }
 
   bool
@@ -98,7 +106,7 @@ namespace pandora_vision
   {
     //ROS_DEBUG_STREAM("["+this->accessPublicNh()->getNamespace()+"] Calling vision preprocessor.");
     cv_bridge::CvImagePtr inMsg;
-    inMsg = cv_bridge::toCvCopy(*input, sensor_msgs::image_encodings::BGR8);
+    inMsg = cv_bridge::toCvCopy(*input, encoding_);
     output->image = inMsg->image.clone();
 
     output->header = input->header;

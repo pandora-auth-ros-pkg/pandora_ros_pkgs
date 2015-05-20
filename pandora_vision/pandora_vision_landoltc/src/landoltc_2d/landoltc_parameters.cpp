@@ -41,11 +41,33 @@ namespace pandora_vision
 {
   void LandoltcParameters::configLandoltC(const ros::NodeHandle& nh)
   {
+    //!< The dynamic reconfigure parameter's callback
+    server.setCallback(boost::bind(&LandoltcParameters::parametersCallback, this, _1, _2));
+
     nh.param("/gradientThreshold", gradientThreshold, 60.);
     nh.param("/centerThreshold", centerThreshold, 90.);
     nh.param("/huMomentsPrec", huMomentsPrec, 0.3);
     nh.param("/adaptiveThresholdSubtractSize", adaptiveThresholdSubtractSize, 2);
     nh.param("/visualization", visualization, false);
     nh.param("/timerThreshold", timerThreshold, 0.16);
+  }
+  
+  /**
+  @brief The function called when a parameter is changed
+  @param[in] config [const pandora_vision_landoltc::landoltc_cfgConfig&]
+  @param[in] level [const uint32_t] The level 
+  @return void
+  **/
+  void LandoltcParameters::parametersCallback(
+    const pandora_vision_landoltc::landoltc_cfgConfig& config,
+    const uint32_t& level)
+  {
+    //!< Threshold parameters
+    gradientThreshold = config.gradientThreshold;
+    centerThreshold = config.centerThreshold;
+    huMomentsPrec = config.huMomentsPrec;
+    adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
+    visualization = config.visualization;    
+    timerThreshold = config.timerThreshold;    
   }
 }  // namespace pandora_vision

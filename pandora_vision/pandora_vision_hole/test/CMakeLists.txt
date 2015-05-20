@@ -1,3 +1,14 @@
+
+find_package(roslib REQUIRED)
+find_package(rostest REQUIRED)
+find_package(pandora_testing_tools REQUIRED)
+find_package(pandora_cmake_tools REQUIRED)
+
+include_directories(
+${pandora_testing_tools_INCLUDE_DIRS}
+${roslib_INCLUDE_DIRS}
+${catkin_INCLUDE_DIRS})
+
 ###############################  Unit Tests ####################################
 
 #################################### utils #####################################
@@ -169,12 +180,15 @@ target_link_libraries(rgb_filters_test
 
 ############## Functional Tests ###############
 
-find_package(rostest REQUIRED)
+if(${PROJECT_NAME}_functional)
 
-#catkin_download_test_data(
-#    ${PROJECT_NAME}_hole_detector_test.bag
-#    http://downloads.pandora.ee.auth.gr/bags/hole_detector_test.bag
-#    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
-#    MD5 1844a18c09ee3f7b5725bb788fa43ac1
-#    )
-#add_rostest(functional/hole_detector_test.launch)
+  download_data(
+    ${PROJECT_NAME}_hole_detector_test.bag
+    http://downloads.pandora.ee.auth.gr/bags/hole_detector_test.bag
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
+    MD5 1844a18c09ee3f7b5725bb788fa43ac1
+    )
+
+  add_rostest(functional/hole_detector_test.launch
+    DEPENDENCIES ${PROJECT_NAME}_hole_detector_test.bag)
+endif()

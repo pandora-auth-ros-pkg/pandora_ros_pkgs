@@ -44,12 +44,12 @@
 #include "pandora_vision_common/vision_handler.h"
 #include "pandora_vision_motion/motion_preprocessor.h"
 #include "pandora_vision_motion/motion_postprocessor.h"
-#include "pandora_vision_motion/motion_detector.h"
+#include "pandora_vision_motion/motion_processor.h"
 
 namespace pandora_vision
 {
   class MotionHandler : public VisionHandler<MotionPreProcessor, 
-    MotionDetector, MotionPostProcessor>
+    MotionProcessor, MotionPostProcessor>
   {
     public:
       explicit MotionHandler(const std::string& ns);

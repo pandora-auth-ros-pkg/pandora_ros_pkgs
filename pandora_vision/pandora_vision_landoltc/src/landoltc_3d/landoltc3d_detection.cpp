@@ -305,9 +305,9 @@ void LandoltC3dDetection::predatorCallback(
        _frame_id, _parent_frame_id));
   }
 
-  cv::Rect bounding_box = cv::Rect(msg.areaOfInterest.center.x, 
-      msg.areaOfInterest.center.y, msg.areaOfInterest.width,
-      msg.areaOfInterest.height);
+  cv::Rect bounding_box = cv::Rect(msg.regionOfInterest.center.x, 
+      msg.regionOfInterest.center.y, msg.regionOfInterest.width,
+      msg.regionOfInterest.height);
   float posterior = msg.posterior;
   //ROS_INFO("Getting Frame From Predator");
   _landoltc3dDetector.setPredatorValues(bounding_box, posterior);

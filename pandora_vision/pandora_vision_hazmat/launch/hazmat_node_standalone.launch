@@ -1,13 +1,38 @@
 <launch>
   <include file="$(find state_manager)/launch/stateManager.launch" />
    
-  <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
-    <arg name="camID" value="/dev/video1"/>
-    <arg name="name" value="right_camera"/>
-    <arg name="topic_name" value="/kinect/rgb/image_raw"/>
-    <arg name="frame_id" value="right_camera_link"/>
-  </include>
-  
+  <arg name="openni" default="false" />
+
+  <group if="$(arg openni)">
+    <include file="$(find openni_launch)/launch/openni.launch" >
+      <arg name="camera" value="kinect"/>
+      <arg name="depth_registration" value="true" />
+      <arg name="publish_tf" value="false" />
+    </include>
+  </group>
+
+  <arg name="openni2" default="false" />
+
+  <group if="$(arg openni2)">
+    <include file="$(find openni2_launch)/launch/openni2.launch" >
+      <arg name="camera" value="kinect"/>
+      <arg name="depth_registration" value="true" />
+      <arg name="publish_tf" value="false" />
+    </include>
+  </group>
+
+  <arg name="usbcamera" default="true" />
+  <arg name="camID" default="/dev/video1" />
+
+  <group if="$(arg usbcamera)">
+    <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch">
+      <arg name="camID" value="$(arg camID)" /> 
+      <arg name="topic_name" value="/kinect/rgb/image_raw" />
+    </include>
+  </group>
+
   <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
    
+  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+
 </launch>

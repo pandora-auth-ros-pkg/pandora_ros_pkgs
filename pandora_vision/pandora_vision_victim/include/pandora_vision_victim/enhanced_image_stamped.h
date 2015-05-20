@@ -54,17 +54,17 @@ namespace pandora_vision
       
     public:
       bool isDepth;
-      std::vector<Rect2f> areasOfInterest;
+      std::vector<Rect2f> regionsOfInterest;
       
     public:
       void setDepth(bool depth);
       bool getDepth() const;
 
-      void setAreas(const std::vector<Rect2f>&);
-      std::vector<Rect2f> getAreas() const;
+      void setRegions(const std::vector<Rect2f>&);
+      std::vector<Rect2f> getRegions() const;
       
-      void setArea(int , const Rect2f&);
-      Rect2f getArea(int it) const;
+      void setRegion(int , const Rect2f&);
+      Rect2f getRegion(int it) const;
   };
 
   void EnhancedImageStamped::setDepth(bool depth)
@@ -76,24 +76,26 @@ namespace pandora_vision
     return isDepth;
   }
 
-  void EnhancedImageStamped::setAreas(const std::vector<EnhancedImageStamped::Rect2f>& areas)
+  void EnhancedImageStamped::setRegions(const std::vector<EnhancedImageStamped::Rect2f>& regions)
   {
-    areasOfInterest = areas;
+    regionsOfInterest = regions;
   }
-  std::vector<EnhancedImageStamped::Rect2f> EnhancedImageStamped::getAreas() const
+  std::vector<EnhancedImageStamped::Rect2f> EnhancedImageStamped::getRegions() const
   {
-    return areasOfInterest;
+    return regionsOfInterest;
   }
   
-  void EnhancedImageStamped::setArea(int it, const Rect2f& area)
+  void EnhancedImageStamped::setRegion(int it, const Rect2f& region)
   {
     if (it == 0)
-      areasOfInterest.clear();
-    areasOfInterest.push_back(area);
+    {
+      regionsOfInterest.clear();
+    }
+    regionsOfInterest.push_back(region);
   }
-  EnhancedImageStamped::Rect2f EnhancedImageStamped::getArea(int it) const
+  EnhancedImageStamped::Rect2f EnhancedImageStamped::getRegion(int it) const
   {
-    return areasOfInterest[it];
+    return regionsOfInterest[it];
   }
   
   typedef EnhancedImageStamped::Rect2f Rect2f;

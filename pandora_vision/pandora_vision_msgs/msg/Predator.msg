@@ -1,4 +1,4 @@
 Header header
-pandora_vision_msgs/AreaOfInterest areaOfInterest
+pandora_vision_msgs/RegionOfInterest regionOfInterest
 sensor_msgs/Image image
 float32 posterior

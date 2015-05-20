@@ -24,5 +24,5 @@
   </include>
   <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
-  
+
 </launch>

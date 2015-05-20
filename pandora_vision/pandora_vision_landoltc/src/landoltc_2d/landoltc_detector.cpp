@@ -43,6 +43,9 @@ namespace pandora_vision
   LandoltCDetector::LandoltCDetector(const std::string& ns, sensor_processor::Handler* handler) :
     VisionProcessor(ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
+
     _minDiff = 60;
     _threshold = 90;
     _edges = 0;
@@ -198,13 +201,13 @@ namespace pandora_vision
       
       // std::cout << "Angle of " << i <<" is : " << angle*(180/3.14159265359) << std::endl;
       // ROS_INFO("Angle of %d is %lf \n", i, angle*(180/3.14159265359));
-      temp->getAngles().push_back(angle);
+      temp->angles.push_back(angle);
     }
     
     if (params.visualization)
     {
       cv::imshow("paddedptr", paddedptr); 
-      cv::waitKey(30); 
+      cv::waitKey(5); 
     }
     _edges = 0;
     _edgePoints.clear();
@@ -393,7 +396,7 @@ namespace pandora_vision
         if (params.visualization)
         {
           cv::imshow("padded", padded); 
-          cv::waitKey(30);
+          cv::waitKey(5);
         }
         findRotationB(padded, _landoltc[i]);
       }
@@ -523,6 +526,7 @@ namespace pandora_vision
   **/
   std::vector<POIPtr> LandoltCDetector::begin(cv::Mat input)
   {
+    _centers.clear();
     _landoltc.clear();
     cv::Mat gray, gradX, gradY, binary;
     cv::Mat erodeKernel(cv::Size(1, 1), CV_8UC1, cv::Scalar(1));
@@ -566,13 +570,15 @@ namespace pandora_vision
     if (params.visualization)
     {
       cv::imshow("Raw", input);
-      cv::waitKey(20);
+      cv::waitKey(5);
     }
     fusion();
     
     std::vector<POIPtr> landoltc;
     for (int ii = 0; ii < _landoltc.size(); ii++)
     {
+      if (_landoltc[ii]->getProbability() <= 0)
+        continue;
       landoltc.push_back(_landoltc[ii]);
     }
     return landoltc;
@@ -621,6 +627,8 @@ namespace pandora_vision
       {
         _landoltc[i]->setProbability(1);
       }
+      else
+        _landoltc[i]->setProbability(0);
     }
   }  
 

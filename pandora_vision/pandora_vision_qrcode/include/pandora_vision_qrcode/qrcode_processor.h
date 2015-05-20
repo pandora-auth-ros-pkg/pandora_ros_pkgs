@@ -32,98 +32,87 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: Miltiadis-Alexios Papadopoulos
+ * Authors:
+ *   Miltiadis-Alexios Papadopoulos
+ *   Vassilis Choutas <vasilis4ch@gmail.com>
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H
-#define PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H
+#ifndef PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H
+#define PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <zbar.h>
-#include <opencv2/opencv.hpp>
+
+#include <dynamic_reconfigure/server.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+
+#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
 #include "pandora_vision_common/cv_mat_stamped.h"
 #include "pandora_vision_common/pois_stamped.h"
-#include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
-#include "pandora_vision_qrcode/qrcode_poi.h"
+
+#include "pandora_vision_qrcode/qrcode_detector.h"
+#include "pandora_vision_qrcode/qrcode_cfgConfig.h"
+
 
 namespace pandora_vision
 {
-  class QrCodeDetector : public VisionProcessor
+  class QrCodeProcessor : public VisionProcessor
   {
     public:
       typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
 
-      QrCodeDetector(const std::string& ns, sensor_processor::Handler* handler);
-      QrCodeDetector();
-      virtual ~QrCodeDetector() {}
+      /*
+       * @brief: The Main constructor for the QR code Processor objects.
+       * @param ns[const std::string&]: The namespace for the node.
+       * @param handler[sensor_processor::Handler*]: A pointer to the handler
+       * of the processor used to access the nodehandle of the node
+       */
+      QrCodeProcessor(const std::string& ns,
+          sensor_processor::Handler* handler);
+      /*
+       * @brief: The default constructor for the QR Code Processor objects
+      */
+      QrCodeProcessor();
+      virtual ~QrCodeProcessor() {}
 
       virtual bool
-        process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
-
-      void set_debug(bool flag)
-      {
-        debugQrcode_ = flag;
-      };
-
-      cv::Mat get_debug_frame()
-      {
-        return debug_frame;
-      };
+        process(const CVMatStampedConstPtr& input,
+            const POIsStampedPtr& output);
 
     private:
-      //!< Filter Parameters
-      int gaussiansharpenblur;
-      double gaussiansharpenweight;
+      boost::shared_ptr<QrCodeDetector> detectorPtr_;
+
+      //!< Debug image topic
+      std::string debugTopic_;
 
       //!< Debug images publisher flag
-      bool debugQrcode_;
-
-      //!< Input frame
-      cv::Mat input_frame;
-
-      //!< Grayscale frame, processed for QrCode detection
-      cv::Mat gray_frame;
-
-      //!< Frame for debug purposes
-      cv::Mat debug_frame;
-
-      //!< QrCode scanner
-      zbar::ImageScanner scanner;
-
+      bool debugPublish_;
+      
       //!< List of detected qrcodes
       std::vector<POIPtr> qrcode_list;
       
       //!< Debug publisher for QrCodeDetector
-      image_transport::Publisher debugPublisher_;
+      // boost::shared_ptr<image_transport::Publisher> debugPublisherPtr_;
+
+      //!< The dynamic reconfigure parameters' server
+      dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
+        server;
+      //!< The dynamic reconfigure parameters' callback
+      dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
+        ::CallbackType f;
 
       /**
-       * @brief Get parameters referring to Qrcode detection algorithm
-       * @return void
-       */
-      void getQrCodeParams();
-
-      /**
-        @brief Detects qrcodes and stores them in a vector.
-        @param frame [cv::Mat] The image in which the QRs are detected
+        @brief The function called when a parameter is changed
+        @param[in] config [const pandora_vision_qrcode::qrcode_cfgConfig&]
+        @param[in] level [const uint32_t] The level 
         @return void
-       **/
-      std::vector<POIPtr> detectQrCode(cv::Mat input_frame);
-
-      /**
-        @brief Creates view for debugging purposes.
-        @param image [zbar::Image&] The image
-        @return void
-       **/
-      void debug_show(const zbar::Image&);
-      
-      friend class QrCodeDetectorTest;
+      **/
+      void parametersCallback(
+        const pandora_vision_qrcode::qrcode_cfgConfig& config,
+        const uint32_t& level);
   };
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H
+#endif  // PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H

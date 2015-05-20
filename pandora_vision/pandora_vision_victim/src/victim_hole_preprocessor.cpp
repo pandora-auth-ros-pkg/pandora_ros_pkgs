@@ -44,7 +44,11 @@ namespace pandora_vision
   VictimHolePreProcessor::VictimHolePreProcessor(const std::string& ns, 
     sensor_processor::Handler* handler) :
     sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
-    EnhancedImageStamped>(ns, handler) {}
+    EnhancedImageStamped>(ns, handler)
+  {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
+  }
   
   VictimHolePreProcessor::~VictimHolePreProcessor() {}
   
@@ -63,11 +67,11 @@ namespace pandora_vision
 
     output->setDepth(input->isDepth);
 
-    for (int ii = 0; ii < input->areasOfInterest.size(); ii++)
+    for (int ii = 0; ii < input->regionsOfInterest.size(); ii++)
     {
-      Rect2f rect(input->areasOfInterest[ii].center.x, input->areasOfInterest[ii].center.y, 
-        input->areasOfInterest[ii].width, input->areasOfInterest[ii].height);
-      output->setArea(ii, rect);
+      Rect2f rect(input->regionsOfInterest[ii].center.x, input->regionsOfInterest[ii].center.y, 
+        input->regionsOfInterest[ii].width, input->regionsOfInterest[ii].height);
+      output->setRegion(ii, rect);
     }
     return true;
   }

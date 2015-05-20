@@ -47,7 +47,6 @@ include_directories(
 ################# motion detector #################
 add_library(${PROJECT_NAME}_detector
   src/motion_detector.cpp
-  src/motion_parameters.cpp
 )
 add_dependencies(${PROJECT_NAME}_detector
     ${catkin_EXPORTED_TARGETS}
@@ -56,6 +55,22 @@ add_dependencies(${PROJECT_NAME}_detector
 target_link_libraries(${PROJECT_NAME}_detector
   ${catkin_LIBRARIES}
 )
+
+
+################# motion processor #################
+add_library(${PROJECT_NAME}_processor
+  src/motion_processor.cpp
+)
+add_dependencies(${PROJECT_NAME}_processor
+    ${catkin_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+target_link_libraries(${PROJECT_NAME}_processor
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_detector
+
+)
+
 
 ################# motion preprocessor #################
 add_library(${PROJECT_NAME}_preprocessor
@@ -83,8 +98,8 @@ add_library(${PROJECT_NAME}_handler
 )
 target_link_libraries(${PROJECT_NAME}_handler
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_detector
-  ${PROJECT_NAME}_preprocessor
+  ${PROJECT_NAME}_processor
+ ${PROJECT_NAME}_preprocessor
   ${PROJECT_NAME}_postprocessor
 )
 

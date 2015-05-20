@@ -151,6 +151,11 @@ namespace file_utilities
                                std::vector<cv::Rect>* boundingBox,
                                std::vector<std::string>* annotatedImages,
                                std::vector<int>* classAttributes);
+
+  /**
+   * @brief
+   */
+  int findNumberOfAnnotations(const std::string& filename);
 }  // namespace file_utilities
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_FILE_UTILITIES_H

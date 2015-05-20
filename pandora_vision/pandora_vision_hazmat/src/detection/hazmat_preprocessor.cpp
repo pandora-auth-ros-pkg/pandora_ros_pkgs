@@ -42,11 +42,13 @@
 namespace pandora_vision
 {
   HazmatPreProcessor::HazmatPreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler)
+    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler, 
+    sensor_msgs::image_encodings::BGR8)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
   
-  HazmatPreProcessor::~HazmatPreProcessor()
-  {
-  }
+  HazmatPreProcessor::~HazmatPreProcessor() {}
+
 }  // namespace pandora_vision

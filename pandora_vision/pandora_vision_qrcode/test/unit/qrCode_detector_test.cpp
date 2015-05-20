@@ -34,7 +34,7 @@
  * *
  * * Author: Vasilis Bosdelekidis
  * *********************************************************************/
-#include "pandora_vision_qrcode/qrCode_detector.h"
+#include "pandora_vision_qrcode/qrcode_detector.h"
 #include "gtest/gtest.h"
 #include "ros/ros.h"
 #include "ros/package.h"
@@ -48,29 +48,49 @@ namespace pandora_vision
   class QrCodeDetectorTest : public ::testing::Test
   {
     public:
-      QrCodeDetectorTest() : qrCodeDetector_() {}
+      QrCodeDetectorTest() : qrCodeDetectorPtr_() {}
 
       virtual void SetUp()
       {
         WIDTH = 640;  // getParam
         HEIGHT = 480;
+
+        std::string pkgPath = ros::package::getPath("pandora_vision_qrcode");
+        std::string paramsPath = pkgPath + "/" + "config/qrcode_params.yaml";
+
+        // cv::FileStorage fs(paramsPath, cv::FileStorage::READ);
+
+        int gaussianSharpenBlur = 5;
+        float gaussianSharpenWeight = 0.8;
+        bool debugCode = false;
+
+        // fs["debugQrCode"] >> debugCode;
+        // fs["qrCodeSharpenBlur"] >> gaussianSharpenBlur;
+        // fs["qrCodeSharpenWeight"] >> gaussianSharpenWeight;
+
+        qrCodeDetectorPtr_ = new QrCodeDetector(gaussianSharpenBlur,
+            gaussianSharpenWeight, debugCode);
+
+        ASSERT_FALSE(qrCodeDetectorPtr_ == false) << "Could not initialize"
+          << " the QR Code detector!";
       }
 
       std::vector<POIPtr> detectQrCode(cv::Mat frame);
       int* locateQrCode(cv::Point2f center);
 
-      void drawChessboard(int blocksNumberH, int blocksNumberV, cv::Mat& image);
+      void drawChessboard(int blocksNumberH, int blocksNumberV,
+          cv::Mat& image);
 
       int WIDTH;
       int HEIGHT;
 
     private:
-      QrCodeDetector qrCodeDetector_;
+      QrCodeDetector* qrCodeDetectorPtr_;
   };
 
   std::vector<POIPtr> QrCodeDetectorTest::detectQrCode(cv::Mat frame)
   {
-    return qrCodeDetector_.detectQrCode(frame);
+    return qrCodeDetectorPtr_->detectQrCode(frame);
   }
 
   int* QrCodeDetectorTest::locateQrCode(cv::Point2f qrcode_center)
@@ -163,49 +183,4 @@ namespace pandora_vision
     EXPECT_EQ(0, qrcode_list.size());
   }
 
-  // TEST_F (QrCodeDetectorTest, locateQrCodeInImage)
-  // {
-  //    std::stringstream fileName;
-  //    std::vector<QrCode> qrcode_list;
-  //    cv::Mat inputFrame;
-  //    int* center;
-  //    int  cArray[9];
-  //    FILE *fpr;
-  //    fileName.str("");
-  //    fileName << ros::package::getPath("pandora_vision_qrcode");
-  //    fileName << "/test/unit/data/" << "test_qr_centers.txt"; 
-  //    fpr = fopen(fileName.str().c_str(), "r");
-  //    fileName.str("");
-  //    for(int i = 1; i < 13; i ++){
-  //        fileName << ros::package::getPath("pandora_vision_qrcode");
-  //        fileName << "/test/unit/data/" << "test_qr_" << i << ".jpg"; 
-  //        inputFrame = cv::imread(fileName.str());
-  //        fscanf(fpr, " %d", &cArray[0]);
-  //        for( int j = 1; j < (1 + cArray[0] * 4); j ++)
-  //        {
-  //            fscanf(fpr, " %d", &cArray[j]);
-  //        }
-  //        if(!inputFrame.data)
-  //        {
-  //            ROS_ERROR("Cannot open image.");
-  //            fileName.str("");
-  //            continue;
-  //        }
-  //        qrcode_list = detectQrCode(inputFrame);
-  //        EXPECT_EQ(cArray[0], qrcode_list.size());
-  //        if(cArray[0] == qrcode_list.size())
-  //        {
-  //            for( int j = 0; j < qrcode_list.size(); j ++)
-  //            {
-  //                center = locateQrCode(qrcode_list[j].qrcode_center);
-  //                EXPECT_LE(cArray[1 + 0 + j * 4], center[0]);   
-  //                EXPECT_GE(cArray[1 + 1 + j * 4], center[0]);   
-  //                EXPECT_LE(cArray[1 + 2 + j * 4], center[1]);   
-  //                EXPECT_GE(cArray[1 + 3 + j * 4], center[1]);   
-  //            }
-  //        }
-  //        fileName.str("");
-  //    }
-  //    fclose(fpr);
-  // }
 }  // namespace pandora_vision

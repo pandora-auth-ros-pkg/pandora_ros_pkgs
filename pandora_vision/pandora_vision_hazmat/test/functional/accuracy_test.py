@@ -11,7 +11,7 @@ import rospkg
 
 PKG_PATH = rospkg.RosPack().get_path(PKG)
 
-from pandora_testing_tools.testing_interface import vision_test_base
+from pandora_testing_tools.testing_interface import vision_benchmark_test_base
 from sensor_msgs.msg import Image
 
 class AccuracyTester(test_base.TestBase):
@@ -34,7 +34,6 @@ class AccuracyTester(test_base.TestBase):
             # Read the next image.
             currentImg = cv2.imread(os.path.join(imagePath,
                                     fileName), -1)
->>>>>>> Split source into correct folders,add training code [ci skip]
 
 
 class AccuracyTester(vision_test_base.VisionTestBase):
@@ -43,7 +42,7 @@ class AccuracyTester(vision_test_base.VisionTestBase):
                           "/camera/image_raw", "/alert/hazmat")
 
 if __name__ == "__main__":
-    
+
     subscriber_topics = [
         ("/alert/hazmat", "std_msgs", "Bool")]
     publisher_topics = [

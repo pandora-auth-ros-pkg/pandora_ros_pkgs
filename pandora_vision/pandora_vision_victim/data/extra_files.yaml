@@ -1,15 +1,7 @@
 files:
-#- md5: abe6f09759f340f7a93d26b993be8fd0
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_svm_classifier.xml
-#- md5: f5c66539e2f0e416312bf467781f7f46
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_mean_values.xml
-#- md5: a10bf2f73c163a03b5f29afc06f60150
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_standard_deviation_values.xml
-#- md5: 6373fed09155da4d59d1fb9c849f9ba2
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_svm_classifier.xml
-#- md5: 7fa67b5f49dcdadd0ed19d0da279adfe
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_mean_values.xml
-#- md5: 9c135202d3e77d74e0ce927c6509ecbb
-  #url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_standard_deviation_values.xml
-- md5: 1b2263183819cd2553f73ed9e890f9cd
-  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/test/box.png
+- md5: 61d88d473ec593210735d58dd506af88
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_svm_classifier.xml
+- md5: 8e7d6ec98b3b85974aaa9c2a7289dc25
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_mean_values.xml
+- md5: 9a838388cc0477792d396b70450f0907
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_standard_deviation_values.xml

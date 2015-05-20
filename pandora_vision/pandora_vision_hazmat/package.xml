@@ -22,6 +22,7 @@
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>pandora_vision_common</depend>
+  <depend>pandora_common_msgs</depend>
   <depend>pandora_vision_msgs</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
@@ -30,6 +31,7 @@
   <depend>urdf</depend>
 
   <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>pandora_vision_support</test_depend>
   <test_depend>rostest</test_depend>
 
   <export>

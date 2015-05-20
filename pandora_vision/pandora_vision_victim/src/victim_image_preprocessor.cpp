@@ -43,7 +43,11 @@ namespace pandora_vision
 {
   VictimImagePreProcessor::VictimImagePreProcessor(const std::string& ns, 
     sensor_processor::Handler* handler) : sensor_processor::PreProcessor<sensor_msgs::PointCloud2, 
-    ImagesStamped>(ns, handler) {}
+    ImagesStamped>(ns, handler)
+  {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
+  }
   
   VictimImagePreProcessor::~VictimImagePreProcessor() {}
   

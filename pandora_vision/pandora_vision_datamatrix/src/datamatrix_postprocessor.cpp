@@ -45,6 +45,8 @@ namespace pandora_vision
   DataMatrixPostProcessor::DataMatrixPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
     VisionPostProcessor<pandora_vision_msgs::DataMatrixAlertVector>(ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
 
   DataMatrixPostProcessor::~DataMatrixPostProcessor()
