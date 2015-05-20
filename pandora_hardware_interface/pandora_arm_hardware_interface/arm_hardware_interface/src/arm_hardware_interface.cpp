@@ -79,7 +79,7 @@ namespace arm
   void ArmHardwareInterface::read()
   {
     uint16_t value;
-    //ROS_INFO("Will read CO2");
+    // ROS_INFO("Will read CO2");
     // read CO2 percentage from CO2 sensors
     for (int ii = 0; ii < co2SensorName_.size(); ii++)
     {
@@ -93,14 +93,14 @@ namespace arm
       arm_->readGrideyeValues(thermalSensorCode_[ii], thermalData_[ii]);
     }
 
-    //ROS_INFO("Will read SONARS");
+    // ROS_INFO("Will read SONARS");
     // read distances from range sensors
     for (int ii = 0; ii < rangeSensorName_.size(); ii++)
     {
       arm_->readSonarValues(rangeSensorCode_[ii], &value);
       range_[ii] = static_cast<double>(value) / 100;
     }
-    //ROS_INFO("Will read BATTERIES");
+    // ROS_INFO("Will read BATTERIES");
     // read voltage of batteries
     for (int ii = 0; ii < batteryName_.size(); ii++)
     {

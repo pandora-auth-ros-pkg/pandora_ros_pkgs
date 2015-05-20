@@ -106,33 +106,19 @@ namespace arm
   {
     // flush both data received but not read and data written but not transmitted
     tcflush(fd, TCIOFLUSH);
-    //ROS_INFO("JUST FLUSHED BUFFER");
-    
-    
+    // ROS_INFO("JUST FLUSHED BUFFER");
+
     fd_set set;
     struct timeval timeout;
     int rv;
     uint8_t buff[100];
     int len = 100;
-  
+
     FD_ZERO(&set); /* clear the set */
     FD_SET(fd, &set); /* add our file descriptor to the set */
 
     timeout.tv_sec = 3;
     timeout.tv_usec = 0;
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     int nr;
 
@@ -144,95 +130,96 @@ namespace arm
       return WRITE_ERROR;
     }
 
-
     //------------- READ NACK -------------
-   // union
-   // {
+    // union
+    // {
       uint8_t * nackBufInUint8;
-   //   uint16_t nackBufInUint16;
-   // };
-   
-   union{
-     uint8_t nack8[NACK_NBYTES];
-     uint16_t nack16;
-   };
-    
+    //   uint16_t nackBufInUint16;
+    // };
+
+    union
+    {
+      uint8_t nack8[NACK_NBYTES];
+      uint16_t nack16;
+    };
+
     nackBufInUint8 = new uint8_t [NACK_NBYTES];
-    
-    //ROS_INFO("After Write Process");
-    for(int i=0;i<NACK_NBYTES;i++){
+
+    // ROS_INFO("After Write Process");
+    for (int i = 0; i < NACK_NBYTES; i++){
       rv = select(fd + 1, &set, NULL, NULL, &timeout);
-      if(rv == -1){
+      if (rv == -1){
         ROS_ERROR("select error at NACK!"); /* an error accured */
         return SELECT_ERROR;
       }
-      else if(rv == 0){
+      else if (rv == 0){
         ROS_INFO("timeout at NACK!"); /* a timeout occured */
         return READ_TIMEOUT;
       }
-	    //ROS_INFO("Before NACK read");
-      nr = read(fd, (void*)nackBufInUint8++, 1);
+      // ROS_INFO("Before NACK read");
+      nr = read(fd, nackBufInUint8++, 1);
       nack8[i] = *(--nackBufInUint8);
-	    //ROS_INFO("After NACK read %x",*(nackBufInUint8));
-	    nackBufInUint8++;
+      // ROS_INFO("After NACK read %x",*(nackBufInUint8));
+
+      nackBufInUint8++;
+
       if (nr < 0)
       {
         ROS_ERROR("[Arm]: Read Error\n");
         reconnectUsb();
         return READ_ERROR;
       }
-    //else if (nr != NACK_NBYTES)
-    //{
+    // else if (nr != NACK_NBYTES)
+    // {
     //  ROS_ERROR("[Arm]: Wrong number of bytes read\n");
     //  reconnectUsb();
     //  return INCORRECT_NUM_OF_BYTES;
-    //}
-    
-      
-      
-   } //end for
-   
-   if (!(nack16 == 0x0001))
-      {
-        ROS_ERROR("[Arm]: Received NACK: %x",nack16);
-        return RECEIVED_NACK;
-      }
-      //else
-        //ROS_INFO("Received ACK!!!!!!!!!!!!!! : %x",nack16);
-     
-// ------------------------------------------------------
-    for(int i=0;i<read_bytes;i++){
-    rv = select(fd + 1, &set, NULL, NULL, &timeout);
-    if(rv == -1){
-      ROS_ERROR("select error!"); /* an error accured */
-      return SELECT_ERROR;
-    }
-    else if(rv == 0){
-      ROS_INFO("timeout!"); /* a timeout occured */
-      return READ_TIMEOUT;
-    }
-    //ROS_INFO("Before BUFFER READ");
-    nr = read(fd, (void *)readBuf++, 1);  // blocking
-	  //ROS_INFO("After BUFFER READ");
-    if (nr < 0)
+    // }
+    }  // end for
+
+    if (!(nack16 == 0x0001))
     {
-      ROS_ERROR("[Arm]: Read Error\n");
-      reconnectUsb();
-      return READ_ERROR;
+      ROS_ERROR("[Arm]: Received NACK: %x", nack16);
+      return RECEIVED_NACK;
     }
-    else if (nr == 0){
-	  ROS_ERROR("GOT TIMEOUT!");
-	  return READ_TIMEOUT;
+    // else
+      // ROS_INFO("Received ACK!!!!!!!!!!!!!! : %x",nack16);
+// ------------------------------------------------------
+    for (int i = 0; i < read_bytes; i++)
+    {
+      rv = select(fd + 1, &set, NULL, NULL, &timeout);
+      if (rv == -1)
+      {
+        ROS_ERROR("select error!"); /* an error accured */
+        return SELECT_ERROR;
+      }
+      else if (rv == 0)
+      {
+        ROS_INFO("timeout!"); /* a timeout occured */
+        return READ_TIMEOUT;
+      }
+      // ROS_INFO("Before BUFFER READ");
+      nr = read(fd, readBuf++, 1);  // blocking
+      // ROS_INFO("After BUFFER READ");
+      if (nr < 0)
+      {
+        ROS_ERROR("[Arm]: Read Error\n");
+        reconnectUsb();
+        return READ_ERROR;
+      }
+      else if (nr == 0)
+      {
+        ROS_ERROR("GOT TIMEOUT!");
+        return READ_TIMEOUT;
+      }
+    // else if (nr != read_bytes)
+    // {
+    //   ROS_ERROR("[Arm]: Wrong number of bytes read, nr = %d, read = %d",nr,read_bytes);
+    //   reconnectUsb();
+    //   return INCORRECT_NUM_OF_BYTES;
+    // }
     }
-   // else if (nr != read_bytes)
-   // {
-   //   ROS_ERROR("[Arm]: Wrong number of bytes read, nr = %d, read = %d",nr,read_bytes);
-   //   reconnectUsb();
-   //   return INCORRECT_NUM_OF_BYTES;
-   // }
-    }
-    //readBuf = buff;
-    
+    // readBuf = buff;
   }
 
 
