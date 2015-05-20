@@ -4,28 +4,28 @@
   <arg name="description" default="true"/>
 
   <arg name="state_manager" default="true"/>
-  
+
   <arg name="motors" default="true"/>
   <arg name="dynamixel" default="true"/>
   <arg name="imu" default="true"/>
   <arg name="imu_device" default="trax"/>
-  <arg name="arm" default="false"/>
+  <arg name="arm" default="true"/>
   <arg name="hardware_tools" default="true"/>
-  
+
   <arg name="stabilizer" default="true"/>
-  <arg name="eef" default="false"/>
-  
+  <arg name="eef" default="true"/>
+
   <arg name="slam" default="true"/>
-  
+
   <arg name="navigation" default="true"/>
-  
-  <arg name="data_fusion" default="false"/>
-  
+
+  <arg name="data_fusion" default="true"/>
+
   <arg name="xtion" default="false"/>
   <arg name="vision" default="true"/>
-  
+
   <arg name="bag" default="false"/>
-  
+
   <!-- ##################################################################### -->
 
   <!-- Robot description -->
@@ -37,8 +37,11 @@
   <group if="$(arg state_manager)">
     <include file="$(find state_manager)/launch/stateManager.launch"/>
   </group>
-  
+
   <!-- Hardware interface -->
+  <group if="$(arg arm)">
+    <include file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface_and_controllers.launch" />
+  </group>
   <group if="$(arg motors)">
     <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface_and_controllers.launch" >
       <arg name="robot" value="$(arg robot)" />
@@ -51,9 +54,6 @@
     <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" >
       <arg name="device" value="$(arg imu_device)" />
     </include>
-  </group>
-  <group if="$(arg arm)">
-    <include file="$(find pandora_arm_hardware_interface)/arm_hardware_interface/launch/arm_hardware_interface_and_controllers.launch" />
   </group>
   <group if="$(arg hardware_tools)">
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
@@ -78,7 +78,7 @@
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
     <include file="$(find pandora_exploration)/launch/explorer.launch" />
   </group>
-  
+
   <!-- Data fusion -->
   <group if="$(arg data_fusion)">
     <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
@@ -92,7 +92,7 @@
       <arg name="publish_tf" value="false" />
     </include>
   </group>
-  
+
   <!-- Vision -->
   <group if="$(arg vision)">
     <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
@@ -102,5 +102,5 @@
     <node name="bag" type="record" pkg="rosbag"
       args="-b 0 /kinect/rgb/image_raw/compressed /kinect/depth_registered/points /sensors/imu_rpy /tf /laser/scan /slam/map" />
   </group>
-  
+
 </launch>
