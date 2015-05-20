@@ -51,11 +51,13 @@ from state_manager.state_client import StateClient
 class TestBase(unittest.TestCase):
 
     def setUp(self):
+
         for topic in self.messageList.keys():
             self.messageList[topic] = []
 
     @classmethod
     def mockCallback(cls, data, output_topic):
+
         rospy.logdebug("Got message from topic : " + str(output_topic))
         rospy.logdebug(data)
         cls.messageList[output_topic].append(data)
@@ -63,6 +65,7 @@ class TestBase(unittest.TestCase):
         cls.block.set()
 
     def mockPublish(self, input_topic, output_topic, data):
+
         self.block.clear()
         self.repliedList[output_topic] = False
         self.messageList[output_topic] = list()
@@ -81,6 +84,7 @@ class TestBase(unittest.TestCase):
 
     def assertSimpleResult(self, input_topic, input_data,
                            output_topic, assert_data):
+
         self.mockPublish(input_topic, output_topic, input_data)
         self.assertTrue(self.repliedList[output_topic])
         self.assertEqual(len(self.messageList[output_topic]), 1)
@@ -88,6 +92,8 @@ class TestBase(unittest.TestCase):
         self.assertEqual(output_data, assert_data)
 
     def simpleBenchmark(self, input_topic, output_topic, data, N=10):
+
+        self.benchmarking = True
         duration = time.time()
         for _ in xrange(N):
             self.mockPublish(input_topic, output_topic, data)
