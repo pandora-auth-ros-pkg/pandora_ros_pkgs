@@ -1,10 +1,11 @@
 <launch>
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
-    
+
   <include file="$(find pandora_sensor_processing)/launch/co2_processor.launch" />
-  <rosparam file="$(find pandora_sensor_processing)/config/sensor_processing/co2_processor_test_params.yaml" command="load" ns="sensor_processing/co2_processor"/>
-  
+  <rosparam file="$(find pandora_sensor_processing)/config/pandora_sensor_processing/co2_processor_test_params.yaml"
+      command="load" ns="/pandora_sensor_processing/pandora_co2_processor"/>
+
   <test test-name="Co2ProcessorTest" pkg="pandora_sensor_processing"
     type="co2_processor_test.py"/>
 

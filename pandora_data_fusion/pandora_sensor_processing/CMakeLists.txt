@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Eigen REQUIRED)
 
 generate_dynamic_reconfigure_options(
-  config/sensor_processing/SensorProcessing.cfg
+  config/pandora_sensor_processing/SensorProcessing.cfg
   )
 
 catkin_package(
@@ -42,8 +42,8 @@ include_directories(
 
 ########################  utils  ####################################
 
-add_library(${PROJECT_NAME}_sensor_utils src/utils.cpp)
-target_link_libraries(${PROJECT_NAME}_sensor_utils
+add_library(${PROJECT_NAME}_utils src/utils.cpp)
+target_link_libraries(${PROJECT_NAME}_utils
   ${catkin_LIBRARIES}
   )
 
@@ -52,7 +52,7 @@ target_link_libraries(${PROJECT_NAME}_sensor_utils
 add_library(${PROJECT_NAME}_co2_processor src/co2_processor.cpp)
 target_link_libraries(${PROJECT_NAME}_co2_processor
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_sensor_utils
+  ${PROJECT_NAME}_utils
   )
 add_dependencies(${PROJECT_NAME}_co2_processor
   ${catkin_EXPORTED_TARGETS}
@@ -72,7 +72,7 @@ target_link_libraries(co2_node
 add_library(${PROJECT_NAME}_clusterer src/clusterer.cpp)
 target_link_libraries(${PROJECT_NAME}_clusterer
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_sensor_utils
+  ${PROJECT_NAME}_utils
   )
 
 ########################  thermal_processor  ########################
@@ -80,7 +80,7 @@ target_link_libraries(${PROJECT_NAME}_clusterer
 add_library(${PROJECT_NAME}_thermal_processor src/thermal_processor.cpp)
 target_link_libraries(${PROJECT_NAME}_thermal_processor
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_sensor_utils
+  ${PROJECT_NAME}_utils
   ${PROJECT_NAME}_clusterer
   )
 add_dependencies(${PROJECT_NAME}_thermal_processor
@@ -121,7 +121,7 @@ endif()
 ## Install exported libraries
 install(TARGETS ${PROJECT_NAME}_thermal_processor
                 ${PROJECT_NAME}_co2_processor
-                ${PROJECT_NAME}_sensor_utils
+                ${PROJECT_NAME}_utils
                 ${PROJECT_NAME}_clusterer
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

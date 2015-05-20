@@ -32,17 +32,17 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include "sensor_processing/clusterer.h"
+#include "pandora_sensor_processing/clusterer.h"
 
 namespace pandora_sensor_processing
 {
 
   Clusterer::
-    Clusterer(int measurementSize, 
+    Clusterer(int measurementSize,
         int maxClusterMemory, int maxIterations) :
       measurementSize_(measurementSize),
       maxClusterMemory_(maxClusterMemory),
@@ -54,7 +54,7 @@ namespace pandora_sensor_processing
    * @details if dataSet_ has still room for another measurement to track,
    * meaning that clusterer has not currently reached its maxClusterMemory_
    * threshold, it will resize dataSet_ and append current measurement.
-   * Otherwise, it will overwrite the oldest measurement among those in 
+   * Otherwise, it will overwrite the oldest measurement among those in
    * dataSet_. measurementsCounter_, that keeps track of that, is updated.
    */
   void Clusterer::
@@ -72,7 +72,7 @@ namespace pandora_sensor_processing
       measurementsCounter_++;
       if (measurementsCounter_ <= maxClusterMemory_)
       {
-        dataSet_.conservativeResize(4, 
+        dataSet_.conservativeResize(4,
             measurementSize_ * measurementsCounter_);
       }
       dataSet_.block(
@@ -228,7 +228,7 @@ namespace pandora_sensor_processing
       for (int jj = 0; jj < dataSet_.cols(); ++jj)
       {
         //!< Choosing cluster according to datum euclidean distance from means.
-        if (abs(dataSet_(3, jj) - highest) < 
+        if (abs(dataSet_(3, jj) - highest) <
             abs(dataSet_(3, jj) - lowest) || jj == maxCol)
         {
           //!< Resizing cluster1_ by on column and appending qualified datum.

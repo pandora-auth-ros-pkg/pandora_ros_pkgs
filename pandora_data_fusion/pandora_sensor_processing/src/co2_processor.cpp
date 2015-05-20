@@ -32,14 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include <string>
 #include <limits>
 
-#include "sensor_processing/co2_processor.h"
+#include "pandora_sensor_processing/co2_processor.h"
 
 namespace pandora_sensor_processing
 {
@@ -59,8 +59,8 @@ namespace pandora_sensor_processing
       const pandora_sensor_msgs::Co2Msg& msg)
   {
     ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Incoming co2 raw info.", name_.c_str());
-    alert_.yaw = 0;
-    alert_.pitch = 0;
+    alert_.info.yaw = 0;
+    alert_.info.pitch = 0;
     alert_.header = msg.header;
     // Measurement has no information because it has the same value with the ambience.
     if (msg.co2_percentage < ambientCo2_)
@@ -77,10 +77,10 @@ namespace pandora_sensor_processing
         return;
       }
       double timeFromSpike = ros::Time::now().toSec() - spikeTime_;
-      alert_.probability = Utils::weibullPdf(timeFromSpike,
+      alert_.info.probability = Utils::weibullPdf(timeFromSpike,
           SHAPE_PARAMETER, TIME_CONSTANT);
       publishAlert();
-      if (alert_.probability < PROBABILITY_THRES)
+      if (alert_.info.probability < PROBABILITY_THRES)
       {
         ambientCo2_ = msg.co2_percentage;
         spikeFound_ = false;

@@ -44,7 +44,7 @@ import rospy
 
 from state_manager.state_client import StateClient
 from geometry_msgs.msg import Point
-from pandora_common_msgs.msg import GeneralAlertMsg 
+from pandora_common_msgs.msg import GeneralAlertVector
 from pandora_sensor_msgs.msg import Co2Msg
 from sensor_msgs.msg import Image
 
@@ -53,7 +53,7 @@ def distance(a, b):
     return math.sqrt( (a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2 )
 
 def direction(a, b):
-        
+
     dire = Point()
     norm = distance(a, b)
     dire.x = (b.x - a.x)/norm
@@ -76,7 +76,7 @@ class TestBase(unittest.TestCase):
         rospy.sleep(0.1)
         cls.state_changer.transition_to_state(2)
         rospy.sleep(2.)
-        
+
         if processor is "co2":
             cls.mock_publisher = rospy.Publisher("/test/raw_input", Co2Msg)
         elif processor is "thermal":
@@ -90,8 +90,8 @@ class TestBase(unittest.TestCase):
     def setUp(self):
 
         self.mock_subscriber = rospy.Subscriber(
-            "/test/alert_output", 
-            GeneralAlertMsg, self.mockCallback)
+            "/test/alert_output",
+            GeneralAlertVector, self.mockCallback)
         self.alertList = []
         self.replied = False
 

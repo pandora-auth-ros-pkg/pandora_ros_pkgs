@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -43,13 +43,13 @@
 
 #include <dynamic_reconfigure/server.h>
 
-#include "pandora_common_msgs/GeneralAlertMsg.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
 #include "pandora_sensor_processing/SensorProcessingConfig.h"
 
 namespace pandora_sensor_processing
 {
 
-  template <class DerivedProcessor> 
+  template <class DerivedProcessor>
     SensorProcessor<DerivedProcessor>::SensorProcessor(const std::string& ns,
         const std::string& sensorType)
     : nh_(ns), sensorType_(sensorType)
@@ -60,7 +60,7 @@ namespace pandora_sensor_processing
       // Get subscriber topic name.
       if (!nh_.getParam("subscribed_topic_names/raw_input", subscriberTopic_))
       {
-        ROS_FATAL("[%s] %s raw input topic name param not found", 
+        ROS_FATAL("[%s] %s raw input topic name param not found",
             name_.c_str(), sensorType_.c_str());
         ROS_BREAK();
       }
@@ -68,12 +68,12 @@ namespace pandora_sensor_processing
       // Get publisher topic name and register a publisher.
       if (nh_.getParam("published_topic_names/alert_output", publisherTopic_))
       {
-        alertPublisher_ = nh_.advertise<pandora_common_msgs::GeneralAlertMsg>
+        alertPublisher_ = nh_.advertise<pandora_common_msgs::GeneralAlertVector>
           (publisherTopic_, 5);
       }
       else
       {
-        ROS_FATAL("[%s] %s alert output topic name param not found", 
+        ROS_FATAL("[%s] %s alert output topic name param not found",
             name_.c_str(), sensorType_.c_str());
         ROS_BREAK();
       }
@@ -81,7 +81,7 @@ namespace pandora_sensor_processing
       // Set callback for dynamic reconfiguration server.
       dynReconfServer_.setCallback(
           boost::bind(
-            &DerivedProcessor::dynamicReconfigCallback, 
+            &DerivedProcessor::dynamicReconfigCallback,
             static_cast<DerivedProcessor*>(this), _1, _2));
 
       // Get sensor's behaviour according to each robot state.
@@ -115,7 +115,10 @@ namespace pandora_sensor_processing
     void SensorProcessor<DerivedProcessor>::publishAlert()
     {
       ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Publishing alert.", name_.c_str());
-      alertPublisher_.publish(alert_);
+      pandora_common_msgs::GeneralAlertVector alertVector;
+      alertVector.header = alert_.header;
+      alertVector.generalAlerts.push_back(alert_.info);
+      alertPublisher_.publish(alertVector);
     }
 
   template <class DerivedProcessor>
@@ -159,7 +162,7 @@ namespace pandora_sensor_processing
     {
       if (toWork && !working_)
       {
-        sensorSubscriber_ = nh_.subscribe(subscriberTopic_, 1, 
+        sensorSubscriber_ = nh_.subscribe(subscriberTopic_, 1,
             &DerivedProcessor::sensorCallback, static_cast<DerivedProcessor*>(this));
         working_ = true;
       }

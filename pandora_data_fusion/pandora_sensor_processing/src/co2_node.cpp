@@ -32,13 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include <ros/console.h>
 
-#include "sensor_processing/co2_processor.h"
+#include "pandora_sensor_processing/co2_processor.h"
 
 using pandora_sensor_processing::Co2Processor;
 
@@ -53,8 +53,8 @@ int main(int argc, char** argv)
       ros::console::notifyLoggerLevelsChanged();
     }
   }
-  Co2Processor co2Processor("/sensor_processing/co2_processor");
-  ROS_INFO("[SENSOR_PROCESSING] Beginning Co2 Processor node");
+  Co2Processor co2Processor("pandora_co2_processor");
+  ROS_INFO_NAMED("SENSOR_PROCESSING", "[SENSOR_PROCESSING] Beginning Co2 Processor node");
   ros::spin();
   return 0;
 }

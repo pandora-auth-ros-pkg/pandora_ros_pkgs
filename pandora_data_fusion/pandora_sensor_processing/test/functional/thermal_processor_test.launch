@@ -3,9 +3,9 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <node pkg="state_manager" name="state_changer" type="state_changer" args="2" />
 
-  <rosparam file="$(find pandora_sensor_processing)/config/sensor_processing/thermal_processor_test_params.yaml" 
+  <rosparam file="$(find pandora_sensor_processing)/config/pandora_sensor_processing/thermal_processor_test_params.yaml"
     command="load" ns="/test"/>
-  
+
   <test test-name="ThermalProcessorTest" pkg="pandora_sensor_processing"
     type="thermal_processor_test"/>
 

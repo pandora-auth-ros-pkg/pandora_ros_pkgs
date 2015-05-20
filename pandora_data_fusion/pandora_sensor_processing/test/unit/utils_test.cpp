@@ -32,13 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include "gtest/gtest.h"
 
-#include "sensor_processing/utils.h"
+#include "pandora_sensor_processing/utils.h"
 
 namespace pandora_sensor_processing
 {

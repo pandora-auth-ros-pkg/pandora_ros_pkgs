@@ -32,19 +32,19 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include <string>
 
-#include "sensor_processing/thermal_processor.h"
+#include "pandora_sensor_processing/thermal_processor.h"
 
 namespace pandora_sensor_processing
 {
 
   ThermalProcessor::
-    ThermalProcessor(const std::string& ns) : 
+    ThermalProcessor(const std::string& ns) :
       SensorProcessor<ThermalProcessor>(ns, "thermal")
   {
     MAX_CLUSTER_MEMORY = 3;
@@ -72,10 +72,10 @@ namespace pandora_sensor_processing
         frameToClusterer_.end())
     {
       frameToClusterer_[msg.header.frame_id] = ClustererPtr(
-          new Clusterer(msg.height * msg.width, 
+          new Clusterer(msg.height * msg.width,
             MAX_CLUSTER_MEMORY, MAX_CLUSTER_ITERATIONS) );
     }
-      FrameToClusterer::const_iterator 
+      FrameToClusterer::const_iterator
         it = frameToClusterer_.find(msg.header.frame_id);
       if (analyzeImage(msg, (*it).second))
       {
@@ -125,7 +125,7 @@ namespace pandora_sensor_processing
     }
     catch (std::exception& err)
     {
-      ROS_DEBUG_NAMED("SENSOR_PROCESSING", 
+      ROS_DEBUG_NAMED("SENSOR_PROCESSING",
           "[%s/ANALYZE_IMAGE] %s", name_.c_str(), err.what());
       return false;
     }
@@ -161,12 +161,12 @@ namespace pandora_sensor_processing
       // Considering cluster to be a valid alert!
       ROS_INFO_THROTTLE_NAMED(10, "SENSOR_PROCESSING",
           "[%s] Found thermal alert with temperature: %f", name_.c_str(), center(3));
-      alert_.probability = Utils::normalPdf(center(3), 
+      alert_.info.probability = Utils::normalPdf(center(3),
           OPTIMAL_TEMPERATURE, THERMAL_STD_DEV);
       float x = center(0) - static_cast<float>(msg.width) / 2;
       float y = static_cast<float>(msg.height) / 2 - center(1);
-      alert_.yaw = atan(2 * x / msg.width * tan(THERMAL_X_FOV / 2));
-      alert_.pitch = atan(2 * y / msg.height * tan(THERMAL_Y_FOV / 2));
+      alert_.info.yaw = atan(2 * x / msg.width * tan(THERMAL_X_FOV / 2));
+      alert_.info.pitch = atan(2 * y / msg.height * tan(THERMAL_Y_FOV / 2));
       alert_.header = msg.header;
       return true;
     }

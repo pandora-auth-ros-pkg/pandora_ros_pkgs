@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -41,7 +41,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "sensor_processing/utils.h"
+#include "pandora_sensor_processing/utils.h"
 
 namespace pandora_sensor_processing
 {
@@ -89,7 +89,7 @@ namespace pandora_sensor_processing
       }
 
       /**
-       * @brief Getter for current measurement's mean that 
+       * @brief Getter for current measurement's mean that
        * belongs to cluster 1.
        * @param mean [Eigen::Vector4f*] vector representing vector to be filled.
        * @return bool true if there exists at least one cell from current
@@ -106,7 +106,7 @@ namespace pandora_sensor_processing
       }
 
       /**
-       * @brief Getter for current measurement's mean that 
+       * @brief Getter for current measurement's mean that
        * belongs to cluster 2.
        * @param mean [Eigen::Vector4f*] vector representing vector to be filled.
        * @return bool true if there exists at least one cell from current
@@ -185,7 +185,7 @@ namespace pandora_sensor_processing
       {
         maxIterations_ = iterations;
       }
-      
+
     private:
       void
         calculateCovariances();
@@ -214,13 +214,13 @@ namespace pandora_sensor_processing
       Eigen::Matrix4f covariance1_;
       Eigen::Matrix4f covariance2_;
       Eigen::MatrixXf cluster1_;
-      Eigen::MatrixXf cluster2_; 
+      Eigen::MatrixXf cluster2_;
 
       bool currentExistsInCluster1_;
       Eigen::Vector4f currentMean1_;
       bool currentExistsInCluster2_;
       Eigen::Vector4f currentMean2_;
-    
+
     private:
       friend class ClustererTest;
   };

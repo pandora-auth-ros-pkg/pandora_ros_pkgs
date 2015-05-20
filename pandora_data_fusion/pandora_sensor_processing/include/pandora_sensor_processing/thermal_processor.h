@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -43,8 +43,8 @@
 #include <string>
 
 #include "sensor_msgs/Image.h"
-#include "sensor_processing/clusterer.h"
-#include "sensor_processing/sensor_processor.h"
+#include "pandora_sensor_processing/clusterer.h"
+#include "pandora_sensor_processing/sensor_processor.h"
 
 namespace pandora_sensor_processing
 {

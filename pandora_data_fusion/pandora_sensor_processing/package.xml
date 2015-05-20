@@ -2,7 +2,7 @@
   <name>pandora_sensor_processing</name>
   <version>0.0.0</version>
   <description>Processors of raw sensor input produced by hardware interface</description>
-   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -13,15 +13,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>cmake_modules</build_depend> 
-  <build_depend>roslint</build_depend> 
-  <depend>roscpp</depend> 
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>roslint</build_depend>
+  <depend>roscpp</depend>
   <depend>pandora_common_msgs</depend>
   <depend>pandora_sensor_msgs</depend>
-  <depend>sensor_msgs</depend> 
+  <depend>sensor_msgs</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
-  <depend>dynamic_reconfigure</depend> 
+  <depend>dynamic_reconfigure</depend>
 
   <!-- Test dependencies -->
   <test_depend>rostest</test_depend>

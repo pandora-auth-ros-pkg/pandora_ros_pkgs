@@ -1,7 +1,8 @@
 <launch>
 
   <node pkg="pandora_sensor_processing" type="thermal_node" name="thermal_processor"
-    output="screen" ns="sensor_processing" />
-  <rosparam file="$(find pandora_sensor_processing)/config/sensor_processing/thermal_processor_params.yaml" command="load" ns="sensor_processing/thermal_processor"/>
+      output="screen" ns="/pandora_sensor_processing" />
+  <rosparam file="$(find pandora_sensor_processing)/config/pandora_sensor_processing/thermal_processor_params.yaml"
+      command="load" ns="/pandora_sensor_processing/pandora_thermal_processor"/>
 
 </launch>

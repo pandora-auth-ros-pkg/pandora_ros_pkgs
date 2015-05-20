@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -51,7 +51,9 @@
 #include <dynamic_reconfigure/server.h>
 
 #include "state_manager/state_client.h"
-#include "pandora_common_msgs/GeneralAlertMsg.h"
+#include "pandora_common_msgs/GeneralAlert.h"
+#include "pandora_common_msgs/GeneralAlertInfo.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
 #include "pandora_sensor_processing/SensorProcessingConfig.h"
 
 namespace pandora_sensor_processing
@@ -62,7 +64,7 @@ namespace pandora_sensor_processing
    * with other nodes and processor organization through StateClient.
    */
   template <class DerivedProcessor>
-    class SensorProcessor 
+    class SensorProcessor
     : public StateClient, private boost::noncopyable
     {
       public:
@@ -79,9 +81,9 @@ namespace pandora_sensor_processing
 
         /**
          * @brief getter for general alert message alert_
-         * @return pandora_common_msgs::GeneralAlertMsg alert_
+         * @return pandora_common_msgs::GeneralAlert alert_
          */
-        pandora_common_msgs::GeneralAlertMsg getAlert() const
+        pandora_common_msgs::GeneralAlert getAlert() const
         {
           return alert_;
         }
@@ -103,7 +105,7 @@ namespace pandora_sensor_processing
 
       protected:
         //!< Alert message that includes info to be filled by Derived Processor.
-        pandora_common_msgs::GeneralAlertMsg alert_;
+        pandora_common_msgs::GeneralAlert alert_;
 
         //!< Name of this Sensor Processor.
         std::string name_;
@@ -140,6 +142,6 @@ namespace pandora_sensor_processing
 
 }  // namespace pandora_sensor_processing
 
-#include "sensor_processing/sensor_processor.hxx"
+#include "pandora_sensor_processing/sensor_processor.hxx"
 
 #endif  // SENSOR_PROCESSING_SENSOR_PROCESSOR_H

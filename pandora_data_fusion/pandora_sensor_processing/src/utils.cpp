@@ -32,11 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include "sensor_processing/utils.h"
+#include "pandora_sensor_processing/utils.h"
 
 namespace pandora_sensor_processing
 {
@@ -60,7 +60,7 @@ namespace pandora_sensor_processing
       float xCenteredScaled = (x - mean) / stdDev;
       return (1/(stdDev * sqrt(2*PI))) * exp(-0.5 * pow(xCenteredScaled, 2));
     }
-  
+
   double Utils::
     weibullPdf(double x, double k, double l)
     {

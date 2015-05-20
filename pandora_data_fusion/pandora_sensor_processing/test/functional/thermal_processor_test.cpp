@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -41,7 +41,11 @@
 
 #include "gtest/gtest.h"
 
-#include "sensor_processing/thermal_processor.h"
+#include "pandora_common_msgs/GeneralAlert.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
+
+#include "pandora_sensor_processing/clusterer.h"
+#include "pandora_sensor_processing/thermal_processor.h"
 
 namespace pandora_sensor_processing
 {
@@ -50,15 +54,15 @@ namespace pandora_sensor_processing
   {
     public:
       ThermalProcessorTest() : thermalProcessor_("/test") {}
-    
+
     protected:
-      void mockCallback(const pandora_common_msgs::GeneralAlertMsg& msg)
+      void mockCallback(const pandora_common_msgs::GeneralAlertVector& msg)
       {
         responded_ = true;
         incomingAlerts_.push_back(msg);
       }
 
-      virtual void SetUp() 
+      virtual void SetUp()
       {
         clusterer_.reset( new Clusterer(16, 3, 100) );
         time_ = 0;
@@ -85,7 +89,7 @@ namespace pandora_sensor_processing
         delete mockPublisher_;
         mockPublisher_ = NULL;
       }
-        
+
       /* helper functions */
 
       /**
@@ -93,7 +97,7 @@ namespace pandora_sensor_processing
        * If it is to be qualified to an alert, warmer pixels will be to the
        * upper right corner.
        */
-      void makeImage(int width, int height, 
+      void makeImage(int width, int height,
           std::string frame, bool alert = true)
       {
         if (width < 4)
@@ -106,7 +110,7 @@ namespace pandora_sensor_processing
         image_.height = height;
         image_.data = std::vector<uint8_t>(width * height);
         for (int ii = 0; ii < width * height; ++ii)
-        { 
+        {
           image_.data[ii] = 25;
           if (alert && ii % width > 1 && ii / width < height - 2)
             image_.data[ii] = 36;
@@ -149,7 +153,7 @@ namespace pandora_sensor_processing
       }
 
       /* variables */
-      
+
       float time_;
       sensor_msgs::Image image_;
       ClustererPtr clusterer_;
@@ -159,7 +163,7 @@ namespace pandora_sensor_processing
       static ros::NodeHandle* nh_;
       static ros::Publisher* mockPublisher_;
       ros::Subscriber mockSubscriber_;
-      std::vector<pandora_common_msgs::GeneralAlertMsg> incomingAlerts_;
+      std::vector<pandora_common_msgs::GeneralAlertVector> incomingAlerts_;
       bool responded_;
   };
 
@@ -194,10 +198,10 @@ namespace pandora_sensor_processing
     makeImage(4, 4, "pur");
     analyzeImage(image_, clusterer_);
     EXPECT_TRUE(getResults(image_, clusterer_));
-    pandora_common_msgs::GeneralAlertMsg alert = thermalProcessor_.getAlert();
+    pandora_common_msgs::GeneralAlert alert = thermalProcessor_.getAlert();
     EXPECT_EQ(image_.header.frame_id, alert.header.frame_id);
     EXPECT_EQ(image_.header.stamp, alert.header.stamp);
-    EXPECT_GT(alert.probability, 0.3);
+    EXPECT_GT(alert.info.probability, 0.3);
   }
 
   TEST_F(ThermalProcessorTest, getResults_fail_no_alert_in_current)
@@ -216,10 +220,10 @@ namespace pandora_sensor_processing
     makeImage(4, 4, "pur");
     analyzeImage(image_, clusterer_);
     EXPECT_TRUE(getResults(image_, clusterer_));
-    pandora_common_msgs::GeneralAlertMsg alert = thermalProcessor_.getAlert();
+    pandora_common_msgs::GeneralAlert alert = thermalProcessor_.getAlert();
     EXPECT_EQ(image_.header.frame_id, alert.header.frame_id);
     EXPECT_EQ(image_.header.stamp, alert.header.stamp);
-    EXPECT_GT(alert.probability, 0.3);
+    EXPECT_GT(alert.info.probability, 0.3);
   }
 
   TEST_F(ThermalProcessorTest, getResults_fail_no_alert_in_current_2)
@@ -267,7 +271,7 @@ namespace pandora_sensor_processing
     ASSERT_TRUE(responded_);
     ASSERT_EQ(1, incomingAlerts_.size());
     EXPECT_EQ("pur", incomingAlerts_.at(0).header.frame_id);
-    EXPECT_FLOAT_EQ(0.39894228, incomingAlerts_.at(0).probability);
+    EXPECT_FLOAT_EQ(0.39894228, incomingAlerts_.at(0).generalAlerts[0].probability);
 
     // This in not cool because image is not the same size as the other images
     // of frame "pur"

@@ -50,10 +50,10 @@ import rospy
 
 from pandora_testing_tools.testing_interface import test_base
 from pandora_sensor_msgs.msg import Co2Msg
-from pandora_common_msgs.msg import GeneralAlertMsg 
+from pandora_common_msgs.msg import GeneralAlertVector
 
 class Co2ProcessorTest(test_base.TestBase):
-    
+
     def publish_raw(self, percentage):
 
         self.raw = Co2Msg()
@@ -71,10 +71,12 @@ class Co2ProcessorTest(test_base.TestBase):
         times = -1
         if len(self.alertList) == 1:
           times = 0
-        self.assertGreater(self.alertList[times].probability, 0.4)
-        self.assertEqual(self.alertList[times].yaw, 0)
-        self.assertEqual(self.alertList[times].pitch, 0)
-        self.assertEqual(self.alertList[times].header.frame_id, "aer")
+        info = self.alertList[times].generalAlerts[0]
+        header = self.alertList[times].header
+        self.assertGreater(info.probability, 0.4)
+        self.assertEqual(info.yaw, 0)
+        self.assertEqual(info.pitch, 0)
+        self.assertEqual(header.frame_id, "aer")
 
     def expect_fail(self):
 
@@ -137,7 +139,7 @@ if __name__ == '__main__':
     rospy.sleep(5.)
     rospy.init_node(NAME, anonymous=True)
     publisher_topics = [("/test/raw_input", "pandora_sensor_msgs", "Co2Msg")]
-    subscriber_topics = [("/test/alert_ouput", "pandora_common_msgs", "GeneralAlertMsg")]
+    subscriber_topics = [("/test/alert_ouput", "pandora_common_msgs", "GeneralAlertVector")]
     Co2ProcessorTest.connect(subscriber_topics, publisher_topics, 1, False)
     rostest.rosrun(PKG, NAME, Co2ProcessorTest, sys.argv)
     Co2ProcessorTest.disconnect()

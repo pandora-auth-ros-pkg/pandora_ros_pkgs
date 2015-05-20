@@ -32,13 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include "gtest/gtest.h"
 
-#include "sensor_processing/clusterer.h"
+#include "pandora_sensor_processing/clusterer.h"
 
 using Eigen::MatrixXf;
 using Eigen::Matrix4f;
@@ -48,8 +48,8 @@ namespace pandora_sensor_processing
 {
 
     class ClustererTest : public ::testing::Test
-    { 
-      public: 
+    {
+      public:
         /**
          * @brief Constructor
          */
@@ -155,8 +155,8 @@ namespace pandora_sensor_processing
         void fillClusters()
         {
           MatrixXf cluster1(4, 4);
-          cluster1 << 0, 0, 0, 1, 
-                      0, 1, 2, 0, 
+          cluster1 << 0, 0, 0, 1,
+                      0, 1, 2, 0,
                       2, 2, 2, 2,
                       35, 35, 30, 30;
           clusterer_.cluster1_ = cluster1;
@@ -312,7 +312,7 @@ namespace pandora_sensor_processing
       EXPECT_TRUE(areEquals(matrix, *getCluster2()));
 
       Vector4f mean;
-      mean << 0, 1, 0, 35.66667; 
+      mean << 0, 1, 0, 35.66667;
       EXPECT_TRUE(areEquals(mean, clusterer_.getMean1()));
       mean << 1.5, 1, 0, 19.66667;
       EXPECT_TRUE(areEquals(mean, clusterer_.getMean2()));
@@ -429,7 +429,7 @@ namespace pandora_sensor_processing
       EXPECT_TRUE(areEquals(matrix, *getCluster2()));
 
       Vector4f mean, currentMean;
-      mean << 0, 1, 0, 35.66667; 
+      mean << 0, 1, 0, 35.66667;
       EXPECT_TRUE(areEquals(mean, clusterer_.getMean1()));
       EXPECT_TRUE(clusterer_.getCurrentMean1(&currentMean));
       EXPECT_TRUE(areEquals(mean, currentMean));
@@ -450,7 +450,7 @@ namespace pandora_sensor_processing
              -0.20000, -0.40000, 0.00000, 0.66667;
       EXPECT_TRUE(areEquals(cov, clusterer_.getCovariance2()));
     }
-      
+
     TEST_F(ClustererTest, cluster_threeMeasurements_currentExistsInCluster)
     {
       fillDataSet1();
@@ -471,7 +471,7 @@ namespace pandora_sensor_processing
       Vector4f mean, trueMean;
       mean << 0.1, 0.9, 1.1, 34.2;
       EXPECT_TRUE(areEquals(mean, clusterer_.getMean1()));
-      mean << 0.25, 0.75, 2, 32.5; 
+      mean << 0.25, 0.75, 2, 32.5;
       EXPECT_TRUE(clusterer_.getCurrentMean1(&trueMean));
       EXPECT_TRUE(areEquals(mean, trueMean));
       mean << 1.52941, 1.05882, 0.94118, 19.88235;
