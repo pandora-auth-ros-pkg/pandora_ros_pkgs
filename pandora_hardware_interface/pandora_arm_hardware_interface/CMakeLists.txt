@@ -20,8 +20,11 @@ set(THIS_PACKAGE_INCLUDE_DIRS
 catkin_package(
   INCLUDE_DIRS ${THIS_PACKAGE_INCLUDE_DIRS}
   LIBRARIES
-    co2_sensor_controller
-    thermal_sensor_controller
+    arm_co2_sensor_controller
+    arm_thermal_sensor_controller
+    arm_range_sensor_controller
+    arm_battery_controller  
+
   CATKIN_DEPENDS
     roscpp
     controller_manager

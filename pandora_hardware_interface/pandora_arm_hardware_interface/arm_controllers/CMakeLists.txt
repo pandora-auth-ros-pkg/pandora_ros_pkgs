@@ -1,19 +1,42 @@
 add_library(
-  co2_sensor_controller
+  arm_co2_sensor_controller
   src/co2_sensor_controller.cpp)
 add_dependencies(
-  co2_sensor_controller
-  ${catkin_EXPORTED_TARGETS})
+  arm_co2_sensor_controller
+  ${PROJECT_NAME}_gencpp
+  pandora_sensor_msgs_gencpp)
 target_link_libraries(
-  co2_sensor_controller
+  arm_co2_sensor_controller
+  ${catkin_LIBRARIES})
+  
+add_library(
+  arm_thermal_sensor_controller
+  src/thermal_sensor_controller.cpp)
+add_dependencies(
+  arm_thermal_sensor_controller
+  ${PROJECT_NAME}_gencpp
+  pandora_sensor_msgs_gencpp)
+target_link_libraries(
+  arm_thermal_sensor_controller
+  ${catkin_LIBRARIES})
+  
+add_library(
+  arm_battery_controller
+  src/battery_controller.cpp)
+add_dependencies(
+  arm_battery_controller
+  ${PROJECT_NAME}_gencpp
+  pandora_sensor_msgs_gencpp)
+target_link_libraries(
+  arm_battery_controller
   ${catkin_LIBRARIES})
 
 add_library(
-  thermal_sensor_controller
-  src/thermal_sensor_controller.cpp)
+  arm_range_sensor_controller
+  src/range_sensor_controller.cpp)
 add_dependencies(
-  thermal_sensor_controller
-  ${catkin_EXPORTED_TARGETS})
+  arm_range_sensor_controller
+  ${PROJECT_NAME}_gencpp)
 target_link_libraries(
-  thermal_sensor_controller
+  arm_range_sensor_controller
   ${catkin_LIBRARIES})

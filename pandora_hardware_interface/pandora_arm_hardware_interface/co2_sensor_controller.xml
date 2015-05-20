@@ -1,4 +1,4 @@
-<library path="lib/libco2_sensor_controller">
+<library path="lib/libarm_co2_sensor_controller">
   <class
     name="pandora_arm/Co2SensorController"
     type="pandora_hardware_interface::arm::Co2SensorController"

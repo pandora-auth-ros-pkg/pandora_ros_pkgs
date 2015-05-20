@@ -34,86 +34,88 @@
 *
 * Author:  Evangelos Apostolidis
 *********************************************************************/
-#ifndef ARM_CONTROLLERS_CO2_SENSOR_CONTROLLER_H
-#define ARM_CONTROLLERS_CO2_SENSOR_CONTROLLER_H
+#ifndef ARM_CONTROLLERS_RANGE_SENSOR_CONTROLLER_H
+#define ARM_CONTROLLERS_RANGE_SENSOR_CONTROLLER_H
 
 #include <controller_interface/controller.h>
-#include <arm_hardware_interface/co2_sensor_interface.h>
+#include <arm_hardware_interface/range_sensor_interface.h>
 #include <pluginlib/class_list_macros.h>
-#include <pandora_sensor_msgs/Co2Msg.h>
+#include <sensor_msgs/Range.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <boost/shared_ptr.hpp>
 
 typedef boost::shared_ptr<realtime_tools::RealtimePublisher<
-  pandora_sensor_msgs::Co2Msg> > Co2RealtimePublisher;
+  sensor_msgs::Range> > RangeRealtimePublisher;
 
 namespace pandora_hardware_interface
 {
 namespace arm
 {
-  /**
-   @class Co2SensorController
-   @brief Controller used to publish CO2 meausurements with fixed frequency
-  **/
-  class Co2SensorController :
-    public controller_interface::Controller<Co2SensorInterface>
+  class RangeSensorController :
+    public controller_interface::Controller<
+      RangeSensorInterface>
   {
    public:
     /**
-     @brief Default Constructor
+     @class Co2SensorController
+     @brief Controller used to publish CO2 meausurements with fixed frequency
     **/
-    Co2SensorController();
+    RangeSensorController();
 
     /**
      @brief Default Destructor
     **/
-    ~Co2SensorController();
+    ~RangeSensorController();
 
     /**
      @brief Initializes controller
-     @param co2SsensorInterface [Co2SensorInterface*] : CO2 sensor interface
+     @param rangeSensorInterface [rangeSensorInterface*] : range sensor interface
      @param rootNodeHandle [ros::NodeHandle&] : Node handle at root namespace
      @param controllerNodeHandle [ros::NodeHandle&] : Node handle inside the 
        controller namespace
      @return bool
     **/
     virtual bool init(
-      Co2SensorInterface* co2SensorInterface,
+      RangeSensorInterface* rangeSensorInterface,
       ros::NodeHandle& rootNodeHandle,
       ros::NodeHandle& controllerNodeHandle);
 
     /**
-     @brief Starts the CO2 sensor controller
+     @brief Starts the range sensor controller
      @param time [ros::Time&] : Current time
      @return void
-    **/
+    **/      
     virtual void starting(const ros::Time& time);
 
     /**
-     @brief Updates the CO2 Controller and publishes new CO2 measurements
+     @brief Updates the range Controller and publishes new range measurements
      @param time [ros::Time&] : Current time
      @param period [ros::Duration&] : Time since last update
      @return void
-    **/
+    **/    
     virtual void update(const ros::Time& time, const ros::Duration& period);
 
     /**
-     @brief Stops the CO2 controller
+     @brief Stops the range sensor controller
      @param time [ros::Time&] : Current time
      @return void
-    **/
+    **/   
     virtual void stopping(const ros::Time& time);
 
    private:
-    //!< CO2 sensor handle
-    std::vector<Co2SensorHandle> sensorHandles_;
-    //!< CO2 msg publisher
-    std::vector<Co2RealtimePublisher> realtimePublishers_;
+    //!< node handle of root namespace
+    const ros::NodeHandle* rootNodeHandle_;
+    //!< range sensor handle
+    std::vector<RangeSensorHandle> sensorHandles_;
+    //!< range msg publisher
+    std::vector<RangeRealtimePublisher> realtimePublishers_;
     //!< Time since last publishing
     std::vector<ros::Time> lastTimePublished_;
+    //!< range sensor interface
+    RangeSensorInterface* rangeSensorInterface_;
     //!< CO2 msg publishing frequency
     double publishRate_;
   };
 }  // namespace arm
 }  // namespace pandora_hardware_interface
-#endif  // ARM_CONTROLLERS_CO2_SENSOR_CONTROLLER_H
+#endif  // ARM_CONTROLLERS_RANGE_SENSOR_CONTROLLER_H

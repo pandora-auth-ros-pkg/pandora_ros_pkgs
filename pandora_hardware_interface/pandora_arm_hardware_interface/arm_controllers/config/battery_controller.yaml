@@ -1,0 +1,3 @@
+arm_battery_controller:
+  type: pandora_arm/BatteryController
+  publish_rate: 50
