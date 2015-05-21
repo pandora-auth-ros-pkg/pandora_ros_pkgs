@@ -41,22 +41,22 @@
 #define PANDORA_VISION_VICTIM_VICTIM_POSTPROCESSOR_H
 
 #include <string>
-#include "pandora_common_msgs/GeneralAlert.h"
+#include "pandora_common_msgs/GeneralAlertVector.h"
 #include "pandora_vision_common/pandora_vision_interface/vision_postprocessor.h"
 #include "pandora_vision_victim/victim_poi.h"
 
 namespace pandora_vision
 {
-  class VictimPostProcessor : public VisionPostProcessor<pandora_common_msgs::GeneralAlert>
+  class VictimPostProcessor : public VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>
   {
     public:
-      typedef boost::shared_ptr<pandora_common_msgs::GeneralAlert> GeneralAlertPtr;
+      typedef boost::shared_ptr<pandora_common_msgs::GeneralAlertVector> GeneralAlertVectorPtr;
 
       VictimPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
       virtual ~VictimPostProcessor();
-      
+
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const GeneralAlertPtr& output);
+      postProcess(const POIsStampedConstPtr& input, const GeneralAlertVectorPtr& output);
   };
 }  // namespace pandora_vision
 
