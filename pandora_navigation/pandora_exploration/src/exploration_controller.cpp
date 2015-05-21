@@ -95,8 +95,8 @@ void ExplorationController::executeCb(
   while (ros::ok() && do_exploration_server_.isActive()) {
     // we reached maximum goal searches retries
     if (goal_searches_count_ >= max_goal_searches_) {
-      do_exploration_server_.setAborted(pandora_navigation_msgs::DoExplorationResult(),
-                                        "Max retries reached, we could not find more goals");
+      do_exploration_server_.setSucceeded(pandora_navigation_msgs::DoExplorationResult(),
+                                        "[explorer] Max retries reached, we could not find more goals - exploration completed");
       return;
     }
 
@@ -110,11 +110,12 @@ void ExplorationController::executeCb(
 
     if (goal->exploration_type == pandora_navigation_msgs::DoExplorationGoal::TYPE_DEEP &&
         coverage_goal_selector_) {
-      success = coverage_goal_selector_->findNextGoal(&current_goal_);
+      success = coverage_goal_selector_->findNextGoal(&current_goal_);  // to current goal gemizetai me to stoxo pou tha vrei o goal selector
     } else {
       success = explore_goal_selector_->findNextGoal(&current_goal_);
     }
 
+    // if succes is false, dld an den exei vrei stoxo, auksanoume ta goal searches
     if (!success) {
       goal_searches_count_++;
       // wait a little
@@ -193,6 +194,7 @@ bool ExplorationController::isGoalReached()
   if (::hypot(dx, dy) < dist) {
     abort_count_ = 0;
     first_time_ = false;
+    ROS_INFO("[explorer] goal is reached");
     return true;
   }
 
@@ -206,7 +208,7 @@ bool ExplorationController::isTimeReached()
     return false;
   }
 
-  ROS_DEBUG("[%s] Time for goal expired!", ros::this_node::getName().c_str());
+  ROS_INFO("[%s] Time for goal expired!", ros::this_node::getName().c_str());
   return true;
 }
 
