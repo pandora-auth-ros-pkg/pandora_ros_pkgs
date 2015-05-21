@@ -236,10 +236,10 @@ if(MODEL_ENABLE_TRAIN)
   )
 endif()
 
-# download_extra_data(
-  # ${PROJECT_NAME}_download_training_files
-  # EXTRA_FILES data/extra_files.yaml
-  # )
+ download_extra_data(
+   ${PROJECT_NAME}_download_training_files
+   EXTRA_FILES data/extra_files.yaml
+   )
 
 #~ To check lint : catkin_make roslint_pandora_vision_victim
 set(ROSLINT_CPP_OPTS
