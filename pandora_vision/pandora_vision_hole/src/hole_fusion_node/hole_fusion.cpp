@@ -100,11 +100,23 @@ namespace pandora_vision
     debugRespectiveHolesPublisher_ = imageTransport_.advertise
       (debugRespectiveHolesTopic_, 1, true);
 
+    // Advertise the topic that the enhanced image 
+    // will be published to
+    enhancedImagesPublisher_ = nodeHandle_.advertise
+      <pandora_vision_msgs::EnhancedImage>(
+        enhancedImagesTopic_, 1000, true);
+
     // Advertise the topic that the image of the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
       <pandora_vision_msgs::EnhancedImage>(
         enhancedHolesTopic_, 1000, true);
+    
+    // Advertise the topic that the image of the final holes,
+    // will be published to 
+    InterpolatedDepthImagePublisher_ = nodeHandle_.advertise
+      <sensor_msgs::Image>(
+        InterpolatedDepthImageTopic_, 1000, true);
 
     // Advertise the topic where the Hole Fusion node requests from the
     // synchronizer node to subscribe to the input point cloud topic
@@ -591,6 +603,20 @@ namespace pandora_vision
       ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic hole_detector_output_topic");
     }
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // the EnhancedImage msg
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/enhanced_images_topic",
+        enhancedImagesTopic_))
+    {
+      ROS_INFO_NAMED(PKG_NAME,
+        "[Hole Fusion Node] Advertising to the enhanced image topic");
+    }
+    else
+    {
+      ROS_INFO_NAMED (PKG_NAME,
+        "[Hole Fusion Node] Could not find topic enhanced_images_topic");
+    }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
     // additional information about the valid holes found by the
@@ -607,6 +633,24 @@ namespace pandora_vision
       ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic enhanced_holes_topic");
     }
+
+    // Read the name of the topic that the Hole Fusion node uses to publish
+    // the InterpolatedDepthImage found by the
+    // Hole Detector package
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/interpolated_depth_topic",
+        InterpolatedDepthImageTopic_))
+    {
+      ROS_INFO_NAMED(PKG_NAME,
+        "[Hole Fusion Node] Advertising to the interpolated depth topic");
+    }
+    else
+    {
+      ROS_INFO_NAMED (PKG_NAME,
+        "[Hole Fusion Node] Could not find topic interpolated depth topic");
+    }
+
+
 
     // Read the name of the topic that the Hole Fusion node uses to publish
     // messages so that the synchronizer node subscribes to the
@@ -1124,7 +1168,7 @@ namespace pandora_vision
     // Extract the depth image from the point cloud message
     cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
       msg, CV_32FC1);
-
+   
     // Interpolate the depthImage
     cv::Mat interpolatedDepthImage;
     NoiseElimination::performNoiseElimination(depthImage,
@@ -1197,7 +1241,11 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::start("processCandidateHoles", "", true);
     #endif
+    
+    publishEnhancedImage();
 
+    publishInterpolatedDepthImage();
+    
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_respective_holes)
     {
@@ -1492,6 +1540,55 @@ namespace pandora_vision
           << 0 << "\n";
       }
     }
+  }
+  /**
+    @brief Publishes the interpolatedDepthImage.
+    @return void
+  **/
+  void HoleFusion::publishInterpolatedDepthImage()
+  {
+    sensor_msgs::Image depthMsg;
+    depthMsg = MessageConversions::convertImageToMessage(
+    Visualization::scaleImageForVisualization(interpolatedDepthImage_,
+        Parameters::Image::scale_method),
+        sensor_msgs::image_encodings::TYPE_8UC1,
+        depthMsg);
+
+    InterpolatedDepthImagePublisher_.publish(depthMsg);
+
+  }
+  
+  /**
+    @brief Publishes the Images' enhanced information.
+    @return void
+  **/
+  void HoleFusion::publishEnhancedImage()
+  {
+    // The overall message of enhanced holes that will be published
+    pandora_vision_msgs::EnhancedImage enhancedImagesMsg;
+
+    // Set the rgbImage in the enhancedImagesMsg message to the rgb image
+    enhancedImagesMsg.rgbImage = MessageConversions::convertImageToMessage(
+    rgbImage_,
+    sensor_msgs::image_encodings::TYPE_8UC3,
+    enhancedImagesMsg.rgbImage);
+
+    // Set the depthImage in the enhancedImagesMsg message to the depth image
+    enhancedImagesMsg.depthImage = MessageConversions::convertImageToMessage(
+    Visualization::scaleImageForVisualization(interpolatedDepthImage_,
+        Parameters::Image::scale_method),
+        sensor_msgs::image_encodings::TYPE_8UC1,
+        enhancedImagesMsg.depthImage);
+
+    // Set whether depth analysis is applicable
+    enhancedImagesMsg.isDepth = (filteringMode_ == RGBD_MODE);
+
+    // Set the message's header
+    enhancedImagesMsg.header.stamp = timestamp_;
+    enhancedImagesMsg.header.frame_id = frame_id_;
+
+    enhancedImagesPublisher_.publish(enhancedImagesMsg);
+
   }
 
 

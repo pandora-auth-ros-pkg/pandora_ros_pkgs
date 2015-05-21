@@ -42,6 +42,8 @@
 
     <publisher>/vision/holes_direction_alert</publisher>
     <publisher>/vision/enhanced_holes</publisher>
+    <publisher>/vision/enhanced_images</publisher>
+    <publisher>/vision/interpolated_depth_image</publisher>
     <publisher>/unlock_rgb_depth_synchronizer</publisher>
     <publisher>/vision/hole_detector/debug_valid_holes_found</publisher>
 

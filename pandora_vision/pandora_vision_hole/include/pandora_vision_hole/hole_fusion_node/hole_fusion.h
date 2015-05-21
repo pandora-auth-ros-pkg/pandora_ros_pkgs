@@ -122,10 +122,26 @@ namespace pandora_vision
       // produced by this package
       ros::Publisher enhancedHolesPublisher_;
 
+      // The ROS publisher that will be used to publish the enhanced 
+      // image produced by this package
+      ros::Publisher enhancedImagesPublisher_;
+
+      // The ROS publisher that will be used to publish the  
+      //interpolated depth iMAGE
+      ros::Publisher InterpolatedDepthImagePublisher_;
+
       // The name of the topic where the Hole Fusion node will publish
       // additional information, in respect to the valid holes topic,
       // pertaining to the valid holes found by the Hole Detector package
       std::string enhancedHolesTopic_;
+
+      // The name of the topic where the Hole Fusion node will publish
+      // the enhanced Images
+      std::string enhancedImagesTopic_;
+
+      // The name of the topic where the Hole Fusion node will publish
+      // the interpolated depth imaeg
+      std::string InterpolatedDepthImageTopic_;
 
       // The ROS publisher that will be used to publish an image depicting
       // the keypoint, outline points and bounding rectangle of holes found
@@ -293,8 +309,8 @@ namespace pandora_vision
         @return void
        **/
       void depthCandidateHolesCallback(
-        const pandora_vision_hole::CandidateHolesVectorMsg&
-        depthCandidateHolesVector);
+          const pandora_vision_hole::CandidateHolesVectorMsg&
+          depthCandidateHolesVector);
 
       /**
         @brief Runs candidate holes through selected filters.
@@ -310,7 +326,7 @@ namespace pandora_vision
         filter applied, each column to a particular hole
        **/
       std::vector<std::vector<float> > filterHoles(
-        const HolesConveyor& conveyor);
+          const HolesConveyor& conveyor);
 
       /**
         @brief Recreates the HolesConveyor struct for the
@@ -327,10 +343,10 @@ namespace pandora_vision
         @return void
        **/
       void fromCandidateHoleMsgToConveyor(
-        const std::vector<pandora_vision_hole::CandidateHoleMsg>&
-        candidateHolesVector,
-        HolesConveyor* conveyor,
-        const cv::Mat& inImage);
+          const std::vector<pandora_vision_hole::CandidateHoleMsg>&
+          candidateHolesVector,
+          HolesConveyor* conveyor,
+          const cv::Mat& inImage);
 
       /**
         @brief Retrieves the parent to the frame_id of the input point cloud,
@@ -375,7 +391,7 @@ namespace pandora_vision
         @return void
        **/
       void makeValidHolesUnique(HolesConveyor* allHoles,
-        std::map<int, float>* validHolesMap);
+          std::map<int, float>* validHolesMap);
 
       /**
         @brief The function called when a debugging parameter is changed
@@ -385,8 +401,8 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackDebug(
-        const pandora_vision_hole::debug_cfgConfig& config,
-        const uint32_t& level);
+          const pandora_vision_hole::debug_cfgConfig& config,
+          const uint32_t& level);
 
       /**
         @brief The function called when a parameter regarding the order
@@ -397,8 +413,8 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackFiltersPriority(
-        const pandora_vision_hole::filters_priority_cfgConfig& config,
-        const uint32_t& level);
+          const pandora_vision_hole::filters_priority_cfgConfig& config,
+          const uint32_t& level);
 
       /**
         @brief The function called when a parameter regarding thresholds
@@ -409,8 +425,8 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackFiltersThresholds(
-        const pandora_vision_hole::filters_thresholds_cfgConfig& config,
-        const uint32_t& level);
+          const pandora_vision_hole::filters_thresholds_cfgConfig& config,
+          const uint32_t& level);
 
       /**
         @brief The function called when a general parameter is changed
@@ -420,8 +436,8 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackGeneral(
-        const pandora_vision_hole::general_cfgConfig& config,
-        const uint32_t& level);
+          const pandora_vision_hole::general_cfgConfig& config,
+          const uint32_t& level);
 
       /**
         @brief The function called when a parameter regarding the validity of
@@ -432,8 +448,8 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackValidity(
-        const pandora_vision_hole::validity_cfgConfig& config,
-        const uint32_t& level);
+          const pandora_vision_hole::validity_cfgConfig& config,
+          const uint32_t& level);
 
       /**
         @brief Callback for the point cloud that the synchronizer node
@@ -474,8 +490,8 @@ namespace pandora_vision
       void processCandidateHoles();
 
       void produceDataset(
-        const HolesConveyor& conveyor,
-        const std::vector<std::vector<float> >& probabilities);
+          const HolesConveyor& conveyor,
+          const std::vector<std::vector<float> >& probabilities);
 
       /**
         @brief Publishes the holes' enhanced information.
@@ -487,15 +503,28 @@ namespace pandora_vision
         @return void
        **/
       void publishEnhancedHoles (const HolesConveyor& conveyor,
-        std::map<int, float>* validHolesMap);
+          std::map<int, float>* validHolesMap);
 
       /**
-        @brief Publishes an image showing holes found from the Depth node
-        and the RGB node.
-        @param void
+        @brief Publishes the Images' enhanced information.
         @return void
        **/
-      void publishRespectiveHolesFound();
+      void publishEnhancedImage();
+
+      /**
+        @brief Publishes the  interpolated depth Image.
+        @return void
+       **/
+      void publishInterpolatedDepthImage();
+
+
+        /**
+          @brief Publishes an image showing holes found from the Depth node
+          and the RGB node.
+          @param void
+          @return void
+         **/
+        void publishRespectiveHolesFound();
 
       /**
         @brief Publishes the valid holes' information.
@@ -507,7 +536,7 @@ namespace pandora_vision
         @return void
        **/
       void publishValidHoles(const HolesConveyor& conveyor,
-        std::map<int, float>* map);
+          std::map<int, float>* map);
 
       /**
         @brief Callback for the candidate holes via the rgb node
@@ -525,8 +554,8 @@ namespace pandora_vision
         @return void
        **/
       void rgbCandidateHolesCallback(
-        const pandora_vision_hole::CandidateHolesVectorMsg&
-        rgbCandidateHolesVector);
+          const pandora_vision_hole::CandidateHolesVectorMsg&
+          rgbCandidateHolesVector);
 
       /**
         @brief Sets the depth values of a point cloud according to the
@@ -544,7 +573,7 @@ namespace pandora_vision
         @return void
        **/
       void setDepthValuesInPointCloud(const cv::Mat& inImage,
-        PointCloudPtr* pointCloudPtr);
+          PointCloudPtr* pointCloudPtr);
 
       /**
         @brief Requests from the synchronizer to process a new point cloud
@@ -566,10 +595,10 @@ namespace pandora_vision
         @return void
        **/
       void unpackMessage(
-        const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
-        HolesConveyor* conveyor,
-        cv::Mat* image,
-        const std::string& encoding);
+          const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
+          HolesConveyor* conveyor,
+          cv::Mat* image,
+          const std::string& encoding);
 
 
     public:

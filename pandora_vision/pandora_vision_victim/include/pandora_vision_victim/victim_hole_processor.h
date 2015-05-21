@@ -88,6 +88,8 @@ namespace pandora_vision
       
       VictimParameters params_;
       
+      int counter_; 
+
       /// Debug purposes
       image_transport::Publisher interpolatedDepthPublisher_;
       image_transport::Publisher _debugVictimsPublisher;

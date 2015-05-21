@@ -135,8 +135,9 @@ namespace pandora_vision
     //!< Message alert creation
     for (int i = 0;  i < final_victims.size() ; i++)
     {
-      if (final_victims[i]->getClassLabel() == 1)
-      {
+      //if (final_victims[i]->getClassLabel() == 1)
+      //{  
+        //counter_++;
         //!< Debug purposes
         if (params_.debug_img || params_.debug_img_publisher)
         {
@@ -161,7 +162,7 @@ namespace pandora_vision
               break;
           }
         }
-      }
+      //}
     }
 
     /// Debug image
@@ -204,13 +205,26 @@ namespace pandora_vision
           CV_RGB(0, 0, 0));
       }
 
+      
+      if(counter_ == params_.positivesCounter)
+      {
+        std::ostringstream convert;
+        convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10, 60),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 255), 1, CV_AA);
+
+      }
+      else
       {
         std::ostringstream convert;
         convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
           cvPoint(10, 60),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
-      }
+      } 
+
+
       {
         std::ostringstream convert;
         convert << "DEPTH_SVM : "<< depth_svm_keypoints.size();
@@ -218,6 +232,7 @@ namespace pandora_vision
           cvPoint(10, 80),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
       }
+
       {
         std::ostringstream convert;
         convert << "Holes got : "<< input->getRegions().size();
@@ -245,7 +260,11 @@ namespace pandora_vision
       cv::waitKey(30);
     }
     
+    if(counter_ >= params_.positivesCounter)
+    { 
+    counter_ = 0;
     return final_victims;
+    } 
   }
   
   
@@ -324,6 +343,9 @@ namespace pandora_vision
     {
       for (unsigned int i = 0 ; i < rgb_svm_probabilities.size(); i++)
       {
+        if (temp->getClassLabel() == 1)
+        {
+        counter_++;
         temp->setProbability(rgb_svm_probabilities[i]->getProbability() *
           params_.rgb_svm_weight);
         temp->setPoint(rgb_svm_probabilities[i]->getPoint());
@@ -331,7 +353,10 @@ namespace pandora_vision
         temp->setWidth(rgb_svm_probabilities[i]->getWidth());
         temp->setHeight(rgb_svm_probabilities[i]->getHeight());
         final_probabilities.push_back(temp);
-      }
+        }
+        else
+          counter_--;
+     }
     }
     return final_probabilities;
   }

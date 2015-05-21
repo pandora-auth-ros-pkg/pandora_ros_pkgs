@@ -144,6 +144,7 @@ namespace pandora_vision
       std::string interpolatedDepthImg;
       int modelImageHeight;
       int modelImageWidth;
+      int positivesCounter;
 
       //!< parameters referring to the face detection algorithm
       std::string cascade_path;

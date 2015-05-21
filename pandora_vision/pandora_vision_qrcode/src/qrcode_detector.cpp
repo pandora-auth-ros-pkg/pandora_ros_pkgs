@@ -60,7 +60,7 @@ namespace pandora_vision
 
     gaussianSharpenBlur_ = gaussianSharpenBlur;
     gaussianSharpenWeight_ = gaussianSharpenWeight;
-    debugCode = debugCode;
+    debugQrcode_ = debugCode;
   }
   
   /**

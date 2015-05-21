@@ -7,6 +7,8 @@ published_topics:
   synchronizer_unlock_topic: unlock_rgb_depth_synchronizer
   hole_detector_output_topic: /vision/holes_direction_alert
   enhanced_holes_topic: /vision/enhanced_holes
+  enhanced_images_topic: /vision/enhanced_images
+  interpolated_depth_topic: /vision/interpolated_depth_image
   make_synchronizer_subscribe_to_input: subscribe_to_input
   make_synchronizer_leave_subscription_to_input: leave_subscription_to_input
 

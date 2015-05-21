@@ -51,6 +51,8 @@ namespace pandora_vision
   
   double rgb_svm_prob_scaling = 0.5;
   double rgb_svm_prob_translation = 7.0;
+
+  int positivesCounter = 5;
   
   //----------------------------Methods----------------------------//
   
@@ -80,6 +82,7 @@ namespace pandora_vision
     rgb_svm_prob_scaling = config.rgb_svm_prob_scaling;
     rgb_svm_prob_translation = 
       config.rgb_svm_prob_translation;
+    positivesCounter = config.positivesCounter;
   }
   
   void VictimParameters::configVictim(const ros::NodeHandle& nh)

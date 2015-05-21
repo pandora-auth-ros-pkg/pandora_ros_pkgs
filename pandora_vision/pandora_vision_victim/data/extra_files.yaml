@@ -1,7 +1,39 @@
 files:
+- md5: 7ceada846af115794390b31b93392418
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_depth_training_matrix.xml
+- md5: 0da44555b039c2e036c53027dbe4880b
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_results.xml
+- md5: 20386a6ae51bf5e2c4f9d9ee77ffe3f5
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/cascade.xml
+- md5: df559dc62387923e8c42c599a7558828
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_depth_test_matrix.xml
 - md5: 61d88d473ec593210735d58dd506af88
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_svm_classifier.xml
+- md5: d9f81a37150ed5c597be804c3d56e22d
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_training_matrix.xml
 - md5: 8e7d6ec98b3b85974aaa9c2a7289dc25
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_mean_values.xml
+- md5: f99ca9447ea51d8d1d9a816625c3795e
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/model.xml
+- md5: 9c135202d3e77d74e0ce927c6509ecbb
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_standard_deviation_values.xml
+- md5: aed2cd50b29f1276f208c4ba72ced5b8
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_test_matrix.xml
+- md5: 45e4e9ff1c3db080105fb4113c97dac9
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_test_matrix.xml
+- md5: 7fa67b5f49dcdadd0ed19d0da279adfe
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_mean_values.xml
+- md5: 6373fed09155da4d59d1fb9c849f9ba2
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_svm_classifier.xml
+- md5: 7860fb429aa404e61cf7168455aadf18
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_results.xml
+- md5: 27707207da5cfaf9e550ba70d959eece
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_rgb_training_matrix.xml
 - md5: 9a838388cc0477792d396b70450f0907
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_standard_deviation_values.xml
+- md5: 713deb8c80e345df671d6778d3a877d3
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_bag_of_words.xml
+- md5: 4c7630c2c317f1c4da1f227adbd87112
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_rgb_test_matrix.xml
+- md5: abc0dd026d6018a4f3b379ee5596df50
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_training_matrix.xml
