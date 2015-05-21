@@ -77,6 +77,7 @@ class MockGui():
         self.victimFoundy = goal.victimFoundy
         self.probability = goal.probability
         self.sensorIDsFound = goal.sensorIDsFound
+        print goal
 
         while not self.reply:
             rospy.sleep(0.5)
