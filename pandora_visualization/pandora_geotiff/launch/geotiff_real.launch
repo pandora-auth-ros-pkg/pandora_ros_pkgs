@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="pandora_geotiff" type="pandora_geotiff_node" name="pandora_geotiff_node" output="screen" >
+    
+    
+  <param name="plugins" type="string"
+       value="pandora_geotiff_plugins/MapWriter pandora_geotiff_plugins/CoverageWriter pandora_geotiff_plugins/PathWriter pandora_geotiff_plugins/ObjectsWriter"/>
+
+  <rosparam file="$(find pandora_geotiff_plugins)/config/geotiff_plugins/geotiff_plugins_params.yaml"
+    command="load"  />
+
+  <rosparam file="$(find pandora_geotiff)/config/geotiff_creator/geotiff_creator_params.yaml"
+    command="load"  />
+
+</launch>
+
+
+

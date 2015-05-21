@@ -1,0 +1,35 @@
+<package format="2">
+  <name>pandora_geotiff</name>
+  <version>0.0.0</version>
+  <description>Contains pandora geotiff  packages</description>
+
+  <maintainer email="chamzask@gmail.com">Chamzas Konstantinos</maintainer>
+
+  <license>BSD</license>
+
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_visualization/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization.git</url>
+
+  <author>Chamzas Konstantinos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>roslint</build_depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <build_depend>libqt4-dev</build_depend>
+  <exec_depend>libqt4</exec_depend>
+  <depend>tf</depend>
+  <depend version_eq="geotiff_interfaces">pandora_data_fusion_msgs</depend>
+
+  <test_depend>rosunit</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
+</package>

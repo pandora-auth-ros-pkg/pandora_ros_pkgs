@@ -1,0 +1,22 @@
+<library path="lib/libpandora_geotiff_plugins">
+  <class name="pandora_geotiff_plugins/MapWriter" type="pandora_geotiff_plugins::MapWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a Map plugin that draws the map.
+    </description>
+  </class>
+  <class name="pandora_geotiff_plugins/CoverageWriter" type="pandora_geotiff_plugins::CoverageWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a Coverage plugin that draws the coverage.
+    </description>
+  </class>
+   <class name="pandora_geotiff_plugins/PathWriter" type="pandora_geotiff_plugins::PathWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a Path plugin that draws the path the robot walked into.
+    </description>
+  </class>
+   <class name="pandora_geotiff_plugins/ObjectsWriter" type="pandora_geotiff_plugins::ObjectsWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is an Object plugin that draws the objects the robot has found.
+    </description>
+  </class>
+</library>

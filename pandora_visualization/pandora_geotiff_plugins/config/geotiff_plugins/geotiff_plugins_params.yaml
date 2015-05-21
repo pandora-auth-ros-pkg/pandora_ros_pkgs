@@ -1,0 +1,47 @@
+
+published_topic_names:
+  coverage_map: "/data_fusion/sensor_coverage/kinect_space"
+  map: "/slam/map"
+  trajectory: "/robot_trajectory"
+
+service_topic_names:
+  data_fusion_objects: "data_fusion_geotiff"
+
+coverage_map_params:
+  bot_thres: 0
+  top_thres: 100
+  color: "LIGHT_GREEN_MAX"
+
+explored_map_params:
+  explored_bot_thres: 0
+  explored_top_thres: 50
+  wall_bot_thres: 52
+  wall_top_thres: 255
+  explored_color: "WHITE_MAX"
+  wall_color: "SOLID_BLUE"
+
+path_params:
+  width: 2
+  color: "MAGENTA"
+
+arrow_params:
+  color: "YELLOW"
+  size: 7
+
+general_objects_params:
+  txt_color: "WHITE_MAX"
+
+hazmat_params:
+  color: "SOLID_ORANGE"
+  size: 42
+  shape: "DIAMOND"
+victim_params:
+  color: "SOLID_RED"
+  size: 35
+  shape: "CIRCLE"
+qr_params:
+  color: "SOLID_BLUE"
+  size: 35
+  shape: "CIRCLE"
+
+
