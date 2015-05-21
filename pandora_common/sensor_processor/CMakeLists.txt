@@ -81,6 +81,6 @@ if(CATKIN_ENABLE_TESTING)
     ${PROJECT_NAME}_dummy_handler
     )
 
-  add_rostest(test/sensor_processor_node.test)
+  add_rostest(test/sensor_processor_node.launch)
 
 endif()
