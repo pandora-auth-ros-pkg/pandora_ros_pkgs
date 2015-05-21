@@ -4,7 +4,7 @@
   <arg name="control" default="true"/>
   <arg name="gazebo" default="false"/>
   <arg name="navigation" default="true"/>
-  <arg name="fusion" default="false"/>
+  <arg name="fusion" default="true"/>
   <arg name="rviz" default="true"/>
 
   <!-- State manager -->
