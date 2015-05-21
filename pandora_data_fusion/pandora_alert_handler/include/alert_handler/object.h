@@ -357,7 +357,6 @@ namespace pandora_data_fusion
 
       private:
         friend class ObjectListTest;
-
     };
 
     template <class DerivedObject>
@@ -416,7 +415,7 @@ namespace pandora_data_fusion
         }
       }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_H

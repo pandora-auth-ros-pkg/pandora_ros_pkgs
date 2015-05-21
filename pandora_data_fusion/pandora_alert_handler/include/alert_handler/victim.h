@@ -215,7 +215,6 @@ namespace pandora_data_fusion
 
       private:
         friend class VictimTest;
-
     };
 
     typedef Victim::Ptr VictimPtr;
@@ -258,7 +257,7 @@ namespace pandora_data_fusion
         objects_.push_back(representativeObject);
     }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_VICTIM_H

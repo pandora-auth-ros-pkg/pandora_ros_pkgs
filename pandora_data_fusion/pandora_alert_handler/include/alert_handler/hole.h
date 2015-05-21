@@ -94,7 +94,6 @@ namespace pandora_data_fusion
       private:
         //!< The hole's holeId. Caution: Not to be confused with the Object id!
         unsigned int holeId_;
-
     };
 
     typedef Hole::Ptr HolePtr;
@@ -105,7 +104,7 @@ namespace pandora_data_fusion
     typedef Hole::ListPtr HoleListPtr;
     typedef Hole::ListConstPtr HoleListConstPtr;
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_HOLE_H

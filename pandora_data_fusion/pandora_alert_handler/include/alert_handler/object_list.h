@@ -113,7 +113,6 @@ namespace pandora_data_fusion
 
         private:
           friend class ObjectListTest;
-
       };
 
     typedef boost::shared_ptr< ObjectList<BaseObject> > ObjectListPtr;
@@ -142,7 +141,6 @@ namespace pandora_data_fusion
     template <class ObjectType>
       bool ObjectList<ObjectType>::add(const Ptr& object)
       {
-        // TODO RESOLVE!
         // Shepherdness for resolving uninitialized pose issue.
         ROS_DEBUG_NAMED("alert_handler", "[OBJECT_LIST] Adds object of type %s",
             object->getObjectType().c_str());
@@ -327,7 +325,7 @@ namespace pandora_data_fusion
       }
     }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_LIST_H

@@ -103,7 +103,6 @@ namespace pandora_data_fusion
 
       private:
         friend class VictimClustererTest;
-
     };
 
     typedef boost::scoped_ptr<VictimClusterer> VictimClustererPtr;

@@ -81,7 +81,7 @@ namespace pandora_data_fusion
     typedef VictimImage::ListPtr VictimImageListPtr;
     typedef VictimImage::ListConstPtr VictimImageListConstPtr;
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_VICTIM_IMAGE_H

@@ -74,7 +74,7 @@ namespace pandora_data_fusion
         static float stdDevFromProbability(float boundingRadius, float probability);
     };
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_UTILS_H

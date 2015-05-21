@@ -214,6 +214,8 @@ target_link_libraries(alert_handler_node
 
 ########################  roslint  ##################################
 
+set(ROSLINT_CPP_OPTS
+    "--filter=-whitespace/braces")
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
     include/alert_handler/*.h
@@ -248,8 +250,6 @@ roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 # if(CATKIN_ENABLE_TESTING)
 #   add_subdirectory(test)
 # endif()
-
-
 
 ##################### Install targets ###############################
 

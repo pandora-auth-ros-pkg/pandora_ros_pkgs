@@ -130,7 +130,6 @@ namespace pandora_data_fusion
         tf::Transform currentHoleTransform_;
 
         PoseFinderPtr poseFinder_;
-
     };
 
     template <class ObjectType>
@@ -175,7 +174,7 @@ namespace pandora_data_fusion
 
     typedef boost::scoped_ptr<ObjectFactory> ObjectFactoryPtr;
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_OBJECT_FACTORY_H

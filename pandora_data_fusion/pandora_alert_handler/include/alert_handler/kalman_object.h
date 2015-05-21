@@ -233,8 +233,9 @@ namespace pandora_data_fusion
           ->ExpectedValueGet()(1);
         newObjectPose.position.y = filterY_->PostGet()
           ->ExpectedValueGet()(1);
-        newObjectPose.position.z = filterZ_->PostGet()
-          ->ExpectedValueGet()(1);
+        // newObjectPose.position.z = filterZ_->PostGet()
+        //   ->ExpectedValueGet()(1);
+        newObjectPose.position.z = measurementPosition.z;
 
         //!< Setting existing object's orientation.
         newObjectPose.orientation = this->pose_.orientation;

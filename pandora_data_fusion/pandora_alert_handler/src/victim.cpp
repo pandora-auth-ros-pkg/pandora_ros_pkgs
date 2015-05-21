@@ -177,33 +177,48 @@ namespace pandora_data_fusion
      */
     void Victim::updateRepresentativeObject()
     {
-      if (objects_.size() == 0)
-      {
-        selectedObjectIndex_ = -1;
-      }
+      bool isEmpty = objects_.size() == 0;
+      selectedObjectIndex_ = -1;
+      ROS_DEBUG_COND(isEmpty,
+          "[ALERT_HANDLER_VICTIM] Trying to update representative object of an empty victim");
+      if (isEmpty)
+        return;
 
-      int tpaIndex = -1;
+      int victimImageIndex = -1, holeIndex = -1, thermalIndex = -1;
       for (int ii = 0; ii < objects_.size(); ++ii)
       {
-        if (objects_[ii]->getType() == Hole::getObjectType())
+        if (objects_[ii]->getType() == VictimImage::getObjectType())
         {
-          selectedObjectIndex_ = ii;
+          victimImageIndex = ii;
+        }
+        else if (objects_[ii]->getType() == Hole::getObjectType())
+        {
+          holeIndex = ii;
         }
         else if (objects_[ii]->getType() == Thermal::getObjectType())
         {
-          tpaIndex = ii;
+          thermalIndex = ii;
         }
+      }
+
+      if (victimImageIndex != -1)
+      {
+        selectedObjectIndex_ = victimImageIndex;
+      }
+      else if (holeIndex != -1)
+      {
+        selectedObjectIndex_ = holeIndex;
+      }
+      else if (thermalIndex != -1)
+      {
+        selectedObjectIndex_ = thermalIndex;
       }
 
       if (selectedObjectIndex_ == -1)
       {
-        selectedObjectIndex_ = tpaIndex;
+        selectedObjectIndex_ = 0;
       }
-
-      if (selectedObjectIndex_ > -1)
-      {
-        setPose(objects_[selectedObjectIndex_]->getPose());
-      }
+      setPose(objects_[selectedObjectIndex_]->getPose());
     }
 
     /**

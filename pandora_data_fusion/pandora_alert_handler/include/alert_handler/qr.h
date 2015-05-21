@@ -97,7 +97,6 @@ namespace pandora_data_fusion
       private:
         //!< The qr's content
         std::string content_;
-
     };
 
     typedef Qr::Ptr QrPtr;

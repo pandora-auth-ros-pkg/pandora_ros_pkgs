@@ -251,7 +251,6 @@ namespace pandora_data_fusion
         ObjectFactoryPtr objectFactory_;
         ObjectHandlerPtr objectHandler_;
         VictimHandlerPtr victimHandler_;
-
     };
 
       template <class ObjectType>
@@ -309,7 +308,7 @@ namespace pandora_data_fusion
           }
         }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
 #endif  // ALERT_HANDLER_ALERT_HANDLER_H

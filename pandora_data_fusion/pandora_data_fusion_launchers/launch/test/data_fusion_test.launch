@@ -1,10 +1,11 @@
 <launch>
+  <arg name="camera_frame" default="kinect_rgb_frame" />
 
   <node pkg="map_server" type="map_server" name="static_map_publisher"
     args="$(find pandora_alert_handler)/test/test_maps/map1.yaml"/>
 
   <node pkg="tf" type="static_transform_publisher"
-    name="world2headCamera" args="1 2 1 -1.574 0 0 /map headCamera 100" />
+    name="world2headCamera" args="1 2 1 -1.574 0 0 /map $(arg camera_frame) 100" />
 
   <node pkg="tf" type="static_transform_publisher"
     name="world2map" args="0 0 0 0 0 0 /world /map 100" />

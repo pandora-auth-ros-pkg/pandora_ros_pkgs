@@ -613,5 +613,5 @@ namespace pandora_data_fusion
       return true;
     }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

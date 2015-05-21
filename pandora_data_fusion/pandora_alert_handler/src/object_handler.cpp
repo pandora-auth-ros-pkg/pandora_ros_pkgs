@@ -143,5 +143,5 @@ namespace pandora_data_fusion
       VICTIM_CLUSTER_RADIUS = victim_cluster_radius;
     }
 
-  }  // namespace pandora_alert_handler
+}  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
