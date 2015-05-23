@@ -32,9 +32,12 @@ add_executable(
   stabilizer_control_node
   src/stabilizer_control.cpp
   src/stabilizer_control_node.cpp)
+add_dependencies(
+    stabilizer_control_node
+    pandora_sensor_msgs_gencpp)
 target_link_libraries(
   stabilizer_control_node
-  ${catkin_LIBRARIES} )
+  ${catkin_LIBRARIES})
 
 
 if(CATKIN_ENABLE_TESTING)
