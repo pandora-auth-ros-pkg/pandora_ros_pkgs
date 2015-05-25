@@ -157,7 +157,10 @@ namespace pandora_pose_estimation
       previousTf_.setOrigin(tf::Vector3(origin.getX(),origin.getY(),final_z));
       previousTf_.setRotation(intermediateTf.getRotation());
       // Broadcast updated footprint transform
-      tf::Vector3 translationZ(0, 0, final_z);
+      //tf::Vector3 translationZ(0, 0, final_z);
+
+      // For testing purposes: keep z in internal state without affecting others
+      tf::Vector3 translationZ(0, 0, 0);
       tf::Transform tfDz(rotationZero, translationZ);
       poseBroadcaster_.sendTransform(tf::StampedTransform(tfDz,
                                                       ros::Time::now(),
@@ -225,7 +228,6 @@ namespace pandora_pose_estimation
    */
   double PoseEstimation::findDz(double dx, double dy)
   {
-    ROS_INFO("[%s]: finding dz..", nh_.getNamespace().c_str());
     int totalSteps= (pitchQ_.size()-1)*IMU_INTERP_STEPS;
     double sum_dz= 0, pastRoll, pastPitch, stepRoll, stepPitch;
 
@@ -251,8 +253,7 @@ namespace pandora_pose_estimation
     }
     dxQ_.resize(FILTER_LENGTH);
     dyQ_.resize(FILTER_LENGTH);
-
-    ROS_INFO("[%s]: ...found! %f", nh_.getNamespace().c_str(), sum_dz);
+    
     return sum_dz;
   }
 
