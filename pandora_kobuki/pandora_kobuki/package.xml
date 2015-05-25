@@ -1,0 +1,20 @@
+<package format="2">
+  <name>pandora_kobuki</name>
+  <version>0.0.0</version>
+  <description>Contains pandora kobuki packages</description>
+
+  <maintainer email="geromidg@gmail.com">Geromichalos Dimitrios Panagiotis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_kobuki/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_kobuki.git</url>
+
+  <author>Geromichalos Dimitrios Panagiotis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
