@@ -2,6 +2,7 @@
 #include "pandora_explorer/frontier_goal_selector.h"
 
 
+
 void update_thread(pandora_explorer::FrontierGoalSelector* frontier_selector)
 {
   ros::Rate rate(1.0);
@@ -11,7 +12,7 @@ void update_thread(pandora_explorer::FrontierGoalSelector* frontier_selector)
 
     geometry_msgs::PoseStamped goal;
     frontier_selector->findNextGoal(&goal);
-
+    
     rate.sleep();
   }
 
@@ -31,6 +32,8 @@ int main(int argc, char* argv[])
 
   frontier_update_thread->interrupt();
   frontier_update_thread->join();
-
+  
   return 0;
 }
+
+

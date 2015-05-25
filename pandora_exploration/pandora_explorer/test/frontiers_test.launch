@@ -1,6 +1,6 @@
 <launch>
   <param name="/use_sim_time" value="true"/>
-
+  
   <node pkg="pandora_explorer" type="frontier_test" name="frontier_test_node" output="screen" >
     <rosparam file="$(find pandora_explorer)/config/costmap_params.yaml" command="load" ns="explore_costmap" />
     <rosparam file="$(find pandora_explorer)/config/frontier_exploration_params.yaml" command="load" />

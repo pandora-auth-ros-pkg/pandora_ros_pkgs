@@ -2,7 +2,7 @@
 *
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+*  Copyright (c) 2014 - 2015, P.A.N.D.O.R.A. Team.
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -49,17 +49,22 @@ ExplorationController::ExplorationController()
     move_base_client_("move_base", true),
     first_time_(true)
 {
+  // create explore frontier goal selector
   explore_goal_selector_.reset(new FrontierGoalSelector("explore"));
 
+  // load use_coverage
   bool use_coverage;
   private_nh_.param<bool>("use_coverage", use_coverage, false);
 
+  // if use_coverage is enabled we create a frontier goal selector with the name coverage
   if (use_coverage)
     coverage_goal_selector_.reset(new FrontierGoalSelector("coverage"));
 
+  // register preempt callback
   do_exploration_server_.registerPreemptCallback(
       boost::bind(&ExplorationController::preemptCb, this));
 
+  // load max goal searches
   private_nh_.param<int>("max_goal_searches", max_goal_searches_, 5);
   private_nh_.param<int>("max_abortions", max_abortions_, 5);
 
@@ -72,6 +77,7 @@ ExplorationController::ExplorationController()
   private_nh_.param<double>("goal_timeout", goal_timeout, 20.0);
   goal_timeout_ = ros::Duration(goal_timeout);
 
+  // start exploration server
   do_exploration_server_.start();
 }
 
@@ -79,7 +85,8 @@ void ExplorationController::executeCb(
     const pandora_exploration_msgs::DoExplorationGoalConstPtr& goal)
 {
   // wait for move_base to set-up
-  if (!move_base_client_.waitForServer(ros::Duration(1.0))) {
+  if (!move_base_client_.waitForServer(ros::Duration(1.0)))
+  {
     do_exploration_server_.setAborted(pandora_exploration_msgs::DoExplorationResult(),
                                       "Could not connect to move_base action");
     return;
@@ -96,13 +103,13 @@ void ExplorationController::executeCb(
     // we reached maximum goal searches retries
     if (goal_searches_count_ >= max_goal_searches_) {
       do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
-          "[explorer] Max retries reached, we could not find more goals - exploration completed");
+                                        "[explorer] Max retries reached, we could not find more goals - exploration completed");
       return;
     }
 
     if (abort_count_ >= max_abortions_) {
       do_exploration_server_.setAborted(pandora_exploration_msgs::DoExplorationResult(),
-          "Robot refuses to move, aborting...");
+                                        "Robot refuses to move, aborting...");
       return;
     }
 
@@ -110,8 +117,7 @@ void ExplorationController::executeCb(
 
     if (goal->exploration_type == pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP &&
         coverage_goal_selector_) {
-      success = coverage_goal_selector_->findNextGoal(&current_goal_);
-      //!< to current goal gemizetai me to stoxo pou tha vrei o goal selector
+      success = coverage_goal_selector_->findNextGoal(&current_goal_);  // to current goal gemizetai me to stoxo pou tha vrei o goal selector
     } else {
       success = explore_goal_selector_->findNextGoal(&current_goal_);
     }
