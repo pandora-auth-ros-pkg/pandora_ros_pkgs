@@ -1,7 +1,7 @@
 <package format="2">
   <name>pandora_geotiff</name>
   <version>0.0.0</version>
-  <description>Contains pandora geotiff  packages</description>
+  <description>Contains pandora geotiff packages</description>
 
   <maintainer email="chamzask@gmail.com">Chamzas Konstantinos</maintainer>
 
@@ -27,7 +27,7 @@
   <build_depend>libqt4-dev</build_depend>
   <exec_depend>libqt4</exec_depend>
   <depend>tf</depend>
-  <depend version_eq="geotiff_interfaces">pandora_data_fusion_msgs</depend>
+  <depend>pandora_data_fusion_msgs</depend>
 
   <test_depend>rosunit</test_depend>
   <test_depend>rostest</test_depend>
