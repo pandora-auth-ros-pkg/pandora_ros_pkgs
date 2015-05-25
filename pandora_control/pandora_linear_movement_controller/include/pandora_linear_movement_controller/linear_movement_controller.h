@@ -33,44 +33,61 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  Chris Zalidis
 *********************************************************************/
-#ifndef PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
-#define PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
+#ifndef PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H
+#define PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H
 
-#include <vector>
-#include <boost/math/constants/constants.hpp>
+#include <string>
 
 #include <ros/ros.h>
-#include <tf/tf.h>
-#include <std_msgs/Float64.h>
 
-#include <pandora_sensor_msgs/ImuRPY.h>
+#include <std_msgs/Float64.h>
+#include <actionlib/server/simple_action_server.h>
+#include <tf/transform_listener.h>
+#include <urdf_parser/urdf_parser.h>
+
+#include <pandora_linear_movement_controller/MoveLinearAction.h>
 
 namespace pandora_control
 {
-  class StabilizerController
+  class LinearMovementActionServer
   {
     private:
       ros::NodeHandle nodeHandle_;
-      ros::Subscriber imuSubscriber_;
+      std::string actionName_;
+      actionlib::SimpleActionServer<
+        pandora_linear_movement_controller::MoveLinearAction> actionServer_;
 
-      ros::Publisher laserRollPublisher_;
-      ros::Publisher laserPitchPublisher_;
+      ros::Publisher linearCommandPublisher_;
 
-      void serveImuMessage(const pandora_sensor_msgs::ImuRPYConstPtr& msg);
-      std::vector<double> rollBuffer_;
-      std::vector<double> pitchBuffer_;
-      int bufferSize_;
-      int bufferCounter_;
-      double minRoll_;
-      double maxRoll_;
-      double minPitch_;
-      double maxPitch_;
-      double rollOffset_;
-      double pitchOffset_;
+      int command_;
+      double minElevation_;
+      double minCommand_;
+      double maxCommand_;
+      double movementThreshold_;
+      double laxMovementThreshold_;
+      double commandTimeout_;
+      double previousTarget_;
+      std::string linearCommandTopic_;
+      std::string linearMotorFrame_;
+
+      tf::TransformListener tfListener_;
+
+      void callback(const pandora_linear_movement_controller::MoveLinearGoalConstPtr& goal);
+
+      bool getcontrollerParams();
+      void testLinear();
+      void lowerLinear();
+      void moveLinear(std::string pointOfInterest, std::string centerPoint,
+        double movementThreshold);
 
     public:
-      StabilizerController(void);
+      LinearMovementActionServer(
+        std::string name,
+        ros::NodeHandle nodeHandle_);
+
+      ~LinearMovementActionServer(void);
   };
 }  // namespace pandora_control
-#endif  // PANDORA_STABILIZER_CONTROL_STABILIZER_CONTROL_H
+#endif  // PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H

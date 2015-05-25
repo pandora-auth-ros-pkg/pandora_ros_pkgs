@@ -1,9 +1,0 @@
-<launch>
-  <node
-    name="end_effector_planner_smach"
-    pkg="pandora_end_effector_planner"
-    type="end_effector_planner_smach.py"
-    respawn="false"
-    output="screen"/>
-
-</launch>

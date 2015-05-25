@@ -1,0 +1,25 @@
+<launch>
+
+  <node
+    name="kinect_orientation_controller"
+    pkg="pandora_sensor_orientation_controller"
+    type="pandora_sensor_orientation_controller_node"
+    respawn="false"
+    output="screen"
+    ns="/pandora_control"
+    args="move_kinect_action"/>
+  <rosparam
+    command="load"
+    ns="/pandora_control"
+    file="$(find pandora_sensor_orientation_controller)/config/sensor_orientation_controller.yaml"/>
+
+  <!-- <node                                -->
+  <!--   name="head_orientation_controller"    -->
+  <!--   pkg="pandora_sensor_orientation_controller" -->
+  <!--   type="sensor_orientation_controller"  -->
+  <!--   respawn="false"                    -->
+  <!--   output="screen"                    -->
+  <!--   ns="control"                       -->
+  <!--   args="move_head_action"/>          -->
+
+</launch>

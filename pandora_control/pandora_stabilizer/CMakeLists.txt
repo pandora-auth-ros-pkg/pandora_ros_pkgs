@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   pandora_sensor_msgs
   roslint
-)
+  )
 
 catkin_package(
   INCLUDE_DIRS include
@@ -22,38 +22,54 @@ catkin_package(
     geometry_msgs
     pandora_sensor_msgs
 #  DEPENDS system_lib
-)
+  )
 
 include_directories(include
   ${catkin_INCLUDE_DIRS}
-)
+  )
 
 add_executable(
-  stabilizer_control_node
+  ${PROJECT_NAME}_control_node
   src/stabilizer_control.cpp
-  src/stabilizer_control_node.cpp)
-add_dependencies(
-    stabilizer_control_node
-    pandora_sensor_msgs_gencpp)
+  src/stabilizer_control_node.cpp
+  )
 target_link_libraries(
-  stabilizer_control_node
-  ${catkin_LIBRARIES})
-
+  ${PROJECT_NAME}_control_node
+  ${catkin_LIBRARIES}
+  )
+add_dependencies(
+  ${PROJECT_NAME}_control_node
+  ${catkin_EXPORTED_TARGETS}
+  )
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
-  add_rostest(launch/stabilizer_test.launch)
-endif()
+  find_package(pandora_testing_tools REQUIRED)
 
-# To check lint : catkin_make roslint_pandora_control
-set(ROSLINT_CPP_OPTS
-  "--filter=-build/include_what_you_use")
+  include_directories(
+  ${pandora_testing_tools_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  )
+
+  add_rostest(launch/stabilizer_test.launch)
+
+  FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_PYTHON
+    RELATIVE ${PROJECT_SOURCE_DIR}
+    test/*
+    )
+  list(REMOVE_ITEM ${PROJECT_NAME}_LINT_PYTHON
+    RELATIVE ${PROJECT_SOURCE_DIR}
+    *.pyc
+    )
+  roslint_python(${${PROJECT_NAME}_LINT_PYTHON})
+
+endif()
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
   include/pandora_stabilizer_control/stabilizer_control.h
   src/stabilizer_control_node.cpp
   src/stabilizer_control.cpp
-
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+roslint_add_test()

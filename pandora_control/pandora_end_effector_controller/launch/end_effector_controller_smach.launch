@@ -1,0 +1,9 @@
+<launch>
+  <node
+    name="end_effector_controller_smach"
+    pkg="pandora_end_effector_controller"
+    type="end_effector_controller_smach.py"
+    respawn="false"
+    output="screen"/>
+
+</launch>
