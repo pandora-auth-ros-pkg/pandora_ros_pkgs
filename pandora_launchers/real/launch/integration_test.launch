@@ -76,7 +76,7 @@
   <!-- Navigation -->
   <group if="$(arg navigation)">
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
-    <include file="$(find pandora_exploration)/launch/explorer.launch" />
+    <include file="$(find pandora_explorer)/launch/explorer.launch" />
   </group>
 
   <!-- Data fusion -->
