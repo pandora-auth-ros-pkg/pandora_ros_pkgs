@@ -91,7 +91,6 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
     )
 list(REMOVE_ITEM ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-    include/pandora_explorer/geometry_tools.h
     include/pandora_explorer/costmap_tools.h
     include/pandora_explorer/map_frontier_search.h
     include/pandora_explorer/frontier.h
