@@ -1,0 +1,6 @@
+<package>
+
+  <!-- Declare Nodes and inside them declare Subscribers, Publisher,
+    ActionServers, ActionClients, ServiceServers and ServiceClients -->
+
+</package>

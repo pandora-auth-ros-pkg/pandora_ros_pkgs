@@ -1,0 +1,40 @@
+<package format="2">
+  <name>pandora_sensor_planner</name>
+  <version>0.0.0</version>
+  <description>Contains modules for PANDORA's UGV sensor planning for exploration</description>
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+  <maintainer email='lykartsis.giannis@gmail.com'>Lykartsis Ioannis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_discovery/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_discovery.git</url>
+
+  <author>Tsirigotis Christos</author>
+  <author>Lykartsis Ioannis</author>
+
+<!--
+                           Buildtool Dependencies
+                                                                            -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+<!--
+                           Build Dependencies
+                                                                            -->
+
+<!--
+                           Exec Dependencies
+                                                                            -->
+
+<!--
+                           Dependencies
+                                                                            -->
+
+<!--
+                           Test Dependencies
+                                                                            -->
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,13 @@
+<package>
+
+  <node>
+    /data_fusion/sensor_coverage
+    <subscriber>/slam_map/map</subscriber>
+    <subscriber>/tf</subscriber>
+
+    <publisher>/data_fusion/sensor_coverage/coverage_map</publisher>
+    
+  </node>
+  
+</package>
+

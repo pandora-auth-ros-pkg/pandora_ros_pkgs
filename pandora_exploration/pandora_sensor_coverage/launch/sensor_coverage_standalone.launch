@@ -1,0 +1,10 @@
+<launch>
+
+  <!-- State Manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!--  Sensor Coverage  -->
+  <include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" />
+
+</launch>
+

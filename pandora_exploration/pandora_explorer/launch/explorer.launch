@@ -1,0 +1,10 @@
+<launch>
+  
+  <node pkg="pandora_explorer" type="exploration_controller" name="explorer" output="screen" respawn="true" >
+    <rosparam file="$(find pandora_explorer)/config/explore_costmap_params.yaml" command="load" ns="explore_costmap" />
+    <rosparam file="$(find pandora_explorer)/config/coverage_costmap_params.yaml" command="load" ns="coverage_costmap" />
+    <rosparam file="$(find pandora_explorer)/config/frontier_exploration_params.yaml" command="load" />
+    <rosparam file="$(find pandora_explorer)/config/exploration_controller_params.yaml" command="load" />
+  </node>
+
+</launch>
