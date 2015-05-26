@@ -42,8 +42,8 @@
 namespace pandora_vision
 {
   VictimImagePreProcessor::VictimImagePreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : sensor_processor::PreProcessor<sensor_msgs::PointCloud2, 
-    ImagesStamped>(ns, handler)
+    sensor_processor::Handler* handler) : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
+    EnhancedImageStamped>(ns, handler)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
       this->accessProcessorNh()->getNamespace());
@@ -51,12 +51,22 @@ namespace pandora_vision
   
   VictimImagePreProcessor::~VictimImagePreProcessor() {}
   
-  bool VictimImagePreProcessor::preProcess(const PointCloud2ConstPtr& input, 
-    const ImagesStampedPtr& output)
+  bool VictimImagePreProcessor::preProcess(const EnhancedImageConstPtr& input, 
+    const EnhancedImageStampedPtr& output)  
   {
+
     output->setHeader(input->header);
-    
-    output->setRgbImage(MessageConversions::convertPointCloudMessageToImage(input, CV_8UC3);
-    output->setDepthImage(MessageConversions::convertPointCloudMessageToImage(input, CV_32FC1);
+
+    cv_bridge::CvImagePtr inMsg;
+
+    inMsg = cv_bridge::toCvCopy(input->rgbImage, sensor_msgs::image_encodings::TYPE_8UC3);
+    output->setRgbImage(inMsg->image.clone());
+
+    inMsg = cv_bridge::toCvCopy(input->depthImage, sensor_msgs::image_encodings::TYPE_8UC1);
+    cv::Mat depthImage = inMsg->image.clone();
+    output->setDepthImage(depthImage);
+
+    output->setDepth(input->isDepth);
+
   }
 }  // namespace pandora_vision

@@ -331,6 +331,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="saveImagesPushButton">
+         <property name="text">
+          <string>Save all annotated Images</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="rosTopicPushButton">
          <property name="text">
           <string>Connect</string>

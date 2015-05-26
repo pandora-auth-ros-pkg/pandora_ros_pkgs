@@ -1,13 +1,13 @@
 <launch>
  <arg name="xtion" default= "false"/>
  <arg name="usb_cam" default= "false"/>
- <arg name="frame_id" default="kinect_frame"/>
-
+ <arg name="frame_id" default="/kinect_optical_frame"/>
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_landoltc)/launch/landoltc_2d_node.launch" />
 
   <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+
   <group if="$(arg xtion)">
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
     <param name="dataset_path" value="/test/benchmark/images/images_480p"/>
@@ -20,8 +20,9 @@
     <param name="kinect/topic_name" value="/left_camera/image" />
     <param name="dataset_path" value="/test/benchmark/images/images_720p"/>
     <param name="dataset_camera" value="web_camera"/>
-    <param name="kinect_optical_frame/hfov" value="61.14" />
-    <param name="kinect_optical_frame/vfov" value="48" />
+    <param name="frame_id" value="left_camera_optical_frame" />
+    <param name="$(arg frame_id)/hfov" value="60.00" />
+    <param name="$(arg frame_id)/vfov" value="33.75" />
   </group>
 
   <param name="publisherMessagePackage" value="sensor_msgs" />
@@ -34,7 +35,6 @@
   <param name="subscriberAlertTopic" value="/vision/landoltc_alert" />
   <param name="subscriberAlertMessagePackage" value="pandora_vision_msgs" />
   <param name="subscriberAlertMessageType" value="LandoltcAlertVector"/>
-
 
   <param name="algorithm" value="LandoltC"/>
     

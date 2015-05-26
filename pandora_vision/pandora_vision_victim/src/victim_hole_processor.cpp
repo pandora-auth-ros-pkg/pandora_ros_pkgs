@@ -115,6 +115,12 @@ namespace pandora_vision
         input->getRegion(i).height);
       holes_bounding_boxes.push_back(rect);
 
+      if(input->getRegion(i).x - input->getRegion(i).width / 2 <= 0 &&
+         input->getRegion(i).y - input->getRegion(i).height / 2 <= 0 &&
+         input->getRegion(i).width <= 0 &&
+         input->getRegion(i).height <= 0)
+          ROS_FATAL("[victim_node] Bounding box sent from hole out of boundaries");
+
       EnhancedMat emat;
       emat.img = input->getRgbImage()(rect);
       // cv::resize(emat.img, emat.img,

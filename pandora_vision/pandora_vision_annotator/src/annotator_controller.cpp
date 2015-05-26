@@ -57,7 +57,8 @@ namespace pandora_vision
   @param argv [char **] Input arguments
   @return void
   **/
-  CController::CController(int argc, char **argv):
+  CController::CController(
+      int argc, char **argv):
     connector_(argc, argv),
     argc_(argc),
     argv_(argv)
@@ -223,6 +224,13 @@ namespace pandora_vision
     {
       sensor_msgs::Image::ConstPtr img = m.instantiate<sensor_msgs::Image>();
       sensor_msgs::PointCloud2::ConstPtr pc =m.instantiate<sensor_msgs::PointCloud2>();
+      pandora_vision_msgs::EnhancedImage::ConstPtr enhanced = m.instantiate<pandora_vision_msgs::EnhancedImage>();
+
+      if(enhanced != NULL)
+      {
+       depthVisible_ = false;
+       receiveEnhancedImage(enhanced);
+      }
       
       if(img != NULL)
       {
@@ -340,6 +348,7 @@ namespace pandora_vision
       cv::Mat temp;
       currentFrameNo_ = initialFrame; 
       connector_.getcurrentFrame(currentFrameNo_, &temp);
+
       if(enableBackwardTracking)
       {
       std::stringstream filename;
@@ -510,7 +519,55 @@ namespace pandora_vision
     }
   }   
  
- 
+  /**
+  @brief Function called when new ROS message appears, from any topic
+  posting an EnhancedImage  kind of msg
+  @param msg [const pandora_vision_msgs::EnhancedImageConstPtr& ] The message
+  @return void
+  **/
+  void CController::receiveEnhancedImage(const pandora_vision_msgs::EnhancedImageConstPtr& msg)
+  {
+     cv_bridge::CvImagePtr rgb_msg, depth_msg;
+     cv::Mat rgb, depth, temp; 
+
+     if(msg->isDepth) 
+     {
+        rgb_msg = cv_bridge::toCvCopy(msg->depthImage,
+        sensor_msgs::image_encodings::TYPE_8UC1);
+        cv::cvtColor(rgb_msg->image, depth, CV_GRAY2RGB);
+     
+        depth_msg = cv_bridge::toCvCopy(msg->rgbImage,
+        sensor_msgs::image_encodings::TYPE_8UC3); 
+        cv::cvtColor(depth_msg->image, rgb, CV_BGR2RGB); 
+     }
+     
+
+      if(!onlinemode)
+      {
+        if(depthVisible_)
+        {
+          frames.push_back(depth);
+          temp = depth.clone();
+        }
+        else
+        {
+          frames.push_back(rgb);
+          temp = rgb.clone();
+        }
+        msgHeader_.push_back(msg->header);
+      }
+
+      else
+      { 
+        QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
+        dest.bits(); // enforce deep copy, see documentation
+        connector_.setImage(dest);
+        connector_.msgTimeStamp(msg->header);
+        Q_EMIT updateImage();
+      }
+
+  }
+
   /**
   @brief Initializes the ROS spin and Qt threads
   @return bool

@@ -55,23 +55,7 @@ namespace pandora_vision
     
     path_to_samples = datasetPath;
     numFeatures_ = numFeatures;
-    params.svm_type = CvSVM::C_SVC;
-    params.kernel_type = CvSVM::RBF;  //!< CvSVM::RBF, CvSVM::LINEAR ...
-    params.degree = 1;  //!< for poly
-    params.gamma = 5.0625000000000009e-01;  //!< for poly/rbf/sigmoid
-    params.coef0 = 0;  //!< for poly/sigmoid
-    // CvParamGrid CvParamGrid_C(pow(2.0,-5), pow(2.0,15), pow(2.0,2));
-    // CvParamGrid CvParamGrid_gamma(pow(2.0,-20), pow(2.0,3), pow(2.0,2));
-    // if (!CvParamGrid_C.check() || !CvParamGrid_gamma.check())
-      // std::cout << "The grid is NOT VALID." << std::endl;
-    params.C = 3.1250000000000000e+02;  //!< for CV_SVM_C_SVC, CV_SVM_EPS_SVR and CV_SVM_NU_SVR
-    params.nu = 0.3;  //!< for CV_SVM_NU_SVC, CV_SVM_ONE_CLASS, and CV_SVM_NU_SVR
-    params.p = 0.0;  //!< for CV_SVM_EPS_SVR
-    params.class_weights = NULL;  //!< for CV_SVM_C_SVC
-    params.term_crit.type = CV_TERMCRIT_ITER+CV_TERMCRIT_EPS;
-    params.term_crit.max_iter = 10000;
-    params.term_crit.epsilon = 1e-6;
-
+   
     package_path = ros::package::getPath("pandora_vision_victim");
     ROS_INFO("[victim_node] : Created Svm training instance");
 

@@ -177,8 +177,10 @@ namespace pandora_vision
         y = static_cast<float>(result->frameHeight) / 2
           - poiPtr->getPoint().y;
 
-        info.yaw = atan(2 * x / result->frameWidth * tan(hfov / 2));
-        info.pitch = atan(2 * y / result->frameHeight * tan(vfov / 2));
+        info.yaw = atan(2 * x / result->frameWidth *
+            tan(hfov * CV_PI/ 360.0f));
+        info.pitch = atan(2 * y / result->frameHeight *
+            tan(vfov * CV_PI/ 360.0f));
         info.probability = poiPtr->getProbability();
 
         generalAlertInfos.generalAlerts.push_back(info);

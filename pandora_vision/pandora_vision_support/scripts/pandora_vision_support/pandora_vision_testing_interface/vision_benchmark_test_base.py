@@ -46,6 +46,7 @@ import numpy
 import time
 from collections import defaultdict
 import cv2
+import threading
 from cv_bridge import CvBridge, CvBridgeError
 
 from pandora_testing_tools.testing_interface import test_base
@@ -53,6 +54,10 @@ from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
 
 class VisionBenchmarkTestBase(test_base.TestBase):
+
+    alertEvent = threading.Event()
+    datasetCamera = ""
+
     def readImages(self, imagePath):
         rosimage = Image()
         self.images = []
@@ -94,10 +99,6 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             rosimage.header.frame_id = "/kinect_optical_frame"
             rosimage.header.stamp = rospy.Time.now()
             self.images.append(rosimage)
-            self.names.append(fileName)
-            
-            self.imageWidth = currentImg.shape[1]
-            self.imageHeight = currentImg.shape[0]
 
             self.imageWidth = currentImg.shape[1]
             self.imageHeight = currentImg.shape[0]
@@ -366,6 +367,20 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         imageY = -imageY + self.imageHeight / 2.0
         return imageX, imageY
 
+    @classmethod
+    def mockCallback(cls, data, output_topic):
+        rospy.logdebug("Got message from topic : " + str(output_topic))
+        rospy.logdebug(data)
+        cls.messageList[output_topic].append(data)
+        cls.repliedList[output_topic] = True
+        # Set the processor block to notify the program that the processor
+        # answered
+        if "processor" in output_topic:
+            cls.block.set()
+        # Notify the program that an alert has been received.
+        if "alert" in output_topic:
+            cls.alertEvent.set()
+
     def benchmarkTest(self, imagePath, inputTopic, outputTopic):
         # Read a Set of Images
         rospy.loginfo("Reading Images")
@@ -407,6 +422,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         # Confirm the authenticity of the alert using the annotator
         # groundtruth set.
         for image, imageName in zip(self.images, self.names):
+
+            self.alertEvent.clear()
             rospy.logdebug("Sending Image %s", imageName)
             timeFlag = False
             startTime = time.clock()
@@ -421,23 +438,20 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                             #(self.repliedList[outputTopic[0]] and
                              #len(self.messageList[outputTopic[0]]) >= 1))
 
-            response = self.messageList[outputTopic][0]
-            print self.messageList[outputTopic]
-            print "response"
-            print response.success
-            print count
-            print self.messageList.keys()
-            outputTopic2 = self.subscribers.keys()[0]
-            count += 1
-            if response.success == "ERROR":
-                continue
-            if response.success == True and len(self.messageList) == 2 :
+            response = self.messageList[outputTopic[0]]
+            print len(response)
+            print "Object Type : ", response[0].__class__.__name__
+            # possibleAlert = self.messageList[outputTopic[1]]
+            if response[0].success:
+                # Wait for the alert to arrive.
+                self.alertEvent.wait()
                 rospy.logdebug("Alert found in Image %s", imageName)
                 rospy.logdebug("Time passed: %f seconds", elapsedTime)
                 truePositivesInImage = 0
-                #Estimate alert center point from message parameters
+                # Estimate alert center point from message parameters
+                print self.messageList.items()
                 alerts = getattr(
-                        self.messageList[outputTopic2][queueIndex],
+                        self.messageList[outputTopic[1]][queueIndex],
                         self.algorithm.lower()+suffix)
                 print len(alerts)
                 queueIndex += 1
@@ -486,4 +500,3 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         # (Distance, Horizontal Angle, Vertical Angle)
         self.calculateRecallResults()
         self.calculateMeanNumberOfAngles()
-

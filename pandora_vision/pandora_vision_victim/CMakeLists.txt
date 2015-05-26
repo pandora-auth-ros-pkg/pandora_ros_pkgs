@@ -37,8 +37,8 @@ catkin_package(
       dynamic_reconfigure
       sensor_msgs
       urdf
-    #INCLUDE_DIRS
-    #LIBRARIES
+    INCLUDE_DIRS
+    LIBRARIES
 )
 
 include_directories(include
@@ -141,21 +141,33 @@ target_link_libraries(${PROJECT_NAME}_hole_preprocessor
 add_dependencies(${PROJECT_NAME}_hole_preprocessor
   ${catkin_EXPORTED_TARGETS})
 ################# victim image processor #################
-#~ add_library(${PROJECT_NAME}_image_processor
-  #~ src/victim_image_processor.cpp
-#~ )
-#~ target_link_libraries(${PROJECT_NAME}_image_processor
-  #~ ${catkin_LIBRARIES}
-  #~ ${PROJECT_NAME}_victim_parameters
-#~ )
+add_library(${PROJECT_NAME}_image_processor
+  src/victim_image_processor.cpp
+  src/svm_classifier/svm_validator.cpp
+  src/svm_classifier/rgb_svm_validator.cpp
+  src/svm_classifier/depth_svm_validator.cpp
+
+)
+target_link_libraries(${PROJECT_NAME}_image_processor
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_victim_parameters
+  ${PROJECT_NAME}_feature_extractors
+
+)
 
 ################# victim image preprocessor #################
-#~ add_library(${PROJECT_NAME}_image_preprocessor
-  #~ src/victim_image_preprocessor.cpp
-#~ )
-#~ target_link_libraries(${PROJECT_NAME}_image_preprocessor
-  #~ ${catkin_LIBRARIES}
-#~ )
+add_library(${PROJECT_NAME}_image_preprocessor
+  src/victim_image_preprocessor.cpp
+)
+target_link_libraries(${PROJECT_NAME}_image_preprocessor
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_victim_parameters
+
+  )
+
+add_dependencies(${PROJECT_NAME}_image_preprocessor
+  ${catkin_EXPORTED_TARGETS}
+)
 
 ################# victim postprocessor #################
 add_library(${PROJECT_NAME}_postprocessor
@@ -175,8 +187,8 @@ target_link_libraries(${PROJECT_NAME}_handler
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_hole_processor
   ${PROJECT_NAME}_hole_preprocessor
-  #~ ${PROJECT_NAME}_image_processor
-  #~ ${PROJECT_NAME}_image_preprocessor
+   ${PROJECT_NAME}_image_processor
+   ${PROJECT_NAME}_image_preprocessor
   ${PROJECT_NAME}_postprocessor
 )
 

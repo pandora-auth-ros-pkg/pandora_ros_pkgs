@@ -41,26 +41,27 @@
 #define PANDORA_VISION_VICTIM_VICTIM_IMAGE_PREPROCESSOR_H
 
 #include <string>
-#include <sensor_msgs/PointCloud2.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
 #include "sensor_processor/handler.h"
 #include "sensor_processor/preprocessor.h"
-#include "pandora_vision_hole/utils/message_conversions.h"
-#include "pandora_vision_victim/images_stamped.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
+#include "pandora_vision_victim/enhanced_image_stamped.h"
 
 namespace pandora_vision
 {
-  class VictimImagePreProcessor : public sensor_processor::PreProcessor<
-    sensor_msgs::PointCloud2, ImagesStamped>
+  class VictimImagePreProcessor : public sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
+  EnhancedImageStamped>
   {
     protected:
-      boost::shared_ptr<sensor_msgs::PointCloud2> PointCloud2Ptr;
-      boost::shared_ptr<sensor_msgs::PointCloud2 const> PointCloud2ConstPtr;
+       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage> EnhancedImagePtr;
+      typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage const> EnhancedImageConstPtr;
     
     public:
       VictimImagePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
       virtual ~VictimImagePreProcessor();
       
-      virtual bool preProcess(const PointCloud2ConstPtr& input, const ImagesStampedPtr& output);
+      virtual bool preProcess(const EnhancedImageConstPtr& input, const EnhancedImageStampedPtr& output);
   };
 }  // namespace pandora_vision
 

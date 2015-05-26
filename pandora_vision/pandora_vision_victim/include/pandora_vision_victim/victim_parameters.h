@@ -133,7 +133,7 @@ namespace pandora_vision
       double depth_vj_weight;
       double rgb_svm_weight;
       double depth_svm_weight;
-
+      
       //!< Parameters for debug purposes
       bool debug_img;
       bool debug_img_publisher;
@@ -154,6 +154,9 @@ namespace pandora_vision
       std::string depth_classifier_path;
 
       /// parameters for svms
+      CvSVMParams params;
+      bool oneClass;
+      bool autoTrain;
       double rgb_svm_C;
       double rgb_svm_gamma;
       double rgb_svm_prob_scaling;

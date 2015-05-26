@@ -58,15 +58,9 @@ namespace pandora_vision
         std::string pkgPath = ros::package::getPath("pandora_vision_qrcode");
         std::string paramsPath = pkgPath + "/" + "config/qrcode_params.yaml";
 
-        // cv::FileStorage fs(paramsPath, cv::FileStorage::READ);
-
         int gaussianSharpenBlur = 5;
         float gaussianSharpenWeight = 0.8;
         bool debugCode = false;
-
-        // fs["debugQrCode"] >> debugCode;
-        // fs["qrCodeSharpenBlur"] >> gaussianSharpenBlur;
-        // fs["qrCodeSharpenWeight"] >> gaussianSharpenWeight;
 
         qrCodeDetectorPtr_ = new QrCodeDetector(gaussianSharpenBlur,
             gaussianSharpenWeight, debugCode);
@@ -84,14 +78,9 @@ namespace pandora_vision
       int WIDTH;
       int HEIGHT;
 
-    private:
       QrCodeDetector* qrCodeDetectorPtr_;
   };
 
-  std::vector<POIPtr> QrCodeDetectorTest::detectQrCode(cv::Mat frame)
-  {
-    return qrCodeDetectorPtr_->detectQrCode(frame);
-  }
 
   int* QrCodeDetectorTest::locateQrCode(cv::Point2f qrcode_center)
   {
@@ -132,12 +121,13 @@ namespace pandora_vision
   TEST_F(QrCodeDetectorTest, detectQrCodeBlackImage)
   {
     cv::Mat blackFrame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
-    std::vector<POIPtr> qrcode_list = detectQrCode(blackFrame);
+    std::vector<POIPtr> qrcode_list =
+      qrCodeDetectorPtr_->detectQrCode(blackFrame);
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
     // neither when 3 channels are used
     blackFrame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC3);
-    qrcode_list = detectQrCode(blackFrame);
+    qrcode_list = qrCodeDetectorPtr_->detectQrCode(blackFrame);
     EXPECT_EQ(0, qrcode_list.size());
   }
 
@@ -145,7 +135,8 @@ namespace pandora_vision
   {
     cv::Mat whiteFrame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
     whiteFrame.setTo(cv::Scalar(255, 255, 255));
-    std::vector<POIPtr> qrcode_list = detectQrCode(whiteFrame);
+    std::vector<POIPtr> qrcode_list =
+      qrCodeDetectorPtr_->detectQrCode(whiteFrame);
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
   }
@@ -159,10 +150,10 @@ namespace pandora_vision
     cv::Mat H, V;
     cv::hconcat(blackFrame, whiteFrame, H);
     cv::vconcat(blackFrame, whiteFrame, V);
-    std::vector<POIPtr> qrcode_list = detectQrCode(H);
+    std::vector<POIPtr> qrcode_list = qrCodeDetectorPtr_->detectQrCode(H);
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
-    qrcode_list = detectQrCode(V);
+    qrcode_list = qrCodeDetectorPtr_->detectQrCode(V);
     EXPECT_EQ(0, qrcode_list.size());
   }
 
@@ -172,13 +163,13 @@ namespace pandora_vision
     int blocksNumberH = 10;
     int blocksNumberV = 10;
     drawChessboard(blocksNumberH, blocksNumberV, frame);
-    std::vector<POIPtr> qrcode_list = detectQrCode(frame);
+    std::vector<POIPtr> qrcode_list = qrCodeDetectorPtr_->detectQrCode(frame);
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
     blocksNumberH = 100;
     blocksNumberV = 100;
     drawChessboard(blocksNumberH, blocksNumberV, frame);
-    qrcode_list = detectQrCode(frame);
+    qrcode_list = qrCodeDetectorPtr_->detectQrCode(frame);
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
   }

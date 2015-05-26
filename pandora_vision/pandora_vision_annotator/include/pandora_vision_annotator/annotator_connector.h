@@ -335,6 +335,12 @@ namespace pandora_vision
       void removeFilePushButtonTriggered(void);
 
       /**
+      @brief Qt slot that is called when the saveImagesPushButton is pressed
+      @return void
+      **/
+      void saveImagesPushButtonTriggered(void);
+
+      /**
       @brief Qt slot that is called when a QListWidgetItem
       is triggered.display frame and load annotations from file.
       @return void

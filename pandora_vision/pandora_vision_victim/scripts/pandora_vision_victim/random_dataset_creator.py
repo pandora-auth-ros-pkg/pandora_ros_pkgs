@@ -5,6 +5,7 @@ dataset.
 import os
 import shutil
 import random
+import readline
 
 from collections import defaultdict
 
@@ -52,8 +53,8 @@ class RandomDatasetCreator(object):
         two-class classification problem. The sub-set chosen has about the same
         percentage of positive and negative images as the original one.
     """
-    def __init__(self, srcImagePath, srcAnnotationsPath,
-                 srcAnnotationsFileName, dstImagePath, dstAnnotationsPath,
+    def __init__(self, srcImagePath, srcAnnotationsFilePath,
+                 dstImagePath, dstAnnotationsPath,
                  dstAnnotationsFileName, desiredDatasetSize,
                  saveRemainingImages =False, positivesPercentage=0):
         """ Initialize class member variables.
@@ -91,8 +92,7 @@ class RandomDatasetCreator(object):
         self.positivesPercentage = float(positivesPercentage)
 
         self.srcImagePath = srcImagePath
-        self.srcAnnotationsPath = srcAnnotationsPath
-        self.srcAnnotationsFileName = srcAnnotationsFileName
+        self.srcAnnotationsFilePath = srcAnnotationsPath
         self.dstImagePath = dstImagePath
         self.dstAnnotationsPath = dstAnnotationsPath
         self.dstAnnotationsFileName = dstAnnotationsFileName
@@ -104,20 +104,19 @@ class RandomDatasetCreator(object):
         """
         fileExtension = ".txt"
         # Check that the path exists.
-        if not os.path.isdir(self.srcAnnotationsPath):
+        if not os.path.isfile(self.srcAnnotationsFilePath):
             print "ERROR : Incorrect Path for annotations file."
             exit(1)
         # Check that the file extension is appropriate.
-        if (fileExtension not in self.srcAnnotationsFileName):
-            print fileName, "is not a proper file."
+        if (fileExtension not in self.srcAnnotationsFilePath):
+            print fileName, "is not a proper text file."
             exit(2)
         # Read the annotations file.
-        annotationsFile = open(os.path.join(self.srcAnnotationsPath,
-                                            self.srcAnnotationsFileName), "rU")
+        annotationsFile = open(os.path.join(self.srcAnnotationsFilePath), "rU")
 
         # Ensure that the file was read successfully.
         if (annotationsFile is None):
-            print "Error reading the file", self.srcAnnotationsFileName
+            print "Error reading the file", self.srcAnnotationsFilePath
             exit(3)
 
         # Read file and save contents in a dictionary.
@@ -234,6 +233,15 @@ class RandomDatasetCreator(object):
         """ This function copies the randomly chosen dataset images to a
             specified folder.
         """
+        if not os.path.isdir(self.dstImagePath):
+            print ("Directory {} does not exist and will be" +
+                   " created".format(self.dstImagePath))
+            os.mkdir(self.dstImagePath)
+        if (not os.path.isdir(os.path.join(self.dstImagePath, "Remaining")) and
+                self.saveRemainingImages):
+            print ("Directory" + self.dstImagePath + " does not exist and" +
+                   " will be created")
+            os.mkdir(os.path.join(self.dstImagePath, "Remaining"))
         imageTypes = [".png", ".jpg", ".bmp", ".pgm"]
         if not os.path.isdir(self.srcImagePath):
             print "ERROR : Incorrect Path for source image dataset"
@@ -278,16 +286,25 @@ class RandomDatasetCreator(object):
 
 
 if __name__ == "__main__":
+    # Set the auto completion scheme
+    readline.set_completer_delims(" \t")
+    readline.parse_and_bind("tab:complete")
+
     print "Initialize process"
     print "Type the absolute path to the initial dataset:"
     print "e.g. /home/user/foo"
     srcImagePath = raw_input("-->")
     print "Type the absolute path to the initial annotations file:"
-    print "e.g. /home/user/bar"
     srcAnnotationsPath = raw_input("-->")
-    print "Type the name of the initial annotations file:"
-    print "e.g. annotations.txt"
-    srcAnnotationsFileName = raw_input("-->")
+    srcAnnotationsFileName = os.path.basename(srcAnnotationsPath)
+
+    print ("Is the annotation file Name" +
+           " = {} ? [Y/N]".format(srcAnnotationsFileName))
+    answer = raw_input("-->")
+    if "N" in answer:
+        print "Type the name of the initial annotations file:"
+        print "e.g. annotations.txt"
+        srcAnnotationsFileName = raw_input("-->")
     print "Would you like to copy the new dataset images? If so, press [y]." \
           "In any other case, a new annotations file will only be created."
     copyNewDatasetImages = raw_input("-->")
@@ -331,10 +348,13 @@ if __name__ == "__main__":
         flag = False
 
     randDataset = RandomDatasetCreator(srcImagePath, srcAnnotationsPath,
-                                       srcAnnotationsFileName, dstImagePath,
+                                       dstImagePath,
                                        dstAnnotationsPath,
                                        dstAnnotationsFileName,
                                        desiredDatasetSize, flag,
                                        positivesPercentage)
+    print "Creating new Annotations File!"
     randDataset.createNewDatasetAnnotations()
+    if copyNewDatasetImages == "y":
+        randDataset.copyDatasetImages()
     print "Process is finished successfully!"

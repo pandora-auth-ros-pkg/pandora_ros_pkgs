@@ -42,9 +42,9 @@
 
 #include <string>
 #include "sensor_processor/handler.h"
-//~ #include "pandora_vision_victim/victim_image_preprocessor.h"
+#include "pandora_vision_victim/victim_image_preprocessor.h"
 #include "pandora_vision_victim/victim_hole_preprocessor.h"
-//~ #include "pandora_vision_victim/victim_image_processor.h"
+#include "pandora_vision_victim/victim_image_processor.h"
 #include "pandora_vision_victim/victim_hole_processor.h"
 #include "pandora_vision_victim/victim_postprocessor.h"
 

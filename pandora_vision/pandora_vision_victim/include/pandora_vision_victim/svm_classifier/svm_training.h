@@ -57,8 +57,6 @@
 #include "pandora_vision_victim/utilities/file_utilities.h"
 #include "pandora_vision_victim/utilities/feature_extraction_utilities.h"
 
-#define USE_OPENCV_GRID_SEARCH_AUTOTRAIN 1
-
 namespace pandora_vision
 {
   class SvmTraining
@@ -203,7 +201,7 @@ namespace pandora_vision
       /// and/or feature selection.
       FeatureExtractionUtilities* featureExtractionUtilities_;
       /// Set up SVM's parameters
-      CvSVMParams params;
+      //CvSVMParams params;
       CvParamGrid CvParamGrid_gamma, CvParamGrid_C;
 
       /// Train the SVM

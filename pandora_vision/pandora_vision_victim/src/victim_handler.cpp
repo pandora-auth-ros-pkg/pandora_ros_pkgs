@@ -48,7 +48,7 @@ namespace pandora_vision
     holeActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD);
     holeActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
     
-    //~ imageActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
+    imageActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
   }
   
   void VictimHandler::startTransition(int newState)
@@ -67,11 +67,11 @@ namespace pandora_vision
       holeCurrentlyOn = (holeCurrentlyOn || currentState_ == holeActiveStates_[ii]);
     }
     
-    //~ for (int ii = 0; ii < imageActiveStates_.size(); ii++)
-    //~ {
-      //~ imagePreviouslyOff = (imagePreviouslyOff && previousState_ != imageActiveStates_[ii]);
-      //~ imageCurrentlyOn = (imageCurrentlyOn || currentState_ == imageActiveStates_[ii]);
-    //~ }
+    for (int ii = 0; ii < imageActiveStates_.size(); ii++)
+    {
+      imagePreviouslyOff = (imagePreviouslyOff && previousState_ != imageActiveStates_[ii]);
+      imageCurrentlyOn = (imageCurrentlyOn || currentState_ == imageActiveStates_[ii]);
+    }
    
     if (holePreviouslyOff && holeCurrentlyOn)
     {
@@ -79,12 +79,12 @@ namespace pandora_vision
       processorPtr_.reset(new VictimHoleProcessor("~/processor", this));
       postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
     }
-    //~ else if (imagePreviouslyOff && imageCurrentlyOn)
-    //~ {
-      //~ preProcPtr_.reset(new VictimImagePreProcessor("~/preprocessor", this));
-      //~ processorPtr_.reset(new VictimImageProcessor("~/processor", this));
-      //~ postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
-    //~ }
+    else if (imagePreviouslyOff && imageCurrentlyOn)
+    {
+      preProcPtr_.reset(new VictimImagePreProcessor("~/preprocessor", this));
+      processorPtr_.reset(new VictimImageProcessor("~/processor", this));
+      postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
+    }
     else if ((!holePreviouslyOff || !imagePreviouslyOff) && (!holeCurrentlyOn && !imageCurrentlyOn))
     {
       preProcPtr_.reset();

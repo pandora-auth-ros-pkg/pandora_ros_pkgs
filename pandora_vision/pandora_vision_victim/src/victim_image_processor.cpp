@@ -42,7 +42,8 @@
 namespace pandora_vision
 {
   VictimImageProcessor::VictimImageProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : VisionProcessor(ns, handler)
+    sensor_processor::Handler* handler) : sensor_processor::Processor<EnhancedImageStamped, 
+      POIsStamped>(ns, handler)
   {
     params_.configVictim(*this->accessPublicNh());
 
@@ -56,15 +57,16 @@ namespace pandora_vision
       this->accessProcessorNh()->getNamespace());
   }
 
-  VictimImageProcessor::VictimImageProcessor() : VisionProcessor() {}
+  VictimImageProcessor::VictimImageProcessor() : sensor_processor::Processor<EnhancedImageStamped, 
+    POIsStamped>(){}
 
   VictimImageProcessor::~VictimImageProcessor()
   {
     ROS_DEBUG("[victim_node] : Destroying Victim Image Processor instance");
   }
 
-  std::vector<VictimPOIPtr> VictimHoleProcessor::detectVictims(
-    const ImageStampedConstPtr& input)
+  std::vector<VictimPOIPtr> VictimImageProcessor::detectVictims(
+    const EnhancedImageStampedConstPtr& input)
   {
     if (params_.debug_img || params_.debug_img_publisher)
     {
@@ -77,7 +79,7 @@ namespace pandora_vision
       depth_svm_p.clear();
     }
 
-    bool depthEnable;  // NO VALUE??
+    bool depthEnable = input->getDepth();  
 
     std::vector<VictimPOIPtr> final_victims = victimFusion(input, depthEnable);
 
@@ -184,45 +186,54 @@ namespace pandora_vision
     return final_victims;
   }
 
-  std::vector<VictimPOIPtr> VictimHoleProcessor::victimFusion(const ImageStampedConstPtr& input, 
+  std::vector<VictimPOIPtr> VictimImageProcessor::victimFusion(const EnhancedImageStampedConstPtr& input, 
     bool depthEnable)
   {
-    VictimPOIPtr finalProbability;
+    std::vector<VictimPOIPtr> finalProbability;
 
     VictimPOIPtr rgbSvmProbability(new VictimPOI);
     VictimPOIPtr depthSvmProbability(new VictimPOI);
+    cv::Point p;
 
     //VictimPOIPtr temp(new VictimPOI);
     float probability, classLabel;
-
-    rgbSvmProbability->setProbability(rgbSvmValidator_->calculatePredictionProbability(
-      input->getRgbImage(), &classLabel, &probability));
+    p.x = input->getRgbImage().rows/2;
+    p.y = input->getRgbImage().cols/2;
+    rgbSvmValidatorPtr_->calculatePredictionProbability(input->getRgbImage(), &classLabel, &probability);
+    rgbSvmProbability->setProbability(params_.rgb_svm_weight * probability);
     rgbSvmProbability->setProbability(probability);
     rgbSvmProbability->setClassLabel(classLabel);
-    rgbSvmProbability->setPoint();  // center of frame???
+    rgbSvmProbability->setPoint(p);  // center of frame???
+    rgbSvmProbability->setWidth(input->getRgbImage().rows);
+    rgbSvmProbability->setHeight(input->getRgbImage().cols);
     rgbSvmProbability->setSource(RGB_SVM);
 
-    if (depthEnabled)
-    {
-      depthSvmProbability->setProbability(depthSvmValidator_->calculatePredictionProbability(
-        input->getDepthImage(), &classLabel, &probability));
+    if (depthEnable)
+    { 
+      p.x = input->getDepthImage().rows/2;
+      p.y = input->getDepthImage().cols/2;
+      depthSvmValidatorPtr_->calculatePredictionProbability(input->getDepthImage(), &classLabel, &probability);
+      depthSvmProbability->setProbability(params_.depth_svm_weight * probability);
       depthSvmProbability->setProbability(probability);
       depthSvmProbability->setClassLabel(classLabel);
-      depthSvmProbability->setPoint();  // center of frame???
+      depthSvmProbability->setPoint(p);  // center of frame???]
+      depthSvmProbability->setWidth(input->getDepthImage().rows);
+      depthSvmProbability->setHeight(input->getDepthImage().cols);
       depthSvmProbability->setSource(DEPTH_RGB_SVM);
     }
 
-    finalProbability->setProbability((
-      params_.depth_svm_weight * depth_svm_probability->getProbability() +
-      params_.rgb_svm_weight * rgb_svm_probability->getProbability()) /
-      (params_.depth_svm_weight + params_.rgb_svm_weight));
+    finalProbability.push_back(rgbSvmProbability);
+    if(depthEnable)
+    {
+      finalProbability.push_back(depthSvmProbability);
+    }
 
     //......
     
     return finalProbability;  // vector??
   }
 
-  bool VictimImageProcessor::process(const ImagesStampedConstPtr& input, 
+  bool VictimImageProcessor::process(const EnhancedImageStampedConstPtr& input, 
     const POIsStampedPtr& output)
   {
     output->header = input->getHeader();

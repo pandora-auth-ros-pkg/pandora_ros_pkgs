@@ -107,6 +107,8 @@ namespace pandora_vision
       //!< flag to indicate if backward tracking is enabled
       bool enableBackwardTracking;
 
+      bool depthVisible_;
+
 
     //------------------------------------------------------------------------//
     public:
@@ -144,6 +146,7 @@ namespace pandora_vision
       @return void
       **/
       void receivePointCloud(const sensor_msgs::PointCloud2ConstPtr& msg);
+
       /**
       @brief Function called when new ROS message appears, from any topic
       posting a sensor_msgs kind of msg
@@ -151,6 +154,14 @@ namespace pandora_vision
       @return void
       **/
       void receiveImage(const sensor_msgs::ImageConstPtr& msg);
+
+      /**
+      @brief Function called when new ROS message appears, from any topic
+      posting an EnhancedImage kind of msg
+      @param msg [const pandora_vision_msgs::EnhancedImageConstPtr& ] The message
+      @return void
+      **/
+      void receiveEnhancedImage(const pandora_vision_msgs::EnhancedImageConstPtr& msg);
 
       /**
       @brief function that loads the bag

@@ -42,13 +42,16 @@
 
 #include "sensor_processor/processor.h"
 #include "pandora_vision_common/pois_stamped.h"
-#include "pandora_vision_victim/images_stamped.h"
+#include "pandora_vision_victim/enhanced_image_stamped.h"
 #include "pandora_vision_victim/victim_poi.h"
 #include "pandora_vision_victim/victim_parameters.h"
+#include "pandora_vision_victim/svm_classifier/rgb_svm_validator.h"
+#include "pandora_vision_victim/svm_classifier/depth_svm_validator.h"
+
 
 namespace pandora_vision
 {
-  class VictimImageProcessor : public sensor_processor::Processor<ImagesStamped, POIsStamped>
+  class VictimImageProcessor : public sensor_processor::Processor<EnhancedImageStamped, POIsStamped>
   {
     public:
       VictimImageProcessor(const std::string& ns, sensor_processor::Handler* handler);
@@ -56,7 +59,7 @@ namespace pandora_vision
 
       virtual ~VictimImageProcessor();
 
-      virtual bool process(const ImagesStampedConstPtr& input, const POIsStampedPtr& output);
+      virtual bool process(const EnhancedImageStampedConstPtr&  input, const POIsStampedPtr& output);
 
     private:
       VictimParameters params_;
@@ -65,7 +68,7 @@ namespace pandora_vision
       @brief
       @return void
       **/
-      std::vector<VictimPOIPtr> detectVictims(const ImageStampedConstPtr& input);
+      std::vector<VictimPOIPtr> detectVictims(const EnhancedImageStampedConstPtr& input);
 
       /**
       @brief Function that enables suitable subsystems, according
@@ -73,7 +76,7 @@ namespace pandora_vision
       @param
       @return void
       **/ 
-      std::vector<VictimPOIPtr> victimFusion(const ImageStampedConstPtr& input, 
+      std::vector<VictimPOIPtr> victimFusion(const EnhancedImageStampedConstPtr& input, 
         bool depthEnable);
 
       std::vector<cv::Mat> _rgbdImages;

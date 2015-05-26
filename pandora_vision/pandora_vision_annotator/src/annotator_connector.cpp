@@ -87,6 +87,9 @@ namespace pandora_vision
         loader_.removeFilePushButton, SIGNAL(clicked(bool)),
         this, SLOT(removeFilePushButtonTriggered()));
     QObject::connect(
+        loader_.saveImagesPushButton, SIGNAL(clicked(bool)),
+        this, SLOT(saveImagesPushButtonTriggered()));
+    QObject::connect(
       loader_.rosTopicPushButton, SIGNAL(clicked(bool)),
       this, SLOT(rosTopicPushButtonTriggered()));
     QObject::connect(
@@ -164,6 +167,34 @@ namespace pandora_vision
   {
     Q_EMIT removeFile();
   }
+
+ /**
+  @brief Qt slot that is called when the saveImagesPushButton is pressed
+  @return void
+  **/
+  void CConnector::saveImagesPushButtonTriggered(void)
+  {
+    for(int i = offset_; i < frames.size()+offset_; i++)
+    {
+      std::stringstream imgName, file;
+      file << package_path << "/data/annotations.txt";
+      imgName << package_path  << "/data/depth/frame" << i + offset_ << ".png";
+      std::string img_name = "frame" + boost::to_string(i+offset_) + ".png";
+
+      ImgAnnotations::annotations.clear();
+      ImgAnnotations::readFromFile(file.str(), img_name);
+      ImgAnnotations::annPerImage = ImgAnnotations::annotations.size();
+      if(ImgAnnotations::annPerImage != 0)
+      {
+        cv::Mat temp;
+        cv::cvtColor(frames[i], temp, CV_BGR2RGB);
+        cv::imwrite(imgName.str(), temp);
+        loader_.statusLabel->setText("Save current Frame as:" + QString(imgName.str().c_str() ));
+      }
+    }
+  }
+
+
 
   /**
   @brief Qt slot that is called when the predatorPushButton is pressed

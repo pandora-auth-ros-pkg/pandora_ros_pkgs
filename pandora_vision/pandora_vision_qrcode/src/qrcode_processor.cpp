@@ -93,21 +93,6 @@ namespace pandora_vision
     //!< The dynamic reconfigure parameter's callback
     server.setCallback(boost::bind(&QrCodeProcessor::parametersCallback,
           this, _1, _2));
-
-    // if (debugQrcode_)
-    // {
-      // !< Advertise topics for debugging if we are in debug mode
-      // if (this->accessPublicNh()->getParam("debug_qrcode_topic", debugTopic_))
-      // {
-        // debugPublisherPtr_.reset(new image_transport::Publisher());
-        // *debugPublisherPtr_ = image_transport::ImageTransport(
-          // *this->accessProcessorNh()).advertise(debugTopic_, 1); 
-      // }
-      // else
-      // {
-        // ROS_WARN("Cannot find qrcode debug show topic");
-      // }
-    // }
   }
   
   /**
@@ -121,17 +106,8 @@ namespace pandora_vision
     const uint32_t& level)
   {
     detectorPtr_->set_debug(config.debugEnable);
-
     detectorPtr_->setSharpenBlur(config.sharpenBlur);
     detectorPtr_->setSharpenWeight(config.sharpenWeight);
-    // if (debugQrcode_)
-    // {
-      // debugPublisherPtr_.reset(new image_transport::Publisher());
-      // *debugPublisherPtr_ = image_transport::ImageTransport(
-          // *this->accessProcessorNh()).advertise(debugTopic_, 1); 
-    // }
-    // else
-      // debugPublisherPtr_.reset();
   }
 
   /*
@@ -149,14 +125,6 @@ namespace pandora_vision
     output->frameHeight = input->getImage().rows;
     
     output->pois = detectorPtr_->detectQrCode(input->getImage());
-
-    // if (debugPublish_)
-    // {
-      // cv_bridge::CvImage qrcodeDebug;
-      // qrcodeDebug.encoding = sensor_msgs::image_encodings::MONO8;
-      // qrcodeDebug.image = detectorPtr_->getDebugImage();
-      // debugPublisherPtr_->publish(qrcodeDebug.toImageMsg());
-    // }
 
     if (output->pois.empty())
     {
