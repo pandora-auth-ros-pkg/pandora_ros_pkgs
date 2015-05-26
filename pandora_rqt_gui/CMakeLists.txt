@@ -25,9 +25,11 @@ catkin_package(
     rqt_gui
     rqt_gui_py
     message_runtime
+    message_generation
     std_msgs
     actionlib_msgs
     pandora_data_fusion_msgs
+    roslint
 )
 
 ################ RosLint ###################################################
