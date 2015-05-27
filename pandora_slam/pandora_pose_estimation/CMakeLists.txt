@@ -41,8 +41,8 @@ target_link_libraries(pose_estimation_node
   pose_estimation
   )
 
-# set(ROSLINT_CPP_OPTS
-    # "--filter=-whitespace/end_of_line,-build/include_order,-whitespace/blank_line,-whitespace/parens,-whitespace/comments,-whitespace/braces")
+set(ROSLINT_CPP_OPTS
+    "--filter=-whitespace/end_of_line,-build/include_order,-whitespace/blank_line,-whitespace/parens,-whitespace/comments,-whitespace/braces")
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
     src/*.cpp

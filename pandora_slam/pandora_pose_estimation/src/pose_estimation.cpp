@@ -36,6 +36,8 @@
  *   Author Name <author's email>
  *********************************************************************/
 
+#include <deque>
+#include <string>
 #include "pandora_pose_estimation/pose_estimation.h"
 
 namespace pandora_pose_estimation
@@ -58,15 +60,15 @@ namespace pandora_pose_estimation
     nh_.param<int>("IMU_interpolation_steps", IMU_INTERP_STEPS, 6);
 
     // Initialize exponential decay filter
-    double rate, normalizeSum=0;
+    double rate, normalizeSum= 0;
     onExpFilt_= new double[FILTER_LENGTH];
-    for(rate=0.05; exp((1-FILTER_LENGTH)*rate)< 0.1; rate+=0.005);
+    for(rate= 0.05; exp((1-FILTER_LENGTH)*rate)< 0.1; rate+= 0.005) {};
     rate-= 0.005;
-    for(int i=0; i<FILTER_LENGTH; i++){
+    for(int i= 0; i< FILTER_LENGTH; i++){
       onExpFilt_[i]= exp(-i*rate);
       normalizeSum+= onExpFilt_[i];
     }
-    for(int i=0; i<FILTER_LENGTH; i++){
+    for(int i= 0; i< FILTER_LENGTH; i++){
       onExpFilt_[i]/= normalizeSum;
     }
 
@@ -111,7 +113,7 @@ namespace pandora_pose_estimation
     //DEBUG z --> Publish IMU RPY
     std_msgs::Float64MultiArray imuMsg;
     std_msgs::MultiArrayLayout layout; std_msgs::MultiArrayDimension dim;
-    dim.label="1"; dim.size=4; dim.stride=4;
+    dim.label= "1"; dim.size= 4; dim.stride= 4;
     layout.dim.push_back(/*MultiArrayDimension*/dim);
     imuMsg.layout= layout;
     imuMsg.data.push_back(/*float*/latestRoll_);
@@ -151,10 +153,10 @@ namespace pandora_pose_estimation
       tfScalar roll, pitch, yaw;
       intermediateTf.getBasis().getRPY(roll, pitch, yaw);
       // Find difference in z
-      // TODO: interpolation steps as parameter
+      // TODO(lynx): interpolation steps as parameter
       final_z = findDz(dx, dy) + previousOrigin.getZ();
       // Update previousOrigin
-      previousTf_.setOrigin(tf::Vector3(origin.getX(),origin.getY(),final_z));
+      previousTf_.setOrigin(tf::Vector3(origin.getX(), origin.getY(), final_z));
       previousTf_.setRotation(intermediateTf.getRotation());
       // Broadcast updated footprint transform
       //tf::Vector3 translationZ(0, 0, final_z);
@@ -170,7 +172,7 @@ namespace pandora_pose_estimation
       //DEBUG z
       std_msgs::Float64MultiArray zMsg;
       std_msgs::MultiArrayLayout layout; std_msgs::MultiArrayDimension dim;
-      dim.label="1"; dim.size=6; dim.stride=6;
+      dim.label= "1"; dim.size= 6; dim.stride= 6;
       layout.dim.push_back(/*MultiArrayDimension*/dim);
       zMsg.layout= layout;
       zMsg.data.push_back(/*float*/final_z);
@@ -235,19 +237,19 @@ namespace pandora_pose_estimation
     dxQ_.push_front(dx);
     dyQ_.push_front(dy);
     // Accumulators
-    double dxAccum=0, dyAccum=0;
+    double dxAccum= 0, dyAccum= 0;
     std::deque<double>::iterator ix= dxQ_.begin(), iy= dyQ_.begin();
-    for(int i=0; i<FILTER_LENGTH && ix!=dxQ_.end(); i++, ix++, iy++)
+    for(int i= 0; i< FILTER_LENGTH && ix!= dxQ_.end(); i++, ix++, iy++)
       dxAccum+= (*ix)*onExpFilt_[i], dyAccum+= (*iy)*onExpFilt_[i];
     dxQ_.front()= dxAccum, dyQ_.front()= dyAccum;
     //Leave 1 element in queue as starting point for next loop
-    //TODO: exp filter IMU
-    while(pitchQ_.size()>1){
+    //TODO(lynx): exp filter IMU
+    while(pitchQ_.size()> 1){
       pastRoll= rollQ_.front(); rollQ_.pop_front();
       pastPitch= pitchQ_.front(); pitchQ_.pop_front();
       stepRoll= linInterp(pastRoll, rollQ_.front(), IMU_INTERP_STEPS);
       stepPitch= linInterp(pastPitch, pitchQ_.front(), IMU_INTERP_STEPS);
-      for(int i=0; i<IMU_INTERP_STEPS; i++)
+      for(int i= 0; i< IMU_INTERP_STEPS; i++)
         sum_dz+= dz(dxQ_.front()/totalSteps, dyQ_.front()/totalSteps,
                     pastRoll+i*stepRoll, pastPitch+i*stepPitch);  
     }
