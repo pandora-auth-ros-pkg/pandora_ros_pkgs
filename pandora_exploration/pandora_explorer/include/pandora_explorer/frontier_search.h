@@ -78,7 +78,7 @@ class FrontierSearch {
   }
 
  protected:
-  
+
   // shared ptr that holds the costmap
   boost::shared_ptr<costmap_2d::Costmap2D> costmap_;
   std::string costmap_frame_;

@@ -58,7 +58,7 @@ namespace pandora_explorer {
   */
 class NavfnServiceFrontierPathGenerator : public FrontierPathGenerator {
  public:
-  
+
   /**
     * @brief Constructor for the class NavfnServiceFrontierPathGenerator
     * @param name The name of the frontier path generator

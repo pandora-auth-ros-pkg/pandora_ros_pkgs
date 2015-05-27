@@ -68,7 +68,6 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
   */
 class ExplorationController {
  public:
-  
   /**
     * @brief  Constructor for the ExplorationController class
     * 
@@ -82,13 +81,13 @@ class ExplorationController {
     * @param goal The goal 
     */
   void executeCb(const pandora_exploration_msgs::DoExplorationGoalConstPtr& goal);
-  
+
   /**
     * @brief Feedback callback of exploration server
     * @param feedback  
     */
   void feedbackMovingCb(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
-  
+
   /**
     * @brief 
     * @param state  
@@ -96,7 +95,7 @@ class ExplorationController {
     */
   void doneMovingCb(const actionlib::SimpleClientGoalState& state,
                     const move_base_msgs::MoveBaseResultConstPtr& result);
-  
+
   /**
     * @brief Preempt callback of the 
     *
@@ -106,13 +105,13 @@ class ExplorationController {
   void preemptCb();
 
  private:
-  
+
   /**
     * @brief Checks if the goal, which we passed to move base is reached.
     * @return True if the goal is reached.
     */
   bool isGoalReached();
-  
+
   /**
     * @brief Checks if time for goal is expired
     * @return True if time expired
@@ -124,7 +123,7 @@ class ExplorationController {
   ros::NodeHandle private_nh_;
 
   DoExplorationServer do_exploration_server_;
-  
+
   // Move base client, asking move base for service
   MoveBaseClient move_base_client_;
 

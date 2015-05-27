@@ -71,7 +71,7 @@ bool NavfnServiceFrontierPathGenerator::findPaths(const geometry_msgs::PoseStamp
     srv.request.start = start;
 
     srv.request.goal.header = frontier.header;
-    
+
     // check to what point we want to plan
     if (frontier_representation_ == "centroid") {
       srv.request.goal.pose.position = frontier.centroid;

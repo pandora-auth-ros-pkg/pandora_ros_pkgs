@@ -47,7 +47,7 @@ FrontierGoalSelector::FrontierGoalSelector(const std::string& name)
 
   // setup exploration costmap
   explore_costmap_ros_.reset(new costmap_2d::Costmap2DROS(name_ + "_costmap", tf_listener_));
-  
+
   // setup marker publisher
   frontier_marker_pub_ =
       private_nh.advertise<visualization_msgs::MarkerArray>(name_ + "_frontier_markers", 10);
@@ -98,11 +98,11 @@ FrontierGoalSelector::FrontierGoalSelector(const std::string& name)
 
   FrontierCostFunctionPtr distance_cost_function(new DistanceCostFunction(dist_scale));
   frontier_cost_function_vec_.push_back(distance_cost_function);
-  
+
   FrontierCostFunctionPtr alignment_cost_function(
       new AlignmentCostFunction(alignment_scale, current_robot_pose_));
   frontier_cost_function_vec_.push_back(alignment_cost_function);
-  
+
   FrontierCostFunctionPtr visited_cost_function(
       new VisitedCostFunction(visited_scale, selected_goals_));
   frontier_cost_function_vec_.push_back(visited_cost_function);
@@ -321,7 +321,7 @@ void FrontierGoalSelector::visualizeFrontiers()
   marker.color.b = 1.0;
   //marker.color.g = 0.0;
   // "a" is by default "0" if you forget it marker will be invisble
-  marker.color.a = 1.0;  
+  marker.color.a = 1.0;
   if (frontier_representation_ == "centroid") {
     marker.pose.position.x = best.centroid.x;
     marker.pose.position.y = best.centroid.y;

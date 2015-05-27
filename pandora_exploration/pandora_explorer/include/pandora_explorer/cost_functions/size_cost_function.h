@@ -72,7 +72,6 @@ namespace pandora_explorer {
       * add any cost.
       */
     virtual void scoreFrontiers(const FrontierListPtr& frontier_list);
-    
 
     /**
       * @brief Destructor for the SizeCostFunction class.

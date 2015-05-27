@@ -69,7 +69,7 @@ namespace pandora_explorer {
   */
 class FrontierGoalSelector : public GoalSelector {
  public:
-  
+
   /**
     * @brief Explicit constructor for the FrontierGoalSelector class
     * @param name The name of the goal selector
@@ -96,7 +96,7 @@ class FrontierGoalSelector : public GoalSelector {
   }
 
  private:
-  
+
   /**
     * @brief Finds the best frontier from the frontier list and passes it
     * to the frontier ptr we pass as argument
@@ -106,7 +106,7 @@ class FrontierGoalSelector : public GoalSelector {
     * The frontier with the max cost is choosed
     */
   bool findBestFrontier(Frontier* selected);
-  
+
   /**
     * @brief Calculates the final orientation of the goal
     * @param frontier The goal frontier
@@ -116,7 +116,7 @@ class FrontierGoalSelector : public GoalSelector {
     * of the frontier path
     */
   void calculateFinalGoalOrientation(Frontier* frontier);
-  
+
   /**
     * @brief Implements the visualization procedure in rviz
     * 
@@ -130,11 +130,11 @@ class FrontierGoalSelector : public GoalSelector {
  private:
   // Marker publisher used for visualization purposes
   ros::Publisher frontier_marker_pub_;
-  
-  // A shared ptr to the Costmap2DROS 
+
+  // A shared ptr to the Costmap2DROS
   boost::shared_ptr<costmap_2d::Costmap2DROS> explore_costmap_ros_;
-  
-  // A shared ptr to an std::list of frontier objects 
+
+  // A shared ptr to an std::list of frontier objects
   FrontierListPtr frontier_list_;
 
   tf::TransformListener tf_listener_;

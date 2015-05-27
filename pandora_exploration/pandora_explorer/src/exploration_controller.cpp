@@ -103,7 +103,7 @@ void ExplorationController::executeCb(
     // we reached maximum goal searches retries
     if (goal_searches_count_ >= max_goal_searches_) {
       do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
-                                        "[explorer] Max retries reached, we could not find more goals - exploration completed");
+      "[explorer] Max retries reached, we could not find more goals - exploration completed");
       return;
     }
 
@@ -117,7 +117,8 @@ void ExplorationController::executeCb(
 
     if (goal->exploration_type == pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP &&
         coverage_goal_selector_) {
-      success = coverage_goal_selector_->findNextGoal(&current_goal_);  // to current goal gemizetai me to stoxo pou tha vrei o goal selector
+      // to current goal gemizetai me to stoxo pou tha vrei o goal selector
+      success = coverage_goal_selector_->findNextGoal(&current_goal_);
     } else {
       success = explore_goal_selector_->findNextGoal(&current_goal_);
     }

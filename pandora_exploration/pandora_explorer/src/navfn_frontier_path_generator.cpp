@@ -78,7 +78,7 @@ bool NavfnFrontierPathGenerator::findPaths(const geometry_msgs::PoseStamped& sta
   // calculate path for each frontier
   BOOST_FOREACH(Frontier & frontier, *frontier_list)
   {
-    // Here we will store the plan to 
+    // Here we will store the plan to
     nav_msgs::Path plan;
     geometry_msgs::PoseStamped goal;
 
@@ -97,7 +97,7 @@ bool NavfnFrontierPathGenerator::findPaths(const geometry_msgs::PoseStamped& sta
     goal.pose.orientation.w = 1.0;
 
     // start pose, goal pose, plan filled by the planner
-    // TODO isws edw kati den paei kala, an xrhsimopoiithei autos o generator
+    // TODO(dimkirt) isws edw kati den paei kala, an xrhsimopoiithei autos o generator
     // to make plan epistrefei true an vrhke ena valid plan alliws false.
     planner_->makePlan(start, goal, plan.poses);
 

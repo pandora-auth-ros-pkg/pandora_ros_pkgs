@@ -54,7 +54,7 @@ namespace pandora_explorer {
   */
 class FrontierPathGenerator {
  public:
-  
+
   /**
     * @brief Creates paths from start pose to a frontier, for all the frontiers we pass
     * @param start The start pose from where we create the path for each frontier
@@ -73,7 +73,7 @@ class FrontierPathGenerator {
   }
 
  protected:
-  
+
  /**
     * @brief Constructor for the class FrontierPathGenerator
     * @param name The name of the frontier path generator

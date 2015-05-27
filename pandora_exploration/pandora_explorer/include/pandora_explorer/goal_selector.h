@@ -56,7 +56,7 @@ namespace pandora_explorer {
   */
 class GoalSelector {
  public:
-  
+
   /**
     * @brief Finds next exploration goal
     * @param goal We pass the goal that is found to this argument
