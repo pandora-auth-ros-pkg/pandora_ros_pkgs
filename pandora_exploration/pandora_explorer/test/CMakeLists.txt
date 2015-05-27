@@ -19,8 +19,4 @@ target_link_libraries(map_frontier_search_test
   frontier_searchers
   )
 
-catkin_add_gtest(export_costmap export_costmap.cpp)
-target_link_libraries(export_costmap
-  ${catkin_LIBRARIES}
-  gtest_main
-  )
+
