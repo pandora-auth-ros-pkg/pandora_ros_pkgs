@@ -1,0 +1,3 @@
+subscribed_topics: [synchronized/depth/image]
+
+published_topics: synchronized/depth/candidate_holes

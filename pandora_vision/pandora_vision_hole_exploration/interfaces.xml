@@ -1,0 +1,56 @@
+<package>
+
+  
+  <node>
+    /synchronizer_node
+
+    <subscriber>/kinect/point_cloud</subscriber>
+    <subscriber>/unlock_rgb_depth_synchronizer</subscriber>
+
+    <publisher>/synchronized/depth/points</publisher>
+    <publisher>/pandora_vision_hole_exploration_depth/synchronized/depth/image</publisher>
+    <publisher>/pandora_vision_hole_exploration_rgb/synchronized/rgb/image</publisher>
+
+  </node>
+
+
+  <node>
+    /depth_node
+
+    <subscriber>/pandora_vision_hole_exploration_depth/syncronized/depth/image</subscriber>
+
+    <publisher>/pandora_vision_hole_exploration_depth/synchronized/depth/candidate_holes</publisher>
+
+  </node>
+  
+
+
+  <node>
+    /rgb_node
+
+    <subscriber>/pandora_vision_hole_exploration_rgb/synchronized/rgb/image</subscriber>
+
+    <publisher>/pandora_vision_hole_exploration_rgb/synchronized/rgb/candidate_holes</publisher>
+
+  </node>
+
+  
+
+  <node>
+    /hole_fusion_node
+
+    <subscriber>/synchronized/depth/points</subscriber>
+    <subscriber>/pandora_vision_hole_exploration_rgb/synchronized/rgb/image</subscriber>
+    <subscriber>/pandora_vision_hole_exploration_depth/synchronized/depth/image</subscriber>
+    <subscriber>/pandora_vision_hole_exploration_rgb/synchronized/rgb/candidate_holes</subscriber>
+    <subscriber>/pandora_vision_hole_exploration_depth/synchronized/depth/candidate_holes</subscriber>
+
+    <publisher>/vision/holes_direction_alert</publisher>
+    <publisher>/vision/enhanced_holes</publisher>
+    <publisher>/unlock_rgb_depth_synchronizer</publisher>
+    <publisher>/vision/hole_detector/debug_valid_holes_found</publisher>
+
+  </node>
+  
+
+</package>

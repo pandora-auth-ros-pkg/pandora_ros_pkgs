@@ -1,0 +1,34 @@
+<launch>
+  <arg name="frame_id" default="/kinect_optical_frame"/>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+  <include file="$(find pandora_vision_hole_exploration)/launch/pandora_vision_hole_exploration.launch"/>
+  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+
+
+  <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
+  <param name="dataset_camera" value="kinect"/>
+
+  <param name="/kinect_optical_frame/hfov" value="58.0" />
+  <param name="/kinect_optical_frame/vfov" value="45.0" />
+
+  <param name="benchmarkFlag" value="False" />
+  <param name="kinect/topic_name" value="/kinect/depth_registered/points" />
+  <param name="publisherMessagePackage" value="sensor_msgs" />
+  <param name="publisherMessageType" value="PointCloud2"/>
+
+   <param name="syncSubscriberTopic" value="/pandora_vision/processor_log" />
+   <param name="subscriberMessagePackage" value="sensor_processor" />
+   <param name="subscriberMessageType" value="ProcessorLogInfo"/>
+
+   <param name="subscriberAlertTopic" value="/vision/holes_direction_alert" />
+   <param name="subscriberAlertMessagePackage" value="pandora_vision_msgs" />
+   <param name="subscriberAlertMessageType" value="HoleDirectionAlertVector"/>
+
+   <param name="algorithm" value="Hole"/>
+  
+  
+   <test test-name="HoleExplorationBenchmarkTest" pkg="pandora_vision_hole_exploration"
+     type="hole_exploration_benchmark_test.py" time-limit="6000.0"/>
+  
+</launch>

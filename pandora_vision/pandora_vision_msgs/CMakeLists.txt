@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   sensor_msgs
+  #actionlib_msgs
   pandora_common_msgs
 )
 
@@ -29,6 +30,7 @@ add_message_files(
   QRAlertVector.msg
   RegionOfInterest.msg
   RegionOfInterestVector.msg
+  SynchronizedMsg.msg
   )
 
 generate_messages(

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_vision_hole_exploration</name>
+  <version>0.1.0</version>
+  <description>Contains hole detection based on RGBDT frames in exploration mode.</description>
+
+  <maintainer email="vasilis1bos@gmail.com">Vasilis Bosdelekidis</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Vasilis Bosdelekidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+  <build_depend>pandora_cmake_tools</build_depend>
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
+  <depend>pandora_vision_msgs</depend>
+  <depend>pandora_vision_common</depend>
+  <depend>sensor_processor</depend>
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>pcl_ros</depend>
+  <depend>message_filters</depend>
+  <depend>urdf</depend>
+
+  <exec_depend>openni2_launch</exec_depend>
+
+  <!-- Test Depends -->                                                                                                                                                 
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>pandora_vision_support</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
+
+  <export>
+  </export>
+
+</package>

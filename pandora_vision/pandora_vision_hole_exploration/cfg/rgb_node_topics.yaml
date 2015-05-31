@@ -1,0 +1,3 @@
+subscribed_topics: [synchronized/rgb/image]
+
+published_topics: synchronized/rgb/candidate_holes
