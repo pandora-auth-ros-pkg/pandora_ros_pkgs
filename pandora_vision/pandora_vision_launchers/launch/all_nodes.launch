@@ -1,13 +1,13 @@
 <launch>
   <arg name="vision_cameras" default="true"/>
   <arg name="vision_nodes" default="true"/>
-  <arg name="camera_left" default="true"/>
-  <arg name="camera_right" default="true"/>
+  <arg name="camera_left" default="false"/>
+  <arg name="camera_right" default="false"/>
   <arg name="xtion" default="true"/>
   <arg name="vision_qr" default="true"/>
   <arg name="vision_hazmat" default="true"/>
   <arg name="vision_landoltc" default="true"/>
-  <arg name="vision_motion" default="false"/>
+  <arg name="vision_motion" default="true"/>
   <arg name="vision_datamatrix" default="false"/>
   <arg name="vision_landoltc3d" default="false"/>
   <arg name="vision_predator" default="false"/>
@@ -39,7 +39,7 @@
      file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
 
     <include if="$(arg vision_motion)"
-     file="$(find pandora_vision_motion)/launch/motion_node.launch" />
+     file="$(find pandora_vision_motion)/launch/pandora_vision_motion_node.launch" />
     <include if="$(arg vision_landoltc3d)"
      file="$(find pandora_vision_landoltc)/launch/predator-landoltc3d.launch" />
     <include if="$(arg vision_predator)"
