@@ -232,5 +232,10 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST_SRC
 roslint_cpp(${${PROJECT_NAME}_LINT_TEST_SRC})
 
 if(CATKIN_ENABLE_TESTING)
+  # Check if the benchmark images should be downloaded.
+  if (${PROJECT_NAME}_download)
+    set(${PROJECT_NAME}_download TRUE)
+  endif()
+
   add_subdirectory(test)
 endif()

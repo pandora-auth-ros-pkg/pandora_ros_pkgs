@@ -23,9 +23,14 @@ class BenchmarkTester(vision_benchmark_test_base.VisionBenchmarkTestBase):
         self.imageVFOV *= math.pi / 180
 
         self.algorithm = rospy.get_param("algorithm")
+        if rospy.has_param("benchmarkFlag"):
+            benchmarkFlag = rospy.get_param("benchmarkFlag")
+        else:
+            benchmarkFlag = True
+
         imagePath = rospy.get_param("dataset_path")
         self.benchmarkTest(PKG_PATH + imagePath,
-                           publisherTopic, subscriberTopic)
+                           publisherTopic, subscriberTopic, benchmarkFlag)
 
 if __name__ == "__main__":
 
@@ -50,7 +55,7 @@ if __name__ == "__main__":
     subscriberMessagePackage = None
     subscriberMessageType = None
 
-    if rospy.has_param("kinect/topic_name"):
+    if rospy.has_param("subscriberTopic"):
         subscriberTopic = rospy.get_param("subscriberTopic")
     else:
         rospy.logfatal("Could not find the Processor Image Topic name" +

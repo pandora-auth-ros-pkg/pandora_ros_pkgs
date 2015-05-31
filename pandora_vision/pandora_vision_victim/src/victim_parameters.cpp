@@ -39,26 +39,26 @@
 
 namespace pandora_vision
 {
-  //----------------------------Parameters----------------------------//
-  //!< Dynamic reconfigure parameters
-  double rgb_vj_weight = 0.2;
-  double depth_vj_weight = 0;
-  double rgb_svm_weight = 0.9;
-  double depth_svm_weight = 0;
-  bool oneClass = false;
-  bool autoTrain = true;
-  bool debug_img = false;
-  bool debug_img_publisher = false;
-  
-  double rgb_svm_prob_scaling = 0.5;
-  double rgb_svm_prob_translation = 7.0;
-
-  int positivesCounter = 5;
-  
   //----------------------------Methods----------------------------//
   
   VictimParameters::VictimParameters()
   {
+    //!< Dynamic reconfigure parameters
+    rgb_vj_weight = 0.2;
+    depth_vj_weight = 0;
+    rgb_svm_weight = 0.9;
+    depth_svm_weight = 0;
+    oneClass = false;
+    autoTrain = true;
+    debug_img = false;
+    debug_img_publisher = false;
+    
+    rgb_svm_prob_scaling = 0.5;
+    rgb_svm_prob_translation = 7.0;
+    depth_svm_prob_scaling = 0.5;
+    depth_svm_prob_translation = 7.0;
+    positivesCounter = 1;
+
     params.svm_type = CvSVM::C_SVC;
     params.kernel_type = CvSVM::RBF;  //!< CvSVM::RBF, CvSVM::LINEAR ...
     params.degree = 1;  //!< for poly
@@ -100,6 +100,9 @@ namespace pandora_vision
     rgb_svm_prob_scaling = config.rgb_svm_prob_scaling;
     rgb_svm_prob_translation = 
       config.rgb_svm_prob_translation;
+    depth_svm_prob_scaling = config.depth_svm_prob_scaling;
+    depth_svm_prob_translation = 
+      config.depth_svm_prob_translation;
     positivesCounter = config.positivesCounter;
     autoTrain = config.autoTrain;
     oneClass = config.oneClass;
@@ -132,8 +135,8 @@ namespace pandora_vision
     nh.param("rgb_svm_gamma", rgb_svm_gamma, 0.50625);
     nh.param("depth_svm_C", depth_svm_C, 312.5);
     nh.param("depth_svm_gamma", depth_svm_gamma, 0.50625);
-    nh.param("depth_svm_prob_scaling", depth_svm_prob_scaling, 0.5);
-    nh.param("depth_svm_prob_translation", depth_svm_prob_translation, 7.);
+    /* nh.param("depth_svm_prob_scaling", depth_svm_prob_scaling, 0.5);*/
+    /*nh.param("depth_svm_prob_translation", depth_svm_prob_translation, 7.);*/
     
     if (!nh.getParam("cascade_path", cascade_path))
     {

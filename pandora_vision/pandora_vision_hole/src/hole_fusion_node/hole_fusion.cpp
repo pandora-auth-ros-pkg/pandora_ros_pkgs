@@ -78,6 +78,12 @@ namespace pandora_vision
     unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>(
       unlockTopic_, 1000, true);
 
+    // Advertise the topic where any external node(e.g. a functional test node)
+    // will be subscribed to know that the hole node has finished processing
+    // the current candidate holes as well as the result of the procedure.
+    processEndPublisher_ = nodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
+        processEndTopic_, 1000, true);
+
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
     validHolesPublisher_ = nodeHandle_.advertise
@@ -587,6 +593,24 @@ namespace pandora_vision
     {
       ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic synchronizer_unlock_topic");
+    }
+
+    // Get the topic where the result of the hole processing will be
+    // published.
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/published_topics/processor_log_topic",
+        processEndTopic_))
+    {
+      // Make the topic's name absolute
+      processEndTopic_ = ns + "/" + processEndTopic_;
+
+      ROS_INFO_NAMED(PKG_NAME,
+        "[Hole Fusion Node] Advertising to the Process End topic");
+    }
+    else
+    {
+      ROS_INFO_NAMED (PKG_NAME,
+        "[Hole Fusion Node] Could not find topic Process end Topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
@@ -1483,11 +1507,14 @@ namespace pandora_vision
     }
     #endif
 
+    sensor_processor::ProcessorLogInfo resultMsg;
+    resultMsg.success = validHolesMap.size() > 0;
     // If there are valid holes, publish them
-    if (validHolesMap.size() > 0)
+    if (resultMsg.success)
     {
       publishValidHoles(uniqueValidHoles, &validHolesMap);
     }
+    processEndPublisher_.publish(resultMsg);
 
     // Publish the enhanced holes message
     // regardless of the amount of valid holes

@@ -90,7 +90,7 @@ namespace pandora_vision
     }
 
     DetectionImages imgs;
-    int stateIndicator = 2; //* input->getDepth() + (input->getRegions().size() > 0) + 1;
+    int stateIndicator = 2;// * input->getDepth() + (input->getRegions().size() > 0) + 1;
 
     DetectionMode detectionMode;
     switch (stateIndicator)
@@ -183,6 +183,7 @@ namespace pandora_vision
           CV_RGB(0, 100, 255));
         {
           std::ostringstream convert;
+          convert.str("");
           convert << rgb_svm_p[i];
           cv::putText(debugImage, convert.str().c_str(),
             rgb_svm_keypoints[i].pt,
@@ -199,6 +200,7 @@ namespace pandora_vision
           CV_RGB(0, 255, 255));
         {
           std::ostringstream convert;
+          convert.str("");
           convert << depth_svm_p[i];
           cv::putText(debugImage, convert.str().c_str(),
             depth_svm_keypoints[i].pt,
@@ -212,7 +214,7 @@ namespace pandora_vision
       }
 
       
-      if(counter_ == params_.positivesCounter)
+      //if(counter_ == params_.positivesCounter)
       {
         std::ostringstream convert;
         convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
@@ -221,14 +223,14 @@ namespace pandora_vision
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 255), 1, CV_AA);
 
       }
-      else
-      {
-        std::ostringstream convert;
-        convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
-        cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10, 60),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
-      } 
+      /*else*/
+      //{
+        //std::ostringstream convert;
+        //convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
+        //cv::putText(debugImage, convert.str().c_str(),
+          //cvPoint(10, 60),
+          //cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
+      /*} */
 
 
       {
@@ -266,11 +268,15 @@ namespace pandora_vision
       cv::waitKey(30);
     }
     
-    if(counter_ >= params_.positivesCounter)
+    if (counter_ >= params_.positivesCounter)
     { 
-    counter_ = 0;
+      counter_ = 0;
+    }
+    else
+    {
+      final_victims.clear();
+    }
     return final_victims;
-    } 
   }
   
   
@@ -289,13 +295,13 @@ namespace pandora_vision
     std::vector<VictimPOIPtr> rgb_svm_probabilities;
     std::vector<VictimPOIPtr> depth_svm_probabilities;
 
-    VictimPOIPtr temp(new VictimPOI);
-    float probability, classLabel;
+        float probability, classLabel;
     
     if (detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH )  // || detectionMode == GOT_RGB
     {
       for (int i = 0 ; i < imgs.rgbMasks.size(); i++)
-      {
+      { 
+        VictimPOIPtr temp(new VictimPOI);
         rgbSvmValidatorPtr_->calculatePredictionProbability(imgs.rgbMasks.at(i).img, &classLabel, &probability);
         temp->setProbability(probability);
         temp->setClassLabel(classLabel);
@@ -311,6 +317,7 @@ namespace pandora_vision
     {
       for (int i = 0 ; i < imgs.depthMasks.size(); i++)
       {
+        VictimPOIPtr temp(new VictimPOI);
         depthSvmValidatorPtr_->calculatePredictionProbability(imgs.depthMasks.at(i).img, &classLabel, &probability);
         temp->setProbability(probability);
         temp->setClassLabel(classLabel);
@@ -319,6 +326,8 @@ namespace pandora_vision
         temp->setWidth(imgs.depthMasks[i].bounding_box.width);
         temp->setHeight(imgs.depthMasks[i].bounding_box.height);
         depth_svm_probabilities.push_back(temp);
+        //final_probabilities.push_back(temp);
+
       }
     }
 
@@ -328,19 +337,27 @@ namespace pandora_vision
     {
       for (unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
       {
-        /// Weighted mean
-        temp->setProbability(
-          (params_.depth_svm_weight *
-            depth_svm_probabilities[i]->getProbability() +
-          params_.rgb_svm_weight *
-            rgb_svm_probabilities[i]->getProbability()) /
-          (params_.depth_svm_weight +
-            params_.rgb_svm_weight));
-        temp->setPoint(depth_svm_probabilities[i]->getPoint());
-        temp->setSource(DEPTH_RGB_SVM);
-        temp->setWidth(depth_svm_probabilities[i]->getWidth());
-        temp->setHeight(depth_svm_probabilities[i]->getHeight());
-        final_probabilities.push_back(temp);
+        VictimPOIPtr temp(new VictimPOI);
+        float mergedProb;
+        mergedProb = (depth_svm_probabilities[i]->getClassLabel() * params_.depth_svm_weight *
+                     depth_svm_probabilities[i]->getProbability() +
+                     rgb_svm_probabilities[i]->getClassLabel() * params_.rgb_svm_weight *
+                     rgb_svm_probabilities[i]->getProbability()); 
+
+        if (mergedProb >= 0.0f)
+        {
+          counter_++;
+          /// Weighted mean
+          temp->setProbability(mergedProb);
+          temp->setPoint(depth_svm_probabilities[i]->getPoint());
+          temp->setSource(DEPTH_RGB_SVM);
+          temp->setWidth(depth_svm_probabilities[i]->getWidth());
+          temp->setHeight(depth_svm_probabilities[i]->getHeight());
+          final_probabilities.push_back(temp);
+        }
+        else
+          counter_--;
+
       }
     }
     // Only rgb svm probabilities
@@ -348,17 +365,18 @@ namespace pandora_vision
     if (detectionMode == GOT_HOLES )  // || detectionMode == GOT_RGB
     {
       for (unsigned int i = 0 ; i < rgb_svm_probabilities.size(); i++)
-      {
-        if (temp->getClassLabel() == 1)
+      { 
+        VictimPOIPtr temp(new VictimPOI);
+        if (rgb_svm_probabilities[i]->getClassLabel() == 1)
         {
-        counter_++;
-        temp->setProbability(rgb_svm_probabilities[i]->getProbability() *
-          params_.rgb_svm_weight);
-        temp->setPoint(rgb_svm_probabilities[i]->getPoint());
-        temp->setSource(RGB_SVM);
-        temp->setWidth(rgb_svm_probabilities[i]->getWidth());
-        temp->setHeight(rgb_svm_probabilities[i]->getHeight());
-        final_probabilities.push_back(temp);
+          counter_++;
+          temp->setProbability(rgb_svm_probabilities[i]->getProbability() *
+            params_.rgb_svm_weight);
+          temp->setPoint(rgb_svm_probabilities[i]->getPoint());
+          temp->setSource(RGB_SVM);
+          temp->setWidth(rgb_svm_probabilities[i]->getWidth());
+          temp->setHeight(rgb_svm_probabilities[i]->getHeight());
+          final_probabilities.push_back(temp);
         }
         else
           counter_--;

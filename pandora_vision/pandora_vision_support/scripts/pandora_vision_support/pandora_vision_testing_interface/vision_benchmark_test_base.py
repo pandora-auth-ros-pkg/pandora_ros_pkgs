@@ -53,101 +53,94 @@ from pandora_testing_tools.testing_interface import test_base
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import PointCloud2
 
+
 class VisionBenchmarkTestBase(test_base.TestBase):
 
     alertEvent = threading.Event()
     datasetCamera = ""
 
-    def readImages(self, imagePath):
+    def readImages(self, imagePath, fileName):
         rosimage = Image()
-        self.images = []
-        self.names = []
         imageTypes = [".png", ".jpg", ".bmp", ".pgm"]
         bridge = CvBridge()
-        if not os.path.isdir(imagePath):
-            rospy.logerr("ERROR : Incorrect Path for image dataset")
-            exit(1)
 
-        for fileName in sorted(os.listdir(imagePath)):
-            isImage = False
-            for type in imageTypes:
-                if (type in fileName):
-                    isImage = True
-                    break
-            if (not isImage):
-                rospy.logdebug("%s is not an image", fileName)
-                continue
-            # Read the next image.
-            currentImg = cv2.imread(os.path.join(imagePath,
-                                    fileName), -1)
+        isImage = False
+        for type in imageTypes:
+            if (type in fileName):
+                isImage = True
+                break
+        if (not isImage):
+            rospy.logdebug("%s is not an image", fileName)
+            return
+        # Read the next image.
+        currentImg = cv2.imread(os.path.join(imagePath,
+                                fileName), -1)
 
-            # If the image was not read succesfully continue to the
-            # next file.
-            if (currentImg is None):
-                rospy.logdebug("Error reading image %s", fileName)
-                rospy.logdebug("The process will read the next image!")
-                continue
+        # If the image was not read succesfully continue to the
+        # next file.
+        if (currentImg is None):
+            rospy.logdebug("Error reading image %s", fileName)
+            rospy.logdebug("The process will read the next image!")
+            return
 
-            # If the tested algorithm is not Victim, there is no need to use
-            # depth and thermal images.
-            if (("depth" in fileName or "thermal" in fileName) and
-                (self.algorithm != "Victim" and self.algorithm != "Hole")):
+        # If the tested algorithm is not Victim, there is no need to use
+        # depth and thermal images.
+        if (("depth" in fileName or "thermal" in fileName) and
+           (self.algorithm != "Victim" and self.algorithm != "Hole")):
 
-                continue
-            # Store the image.
-            rosimage = bridge.cv2_to_imgmsg(currentImg, "bgr8")
-            rosimage.header.frame_id = "/kinect_optical_frame"
-            rosimage.header.stamp = rospy.Time.now()
-            self.images.append(rosimage)
+            return
+        # Store the image.
+        rosimage = bridge.cv2_to_imgmsg(currentImg, "bgr8")
+        rosimage.header.frame_id = "/kinect_optical_frame"
+        rosimage.header.stamp = rospy.Time.now()
+        self.images.append(rosimage)
+        self.names.append(fileName)
 
-            self.imageWidth = currentImg.shape[1]
-            self.imageHeight = currentImg.shape[0]
+        self.imageWidth = currentImg.shape[1]
+        self.imageHeight = currentImg.shape[0]
 
-    def readRosBags(self, imagePath):
-        self.images = []
-        self.names = []
+    def readRosBags(self, imagePath, fileName):
         imageTypes = [".bag"]
-        if not os.path.isdir(imagePath):
-            rospy.logerr("ERROR : Incorrect Path for image dataset")
-            exit(1)
 
-        for fileName in sorted(os.listdir(imagePath)):
-            isImage = False
-            for type in imageTypes:
-                if (type in fileName):
-                    isImage = True
-                    break
-            if (not isImage):
-                rospy.logdebug("%s is not a bag", fileName)
-                continue
-            # Read the next bag.
-            currentBag = rosbag.Bag(os.path.join(imagePath, fileName), "r")
-            # If the bag was not read succesfully continue to the
-            # next file.
-            if (currentBag is None):
-                rospy.logdebug("Error reading bag %s", fileName)
-                rospy.logdebug("The process will read the next bag!")
-                continue
-            # Store the bag.
-            tempPointCloud = PointCloud2()
-            for topic, msg, t in currentBag.read_messages("/camera/depth_registered/points"):
-                tempPointCloud.header = msg.header
-                tempPointCloud.height = msg.height
-                tempPointCloud.width = msg.width
-                tempPointCloud.fields = msg.fields
-                tempPointCloud.is_bigendian = msg.is_bigendian
-                tempPointCloud.point_step = msg.point_step
-                tempPointCloud.row_step = msg.row_step
-                tempPointCloud.data = msg.data
-                tempPointCloud.is_dense = msg.is_dense
+        isImage = False
+        for type in imageTypes:
+            if (type in fileName):
+                isImage = True
+                break
+        if (not isImage):
+            rospy.logdebug("%s is not a bag", fileName)
+            return
+        # Read the next bag.
+        currentBag = rosbag.Bag(os.path.join(imagePath, fileName), "r")
+        # If the bag was not read succesfully continue to the
+        # next file.
+        if (currentBag is None):
+            rospy.logdebug("Error reading bag %s", fileName)
+            rospy.logdebug("The process will read the next bag!")
+            return
+        # Store the bag.
+        tempPointCloud = PointCloud2()
+        fileExtension = ".png"
+        for topic, msg, t in currentBag.read_messages("/kinect/depth_registered/points"):
+            tempPointCloud.header = msg.header
+            tempPointCloud.height = msg.height
+            tempPointCloud.width = msg.width
+            tempPointCloud.fields = msg.fields
+            tempPointCloud.is_bigendian = msg.is_bigendian
+            tempPointCloud.point_step = msg.point_step
+            tempPointCloud.row_step = msg.row_step
+            tempPointCloud.data = msg.data
+            tempPointCloud.is_dense = msg.is_dense
 
-                self.images.append(tempPointCloud)
+            self.images.append(tempPointCloud)
 
-                self.imageWidth = tempPointCloud.width
-                self.imageHeight = tempPointCloud.height
+            self.imageWidth = tempPointCloud.width
+            self.imageHeight = tempPointCloud.height
 
+            tempFileName = "frame" + str(self.suffixNum) + fileExtension
             self.names.append(fileName)
-            currentBag.close()
+            self.suffixNum += 1
+        currentBag.close()
 
     def readBenchmarkFile(self, filePath):
         filePath, pathTail = os.path.split(filePath)
@@ -228,7 +221,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                 specs = dictKey[4]
                 num = 0
                 for ii in xrange(len(dictValues)):
-                    if dictValues[ii] in self.names:
+                    if dictValues[ii] in self.allImageNames:
                         num += 1
                 if num > 0:
                     self.actualPositivesBenchmarkDict[
@@ -281,7 +274,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
     def calculateBenchmarkResults(self):
         rospy.loginfo("Benchmarking Test Results for %s node.", self.algorithm)
         rospy.loginfo("Number of images used in algorithms: %d",
-                      len(self.images))
+                      self.numDatasetImages)
         rospy.loginfo("Number of True Positives: %d",
                       self.truePositives)
         rospy.loginfo("Number of False Positives: %d",
@@ -330,7 +323,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                 self.falsePositives > 0):
             fMeasure = (2.0 * self.truePositives /
                         (2.0 * self.truePositives +
-                        self.falseNegatives + self.falsePositives))
+                         self.falseNegatives + self.falsePositives))
 
         if self.truePositives > 0:
             self.meanSquaredError /= float(self.truePositives)
@@ -351,7 +344,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
 
     def calculateMeanNumberOfAngles(self):
         if self.algorithm == "LandoltC":
-            rospy.loginfo("Mean Number of Landoltc found for each set of parameters")
+            rospy.loginfo("Mean Number of Landoltc found for each" +
+                          " set of parameters")
             for dictKeyTP, dictValuesTP in self.truePositivesBenchmarkDict.iteritems():
                 if dictKeyTP in self.additionalInfoDict:
                     numOfAngles = self.additionalInfoDict[dictKeyTP]
@@ -381,25 +375,16 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         if "alert" in output_topic:
             cls.alertEvent.set()
 
-    def benchmarkTest(self, imagePath, inputTopic, outputTopic):
-        # Read a Set of Images
-        rospy.loginfo("Reading Images")
-        print outputTopic
-        if self.algorithm == "Hole" or self.algorithm == "Victim":
-            self.readRosBags(imagePath)
-        else:
-            self.readImages(imagePath)
+    def benchmarkTest(self, imagePath, inputTopic, outputTopic,
+                      benchmarkFlag=True):
         # Read Annotations for a Set of Images
         rospy.loginfo("Reading Annotator File")
         self.readAnnotatorFile(imagePath)
-        # Read Benchmark Parameters for a Set of Images
-        rospy.loginfo("Reading Benchmark File")
-        self.readBenchmarkFile(imagePath)
         # Create Helper Structures for Benchmarking
         self.truePositivesBenchmarkDict = defaultdict(int)
         self.actualPositivesBenchmarkDict = defaultdict(int)
-        self.updateActualPositiveDictionary()
         # Test Parameters and Variables
+        self.numDatasetImages = 0
         self.truePositives = 0
         self.falsePositives = 0
         self.trueNegatives = 0
@@ -407,6 +392,12 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         self.meanSquaredError = 0.0
         self.elapsedTimeList = []
         self.additionalInfoDict = defaultdict(int)
+
+        if benchmarkFlag:
+            # Read Benchmark Parameters for a Set of Images
+            rospy.loginfo("Reading Benchmark File")
+            self.readBenchmarkFile(imagePath)
+
         errorThreshold = 3000.0
         maxWaitTime = 1.0
         bridge = CvBridge()
@@ -416,87 +407,97 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             suffix = "Alerts"
 
         queueIndex = 0
-        count  = 0
+        count = 0
 
-        # Publish image files sequentially and wait for an alert.
-        # Confirm the authenticity of the alert using the annotator
-        # groundtruth set.
-        for image, imageName in zip(self.images, self.names):
+        # Read Images Sequentially
+        rospy.loginfo("Reading Images")
 
-            self.alertEvent.clear()
-            rospy.logdebug("Sending Image %s", imageName)
-            timeFlag = False
-            startTime = time.clock()
-            self.mockPublish(inputTopic, outputTopic, image)
-            print outputTopic
-            #self.mockPublish(inputTopic, outputTopic[1], image)
-            elapsedTime = time.clock() - startTime
+        if not os.path.isdir(imagePath):
+            rospy.logerr("ERROR : Incorrect Path for image dataset")
+            exit(1)
 
-            # while not timeFlag:
-                #elapsedTime = time.clock() - startTime
-                #timeFlag = (elapsedTime > maxWaitTime or
-                            #(self.repliedList[outputTopic[0]] and
-                             #len(self.messageList[outputTopic[0]]) >= 1))
-
-            response = self.messageList[outputTopic[0]]
-            print len(response)
-            print "Object Type : ", response[0].__class__.__name__
-            # possibleAlert = self.messageList[outputTopic[1]]
-            if response[0].success:
-                # Wait for the alert to arrive.
-                self.alertEvent.wait()
-                rospy.logdebug("Alert found in Image %s", imageName)
-                rospy.logdebug("Time passed: %f seconds", elapsedTime)
-                truePositivesInImage = 0
-                # Estimate alert center point from message parameters
-                print self.messageList.items()
-                alerts = getattr(
-                        self.messageList[outputTopic[1]][queueIndex],
-                        self.algorithm.lower()+suffix)
-                print len(alerts)
-                queueIndex += 1
-                for iiAlert in xrange(len(alerts)):
-                    imageYaw = float(alerts[iiAlert].info.yaw)
-                    imagePitch = float(alerts[iiAlert].info.pitch)
-                    rospy.logdebug("Yaw: %f Degrees",
-                                   imageYaw * 180 / math.pi)
-                    rospy.logdebug("Pitch: %f Degrees",
-                                   imagePitch * 180 / math.pi)
-                    imageX, imageY = self.calculateAlertCenterPoint(
-                            imageYaw, imagePitch)
-
-                    minSqrError = self.calculateAlertDistanceError(
-                            imageName, imageX, imageY)
-
-                    isCorrectAlert = self.checkCorrectAlert(
-                            imageName, alerts[iiAlert])
-
-                    if minSqrError < errorThreshold and isCorrectAlert:
-                        truePositivesInImage += 1
-                        self.truePositives += 1
-                        self.meanSquaredError += minSqrError
-                        self.updateTruePositiveDictionary(imageName)
-                        self.elapsedTimeList.append(elapsedTime)
-                        self.updateAdditionalInfoDict(imageName,
-                                alerts[iiAlert])
-                    else:
-                        self.falsePositives += 1
-
-                annotationsInImage = self.findAnnotations(imageName)
-                if annotationsInImage > truePositivesInImage:
-                    self.falseNegatives += (annotationsInImage -
-                                            truePositivesInImage)
+        self.suffixNum = 0
+        self.allImageNames = []
+        for fileName in sorted(os.listdir(imagePath)):
+            self.images = []
+            self.names = []
+            if self.algorithm == "Hole" or self.algorithm == "Victim":
+                self.readRosBags(imagePath, fileName)
             else:
-                numberOfFalseNegatives = self.findAnnotations(imageName)
-                if numberOfFalseNegatives > 0:
-                    self.falseNegatives += numberOfFalseNegatives
+                self.readImages(imagePath, fileName)
+            if not self.images:
+                continue
+            self.numDatasetImages += len(self.images)
+            for imageName in self.names:
+                self.allImageNames.append(imageName)
+
+            # Publish image files sequentially and wait for an alert.
+            # Confirm the authenticity of the alert using the annotator
+            # groundtruth set.
+            for image, imageName in zip(self.images, self.names):
+                self.alertEvent.clear()
+                rospy.logdebug("Sending Image %s", imageName)
+                timeFlag = False
+                startTime = time.clock()
+                self.mockPublish(inputTopic, outputTopic[1], image)
+                elapsedTime = time.clock() - startTime
+
+                response = self.messageList[outputTopic[0]][-1]
+                if response.success:
+                    # Wait for the alert to arrive.
+                    self.alertEvent.wait()
+                    rospy.logdebug("Alert found in Image %s", imageName)
+                    rospy.logdebug("Time passed: %f seconds", elapsedTime)
+                    truePositivesInImage = 0
+                    # Estimate alert center point from message parameters
+                    alerts = getattr(
+                            self.messageList[outputTopic[1]][-1],
+                            self.algorithm.lower()+suffix)
+                    queueIndex += 1
+                    for iiAlert in xrange(len(alerts)):
+                        imageYaw = float(alerts[iiAlert].info.yaw)
+                        imagePitch = float(alerts[iiAlert].info.pitch)
+                        rospy.logdebug("Yaw: %f Degrees",
+                                       imageYaw * 180 / math.pi)
+                        rospy.logdebug("Pitch: %f Degrees",
+                                       imagePitch * 180 / math.pi)
+                        imageX, imageY = self.calculateAlertCenterPoint(
+                                imageYaw, imagePitch)
+
+                        minSqrError = self.calculateAlertDistanceError(
+                                imageName, imageX, imageY)
+
+                        isCorrectAlert = self.checkCorrectAlert(
+                                imageName, alerts[iiAlert])
+
+                        if minSqrError < errorThreshold and isCorrectAlert:
+                            truePositivesInImage += 1
+                            self.truePositives += 1
+                            self.meanSquaredError += minSqrError
+                            self.elapsedTimeList.append(elapsedTime)
+                            if benchmarkFlag:
+                                self.updateTruePositiveDictionary(imageName)
+                                self.updateAdditionalInfoDict(imageName,
+                                                              alerts[iiAlert])
+                        else:
+                            self.falsePositives += 1
+
+                    annotationsInImage = self.findAnnotations(imageName)
+                    if annotationsInImage > truePositivesInImage:
+                        self.falseNegatives += (annotationsInImage -
+                                                truePositivesInImage)
                 else:
-                    self.trueNegatives += 1
-        
-        
+                    numberOfFalseNegatives = self.findAnnotations(imageName)
+                    if numberOfFalseNegatives > 0:
+                        self.falseNegatives += numberOfFalseNegatives
+                    else:
+                        self.trueNegatives += 1
+
         # Calculate the Benchmarking Results.
         self.calculateBenchmarkResults()
-        # Estimate Recall values for each set of
-        # (Distance, Horizontal Angle, Vertical Angle)
-        self.calculateRecallResults()
-        self.calculateMeanNumberOfAngles()
+        if benchmarkFlag:
+            # Estimate Recall values for each set of
+            # (Distance, Horizontal Angle, Vertical Angle)
+            self.updateActualPositiveDictionary()
+            self.calculateRecallResults()
+            self.calculateMeanNumberOfAngles()

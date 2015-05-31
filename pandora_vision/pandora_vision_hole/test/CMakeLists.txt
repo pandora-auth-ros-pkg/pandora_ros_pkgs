@@ -192,3 +192,9 @@ if(${PROJECT_NAME}_functional)
   add_rostest(functional/hole_detector_test.launch
     DEPENDENCIES ${PROJECT_NAME}_hole_detector_test.bag)
 endif()
+
+if ({PROJECT_NAME}_benchmark)
+  
+
+  add_rostest(benchmark/hole_benchmark_test.launch)
+endif()

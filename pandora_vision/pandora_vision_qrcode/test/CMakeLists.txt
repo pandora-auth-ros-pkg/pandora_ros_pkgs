@@ -36,6 +36,11 @@ if (${PROJECT_NAME}_download)
     ${PROJECT_NAME}_benchmark_images_480p
     EXTRA_FILES test/benchmark/images/images_480p/extra_files.yaml
     )
+  # Download the images for the 720p web cam benchmarking.
+  download_extra_data(
+    ${PROJECT_NAME}_benchmark_images_720p
+    EXTRA_FILES test/benchmark/images/images_720p/extra_files.yaml
+    )
 endif()
 ################################################################################
 #                               Benchmark Tests                                #
@@ -43,7 +48,9 @@ endif()
 
 if (${PROJECT_NAME}_benchmark)
 
-  add_rostest(benchmark/qrcode_kinect_benchmark_test.launch
-              ARGS xtion:=true)
+  add_rostest(benchmark/qrcode_benchmark_test.launch
+    ARGS xtion:=true)
+  add_rostest(benchmark/qrcode_benchmark_test.launch
+    ARGS usb_cam:=true)
 
 endif()

@@ -60,10 +60,10 @@ namespace pandora_vision
     std::string loadModel = fs["load_classifier_model"];
     std::string pcaAnalysis = fs["do_pca_analysis"];
 
-    trainingSetFeatureExtraction_ = trainingSetExtraction.compare("false");
-    testSetFeatureExtraction_ = testSetExtraction.compare("false");
-    loadClassifierModel_ = loadModel.compare("false");
-    doPcaAnalysis_ = pcaAnalysis.compare("false");
+    trainingSetFeatureExtraction_ = trainingSetExtraction.compare("true") == 0;
+    testSetFeatureExtraction_ = testSetExtraction.compare("true") == 0;
+    loadClassifierModel_ = loadModel.compare("true") == 0;
+    doPcaAnalysis_ = pcaAnalysis.compare("true") == 0;
     typeOfNormalization_ = static_cast<int>(fs["type_of_normalization"]);
 
     fs.release();
@@ -97,13 +97,13 @@ namespace pandora_vision
     const std::string resultsFile = filesDirectory + imageType_ + "results.xml";
     const std::string svmClassifierFile = filesDirectory + imageType_ + "svm_classifier.xml";
 
-    const std::string trainingDatasetPath = path_to_samples + "/data";
+    const std::string trainingDatasetPath = path_to_samples + "/Training_Images";
     boost::filesystem::path trainingDirectory(trainingDatasetPath);
 
     const std::string trainingAnnotationsFile = filesDirectory + imageType_ + "training_annotations.txt";
     int numTrainingFiles = file_utilities::findNumberOfAnnotations(trainingAnnotationsFile);
 
-    const std::string testDatasetPath = path_to_samples + "/data";
+    const std::string testDatasetPath = path_to_samples + "/Test_Images";
     boost::filesystem::path testDirectory(testDatasetPath);
 
     const std::string testAnnotationsFile = filesDirectory + imageType_ + "test_annotations.txt";
@@ -126,9 +126,13 @@ namespace pandora_vision
         std::cout << "Create necessary training matrix" << std::endl;
         std::string prefix = "training_";
 
+        bool vocabularyNeeded = constructBagOfWordsVocabulary(trainingDirectory,
+            trainingAnnotationsFile);
+
         constructFeaturesMatrix(trainingDirectory, trainingAnnotationsFile,
             &trainingFeaturesMat, &trainingLabelsMat);
 
+        std::cout << "Normalize features" << std::endl;
         normalizeFeaturesAndSaveNormalizationParameters(&trainingFeaturesMat);
 
         trainingFeaturesMat.convertTo(trainingFeaturesMat, CV_32FC1);
@@ -137,6 +141,16 @@ namespace pandora_vision
         file_utilities::saveFeaturesInFile(trainingFeaturesMat, trainingLabelsMat,
             prefix, trainingFeaturesMatrixFile, trainingLabelsMatrixFile,
             imageType_);
+
+        if (vocabularyNeeded)
+        {
+          std::cout << "Save bag of words vocabulary" << std::endl;
+          const std::string bagOfWordsFile = imageType_ + "bag_of_words.xml";
+          const std::string bagOfWordsFilePath = filesDirectory + bagOfWordsFile;
+          file_utilities::saveToFile(bagOfWordsFilePath, "bag_of_words",
+              featureExtraction_->getBagOfWordsVocabulary());
+        }
+
       }
       else
       {
@@ -183,10 +197,7 @@ namespace pandora_vision
       std::cout << "Create necessary test matrix" << std::endl;
       std::string prefix = "test_";
 
-      const std::string testAnnotationsFile = imageType_ + "test_annotations.txt";
-      const std::string testAnnotationsFilePath = filesDirectory + testAnnotationsFile;
-
-      constructFeaturesMatrix(testDirectory, testAnnotationsFilePath,
+      constructFeaturesMatrix(testDirectory, testAnnotationsFile,
           &testFeaturesMat, &testLabelsMat);
 
       loadNormalizationParametersAndNormalizeFeatures(&testFeaturesMat);

@@ -54,7 +54,6 @@ namespace pandora_vision
   bool VictimImagePreProcessor::preProcess(const EnhancedImageConstPtr& input, 
     const EnhancedImageStampedPtr& output)  
   {
-
     output->setHeader(input->header);
 
     cv_bridge::CvImagePtr inMsg;
@@ -68,5 +67,6 @@ namespace pandora_vision
 
     output->setDepth(input->isDepth);
 
+    return true;
   }
 }  // namespace pandora_vision

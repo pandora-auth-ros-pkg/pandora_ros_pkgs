@@ -68,13 +68,23 @@ namespace pandora_vision
     std::string siftFeatures = fs["extract_sift_features"];
     std::string hogFeatures = fs["extract_hog_features"];
 
-    bool extractChannelsStatisticsFeatures = channelsStatisticsFeatures.compare("false");
-    bool extractEdgeOrientationFeatures = edgeOrientationFeatures.compare("false");
-    bool extractHaralickFeatures = haralickFeatures.compare("false");
-    bool extractSiftFeatures = siftFeatures.compare("false");
-    bool extractHogFeatures = hogFeatures.compare("false");
+    bool extractChannelsStatisticsFeatures = channelsStatisticsFeatures.compare("true") == 0;
+    bool extractEdgeOrientationFeatures = edgeOrientationFeatures.compare("true") == 0;
+    bool extractHaralickFeatures = haralickFeatures.compare("true") == 0;
+    bool extractSiftFeatures = siftFeatures.compare("true") == 0;
+    bool extractHogFeatures = hogFeatures.compare("true") == 0;
 
-    int dictionarySize = static_cast<int>(fs["dictionary_size"]);
+    std::string viewDescriptor = fs["visualization"];
+    visualization_ = viewDescriptor.compare("true") == 0;
+
+    std::string saveDescriptors = fs["save_descriptors"];
+    saveDescriptors_ = saveDescriptors.compare("true") == 0;
+
+    std::string loadDescriptors = fs["load_descriptors"];
+    loadDescriptors_ = loadDescriptors.compare("true") == 0;
+
+
+    dictionarySize_ = static_cast<int>(fs["dictionary_size"]);
     fs.release();
 
     chosenFeatureTypesMap_["channels_statistics"] =
@@ -95,7 +105,7 @@ namespace pandora_vision
 
       std::string descriptorMatcherType = "FlannBased";
       bowTrainerPtr_.reset(new BagOfWordsTrainer(featureDetectorType,
-          descriptorExtractorType, descriptorMatcherType, dictionarySize));
+          descriptorExtractorType, descriptorMatcherType, dictionarySize_));
     }
     if (chosenFeatureTypesMap_["hog"] == true)
     {
@@ -159,20 +169,29 @@ namespace pandora_vision
 
     if (chosenFeatureTypesMap_["sift"] == true)
     {
-      /// Extract SIFT features from RGB image
+      /// Extract SIFT features from Depth image
       cv::Mat siftDescriptors;
       bowTrainerPtr_->createBowRepresentation(inImage, &siftDescriptors);
-      /// Append SIFT features to RGB feature vector.
+      if (visualization_)
+        bowTrainerPtr_->plotDescriptor(siftDescriptors);
+      /// Append SIFT features to Depth feature vector.
       for (int ii = 0; ii < siftDescriptors.cols; ii++)
         featureVector_.push_back(siftDescriptors.at<float>(ii));
+      if (siftDescriptors.cols == 0)
+      {
+        for (int ii = 0; ii < dictionarySize_; ii++)
+        {
+          featureVector_.push_back(0.0);
+        }
+      }
     }
 
     if (chosenFeatureTypesMap_["hog"] == true)
     {
-      /// Extract HOG features from RGB image
+      /// Extract HOG features from Depth image
       std::vector<float> hogDescriptors;
       featureFactoryPtrMap_["hog"]->extractFeatures(inImage, &hogDescriptors);
-      /// Append HOG features to RGB feature vector.
+      /// Append HOG features to Depth feature vector.
       for (int ii = 0; ii < hogDescriptors.size(); ii++)
         featureVector_.push_back(hogDescriptors.at(ii));
     }

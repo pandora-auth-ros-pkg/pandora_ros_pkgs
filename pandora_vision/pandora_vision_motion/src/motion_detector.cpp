@@ -70,7 +70,6 @@ namespace pandora_vision
   {
     bounding_box_.reset( new BBoxPOI() );
     kernel_erode_ = getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2));
-    bg_ = cv::BackgroundSubtractorMOG2(history, varThreshold, bShadowDetection);
 
     bounding_box_->setPoint(cv::Point(0, 0));
     bounding_box_->setWidth(0);
@@ -90,6 +89,7 @@ namespace pandora_vision
     show_moving_objects_contours = false;
 
     max_deviation_ = 50;
+    bg_ = cv::BackgroundSubtractorMOG2(history, varThreshold, bShadowDetection);
     ROS_INFO("Created MotionDetector instance");
   }
 

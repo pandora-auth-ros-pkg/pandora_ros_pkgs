@@ -1,7 +1,7 @@
 <launch>
     
   <node name="hazmat_node" type="pandora_vision_hazmat_node" pkg="pandora_vision_hazmat"
-    respawn="False" output="screen" ns="/pandora_vision"/>
+    respawn="False" ns="/pandora_vision"/>
   <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   
   <rosparam file="$(find pandora_vision_hazmat)/config/pandora_vision_hazmat/hazmat_topics.yaml"

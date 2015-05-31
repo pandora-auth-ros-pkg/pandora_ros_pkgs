@@ -269,5 +269,13 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 ##################################### Testing ##################################
 if(CATKIN_ENABLE_TESTING)
+
+  if(${PROJECT_NAME}_download_benchmark)
+
+    download_extra_data(${PROJECT_NAME}_download_benchark_bags
+      EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
+
+  endif()
+
   add_subdirectory(test)
 endif()

@@ -65,6 +65,8 @@ namespace pandora_vision
   {
     PredatorNowOn = false;
     offset = 0;
+    package_path = ros::package::getPath("pandora_vision_annotator");
+
   }
 
   /**
@@ -121,6 +123,11 @@ namespace pandora_vision
     QObject::connect(
         &connector_, SIGNAL(removeFile()),
         this, SLOT(removeFile()));
+
+    QObject::connect(
+        &connector_, SIGNAL(saveImages()),
+        this, SLOT(saveImages()));
+
   }      
 
   /**
@@ -160,6 +167,35 @@ namespace pandora_vision
     offset += 1;
     ROS_INFO_STREAM("Frame indexing starting at: " << offset);
   }
+
+  /**
+  @brief save all annotated images
+  @return void
+  **/
+  void CController::saveImages(void)
+  {
+    ROS_INFO_STREAM("ENTER SAVE IMAGES");
+      for(int i = offset; i < tempFrames.size()+offset; i++)
+    {
+      std::stringstream imgName, file;
+      file << package_path << "/data/annotations.txt";
+      imgName << package_path  << "/data/depth/frame" << i  << ".png";
+      std::string img_name = "frame" + boost::to_string(i) + ".png";
+
+      ImgAnnotations::annotations.clear();
+      ImgAnnotations::readFromFile(file.str(), img_name);
+      ImgAnnotations::annPerImage = ImgAnnotations::annotations.size();
+      if(ImgAnnotations::annPerImage != 0)
+      {
+        cv::Mat temp;
+        cv::cvtColor(tempFrames[i-offset], temp, CV_BGR2RGB);
+        cv::imwrite(imgName.str(), temp);
+        ROS_INFO_STREAM("SAVING " << imgName.str());
+      }
+    }
+
+  }
+
 
   /**
   @brief sets initial frame and calls function to publish
@@ -274,6 +310,7 @@ namespace pandora_vision
       }
     } 
     frames.push_back(imageFrame);
+    msgHeader_.push_back(msg->header);
   }
   
   /**
@@ -532,14 +569,14 @@ namespace pandora_vision
 
      if(msg->isDepth) 
      {
-        rgb_msg = cv_bridge::toCvCopy(msg->depthImage,
+        depth_msg = cv_bridge::toCvCopy(msg->depthImage,
         sensor_msgs::image_encodings::TYPE_8UC1);
-        cv::cvtColor(rgb_msg->image, depth, CV_GRAY2RGB);
+        cv::cvtColor(depth_msg->image, depth, CV_GRAY2RGB);
      
-        depth_msg = cv_bridge::toCvCopy(msg->rgbImage,
+        rgb_msg = cv_bridge::toCvCopy(msg->rgbImage,
         sensor_msgs::image_encodings::TYPE_8UC3); 
-        cv::cvtColor(depth_msg->image, rgb, CV_BGR2RGB); 
-     }
+        cv::cvtColor(rgb_msg->image, rgb, CV_BGR2RGB); 
+     
      
 
       if(!onlinemode)
@@ -547,25 +584,18 @@ namespace pandora_vision
         if(depthVisible_)
         {
           frames.push_back(depth);
+          tempFrames.push_back(rgb);
           temp = depth.clone();
         }
         else
         {
           frames.push_back(rgb);
+          tempFrames.push_back(depth);
           temp = rgb.clone();
         }
         msgHeader_.push_back(msg->header);
       }
-
-      else
-      { 
-        QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
-        dest.bits(); // enforce deep copy, see documentation
-        connector_.setImage(dest);
-        connector_.msgTimeStamp(msg->header);
-        Q_EMIT updateImage();
-      }
-
+     }
   }
 
   /**

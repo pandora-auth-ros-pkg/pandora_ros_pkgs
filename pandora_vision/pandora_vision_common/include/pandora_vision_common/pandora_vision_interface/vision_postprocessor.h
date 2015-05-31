@@ -39,19 +39,8 @@
 #ifndef PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H
 #define PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H
 
-#include <map>
-#include <string>
-#include <utility>
-
-#include <boost/shared_ptr.hpp>
-#include <urdf_parser/urdf_parser.h>
-
 #include "sensor_processor/postprocessor.h"
-#include "pandora_common_msgs/GeneralAlertVector.h"
-#include "pandora_common_msgs/GeneralAlertInfo.h"
-
-#include "pandora_vision_common/pois_stamped.h"
-#include "pandora_vision_common/pandora_vision_interface/vision_exceptions.h"
+#include "pandora_vision_common/pandora_vision_interface/general_alert_converter.h"
 
 namespace pandora_vision
 {
@@ -100,53 +89,14 @@ namespace pandora_vision
     pandora_common_msgs::GeneralAlertVector
       getGeneralAlertInfo(const POIsStampedConstPtr& result);
 
-  private:
-    /**
-     * @brief Function that finds in a dictionary a parameter of type T with the frame id
-     * as key. If the parameter is not found there, external files (yaml files, launchers)
-     * are searched and, when found, the parameter is inserted to the dictionary
-     * @param dict [std::map<std::string, T>*] Pointer to the dictionary to be searched and
-     * possibly altered
-     * @param key [const std::string&] The key used to search in the dictionary
-     * @return [T] The parameter that is found
-     **/
-    template <class T>
-      T
-      findParam(std::map<std::string, T>* dict, const std::string& key);
-
-    /**
-     * @brief Function that finds in a dictionary the parent frame id with the frame id
-     * as key. If the parameter is not found there, the robot model is searched and when
-     * the connection to the frame id is found, it is inserted to the dictionary
-     * @param dict [std::map<std::string, std::string>*] Pointer to the dictionary to be
-     * searched and possibly altered
-     * @param key [std::string&] The key used to search in the dictionary
-     * @param model_param_name [std::string&] The model parameter name
-     * @return [std::string] The parent frame id
-     **/
-    std::string
-      findParentFrameId(std::map<std::string, std::string>* dict,
-        const std::string& key,
-        const std::string& model_param_name);
-
-  protected:
-    /// A dictionary that includes every parent frame id that the node uses
-    /// with frame id as key
-    std::map<std::string, std::string> parentFrameDict_;
-
-    /// A dictionary that includes Horizontal Fields Of View for every camera
-    /// with frame id as key
-    std::map<std::string, double> hfovDict_;
-
-    /// A dictionary that includes Vertical Fields Of View for every camera
-    /// with frame id as key
-    std::map<std::string, double> vfovDict_;
+    boost::shared_ptr<GeneralAlertConverter> converter_;
   };
 
   template <class VisionAlertMsg>
     VisionPostProcessor<VisionAlertMsg>::
     VisionPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-      sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(ns, handler)
+      sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(ns, handler),
+      converter_(new GeneralAlertConverter)
     {
     }
 
@@ -155,125 +105,9 @@ namespace pandora_vision
     VisionPostProcessor<VisionAlertMsg>::
     getGeneralAlertInfo(const POIsStampedConstPtr& result)
     {
-      //ROS_DEBUG_STREAM("key = " + result->header.frame_id);
-      pandora_common_msgs::GeneralAlertVector generalAlertInfos;
-
-      float x = 0, y = 0;
-      // fov are in radians
-      float hfov = findParam<double>(&hfovDict_, result->header.frame_id + "/hfov");
-      float vfov = findParam<double>(&vfovDict_, result->header.frame_id + "/vfov");
-      std::string parentFrameId = findParentFrameId(&parentFrameDict_,
-          result->header.frame_id, "/robot_description");
-
-      generalAlertInfos.header = result->header;
-      generalAlertInfos.header.frame_id = parentFrameId;
-
-      for (int i = 0; i < result->pois.size(); ++i)
-      {
-        const POIPtr poiPtr = result->pois[i];
-        pandora_common_msgs::GeneralAlertInfo info;
-        x = poiPtr->getPoint().x
-          - static_cast<float>(result->frameWidth) / 2;
-        y = static_cast<float>(result->frameHeight) / 2
-          - poiPtr->getPoint().y;
-
-        info.yaw = atan(2 * x / result->frameWidth *
-            tan(hfov * CV_PI/ 360.0f));
-        info.pitch = atan(2 * y / result->frameHeight *
-            tan(vfov * CV_PI/ 360.0f));
-        info.probability = poiPtr->getProbability();
-
-        generalAlertInfos.generalAlerts.push_back(info);
-      }
-
-      return generalAlertInfos;
+      return converter_->getGeneralAlertInfo(this->getName(), *this->accessPublicNh(), result);
     }
 
-  template <class VisionAlertMsg>
-    template <class T>
-      T
-      VisionPostProcessor<VisionAlertMsg>::
-      findParam(std::map<std::string, T>* dict, const std::string& key)
-      {
-        typename std::map<std::string, T>::iterator iter;
-        if ((iter = dict->find(key)) != dict->end())
-        {
-          return iter->second;
-        }
-        else
-        {
-          ROS_DEBUG("[%s] First at: %s", this->getName().c_str(), key.c_str());
-
-          std::string true_key;
-          if (key[0] == '/') {
-            true_key = key;
-          }
-          else {
-            true_key = '/' + key;
-          }
-
-          T param;
-
-          if (!this->accessPublicNh()->getParam(true_key, param))
-          {
-            ROS_ERROR_NAMED(this->getName(),
-                "Params couldn't be retrieved for %s", true_key.c_str());
-            throw vision_config_error(key + " : not found");
-          }
-          ROS_DEBUG("[%s] Got: %f", this->getName().c_str(), param);
-          dict->insert(std::make_pair(key, param));
-          return param;
-        }
-      }
-
-  template <class VisionAlertMsg>
-    std::string
-    VisionPostProcessor<VisionAlertMsg>::
-    findParentFrameId(std::map<std::string, std::string>* dict,
-        const std::string& key,
-        const std::string& model_param_name)
-    {
-      typename std::map<std::string, std::string>::iterator iter;
-      if ((iter = dict->find(key)) != dict->end())
-      {
-        return iter->second;
-      }
-      else
-      {
-        ROS_DEBUG("[%s] First at: %s", this->getName().c_str(), key.c_str());
-          
-        std::string true_key;
-        if (key[0] == '/') {
-          true_key = key;
-          true_key.erase(0, 1);
-        }
-        else {
-          true_key = key;
-        }
-
-        std::string robot_description;
-
-        if (!this->accessPublicNh()->getParam(model_param_name, robot_description))
-        {
-          ROS_ERROR_NAMED(this->getName(),
-              "Robot description couldn't be retrieved from the parameter server.");
-          throw vision_config_error(model_param_name + " : not found");
-        }
-
-        std::string parent_frame_id;
-
-        boost::shared_ptr<urdf::ModelInterface> model(
-          urdf::parseURDF(robot_description));
-        // Get current link and its parent
-        boost::shared_ptr<const urdf::Link> currentLink( model->getLink(true_key) );
-        boost::shared_ptr<const urdf::Link> parentLink( currentLink->getParent() );
-        // Set the parent frame_id to the parent of the frame_id
-        parent_frame_id = parentLink->name;
-        ROS_DEBUG("[%s] Got: %s", this->getName().c_str(), parent_frame_id.c_str());
-        dict->insert(std::make_pair(key, parent_frame_id));
-        return parent_frame_id;
-      }
-    }
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H

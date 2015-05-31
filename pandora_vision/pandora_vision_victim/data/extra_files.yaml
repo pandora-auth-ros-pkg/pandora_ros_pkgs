@@ -7,31 +7,33 @@ files:
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/cascade.xml
 - md5: df559dc62387923e8c42c599a7558828
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_depth_test_matrix.xml
-- md5: 61d88d473ec593210735d58dd506af88
+- md5: 571c61859606bdb19af0c8a596a0dc85
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_svm_classifier.xml
 - md5: d9f81a37150ed5c597be804c3d56e22d
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_training_matrix.xml
-- md5: 8e7d6ec98b3b85974aaa9c2a7289dc25
+- md5: 68ea5554cbd0be3ed8a32e704f488db9
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_mean_values.xml
 - md5: f99ca9447ea51d8d1d9a816625c3795e
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/model.xml
-- md5: 9c135202d3e77d74e0ce927c6509ecbb
+- md5: 99476613460b936517e0afb1575cf10e
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_standard_deviation_values.xml
+- md5: 8070412d05bcbdd01510ef9a9e31a793
+  url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_bag_of_words.xml
 - md5: aed2cd50b29f1276f208c4ba72ced5b8
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_test_matrix.xml
 - md5: 45e4e9ff1c3db080105fb4113c97dac9
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_test_matrix.xml
-- md5: 7fa67b5f49dcdadd0ed19d0da279adfe
+- md5: 3311463ac4cbf709a7cb311ee17e87c4
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_mean_values.xml
-- md5: 6373fed09155da4d59d1fb9c849f9ba2
+- md5: c588f26804b3ba4b1590444631d3d639
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/depth_svm_classifier.xml
 - md5: 7860fb429aa404e61cf7168455aadf18
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_results.xml
 - md5: 27707207da5cfaf9e550ba70d959eece
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_rgb_training_matrix.xml
-- md5: 9a838388cc0477792d396b70450f0907
+- md5: a97c5226ac7f9dc2a1740f2970536a81
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_standard_deviation_values.xml
-- md5: 713deb8c80e345df671d6778d3a877d3
+- md5: ecd8149669dc9b4ef148e0a8c8b8ed82
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/rgb_bag_of_words.xml
 - md5: 4c7630c2c317f1c4da1f227adbd87112
   url: http://downloads.pandora.ee.auth.gr/data/vision/victim_training/labels_rgb_test_matrix.xml

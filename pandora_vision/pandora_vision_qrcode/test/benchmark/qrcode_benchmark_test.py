@@ -17,19 +17,22 @@ PKG_PATH = rospkg.RosPack().get_path(PKG)
 class BenchmarkTester(vision_benchmark_test_base.VisionBenchmarkTestBase):
     def test_benchmark(self):
         self.datasetCamera = rospy.get_param("dataset_camera")
-        # if datasetCamera == "kinect":
+
         self.imageHFOV = rospy.get_param("/kinect_optical_frame/hfov")
         self.imageVFOV = rospy.get_param("/kinect_optical_frame/vfov")
-        # else:
-            # self.imageHFOV = rospy.get_param("/kinect_frame/hfov")
-            # self.imageVFOV = rospy.get_param("/kinect_frame/vfov")
+
         self.imageHFOV *= math.pi / 180
         self.imageVFOV *= math.pi / 180
 
         self.algorithm = rospy.get_param("algorithm")
+        if rospy.has_param("benchmarkFlag"):
+            benchmarkFlag = rospy.get_param("benchmarkFlag")
+        else:
+            benchmarkFlag = True
+
         imagePath = rospy.get_param("dataset_path")
         self.benchmarkTest(PKG_PATH + imagePath,
-                           publisherTopic, subscriberTopic)
+                           publisherTopic, subscriberTopic, benchmarkFlag)
 
 if __name__ == "__main__":
     # Initialize the node
@@ -55,7 +58,7 @@ if __name__ == "__main__":
     subscriberMessagePackage = None
     subscriberMessageType = None
 
-    if rospy.has_param("kinect/topic_name"):
+    if rospy.has_param("subscriberTopic"):
         subscriberTopic = rospy.get_param("subscriberTopic")
     else:
         rospy.logfatal("Could not find the Processor Image Topic name" +

@@ -97,13 +97,13 @@ namespace pandora_vision
     const std::string resultsFile = filesDirectory + imageType_ + "results.xml";
     const std::string svmClassifierFile = filesDirectory + imageType_ + "svm_classifier.xml";
 
-    const std::string trainingDatasetPath = path_to_samples + "/data";
+    const std::string trainingDatasetPath = path_to_samples + "/Training_Images";
     boost::filesystem::path trainingDirectory(trainingDatasetPath);
 
     const std::string trainingAnnotationsFile = filesDirectory + imageType_ + "training_annotations.txt";
     int numTrainingFiles = file_utilities::findNumberOfAnnotations(trainingAnnotationsFile);
 
-    const std::string testDatasetPath = path_to_samples + "/data";
+    const std::string testDatasetPath = path_to_samples + "/Test_Images";
     boost::filesystem::path testDirectory(testDatasetPath);
 
     const std::string testAnnotationsFile = filesDirectory + imageType_ + "test_annotations.txt";

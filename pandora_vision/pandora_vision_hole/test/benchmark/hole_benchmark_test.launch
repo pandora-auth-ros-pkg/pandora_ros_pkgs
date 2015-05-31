@@ -1,84 +1,35 @@
 <launch>
 
+  <arg name="frame_id" default="/kinect_optical_frame"/>
+
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  <!-- ============================= Namespace ============================= -->
+  <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
+  <!-- <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" /> -->
 
-  <arg name="namespace" default="pandora_vision/hole_detector" />
+  <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
+  <param name="dataset_camera" value="kinect"/>
 
-  <!-- ========================= Synchronizer node ========================= -->
+  <param name="/kinect_optical_frame/hfov" value="58.0" />
+  <param name="/kinect_optical_frame/vfov" value="45.0" />
 
-  <node
-    name="synchronizer_node"
-    type="synchronizer_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="screen"
-    ns="$(arg namespace)">
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_node_topics.yaml"
-              command="load" />
-  </node>
-
-  <!-- ============================ Depth node ============================= -->
-
-  <node
-    name="depth_node"
-    type="depth_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="screen"
-    ns="$(arg namespace)">
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/depth_node_topics.yaml"
-              command="load" />
-  </node>
-
-  <!-- ============================= RGB node ============================== -->
-
-  <node
-    name="rgb_node"
-    type="rgb_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="screen"
-    ns="$(arg namespace)">
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/rgb_node_topics.yaml"
-              command="load" />
-  </node>
-
-  <!-- ========================= Hole Fusion node ========================== -->
-
-  <node
-    name="hole_fusion_node"
-    type="hole_fusion_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="screen"
-    ns="$(arg namespace)">
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/hole_fusion_node_topics.yaml"
-              command="load" />
-  </node>
-
-  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
-    command="load"/>
-
-  <param name="subscriberTopic" value="/vision/holes_direction_alert" />
-  <param name="subscriberMessagePackage" value="pandora_vision_msgs" />
-  <param name="subscriberMessageType" value="HolesDirectionsVectorMsg"/>
-
-  <param name="publisherTopic" value="/camera/depth_registered/points" />
+  <param name="benchmarkFlag" value="False" />
+  <param name="kinect/topic_name" value="/kinect/depth_registered/points" />
   <param name="publisherMessagePackage" value="sensor_msgs" />
   <param name="publisherMessageType" value="PointCloud2"/>
-  
-  <param name="algorithm" value="Hole"/>
-  <remap from="/camera/depth_registered/points" to="/kinect/depth_registered/points" />
 
-  <param name="dataset_camera" value="kinect"/>
-  <param name="dataset_path" value="/test/benchmark/images/bags_pcl"/>
-  
+  <param name="syncSubscriberTopic" value="/hole_detector/processor_log" />
+  <param name="subscriberMessagePackage" value="sensor_processor" />
+  <param name="subscriberMessageType" value="ProcessorLogInfo"/>
+
+  <param name="subscriberAlertTopic" value="/vision/holes_direction_alert" />
+  <param name="subscriberAlertMessagePackage" value="pandora_vision_msgs" />
+  <param name="subscriberAlertMessageType" value="HoleDirectionAlertVector"/>
+
+  <param name="algorithm" value="Hole"/>
+    
   <test test-name="HoleBenchmarkTest" pkg="pandora_vision_hole"
-    type="hole_benchmark_test.py" time-limit="1000.0"/>
+    type="hole_benchmark_test.py" time-limit="6000.0"/>
+
   
 </launch>

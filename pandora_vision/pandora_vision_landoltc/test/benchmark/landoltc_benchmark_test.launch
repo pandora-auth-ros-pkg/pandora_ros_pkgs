@@ -4,7 +4,7 @@
  <arg name="frame_id" default="/kinect_optical_frame"/>
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
+  <include file="$(find pandora_vision_landoltc)/launch/landoltc_2d_node.launch" />
 
   <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
 
@@ -21,24 +21,25 @@
     <param name="dataset_path" value="/test/benchmark/images/images_720p"/>
     <param name="dataset_camera" value="web_camera"/>
     <param name="frame_id" value="left_camera_optical_frame" />
-    <param name="$(arg frame_id)/hfov" value="58.00" />
-    <param name="$(arg frame_id)/vfov" value="45.00" />
+    <param name="$(arg frame_id)/hfov" value="60.00" />
+    <param name="$(arg frame_id)/vfov" value="33.75" />
   </group>
 
+  <param name="benchmarkFlag" value="False" />
   <param name="publisherMessagePackage" value="sensor_msgs" />
   <param name="publisherMessageType" value="Image"/>
 
-  <param name="subscriberTopic" value="/pandora_vision/qrcode_node/processor_log" />
+  <param name="subscriberTopic" value="/pandora_vision/landoltc_2d_node/processor_log" />
   <param name="subscriberMessagePackage" value="sensor_processor" />
   <param name="subscriberMessageType" value="ProcessorLogInfo"/>
 
-  <param name="subscriberAlertTopic" value="/vision/qr_alert" />
+  <param name="subscriberAlertTopic" value="/vision/landoltc_alert" />
   <param name="subscriberAlertMessagePackage" value="pandora_vision_msgs" />
-  <param name="subscriberAlertMessageType" value="QRAlertVector"/>
+  <param name="subscriberAlertMessageType" value="LandoltcAlertVector"/>
 
-  <param name="algorithm" value="QR"/>
+  <param name="algorithm" value="LandoltC"/>
     
-  <test test-name="QRBenchmarkTest" pkg="pandora_vision_qrcode"
-    type="qrcode_benchmark_test.py" time-limit="2000.0"/>
+  <test test-name="LandoltcBenchmarkTest" pkg="pandora_vision_landoltc"
+    type="landoltc_benchmark_test.py" time-limit="2000.0"/>
   
 </launch>

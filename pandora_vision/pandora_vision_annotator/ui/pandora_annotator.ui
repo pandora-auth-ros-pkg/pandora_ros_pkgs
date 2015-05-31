@@ -305,14 +305,14 @@
        <item>
         <widget class="QLineEdit" name="bagLineEdit">
          <property name="text">
-          <string>cropped.bag</string>
+          <string>positive1-1.bag</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="rosTopicLineEdit">
          <property name="text">
-          <string>/kinect/rgb/image_raw</string>
+          <string>/vision/enhanced_images</string>
          </property>
         </widget>
        </item>

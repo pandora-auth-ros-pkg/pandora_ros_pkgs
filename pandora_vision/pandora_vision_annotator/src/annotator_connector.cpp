@@ -174,24 +174,7 @@ namespace pandora_vision
   **/
   void CConnector::saveImagesPushButtonTriggered(void)
   {
-    for(int i = offset_; i < frames.size()+offset_; i++)
-    {
-      std::stringstream imgName, file;
-      file << package_path << "/data/annotations.txt";
-      imgName << package_path  << "/data/depth/frame" << i + offset_ << ".png";
-      std::string img_name = "frame" + boost::to_string(i+offset_) + ".png";
-
-      ImgAnnotations::annotations.clear();
-      ImgAnnotations::readFromFile(file.str(), img_name);
-      ImgAnnotations::annPerImage = ImgAnnotations::annotations.size();
-      if(ImgAnnotations::annPerImage != 0)
-      {
-        cv::Mat temp;
-        cv::cvtColor(frames[i], temp, CV_BGR2RGB);
-        cv::imwrite(imgName.str(), temp);
-        loader_.statusLabel->setText("Save current Frame as:" + QString(imgName.str().c_str() ));
-      }
-    }
+     Q_EMIT saveImages();
   }
 
 
@@ -399,6 +382,7 @@ namespace pandora_vision
         const QMouseEvent* const me =
           static_cast<const QMouseEvent*>( event );
         QPoint p = me->pos();
+
 
         int container_width = loader_.imageLabel->width();
         int container_height = loader_.imageLabel->height();

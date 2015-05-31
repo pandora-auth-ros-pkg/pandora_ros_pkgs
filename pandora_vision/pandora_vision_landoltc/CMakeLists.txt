@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     pandora_common_msgs
     pandora_vision_msgs
     pandora_vision_common
+    pandora_cmake_tools
     state_manager
     state_manager_msgs
     cv_bridge
@@ -166,5 +167,10 @@ roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 ##################################### Testing ##################################
 
 if(CATKIN_ENABLE_TESTING)
+
+  if (${PROJECT_NAME}_download)
+      set(${PROJECT_NAME}_download TRUE)
+  endif()
+
   add_subdirectory(test)
 endif()

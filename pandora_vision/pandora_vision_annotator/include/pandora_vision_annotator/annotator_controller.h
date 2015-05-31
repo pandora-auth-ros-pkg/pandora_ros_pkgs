@@ -86,9 +86,15 @@ namespace pandora_vision
       //!< Vector of frames
       std::vector<cv::Mat> frames;
 
+      //!< Vector of frames
+      std::vector<cv::Mat> tempFrames;
+
       //!< Vector of bag msgs Header
       std::vector<std_msgs::Header> msgHeader_;
-      
+
+      //!< the path of the ros package
+      std::string package_path;
+
       //!< the number of current Frame
       int currentFrameNo_;
 
@@ -243,6 +249,13 @@ namespace pandora_vision
       @return void
       **/
       void removeFile();
+
+      /**
+      @brief save all annotated images
+      @return void
+      **/
+      void saveImages(void);
+
     
     //------------------------------------------------------------------------//
     Q_SIGNALS:

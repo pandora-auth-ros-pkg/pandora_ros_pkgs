@@ -358,6 +358,7 @@ namespace pandora_vision
       void offlineModeGiven(void);
       void appendToFile(void);
       void removeFile(void);
+      void saveImages(void);
   };
 }// namespace pandora_vision
 
