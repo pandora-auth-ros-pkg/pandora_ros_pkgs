@@ -67,7 +67,7 @@ namespace pandora_vision
       holeCurrentlyOn = (holeCurrentlyOn || currentState_ == holeActiveStates_[ii]);
     }
     
-   /* for (int ii = 0; ii < imageActiveStates_.size(); ii++)*/
+    /* for (int ii = 0; ii < imageActiveStates_.size(); ii++)*/
     //{
       //imagePreviouslyOff = (imagePreviouslyOff && previousState_ != imageActiveStates_[ii]);
       //imageCurrentlyOn = (imageCurrentlyOn || currentState_ == imageActiveStates_[ii]);
@@ -79,7 +79,7 @@ namespace pandora_vision
       processorPtr_.reset(new VictimHoleProcessor("~/processor", this));
       postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
     }
-   /* else if (imagePreviouslyOff && imageCurrentlyOn)*/
+    /* else if (imagePreviouslyOff && imageCurrentlyOn)*/
     //{
       //preProcPtr_.reset(new VictimImagePreProcessor("~/preprocessor", this));
       //processorPtr_.reset(new VictimImageProcessor("~/processor", this));
