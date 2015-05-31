@@ -8,7 +8,7 @@
 
   <group if="$(arg eef_planner)">
     <!--Linear Kinect and Head-->
-    <include file="$(find pandora_end_effector_planner)/end_effector_planner/launch/end_effector_planner.launch" />
+    <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller.launch" />
 
     <!--Center motors -->
     <node
