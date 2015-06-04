@@ -72,6 +72,9 @@ namespace pandora_vision
 
     svmParams_.C = params.rgb_svm_C;
     svmParams_.gamma = params.rgb_svm_gamma;
+    svmParams_.svm_type = CvSVM::C_SVC;
+    svmParams_.kernel_type = CvSVM::RBF; 
+
 
     std::string filesDirectory = packagePath_ + "/data/";
 

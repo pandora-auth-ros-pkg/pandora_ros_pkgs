@@ -119,9 +119,9 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             rospy.logdebug("The process will read the next bag!")
             return
         # Store the bag.
-        tempPointCloud = PointCloud2()
         fileExtension = ".png"
         for topic, msg, t in currentBag.read_messages("/kinect/depth_registered/points"):
+            tempPointCloud = PointCloud2()
             tempPointCloud.header = msg.header
             tempPointCloud.height = msg.height
             tempPointCloud.width = msg.width
@@ -137,8 +137,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             self.imageWidth = tempPointCloud.width
             self.imageHeight = tempPointCloud.height
 
-            tempFileName = "frame" + str(self.suffixNum) + fileExtension
-            self.names.append(fileName)
+            tempFileName = "frame" + str(self.suffixNum).zfill(4) + fileExtension
+            self.names.append(tempFileName)
             self.suffixNum += 1
         currentBag.close()
 
@@ -174,7 +174,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             if line.startswith("#"):
                 continue
             (frameName, objectType, xTopLeftPoint, yTopLeftPoint,
-                xBottomRightPoint, yBottomRightPoint) = line.split(", ")
+                xBottomRightPoint, yBottomRightPoint) = line.split(",")
             if self.algorithm != "Victim" and "depth" in frameName:
                 continue
             yBottomRightPoint = yBottomRightPoint.replace("\n", "")
@@ -398,7 +398,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             rospy.loginfo("Reading Benchmark File")
             self.readBenchmarkFile(imagePath)
 
-        errorThreshold = 3000.0
+        errorThreshold = 900.0
         maxWaitTime = 1.0
         bridge = CvBridge()
         if self.algorithm == "Hole":
@@ -437,10 +437,9 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             for image, imageName in zip(self.images, self.names):
                 self.alertEvent.clear()
                 rospy.logdebug("Sending Image %s", imageName)
-                timeFlag = False
-                startTime = time.clock()
+                startTime = time.time()
                 self.mockPublish(inputTopic, outputTopic[1], image)
-                elapsedTime = time.clock() - startTime
+                elapsedTime = time.time() - startTime
 
                 response = self.messageList[outputTopic[0]][-1]
                 if response.success:

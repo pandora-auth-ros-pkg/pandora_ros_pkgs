@@ -272,7 +272,7 @@ if(CATKIN_ENABLE_TESTING)
 
   if(${PROJECT_NAME}_download_benchmark)
 
-    download_extra_data(${PROJECT_NAME}_download_benchark_bags
+    download_extra_data(${PROJECT_NAME}_download_benchmark_bags
       EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
 
   endif()

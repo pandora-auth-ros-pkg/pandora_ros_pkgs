@@ -91,7 +91,6 @@ namespace pandora_vision
 
     DetectionImages imgs;
     int stateIndicator = 2;// * input->getDepth() + (input->getRegions().size() > 0) + 1;
-
     DetectionMode detectionMode;
     switch (stateIndicator)
     {
@@ -272,10 +271,10 @@ namespace pandora_vision
     { 
       counter_ = 0;
     }
-    else
-    {
-      final_victims.clear();
-    }
+    /*else*/
+    //{
+      //final_victims.clear();
+    /*}*/
     return final_victims;
   }
   
@@ -295,7 +294,7 @@ namespace pandora_vision
     std::vector<VictimPOIPtr> rgb_svm_probabilities;
     std::vector<VictimPOIPtr> depth_svm_probabilities;
 
-        float probability, classLabel;
+    float probability, classLabel;
     
     if (detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH )  // || detectionMode == GOT_RGB
     {
@@ -326,14 +325,16 @@ namespace pandora_vision
         temp->setWidth(imgs.depthMasks[i].bounding_box.width);
         temp->setHeight(imgs.depthMasks[i].bounding_box.height);
         depth_svm_probabilities.push_back(temp);
-        //final_probabilities.push_back(temp);
-
+        if (depth_svm_probabilities[i]->getClassLabel() == 1)
+        {
+          final_probabilities.push_back(temp);
+        }
       }
     }
 
     // SVM mask merging
     // Combine rgb & depth probabilities
-    if (detectionMode == GOT_HOLES_AND_DEPTH)
+    /*if (detectionMode == GOT_HOLES_AND_DEPTH)
     {
       for (unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
       {
@@ -359,7 +360,7 @@ namespace pandora_vision
           counter_--;
 
       }
-    }
+    }*/
     // Only rgb svm probabilities
 
     if (detectionMode == GOT_HOLES )  // || detectionMode == GOT_RGB

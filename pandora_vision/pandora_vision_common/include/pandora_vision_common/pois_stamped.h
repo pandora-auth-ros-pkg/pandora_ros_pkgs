@@ -51,6 +51,9 @@ namespace pandora_vision
       typedef boost::shared_ptr<POIsStamped const> ConstPtr;
 
     public:
+      virtual ~POIsStamped() {}
+
+    public:
       /// Message Header referring to the Points of Interest in a frame
       std_msgs::Header header;
 

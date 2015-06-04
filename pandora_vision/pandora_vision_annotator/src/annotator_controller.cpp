@@ -495,7 +495,7 @@ namespace pandora_vision
                      << " " << annotationMsg.regionOfInterest.height);
 
       predatorSubscriber_.shutdown();
-
+      connector_.setState(OFFLINE); 
   }
   
   /**

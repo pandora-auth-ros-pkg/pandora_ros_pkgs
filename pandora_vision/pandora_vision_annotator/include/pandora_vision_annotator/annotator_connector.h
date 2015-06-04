@@ -203,6 +203,13 @@ namespace pandora_vision
       void setcurrentFrame(int x);
 
       /**
+      @brief function that sets the current image state
+      @param state [std::string] the current state
+      @return void
+      **/
+      void setState(pandora_vision::States state);
+
+      /**
       @brief function that returns the current Frame
       @param x [int] the current frame number
       @param frame [cv::Mat*] the actual frame matrix

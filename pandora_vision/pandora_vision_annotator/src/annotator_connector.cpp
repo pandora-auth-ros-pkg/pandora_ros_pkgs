@@ -259,6 +259,16 @@ namespace pandora_vision
     setImage(dest);
     Q_EMIT updateImage();
   } 
+  
+  /**
+  @brief function that sets the current image state
+  @param state [std::string] the current state
+  @return void
+  **/
+  void CConnector::setState(pandora_vision::States state)
+  {
+    state_ = state;
+  }
 
   /**
   @brief function that returns the current Frame
@@ -403,7 +413,7 @@ namespace pandora_vision
                      loader_.victimCoordsLabel->text() + QString("[") +
                      QString().setNum(p.x()) + QString(",") +
                      QString().setNum(p.y() - diff) + QString("]"));
-                     ImgAnnotations::setAnnotations(img_name, "Victim", p.x(), p.y()-diff);
+                     ImgAnnotations::setAnnotations(img_name, "1", p.x(), p.y()-diff);
                     bbox_ready[0]++;
                     if(bbox_ready[0] == 2)
                     {
@@ -419,7 +429,7 @@ namespace pandora_vision
                      loader_.holeCoordsLabel->text() + QString("[") +
                      QString().setNum(p.x()) + QString(",") +
                      QString().setNum(p.y() - diff) + QString("]"));
-                     ImgAnnotations::setAnnotations(img_name, "Hole", p.x(), p.y()-diff);
+                     ImgAnnotations::setAnnotations(img_name, "-1", p.x(), p.y()-diff);
                     bbox_ready[0]++;
                     if(bbox_ready[0] == 2)
                     {
