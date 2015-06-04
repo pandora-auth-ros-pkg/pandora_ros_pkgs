@@ -220,6 +220,7 @@ namespace arm
     // }
     }
     // readBuf = buff;
+    return NO_ERROR;
   }
 
 
@@ -279,7 +280,8 @@ namespace arm
     }
 
     int ret = readData(fd, bufOut, SONAR_NBYTES, sonarBufIn_uint8);
-    *value = sonarBufIn_uint16;
+    if ( ret==NO_ERROR )
+      *value = sonarBufIn_uint16;
     return ret;
   }
 
@@ -295,7 +297,8 @@ namespace arm
     int nr;
     uint8_t bufOut = COMMAND_CO2;
     int ret = readData(fd, bufOut, CO2_NBYTES, CO2BufInUint8);
-    *value = CO2BufInFloat;
+    if ( ret==NO_ERROR )
+      *value = CO2BufInFloat;
     return ret;
   }
 
@@ -310,7 +313,8 @@ namespace arm
     int nr;
     uint8_t bufOut = COMMAND_ENCODER;
     int ret = readData(fd, bufOut, ENCODER_NBYTES, encoderBufInUint8);
-    *value = encoderBufInUint16;
+    if ( ret==NO_ERROR )
+      *value = encoderBufInUint16;
     return ret;
   }
 
@@ -343,7 +347,8 @@ namespace arm
     }
 
     int ret = readData(fd, bufOut, BATTERY_NBYTES, batteryBufInUint8);
-    *value = batteryBufInUint16;
+    if ( ret==NO_ERROR )
+      *value = batteryBufInUint16;
     return ret;
   }
 

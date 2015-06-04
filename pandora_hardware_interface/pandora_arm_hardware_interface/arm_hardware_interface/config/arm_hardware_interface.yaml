@@ -13,14 +13,14 @@ range_sensors:
     frame_id: 'left_sonar_frame'
     code: 'L'
     radiation_type: 0
-    field_of_view: 60.0
+    field_of_view: 1.0472
     min_range: 0.2
     max_range: 4.0
   - name: '/sensors/right_sonar'
     frame_id: 'right_sonar_frame'
     code: 'R'
     radiation_type: 0
-    field_of_view: 60.0
+    field_of_view: 1.0472
     min_range: 0.2
     max_range: 4.0
 batteries:
