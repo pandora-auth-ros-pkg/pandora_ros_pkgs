@@ -16,7 +16,7 @@
   <include file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
 
   <node name="mass_alert_publisher" type="mass_alert_publisher.py"
-    pkg="pandora_alert_handler" respawn="true" args="headCamera" />
+    pkg="pandora_alert_handler" respawn="true" args="$(arg camera_frame)" />
 
   <node name="data_fusion_object_visualization" type="rqt_gui" pkg="rqt_gui" />
 
