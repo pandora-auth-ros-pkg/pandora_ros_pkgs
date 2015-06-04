@@ -780,6 +780,10 @@ namespace pandora_vision
     ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
 
     ////////////////////////////// Debug parameters ////////////////////////////
+    
+    // Publish the enhancedImage 
+    Parameters::Debug::publish_enhanced_Images =
+      config.publish_enhanced_Images;
 
     // Show the holes that each of the depth and RGB nodes transmit to the
     // hole fusion node, on top of their respective origin images
@@ -1266,9 +1270,12 @@ namespace pandora_vision
     Timer::start("processCandidateHoles", "", true);
     #endif
     
-    publishEnhancedImage();
+    if(Parameters::Debug::publish_enhanced_Images)
+    {
+      publishEnhancedImage();
 
-    publishInterpolatedDepthImage();
+      publishInterpolatedDepthImage();
+    }
     
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_respective_holes)

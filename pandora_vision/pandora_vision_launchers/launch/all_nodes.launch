@@ -12,6 +12,7 @@
   <arg name="vision_landoltc3d" default="false"/>
   <arg name="vision_predator" default="false"/>
   <arg name="vision_hole_detector" default="true"/>
+  <arg name="vision_hole_exploration" default="false"/>
   <arg name="vision_victim" default="true"/>
 
 
@@ -46,6 +47,8 @@
      file="$(find pandora_vision_predator)/launch/predator_node.launch" />
     <include if="$(arg vision_hole_detector)"
      file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
+    <include if="$(arg vision_hole_exploration)"
+     file="$(find pandora_vision_hole_exploration)/launch/pandora_vision_hole_exploration.launch" />
     <include if="$(arg vision_victim)"
      file="$(find pandora_vision_victim)/launch/victim_node.launch" />
 
