@@ -17,7 +17,8 @@ global_costmap:
     map_topic: /slam/map
     unknown_cost_value: 51
     lethal_cost_threshold: 61
+    #trinary_costmap: false
 
   inflation_layer:
-    inflation_radius: 0.45
+    inflation_radius: 0.5
     cost_scaling_factor: 7.0
