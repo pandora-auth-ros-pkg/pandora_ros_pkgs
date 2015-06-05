@@ -1,0 +1,18 @@
+<launch>
+
+ <machine
+   name="rpi2"
+   address="rpi2"
+   user="pandora"
+   timeout="20.0"
+   env-loader="~/pandora_ws/src/rpi_hardware_interface/scripts/raspberry_env.sh" />
+
+ <!-- Flir Lepton -->
+ <node
+   machine="rpi2"
+   name="pi_camera"
+   pkg="pi_camera"
+   type="pi_camera_node" />
+  
+
+</launch>
