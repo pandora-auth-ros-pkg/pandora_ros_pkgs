@@ -96,6 +96,13 @@ namespace pandora_vision
     static int shape_validation;
     static float one_direction_rectangle_contour_overlap_thresh;
     static int max_intersections_thresh;
+    static float intersections_mean_cost;
+    static float unclosed_contour_punishment;
+    static float intersections_stddev_cost;
+    static float internal_pixels_2d_mean_cost;
+    static float internal_pixels_2d_stddev_cost;
+    static float shape_validity_thresh;
+    static float noise_percent_thresh;
 
     // Show the depth image that arrives in the depth node
     static bool show_depth_image;

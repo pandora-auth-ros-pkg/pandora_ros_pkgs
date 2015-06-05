@@ -63,9 +63,9 @@ namespace pandora_vision
       DepthProcessor(
           const std::string& ns, 
           sensor_processor::Handler* handler);
-      
+
       DepthProcessor();
-      
+
       // The destructor
       virtual ~DepthProcessor();
 
@@ -168,6 +168,23 @@ namespace pandora_vision
           const std::vector<cv::Rect>& boundRect, 
           int ci, 
           std::vector<bool>* realContours);
+
+
+      /**
+        @brief The function called to make validation of found contours, and to eliminate contours whose origin is noise
+        @param[in] image [cv::Mat&] The original image. Used to extract calculate the percent of noise inside a contour
+        @param[in] boundRect [std::vector<cv::Rect>&] A vector containing the bounding rectangles for each contour 
+        @param[in] realContours [std::vector<bool>*] Contains flags if a contour is valid or not. Calculated inside this function.
+        @param[in] ci [int] The current contour to validate
+        @return void
+       **/
+      void removeNoisyContours(
+          const cv::Mat& image, 
+          const std::vector<cv::Rect>& boundRect, 
+          std::vector<bool>* realContours,
+          int ci);
+
+
       /**
         @brief The function called by validateContours to do the final merging after the probabilities for each pair were found in validateContour. New contourwidths and heights are calculated for merged contours. New coordinates for the merged contour as the average of all the contours that consist it are calculated.
         @param[in] ci [int] Current contour index in contours vector 
@@ -190,7 +207,7 @@ namespace pandora_vision
           std::vector<int>* numLabels, 
           std::vector<bool>* realContours, 
           const std::vector<std::vector<cv::Point> >& contours);
-    
+
       virtual bool process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
 
     private:

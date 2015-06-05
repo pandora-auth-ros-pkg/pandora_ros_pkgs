@@ -129,6 +129,15 @@ namespace pandora_vision
           const std::vector<cv::Rect>& boundRect);
 
 
+      void mergeContours(
+          std::vector<std::vector<int> >* mergables,
+          std::vector<int>* contourWidth,
+          std::vector<int>* contourHeight,
+          std::vector<cv::Point2f>* mc, 
+          const std::vector<cv::Rect>& boundRect,
+          std::vector<bool>* realContours);
+
+
       void validateShape(
           const cv::Mat& image, 
           const std::vector<std::vector<cv::Point> >& outline, 
@@ -140,7 +149,7 @@ namespace pandora_vision
 
     private:
       RgbParametersHandler* RgbParametersHandler_;
-    
+
   };
 
 }  // namespace pandora_vision

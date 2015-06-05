@@ -110,8 +110,22 @@ namespace pandora_vision
       configDepth.shape_validation;
     Depth::one_direction_rectangle_contour_overlap_thresh =
       configDepth.one_direction_rectangle_contour_overlap_thresh;
-    Depth::max_intersections_thresh =
-      configDepth.max_intersections_thresh;
+    //Depth::max_intersections_thresh =
+    //  configDepth.max_intersections_thresh;
+    Depth::intersections_mean_cost =
+      configDepth.intersections_mean_cost;
+    Depth::unclosed_contour_punishment =
+      configDepth.unclosed_contour_punishment;
+    Depth::intersections_stddev_cost =
+      configDepth.intersections_stddev_cost;
+    Depth::internal_pixels_2d_mean_cost =
+      configDepth.internal_pixels_2d_mean_cost;
+    Depth::internal_pixels_2d_stddev_cost =
+      configDepth.internal_pixels_2d_mean_cost;
+    Depth::shape_validity_thresh =
+      configDepth.shape_validity_thresh;
+    Depth::noise_percent_thresh =
+      configDepth.noise_percent_thresh;
   }
 
 
@@ -131,7 +145,7 @@ namespace pandora_vision
   int Depth::border_thresh = 20;
   int Depth::dilation_kernel_size = 12;
   int Depth::rect_diff_thresh = 3;
-  int Depth::huge_contour_thresh = 20000;
+  int Depth::huge_contour_thresh = 40000;
   int Depth::tiny_contour_thresh = 800;
   int Depth::small_contour_thresh = 2500;
   int Depth::neighbor_thresh = 50;
@@ -142,9 +156,16 @@ namespace pandora_vision
   int Depth::canny_ratio = 3;
   int Depth::canny_kernel_size = 3;
   int Depth::filtering_type = 1;
-  float Depth::min_valid_depth = 0.6;
-  int Depth::shape_validation = 0;
+  float Depth::min_valid_depth = 0.5;
+  int Depth::shape_validation = 1;
   float Depth::one_direction_rectangle_contour_overlap_thresh = 40.0;
   int Depth::max_intersections_thresh = 4;
+  float Depth::intersections_mean_cost = 0.3;
+  float Depth::unclosed_contour_punishment = 1.0;
+  float Depth::intersections_stddev_cost = 0.3;
+  float Depth::internal_pixels_2d_mean_cost = 0.2;
+  float Depth::internal_pixels_2d_stddev_cost = 0.2;
+  float Depth::shape_validity_thresh = 1.2;
+  float Depth::noise_percent_thresh = 0.1;
 
 }  // namespace pandora_vision

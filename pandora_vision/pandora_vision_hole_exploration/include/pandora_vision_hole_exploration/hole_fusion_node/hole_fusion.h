@@ -47,7 +47,9 @@
 #include "utils/message_conversions.h"
 #include "utils/parameters.h"
 #include "utils/depth_parameters.h"
+#include "utils/rgb_parameters.h"
 #include "utils/visualization.h"
+#include "utils/haralickfeature_extractor.h"
 
 
 /**
@@ -478,7 +480,8 @@ namespace pandora_vision
         candidate holes conveyor
         @param[in,out] depthHolesConveyor [HolesConveyor*] The depth
         candidate holes conveyor
-        @param[in] image [const cv::Mat&] Depth Image used for validation purposes
+        @param[in] depthImage [const cv::Mat&] Depth Image used for validation purposes
+        @param[in] rgbImage [const cv::Mat&] Rgb Image used for validation purposes
         @param[in] pointCloud [const PointCloudPtr] An interpolated point
         cloud used in the connection operation; it maybe will be used to obtain real world
         distances between holes
@@ -490,7 +493,8 @@ namespace pandora_vision
           HolesConveyor* rgbHolesConveyor,
           HolesConveyor* depthHolesConveyor,
           HolesConveyor* thermalHolesConveyor,
-          const cv::Mat& image,
+          const cv::Mat& depthImage,
+          const cv::Mat& rgbImage,
           const PointCloudPtr& pointCloud,
           HolesConveyor* preValidatedHoles,
           std::map<int, float>* validHolesMap);
@@ -510,6 +514,93 @@ namespace pandora_vision
           HolesConveyor* holesConveyor,
           std::vector<bool>* realContours,
           const PointCloudPtr& pointCloud);
+
+      /**
+        @brief Applies merging of contours of same type, e.g. RGB - RGB 
+        @details We will consider distance and homogenity features for the merging
+        @param[in] image [const cv::Mat&] RGB Image used for homogenity extraction
+        @param[in,out] realContours [std::vector<bool>*] A vector which shows for 
+        each hole if it is valid or not
+        @param[in,out] holesConveyor [HolesConveyor*] The rgb, thermal or depth 
+        conveyor 
+        @return void
+       **/
+      static void mergeSameNeighbors(
+          const cv::Mat& image,
+          std::vector<bool>* realContours,
+          HolesConveyor* holesConveyor);
+
+
+      /**
+        @brief Applies merging of contours of different types, 
+        e.g. RGB-Depth-Thermal  
+        @details We will consider distance and homogenity features for the merging
+        Firstly, store in 2D vectors the euclidean distance of all contours of one 
+        type, against the contours of all other types. Finally, find the contours 
+        with small distance and merge them.
+        @param[in] image [const cv::Mat&] RGB Image used for homogenity extraction
+        @param[in,out] realContours1 [std::vector<bool>*] A vector which shows for 
+        each hole of first type if it is valid or not
+        @param[in,out] realContours2 [std::vector<bool>*] A vector which shows for 
+        each hole of second type if it is valid or not
+        @param[in,out] realContours3 [std::vector<bool>*] A vector which shows for 
+        each hole of third type if it is valid or not
+        @param[in,out] holesConveyor1 [const HolesConveyor&] The rgb, thermal or depth 
+        conveyor different from the other types
+        @param[in,out] holesConveyor2 [const HolesConveyor&] The rgb, thermal or depth 
+        conveyor different from the other types
+        @param[in,out] holesConveyor3 [const HolesConveyor&] The rgb, thermal or depth 
+        conveyor different from the other types
+        @param[in,out] preValidatedHoles [HolesConveyor*] The valid and non double registered holes to publish
+        @param[in,out] validHolesMap [std::map<int, float>*] Holes indexes with probabilities
+        @param[in,out] vi [int*] Current valid holes index. The valid holes are stored in one vector
+        @return void
+       **/
+      static void mergeDifferentNeighbors(
+          const cv::Mat& image,
+          std::vector<bool>* realContours1,
+          std::vector<bool>* realContours2,
+          std::vector<bool>* realContours3,
+          const HolesConveyor& holesConveyor1,
+          const HolesConveyor& holesConveyor2,
+          const HolesConveyor& holesConveyor3,
+          HolesConveyor* preValidatedHoles,
+          std::map<int, float>* validHolesMap,
+          int* vi);
+
+
+      /**
+        @brief Finds distance between contours of two sources 
+        @param[in,out] holesConveyor1 [const HolesConveyor&] The rgb, thermal or depth
+        conveyor 
+        @param[in,out] holesConveyor2 [const HolesConveyor&] The rgb, thermal or depth 
+        conveyor
+        @param[in,out] edMatrix [std::vector<std::vector<float> >*] The matrix
+        where distances are stored, first source against second source
+        @return void
+       **/
+      static void findContoursDistance(
+          const HolesConveyor& holesConveyor1,
+          const HolesConveyor& holesConveyor2,
+          std::vector<std::vector<float> >* edMatrix);
+
+      /**
+        @brief Calculates homogenity between two rectangles and returns an 
+        indication if the holes inside these rectangles are mergable or not.
+
+        @param[in] image [const cv::Mat&] The image where homogenity will be
+        calculated
+        @param[in] rectangle1 [cv::Rect&] First rectangle
+        @param[in] rectangle2 [cv::Rect&] Second rectangle
+        @param[out] mergable [bool*] The indication, true means that the holes
+        are mergable
+        @return void
+       **/
+      static void calculateMergingProbability(
+          const cv::Mat& image,
+          const cv::Rect& rectangle1,
+          const cv::Rect& rectangle2,
+          bool* mergable);
 
       /**
         @brief Sets the depth values of a point cloud according to the

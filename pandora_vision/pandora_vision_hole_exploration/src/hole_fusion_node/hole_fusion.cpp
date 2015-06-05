@@ -47,7 +47,7 @@ namespace pandora_vision
     @brief The HoleFusion constructor
    **/
   HoleFusion::HoleFusion(void):
-    //pointCloud_(new PointCloud),
+    pointCloud_(new PointCloud),
     nodeHandle_(""),
     generalNodeHandle_("~/general"),
     debugNodeHandle_("~/debug"),
@@ -58,7 +58,7 @@ namespace pandora_vision
     imageTransport_(nodeHandle_)
   {
     // Initialize the parent frame_id to an empty string
-    //parent_frame_id_ = "";
+    parent_frame_id_ = "";
 
     // Acquire the names of topics which the Hole Fusion node will be having
     // transactionary affairs with
@@ -153,9 +153,9 @@ namespace pandora_vision
 
     // Subscribe to the topic where the synchronizer node publishes
     // the point cloud
-    //pointCloudSubscriber_= nodeHandle_.subscribe(
-    //    pointCloudTopic_, 1,
-    //    &HoleFusion::pointCloudCallback, this);
+    pointCloudSubscriber_= nodeHandle_.subscribe(
+        pointCloudTopic_, 1,
+        &HoleFusion::pointCloudCallback, this);
 
 
     // The dynamic reconfigure server for debugging parameters
@@ -276,7 +276,7 @@ namespace pandora_vision
     // If the RGB candidate holes and the RGB image are set
     // and the point cloud has been delivered and interpolated,
     // unlock the synchronizer and process the candidate holes from both sources
-    if (numNodesReady_ == 2)
+    if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
 
@@ -411,7 +411,7 @@ namespace pandora_vision
     // If the depth candidate holes and the interpolated depth image are set
     // and the point cloud has been delivered and interpolated,
     // unlock the synchronizer and process the candidate holes from both sources
-    if (numNodesReady_ == 2)
+    if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
 
@@ -606,19 +606,19 @@ namespace pandora_vision
     // Get the topic where the result of the hole processing will be
     // published.
     if (nodeHandle_.getParam(
-        ns + "/hole_fusion_node/published_topics/processor_log_topic",
-        processEndTopic_))
+          ns + "/hole_fusion_node/published_topics/processor_log_topic",
+          processEndTopic_))
     {
       // Make the topic's name absolute
       processEndTopic_ = ns + "/" + processEndTopic_;
 
       ROS_INFO_NAMED(PKG_NAME,
-        "[Hole Fusion Node] Advertising to the Process End topic");
+          "[Hole Fusion Node] Advertising to the Process End topic");
     }
     else
     {
       ROS_INFO_NAMED (PKG_NAME,
-        "[Hole Fusion Node] Could not find topic Process end Topic");
+          "[Hole Fusion Node] Could not find topic Process end Topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to publish
@@ -838,8 +838,8 @@ namespace pandora_vision
       const pandora_vision_hole_exploration::validity_cfgConfig &config,
       const uint32_t& level)
   {
-    Parameters::HoleFusion::bin_to_find_mergable_size =
-      config.bin_to_find_mergable_size;
+    Parameters::HoleFusion::merging_distance_thresh =
+      config.merging_distance_thresh;
     Parameters::HoleFusion::valid_strong_probability =
       config.valid_strong_probability;
     Parameters::HoleFusion::valid_medium_probability =
@@ -955,7 +955,7 @@ namespace pandora_vision
     // If the depth and RGB candidate holes, the interpolated depth image
     // and the RGB image are set,
     // unlock the synchronizer and process the candidate holes from all sources
-    if (numNodesReady_ == 2)
+    if (numNodesReady_ == 3)
     {
       numNodesReady_ = 0;
 
@@ -1087,6 +1087,7 @@ namespace pandora_vision
         &depthHolesConveyor_, 
         &thermalHolesConveyor_, 
         interpolatedDepthImage_, 
+        rgbImage_, 
         pointCloud_, 
         &preValidatedHoles, 
         &validHolesMap);
@@ -1363,7 +1364,8 @@ namespace pandora_vision
     candidate holes conveyor
     @param[in,out] thermalHolesConveyor [HolesConveyor*] The thermal
     candidate holes conveyor
-    @param[in] image [const cv::Mat&] Depth Image used for validation purposes
+    @param[in] depthImage [const cv::Mat&] Depth Image used for validation purposes
+    @param[in] rgbImage [const cv::Mat&] Rgb Image used for validation purposes
     @param[in] pointCloud [const PointCloudPtr] An interpolated point
     cloud used in the connection operation; it maybe will be used to obtain real world
     distances between holes
@@ -1375,7 +1377,8 @@ namespace pandora_vision
       HolesConveyor* rgbHolesConveyor,
       HolesConveyor* depthHolesConveyor,
       HolesConveyor* thermalHolesConveyor,
-      const cv::Mat& image,
+      const cv::Mat& depthImage,
+      const cv::Mat& rgbImage,
       const PointCloudPtr& pointCloud, 
       HolesConveyor* preValidatedHoles,
       std::map<int, float>* validHolesMap)
@@ -1385,17 +1388,18 @@ namespace pandora_vision
 #endif
     std::vector<bool> realRgbContours(rgbHolesConveyor -> rectangle.size(), true);
     std::vector<bool> realDepthContours(depthHolesConveyor -> rectangle.size(), true);
+    std::vector<bool> realThermalContours(thermalHolesConveyor -> rectangle.size(), true);
     // Small contours at a small distance are not valid. Moreover, big contours at a big distance are not valid.
-    validateDistance(image, &(*rgbHolesConveyor), &realRgbContours, pointCloud);
-    validateDistance(image, &(*depthHolesConveyor), &realDepthContours, pointCloud);
+    validateDistance(depthImage, &(*rgbHolesConveyor), &realRgbContours, pointCloud);
+    validateDistance(depthImage, &(*depthHolesConveyor), &realDepthContours, pointCloud);
 
     // eliminate RGB contours with small distance variance or very big distance variance (considering them as unstuffed)
     // Do not bother for small depth variance if the holes are too close to the sensor
     float sum = 0;
-    for(int row = 0; row < image.rows; row ++)
-      for(int col = 0; col < image.cols; col ++)
-        sum += image.at<float>(row, col);
-    float avg = sum / (image.rows * image.cols);
+    for(int row = 0; row < depthImage.rows; row ++)
+      for(int col = 0; col < depthImage.cols; col ++)
+        sum += depthImage.at<float>(row, col);
+    float avg = sum / (depthImage.rows * depthImage.cols);
 
     for(int i = 0; i < rgbHolesConveyor -> rectangle.size(); i++)
     {
@@ -1403,7 +1407,7 @@ namespace pandora_vision
       {
         cv::Scalar mean;
         cv::Scalar stddev;
-        cv::Mat ROI = image(rgbHolesConveyor -> rectangle[i]);
+        cv::Mat ROI = depthImage(rgbHolesConveyor -> rectangle[i]);
         cv::meanStdDev (ROI, mean, stddev);
         float distanceVariance = static_cast<float>(stddev.val[0]); 
         if(avg > Depth::min_valid_depth)
@@ -1432,7 +1436,7 @@ namespace pandora_vision
           {
             cv::Scalar mean;
             cv::Scalar stddev;
-            cv::Mat ROI = image(rgbHolesConveyor -> rectangle[i]);
+            cv::Mat ROI = depthImage(rgbHolesConveyor -> rectangle[i]);
             cv::meanStdDev (ROI, mean, stddev);
             float distanceVariance = static_cast<float>(stddev.val[0]); 
             if(distanceVariance > Parameters::HoleFusion::depth_difference_thresh)
@@ -1457,21 +1461,21 @@ namespace pandora_vision
             int sumHPixels = 0;
             for(int j = startY; j < rgbHolesConveyor -> keypoint[i].y; j ++) 
             {
-              if(image.at<float>(j, rgbHolesConveyor -> keypoint[i].x) != 0)
+              if(depthImage.at<float>(j, rgbHolesConveyor -> keypoint[i].x) != 0)
               {
                 sumV += 
-                  std::abs(image.at<float>(startY, rgbHolesConveyor -> keypoint[i].x) 
-                      - image.at<float>(j, rgbHolesConveyor -> keypoint[i].x));
+                  std::abs(depthImage.at<float>(startY, rgbHolesConveyor -> keypoint[i].x) 
+                      - depthImage.at<float>(j, rgbHolesConveyor -> keypoint[i].x));
                 sumVPixels++;
               }
             }
             for(int j = startX; j < rgbHolesConveyor -> keypoint[i].x; j ++) 
             {
-              if(image.at<float>(rgbHolesConveyor -> keypoint[i].y, j) != 0)
+              if(depthImage.at<float>(rgbHolesConveyor -> keypoint[i].y, j) != 0)
               {
                 sumH += 
-                  std::abs(image.at<float>(rgbHolesConveyor -> keypoint[i].y, startX) 
-                      - image.at<float>(rgbHolesConveyor -> keypoint[i].y, j));
+                  std::abs(depthImage.at<float>(rgbHolesConveyor -> keypoint[i].y, startX) 
+                      - depthImage.at<float>(rgbHolesConveyor -> keypoint[i].y, j));
                 sumHPixels++;
               }
             }
@@ -1511,7 +1515,7 @@ namespace pandora_vision
           {
             cv::Scalar mean;
             cv::Scalar stddev;
-            cv::Mat ROI = image(depthHolesConveyor -> rectangle[i]);
+            cv::Mat ROI = depthImage(depthHolesConveyor -> rectangle[i]);
             cv::meanStdDev (ROI, mean, stddev);
             float distanceVariance = static_cast<float>(stddev.val[0]); 
             if(distanceVariance > Parameters::HoleFusion::depth_difference_thresh)
@@ -1536,21 +1540,21 @@ namespace pandora_vision
             int sumHPixels = 0;
             for(int j = startY; j < depthHolesConveyor -> keypoint[i].y; j ++) 
             {
-              if(image.at<float>(j, depthHolesConveyor -> keypoint[i].x) != 0)
+              if(depthImage.at<float>(j, depthHolesConveyor -> keypoint[i].x) != 0)
               {
                 sumV += 
-                  std::abs(image.at<float>(startY, depthHolesConveyor -> keypoint[i].x) 
-                      - image.at<float>(j, depthHolesConveyor -> keypoint[i].x));
+                  std::abs(depthImage.at<float>(startY, depthHolesConveyor -> keypoint[i].x) 
+                      - depthImage.at<float>(j, depthHolesConveyor -> keypoint[i].x));
                 sumVPixels++;
               }
             }
             for(int j = startX; j < depthHolesConveyor -> keypoint[i].x; j ++) 
             {
-              if(image.at<float>(depthHolesConveyor -> keypoint[i].y, j) != 0)
+              if(depthImage.at<float>(depthHolesConveyor -> keypoint[i].y, j) != 0)
               {
                 sumH += 
-                  std::abs(image.at<float>(depthHolesConveyor -> keypoint[i].y, startX) 
-                      - image.at<float>(depthHolesConveyor -> keypoint[i].y, j));
+                  std::abs(depthImage.at<float>(depthHolesConveyor -> keypoint[i].y, startX) 
+                      - depthImage.at<float>(depthHolesConveyor -> keypoint[i].y, j));
                 sumHPixels++;
               }
             }
@@ -1561,6 +1565,7 @@ namespace pandora_vision
         }
       }
     }
+
 
     for(int i = 0; i < depthHolesConveyor -> rectangle.size(); i++)
       if(realDepthContours[i])
@@ -1577,212 +1582,64 @@ namespace pandora_vision
     for(int i = 0; i < depthHolesConveyor -> rectangle.size(); i++)
       realDepthContours.push_back(true);
 
+
+    // all thermal contours are valid
+    for(int i = 0; i < thermalHolesConveyor -> rectangle.size(); i++)
+      realThermalContours.push_back(true);
     // If there are no candidate holes from both RGB and Depth,
     // there is no meaning to this operation
     if (rgbHolesConveyor -> rectangle.size() == 0 || depthHolesConveyor -> rectangle.size() == 0)
     {
     }
 
-    // merge overlapping contours. Firstly, split the image in some bins 
-    // and find the keypoints of depth, rgb and thermal candidate holes 
-    // inside each bin. Then for each bin merge the containing depth,
-    // rgb and thermal candid holes by averaging their attributes
+    // merge contours of the same kind
+    mergeSameNeighbors(rgbImage, &realRgbContours, &(*rgbHolesConveyor));
+    mergeSameNeighbors(rgbImage, &realDepthContours, &(*depthHolesConveyor));
+    mergeSameNeighbors(rgbImage, &realThermalContours, &(*thermalHolesConveyor));
 
-    int binSize = Parameters::HoleFusion::bin_to_find_mergable_size;
-
-    int numberOfBinsX = static_cast<int>(image.cols / binSize);
-    int numberOfBinsY = static_cast<int>(image.rows / binSize);
-    int numberOfBins = numberOfBinsX * numberOfBinsY;
-
-    std::vector<std::vector<std::vector<int> > > 
-      assignedHolesIds(numberOfBins, std::vector<std::vector<int> >(3)); 
-
-    int binId = 0;
-    if((*depthHolesConveyor).rectangle.size() == 0)
-      for(int i = 0; i < numberOfBins; i ++)
-      {
-        assignedHolesIds[binId][0].push_back(-1);
-        binId++;
-      }
-    else
-      for(int i = 0; i < (*depthHolesConveyor).rectangle.size(); i ++)
-      {
-        binId = 0;
-        for(int binx = 0; binx < numberOfBinsX; binx ++)
-          for(int biny = 0; biny < numberOfBinsY; biny ++)
-          {
-            if((*depthHolesConveyor).keypoint[i].x >= binx * binSize
-                && (*depthHolesConveyor).keypoint[i].x < (binx + 1) * binSize
-                && (*depthHolesConveyor).keypoint[i].y >= biny * binSize
-                && (*depthHolesConveyor).keypoint[i].y < (biny + 1) * binSize)
-              assignedHolesIds[binId][0].push_back(i);
-            else
-              assignedHolesIds[binId][0].push_back(-1);
-            binId++;
-          }
-      }
-
-    binId = 0;
-    if((*thermalHolesConveyor).rectangle.size() == 0)
-      for(int i = 0; i < numberOfBins; i ++)
-      {
-        assignedHolesIds[binId][1].push_back(-1);
-        binId++;
-      }
-    else
-      for(int i = 0; i < (*thermalHolesConveyor).rectangle.size(); i ++)
-      {
-        binId = 0;
-        for(int binx = 0; binx < numberOfBinsX; binx ++)
-          for(int biny = 0; biny < numberOfBinsY; biny ++)
-          {
-            if((*thermalHolesConveyor).keypoint[i].x >= binx * binSize
-                && (*thermalHolesConveyor).keypoint[i].x < (binx + 1) * binSize
-                && (*thermalHolesConveyor).keypoint[i].y >= biny * binSize
-                && (*thermalHolesConveyor).keypoint[i].y < (biny + 1) * binSize)
-              assignedHolesIds[binId][1].push_back(i);
-            else
-              assignedHolesIds[binId][1].push_back(-1);
-            binId++;
-          }
-      }
-
-    binId = 0;
-    if((*rgbHolesConveyor).rectangle.size() == 0)
-      for(int i = 0; i < numberOfBins; i ++)
-      {
-        assignedHolesIds[binId][2].push_back(-1);
-        binId++;
-      }
-    else
-      for(int i = 0; i < (*rgbHolesConveyor).rectangle.size(); i ++)
-      {
-        binId = 0;
-        for(int binx = 0; binx < numberOfBinsX; binx ++)
-          for(int biny = 0; biny < numberOfBinsY; biny ++)
-          {
-            if((*rgbHolesConveyor).keypoint[i].x >= binx * binSize
-                && (*rgbHolesConveyor).keypoint[i].x < (binx + 1) * binSize
-                && (*rgbHolesConveyor).keypoint[i].y >= biny * binSize
-                && (*rgbHolesConveyor).keypoint[i].y < (biny + 1) * binSize)
-              assignedHolesIds[binId][2].push_back(i);
-            else
-              assignedHolesIds[binId][2].push_back(-1);
-            binId++;
-          }
-      }
+    // counter for the number of valid holes
     int vi = 0;
+    // merge overlapping contours. 
+    // merge rgb contours with all others
+    mergeDifferentNeighbors(
+        rgbImage,
+        &realRgbContours, 
+        &realDepthContours, 
+        &realThermalContours, 
+        (*rgbHolesConveyor),
+        (*depthHolesConveyor),
+        (*thermalHolesConveyor),
+        &(*preValidatedHoles),
+        &(*validHolesMap),
+        &vi);
 
-    for(int i = 0; i < numberOfBins; i ++)
-    {
-      int sumKX = 0;
-      int sumKY = 0;
-      int maxX = 0;
-      int maxY = 0;
-      int minX = std::numeric_limits<int>::max();
-      int minY = std::numeric_limits<int>::max();
-      int overlapsNumber = 0;
-      int overlapsSum = 0;
-      bool counted = false;
-      for(int j = 0; j < assignedHolesIds[i][0].size(); j ++)
-        if(assignedHolesIds[i][0][j] != -1)
-        {
-          sumKX += (*depthHolesConveyor).keypoint[assignedHolesIds[i][0][j]].x;
-          sumKY += (*depthHolesConveyor).keypoint[assignedHolesIds[i][0][j]].y;
-          overlapsSum++;
-          if(!counted)
-          {
-            overlapsNumber++;
-            counted = true;
-          }
-          if((*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].x
-              + (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].width > maxX)
-            maxX = 
-              (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].x
-              + (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].width;
-          if((*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].y
-              + (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].height > maxY)
-            maxY = 
-              (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].y
-              + (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].height;
-          if((*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].x < minX)
-            minX = (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].x;
-          if((*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].y < minY)
-            minY = (*depthHolesConveyor).rectangle[assignedHolesIds[i][0][j]].y;
-        }
+    // merge depth contours with all others. This happens only if these contours
+    // did not get merged at the previous step 
+    mergeDifferentNeighbors(
+        rgbImage,
+        &realDepthContours, 
+        &realRgbContours, 
+        &realThermalContours, 
+        (*depthHolesConveyor),
+        (*rgbHolesConveyor),
+        (*thermalHolesConveyor),
+        &(*preValidatedHoles),
+        &(*validHolesMap),
+        &vi);
 
-      counted = false;
-      for(int j = 0; j < assignedHolesIds[i][1].size(); j ++)
-        if(assignedHolesIds[i][1][j] != -1)
-        {
-          sumKX += (*thermalHolesConveyor).keypoint[assignedHolesIds[i][1][j]].x;
-          sumKY += (*thermalHolesConveyor).keypoint[assignedHolesIds[i][1][j]].y;
-          overlapsSum++;
-          if(!counted)
-          {
-            overlapsNumber++;
-            counted = true;
-          }
-          if((*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].x
-              + (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].width > maxX)
-            maxX = 
-              (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].x
-              + (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].width;
-          if((*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].y
-              + (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].height > maxY)
-            maxY = 
-              (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].y
-              + (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].height;
-          if((*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].x < minX)
-            minX = (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].x;
-          if((*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].y < minY)
-            minY = (*thermalHolesConveyor).rectangle[assignedHolesIds[i][1][j]].y;
-        }
-
-      counted = false;
-      for(int j = 0; j < assignedHolesIds[i][2].size(); j ++)
-        if(assignedHolesIds[i][2][j] != -1)
-        {
-          sumKX += (*rgbHolesConveyor).keypoint[assignedHolesIds[i][2][j]].x;
-          sumKY += (*rgbHolesConveyor).keypoint[assignedHolesIds[i][2][j]].y;
-          overlapsSum++;
-          if(!counted)
-          {
-            overlapsNumber++;
-            counted = true;
-          }
-          if((*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].x
-              + (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].width > maxX)
-            maxX = 
-              (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].x
-              + (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].width;
-          if((*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].y
-              + (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].height > maxY)
-            maxY = 
-              (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].y
-              + (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].height;
-          if((*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].x < minX)
-            minX = (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].x;
-          if((*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].y < minY)
-            minY = (*rgbHolesConveyor).rectangle[assignedHolesIds[i][2][j]].y;
-        }
-      if(overlapsNumber > 0)
-      {
-
-        cv::Point2f mergedKeypoint(sumKX / overlapsSum, sumKY / overlapsSum);
-        (*preValidatedHoles).keypoint.push_back(mergedKeypoint);
-        cv::Rect mergedRect(minX, minY, maxX - minX, maxY - minY);
-        (*preValidatedHoles).rectangle.push_back(mergedRect);
-        if(overlapsNumber == 1)
-          (*validHolesMap)[vi] = Parameters::HoleFusion::valid_light_probability;
-        else if(overlapsNumber == 2)
-          (*validHolesMap)[vi] = Parameters::HoleFusion::valid_medium_probability;
-        else
-          (*validHolesMap)[vi] = Parameters::HoleFusion::valid_strong_probability;
-        vi++;
-      }
-    }
-
+    // merge thermal contours with all others. This happens only if these contours
+    // did not get merged at the previous step 
+    mergeDifferentNeighbors(
+        rgbImage,
+        &realThermalContours, 
+        &realDepthContours, 
+        &realRgbContours, 
+        (*thermalHolesConveyor),
+        (*depthHolesConveyor),
+        (*rgbHolesConveyor),
+        &(*preValidatedHoles),
+        &(*validHolesMap),
+        &vi);
 
 #ifdef DEBUG_TIME
     Timer::tick("applyMergeOperation");
@@ -1841,7 +1698,297 @@ namespace pandora_vision
     }
   }
 
+  /**
+    @brief Applies merging of contours of same type, e.g. RGB - RGB 
+    @details We will consider distance and homogenity features for the merging
+    @param[in] image [const cv::Mat&] RGB Image used for homogenity extraction
+    @param[in,out] realContours [std::vector<bool>*] A vector which shows for 
+    each hole if it is valid or not
+    @param[in,out] holesConveyor [HolesConveyor*] The rgb, thermal or depth 
+    conveyor 
+    cloud 
+    @return void
+   **/
 
+  void HoleFusion::mergeSameNeighbors(
+      const cv::Mat& image,
+      std::vector<bool>* realContours,
+      HolesConveyor* holesConveyor)
+  {
+    HolesConveyor conveyorTemp;
+    std::vector<std::vector<float> > 
+      edMatrix(holesConveyor -> rectangle.size(), std::vector<float>(holesConveyor -> rectangle.size()));
+    // first step of contour merging; merge contours of the same kind
+    for(int contouri = 0; contouri < holesConveyor -> rectangle.size(); contouri ++)
+      for(int contourj = 0; contourj < holesConveyor -> rectangle.size(); contourj ++)
+      {
+        float keypointDistance = 
+          std::sqrt(
+              std::pow(holesConveyor -> keypoint[contouri].x - holesConveyor -> keypoint[contourj].x, 2 )
+              + std::pow(holesConveyor -> keypoint[contouri].y - holesConveyor -> keypoint[contourj].y, 2 ));
+        float minBorderDistanceX = 
+          std::min(std::abs(holesConveyor -> rectangle[contouri].x - holesConveyor -> rectangle[contourj].x 
+                - holesConveyor -> rectangle[contourj].width),
+              std::abs(holesConveyor -> rectangle[contouri].x + holesConveyor -> rectangle[contouri].width 
+                - holesConveyor -> rectangle[contourj].x));
+        float minBorderDistanceY = 
+          std::min(std::abs(holesConveyor -> rectangle[contouri].y - holesConveyor -> rectangle[contourj].y 
+                - holesConveyor -> rectangle[contourj].height),
+              std::abs(holesConveyor -> rectangle[contouri].y + holesConveyor -> rectangle[contouri].height 
+                - holesConveyor -> rectangle[contourj].y));
+        float bordersDistance = 
+          std::sqrt(std::pow(minBorderDistanceX, 2) + std::pow(minBorderDistanceY, 2));
+        edMatrix[contouri][contourj] = std::min(keypointDistance, bordersDistance);
+      }
+    // Merge same type step
+
+    for(int contouri = 0; contouri < holesConveyor -> rectangle.size(); contouri ++)
+    {
+      if((*realContours)[contouri])
+      {
+        float sumKX = holesConveyor -> keypoint[contouri].x;
+        float sumKY = holesConveyor -> keypoint[contouri].y;
+        int overlapsSum = 1;
+        int upperX = holesConveyor -> rectangle[contouri].x;
+        int upperY = holesConveyor -> rectangle[contouri].y;
+        int lowerX = holesConveyor -> rectangle[contouri].x + holesConveyor -> rectangle[contouri].width;
+        int lowerY = holesConveyor -> rectangle[contouri].y + holesConveyor -> rectangle[contouri].height;
+
+        for(int contourj = contouri + 1; contourj < holesConveyor -> rectangle.size(); contourj ++)
+        {
+          if(edMatrix[contouri][contourj] < Parameters::HoleFusion::merging_distance_thresh)
+          {
+            overlapsSum++;
+            sumKX += holesConveyor -> keypoint[contourj].x;
+            sumKY += holesConveyor -> keypoint[contourj].y;
+            upperX = std::min(upperX, holesConveyor -> rectangle[contourj].x);
+            upperY = std::min(upperY, holesConveyor -> rectangle[contourj].y);
+            lowerX = 
+              std::max(lowerX, holesConveyor -> rectangle[contourj].x 
+                  + holesConveyor -> rectangle[contourj].width);
+            lowerY = 
+              std::max(lowerY, holesConveyor -> rectangle[contourj].y 
+                  + holesConveyor -> rectangle[contourj].height);
+            (*realContours)[contourj] = false;
+          }
+        }
+        cv::Point2f mergedKeypoint(sumKX / overlapsSum, sumKY / overlapsSum);
+        conveyorTemp.keypoint.push_back(mergedKeypoint);
+        cv::Rect mergedRect(upperX, upperY, lowerX - upperX, lowerY - upperY);
+        conveyorTemp.rectangle.push_back(mergedRect);
+        
+      }
+    }
+    // Replace conveyor with the merged holes
+    (*holesConveyor).rectangle = conveyorTemp.rectangle;
+    (*holesConveyor).keypoint = conveyorTemp.keypoint;
+    conveyorTemp.rectangle.clear();
+    conveyorTemp.keypoint.clear();
+
+    (*realContours).clear();
+    for(int i = 0; i < (*holesConveyor).rectangle.size(); i ++)
+      (*realContours).push_back(true);
+
+  }
+
+
+  /**
+    @brief Applies merging of contours of different types, 
+    e.g. RGB-Depth-Thermal  
+    @details We will consider distance and homogenity features for the merging.
+    Firstly, store in 2D vectors the euclidean distance of all contours of one 
+    type, against the contours of all other types. Finally, find the contours 
+    with small distance and merge them.
+    @param[in] image [const cv::Mat&] RGB Image used for homogenity extraction
+    @param[in,out] realContours1 [std::vector<bool>*] A vector which shows for 
+    each hole of first type if it is valid or not
+    @param[in,out] realContours2 [std::vector<bool>*] A vector which shows for 
+    each hole of second type if it is valid or not
+    @param[in,out] realContours3 [std::vector<bool>*] A vector which shows for 
+    each hole of third type if it is valid or not
+    @param[in,out] holesConveyor1 [const HolesConveyor&] The rgb, thermal or depth 
+    conveyor different from the other types
+    @param[in,out] holesConveyor2 [const HolesConveyor&] The rgb, thermal or depth 
+    conveyor different from the other types
+    @param[in,out] holesConveyor3 [const HolesConveyor&] The rgb, thermal or depth 
+    conveyor different from the other types
+    @param[in,out] preValidatedHoles [HolesConveyor*] The valid and non double registered holes to publish
+    @param[in,out] validHolesMap [std::map<int, float>*] Holes indexes with probabilities
+    @param[in,out] vi [int*] Current valid holes index. The valid holes are stored in one vector
+    @return void
+   **/
+  void HoleFusion::mergeDifferentNeighbors(
+      const cv::Mat& image,
+      std::vector<bool>* realContours1,
+      std::vector<bool>* realContours2,
+      std::vector<bool>* realContours3,
+      const HolesConveyor& holesConveyor1,
+      const HolesConveyor& holesConveyor2,
+      const HolesConveyor& holesConveyor3,
+      HolesConveyor* preValidatedHoles,
+      std::map<int, float>* validHolesMap,
+      int* vi)
+  {
+    std::vector<std::vector<float> > 
+      edMatrix12(holesConveyor1.rectangle.size(), std::vector<float>(holesConveyor2.rectangle.size()));
+    std::vector<std::vector<float> > 
+      edMatrix13(holesConveyor1.rectangle.size(), std::vector<float>(holesConveyor3.rectangle.size()));
+    std::vector<std::vector<float> > 
+      edMatrix23(holesConveyor2.rectangle.size(), std::vector<float>(holesConveyor3.rectangle.size()));
+    // Calculate distances for all combinations between the contours sources 
+    findContoursDistance(holesConveyor1, holesConveyor2, &edMatrix12);
+    findContoursDistance(holesConveyor1, holesConveyor3, &edMatrix13);
+    findContoursDistance(holesConveyor2, holesConveyor3, &edMatrix23);
+    // Merge step
+
+    for(int contouri = 0; contouri < holesConveyor1.rectangle.size(); contouri ++)
+    {
+      if((*realContours1)[contouri])
+      {
+        int merges = 0;
+        bool foundOne1 = false;
+        bool foundOne2 = false;
+        float sumKX = holesConveyor1.keypoint[contouri].x;
+        float sumKY = holesConveyor1.keypoint[contouri].y;
+        int overlapsSum = 1;
+        int upperX = holesConveyor1.rectangle[contouri].x;
+        int upperY = holesConveyor1.rectangle[contouri].y;
+        int lowerX = holesConveyor1.rectangle[contouri].x + holesConveyor1.rectangle[contouri].width;
+        int lowerY = holesConveyor1.rectangle[contouri].y + holesConveyor1.rectangle[contouri].height;
+
+        for(int contourj = 0; contourj < holesConveyor2.rectangle.size(); contourj ++)
+        {
+          bool mergable = false;
+          calculateMergingProbability(
+              image, 
+              holesConveyor1.rectangle[contouri],
+              holesConveyor2.rectangle[contourj],
+              &mergable);
+          if(edMatrix12[contouri][contourj] < Parameters::HoleFusion::merging_distance_thresh
+              && (*realContours2)[contourj] && mergable)
+          {
+            mergable = false;
+            (*realContours2)[contourj] = false;
+            if(!foundOne1)
+              merges++;
+            foundOne1 = true;
+            overlapsSum++;
+            sumKX += holesConveyor2.keypoint[contourj].x;
+            sumKY += holesConveyor2.keypoint[contourj].y;
+            upperX = std::min(upperX, holesConveyor2.rectangle[contourj].x);
+            upperY = std::min(upperY, holesConveyor2.rectangle[contourj].y);
+            lowerX = std::max(lowerX, holesConveyor2.rectangle[contourj].x
+                + holesConveyor2.rectangle[contourj].width);
+            lowerY = std::max(lowerY, holesConveyor2.rectangle[contourj].y
+                + holesConveyor2.rectangle[contourj].height);
+            for(int contourk = 0; contourk < holesConveyor3.rectangle.size(); contourk ++)
+            {
+              bool mergable1 = false;
+              bool mergable2 = false;
+              calculateMergingProbability(
+                  image, 
+                  holesConveyor1.rectangle[contouri],
+                  holesConveyor3.rectangle[contourk],
+                  &mergable1);
+              calculateMergingProbability(
+                  image, 
+                  holesConveyor2.rectangle[contourj],
+                  holesConveyor3.rectangle[contourk],
+                  &mergable2);
+              if(((edMatrix13[contouri][contourk] < Parameters::HoleFusion::merging_distance_thresh
+                      && mergable1) 
+                    || (edMatrix23[contourj][contourk] < Parameters::HoleFusion::merging_distance_thresh 
+                      && mergable2))
+                  && (*realContours3)[contourk])
+              {
+                (*realContours3)[contourk] = false;
+                mergable1 = false;
+                mergable2 = false;
+                overlapsSum++;
+                sumKX += holesConveyor3.keypoint[contourk].x;
+                sumKY += holesConveyor3.keypoint[contourk].y;
+                if(!foundOne2)
+                  merges++;
+                foundOne2 = true;
+                upperX = std::min(upperX, holesConveyor3.rectangle[contourk].x);
+                upperY = std::min(upperY, holesConveyor3.rectangle[contourk].y);
+                lowerX = std::max(lowerX, holesConveyor3.rectangle[contourk].x 
+                    + holesConveyor3.rectangle[contourk].width);
+                lowerY = 
+                  std::max(lowerY, holesConveyor3.rectangle[contourk].y 
+                      + holesConveyor3.rectangle[contourk].height);
+              }
+            }
+          }
+        }
+
+        if(merges == 0)
+          (*validHolesMap)[(*vi)] = Parameters::HoleFusion::valid_light_probability;
+        else if(merges == 1)
+          (*validHolesMap)[(*vi)] = Parameters::HoleFusion::valid_medium_probability;
+        else
+          (*validHolesMap)[(*vi)] = Parameters::HoleFusion::valid_strong_probability;
+        (*realContours1)[contouri] = false;
+        cv::Point2f mergedKeypoint(sumKX / overlapsSum, sumKY / overlapsSum);
+        (*preValidatedHoles).keypoint.push_back(mergedKeypoint);
+        cv::Rect mergedRect(upperX, upperY, lowerX - upperX, lowerY - upperY);
+        (*preValidatedHoles).rectangle.push_back(mergedRect);
+        (*vi)++;
+      }
+    }
+  }
+
+
+  /**
+    @brief Finds distance between contours of two sources 
+    @param[in,out] holesConveyor1 [HolesConveyor&] The rgb, thermal or depth
+    conveyor 
+    @param[in,out] holesConveyor2 [HolesConveyor&] The rgb, thermal or depth 
+    conveyor
+    @param[in,out] edMatrix [std::vector<std::vector<float> >*] The matrix
+    where distances are stored, first source against second source
+    @return void
+   **/
+  void HoleFusion::findContoursDistance(
+      const HolesConveyor& holesConveyor1,
+      const HolesConveyor& holesConveyor2,
+      std::vector<std::vector<float> >* edMatrix)
+  {
+    for(int contouri = 0; contouri < holesConveyor1.rectangle.size(); contouri ++)
+    {
+      for(int contourj = 0; contourj < holesConveyor2.rectangle.size(); contourj ++)
+      {
+        cv::Rect overlap = holesConveyor1.rectangle[contouri] & holesConveyor2.rectangle[contourj];
+        // check if two rectangles intersect, if yes set a very small distance, otherwise set the smallest distance 
+        // between the two rectangles 
+        if( cv::Rect(holesConveyor1.rectangle[contouri]) == cv::Rect() )
+        {
+          float keypointDistance = 
+            std::sqrt(
+                std::pow(holesConveyor1.keypoint[contouri].x - holesConveyor2.keypoint[contourj].x, 2 )
+                + std::pow(holesConveyor1.keypoint[contouri].y - holesConveyor2.keypoint[contourj].y, 2 ));
+          float minBorderDistanceX = 
+            std::min(std::abs(holesConveyor1.rectangle[contouri].x - holesConveyor2.rectangle[contourj].x 
+                  - holesConveyor2.rectangle[contourj].width),
+                std::abs(holesConveyor1.rectangle[contouri].x + holesConveyor1.rectangle[contouri].width 
+                  - holesConveyor2.rectangle[contourj].x));
+          float minBorderDistanceY = 
+            std::min(std::abs(holesConveyor1.rectangle[contouri].y - holesConveyor2.rectangle[contourj].y 
+                  - holesConveyor2.rectangle[contourj].height),
+                std::abs(holesConveyor1.rectangle[contouri].y + holesConveyor1.rectangle[contouri].height 
+                  - holesConveyor2.rectangle[contourj].y));
+          float bordersDistance = 
+            std::sqrt(std::pow(minBorderDistanceX, 2) + std::pow(minBorderDistanceY, 2));
+          (*edMatrix)[contouri][contourj] = std::min(keypointDistance, bordersDistance);
+        }
+        else
+        {
+          // If there is an intersection then they surely need to get merged
+          (*edMatrix)[contouri][contourj] = 1;
+        }
+      }
+    }
+  }
 
   /**
     @brief Sets the depth values of a point cloud according to the
@@ -1885,7 +2032,59 @@ namespace pandora_vision
 #endif
   }
 
+  /**
+    @brief Calculates homogenity between two rectangles and returns an 
+    indication if the holes inside these rectangles are mergable or not.
 
+    @param[in] image [const cv::Mat&] The image where homogenity will be
+    calculated
+    @param[in] rectangle1 [cv::Rect&] First rectangle
+    @param[in] rectangle2 [cv::Rect&] Second rectangle
+    @param[out] mergable [bool*] The indication, true means that the holes
+    are mergable
+    @return void
+   **/
+  void HoleFusion::calculateMergingProbability(
+      const cv::Mat& image,
+      const cv::Rect& rectangle1,
+      const cv::Rect& rectangle2,
+      bool* mergable)
+  {
+    float upperX = std::min(rectangle1.x, rectangle2.x);
+    float upperY = std::min(rectangle1.y, rectangle2.y);
+    float lowerX = 
+      std::max(rectangle1.x + rectangle1.width,
+          rectangle2.x + rectangle2.width);
+    float lowerY = 
+      std::max(rectangle1.y + rectangle1.height,
+          rectangle2.y + rectangle2.height);
+    float homogRectWidth = std::abs(lowerX - upperX);
+    float homogRectHeight = std::abs(lowerY - upperY);
+    if(homogRectWidth < Rgb::homog_rect_dims_thresh)
+      homogRectWidth = std::max(rectangle1.width, rectangle2.width);
+    if(homogRectHeight < Rgb::homog_rect_dims_thresh)
+      homogRectHeight = std::max(rectangle1.height, rectangle2.height);
+    if(homogRectWidth == 0 || homogRectHeight == 0)
+      return;
+    //if(upperX < 0)
+    //  upperX = 0;
+    //if(upperY < 0)
+    //  upperY = 0;
+    //if(lowerX > image.cols)
+    //  lowerX = image.cols;
+    //if(lowerY > image.rows)
+    //  lowerY = image.rows;
+    cv::Mat ROI = image(cv::Rect(upperX, upperY, homogRectWidth, homogRectHeight));
+    HaralickFeaturesExtractor haralickFeaturesDetector_;
+    haralickFeaturesDetector_.findHaralickFeatures(ROI);
+    std::vector<double> haralickFeatures = haralickFeaturesDetector_.getFeatures();
+    if(haralickFeatures[0] > Rgb::homogenity_thresh)
+    {
+      (*mergable) = true;
+    }
+
+
+  }
 
   /**
     @brief The node's state manager.

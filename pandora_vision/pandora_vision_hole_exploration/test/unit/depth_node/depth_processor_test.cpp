@@ -283,14 +283,14 @@ namespace pandora_vision
       EXPECT_NEAR ( 6400, conveyor.rectangle[k].width * conveyor.rectangle[k].height, 5000  );
     }
 
-    // Finally check that for small depth value there are no holes found
+    // Check that for small depth value there are no holes found
     
-    // Set the depth for each point of the squares_ image to 0.5
+    // Set the depth for each point of the squares_ image to 0.4
     for ( int rows = 0; rows < squares_.rows; rows++ )
     {
       for ( int cols = 0; cols < squares_.cols; cols++ )
       {
-        squares_.at< float >( rows, cols ) = 0.5;
+        squares_.at< float >( rows, cols ) = 0.4;
       }
     }
     squares_ += mergable1Square + mergable2Square;
@@ -305,6 +305,36 @@ namespace pandora_vision
     // There should be no keypoints: the hole depth node procedure is ignored
     ASSERT_EQ ( 0, size );
 
+    // Check that contours that are detected from noisy pixels, are eliminated
+    
+    // Set the depth for each point of the squares_ image to 1.0
+    for ( int rows = 0; rows < squares_.rows; rows++ )
+    {
+      for ( int cols = 0; cols < squares_.cols; cols++ )
+      {
+        squares_.at< float >( rows, cols ) = 1.0;
+      }
+    }
+
+    // Set a small and random region to 0.0, simulating a noisy region
+    for ( int rows = 150; rows < 200; rows += 2 )
+    {
+      for ( int cols = 80; cols < 140; cols += 3 )
+      {
+        squares_.at< float >( rows, cols ) = 0.0;
+      }
+    }
+    //squares_ += mergable1Square + mergable2Square;
+    
+
+    // Run DepthProcessor::findHoles
+    conveyor.keypoint.clear();
+    conveyor.rectangle.clear();
+    conveyor = DepthProcessor_.findHoles ( squares_ );
+    // The number of keypoints found
+    size = conveyor.keypoint.size();
+    // There should be no keypoints: the noisy region must be ignored
+    ASSERT_EQ ( 0, size );
   }
 
 } // namespace pandora_vision

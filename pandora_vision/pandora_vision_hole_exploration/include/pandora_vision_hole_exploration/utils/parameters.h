@@ -63,7 +63,7 @@ namespace pandora_vision
   {
     struct HoleFusion
     {
-      static int bin_to_find_mergable_size;
+      static int merging_distance_thresh;
       static float valid_strong_probability;
       static float valid_medium_probability;
       static float valid_light_probability;
