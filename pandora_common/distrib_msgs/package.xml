@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>distrib_msgs</name>
+  <version>0.0.0</version>
+  <description>Distributed messages, used by various devices/machines.</description>
+
+  <maintainer email="klpanagi@gmail.com">Konstantinos Panayiotou</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_common/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
+
+  <author>Konstantinos Panayiotou</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+
+  <export>
+  </export>
+
+</package>
