@@ -32,7 +32,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/co2/dynament.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/flir/flir.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>

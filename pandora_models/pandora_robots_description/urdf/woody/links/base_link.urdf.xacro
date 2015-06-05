@@ -2,52 +2,37 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
-<!-- ###################################################################### -->
-
   <xacro:macro name="base_link" >
   
     <link name="base_link" >
 
       <inertial>
-        <!-- ============================================================== -->
         <origin xyz="-0.00968 -0.00122 0.19369" />
-        <!-- ============================================================== -->
         <mass value="8.25079" />
-        <!-- ============================================================== -->
         <inertia ixx="0.112701442"
                  ixy="-0.000233829"
                  ixz="-0.014681510"
                  iyy="0.096589855"
                  iyz="-0.000177925"
                  izz="0.083438037" />
-        <!-- ============================================================== -->
       </inertial>
 
       <visual>
-        <!-- ============================================================== -->
         <xacro:default_origin />
-        <!-- ============================================================== -->
         <geometry>
           <mesh filename="package://pandora_robots_description/meshes/woody/visual/base/base_link.dae" />
         </geometry>
-        <!-- ============================================================== -->
         <material name="base" />
-        <!-- ============================================================== -->
       </visual>
 
       <collision>
-        <!-- ============================================================== -->
         <xacro:default_origin />
-        <!-- ============================================================== -->
         <geometry>
           <mesh filename="package://pandora_robots_description/meshes/woody/collision/base/base_link.stl" />
         </geometry>
-        <!-- ============================================================== -->
       </collision>
 
     </link>
-  
-  
   
     <link name="miniitx" >
       <inertial>
@@ -69,8 +54,6 @@
               rpy="0.0 0.0 0.0" />
     </joint>
     
-    
-  
     <link name="ssd" >
       <inertial>
         <origin xyz="0.0 0.0 0.0" />
@@ -87,11 +70,31 @@
            type="fixed" >
       <parent link="base_link" />
       <child link="ssd" />
-      <origin xyz="-0.06872 0.03699 0.07022"
-              rpy="0.0 0.0 0.0" />
+      <origin xyz="0.059 -0.097 0.181"
+              rpy="${PI_2} 0.0 0.0" />
     </joint>
   
-  
+    <link name="raspberry" >
+      <xacro:solid_cuboid_inertial mass="0.062" width="0.070" height="0.025" depth="0.095" />
+    </link>
+    <joint name="raspberry_joint"
+           type="fixed" >
+      <parent link="base_link" />
+      <child link="raspberry" />
+      <origin xyz="0.071 0.076 0.24"
+              rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <link name="arm" >
+      <xacro:solid_cuboid_inertial mass="0.050" width="0.064" height="0.03" depth="0.104" />
+    </link>
+    <joint name="arm_joint"
+           type="fixed" >
+      <parent link="base_link" />
+      <child link="arm" />
+      <origin xyz="-0.052 0.002 0.245"
+              rpy="0.0 0.0 ${PI_2}" />
+    </joint>
   
     <link name="epos" >
       <inertial>
@@ -113,8 +116,6 @@
               rpy="0.0 0.0 0.0" />
     </joint>
     
-    
-  
     <link name="psu" >
       <inertial>
         <origin xyz="0.0 0.0 0.0" />
@@ -135,9 +136,7 @@
               rpy="0.0 0.0 0.0" />
     </joint>
     
-    
-  
-    <link name="battery1" >
+    <link name="motor_battery" >
       <inertial>
         <origin xyz="0.0 0.0 0.0" />
         <mass value="0.8" />
@@ -149,17 +148,15 @@
                  izz="0.0015582" />
       </inertial>
     </link>
-    <joint name="battery1_joint"
+    <joint name="motor_battery_joint"
            type="fixed" >
       <parent link="base_link" />
-      <child link="battery1" />
+      <child link="motor_battery" />
       <origin xyz="0.10395 0.027 0.04822"
               rpy="0.0 0.0 0.0" />
     </joint>
-    
-    
   
-    <link name="battery2" >
+    <link name="pc_battery" >
       <inertial>
         <origin xyz="0.0 0.0 0.0" />
         <mass value="0.8" />
@@ -171,27 +168,24 @@
                  izz="0.0015582" />
       </inertial>
     </link>
-    <joint name="battery2_joint"
+    <joint name="pc_battery_joint"
            type="fixed" >
       <parent link="base_link" />
-      <child link="battery2" />
+      <child link="pc_battery" />
       <origin xyz="0.10395 -0.027 0.04822"
               rpy="0.0 0.0 0.0" />
     </joint>
-    
-    
   
     <link name="cables" >
       <inertial>
         <origin xyz="0.0 0.0 0.0" />
         <mass value="0.6" />
-        <!-- TODO -->
-        <inertia ixx="0.0001"
+        <inertia ixx="0.00001"
                  ixy="0.0"
                  ixz="0.0"
-                 iyy="0.0001"
+                 iyy="0.00001"
                  iyz="0.0"
-                 izz="0.0001" />
+                 izz="0.00001" />
       </inertial>
     </link>
     <joint name="cables_joint"
@@ -201,21 +195,9 @@
       <origin xyz="0.0 0.0 0.1"
               rpy="0.0 0.0 0.0" />
     </joint>
-    
-    
-  
+
     <link name="axis" >
-      <inertial>
-        <origin xyz="0.0 0.0 0.0" />
-        <mass value="0.446" />
-        <!-- TODO -->
-        <inertia ixx="0.0001"
-                 ixy="0.0"
-                 ixz="0.0"
-                 iyy="0.0001"
-                 iyz="0.0"
-                 izz="0.0001" />
-      </inertial>
+      <xacro:solid_cylinder_inertial mass="0.446" radius="0.03" height="0.267" />
     </link>
     <joint name="axis_joint"
            type="fixed" >
@@ -224,32 +206,38 @@
       <origin xyz="0.0 0.0 0.0"
               rpy="0.0 0.0 0.0" />
     </joint>
-    
-    
-  
-    <link name="differential" >
-      <inertial>
-        <origin xyz="0.0 0.0 0.0" />
-        <mass value="0.31" />
-        <!-- TODO -->
-        <inertia ixx="0.0001"
-                 ixy="0.0"
-                 ixz="0.0"
-                 iyy="0.0001"
-                 iyz="0.0"
-                 izz="0.0001" />
-      </inertial>
-    </link>
-    <joint name="differential_joint"
+
+    <link name="imu" >
+      <xacro:solid_cuboid_inertial mass="0.05" width="0.045" height="0.024" depth="0.057" />
+    </link>/
+    <joint name="imu_joint"
            type="fixed" >
       <parent link="base_link" />
-      <child link="differential" />
-      <origin xyz="-0.15 0.0 0.09031"
+      <child link="imu" />
+      <origin xyz="0.09013 -0.08006 0.24281"
               rpy="0.0 0.0 0.0" />
     </joint>
+  
+<!--    <link name="differential" >-->
+<!--      <inertial>-->
+<!--        <origin xyz="0.0 0.0 0.0" />-->
+<!--        <mass value="0.31" />-->
+<!--        <inertia ixx="0.0001"-->
+<!--                 ixy="0.0"-->
+<!--                 ixz="0.0"-->
+<!--                 iyy="0.0001"-->
+<!--                 iyz="0.0"-->
+<!--                 izz="0.0001" />-->
+<!--      </inertial>-->
+<!--    </link>-->
+<!--    <joint name="differential_joint"-->
+<!--           type="fixed" >-->
+<!--      <parent link="base_link" />-->
+<!--      <child link="differential" />-->
+<!--      <origin xyz="-0.15 0.0 0.09031"-->
+<!--              rpy="0.0 0.0 0.0" />-->
+<!--    </joint>-->
     
   </xacro:macro>
-
-<!-- ###################################################################### -->
 
 </robot>

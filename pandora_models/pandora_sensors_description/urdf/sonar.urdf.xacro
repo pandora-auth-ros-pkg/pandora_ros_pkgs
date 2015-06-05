@@ -32,7 +32,7 @@
                 rpy="0 0 0" />
         <!-- ============================================================== -->
         <geometry>
-          <mesh filename="package://pandora_sensors_description/meshes/sonar/max_ez4.dae" />
+          <mesh filename="package://pandora_sensors_description/meshes/sonar/sonar_new.dae" />
         </geometry>
         <!-- ============================================================== -->
       </visual>

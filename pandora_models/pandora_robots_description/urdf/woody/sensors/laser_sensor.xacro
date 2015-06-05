@@ -2,11 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
-  <!-- ==================================================================== -->
   <xacro:include filename="$(find pandora_sensors_description)/urdf/laser.urdf.xacro" />
-  <!-- ==================================================================== -->
-
-<!-- ###################################################################### -->
 
   <xacro:macro name="laser_sensor"
                params="fixed" >
@@ -17,14 +13,10 @@
                          roll_max_limit="${laser_roll_joint_max_limit}"
                          pitch_min_limit="${laser_pitch_joint_min_limit}" 
                          pitch_max_limit="${laser_pitch_joint_max_limit}" >
-
       <origin xyz="0.2185 -0.00219 0.12885"
               rpy="${zero}" />
-
     </xacro:laser_caster>
     
   </xacro:macro>
-
-<!-- ###################################################################### -->
 
 </robot>

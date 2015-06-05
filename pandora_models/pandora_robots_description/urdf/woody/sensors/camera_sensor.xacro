@@ -2,38 +2,22 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
-  <!-- ==================================================================== -->
   <xacro:include filename="$(find pandora_sensors_description)/urdf/camera.urdf.xacro" />
-  <!-- ==================================================================== -->
-
-<!-- ###################################################################### -->
-
-  <!-- ==================================================================== -->
-  <xacro:macro name="left_camera_sensor" >
   
+  <xacro:macro name="left_camera_sensor" >
     <xacro:camera_caster parent="base_link"
                          prefix_y="left" >
-
       <origin xyz="-0.08308 0.08308 0.23081"
               rpy="0.0 0.0 ${ 3 * PI_4 }" />
-
     </xacro:camera_caster>
-    
   </xacro:macro>
-  <!-- ==================================================================== -->
-  <xacro:macro name="right_camera_sensor" >
   
+  <xacro:macro name="right_camera_sensor" >
     <xacro:camera_caster parent="base_link"
                          prefix_y="right" >
-
       <origin xyz="-0.08308 -0.08308 0.23081"
               rpy="0.0 0.0 ${ 5 * PI_4 }" />
-
     </xacro:camera_caster>
-    
   </xacro:macro>
-  <!-- ==================================================================== -->
-
-<!-- ###################################################################### -->
 
 </robot>

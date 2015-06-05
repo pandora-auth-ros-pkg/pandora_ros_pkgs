@@ -2,24 +2,13 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
-  <!-- ==================================================================== -->
   <xacro:include filename="$(find pandora_sensors_description)/urdf/flir.urdf.xacro" />
-  <!-- ==================================================================== -->
-
-<!-- ###################################################################### -->
-
-  <!-- ==================================================================== -->
-  <xacro:macro name="flir_sensor" >
   
+  <xacro:macro name="flir_sensor" >
     <xacro:flir_caster parent="kinect_main_link" >
-
-      <origin xyz="0.01732 0.07882 0.02341"
+      <origin xyz="0.0173 0.0747 0.022"
               rpy="0 0 0" />
-
     </xacro:flir_caster>
-    
   </xacro:macro>
-
-<!-- ###################################################################### -->
 
 </robot>
