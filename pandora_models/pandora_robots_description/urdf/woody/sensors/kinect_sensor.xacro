@@ -13,7 +13,7 @@
                          pitch_max_limit="${kinect_pitch_joint_max_limit}" 
                          yaw_min_limit="${kinect_yaw_joint_min_limit}" 
                          yaw_max_limit="${kinect_yaw_joint_max_limit}" >
-      <origin xyz="0.08085 0.02998 0.26749"
+      <origin xyz="0.11999 0.031 0.25781"
               rpy="0.0 0.0 0.0" />
     </xacro:kinect_caster>
     

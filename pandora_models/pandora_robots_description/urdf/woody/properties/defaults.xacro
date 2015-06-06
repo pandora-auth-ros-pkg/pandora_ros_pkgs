@@ -37,11 +37,26 @@
 
   <!-- 3D Inertial Objects ################################################ -->
 
-  <xacro:macro name="solid_sphere_inertial"
-               params="mass radius" >
+  <xacro:macro name="point_mass_inertial" >
     <inertial>
+      <origin xyz="0.0 0.0 0.0" />
+      <mass value="0.001" />
+      <inertia ixx="1.0E-6"
+               ixy="0"
+               ixz="0"
+               iyy="1.0E-6"
+               iyz="0"
+               izz="1.0E-6" />
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="solid_sphere_inertial"
+               params="mass
+                       radius
+                       *origin" >
+    <inertial>
+      <xacro:insert_block name="origin" />
       <mass value="${mass}" />
-      <xacro:default_origin />
       <inertia ixx="${ ( 2 / 5 ) * mass * ( radius * radius ) }"
                ixy="0.0"
                ixz="0.0"
@@ -52,24 +67,31 @@
   </xacro:macro>
   
   <xacro:macro name="solid_cuboid_inertial"
-               params="mass width height depth" >
+               params="mass
+                       x
+                       y
+                       z
+                       *origin" >
     <inertial>
+      <xacro:insert_block name="origin" />
       <mass value="${mass}" />
-      <xacro:default_origin />
-      <inertia ixx="${ ( 1 / 12 ) * mass * ( ( height * height ) + ( depth * depth ) ) }"
+      <inertia ixx="${ ( 1 / 12 ) * mass * ( ( y * y ) + ( z * z ) ) }"
                ixy="0.0"
                ixz="0.0"
-               iyy="${ ( 1 / 12 ) * mass * ( ( width * width ) + ( depth * depth ) ) }"
+               iyy="${ ( 1 / 12 ) * mass * ( ( x * x ) + ( z * z ) ) }"
                iyz="0.0"
-               izz="${ ( 1 / 12 ) * mass * ( ( width * width ) + ( height * height ) ) }" />
+               izz="${ ( 1 / 12 ) * mass * ( ( x * x ) + ( y * y ) ) }" />
     </inertial>
   </xacro:macro>
   
   <xacro:macro name="solid_cylinder_inertial"
-               params="mass radius height" >
+               params="mass
+                       radius
+                       height
+                       *origin" >
     <inertial>
+      <xacro:insert_block name="origin" />
       <mass value="${mass}" />
-      <xacro:default_origin />
       <inertia ixx="${ ( 1 / 12 ) * mass * ( 3 * ( radius * radius ) + ( height * height ) ) }"
                ixy="0.0"
                ixz="0.0"

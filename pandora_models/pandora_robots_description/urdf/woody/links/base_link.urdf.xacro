@@ -75,7 +75,9 @@
     </joint>
   
     <link name="raspberry" >
-      <xacro:solid_cuboid_inertial mass="0.062" width="0.070" height="0.025" depth="0.095" />
+      <xacro:solid_cuboid_inertial mass="0.062" x="0.095" y="0.070" z="0.025" >
+        <xacro:default_origin />
+      </xacro:solid_cuboid_inertial>
     </link>
     <joint name="raspberry_joint"
            type="fixed" >
@@ -86,7 +88,9 @@
     </joint>
 
     <link name="arm" >
-      <xacro:solid_cuboid_inertial mass="0.050" width="0.064" height="0.03" depth="0.104" />
+      <xacro:solid_cuboid_inertial mass="0.050" x="0.064" y="0.104" z="0.030" >
+        <xacro:default_origin />
+      </xacro:solid_cuboid_inertial>
     </link>
     <joint name="arm_joint"
            type="fixed" >
@@ -197,7 +201,9 @@
     </joint>
 
     <link name="axis" >
-      <xacro:solid_cylinder_inertial mass="0.446" radius="0.03" height="0.267" />
+      <xacro:solid_cylinder_inertial mass="0.446" radius="0.03" height="0.267" >
+        <xacro:default_origin />
+      </xacro:solid_cylinder_inertial>
     </link>
     <joint name="axis_joint"
            type="fixed" >
@@ -208,7 +214,9 @@
     </joint>
 
     <link name="imu" >
-      <xacro:solid_cuboid_inertial mass="0.05" width="0.045" height="0.024" depth="0.057" />
+      <xacro:solid_cuboid_inertial mass="0.05" x="0.057" y="0.045" z="0.024" >
+        <xacro:default_origin />
+      </xacro:solid_cuboid_inertial>
     </link>/
     <joint name="imu_joint"
            type="fixed" >
