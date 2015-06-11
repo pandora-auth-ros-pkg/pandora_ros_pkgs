@@ -47,7 +47,9 @@ ExplorationController::ExplorationController()
     do_exploration_server_(nh_, "do_exploration",
                            boost::bind(&ExplorationController::executeCb, this, _1), false),
     move_base_client_("move_base", true),
-    first_time_(true)
+    first_time_(true),
+    goal_reached_(false),
+    goal_expired_count_(0)
 {
   // create explore frontier goal selector
   explore_goal_selector_.reset(new FrontierGoalSelector("explore"));
@@ -101,12 +103,22 @@ void ExplorationController::executeCb(
   // while we didn't receive a preempt request
   while (ros::ok() && do_exploration_server_.isActive()) {
     // we reached maximum goal searches retries
-    if (goal_searches_count_ >= max_goal_searches_) {
+    // if we reach maximum goal searches but there are frontiers found
+    // should not set succeed the exploration
+    // Maybe we should wait move_base to finish
+    if (goal_searches_count_ >= max_goal_searches_ && goal_reached_) {
       do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
-      "[explorer] Max retries reached, we could not find more goals - exploration completed");
+      "[pandora_explorer] Max retries reached, we could not find more goals - exploration completed");
       return;
     }
-
+    // Check for timeouts
+    /*int max_goal_timeouts = 5;
+    if (goal_searches_count_ >= max_goal_searches_ && goal_expired_count_ >= max_goal_timeouts) {
+      do_exploration_server_.setAborted(pandora_exploration_msgs::DoExplorationResult(),
+      "[pandora_explorer] Max retries reached, goal is not reached, move_base appears to be stucked");
+      return;
+    }
+*/
     if (abort_count_ >= max_abortions_) {
       do_exploration_server_.setAborted(pandora_exploration_msgs::DoExplorationResult(),
                                         "Robot refuses to move, aborting...");
@@ -118,6 +130,7 @@ void ExplorationController::executeCb(
     if (goal->exploration_type == pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP &&
         coverage_goal_selector_) {
       // to current goal gemizetai me to stoxo pou tha vrei o goal selector
+      // If success is false that means we cant find more frontiers
       success = coverage_goal_selector_->findNextGoal(&current_goal_);
     } else {
       success = explore_goal_selector_->findNextGoal(&current_goal_);
@@ -152,10 +165,10 @@ void ExplorationController::executeCb(
         coverage_goal_selector_->setSelectedGoal(current_goal_);
     }
 
-    while (ros::ok() && do_exploration_server_.isActive() && !isGoalReached() && !isTimeReached() &&
+    while (ros::ok() && do_exploration_server_.isActive() && goal_reached_ != true && !isTimeReached() &&
            !aborted_)
       ros::Duration(0.1).sleep();
-
+    goal_reached_ = false;
   }  // end of outer while
 
   // goal should never be active at this point
@@ -176,6 +189,11 @@ void ExplorationController::doneMovingCb(const actionlib::SimpleClientGoalState&
     abort_count_++;
     aborted_ = true;
   }
+  if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
+  {
+    ROS_WARN("[pandora_explorer] How much fire tell me");
+    goal_reached_ = true;
+  }
 }
 
 void ExplorationController::preemptCb()
@@ -190,6 +208,9 @@ bool ExplorationController::isGoalReached()
 {
   // check if we are close to target
   // TODO(czalidis): check for race condition
+  // Auto ousiastika klanei to navi gt den perimenei na tou pei an eftase, alla
+  // to apofasizei mono tou, omws den douleuei swsta gt otan ftanei to navi,
+  // o explorer perimenei na faei timeout gia na vgalei epomeno stoxo.
   double dx = current_goal_.pose.position.x - feedback_.base_position.pose.position.x;
   double dy = current_goal_.pose.position.y - feedback_.base_position.pose.position.y;
 
@@ -202,7 +223,7 @@ bool ExplorationController::isGoalReached()
   if (::hypot(dx, dy) < dist) {
     abort_count_ = 0;
     first_time_ = false;
-    ROS_INFO("[explorer] goal is reached");
+    ROS_INFO("[pandora_explorer] goal is reached");
     return true;
   }
 
@@ -215,7 +236,9 @@ bool ExplorationController::isTimeReached()
   if (ros::Time::now() - current_goal_.header.stamp < goal_timeout_) {
     return false;
   }
-
+ // goal_expired_count_ ++;
+ // if (goal_expired_count_ >= 5)
+   // goal_expired_count_ = 0;
   ROS_INFO("[%s] Time for goal expired!", ros::this_node::getName().c_str());
   return true;
 }
