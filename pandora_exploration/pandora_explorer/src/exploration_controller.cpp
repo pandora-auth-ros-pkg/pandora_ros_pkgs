@@ -236,9 +236,9 @@ bool ExplorationController::isTimeReached()
   if (ros::Time::now() - current_goal_.header.stamp < goal_timeout_) {
     return false;
   }
- // goal_expired_count_ ++;
- // if (goal_expired_count_ >= 5)
-   // goal_expired_count_ = 0;
+  // goal_expired_count_ ++;
+  // if (goal_expired_count_ >= 5)
+  // goal_expired_count_ = 0;
   ROS_INFO("[%s] Time for goal expired!", ros::this_node::getName().c_str());
   return true;
 }
