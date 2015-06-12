@@ -12,6 +12,7 @@
     name="joint_states_controller_spawner"
     pkg="controller_manager"
     type="controller_manager" output="screen"
-    args="spawn joint_state_controller"
+    args="spawn
+          joint_state_controller"
     ns = "$(arg namespace)"/>
 </launch>

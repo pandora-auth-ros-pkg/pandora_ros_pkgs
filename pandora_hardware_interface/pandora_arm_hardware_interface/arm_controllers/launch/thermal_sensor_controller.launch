@@ -9,9 +9,10 @@
 
   <!-- spawn controller -->
   <node
-    name="thermal_sensor_controller_spawner"
+    name="arm_thermal_sensor_controller_spawner"
     pkg="controller_manager"
     type="controller_manager" output="screen"
-    args="spawn thermal_sensor_controller"
+    args="spawn
+          arm_thermal_sensor_controller"
     ns = "$(arg namespace)"/>
 </launch>
