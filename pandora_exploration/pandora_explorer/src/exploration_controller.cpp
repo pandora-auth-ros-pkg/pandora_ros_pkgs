@@ -32,7 +32,8 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Chris Zalidis <zalidis@gmail.com>
+* Author: Chris Zalidis <zalidis@gmail.com>,
+          Dimitrios Kirtsios <dimkirts@gmail.com>
 *********************************************************************/
 
 #include "pandora_explorer/exploration_controller.h"
@@ -139,6 +140,12 @@ void ExplorationController::executeCb(
     // if succes is false, dld an den exei vrei stoxo, auksanoume ta goal searches
     if (!success) {
       goal_searches_count_++;
+      if(goal_searches_count_ > max_goal_searches_)
+      {
+        do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
+      "[pandora_explorer] Exploration completed");
+        return;
+      }  
       // wait a little
       ros::Duration(0.2).sleep();
       continue;
@@ -188,10 +195,14 @@ void ExplorationController::doneMovingCb(const actionlib::SimpleClientGoalState&
   if (state == actionlib::SimpleClientGoalState::ABORTED) {
     abort_count_++;
     aborted_ = true;
+    //ROS_WARN("[pandora_explorer] Abort state");
+    //ROS_INFO("abort_count [%d]",abort_count_ );
   }
   if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
   {
     ROS_WARN("[pandora_explorer] How much fire tell me");
+    //ROS_INFO("goal searches [%d]",goal_searches_count_ );
+    //ROS_INFO("Goal reached [%d]", goal_reached_);
     goal_reached_ = true;
   }
 }
