@@ -70,9 +70,10 @@ class ConsoleWidget(QWidget):
 
     def __init__(self, proxy_model, rospack, minimal=False):
         """
-        :param proxymodel: the proxy model to display in the widget,''QSortFilterProxyModel''
-        :param minimal: if true the load,
-          save and column buttons will be hidden as well as the filter splitter, ''bool''
+        :param proxymodel: the proxy model to display in the
+                           widget,''QSortFilterProxyModel''
+        :param minimal: if true the load, save and column buttons will
+                        be hidden as well as the filter splitter, ''bool''
         """
         super(ConsoleWidget, self).__init__()
         self._proxy_model = proxy_model
@@ -84,8 +85,8 @@ class ConsoleWidget(QWidget):
         self._exclude_filters = []
         self._highlight_filters = []
 
-        ui_file = os.path.join(
-            self._rospack.get_path('rqt_console'), 'resource', 'console_widget.ui')
+        ui_file = os.path.join(self._rospack.get_path('rqt_console'),
+                               'resource', 'console_widget.ui')
         loadUi(ui_file, self)
         # self.exclude_group_box.close()
         # self.highlight_group_box.close()
@@ -175,10 +176,13 @@ class ConsoleWidget(QWidget):
         self.exclude_table.resizeColumnsToContents()
         self.highlight_table.resizeColumnsToContents()
 
-    def get_message_summary(self, start_time_offset=None, end_time_offset=None):
+    def get_message_summary(self, start_time_offset=None,
+                            end_time_offset=None):
         """
-        :param start_time: number of seconds before now to start, ''int'' (optional)
-        :param end_time: number of seconds before now to end, ''int'' (optional)
+        :param start_time: number of seconds before now to start,
+                           ''int'' (optional)
+        :param end_time: number of seconds before now to end,
+                         ''int'' (optional)
         :returns: summary of message numbers within time
         """
         current_time = time.mktime(datetime.datetime.now().timetuple())
@@ -220,7 +224,8 @@ class ConsoleWidget(QWidget):
 
     def get_time_range_from_selection(self):
         """
-        :returns: the range of time of messages in the current table selection (min, max), ''tuple(str,str)''
+        :returns: the range of time of messages in the current table
+                  selection (min, max), ''tuple(str,str)''
         """
         rowlist = []
         indexes = self.table_view.selectionModel().selectedIndexes()

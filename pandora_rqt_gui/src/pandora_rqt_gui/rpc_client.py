@@ -29,37 +29,35 @@
 
 from __future__ import print_function
 
-__author__ = "Chamzas Konstantinos"
-__maintainer__ = "Chamzas Konstantinos"
-__email__ = "chamzask@gmail.com"
+__author__ = "Sideris Konstantinos"
+__maintainer__ = "Sideris Konstantinos"
+__email__ = "siderisk@auth.gr"
 
-from rospy import ServiceProxy, wait_for_service, ServiceException
-from pandora_geotiff.srv import *
-from std_msgs.msg import String
-
-save_geotiff_service = 'pandora_geotiff_node/saveMission'
+import os
+import zmq
 
 
-class SaveMissionClient():
+RPC_SERVER_PORT = '5555'
 
-    def init():
-        pass
 
-    def save_mission_client(self, mission_name):
-        print("WAITING FOR SEVICE")
-        wait_for_service(save_geotiff_service)
-        msg = String(mission_name)
-        try:
-            save_mission = ServiceProxy(save_geotiff_service, SaveMission)
-            resp = save_mission(msg)
-        except ServiceException as e:
-            print("Service call failed :%s" % e)
+class Client(object):
 
-        print("Service call succeded")
-        return True
+    def __init__(self):
+        master_uri = os.environ['ROS_MASTER_URI']
+        self.rpc_ip = master_uri.split('//')[1].split(':')[0]
+        self.context = zmq.Context()
+        print('Connecting to the 0MQ Server...')
+        self.socket = self.context.socket(zmq.REQ)
+        self.socket.connect('tcp://' + self.rpc_ip + ':' + RPC_SERVER_PORT)
 
-if __name__ == "__main__":
+    def start_agent(self):
+        print('Sending start command to the agent...')
+        self.socket.send('agent:start')
+        pid = self.socket.recv()
+        print('Process started with pid: %s.' % pid)
 
-    print("Requesting save Mission Named Eleana")
-    SMC = SaveMissionClient()
-    SMC.save_mission_client("Testing")
+    def stop_agent(self):
+        print('Sending stop command to the agent...')
+        self.socket.send('agent:stop')
+        response = self.socket.recv()
+        print('Received %s.' % response)

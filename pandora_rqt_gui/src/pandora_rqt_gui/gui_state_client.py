@@ -1,8 +1,4 @@
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -49,21 +45,22 @@ class GuiStateClient(StateClient):
 
         self.state_ = RobotModeMsg.MODE_OFF
         self.int_to_state_dict = {
-            RobotModeMsg.MODE_OFF: "MODE_OFF",
-            RobotModeMsg.MODE_START_AUTONOMOUS: "MODE_START_AUTONOMOUS",
-            RobotModeMsg.MODE_EXPLORATION_RESCUE: "MODE_EXPLORATION_RESCUE",
-            RobotModeMsg.MODE_IDENTIFICATION: "MODE_IDENTIFICATION",
-            RobotModeMsg.MODE_SENSOR_HOLD: "MODE_SENSOR_HOLD",
-            RobotModeMsg.MODE_SEMI_AUTONOMOUS: "MODE_SEMI_AUTONOMOUS",
-            RobotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "MODE_TELEOPERATED_LOCOMOTION",
-            RobotModeMsg.MODE_SENSOR_TEST: "MODE_SENSOR_TEST",
-            RobotModeMsg.MODE_EXPLORATION_MAPPING: "MODE_EXPLORATION_MAPPING",
-            RobotModeMsg.MODE_TERMINATING: "MODE_TERMINATING"
+            RobotModeMsg.MODE_OFF: "OFF",
+            RobotModeMsg.MODE_START_AUTONOMOUS: "START_AUTONOMOUS",
+            RobotModeMsg.MODE_EXPLORATION_RESCUE: "EXPLORATION_RESCUE",
+            RobotModeMsg.MODE_IDENTIFICATION: "IDENTIFICATION",
+            RobotModeMsg.MODE_SENSOR_HOLD: "SENSOR_HOLD",
+            RobotModeMsg.MODE_SEMI_AUTONOMOUS: "SEMI_AUTONOMOUS",
+            RobotModeMsg.MODE_TELEOPERATED_LOCOMOTION: "TELEOPERATION",
+            RobotModeMsg.MODE_SENSOR_TEST: "SENSOR_TEST",
+            RobotModeMsg.MODE_EXPLORATION_MAPPING: "EXPLORATION_MAPPING",
+            RobotModeMsg.MODE_TERMINATING: "TERMINATING"
             }
 
     def start_transition(self, state):
 
-        rospy.loginfo("[%s] Starting Transition to state %i", self._name, state)
+        rospy.loginfo("[%s] Starting Transition to state %i",
+                      self._name, state)
         self.state_ = state
         self.transition_complete(state)
 

@@ -1,38 +1,29 @@
 #!/usr/bin/env python
-import rospy
 
+from __future__ import print_function
+
+import random
+import rospy
 from pandora_data_fusion_msgs.msg import GlobalProbabilitiesMsg
 
-# float32 thermal
-# float32 co2
-# float32 sound
-# float32 motion
-# float32 face
-
-global_propabilities_topic = "/data_fusion/victim_fusion/global_probabilities"
+global_propabilities_topic = "/data_fusion/signs_of_life"
 
 
 def talker():
     msg = GlobalProbabilitiesMsg()
-    msg.thermal = 1
-    msg.co2 = 2
-    msg.sound = 3
-    msg.motion = 4
-    msg.face = 5
-    pub = rospy.Publisher(global_propabilities_topic, GlobalProbabilitiesMsg, queue_size=10)
+    pub = rospy.Publisher(global_propabilities_topic, GlobalProbabilitiesMsg,
+                          queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rospy.loginfo(" Publisher for Victim Propabilities initialized")
-    r = rospy.Rate(1)  # 1 hz
     while not rospy.is_shutdown():
-
-        msg.thermal = 1 + msg.thermal
-        msg.co2 = 2 + msg.thermal
-        msg.sound = 3 + msg.thermal
-        msg.motion = 4 + msg.thermal
-        msg.face = 5 + msg.thermal
+        msg.thermal = random.randint(0, 5)
+        msg.co2 = random.randint(0, 5)
+        msg.sound = random.randint(0, 5)
+        msg.motion = random.randint(0, 5)
+        msg.victim = random.randint(0, 5)
+        print(msg)
         pub.publish(msg)
-
-        r.sleep()
+        rospy.sleep(1)
 
 if __name__ == '__main__':
     try:

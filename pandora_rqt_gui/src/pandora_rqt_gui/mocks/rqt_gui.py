@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2014, P.A.N.D.O.R.A. Team. All rights reserved."
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -39,7 +34,8 @@ __email__ = "tsirif@gmail.com"
 import rospy
 from actionlib import SimpleActionServer
 
-from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIResult
+from pandora_gui_msgs.msg import ValidateVictimGUIAction
+from pandora_gui_msgs.msg import ValidateVictimGUIResult
 
 
 class MockGui():

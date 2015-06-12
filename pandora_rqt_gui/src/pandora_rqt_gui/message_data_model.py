@@ -30,7 +30,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from python_qt_binding.QtCore import QAbstractTableModel, QModelIndex, Qt, qWarning
+from python_qt_binding.QtCore import (QAbstractTableModel, QModelIndex, Qt,
+                                      qWarning)
 from python_qt_binding.QtGui import QBrush, QIcon
 
 from rqt_console.message import Message

@@ -1,9 +1,4 @@
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -35,13 +30,7 @@ __author__ = "Chamzas Konstantinos"
 __maintainer__ = "Chamzas Konstantinos"
 __email__ = "chamzask@gmail.com"
 
-import os
-import roslib
-import rospkg
-import rospy
-
-from python_qt_binding import loadUi
-from python_qt_binding.QtCore import Qt, QTimer, Signal, Slot
+from python_qt_binding.QtCore import QTimer, Slot
 from python_qt_binding.QtGui import QWidget
 from PyQt4 import QtGui
 
@@ -65,14 +54,14 @@ class MainWidget(QWidget):
         self.standarWidget = StandarWidget(self)
         self.standarWidget.start()
 
-        #Create and set the Layouts
+        # Create and set the Layouts.
         self.vbox = QtGui.QVBoxLayout()
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.standarWidget)
         self.hbox.addLayout(self.vbox)
         self.setLayout(self.hbox)
 
-        #Timers  to refresh 1 sec
+        # Timers to refresh 1 sec.
         self.timer_refresh_main_widget = QTimer(self)
         self.timer_refresh_main_widget.timeout.connect(self.main_widget_refresh)
         self.timer_refresh_main_widget.start(1000)
@@ -81,29 +70,30 @@ class MainWidget(QWidget):
     def main_widget_refresh(self):
         addwidgetList = []
         removewidgetList = []
+        show_all_checked = self.standarWidget.show_all_checked
 
         # Add the extra widget if checked or remove if unckecked
-        if self.standarWidget.temp_checked or self.standarWidget.show_all_checked:
+        if self.standarWidget.temp_checked or show_all_checked:
             addwidgetList.append(TempWidget(self))
         else:
             removewidgetList.append("Temp")
 
-        if self.standarWidget.co2_checked or self.standarWidget.show_all_checked:
+        if self.standarWidget.co2_checked or show_all_checked:
             addwidgetList.append(CO2Widget(self))
         else:
             removewidgetList.append("CO2")
 
-        if self.standarWidget.battery_checked or self.standarWidget.show_all_checked:
+        if self.standarWidget.battery_checked or show_all_checked:
             addwidgetList.append(BatteryWidget(self))
         else:
             removewidgetList.append("Battery")
 
-        if self.standarWidget.sonars_checked or self.standarWidget.show_all_checked:
+        if self.standarWidget.sonars_checked or show_all_checked:
             addwidgetList.append(SonarsWidget(self))
         else:
             removewidgetList.append("Sonars")
 
-        # Add if not already added
+        # Add if not already added.
         for widget in addwidgetList:
             if widget.id_ not in self.widgetListId:
                 self.vbox.addWidget(widget)
@@ -111,7 +101,7 @@ class MainWidget(QWidget):
                 self.widgetListId.append(widget.id_)
                 widget.start()
 
-        #remove if not already removed
+        # Remove if not already removed.
         for widget in self.widgetList:
             if widget.id_ in removewidgetList:
                 self.vbox.removeWidget(widget)

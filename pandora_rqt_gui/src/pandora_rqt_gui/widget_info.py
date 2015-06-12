@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -36,9 +31,6 @@ __author__ = "Chamzas Konstantinos"
 __maintainer__ = "Chamzas Konstantinos"
 __email__ = "chamzask@gmail.com"
 
-from std_msgs.msg import String
-
-import roslib
 import rospy
 
 
@@ -64,10 +56,9 @@ class WidgetInfo():
 
         if self.topic_type_ is not None:
             self.monitoring = True
-            self.subscriber = rospy.Subscriber(
-                self.topic_name_,
-                self.topic_type_,
-                self.message_callback)
+            self.subscriber = rospy.Subscriber(self.topic_name_,
+                                               self.topic_type_,
+                                               self.message_callback)
 
     def stop_monitoring(self):
         self.monitoring = False

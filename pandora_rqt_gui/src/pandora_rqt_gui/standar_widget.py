@@ -1,9 +1,4 @@
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -35,6 +30,7 @@ __copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
 __author__ = "Chamzas Konstantinos"
 __maintainer__ = "Chamzas Konstantinos"
 __email__ = "chamzask@gmail.com"
+
 import os
 import roslib
 import rospkg
@@ -54,6 +50,7 @@ from .probability_info import ProbabilityInfoWidget
 from .console import Console
 from .gui_state_client import GuiStateClient
 from .save_mission_client import SaveMissionClient
+from .rpc_client import Client
 
 world_model_info_topic = '/data_fusion/world_model'
 robocup_score_topic = 'data_fusion/robocup_score'
@@ -68,7 +65,8 @@ class StandarWidget(QWidget):
     def __init__(self, plugin=None):
 
         super(StandarWidget, self).__init__()
-        #Load Ui
+
+        # Load the UI
         rp = rospkg.RosPack()
         ui_file = os.path.join(
             rp.get_path('pandora_rqt_gui'),
@@ -81,38 +79,44 @@ class StandarWidget(QWidget):
         self.ProbabilityInfoWidget_ = ProbabilityInfoWidget(self)
         self.GuiStateClient_ = GuiStateClient()
 
-        #Add Console in the 2,1 position of InternalGrid
+        # Add Console in the 2,1 position of InternalGrid
         self.internal_grid.addWidget(self.ConsoleWidget_, 2, 1)
 
-        #use full ABSOLUTE path to the image, not relative
+        # Use full ABSOLUTE path to the image, not relative
         self.image.setPixmap(QPixmap(os.path.join(
             rp.get_path('pandora_rqt_gui'),
             'images', 'pandora_logo.jpeg')))
 
-        # the ValidateVictimActionServer is used called when a victim is found
+        # ValidateVictimActionServer is used called when a victim is found
         self.ValidateVictimActionServer_ = ValidateVictimActionServer(
             validate_victim_service_name)
-        # dynamic_reconfigure client is used to change the parameters
-        #~ self.dynamic_reconfigure_client = dynamic_reconfigure.client.Client("agent")
+
+        # Dynamic_reconfigure client is used to change the parameters
+        # self.dynamic_reconfigure_client =
+        # dynamic_reconfigure.client.Client("agent")
 
         self.dynamic_reconfigure_client = None
 
-        #The SaveMissionClient is used to save the mission geotiff
+        # The SaveMissionClient is used to save the mission geotiff
         self.SaveMissionClient = SaveMissionClient()
 
-        #Subscribe the score the world_model_info and Info
+        # RPC client
+        self.rpc_client = Client()
+
+        # Subscribe the score the world_model_info and Info
         self.score_info = WidgetInfo(robocup_score_topic, Int32)
-        self.world_model_info = WidgetInfo(world_model_info_topic, WorldModelMsg)
+        self.world_model_info = WidgetInfo(world_model_info_topic,
+                                           WorldModelMsg)
         self.victim_info = []
 
         self.timer_started = False
 
-        #connecting the radioButtons
+        # Connecting the radioButtons
         self.yellow_arena_radio_button.clicked.connect(self.yellow_arena_radio_button_clicked)
         self.yellow_black_arena_radio_button.clicked.connect(self.yellow_black_arena_radio_button_clicked)
         self.mapping_mission_radio_button.clicked.connect(self.mapping_mission_radio_button_clicked)
 
-        #Connecting the Buttons
+        # Connecting the Buttons
         self.go_button.clicked.connect(self.go_button_clicked)
         self.stop_button.clicked.connect(self.stop_button_clicked)
         self.confirm_button.clicked.connect(self.confirm_victim_clicked)
@@ -125,7 +129,7 @@ class StandarWidget(QWidget):
         self.semi_autonomous_state_button.clicked.connect(self.sensor_test_state_button_clicked)
         self.terminate_button.clicked.connect(self.terminate_button_clicked)
 
-        #Connecting the CheckBoxes
+        # Connecting the CheckBoxes
         self.temp_checkbox.stateChanged.connect(self.temp_checked)
         self.co2_checkbox.stateChanged.connect(self.co2_checked)
         self.sonars_checkbox.stateChanged.connect(self.sonars_checked)
@@ -133,20 +137,20 @@ class StandarWidget(QWidget):
         self.show_all_checkbox.stateChanged.connect(self.show_all)
         self.terminate_check_box.stateChanged.connect(self.terminate_checked)
 
-        #In the Beggining all the checkboxes are unchecked(used for MainWidget)
+        # In the beggining all the checkboxes are unchecked.
         self.temp_checked = False
         self.battery_checked = False
         self.sonars_checked = False
         self.co2_checked = False
         self.show_all_checked = True
 
-        #The left panel is visible
+        # The left panel is visible
         self.left_panel = True
 
         # Resize at first
         self.resize = True
 
-        #Show the console options at first
+        # Show the console options at first
         self.console_show_options = True
 
         # Refresh timer
@@ -225,7 +229,7 @@ class StandarWidget(QWidget):
             self.victim_info = self.ValidateVictimActionServer_.victim_info
             self.enable_victim_found_options()
 
-    #Start the timer
+    # Start the timer
     def go_button_clicked(self):
 
         self.timer_started = True
@@ -237,15 +241,20 @@ class StandarWidget(QWidget):
         self.sensor_test_state_button.setEnabled(False)
         self.time_ = (self.timer.time())
         self.timer.setTime(self.time_)
-        self.GuiStateClient_.transition_to_state(1)
+
+        # Bring up the agent.
+        self.rpc_client.start_agent()
         self.ConsoleWidget_._handle_column_resize_clicked()
 
-    #Stop the timer and The robot
+    # Stop the timer and The robot
     def stop_button_clicked(self):
         self.ConsoleWidget_._handle_column_resize_clicked()
         self.timer_started = False
         self.go_button.setEnabled(True)
         self.stop_button.setEnabled(False)
+
+        # Shutdown the agent.
+        self.rpc_client.stop_agent()
         self.GuiStateClient_.transition_to_state(0)
 
     def decline_button_clicked(self):
@@ -336,7 +345,7 @@ class StandarWidget(QWidget):
             self.dynamic_reconfigure_client.update_configuration(
                 {"arenaType": 2})
 
-    #The _checkboxes slots
+    # The checkboxes slots.
     def sonars_checked(self):
 
         self.sonars_checked = self.sonars_checkbox.isChecked()
@@ -359,7 +368,7 @@ class StandarWidget(QWidget):
     def terminate_checked(self):
         self.terminate_button.setEnabled(self.terminate_check_box.isChecked())
 
-    #Method called when the Widget is terminated
+    # Method called when the Widget is terminated.
     def shutdown(self):
         self.world_model_info.stop_monitoring()
         self.score_info.stop_monitoring()

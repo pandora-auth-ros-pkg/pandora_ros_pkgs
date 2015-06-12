@@ -235,12 +235,12 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Face</string>
+          <string>Victim</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QProgressBar" name="faceBar">
+        <widget class="QProgressBar" name="victimBar">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
            <horstretch>0</horstretch>

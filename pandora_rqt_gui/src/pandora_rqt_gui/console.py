@@ -46,12 +46,13 @@ from rqt_console.message_proxy_model import MessageProxyModel
 
 class Console():
     """
-    rqt_console plugin's main class. Handles communication with ros_gui and contains
-    callbacks to handle incoming message
+    rqt_console plugin's main class. Handles communication with ros_gui
+    and contains callbacks to handle incoming message
     """
     def __init__(self):
         """
-        :param context: plugin context hook to enable adding widgets as a ROS_GUI pane, ''PluginContext''
+        :param context: plugin context hook to enable adding widgets
+                        as a ROS_GUI pane, ''PluginContext''
         """
 
         self._rospack = rospkg.RosPack()
@@ -62,8 +63,9 @@ class Console():
 
         self._widget = ConsoleWidget(self._proxy_model, self._rospack)
 
-        # queue to store incoming data which get flushed periodically to the model
-        # required since QSortProxyModel can not handle a high insert rate
+        # Queue to store incoming data which get flushed periodically
+        # to the model.
+        # Required since QSortProxyModel can not handle a high insert rate.
         self._message_queue = []
         self._mutex = QMutex()
         self._timer = QTimer()
@@ -97,7 +99,8 @@ class Console():
 
     def insert_messages(self):
         """
-        Callback for flushing incoming Log messages from the queue to the model.
+        Callback for flushing incoming Log messages from the queue
+        to the model.
         """
         with QMutexLocker(self._mutex):
             msgs = self._message_queue

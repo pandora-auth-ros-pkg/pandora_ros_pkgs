@@ -36,14 +36,11 @@ __maintainer__ = "Chamzas Konstantinos"
 __email__ = "chamzask@gmail.com"
 
 import os
-import roslib
 import rospkg
-import rospy
 
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Slot, QTimer
 from python_qt_binding.QtGui import QWidget
-from rospy.exceptions import ROSException
 from pandora_sensor_msgs.msg import BatteryMsg
 from .widget_info import WidgetInfo
 

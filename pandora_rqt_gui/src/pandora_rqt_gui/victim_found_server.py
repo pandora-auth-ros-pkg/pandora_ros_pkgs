@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 # Software License Agreement
-__version__ = "0.0.1"
-__status__ = "Production"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
-#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
@@ -36,12 +31,11 @@ __author__ = "Chamzas Konstantinos"
 __maintainer__ = "Chamzas Konstantinos"
 __email__ = "chamzask@gmail.com"
 
-import roslib
 import rospy
-import pandora_fsm
 import actionlib
 
-from pandora_rqt_gui.msg import ValidateVictimGUIAction, ValidateVictimGUIResult
+from pandora_gui_msgs.msg import ValidateVictimGUIAction
+from pandora_gui_msgs.msg import ValidateVictimGUIResult
 
 
 class ValidateVictimActionServer(object):
@@ -86,8 +80,8 @@ class ValidateVictimActionServer(object):
             self.as_.set_succeeded(self.result)
 
     def wait_for_response(self):
-        while (not self.operator_responded):
-            print "I AM WAITTING "
+        while not self.operator_responded:
+            print('Victim validation => waiting for the operator.')
             rospy.sleep(1)
 
     def shutdown(self):
