@@ -83,7 +83,7 @@ namespace arm
     // read CO2 percentage from CO2 sensors
     for (int ii = 0; ii < co2SensorName_.size(); ii++)
     {
-      arm_->readCo2Value(co2Percentage_ + ii);
+      arm_->readCo2Value(&co2Percentage_[ii]);
     }
 
     // read thermal image from grideye sensors
