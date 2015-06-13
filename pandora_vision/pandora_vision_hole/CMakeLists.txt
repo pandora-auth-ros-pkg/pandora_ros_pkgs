@@ -51,7 +51,7 @@ add_message_files(
   CandidateHoleMsg.msg
   CandidateHolesVectorMsg.msg
   )
-  
+
 generate_messages(
   DEPENDENCIES
   std_msgs
@@ -269,13 +269,14 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 ##################################### Testing ##################################
 if(CATKIN_ENABLE_TESTING)
-
-  if(${PROJECT_NAME}_download_benchmark)
-
-    download_extra_data(${PROJECT_NAME}_download_benchmark_bags
-      EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
-
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
   endif()
-
+  if(FUNCTIONAL_TEST)
+    set(${PROJECT_NAME}_functional_test true)
+  endif()
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
+  endif()
   add_subdirectory(test)
 endif()

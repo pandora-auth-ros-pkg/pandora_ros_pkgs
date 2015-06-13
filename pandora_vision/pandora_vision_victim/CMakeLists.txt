@@ -200,8 +200,8 @@ add_dependencies(${PROJECT_NAME}_node
   ${catkin_EXPORTED_TARGETS}
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
-target_link_libraries(${PROJECT_NAME}_node 
-  ${catkin_LIBRARIES} 
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
   ${PROJECT_NAME}_handler
 )
 
@@ -254,24 +254,28 @@ endif()
    )
 
 #~ To check lint : catkin_make roslint_pandora_vision_victim
-set(ROSLINT_CPP_OPTS
-    "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use")
-    
 ## Additional lint filters - Not Needed ##
 # -whitespace/braces, -whitespace/newline, -readability/multiline_string
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-
   include/*.h
   src/*.cpp
   test/*.cpp
-
-)
+  )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 ##################################### Testing ##################################
 
 if(CATKIN_ENABLE_TESTING)
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
+  endif()
+  if(FUNCTIONAL_TEST)
+    set(${PROJECT_NAME}_functional true)
+  endif()
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
+  endif()
   add_subdirectory(test)
 endif()

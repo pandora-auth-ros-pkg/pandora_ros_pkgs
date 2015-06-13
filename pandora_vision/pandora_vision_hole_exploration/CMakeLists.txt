@@ -177,11 +177,16 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
-
 ##################################### Testing ##################################
 if(CATKIN_ENABLE_TESTING)
-  if(${PROJECT_NAME}_download)
-    SET(${PROJECT_NAME}_download_data TRUE)
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
+  endif()
+  if(FUNCTIONAL_TEST)
+    set(${PROJECT_NAME}_functional_test true)
+  endif()
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
   endif()
   add_subdirectory(test)
 endif()

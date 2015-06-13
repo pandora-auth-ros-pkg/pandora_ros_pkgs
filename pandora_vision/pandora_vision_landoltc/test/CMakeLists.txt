@@ -24,7 +24,7 @@ ${catkin_INCLUDE_DIRS})
 ##############################################################################
 #                             Download Benchmark Data                        #
 ##############################################################################
-if (${PROJECT_NAME}_download)
+if(${PROJECT_NAME}_download_testing_data)
 
   # Download the images for the kinect/xtion benchmarking.
   download_extra_data(
@@ -43,7 +43,7 @@ endif()
 #                               Benchmark Tests                                #
 ################################################################################
 
-if (${PROJECT_NAME}_benchmark)
+if(${PROJECT_NAME}_benchmark)
 
   add_rostest(benchmark/landoltc_benchmark_test.launch
               ARGS xtion:=true)

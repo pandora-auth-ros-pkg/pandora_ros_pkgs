@@ -54,7 +54,7 @@ add_library(${PROJECT_NAME}_2d_detector
   src/landoltc_2d/landoltc_detector.cpp
   src/landoltc_2d/landoltc_parameters.cpp
   )
-target_link_libraries(${PROJECT_NAME}_2d_detector 
+target_link_libraries(${PROJECT_NAME}_2d_detector
   ${catkin_LIBRARIES}
   )
 add_dependencies(${PROJECT_NAME}_2d_detector
@@ -67,7 +67,7 @@ add_dependencies(${PROJECT_NAME}_2d_detector
 add_library(${PROJECT_NAME}_2d_preprocessor
   src/landoltc_2d/landoltc_preprocessor.cpp
   )
-target_link_libraries(${PROJECT_NAME}_2d_preprocessor 
+target_link_libraries(${PROJECT_NAME}_2d_preprocessor
   ${catkin_LIBRARIES}
   )
 
@@ -78,7 +78,7 @@ add_dependencies(${PROJECT_NAME}_2d_preprocessor
 add_library(${PROJECT_NAME}_2d_postprocessor
   src/landoltc_2d/landoltc_postprocessor.cpp
   )
-target_link_libraries(${PROJECT_NAME}_2d_postprocessor 
+target_link_libraries(${PROJECT_NAME}_2d_postprocessor
   ${catkin_LIBRARIES}
   )
 
@@ -89,7 +89,7 @@ add_dependencies(${PROJECT_NAME}_2d_postprocessor
 add_library(${PROJECT_NAME}_2d_handler
   src/landoltc_2d/landoltc_handler.cpp
   )
-target_link_libraries(${PROJECT_NAME}_2d_handler 
+target_link_libraries(${PROJECT_NAME}_2d_handler
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_2d_detector
   ${PROJECT_NAME}_2d_preprocessor
@@ -100,7 +100,7 @@ target_link_libraries(${PROJECT_NAME}_2d_handler
 add_executable(${PROJECT_NAME}_2d_node
   src/landoltc_2d/landoltc_node.cpp
 )
-target_link_libraries(${PROJECT_NAME}_2d_node 
+target_link_libraries(${PROJECT_NAME}_2d_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_2d_handler
   )
@@ -137,7 +137,7 @@ set(ROSLINT_CPP_OPTS
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  
+
   include/landoltc_2d/*
   src/landoltc_2d/*
   #~ include/landoltc_3d/landoltc3d_detector.h
@@ -167,10 +167,14 @@ roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 ##################################### Testing ##################################
 
 if(CATKIN_ENABLE_TESTING)
-
-  if (${PROJECT_NAME}_download)
-      set(${PROJECT_NAME}_download TRUE)
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
   endif()
-
+  if(FUNCTIONAL_TEST)
+    set(${PROJECT_NAME}_functional_test true)
+  endif()
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
+  endif()
   add_subdirectory(test)
 endif()

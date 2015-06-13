@@ -8,11 +8,9 @@ ${pandora_testing_tools_INCLUDE_DIRS}
 ${roslib_INCLUDE_DIRS}
 ${catkin_INCLUDE_DIRS})
 
-
 ###############################  Unit Tests ####################################
 
 #################################### utils #####################################
-
 
 catkin_add_gtest(${PROJECT_NAME}_holes_conveyor_test
   unit/utils/holes_conveyor_test.cpp)
@@ -63,29 +61,31 @@ target_link_libraries(${PROJECT_NAME}_hole_fusion_test
   ${PROJECT_NAME}_hole_fusion
   gtest_main)
 
+################### Download testing data ###################################
+
+if(${PROJECT_NAME}_download_testing_data)
+  download_extra_data(${PROJECT_NAME}_download_benchmark_bags
+    EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
+
+  catkin_download_test_data(
+    ${PROJECT_NAME}_hole_exploration_test.bag
+    http://downloads.pandora.ee.auth.gr/bags/hole_detector_test.bag
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
+    MD5 1844a18c09ee3f7b5725bb788fa43ac1
+    )
+endif()
+
 ############### Functional Tests ###############
 
-find_package(rostest REQUIRED)
-
-#catkin_download_test_data(
-#    ${PROJECT_NAME}_hole_exploration_test.bag
-#    http://downloads.pandora.ee.auth.gr/bags/hole_detector_test.bag
-#    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
-#    MD5 1844a18c09ee3f7b5725bb788fa43ac1
-#    )
-#add_rostest(functional/hole_exploration_test.launch)
+if(${PROJECT_NAME}_functional_test)
+  add_rostest(functional/hole_exploration_test.launch)
+endif()
 
 ################################################################################
 #                               Benchmark Tests                                #
 ################################################################################
 
-if(${PROJECT_NAME}_download_data)
-  download_extra_data(${PROJECT_NAME}_download_benchark_bags
-    EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
+if(${PROJECT_NAME}_benchmark)
+  add_rostest(benchmark/hole_exploration_benchmark_test.launch)
+  add_rostest(benchmark/hole_benchmark_test.launch)
 endif()
-
-#add_dependencies(${PROJECT_NAME}_benchmark_images_bags_pcl tests)
-
-# add_rostest(benchmark/hole_exploration_benchmark_test.launch)
-# add_rostest(benchmark/hole_benchmark_test.launch DEPENDENCIES
-# ${PROJECT_NAME}_benchmark_images_bags_pcl)

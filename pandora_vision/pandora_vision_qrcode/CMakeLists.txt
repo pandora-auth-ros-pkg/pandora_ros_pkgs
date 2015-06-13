@@ -62,7 +62,7 @@ add_dependencies(${PROJECT_NAME}_detector
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
-################# qrcode processor ################### 
+################# qrcode processor ###################
 add_library(${PROJECT_NAME}_processor
   src/qrcode_processor.cpp
 )
@@ -106,6 +106,7 @@ target_link_libraries(${PROJECT_NAME}_handler
 )
 
 ################# qrcode node #################
+
 add_executable(${PROJECT_NAME}_node
   src/qrcode_node.cpp
 )
@@ -113,18 +114,16 @@ add_dependencies(${PROJECT_NAME}_node
   ${catkin_EXPORTED_TARGETS}
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
-target_link_libraries(${PROJECT_NAME}_node 
-  ${catkin_LIBRARIES} 
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
   ${PROJECT_NAME}_handler
 )
-
 
 ################# roslint #################
 
 #~ To check lint : catkin_make roslint_pandora_vision_qrcode
 set(ROSLINT_CPP_OPTS
-    "--filter=-whitespace/end_of_line,-build/include_what_you_use, -runtime/references")
-
+    "--filter=-runtime/references")
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
   include/*.h
@@ -138,11 +137,12 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 ################################################################################
 
 if(CATKIN_ENABLE_TESTING)
-
   # Check if the benchmark images should be downloaded.
-  if (${PROJECT_NAME}_download)
-    set(${PROJECT_NAME}_download TRUE)
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
   endif()
-
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
+  endif()
   add_subdirectory(test)
 endif()

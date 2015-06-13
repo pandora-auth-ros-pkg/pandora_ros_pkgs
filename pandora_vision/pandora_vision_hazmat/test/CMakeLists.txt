@@ -22,7 +22,7 @@ target_link_libraries(feature_detector_test
   ${PROJECT_NAME}_orb_detector
   gtest_main
   gtest
-  ${GTEST_LIBRARIES} 
+  ${GTEST_LIBRARIES}
   )
 
 catkin_add_gtest(image_signature_test unit/image_signature_test.cpp)
@@ -36,8 +36,7 @@ target_link_libraries(image_signature_test
 ##############################################################################
 #                             Download Benchmark Data                        #
 ##############################################################################
-if (${PROJECT_NAME}_download)
-
+if (${PROJECT_NAME}_download_testing_data)
   # Download the images for the kinect/xtion benchmarking.
   download_extra_data(
     ${PROJECT_NAME}_benchmark_images_480p
@@ -54,10 +53,8 @@ endif()
 ################################################################################
 
 if (${PROJECT_NAME}_benchmark)
-
   add_rostest(benchmark/hazmat_benchmark_test.launch
     ARGS xtion:=true)
   add_rostest(benchmark/hazmat_benchmark_test.launch
     ARGS usb_cam:=true)
-
 endif()

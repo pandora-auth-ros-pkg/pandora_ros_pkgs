@@ -64,7 +64,7 @@ target_link_libraries(${PROJECT_NAME}_detector
   ${PROJECT_NAME}_filters
   ${catkin_LIBRARIES}
   )
-  
+
 ####### hazmat feature_matching_detector ########
 add_library(
   ${PROJECT_NAME}_feature_matching_detector
@@ -74,7 +74,7 @@ target_link_libraries(${PROJECT_NAME}_feature_matching_detector
   ${PROJECT_NAME}_detector
   ${catkin_LIBRARIES}
   )
-  
+
 ################# hazmat sift detector #################
 add_library(
   ${PROJECT_NAME}_sift_detector
@@ -84,7 +84,7 @@ target_link_libraries(${PROJECT_NAME}_sift_detector
   ${PROJECT_NAME}_feature_matching_detector
   ${catkin_LIBRARIES}
   )
-  
+
 ################# hazmat surf detector #################
 add_library(
   ${PROJECT_NAME}_surf_detector
@@ -180,13 +180,13 @@ option(${PROJECT_NAME}_training "Build flag for the training module")
 ########################### hazmatTrainNode ############################
 
 if(${PROJECT_NAME}_training)
-  
-############### Download images for training the detector ################  
+
+############### Download images for training the detector ################
   download_extra_data(${PROJECT_NAME}_download_training_images
                     EXTRA_FILES data/training_files.yaml)
 
   add_library(${PROJECT_NAME}_feature_trainer
-    src/training/planar_pattern_trainer.cpp 
+    src/training/planar_pattern_trainer.cpp
     src/training/sift_trainer.cpp
     src/training/surf_trainer.cpp
     src/training/orb_trainer.cpp)
@@ -201,7 +201,7 @@ if(${PROJECT_NAME}_training)
     ${PROJECT_NAME}_feature_trainer
     ${catkin_LIBRARIES})
 
-  add_executable(${PROJECT_NAME}_trainer_node 
+  add_executable(${PROJECT_NAME}_trainer_node
     src/training/hazmat_trainer_node.cpp
     )
   target_link_libraries(${PROJECT_NAME}_trainer_node
@@ -212,30 +212,28 @@ endif()
 
 
 #~ To check lint : catkin_make roslint_pandora_vision_hazmat
-set(ROSLINT_CPP_OPTS
-    "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string")
-
-############################## Node code Lint ############################## 
+############################## Node code Lint ##############################
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  "src/*.cpp"
-  "include/*.h"
+  src/**/*.cpp
+  include/**/*.h
 )
-
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
-############################## Test code Lint ############################## 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST_SRC
   RELATIVE ${PROJECT_SOURCE_DIR}
-  "test/*.cpp"
+  test/**/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_TEST_SRC})
 
-if(CATKIN_ENABLE_TESTING)
-  # Check if the benchmark images should be downloaded.
-  if (${PROJECT_NAME}_download)
-    set(${PROJECT_NAME}_download TRUE)
-  endif()
+############################## Test code Lint ##############################
 
+if(CATKIN_ENABLE_TESTING)
+  if(DOWNLOAD_TESTING_DATA)
+    set(${PROJECT_NAME}_download_testing_data true)
+  endif()
+  if(BENCHMARK)
+    set(${PROJECT_NAME}_benchmark true)
+  endif()
   add_subdirectory(test)
 endif()

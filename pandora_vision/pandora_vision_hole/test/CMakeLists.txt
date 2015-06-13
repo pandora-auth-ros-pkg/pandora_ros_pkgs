@@ -1,4 +1,3 @@
-
 find_package(roslib REQUIRED)
 find_package(rostest REQUIRED)
 find_package(pandora_testing_tools REQUIRED)
@@ -180,8 +179,7 @@ target_link_libraries(rgb_filters_test
 
 ############## Functional Tests ###############
 
-if(${PROJECT_NAME}_functional)
-
+if (${PROJECT_NAME}_download_testing_data)
   download_data(
     ${PROJECT_NAME}_hole_detector_test.bag
     http://downloads.pandora.ee.auth.gr/bags/hole_detector_test.bag
@@ -189,12 +187,14 @@ if(${PROJECT_NAME}_functional)
     MD5 1844a18c09ee3f7b5725bb788fa43ac1
     )
 
-  add_rostest(functional/hole_detector_test.launch
-    DEPENDENCIES ${PROJECT_NAME}_hole_detector_test.bag)
+  download_extra_data(${PROJECT_NAME}_download_benchmark_bags
+    EXTRA_FILES benchmark/data/bags_pcl/extra_files.yaml)
 endif()
 
-if ({PROJECT_NAME}_benchmark)
-  
+if(${PROJECT_NAME}_functional_test)
+  add_rostest(functional/hole_detector_test.launch)
+endif()
 
+if (${PROJECT_NAME}_benchmark)
   add_rostest(benchmark/hole_benchmark_test.launch)
 endif()
