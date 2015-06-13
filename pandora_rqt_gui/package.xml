@@ -11,24 +11,18 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>roslint</depend>
+  <build_depend>roslint</build_depend>
+
+  <exec_depend>rqt_gui_py</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>pandora_data_fusion_msgs</exec_depend>
+  <exec_depend>pandora_geotiff</exec_depend>
+  <exec_depend>pandora_gui_msgs</exec_depend>
+  <exec_depend>pandora_sensor_msgs</exec_depend>
+  <exec_depend>state_manager_msgs</exec_depend>
 
   <depend>rospy</depend>
   <depend>rqt_gui</depend>
-  <depend>rqt_gui_py</depend>
-
-  <depend>message_generation</depend>
-  <depend>message_runtime</depend>
-
-  <depend>std_msgs</depend>
-
-  <depend>actionlib_msgs</depend>
-  <depend>pandora_data_fusion_msgs</depend>
-  <depend>pandora_geotiff</depend>
-  <depend>pandora_gui_msgs</depend>
-  <depend>pandora_sensor_msgs</depend>
-  <depend>state_manager</depend>
-  <depend>state_manager_msgs</depend>
 
   <export>
      <rqt_gui plugin="${prefix}/plugin.xml"/>
