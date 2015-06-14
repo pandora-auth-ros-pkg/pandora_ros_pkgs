@@ -1,2 +1,0 @@
-sensor_msgs/Temperature data
-pandora_common_msgs/GeneralAlertInfo info

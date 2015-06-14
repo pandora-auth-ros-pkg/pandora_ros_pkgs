@@ -1,5 +1,0 @@
-<launch>
-  <arg name="state" default="0" />
-
-  <node pkg="state_manager" name="state_changer" type="state_changer" args="$(arg state)" />
-</launch>

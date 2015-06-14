@@ -23,7 +23,6 @@
   <exec_depend>pandora_vision_datamatrix</exec_depend>
   <exec_depend>pandora_vision_hazmat</exec_depend>
   <exec_depend>pandora_vision_hole</exec_depend>
-  <exec_depend>pandora_vision_hole_exploration</exec_depend>
   <exec_depend>pandora_vision_landoltc</exec_depend>
   <exec_depend>pandora_vision_launchers</exec_depend>
   <exec_depend>pandora_vision_motion</exec_depend>

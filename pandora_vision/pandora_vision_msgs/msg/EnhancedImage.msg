@@ -13,9 +13,6 @@ sensor_msgs/Image depthImage
 # current rgb image transformed and synced
 sensor_msgs/Image rgbImage
 
-# current thermal image transformed and synced
-sensor_msgs/Image thermalImage
-
 # flag that indicates if depth analysis is possible
 bool isDepth
 

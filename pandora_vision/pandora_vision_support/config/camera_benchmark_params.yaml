@@ -8,4 +8,5 @@ camera_sensors:
     hfov: 60
     vfov: 33.75
     image_width: 1280
-    image_height: 720
+    image_height: 720 
+

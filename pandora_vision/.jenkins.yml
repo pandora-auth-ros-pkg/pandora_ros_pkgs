@@ -32,7 +32,6 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - catkin_make roslint_pandora_vision_datamatrix
   - catkin_make roslint_pandora_vision_hazmat
   - catkin_make roslint_pandora_vision_hole
-  - catkin_make roslint_pandora_vision_hole_exploration
   - catkin_make roslint_pandora_vision_landoltc
   - catkin_make roslint_pandora_vision_motion
   - catkin_make roslint_pandora_vision_predator
@@ -40,7 +39,6 @@ script: # All commands must exit with code 0 on success. Anything else is consid
   - catkin_make roslint_pandora_vision_victim
   - catkin_make tests # Build all tests, even from other packages. Its not optimal, but...
   - catkin_make run_tests_pandora_vision_hole
-  - catkin_make run_tests_pandora_vision_hole_exploration
   - catkin_make run_tests_pandora_vision_victim
   - catkin_make run_tests_pandora_vision_qrcode
   - catkin_make run_tests_pandora_vision_datamatrix

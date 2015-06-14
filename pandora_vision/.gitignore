@@ -52,12 +52,7 @@ Thumbs.db
 
 # General #
 ###########
-*.swp
-*.swo
-*.swn
-*.swm
-*.swl
-*.orig
+.*.swp
 *.log
 core*
 *~
