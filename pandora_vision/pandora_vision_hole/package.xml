@@ -21,12 +21,15 @@
   <build_depend>message_generation</build_depend>
 
   <depend>roscpp</depend>
+  <depend>rospy</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>pandora_vision_common</depend>
   <depend>pandora_vision_msgs</depend>
+  <depend>pandora_common_msgs</depend>
+  <depend>distrib_msgs</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>dynamic_reconfigure</depend>

@@ -1,0 +1,3 @@
+pandora_common_msgs/GeneralAlertInfo info
+
+float32 temperature

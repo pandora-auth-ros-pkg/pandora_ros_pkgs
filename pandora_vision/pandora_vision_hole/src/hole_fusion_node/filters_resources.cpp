@@ -105,7 +105,6 @@ namespace pandora_vision
     bool enable_intermediatePointsImageVector = false;
     bool enable_intermediatePointsSetVector = false;
 
-
     // If the conditions permit for the depth filters to be applied,
     // create their resources
     if (filteringMode == RGBD_MODE)

@@ -155,6 +155,11 @@ namespace pandora_vision
       pointCloudTopic_, 1,
       &HoleFusion::pointCloudCallback, this);
 
+    // Subscribe to the topic where the thermal node publishes
+    // candidate holes
+    thermalCandidateHolesSubscriber_= nodeHandle_.subscribe(
+      thermalCandidateHolesTopic_, 1,
+      &HoleFusion::thermalCandidateHolesCallback, this);
 
     // The dynamic reconfigure server for debugging parameters
     serverDebug.setCallback(
@@ -270,7 +275,7 @@ namespace pandora_vision
     // If the RGB candidate holes and the RGB image are set
     // and the point cloud has been delivered and interpolated,
     // unlock the synchronizer and process the candidate holes from both sources
-    if (numNodesReady_ == 3)
+    if (numNodesReady_ == 4)
     {
       numNodesReady_ = 0;
 
@@ -285,7 +290,63 @@ namespace pandora_vision
     #endif
   }
 
+  /**
+    @brief Callback for the candidate holes via the thermal node.
 
+    This method sets the thermal image and the
+    candidate holes acquired from the thermal node.
+    If the rgb and point cloud callback counterparts have done
+    what must be, it resets the number of ready nodes, unlocks
+    the synchronizer and calls for processing of the candidate
+    holes.
+    @param[in] thermalCandidateHolesVector
+    [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+    The message containing the necessary information acquired through
+    the thermal node
+    @return void
+   **/
+  void HoleFusion::thermalCandidateHolesCallback(
+    const pandora_vision_hole::CandidateHolesVectorMsg&
+    thermalCandidateHolesVector)
+  {
+    #ifdef DEBUG_TIME
+    Timer::start("thermalCandidateHolesCallback", "", true);
+    #endif
+
+    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Thermal callback");
+
+    // Clear the current depthHolesConveyor struct
+    // (or else keyPoints, rectangles and outlines accumulate)
+    HolesConveyorUtils::clear(&thermalHolesConveyor_);
+
+    // Unpack the message
+    MessageConversions::unpackMessage(thermalCandidateHolesVector,
+      &thermalHolesConveyor_,
+      &thermalImage_, 0,
+      sensor_msgs::image_encodings::TYPE_8UC1,
+      Parameters::Outline::raycast_keypoint_partitions);
+
+    // The candidate holes acquired from the thermal node and the
+    // thermal image are set
+    numNodesReady_++;
+
+    // If the RGB candidate holes and the RGB image are set
+    // and the point cloud has been delivered and interpolated,
+    // unlock the synchronizer and process the candidate holes from both sources
+    if (numNodesReady_ == 4)
+    {
+      numNodesReady_ = 0;
+
+      unlockSynchronizer();
+
+      processCandidateHoles();
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::tick("thermalCandidateHolesCallback");
+    Timer::printAllMeansTree();
+    #endif
+  }
 
   /**
     @brief Runs candidate holes through selected filters.
@@ -344,7 +405,6 @@ namespace pandora_vision
       &inflatedRectanglesIndices,
       &intermediatePointsImageVector,
       &intermediatePointsSetVector);
-
 
     // Initialize the probabilities 2D vector.
 
@@ -435,7 +495,6 @@ namespace pandora_vision
       ROS_ERROR_NAMED(PKG_NAME,
         "[Hole Fusion node] Pre filtering process failure");
     }
-
 
     // The 2D vector that contains the probabilities from the rgb filtering
     // regime.
@@ -575,6 +634,24 @@ namespace pandora_vision
     {
       ROS_INFO_NAMED (PKG_NAME,
         "[Hole Fusion Node] Could not find topic rgb_candidate_holes_topic");
+    }
+
+    // Read the name of the topic from where the Hole Fusion node acquires the
+    // candidate holes originated from the Thermal node
+    if (nodeHandle_.getParam(
+        ns + "/hole_fusion_node/subscribed_topics/thermal_candidate_holes_topic"
+        ,thermalCandidateHolesTopic_))
+    {
+      // Make the topic's name absolute
+      thermalCandidateHolesTopic_ = ns + "/" + thermalCandidateHolesTopic_;
+
+      ROS_INFO_NAMED(PKG_NAME,
+        "[Hole Fusion Node] Subscribed to the Thermal candidate holes topic");
+    }
+    else
+    {
+      ROS_INFO_NAMED (PKG_NAME,
+       "[Hole Fusion Node] Could not find topic thermal_candidate_holes_topic");
     }
 
     // Read the name of the topic that the Hole Fusion node uses to unlock
@@ -1226,7 +1303,7 @@ namespace pandora_vision
     // If the depth and RGB candidate holes, the interpolated depth image
     // and the RGB image are set,
     // unlock the synchronizer and process the candidate holes from both sources
-    if (numNodesReady_ == 3)
+    if (numNodesReady_ == 4)
     {
       numNodesReady_ = 0;
 
@@ -1245,7 +1322,7 @@ namespace pandora_vision
 
   /**
     @brief Implements a strategy to combine information from both
-    the depth and rgb image and holes sources in order to accurately
+    the depth rgb and thermal image and holes sources in order to accurately
     find valid holes.
 
     It first assimilates all the holes that can be assimilated into other
@@ -1322,12 +1399,45 @@ namespace pandora_vision
           -1,
           msgs);
 
-      // The four images
+      // Holes originated from analysis on the thermal image,
+      // on top of the depth image
+      cv::Mat thermalHolesOnDepthImage =
+        Visualization::showHoles(
+          "Holes originated from Thermal analysis, on the Depth image",
+          interpolatedDepthImage_,
+          thermalHolesConveyor_,
+          -1,
+          msgs);
+
+      // Holes originated from analysis on the thermal image,
+      // on top of the rgb image
+      cv::Mat thermalHolesOnRgbImage =
+        Visualization::showHoles(
+          "Holes originated from Thermal analysis, on the Rgb image",
+          rgbImage_,
+          thermalHolesConveyor_,
+          -1,
+          msgs);
+
+      // Holes originated from analysis on the thermal image,
+      // on top of the resized Thermal image
+      cv::Mat thermalHolesOnThermalImage =
+        Visualization::showHoles(
+          "Holes originated from Thermal analysis, on the Thermal image",
+          thermalImage_,
+          thermalHolesConveyor_,
+          -1,
+          msgs);
+
+      // The six images
       std::vector<cv::Mat> imgs;
       imgs.push_back(depthHolesOnDepthImage);
       imgs.push_back(depthHolesOnRgbImage);
       imgs.push_back(rgbHolesOnRgbImage);
       imgs.push_back(rgbHolesOnDepthImage);
+      imgs.push_back(thermalHolesOnDepthImage);
+      imgs.push_back(thermalHolesOnRgbImage);
+      imgs.push_back(thermalHolesOnThermalImage);
 
       // The titles of the images
       std::vector<std::string> titles;
@@ -1336,17 +1446,23 @@ namespace pandora_vision
       titles.push_back("Holes originated from Depth analysis, on the RGB image");
       titles.push_back("Holes originated from RGB analysis, on the RGB image");
       titles.push_back("Holes originated from RGB analysis, on the Depth image");
+      titles.push_back("Holes originated from Thermal analysis, on the Depth image");
+      titles.push_back("Holes originated from Thermal analysis, on the Rgb image");
+      titles.push_back("Holes originated from Thermal analysis, on the Thermal image");
 
       Visualization::multipleShow("Respective keypoints", imgs, titles, 1280, 1);
     }
     #endif
 
-    // Publish an image depicting the holes found by the Depth and RGB nodes
+    // Publish an image depicting the holes found by the Depth RGB and Thermal nodes
     publishRespectiveHolesFound();
 
-    // Merge the conveyors from the RGB and Depth sources into one conveyor
+    // Merge the conveyors from the RGB Depth and Thermal sources into one conveyor
     HolesConveyor rgbdHolesConveyor;
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
+      &rgbdHolesConveyor);
+
+    HolesConveyorUtils::merge(rgbdHolesConveyor, thermalHolesConveyor_,
       &rgbdHolesConveyor);
 
     // The container in which holes will be assembled before validation
@@ -1375,7 +1491,6 @@ namespace pandora_vision
     {
       HolesConveyorUtils::copyTo(rgbdHolesConveyor, &preValidatedHoles);
     }
-
 
     // Because mergers may have not been deemed valid, the preValidatedHoles
     // container may include duplicate holes. Delete them, so that resources
@@ -1630,7 +1745,7 @@ namespace pandora_vision
   /**
     @brief Publishes the holes' enhanced information.
     @param[in] conveyor [const HolesConveyor&]
-    The overall valid holes found by the depth and RGB nodes.
+    The overall valid holes found by the depth RGB and thermal nodes.
     @param[in] validHolesMap [std::map<int, float>*]
     A map containing the indices of the valid holes inside the conveyor
     and their respective validity probabilities
@@ -1654,6 +1769,13 @@ namespace pandora_vision
         Parameters::Image::scale_method),
       sensor_msgs::image_encodings::TYPE_8UC1,
       enhancedHolesMsg.depthImage);
+
+    // Set the thermalImage in the enhancedHolesMsg message to the thermal image
+    enhancedHolesMsg.thermalImage = MessageConversions::convertImageToMessage(
+      Visualization::scaleImageForVisualization(thermalImage_,
+        Parameters::Image::scale_method),
+      sensor_msgs::image_encodings::TYPE_8UC1,
+      enhancedHolesMsg.thermalImage);
 
     // Set whether depth analysis is applicable
     enhancedHolesMsg.isDepth = (filteringMode_ == RGBD_MODE);
@@ -1901,7 +2023,7 @@ namespace pandora_vision
     // If the depth candidate holes and the interpolated depth image are set
     // and the point cloud has been delivered and interpolated,
     // unlock the synchronizer and process the candidate holes from both sources
-    if (numNodesReady_ == 3)
+    if (numNodesReady_ == 4)
     {
       numNodesReady_ = 0;
 

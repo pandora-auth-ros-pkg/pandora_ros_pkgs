@@ -1,0 +1,15 @@
+subscribed_topics:
+  thermal_image_topic: synchronized/thermal/image
+  
+  # thermal cropper node
+  thermal_poi_topic: thermal/cropper/poi
+  rgb_depth_images_topic: rgb/depth/images/cropper
+
+published_topics:
+  candidate_holes_topic: thermal/candidate_holes
+  thermal_data_fusion_topic: /vision/thermal_direction_alert
+  thermal_to_cropper_topic: thermal/cropper/poi  
+
+  # thermal cropper node 
+  thermal_victim_node_topic: /vision/enhanced_holes
+  thermal_unlock_synchronizer_topic: thermal/unlock/synchronizer

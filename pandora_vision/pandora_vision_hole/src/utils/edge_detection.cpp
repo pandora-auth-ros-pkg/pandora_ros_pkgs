@@ -429,7 +429,64 @@ namespace pandora_vision
     #endif
   }
 
+  /**
+    @brief Takes as input a thermal image containing unsigned chars,
+    locates the edges in it and tries to clear as much noise as possible
+    in the edges image. As noise we identify everything that is not,
+    or does not look like, hole-like shapes,
+    with the knowledge that these shapes might be open curves, or that
+    holes-like shapes in an image of edges are not connected to
+    anything else, ergo they are standalone shapes in it.
+    It outputs a binary image that contains areas that we wish to validate
+    as holes.
+    @param[in] inImage [const cv::Mat&] The thermal image extracted from the
+    thermal camera, of type CV_8UC1
+    @param[out] edges [cv::Mat*] The final denoised edges image that
+    corresponds to the input image
+    @return void
+   **/
+  void EdgeDetection::computeThermalEdges(const cv::Mat& inImage, cv::Mat* edges)
+  {
+    if (inImage.type() != CV_8UC1)
+    {
+      ROS_ERROR_NAMED(PKG_NAME,
+        "EdgeDetection::computeEdges : Inappropriate thermal image type.");
 
+      return;
+    }
+
+    #ifdef DEBUG_TIME
+    Timer::start("computeEdges", "findHoles");
+    #endif
+
+    // The input thermal image, in CV_8UC1 format
+    cv::Mat visualizableDepthImage = Visualization::scaleImageForVisualization(
+      inImage, Parameters::Image::scale_method);
+
+    // The image of edges of the denoised thermal image, in CV_8UC1 format
+    cv::Mat denoisedDepthImageEdges;
+
+    // Detect edges in the visualizableDepthImage
+    detectEdges(visualizableDepthImage, &denoisedDepthImageEdges,
+      Parameters::Edge::edge_detection_method);
+
+    // Apply a threshold to the image of edges
+    // to get rid of low value - insignificant - edges
+    cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges,
+      Parameters::Edge::denoised_edges_threshold, 255, 3);
+
+    // Make all non zero pixels have a value of 255
+    cv::threshold(denoisedDepthImageEdges, denoisedDepthImageEdges, 0, 255,
+      cv::THRESH_BINARY);
+
+    // Denoise the edges found
+    denoisedDepthImageEdges.copyTo(*edges);
+    denoiseEdges(edges);
+
+    #ifdef DEBUG_TIME
+    Timer::tick("computeEdges");
+    #endif
+  }
 
   /**
     @brief Takes as input a RGB image of type CV_8UC3,

@@ -67,6 +67,9 @@ namespace pandora_vision
   // Show the depth image that arrives in the depth node
   bool Parameters::Debug::show_depth_image = false;
 
+  //Show the thermal image that arrives in the thermal node
+  bool Parameters::Debug::show_thermal_image=false;
+
   // Show the rgb image that arrives in the rgb node
   bool Parameters::Debug::show_rgb_image = false;
 
@@ -118,6 +121,28 @@ namespace pandora_vision
   // 2 for brushfire far
   int Parameters::Depth::interpolation_method = 0;
 
+  ////////////////// Parameters pecific to the Thermal node ////////////////////
+  
+  // The probability extraction method
+  // 0 for Gaussian function
+  // 1 for Logistic function
+  
+  int Parameters::Thermal::probability_method = 1;
+
+  // Gausian variables
+  float Parameters::Thermal::optimal_temperature = 35;
+  float Parameters::Thermal::tolerance = 10;
+
+  // Logistic variables
+  float Parameters::Thermal::low_acceptable_temperature = 32;
+  float Parameters::Thermal::high_acceptable_temperature = 38;
+
+  float Parameters::Thermal::left_tolerance = 4;
+  float Parameters::Thermal::right_tolerance = 8;
+
+  ////////////////////// Parameters of the thermal image ///////////////////////
+  int Parameters::ThermalImage::WIDTH = 80;
+  int Parameters::ThermalImage::HEIGHT =60;
 
   ///////////////////// Edge detection specific parameters /////////////////////
 

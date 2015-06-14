@@ -20,7 +20,11 @@ project(pandora_vision_hole)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   message_generation
+  rospy
   pandora_vision_msgs
+  pandora_vision_common
+  pandora_common_msgs
+  distrib_msgs
   state_manager
   state_manager_msgs
   cv_bridge
@@ -36,6 +40,7 @@ find_package(catkin REQUIRED COMPONENTS
   )
 
 generate_dynamic_reconfigure_options(
+  cfg/thermal_node_cfg/thermal_cfg.cfg
   cfg/depth_node_cfg/depth_cfg.cfg
   cfg/hole_fusion_node_cfg/hole_fusion_cfg.cfg
   cfg/hole_fusion_node_cfg/debug_cfg.cfg
@@ -44,6 +49,7 @@ generate_dynamic_reconfigure_options(
   cfg/hole_fusion_node_cfg/general_cfg.cfg
   cfg/hole_fusion_node_cfg/validity_cfg.cfg
   cfg/rgb_node_cfg/rgb_cfg.cfg
+  cfg/temperatures_node_cfg/temperatures_cfg.cfg
   )
 
 add_message_files(
@@ -62,7 +68,11 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     message_runtime
+    rospy
     pandora_vision_msgs
+    pandora_vision_common
+    pandora_common_msgs
+    distrib_msgs
     state_manager
     state_manager_msgs
     cv_bridge
@@ -100,6 +110,7 @@ add_library(${PROJECT_NAME}_utils
   src/utils/timer.cpp
   src/utils/visualization.cpp
   src/utils/wavelets.cpp
+  src/utils/image_matching.cpp
   )
 
 target_link_libraries(${PROJECT_NAME}_utils
@@ -110,6 +121,7 @@ add_subdirectory(src/depth_node)
 add_subdirectory(src/hole_fusion_node)
 add_subdirectory(src/rgb_node)
 add_subdirectory(src/synchronizer_node)
+add_subdirectory(src/thermal_node)
 
 # Download extra files not needed when building
 # but necessary when running the package.

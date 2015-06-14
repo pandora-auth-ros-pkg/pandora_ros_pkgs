@@ -147,7 +147,7 @@ namespace pandora_vision
     float hfov = findParam<double>(nodeName, nh, &hfovDict_, result->header.frame_id + "/hfov");
     float vfov = findParam<double>(nodeName, nh, &vfovDict_, result->header.frame_id + "/vfov");
     std::string parentFrameId = findParentFrameId(nodeName, nh, &parentFrameDict_,
-        result->header.frame_id, "/robot_description");
+    result->header.frame_id, "/robot_description");
 
     generalAlertInfos.header = result->header;
     generalAlertInfos.header.frame_id = parentFrameId;
@@ -223,7 +223,7 @@ namespace pandora_vision
     else
     {
       ROS_DEBUG("[%s] First at: %s", nodeName.c_str(), key.c_str());
-        
+
       std::string true_key;
       if (key[0] == '/') {
         true_key = key;

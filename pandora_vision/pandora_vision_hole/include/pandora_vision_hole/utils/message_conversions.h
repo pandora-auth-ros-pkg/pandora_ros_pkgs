@@ -42,6 +42,7 @@
 #include "utils/outline_discovery.h"
 #include "utils/holes_conveyor.h"
 #include "pandora_vision_hole/CandidateHolesVectorMsg.h"
+#include "std_msgs/Float32MultiArray.h"
 
 /**
   @namespace pandora_vision
@@ -196,6 +197,15 @@ namespace pandora_vision
         const std::string& encoding,
         const int& raycastKeypointPartitions);
 
+      /**
+       @brief Convert the Float32MultiArray data to cv::Mat.
+       Its cv format  will be CV_8UC1.
+       @param[in] inArray [const std_msgs::Float32MultiArray&] 
+       The input MultiArray
+       @return cv::Mat
+       **/
+      static cv::Mat convertFloat32MultiArrayToMat(
+        const std_msgs::Float32MultiArray& inArray);
   };
 
 } // namespace pandora_vision

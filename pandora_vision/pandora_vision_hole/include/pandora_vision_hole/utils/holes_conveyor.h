@@ -38,6 +38,8 @@
 #ifndef UTILS_HOLES_CONVEYOR_H
 #define UTILS_HOLES_CONVEYOR_H
 
+#include <std_msgs/Header.h>
+
 #include "utils/defines.h"
 
 /**
@@ -59,15 +61,23 @@ namespace pandora_vision
     cv::KeyPoint keypoint;
     std::vector<cv::Point2f> rectangle;
     std::vector<cv::Point2f> outline;
+
+    // For Thermal Holes these variables get filled too.
+    float holeProbability;
+    float holeTemperature;
   };
 
+  typedef boost::shared_ptr<HoleConveyor> HoleConveyorPtr;
+  typedef boost::shared_ptr<HoleConveyor const> HoleConveyorConstPtr;
 
   /**
     A struct conveying information about multiple holes
+    @param header [std_msgs::Header] Header in respect with the frame of holes
     @param holes [std::vector<HoleConveyor>] The vector of holes
    **/
   struct HolesConveyor
   {
+    std_msgs::Header header;
     std::vector<HoleConveyor> holes;
 
     /**
@@ -82,6 +92,8 @@ namespace pandora_vision
 
   };
 
+  typedef boost::shared_ptr<HolesConveyor> HolesConveyorPtr;
+  typedef boost::shared_ptr<HolesConveyor const> HolesConveyorConstPtr;
 
   /**
     @Class HoleConveyorUtils

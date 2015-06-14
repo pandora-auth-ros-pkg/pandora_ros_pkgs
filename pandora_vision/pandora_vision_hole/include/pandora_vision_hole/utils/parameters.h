@@ -41,6 +41,7 @@
 #include "utils/defines.h"
 #include "utils/parameters.h"
 #include <dynamic_reconfigure/server.h>
+#include <pandora_vision_hole/thermal_cfgConfig.h>
 #include <pandora_vision_hole/depth_cfgConfig.h>
 #include <pandora_vision_hole/rgb_cfgConfig.h>
 #include <pandora_vision_hole/hole_fusion_cfgConfig.h>
@@ -62,7 +63,7 @@ namespace pandora_vision
     hole detector package
    **/
   struct Parameters
-  {
+  {       
     //! Blob detection - specific parameters
     struct Blob
     {
@@ -90,6 +91,9 @@ namespace pandora_vision
 
       // Show the depth image that arrives in the depth node
       static bool show_depth_image;
+
+      //Show the thermal image that arrives in the thermal node
+      static bool show_thermal_image;
 
       // Show the rgb image that arrives in the rgb node
       static bool show_rgb_image;
@@ -146,7 +150,33 @@ namespace pandora_vision
       static int interpolation_method;
     };
 
+    //! Parameters specific to the Thermal node
+    struct Thermal
+    {
+      // The probability extraction method
+      // 0 for Gaussian function
+      // 1 for Logistic function
+      static int probability_method;
 
+      // Gausian variables
+      static float optimal_temperature;
+      static float tolerance;
+
+      // Logistic variables
+      static float low_acceptable_temperature;
+      static float high_acceptable_temperature;
+
+      static float left_tolerance;
+      static float right_tolerance;
+    };
+
+    //! Thermal image parameters
+    struct ThermalImage
+    {
+      // Thermal image width and height
+      static int WIDTH;
+      static int HEIGHT;
+    };
 
     //! Edge detection specific parameters
     struct Edge

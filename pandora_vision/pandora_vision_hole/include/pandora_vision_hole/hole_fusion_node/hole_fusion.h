@@ -214,6 +214,15 @@ namespace pandora_vision
       // where it acquires the point cloud from the Synchronizer node
       std::string pointCloudTopic_;
 
+      // The ROS subscriber for acquisition of candidate holes originated
+      // from the thermal node
+      ros::Subscriber thermalCandidateHolesSubscriber_;
+
+      // The name of the topic where the Hole Fusion node is subscribed to
+      // for acquiring information about candidate holes found by the Thermal
+      // node
+      std::string thermalCandidateHolesTopic_;
+
       // The timestamp of the point cloud
       ros::Time timestamp_;
 
@@ -236,11 +245,17 @@ namespace pandora_vision
       // The interpolated depth image received by the depth node
       cv::Mat interpolatedDepthImage_;
 
+      // The thermal image received by the thermal node
+      cv::Mat thermalImage_;
+
       // The conveyor of hole candidates received by the depth node
       HolesConveyor depthHolesConveyor_;
 
       // The conveyor of hole candidates received by the rgb node
       HolesConveyor rgbHolesConveyor_;
+
+      // The conveyor of hole candidates received by the thermal node
+      HolesConveyor thermalHolesConveyor_;
 
       // Indicates whether RGB-based only
       // or both the RGB and Depth based filtering is applicable
@@ -319,6 +334,25 @@ namespace pandora_vision
       void depthCandidateHolesCallback(
           const pandora_vision_hole::CandidateHolesVectorMsg&
           depthCandidateHolesVector);
+
+      /**
+        @brief Callback for the candidate holes via the thermal node.
+
+        This method sets the thermal image and the
+        candidate holes acquired from the thermal node.
+        If the rgb and point cloud callback counterparts have done
+        what must be, it resets the number of ready nodes, unlocks
+        the synchronizer and calls for processing of the candidate
+        holes.
+        @param[in] thermalCandidateHolesVector
+        [const pandora_vision_msgs::CandidateHolesVectorMsg&]
+        The message containing the necessary information acquired through
+        the thermal node
+        @return void
+       **/
+      void thermalCandidateHolesCallback(
+        const pandora_vision_hole::CandidateHolesVectorMsg&
+        thermalCandidateHolesVector);
 
       /**
         @brief Runs candidate holes through selected filters.

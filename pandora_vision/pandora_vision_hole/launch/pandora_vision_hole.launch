@@ -4,6 +4,13 @@
 
   <arg name="namespace" default="hole_detector" />
 
+  <!-- ================== Parameters for yaw pitch extraction ============== -->
+
+  <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
+  <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
+
+  <!-- Output selection -->
+  <arg name="output" default="screen" />
 
   <!-- ========================= Synchronizer node ========================= -->
 
@@ -21,6 +28,20 @@
               command="load" />
   </node>
 
+  <!-- ======================= RGBDT Synchronizer node ===================== -->
+  
+  <node name="rgb_depth_thermal_synchronizer_node"
+        type="rgb_depth_thermal_synchronizer.py"
+        pkg="pandora_vision_hole"
+        respawn="false"
+        output="$(arg output)"
+        ns="$(arg namespace)">
+        
+
+    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_node_topics.yaml"
+              command="load" />
+
+  </node>
 
   <!-- ============================ Depth node ============================= -->
 
@@ -47,6 +68,37 @@
               command="load" />
   </node>
 
+  <!-- ============================= Thermal node ========================== -->
+
+  <node
+    name="thermal_camera_node"
+    type="thermal_camera_node"
+    pkg="pandora_vision_hole"
+    respawn="False"
+    output="$(arg output)"
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
+    command="load" />
+
+    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_matching_variables.yaml"
+    command="load" /> 
+   
+  </node>
+
+  <!-- ====================== Thermal Cropper node ========================= -->
+  <node
+    name="thermal_cropper_node"
+    type="thermal_cropper_node"
+    pkg="pandora_vision_hole"
+    respawn="False"
+    output="$(arg output)"
+    ns="$(arg namespace)">
+
+    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
+    command="load" />
+
+  </node>
 
   <!-- ========================= Hole Fusion node ========================== -->
 
