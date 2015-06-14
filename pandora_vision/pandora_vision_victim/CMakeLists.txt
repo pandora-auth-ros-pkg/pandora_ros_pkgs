@@ -248,10 +248,12 @@ if(MODEL_ENABLE_TRAIN)
   )
 endif()
 
+if(DOWNLOAD_DATA or FUNCTIONAL_TEST or BENCHMARK)
  download_extra_data(
    ${PROJECT_NAME}_download_training_files
    EXTRA_FILES data/extra_files.yaml
    )
+endif()
 
 #~ To check lint : catkin_make roslint_pandora_vision_victim
 ## Additional lint filters - Not Needed ##

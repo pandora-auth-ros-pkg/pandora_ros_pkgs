@@ -119,25 +119,27 @@ download_extra_data(
   EXTRA_FILES walls/extra_files.yaml
   )
 
+if(DOWNLOAD_DATA or FUNCTIONAL_TEST or BENCHMARK)
 # Download extra files, not needed when building
 # and not necessary to run any executable.
 # To download run: catkin_make download_extra_data
-download_data(
-  ${PROJECT_NAME}_simple_pcl_frame.bag
-  http://downloads.pandora.ee.auth.gr/bags/simple_pcl_frame.bag
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
-  MD5 4304760d90c53b80c3b42a4c148379e5
-  EXCLUDE_FROM_ALL
-  )
+  download_data(
+    ${PROJECT_NAME}_simple_pcl_frame.bag
+    http://downloads.pandora.ee.auth.gr/bags/simple_pcl_frame.bag
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
+    MD5 4304760d90c53b80c3b42a4c148379e5
+    EXCLUDE_FROM_ALL
+    )
 
-download_data(
-  ${PROJECT_NAME}_simple_pcl_frame_0.bag
-  http://downloads.pandora.ee.auth.gr/bags/simple_pcl_frame_0.bag
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
-  MD5 d7d56db4b5d121aa8ffe75c7a41ff690
-  EXCLUDE_FROM_ALL
-  OPTIONAL
-  )
+  download_data(
+    ${PROJECT_NAME}_simple_pcl_frame_0.bag
+    http://downloads.pandora.ee.auth.gr/bags/simple_pcl_frame_0.bag
+    DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/test/functional
+    MD5 d7d56db4b5d121aa8ffe75c7a41ff690
+    EXCLUDE_FROM_ALL
+    OPTIONAL
+    )
+endif()
 ################################# ROSLINT ######################################
 # Execute via lint : catkin_make roslint_{PACKAGE_NAME}
 

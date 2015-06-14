@@ -172,9 +172,10 @@ add_dependencies(${PROJECT_NAME}_node
 )
 
 ############### Download necessary data to detect patterns ##################
-
-download_extra_data(${PROJECT_NAME}_download_training_results
-                    EXTRA_FILES data/extra_files.yaml)
+if(DOWNLOAD_DATA or FUNCTIONAL_TEST or BENCHMARK)
+  download_extra_data(${PROJECT_NAME}_download_training_results
+                      EXTRA_FILES data/extra_files.yaml)
+endif()
 
 option(${PROJECT_NAME}_training "Build flag for the training module")
 ########################### hazmatTrainNode ############################
