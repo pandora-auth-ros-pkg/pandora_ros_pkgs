@@ -54,19 +54,21 @@ namespace pandora_vision
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
     output->header = alertVector.header;
+    if (alertVector.alerts.size() == 0)
+      return false;
 
-    for (int ii = 0; ii < alertVector.generalAlerts.size(); ii++)
+    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
     {
       pandora_vision_msgs::HazmatAlert hazmatAlert;
 
-      hazmatAlert.info.yaw = alertVector.generalAlerts[ii].yaw;
-      hazmatAlert.info.pitch = alertVector.generalAlerts[ii].pitch;
+      hazmatAlert.info.yaw = alertVector.alerts[ii].yaw;
+      hazmatAlert.info.pitch = alertVector.alerts[ii].pitch;
       hazmatAlert.info.probability = 0.90;
 
       boost::shared_ptr<HazmatPOI> hazmatPOI(boost::dynamic_pointer_cast<HazmatPOI>(input->pois[ii]));
       hazmatAlert.patternType = hazmatPOI->getPattern();
 
-      output->hazmatAlerts.push_back(hazmatAlert);
+      output->alerts.push_back(hazmatAlert);
     }
     return true;
   }

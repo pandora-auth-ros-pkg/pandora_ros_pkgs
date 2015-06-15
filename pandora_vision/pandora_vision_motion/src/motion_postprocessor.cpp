@@ -41,7 +41,7 @@
 
 namespace pandora_vision
 {
-  MotionPostProcessor::MotionPostProcessor(const std::string& ns, 
+  MotionPostProcessor::MotionPostProcessor(const std::string& ns,
     sensor_processor::Handler* handler) :
     VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>(
     ns, handler)
@@ -52,11 +52,14 @@ namespace pandora_vision
 
   MotionPostProcessor::~MotionPostProcessor() {}
 
-  bool MotionPostProcessor::postProcess(const POIsStampedConstPtr& input, 
+  bool MotionPostProcessor::postProcess(const POIsStampedConstPtr& input,
     const GeneralAlertVectorPtr& output)
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
     *output = alertVector;
+    if (output->alerts.size() == 0) {
+      return false;
+    }
     return true;
   }
 }  // namespace pandora_vision

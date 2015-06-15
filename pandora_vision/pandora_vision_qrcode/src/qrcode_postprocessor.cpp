@@ -58,19 +58,21 @@ namespace pandora_vision
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
     output->header = alertVector.header;
+    if (alertVector.alerts.size() == 0)
+      return false;
 
-    for (int ii = 0; ii < alertVector.generalAlerts.size(); ii++)
+    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
     {
       pandora_vision_msgs::QRAlert qrAlert;
 
-      qrAlert.info.yaw = alertVector.generalAlerts[ii].yaw;
-      qrAlert.info.pitch = alertVector.generalAlerts[ii].pitch;
+      qrAlert.info.yaw = alertVector.alerts[ii].yaw;
+      qrAlert.info.pitch = alertVector.alerts[ii].pitch;
       qrAlert.info.probability = 1;
 
       boost::shared_ptr<QrCodePOI> qrCodePOI(boost::dynamic_pointer_cast<QrCodePOI>(input->pois[ii]));
       qrAlert.QRcontent = qrCodePOI->getContent();
 
-      output->qrAlerts.push_back(qrAlert);
+      output->alerts.push_back(qrAlert);
     }
     return true;
   }

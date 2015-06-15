@@ -364,16 +364,16 @@ void LandoltC3dDetection::landoltc3dCallback()
       landoltc3dcodeMsg.angles.push_back( _landoltc3d.at(i).angles.at(j));
     }
 
-    landoltc3dVectorMsg.landoltcAlerts.push_back(landoltc3dcodeMsg);
+    landoltc3dVectorMsg.alerts.push_back(landoltc3dcodeMsg);
 
 
     ROS_INFO_STREAM("[landoltc3d_node] : Landoltc3D found");
     landoltc3dcodeMsg.angles.clear();
 
   }
-  if(_landoltc3d.size() > 0 && landoltc3dVectorMsg.landoltcAlerts.size() > 0){
+  if(_landoltc3d.size() > 0 && landoltc3dVectorMsg.alerts.size() > 0){
     _landoltc3dPublisher.publish(landoltc3dVectorMsg);
-    landoltc3dVectorMsg.landoltcAlerts.clear();
+    landoltc3dVectorMsg.alerts.clear();
   }
   _landoltc3dDetector.clear();
 }

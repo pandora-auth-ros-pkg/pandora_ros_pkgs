@@ -1,2 +1,2 @@
 Header header
-pandora_vision_msgs/HolePositionAlert[] holesPositions
+pandora_vision_msgs/HolePositionAlert[] alerts

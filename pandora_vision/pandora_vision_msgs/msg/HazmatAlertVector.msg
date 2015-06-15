@@ -1,2 +1,2 @@
 Header header
-pandora_vision_msgs/HazmatAlert[] hazmatAlerts
+pandora_vision_msgs/HazmatAlert[] alerts

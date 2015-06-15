@@ -165,7 +165,7 @@ namespace pandora_vision
       info.pitch = atan(2 * y / result->frameHeight * tan(vfov * CV_PI / 360.0f));
       info.probability = poiPtr->getProbability();
 
-      generalAlertInfos.generalAlerts.push_back(info);
+      generalAlertInfos.alerts.push_back(info);
     }
 
     return generalAlertInfos;

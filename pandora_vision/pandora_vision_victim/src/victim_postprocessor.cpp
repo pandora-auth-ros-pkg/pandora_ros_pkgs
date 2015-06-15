@@ -57,7 +57,7 @@ namespace pandora_vision
     const GeneralAlertVectorPtr& output)
   {
     *output = getGeneralAlertInfo(input);
-    if (output->generalAlerts.size() == 0) {
+    if (output->alerts.size() == 0) {
       return false;
     }
     return true;

@@ -65,8 +65,8 @@ namespace pandora_vision
     candidateHolesPublisher_ = nodeHandle_.advertise
       <pandora_vision_hole::CandidateHolesVectorMsg>(
       candidateHolesTopic_, 1000);
-        
-    // Advertise the candidate holes found by the thermal 
+
+    // Advertise the candidate holes found by the thermal
     // node to thermal cropper
     thermalToCropperPublisher_ = nodeHandle_.advertise
       <pandora_vision_hole::CandidateHolesVectorMsg>(
@@ -121,7 +121,7 @@ namespace pandora_vision
     // to be processed. Its cv format will be CV_8UC1.
 
     cv::Mat thermalImage;
-    MessageConversions::extractImageFromMessage(msg.thermalImage, &thermalImage, 
+    MessageConversions::extractImageFromMessage(msg.thermalImage, &thermalImage,
       sensor_msgs::image_encodings::TYPE_8UC1);
 
     // Obtain the thermal message and extract the temperature information.
@@ -133,7 +133,7 @@ namespace pandora_vision
     // Apply double threshold(up and down) in the temperature image.
     // The threshold is set by configuration
     //cv::inRange(
-      //thermalImage, cv::Scalar(30), cv::Scalar(40), thermalImage); 
+      //thermalImage, cv::Scalar(30), cv::Scalar(40), thermalImage);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_thermal_image)
@@ -163,9 +163,9 @@ namespace pandora_vision
     // Create the candidate holes message
     pandora_vision_hole::CandidateHolesVectorMsg thermalCandidateHolesMsg;
 
-    // Pack information about holes found and the thermal image 
+    // Pack information about holes found and the thermal image
     // inside a message.
-    // This message will be published to and received by the hole fusion 
+    // This message will be published to and received by the hole fusion
     // or thermal cropper node based on the index of thermal message acquired
     // from the synchronizer node
     MessageConversions::createCandidateHolesVectorMessage(holes,
@@ -195,7 +195,7 @@ namespace pandora_vision
     }
 
     // Finally find the yaw and pitch of each candidate hole found and
-    // send it to data fusion if a hole exists. The message to be sent is 
+    // send it to data fusion if a hole exists. The message to be sent is
     // ThermalAlertsVectorMsg type.
     if(holes.size() > 0)
     {
@@ -203,7 +203,7 @@ namespace pandora_vision
       pandora_vision_msgs::ThermalAlert thermalMsg;
       pandora_vision_msgs::ThermalAlertVector thermalMsgVector;
 
-      POIsStampedPtr poisStamped(new POIsStamped);  
+      POIsStampedPtr poisStamped(new POIsStamped);
 
       poisStamped->header.stamp = msg.header.stamp;
       poisStamped->header.frame_id = "/kinect_rgb_optical_frame";
@@ -214,33 +214,33 @@ namespace pandora_vision
       for(unsigned int i = 0; i < holes.size(); i++)
       {
 
-        POIPtr poi(new POI);  
+        POIPtr poi(new POI);
 
         // Set the keypoint
         poi->point.x = holes.holes[i].keypoint.pt.x;
         poi->point.y = holes.holes[i].keypoint.pt.y;
-      
-        // Fill the probabilities 
+
+        // Fill the probabilities
         poi->probability = holes.holes[i].holeProbability;
-        
+
         poisStamped->pois.push_back(poi);
       }
 
       GeneralAlertConverter converter;
 
-      pandora_common_msgs::GeneralAlertVector alert = 
+      pandora_common_msgs::GeneralAlertVector alert =
         converter.getGeneralAlertInfo(ros::this_node::getName(),
           nodeHandle_, poisStamped);
 
-      for(unsigned int i = 0; i < alert.generalAlerts.size(); i++)
+      for(unsigned int i = 0; i < alert.alerts.size(); i++)
       {
         // Fill the temperature of the thermal message for each hole
         thermalMsg.temperature = holes.holes[i].holeTemperature;
 
-        thermalMsg.info = alert.generalAlerts.at(i);
+        thermalMsg.info = alert.alerts.at(i);
 
         // Push back into vector of messages
-        thermalMsgVector.thermalAlerts.push_back(thermalMsg);
+        thermalMsgVector.alerts.push_back(thermalMsg);
       }
       // Fill the thermal message header to be sent
       thermalMsgVector.header = alert.header;
@@ -263,7 +263,7 @@ namespace pandora_vision
     @param void
     @return void
    **/
-  void Thermal::getTopicNames ()
+  void Thermal::getTopicNames()
   {
     // The namespace dictated in the launch file
     std::string ns = nodeHandle_.getNamespace();
@@ -274,8 +274,8 @@ namespace pandora_vision
         ns + "/thermal_camera_node/subscribed_topics/thermal_image_topic",
         thermalImageTopic_ ))
     {
-    
-      // Make topic's name absolute  
+
+      // Make topic's name absolute
       thermalImageTopic_ = ns + "/" + thermalImageTopic_;
 
       ROS_INFO_NAMED(PKG_NAME,
@@ -288,7 +288,7 @@ namespace pandora_vision
     }
 
     // Read the name of the topic to which the thermal node will be publishing
-    // information to hole-fusion about the candidate holes found 
+    // information to hole-fusion about the candidate holes found
     // and store it in a private member variable
     if (nodeHandle_.getParam(
         ns + "/thermal_camera_node/published_topics/candidate_holes_topic",
@@ -307,7 +307,7 @@ namespace pandora_vision
     }
 
     // Read the name of the topic to which the thermal node will be publishing
-    // information to thermal cropper about the candidate holes found 
+    // information to thermal cropper about the candidate holes found
     // and store it in a private member variable
     if (nodeHandle_.getParam(
         ns + "/thermal_camera_node/published_topics/thermal_to_cropper_topic",
@@ -326,7 +326,7 @@ namespace pandora_vision
     }
 
     // Read the name of the topic to which the thermal node will be publishing
-    // information directly to Data fusion about the candidate holes found 
+    // information directly to Data fusion about the candidate holes found
     // and store it in a private member variable
     if (nodeHandle_.getParam(
         ns + "/thermal_camera_node/published_topics/thermal_data_fusion_topic",
@@ -345,7 +345,7 @@ namespace pandora_vision
 
 
   /**
-    @brief This function finds for each point of interest found it's 
+    @brief This function finds for each point of interest found it's
     probability based on the keypoint's average temperature.
     @param[out] holes [const HolesConveyor&] The points of interest found
     @param[in] temperatures [const Float32MultiArray&] The multiArray with
@@ -359,7 +359,7 @@ namespace pandora_vision
   {
     // The width and height of the input temperature multiarray
     int width = temperatures.layout.dim[1].size;
-    int height = temperatures.layout.dim[0].size; 
+    int height = temperatures.layout.dim[0].size;
 
     // For each hole find its probability
     for(unsigned int i = 0; i < holes->size(); i++)
@@ -369,7 +369,7 @@ namespace pandora_vision
       // Find the keypoint coordinates
       float temperatureX = holes->holes[i].keypoint.pt.x;
       float temperatureY = holes->holes[i].keypoint.pt.y;
-      
+
       // Convert them to int, in order to access the point in MultiArray
       int tempX = static_cast <int> (std::floor(temperatureX));
       int tempY = static_cast <int> (std::floor(temperatureY));
@@ -395,7 +395,7 @@ namespace pandora_vision
       {
         // If it is on the edges it take the temperature of the keypoint it self
         average = temperatures.data[tempY * width + tempX];
-      }      
+      }
 
       // Fill the average temperature vector
       holes->holes[i].holeTemperature = average;
@@ -413,12 +413,12 @@ namespace pandora_vision
       // Apply logistic function on the average temperature found
       else if(method == 1)
       {
-        float probability = 1/(1 + exp( -Parameters::Thermal::left_tolerance * 
-            (average - Parameters::Thermal::low_acceptable_temperature ) )) 
+        float probability = 1/(1 + exp( -Parameters::Thermal::left_tolerance *
+            (average - Parameters::Thermal::low_acceptable_temperature ) ))
             - 1/(1 + exp(- Parameters::Thermal::right_tolerance *
             (average - Parameters::Thermal::high_acceptable_temperature)));
 
-        // Push the probability in the vector 
+        // Push the probability in the vector
         holes->holes[i].holeProbability = probability;
       }
     }
@@ -560,7 +560,7 @@ namespace pandora_vision
     }
 
     //-------------------- Probability extraction Parameters -------------------
-    
+
     // The interpolation method for noise removal
     // 0 for averaging the pixel's neighbor values
     // 1 for brushfire near
@@ -570,7 +570,7 @@ namespace pandora_vision
     //-------------------- Gausian variables ---------------------
     Parameters::Thermal::optimal_temperature = config.optimal_temperature;
 
-    // As the standard deviation(tolerance) is higher we consider 
+    // As the standard deviation(tolerance) is higher we consider
     // more temperatures as valid. We handle the tolerance.
     Parameters::Thermal::tolerance = config.tolerance;
 
@@ -578,9 +578,9 @@ namespace pandora_vision
 
     // These temperatures have 50% probability.
     // Inside their range the probability grows.
-    Parameters::Thermal::low_acceptable_temperature = 
+    Parameters::Thermal::low_acceptable_temperature =
       config.low_acceptable_temperature;
-    Parameters::Thermal::high_acceptable_temperature =  
+    Parameters::Thermal::high_acceptable_temperature =
       config.high_acceptable_temperature;
 
     // These variables handle the tolerance of the temperatures.

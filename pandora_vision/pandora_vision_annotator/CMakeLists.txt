@@ -66,9 +66,6 @@ QT_WRAP_CPP(pandora_vision_annotator_node SAMPLE_MOC_SRCS
   )
 #-----------------------------------------------------------------------------#
 
-#~ set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_BUILD_TYPE Release)
-
 add_executable(pandora_vision_annotator_node
   src/annotator_node.cpp
   src/annotator_application.cpp

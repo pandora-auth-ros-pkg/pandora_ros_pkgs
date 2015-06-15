@@ -1930,7 +1930,7 @@ namespace pandora_vision
       holeMsg.holeId = holeId;
 
       // Fill the overall holes found message with the current hole message
-      holesVectorMsg.holesDirections.push_back(holeMsg);
+      holesVectorMsg.alerts.push_back(holeMsg);
 
       holeId++;
     }

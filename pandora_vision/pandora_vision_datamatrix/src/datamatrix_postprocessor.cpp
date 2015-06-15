@@ -58,19 +58,22 @@ namespace pandora_vision
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
     output->header = alertVector.header;
+    if (alertVector.alerts.size() == 0)
+      return false;
 
-    for (int ii = 0; ii < alertVector.generalAlerts.size(); ii++)
+    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
     {
       pandora_vision_msgs::DataMatrixAlert dataMatrixAlert;
 
-      dataMatrixAlert.info.yaw = alertVector.generalAlerts[ii].yaw;
-      dataMatrixAlert.info.pitch = alertVector.generalAlerts[ii].pitch;
+      dataMatrixAlert.info.yaw = alertVector.alerts[ii].yaw;
+      dataMatrixAlert.info.pitch = alertVector.alerts[ii].pitch;
+      dataMatrixAlert.info.probability = 0.90;
 
       boost::shared_ptr<DataMatrixPOI> dataMatrixPOI(
         boost::dynamic_pointer_cast<DataMatrixPOI>(input->pois[ii]));
       dataMatrixAlert.datamatrixContent = dataMatrixPOI->getContent();
 
-      output->dataMatrixAlerts.push_back(dataMatrixAlert);
+      output->alerts.push_back(dataMatrixAlert);
     }
     return true;
   }

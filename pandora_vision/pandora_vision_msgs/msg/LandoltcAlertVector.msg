@@ -1,2 +1,2 @@
 Header header
-pandora_vision_msgs/LandoltcAlert[] landoltcAlerts
+pandora_vision_msgs/LandoltcAlert[] alerts

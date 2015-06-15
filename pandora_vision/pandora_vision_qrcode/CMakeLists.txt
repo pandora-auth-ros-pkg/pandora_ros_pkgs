@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_qrcode)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     pandora_vision_common

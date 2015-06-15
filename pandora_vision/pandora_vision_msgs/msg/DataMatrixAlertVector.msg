@@ -1,2 +1,2 @@
 Header header
-pandora_vision_msgs/DataMatrixAlert[] dataMatrixAlerts
+pandora_vision_msgs/DataMatrixAlert[] alerts
