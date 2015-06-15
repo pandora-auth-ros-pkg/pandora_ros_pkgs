@@ -44,6 +44,8 @@ import rospy
 
 from pandora_vision_msgs.msg import HoleDirectionAlert
 from pandora_vision_msgs.msg import HoleDirectionAlertVector
+from pandora_vision_msgs.msg import ThermalAlert
+from pandora_vision_msgs.msg import ThermalAlertVector
 from pandora_vision_msgs.msg import HazmatAlert
 from pandora_vision_msgs.msg import HazmatAlertVector
 from pandora_vision_msgs.msg import QRAlert
@@ -84,6 +86,9 @@ class AlertDeliveryBoy():
         self.hole_msg = HoleDirectionAlertVector()
         self.hole_msg.header.frame_id = self.frame_id
 
+        self.thermal_msg = ThermalAlertVector()
+        self.thermal_msg.header.frame_id = self.frame_id
+
         self.general_msg = GeneralAlertVector()
         self.general_msg.header.frame_id = self.frame_id
 
@@ -102,9 +107,9 @@ class AlertDeliveryBoy():
         self.dataMatrixDeliveryAddress = '/vision/dataMatrix_alert'
         self.dataMatrix_pub = rospy.Publisher(self.dataMatrixDeliveryAddress,
                                       DataMatrixAlertVector)
-        self.thermalDeliveryAddress = '/sensor_processing/thermal_direction_alert'
+        self.thermalDeliveryAddress = '/vision/thermal_direction_alert'
         self.thermal_pub = rospy.Publisher(self.thermalDeliveryAddress,
-                                       GeneralAlertVector)
+                                       ThermalAlertVector)
         self.victimImageDeliveryAddress = '/vision/victim_direction_alert'
         self.victimImage_pub = rospy.Publisher(self.victimImageDeliveryAddress,
                                        GeneralAlertVector)
@@ -212,12 +217,17 @@ class AlertDeliveryBoy():
 
     def deliverThermalOrder(self, orderYaw, orderPitch, orderProbability,
             publish=True):
-        msg = self.makeGeneralAlertVector(orderYaw, orderPitch, orderProbability)
+        self.thermal_msg.header.stamp = rospy.get_rostime()
+        self.thermal_msg.alerts = []
+        msg = ThermalAlert(
+                info=self.makeGeneralAlertInfo(orderYaw, orderPitch, orderProbability),
+                temperature=35.0)
+        self.thermal_msg.alerts.append(msg)
         if publish:
-            self.thermal_pub.publish(msg)
+            self.thermal_pub.publish(self.thermal_msg)
             rospy.sleep(0.1)
         else:
-            return msg
+            return self.thermal_msg
 
     def deliverVictimImageOrder(self, orderYaw, orderPitch, orderProbability,
             publish=True):
