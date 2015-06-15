@@ -1,2 +1,2 @@
 Header header
-pandora_common_msgs/GeneralAlertInfo[] generalAlerts
+pandora_common_msgs/GeneralAlertInfo[] alerts
