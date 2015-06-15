@@ -3,9 +3,9 @@ subscribed_topics:
   input_topic: /kinect/depth_registered/points
 
   # Temporary topic for rosbags
-  input_thermal_topic: /flir_lepton/fused_msg
+  # input_thermal_topic: /flir_lepton/fused_msg
   # Real topic after integration
-  # input_thermal_topic: /rpi2/thermal/fused_msg
+  input_thermal_topic: /rpi2/thermal/fused_msg
 
   # Topics in synchronizer node
   synchronized_topic: synchronized/message/info
@@ -14,7 +14,7 @@ subscribed_topics:
   leave_subscription_to_input: leave_subscription_to_input
 
   # From thermal cropper
-  thermal_unlock_synchronizer_topic: thermal/unlock/synchronizer  
+  thermal_unlock_synchronizer_topic: thermal/unlock/synchronizer
 
 published_topics:
   # Topics in synchronizer node

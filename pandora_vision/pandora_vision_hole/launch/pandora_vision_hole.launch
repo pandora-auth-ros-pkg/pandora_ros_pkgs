@@ -29,14 +29,14 @@
   </node>
 
   <!-- ======================= RGBDT Synchronizer node ===================== -->
-  
+
   <node name="rgb_depth_thermal_synchronizer_node"
         type="rgb_depth_thermal_synchronizer.py"
         pkg="pandora_vision_hole"
         respawn="false"
         output="$(arg output)"
         ns="$(arg namespace)">
-        
+
 
     <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_node_topics.yaml"
               command="load" />
@@ -82,8 +82,8 @@
     command="load" />
 
     <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_matching_variables.yaml"
-    command="load" /> 
-   
+    command="load" />
+
   </node>
 
   <!-- ====================== Thermal Cropper node ========================= -->
