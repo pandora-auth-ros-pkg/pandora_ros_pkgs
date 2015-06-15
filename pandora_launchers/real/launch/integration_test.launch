@@ -14,6 +14,8 @@
   <arg name="arm" default="true"/>
   <arg name="hardware_tools" default="true"/>
 
+  <arg name="rpi" default="true" />
+
   <arg name="stabilizer" default="true"/>
   <arg name="eef" default="true"/>
 
@@ -69,6 +71,9 @@
   </group>
   <group if="$(arg hardware_tools)">
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
+  </group>
+  <group if="$(arg rpi)">
+    <include file="$(find pandora_launchers)/remote_machines/launch/rpi_flir.launch" />
   </group>
 
   <!-- Control -->
