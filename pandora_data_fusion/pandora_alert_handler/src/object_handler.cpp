@@ -80,39 +80,11 @@ namespace pandora_data_fusion
     void ObjectHandler::handleHoles(const HolePtrVectorPtr& newHoles,
         const tf::Transform& transform)
     {
-      keepValidHoles(newHoles, transform);
+      keepValidObjects<Hole>(newHoles, transform);
 
       for (int ii = 0; ii < newHoles->size(); ++ii)
       {
         Hole::getList()->add(newHoles->at(ii));
-      }
-    }
-
-    void ObjectHandler::keepValidHoles(const HolePtrVectorPtr& holesPtr,
-        const tf::Transform& transform)
-    {
-      tf::Vector3 origin = transform.getOrigin();
-      geometry_msgs::Point framePosition = Utils::vector3ToPoint(origin);
-
-      HolePtrVector::iterator iter = holesPtr->begin();
-
-      while (iter != holesPtr->end())
-      {
-        bool invalid = !Utils::arePointsInRange((*iter)->getPose().position,
-            framePosition, Hole::is3D, SENSOR_RANGE);
-
-        if (invalid)
-        {
-          ROS_DEBUG_NAMED("ALERT_HANDLER",
-              "[OBJECT_HANDLER %d] Deleting not valid hole...", __LINE__);
-          ROS_DEBUG_NAMED("ALERT_HANDLER",
-              "[OBJECT_HANDLER %d] SENSOR_RANGE = %f", __LINE__, SENSOR_RANGE);
-          iter = holesPtr->erase(iter);
-        }
-        else
-        {
-          ++iter;
-        }
       }
     }
 

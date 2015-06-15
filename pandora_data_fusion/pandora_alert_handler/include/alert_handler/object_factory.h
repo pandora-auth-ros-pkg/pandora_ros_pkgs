@@ -74,9 +74,9 @@ namespace pandora_data_fusion
           typename ObjectType::PtrVectorPtr makeObjects(
               const typename ObjectType::AlertVector& msg);
 
-        tf::Transform getCurrentHoleTransform() const
+        tf::Transform getCurrentTransform() const
         {
-          return currentHoleTransform_;
+          return currentTransform_;
         }
 
         void dynamicReconfigForward(float occupiedCellThres,
@@ -100,7 +100,7 @@ namespace pandora_data_fusion
               const tf::Transform& transform);
 
       private:
-        tf::Transform currentHoleTransform_;
+        tf::Transform currentTransform_;
 
         PoseFinderPtr poseFinder_;
     };
@@ -109,8 +109,7 @@ namespace pandora_data_fusion
     typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
         const typename ObjectType::AlertVector& msg)
     {
-      tf::Transform transform;
-      transform = poseFinder_->lookupTransformFromWorld(msg.header);
+      currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
 
       typename ObjectType::PtrVectorPtr objectsVectorPtr(
           new typename ObjectType::PtrVector);
@@ -119,7 +118,7 @@ namespace pandora_data_fusion
         {
           typename ObjectType::Ptr newObject( new ObjectType );
           setUpObject<ObjectType>(newObject, msg.alerts[ii],
-                                  msg.header.stamp, transform);
+                                  msg.header.stamp, currentTransform_);
           objectsVectorPtr->push_back(newObject);
         }
         catch (AlertException ex)

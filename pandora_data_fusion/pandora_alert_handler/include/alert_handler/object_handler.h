@@ -89,7 +89,8 @@ namespace pandora_data_fusion
          */
         template <class ObjectType>
         void handleObjects(
-            const typename ObjectType::PtrVectorPtr& objectsPtr);
+            const typename ObjectType::PtrVectorPtr& objectsPtr,
+            const tf::Transform& transform);
 
         /**
          * @brief parameter updating from dynamic reconfiguration
@@ -104,13 +105,14 @@ namespace pandora_data_fusion
       private:
         /**
          * @brief Alert filtering for holes.
-         * @param holesPtr [HolePtrVectorPtr const&] vector with newly
-         * created hole alerts
+         * @param objectsPtr [ObjectType::PtrVectorPtr const&] vector with newly
+         * created object alerts
          * @param cameraTransform [tf::Transform const&] camera transform gives
          * current location
          * @return void
          */
-        void keepValidHoles(const HolePtrVectorPtr& holesPtr,
+        template <class ObjectType>
+        void keepValidObjects(const typename ObjectType::PtrVectorPtr& objectsPtr,
             const tf::Transform& cameraTransform);
         template <class ObjectType>
           void keepValidVerificationObjects(
@@ -129,16 +131,46 @@ namespace pandora_data_fusion
         float VICTIM_CLUSTER_RADIUS;
     };
 
+    template <class ObjectType>
+    void ObjectHandler::keepValidObjects(
+        const typename ObjectType::PtrVectorPtr& objectsPtr,
+        const tf::Transform& transform)
+    {
+      tf::Vector3 origin = transform.getOrigin();
+      geometry_msgs::Point framePosition = Utils::vector3ToPoint(origin);
+
+      typename ObjectType::PtrVector::iterator iter = objectsPtr->begin();
+
+      while (iter != objectsPtr->end())
+      {
+        bool invalid = !Utils::arePointsInRange((*iter)->getPose().position,
+            framePosition, ObjectType::is3D, SENSOR_RANGE);
+
+        if (invalid)
+        {
+          ROS_INFO_NAMED("ALERT_HANDLER",
+              "[OBJECT_HANDLER %d] Deleting not valid object...", __LINE__);
+          ROS_INFO_NAMED("ALERT_HANDLER",
+              "[OBJECT_HANDLER %d] SENSOR_RANGE = %f", __LINE__, SENSOR_RANGE);
+          iter = objectsPtr->erase(iter);
+        }
+        else
+        {
+          ++iter;
+        }
+      }
+    }
+
     /**
      * @details keepValidVerificationObjects should not be called for
      * symbol pois (qr, hazmat, landoltc, datamatrix) as well as thermal
      */
     template <class ObjectType>
     void ObjectHandler::handleObjects(
-        const typename ObjectType::PtrVectorPtr& newObjects)
+        const typename ObjectType::PtrVectorPtr& newObjects,
+        const tf::Transform& transform)
     {
       if (ObjectType::getObjectType() != VictimImage::getObjectType() &&
-          ObjectType::getObjectType() != Thermal::getObjectType() &&
           ObjectType::getObjectType() != Hazmat::getObjectType() &&
           ObjectType::getObjectType() != Landoltc::getObjectType() &&
           ObjectType::getObjectType() != DataMatrix::getObjectType()) {
@@ -155,7 +187,25 @@ namespace pandora_data_fusion
     }
 
     template <>
-    void ObjectHandler::handleObjects<Qr>(const typename Qr::PtrVectorPtr& newQrs)
+    void ObjectHandler::handleObjects<Thermal>(
+        const typename Thermal::PtrVectorPtr& newObjects,
+        const tf::Transform& transform)
+    {
+      keepValidObjects<Thermal>(newObjects, transform);
+      for (int ii = 0; ii < newObjects->size(); ++ii) {
+        if (Thermal::getList()->add(newObjects->at(ii))) {
+          std_msgs::Int32 updateScoreMsg;
+          roboCupScore_ += Thermal::getObjectScore();
+          updateScoreMsg.data = roboCupScore_;
+          scorePublisher_.publish(updateScoreMsg);
+        }
+      }
+    }
+
+    template <>
+    void ObjectHandler::handleObjects<Qr>(
+        const typename Qr::PtrVectorPtr& newQrs,
+        const tf::Transform& transform)
     {
       for (int ii = 0; ii < newQrs->size(); ++ii)
       {

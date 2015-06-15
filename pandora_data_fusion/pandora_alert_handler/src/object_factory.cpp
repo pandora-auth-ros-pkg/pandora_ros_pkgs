@@ -53,7 +53,7 @@ namespace pandora_data_fusion
     HolePtrVectorPtr ObjectFactory::makeHoles(
         const pandora_vision_msgs::HoleDirectionAlertVector& msg)
     {
-      currentHoleTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
+      currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
 
       HolePtrVectorPtr holesVectorPtr( new HolePtrVector );
       for (int ii = 0; ii < msg.alerts.size(); ++ii)
@@ -62,7 +62,7 @@ namespace pandora_data_fusion
         {
           HolePtr newHole( new Hole );
           setUpObject<Hole>(newHole, msg.alerts[ii], msg.header.stamp,
-              currentHoleTransform_);
+              currentTransform_);
           holesVectorPtr->push_back(newHole);
         }
         catch (AlertException ex)

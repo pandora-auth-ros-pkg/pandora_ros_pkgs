@@ -286,7 +286,8 @@ namespace pandora_data_fusion
           return;
         }
 
-        objectHandler_->handleObjects<ObjectType>(objectsVectorPtr);
+        tf::Transform transform = objectFactory_->getCurrentTransform();
+        objectHandler_->handleObjects<ObjectType>(objectsVectorPtr, transform);
 
         if (ObjectType::isVictimAlert)
         {
@@ -295,28 +296,28 @@ namespace pandora_data_fusion
         }
       }
 
-  template <>
-    void AlertHandler::alertCallback<Hole>(
-        const typename Hole::AlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Hole::getObjectType() << " ALERT ARRIVED!");
-
-      HolePtrVectorPtr holesVectorPtr;
-      try
+    template <>
+      void AlertHandler::alertCallback<Hole>(
+          const typename Hole::AlertVector& msg)
       {
-        holesVectorPtr = objectFactory_->makeHoles(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
+        if (map_->data.size() == 0)
+          return;
 
-      tf::Transform transform = objectFactory_->getCurrentHoleTransform();
+        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+            Hole::getObjectType() << " ALERT ARRIVED!");
+
+        HolePtrVectorPtr holesVectorPtr;
+        try
+        {
+          holesVectorPtr = objectFactory_->makeHoles(msg);
+        }
+        catch (TfException ex)
+        {
+          ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+          return;
+        }
+
+      tf::Transform transform = objectFactory_->getCurrentTransform();
       objectHandler_->handleHoles(holesVectorPtr, transform);
 
       victimHandler_->notify();
