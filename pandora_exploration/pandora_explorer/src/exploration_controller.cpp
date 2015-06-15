@@ -47,10 +47,7 @@ ExplorationController::ExplorationController()
     aborted_(false),
     do_exploration_server_(nh_, "do_exploration",
                            boost::bind(&ExplorationController::executeCb, this, _1), false),
-    move_base_client_("move_base", true),
-    first_time_(true),
-    goal_reached_(false),
-    goal_expired_count_(0)
+    move_base_client_("move_base", true)
 {
   // create explore frontier goal selector
   explore_goal_selector_.reset(new FrontierGoalSelector("explore"));
@@ -103,11 +100,11 @@ void ExplorationController::executeCb(
 
   // while we didn't receive a preempt request
   while (ros::ok() && do_exploration_server_.isActive()) {
-    // we reached maximum goal searches retries
-    // if we reach maximum goal searches but there are frontiers found
-    // should not set succeed the exploration
-    // Maybe we should wait move_base to finish
-    if (goal_searches_count_ >= max_goal_searches_ && goal_reached_) {
+    
+    // if we can't find more frontiers and we have reached our goal we end the exploration
+    if (goal_searches_count_ >= max_goal_searches_ && goalReached() )
+    {
+      ROS_WARN("[pandora_explorer] No more frontiers, goal reached, exploration successful");
       do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
       "[pandora_explorer] Max retries reached, we could not find more goals - exploration completed");
       return;
@@ -140,12 +137,7 @@ void ExplorationController::executeCb(
     // if succes is false, dld an den exei vrei stoxo, auksanoume ta goal searches
     if (!success) {
       goal_searches_count_++;
-      if(goal_searches_count_ > max_goal_searches_)
-      {
-        do_exploration_server_.setSucceeded(pandora_exploration_msgs::DoExplorationResult(),
-      "[pandora_explorer] Exploration completed");
-        return;
-      }  
+      
       // wait a little
       ros::Duration(0.2).sleep();
       continue;
@@ -172,14 +164,27 @@ void ExplorationController::executeCb(
         coverage_goal_selector_->setSelectedGoal(current_goal_);
     }
 
-    while (ros::ok() && do_exploration_server_.isActive() && goal_reached_ != true && !isTimeReached() &&
+    while (ros::ok() && do_exploration_server_.isActive() && !goalReached() && !isTimeReached() &&
            !aborted_)
       ros::Duration(0.1).sleep();
-    goal_reached_ = false;
   }  // end of outer while
 
   // goal should never be active at this point
   ROS_ASSERT(!do_exploration_server_.isActive());
+}
+
+bool ExplorationController::goalReached()
+{
+  if(move_base_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  {
+    ROS_WARN("[pandora_explorer] Goal Reached");
+    return true;  
+  }
+  else
+  {
+    return false;
+  }
+  
 }
 
 void ExplorationController::feedbackMovingCb(
@@ -195,15 +200,6 @@ void ExplorationController::doneMovingCb(const actionlib::SimpleClientGoalState&
   if (state == actionlib::SimpleClientGoalState::ABORTED) {
     abort_count_++;
     aborted_ = true;
-    //ROS_WARN("[pandora_explorer] Abort state");
-    //ROS_INFO("abort_count [%d]",abort_count_ );
-  }
-  if (state == actionlib::SimpleClientGoalState::SUCCEEDED)
-  {
-    ROS_WARN("[pandora_explorer] How much fire tell me");
-    //ROS_INFO("goal searches [%d]",goal_searches_count_ );
-    //ROS_INFO("Goal reached [%d]", goal_reached_);
-    goal_reached_ = true;
   }
 }
 

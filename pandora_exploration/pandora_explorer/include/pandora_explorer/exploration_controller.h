@@ -117,7 +117,7 @@ class ExplorationController {
     * @return True if time expired
     */
   bool isTimeReached();
-
+  bool goalReached();
  private:
   ros::NodeHandle nh_;
   ros::NodeHandle private_nh_;
@@ -152,7 +152,7 @@ class ExplorationController {
   pandora_exploration_msgs::DoExplorationFeedback feedback_;
 
   boost::shared_ptr<boost::thread> computation_thread_;
-  bool goal_reached_;  // true if move_base reached it's goal
+  
   bool first_time_;
   int goal_expired_count_;  // number of times a goal has expired
 };
