@@ -65,8 +65,124 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr< ObjectList<DerivedObject> > ListPtr;
         typedef boost::shared_ptr< const ObjectList<DerivedObject> > ListConstPtr;
 
+        /**
+         * @brief Setter for member type_
+         * @param type [std::string] The new type value
+         * @return void
+         */
+        static void setObjectType(std::string type)
+        {
+          type_ = type;
+        }
+
+        /**
+         * @brief Getter for static object type's score.
+         * @return int score
+         */
+        static int getObjectScore()
+        {
+          return objectScore_;
+        }
+
+        /**
+         * @brief Getter for static object type's probability threshold.
+         * @return float probability
+         */
+        static float getProbabilityThres()
+        {
+          return probabilityThres_;
+        }
+
+        /**
+         * @brief Getter for static distance threshold.
+         * @return float distanceThres
+         */
+        static float getDistanceThres()
+        {
+          return distanceThres_;
+        }
+
+        /**
+         * @brief Getter for static merge threshold.
+         * @return float mergeDistance
+         */
+        static float getMergeDistance()
+        {
+          return mergeDistance_;
+        }
+
+        /**
+         * @brief Method for accessing DerivedObject's associated list.
+         * @return ListPtr the list
+         */
+        static ListPtr getList()
+        {
+          return listPtr_;
+        }
+
+        /**
+         * @brief Getter for member type_
+         * @return std::string type
+         */
+        static std::string getObjectType()
+        {
+          return type_;
+        }
+
+        /**
+         * @brief Setter for static distance threshold.
+         * @param distanceThres [float] distance
+         * @return void
+         */
+        static void setDistanceThres(float distanceThres)
+        {
+          distanceThres_ = distanceThres;
+        }
+
+        /**
+         * @brief Setter for static merge threshold.
+         * @param mergeDistance [float] distance
+         * @return void
+         */
+        static void setMergeDistance(float mergeDistance)
+        {
+          mergeDistance_ = mergeDistance;
+        }
+
+        /**
+         * @brief Setter for static object type's score.
+         * @param objectScore [int] score
+         * @return void
+         */
+        static void setObjectScore(int objectScore)
+        {
+          objectScore_ = objectScore;
+        }
+
+        /**
+         * @brief Setter for static object type's probability threshold.
+         * @param probabilityThres [float] probability
+         * @return void
+         */
+        static void setProbabilityThres(float probabilityThres)
+        {
+          probabilityThres_ = probabilityThres;
+        }
+
+        /**
+         * @brief Setter for static pointer to the list that will be filled
+         * by DerivedObjects.
+         * @param listPtr [ListPtr] pointer to list
+         * @return void
+         */
+        static void setList(ListPtr listPtr)
+        {
+          listPtr_ = listPtr;
+        }
+
       public:
         static bool is3D;
+        static bool isVictimAlert;
 
       protected:
         //!< Variable with objects' min distance.
@@ -134,15 +250,6 @@ namespace pandora_data_fusion
           return legit_;
         }
 
-        /**
-         * @brief Getter for member type_
-         * @return std::string type
-         */
-        static std::string getObjectType()
-        {
-          return type_;
-        }
-
         std::string getType() const
         {
           return type_;
@@ -170,7 +277,7 @@ namespace pandora_data_fusion
          * @brief Getter for member pose_
          * @return geometry_msgs::Pose& The object's pose
          */
-        const Pose& getPose() const
+        Pose getPose() const
         {
           return pose_;
         }
@@ -182,51 +289,6 @@ namespace pandora_data_fusion
         std::string getFrameId() const
         {
           return frame_id_;
-        }
-
-        /**
-         * @brief Getter for static object type's score.
-         * @return int score
-         */
-        static int getObjectScore()
-        {
-          return objectScore_;
-        }
-
-        /**
-         * @brief Getter for static object type's probability threshold.
-         * @return float probability
-         */
-        static float getProbabilityThres()
-        {
-          return probabilityThres_;
-        }
-
-        /**
-         * @brief Getter for static distance threshold.
-         * @return float distanceThres
-         */
-        static float getDistanceThres()
-        {
-          return distanceThres_;
-        }
-
-        /**
-         * @brief Getter for static merge threshold.
-         * @return float mergeDistance
-         */
-        static float getMergeDistance()
-        {
-          return mergeDistance_;
-        }
-
-        /**
-         * @brief Method for accessing DerivedObject's associated list.
-         * @return ListPtr the list
-         */
-        static ListPtr getList()
-        {
-          return listPtr_;
         }
 
         /**
@@ -248,16 +310,6 @@ namespace pandora_data_fusion
         void setLegit(bool legit)
         {
           legit_ = legit;
-        }
-
-        /**
-         * @brief Setter for member type_
-         * @param type [std::string] The new type value
-         * @return void
-         */
-        static void setObjectType(std::string type)
-        {
-          type_ = type;
         }
 
         /**
@@ -289,57 +341,6 @@ namespace pandora_data_fusion
           pose_ = pose;
         }
 
-        /**
-         * @brief Setter for static distance threshold.
-         * @param distanceThres [float] distance
-         * @return void
-         */
-        static void setDistanceThres(float distanceThres)
-        {
-          distanceThres_ = distanceThres;
-        }
-
-        /**
-         * @brief Setter for static merge threshold.
-         * @param mergeDistance [float] distance
-         * @return void
-         */
-        static void setMergeDistance(float mergeDistance)
-        {
-          mergeDistance_ = mergeDistance;
-        }
-
-        /**
-         * @brief Setter for static object type's score.
-         * @param objectScore [int] score
-         * @return void
-         */
-        static void setObjectScore(int objectScore)
-        {
-          objectScore_ = objectScore;
-        }
-
-        /**
-         * @brief Setter for static object type's probability threshold.
-         * @param probabilityThres [float] probability
-         * @return void
-         */
-        static void setProbabilityThres(float probabilityThres)
-        {
-          probabilityThres_ = probabilityThres;
-        }
-
-        /**
-         * @brief Setter for static pointer to the list that will be filled
-         * by DerivedObjects.
-         * @param listPtr [ListPtr] pointer to list
-         * @return void
-         */
-        static void setList(ListPtr listPtr)
-        {
-          listPtr_ = listPtr;
-        }
-
       protected:
         //!< The object's id
         int id_;
@@ -367,6 +368,8 @@ namespace pandora_data_fusion
 
     template <class DerivedObject>
       bool Object<DerivedObject>::is3D = true;
+    template <class DerivedObject>
+      bool Object<DerivedObject>::isVictimAlert = true;
     template <class DerivedObject>
       float Object<DerivedObject>::distanceThres_ = 0.5;
     template <class DerivedObject>

@@ -41,6 +41,9 @@
 
 #include <vector>
 
+#include "pandora_common_msgs/GeneralAlertVector.h"
+#include "pandora_common_msgs/GeneralAlertInfo.h"
+
 #include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
@@ -64,7 +67,15 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Sound> > ListConstPtr;
 
+        typedef pandora_common_msgs::GeneralAlertInfo Alert;
+        typedef pandora_common_msgs::GeneralAlertVector AlertVector;
+
       public:
+        static void setUpObject(const Ptr& ptr, const Alert& msg)
+        {
+          return;
+        }
+
         /**
          * @brief Constructor
          */

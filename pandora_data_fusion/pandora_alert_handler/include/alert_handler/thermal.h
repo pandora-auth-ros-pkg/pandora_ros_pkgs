@@ -41,6 +41,9 @@
 
 #include <vector>
 
+#include "pandora_vision_msgs/ThermalAlertVector.h"
+#include "pandora_vision_msgs/ThermalAlert.h"
+
 #include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
@@ -62,12 +65,39 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Thermal> > ListConstPtr;
 
+        typedef pandora_vision_msgs::ThermalAlertVector AlertVector;
+        typedef pandora_vision_msgs::ThermalAlert Alert;
+
+      public:
+        static void setUpObject(const Ptr& ptr, const Alert& msg)
+        {
+          ptr->setTemperature(msg.temperature);
+        }
+
         /**
          * @brief Constructor
          */
         Thermal();
 
         virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+
+        /**
+         * @brief Setter for Thermal object's temperature
+         * @param temperature [float] poi's temperature
+         * @return nothing
+         */
+        void
+        setTemperature(float temperature);
+
+        /**
+         * @brief Getter for Thermal object's temperature
+         * @return poi's temperature
+         */
+        float
+        getTemperature() const;
+
+      private:
+        float temperature_;
     };
 
     typedef Thermal::Ptr ThermalPtr;

@@ -107,6 +107,17 @@ namespace pandora_data_fusion
       Motion::is3D = true;
       VictimImage::is3D = true;
 
+      Hazmat::isVictimAlert = false;
+      Qr::isVictimAlert = false;
+      Landoltc::isVictimAlert = false;
+      DataMatrix::isVictimAlert = false;
+      Sound::isVictimAlert = true;
+      Co2::isVictimAlert = true;
+      Hole::isVictimAlert = true;
+      Thermal::isVictimAlert = true;
+      Motion::isVictimAlert = true;
+      VictimImage::isVictimAlert = true;
+
       victimsToGo_.reset( new VictimList );
       victimsVisited_.reset( new VictimList );
 
@@ -143,33 +154,29 @@ namespace pandora_data_fusion
     void AlertHandler::initRosInterfaces()
     {
       // Alert-concerned Subscribers
-      setSubscriber <pandora_vision_msgs::QRAlertVector const&>
-        (Qr::getObjectType(), &AlertHandler::qrAlertCallback);
-      setSubscriber <pandora_vision_msgs::HazmatAlertVector const&>
-        (Hazmat::getObjectType(), &AlertHandler::hazmatAlertCallback);
-      setSubscriber <pandora_vision_msgs::LandoltcAlertVector const&>
-        (Landoltc::getObjectType(), &AlertHandler::landoltcAlertCallback);
-      setSubscriber <pandora_vision_msgs::DataMatrixAlertVector const&>
-        (DataMatrix::getObjectType(), &AlertHandler::dataMatrixAlertCallback);
 
-      setSubscriber <pandora_vision_msgs::HoleDirectionAlertVector const&>
-        (Hole::getObjectType(), &AlertHandler::holeAlertCallback);
-      setSubscriber <pandora_common_msgs::GeneralAlertVector const&>
-        (Thermal::getObjectType(), &AlertHandler::victimAlertCallback<Thermal>);
-      setSubscriber <pandora_common_msgs::GeneralAlertVector const&>
-        (VictimImage::getObjectType(), &AlertHandler::victimAlertCallback<VictimImage>);
-      setSubscriber <pandora_common_msgs::GeneralAlertVector const&>
-        (Co2::getObjectType(), &AlertHandler::victimAlertCallback<Co2>);
-      setSubscriber <pandora_common_msgs::GeneralAlertVector const&>
-        (Motion::getObjectType(), &AlertHandler::victimAlertCallback<Motion>);
-      setSubscriber <pandora_common_msgs::GeneralAlertVector const&>
-        (Sound::getObjectType(), &AlertHandler::victimAlertCallback<Sound>);
+      setSubscriber<Qr>();
+      setSubscriber<Hazmat>();
+      setSubscriber<Landoltc>();
+      setSubscriber<DataMatrix>();
+      setSubscriber<Hole>();
+      setSubscriber<Thermal>();
+      setSubscriber<VictimImage>();
+      setSubscriber<Co2>();
+      setSubscriber<Motion>();
+      setSubscriber<Sound>();
 
       // Map Subscriber
-      setSubscriber <nav_msgs::OccupancyGridConstPtr const&>
-        ("map", &AlertHandler::updateMap);
-
       std::string param;
+      if (nh_->getParam("subscribed_topic_names/map", param))
+      {
+        mapSubscriber_ = nh_->subscribe(param, 1, &AlertHandler::updateMap, this);
+      }
+      else
+      {
+        ROS_FATAL("[ALERT_HANDLER] map topic name param not found");
+        ROS_BREAK();
+      }
 
       // Publishers
       if (nh_->getParam("published_topic_names/world_model", param))
@@ -264,128 +271,6 @@ namespace pandora_data_fusion
       // Timers
       tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1),
           &AlertHandler::tfPublisherCallback, this);
-    }
-
-    /*  Alert-concerned Callbacks  */
-
-    void AlertHandler::holeAlertCallback(
-        const pandora_vision_msgs::HoleDirectionAlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Hole::getObjectType() << " ALERT ARRIVED!");
-
-      HolePtrVectorPtr holesVectorPtr;
-      try
-      {
-        holesVectorPtr = objectFactory_->makeHoles(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
-      tf::Transform transform = objectFactory_->getCurrentHoleTransform();
-      objectHandler_->handleHoles(holesVectorPtr, transform);
-
-      victimHandler_->notify();
-
-      publishVictims();
-    }
-
-    void AlertHandler::hazmatAlertCallback(
-        const pandora_vision_msgs::HazmatAlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Hazmat::getObjectType() << " ALERT ARRIVED!");
-
-      HazmatPtrVectorPtr hazmatsVectorPtr;
-      try
-      {
-        hazmatsVectorPtr = objectFactory_->makeHazmats(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d]%s",  __LINE__, ex.what());
-        return;
-      }
-
-      objectHandler_->handleObjects<Hazmat>(hazmatsVectorPtr);
-    }
-
-    void AlertHandler::qrAlertCallback(
-        const pandora_vision_msgs::QRAlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Qr::getObjectType() << " ALERT ARRIVED!");
-
-      QrPtrVectorPtr qrsVectorPtr;
-      try
-      {
-        qrsVectorPtr = objectFactory_->makeQrs(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
-      objectHandler_->handleQrs(qrsVectorPtr);
-    }
-
-    void AlertHandler::landoltcAlertCallback(
-        const pandora_vision_msgs::LandoltcAlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Landoltc::getObjectType() << " ALERT ARRIVED!");
-
-      LandoltcPtrVectorPtr landoltcsVectorPtr;
-      try
-      {
-        landoltcsVectorPtr = objectFactory_->makeLandoltcs(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
-      objectHandler_->handleObjects<Landoltc>(landoltcsVectorPtr);
-    }
-
-    void AlertHandler::dataMatrixAlertCallback(
-        const pandora_vision_msgs::DataMatrixAlertVector& msg)
-    {
-      if (map_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          DataMatrix::getObjectType() << " ALERT ARRIVED!");
-
-      DataMatrixPtrVectorPtr dataMatricesVectorPtr;
-      try
-      {
-        dataMatricesVectorPtr = objectFactory_->makeDataMatrices(msg);
-      }
-      catch (TfException ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
-      objectHandler_->handleObjects<DataMatrix>(dataMatricesVectorPtr);
     }
 
     /*  Other Callbacks  */

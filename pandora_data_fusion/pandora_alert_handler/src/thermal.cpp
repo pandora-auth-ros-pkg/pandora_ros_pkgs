@@ -80,6 +80,20 @@ namespace pandora_data_fusion
       markers->markers.push_back(description);
     }
 
+    void
+    Thermal::
+    setTemperature(float temperature)
+    {
+      temperature_ = temperature;
+    }
+
+    float
+    Thermal::
+    getTemperature() const
+    {
+      return temperature_;
+    }
+
+
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-

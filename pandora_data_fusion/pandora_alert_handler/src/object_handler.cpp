@@ -88,27 +88,6 @@ namespace pandora_data_fusion
       }
     }
 
-    void ObjectHandler::handleQrs(const QrPtrVectorPtr& newQrs)
-    {
-      for (int ii = 0; ii < newQrs->size(); ++ii)
-      {
-        if (Qr::getList()->add(newQrs->at(ii)))
-        {
-          pandora_data_fusion_msgs::QrNotificationMsg newQrNofifyMsg;
-          newQrNofifyMsg.header.stamp = newQrs->at(ii)->getTimeFound();
-          newQrNofifyMsg.header.frame_id = newQrs->at(ii)->getFrameId();
-          newQrNofifyMsg.x = newQrs->at(ii)->getPose().position.x;
-          newQrNofifyMsg.y = newQrs->at(ii)->getPose().position.y;
-          newQrNofifyMsg.content = newQrs->at(ii)->getContent();
-          qrPublisher_.publish(newQrNofifyMsg);
-          std_msgs::Int32 updateScoreMsg;
-          roboCupScore_ += Qr::getObjectScore();
-          updateScoreMsg.data = roboCupScore_;
-          scorePublisher_.publish(updateScoreMsg);
-        }
-      }
-    }
-
     void ObjectHandler::keepValidHoles(const HolePtrVectorPtr& holesPtr,
         const tf::Transform& transform)
     {

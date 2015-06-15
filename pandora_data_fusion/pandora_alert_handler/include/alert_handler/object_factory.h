@@ -52,6 +52,7 @@
 #include "pandora_vision_msgs/DataMatrixAlertVector.h"
 #include "pandora_vision_msgs/LandoltcAlertVector.h"
 #include "pandora_common_msgs/GeneralAlertVector.h"
+#include "pandora_common_msgs/GeneralAlertInfo.h"
 
 #include "alert_handler/pose_finder.h"
 #include "alert_handler/objects.h"
@@ -69,17 +70,9 @@ namespace pandora_data_fusion
 
         HolePtrVectorPtr makeHoles(
             const pandora_vision_msgs::HoleDirectionAlertVector& msg);
-        HazmatPtrVectorPtr makeHazmats(
-            const pandora_vision_msgs::HazmatAlertVector& msg);
-        QrPtrVectorPtr makeQrs(
-            const pandora_vision_msgs::QRAlertVector& msg);
-        LandoltcPtrVectorPtr makeLandoltcs(
-            const pandora_vision_msgs::LandoltcAlertVector& msg);
-        DataMatrixPtrVectorPtr makeDataMatrices(
-            const pandora_vision_msgs::DataMatrixAlertVector& msg);
         template <class ObjectType>
           typename ObjectType::PtrVectorPtr makeObjects(
-              const pandora_common_msgs::GeneralAlertVector& msg);
+              const typename ObjectType::AlertVector& msg);
 
         tf::Transform getCurrentHoleTransform() const
         {
@@ -99,30 +92,10 @@ namespace pandora_data_fusion
          * Incoming ros message containing info.
          * @return void
          */
-        void setUpHole(const HolePtr& holePtr,
-            const pandora_vision_msgs::HoleDirectionAlert& msg,
-            const ros::Time& timeFound,
-            const tf::Transform& transform);
-        void setUpHazmat(const HazmatPtr& hazmatPtr,
-            const pandora_vision_msgs::HazmatAlert& msg,
-            const ros::Time& timeFound,
-            const tf::Transform& transform);
-        void setUpQr(const QrPtr& qrPtr,
-            const pandora_vision_msgs::QRAlert& msg,
-            const ros::Time& timeFound,
-            const tf::Transform& transform);
-        void setUpLandoltc(const LandoltcPtr& landoltcPtr,
-            const pandora_vision_msgs::LandoltcAlert& msg,
-            const ros::Time& timeFound,
-            const tf::Transform& transform);
-        void setUpDataMatrix(const DataMatrixPtr& dataMatrixPtr,
-            const pandora_vision_msgs::DataMatrixAlert& msg,
-            const ros::Time& timeFound,
-            const tf::Transform& transform);
         template <class ObjectType>
           void setUpObject(
               const typename ObjectType::Ptr& objectPtr,
-              const pandora_common_msgs::GeneralAlertInfo& msg,
+              const typename ObjectType::Alert& msg,
               const ros::Time& timeFound,
               const tf::Transform& transform);
 
@@ -134,18 +107,19 @@ namespace pandora_data_fusion
 
     template <class ObjectType>
     typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
-        const pandora_common_msgs::GeneralAlertVector& msg)
+        const typename ObjectType::AlertVector& msg)
     {
       tf::Transform transform;
       transform = poseFinder_->lookupTransformFromWorld(msg.header);
 
       typename ObjectType::PtrVectorPtr objectsVectorPtr(
           new typename ObjectType::PtrVector);
-      for (int ii = 0; ii < msg.generalAlerts.size(); ++ii) {
+      for (int ii = 0; ii < msg.alerts.size(); ++ii) {
         try
         {
           typename ObjectType::Ptr newObject( new ObjectType );
-          setUpObject<ObjectType>(newObject, msg.generalAlerts[ii], msg.header.stamp, transform);
+          setUpObject<ObjectType>(newObject, msg.alerts[ii],
+                                  msg.header.stamp, transform);
           objectsVectorPtr->push_back(newObject);
         }
         catch (AlertException ex)
@@ -161,7 +135,61 @@ namespace pandora_data_fusion
     template <class ObjectType>
     void ObjectFactory::setUpObject(
         const typename ObjectType::Ptr& objectPtr,
-        const pandora_common_msgs::GeneralAlertInfo& msg,
+        const typename ObjectType::Alert& msg,
+        const ros::Time& timeFound,
+        const tf::Transform& transform)
+    {
+      objectPtr->setPose(poseFinder_->findAlertPose(msg.info.yaw,
+            msg.info.pitch, transform));
+      objectPtr->setProbability(msg.info.probability);
+      objectPtr->setTimeFound(timeFound);
+      ObjectType::setUpObject(objectPtr, msg);
+      objectPtr->initializeObjectFilter();
+    }
+
+    template <>
+    void ObjectFactory::setUpObject<Motion>(
+        const typename Motion::Ptr& objectPtr,
+        const typename Motion::Alert& msg,
+        const ros::Time& timeFound,
+        const tf::Transform& transform)
+    {
+      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+            msg.pitch, transform));
+      objectPtr->setProbability(msg.probability);
+      objectPtr->setTimeFound(timeFound);
+      objectPtr->initializeObjectFilter();
+    }
+    template <>
+    void ObjectFactory::setUpObject<Sound>(
+        const typename Sound::Ptr& objectPtr,
+        const typename Sound::Alert& msg,
+        const ros::Time& timeFound,
+        const tf::Transform& transform)
+    {
+      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+            msg.pitch, transform));
+      objectPtr->setProbability(msg.probability);
+      objectPtr->setTimeFound(timeFound);
+      objectPtr->initializeObjectFilter();
+    }
+    template <>
+    void ObjectFactory::setUpObject<Co2>(
+        const typename Co2::Ptr& objectPtr,
+        const typename Co2::Alert& msg,
+        const ros::Time& timeFound,
+        const tf::Transform& transform)
+    {
+      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+            msg.pitch, transform));
+      objectPtr->setProbability(msg.probability);
+      objectPtr->setTimeFound(timeFound);
+      objectPtr->initializeObjectFilter();
+    }
+    template <>
+    void ObjectFactory::setUpObject<VictimImage>(
+        const typename VictimImage::Ptr& objectPtr,
+        const typename VictimImage::Alert& msg,
         const ros::Time& timeFound,
         const tf::Transform& transform)
     {

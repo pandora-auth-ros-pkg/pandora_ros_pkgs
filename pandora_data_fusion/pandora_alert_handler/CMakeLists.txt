@@ -105,6 +105,9 @@ target_link_libraries(${PROJECT_NAME}_objects
   ${PROJECT_NAME}_utils
   ${PROJECT_NAME}_filter_model
   )
+add_dependencies(${PROJECT_NAME}_objects
+  ${catkin_EXPORTED_TARGETS}
+  )
 
 add_library(${PROJECT_NAME}_victim
   src/victim.cpp)
@@ -151,7 +154,9 @@ target_link_libraries(${PROJECT_NAME}_object_factory
   ${PROJECT_NAME}_pose_finder
   ${PROJECT_NAME}_objects
   )
-add_dependencies(${PROJECT_NAME}_object_factory ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_object_factory
+  ${catkin_EXPORTED_TARGETS}
+  )
 
 ########################  victim_clusterer  #########################
 
@@ -174,6 +179,9 @@ target_link_libraries(${PROJECT_NAME}_victim_handler
   ${PROJECT_NAME}_victim_list
   ${PROJECT_NAME}_victim_clusterer
   )
+add_dependencies(${PROJECT_NAME}_victim_handler
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
 
 ########################  object_handler  ###########################
 
@@ -185,7 +193,9 @@ target_link_libraries(${PROJECT_NAME}_object_handler
   ${PROJECT_NAME}_objects
   ${PROJECT_NAME}_victim_list
   )
-add_dependencies(${PROJECT_NAME}_object_handler ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_object_handler
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
 
 ########################  alert_handler  ############################
 

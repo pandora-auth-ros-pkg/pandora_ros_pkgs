@@ -41,6 +41,9 @@
 
 #include <vector>
 
+#include "pandora_vision_msgs/HoleDirectionAlertVector.h"
+#include "pandora_vision_msgs/HoleDirectionAlert.h"
+
 #include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
@@ -64,7 +67,14 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Hole> > ListConstPtr;
 
+        typedef pandora_vision_msgs::HoleDirectionAlert Alert;
+        typedef pandora_vision_msgs::HoleDirectionAlertVector AlertVector;
+
       public:
+        static void setUpObject(const Ptr& ptr, const Alert& msg)
+        {
+          ptr->setHoleId(msg.holeId);
+        }
         /**
          * @brief Constructor
          */

@@ -42,6 +42,9 @@
 #include <vector>
 #include <string>
 
+#include "pandora_vision_msgs/DataMatrixAlertVector.h"
+#include "pandora_vision_msgs/DataMatrixAlert.h"
+
 #include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
@@ -65,7 +68,15 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<DataMatrix> > ListConstPtr;
 
+        typedef pandora_vision_msgs::DataMatrixAlertVector AlertVector;
+        typedef pandora_vision_msgs::DataMatrixAlert Alert;
+
       public:
+        static void setUpObject(const Ptr& ptr, const Alert& msg)
+        {
+          ptr->setContent(msg.datamatrixContent);
+        }
+
         /**
          * @brief Constructor
          */

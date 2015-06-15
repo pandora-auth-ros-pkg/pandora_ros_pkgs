@@ -67,6 +67,7 @@
 #include "pandora_vision_msgs/HazmatAlertVector.h"
 #include "pandora_vision_msgs/DataMatrixAlertVector.h"
 #include "pandora_vision_msgs/LandoltcAlertVector.h"
+#include "pandora_vision_msgs/ThermalAlertVector.h"
 #include "pandora_common_msgs/GeneralAlertVector.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
@@ -123,30 +124,13 @@ namespace pandora_data_fusion
         /**
          * @brief Templated subscriber for all objects
          */
-        template <class MsgType, class ClassType>
-          void setSubscriber(const std::string name,
-            void (ClassType::*callback)(MsgType));
-
-        /*  Alert-concerned Subscribers  */
-
-        void hazmatAlertCallback(
-            const pandora_vision_msgs::HazmatAlertVector& msg);
-        void qrAlertCallback(
-            const pandora_vision_msgs::QRAlertVector& msg);
-        void landoltcAlertCallback(
-            const pandora_vision_msgs::LandoltcAlertVector& msg);
-        void dataMatrixAlertCallback(
-            const pandora_vision_msgs::DataMatrixAlertVector& msg);
-
-        /*  Victim-concerned Subscribers  */
-
-        void holeAlertCallback(
-            const pandora_vision_msgs::HoleDirectionAlertVector& msg);
-        void thermalAlertCallback(
-            const pandora_common_msgs::GeneralAlertVector& msg);
         template <class ObjectType>
-          void victimAlertCallback(
-              const pandora_common_msgs::GeneralAlertVector& msg);
+          void setSubscriber();
+
+        /*  Alert-concerned Callback  */
+
+        template <class ObjectType>
+          void alertCallback(const typename ObjectType::AlertVector& msg);
 
         /*  Map Subsriber Callback - Communication with SLAM  */
 
@@ -206,6 +190,7 @@ namespace pandora_data_fusion
 
         //!< Holds the subscribers using a key
         std::map<std::string, ros::Subscriber> subscribers_;
+        ros::Subscriber mapSubscriber_;
 
         ros::ServiceServer getMarkersService_;
         ros::ServiceServer geotiffService_;
@@ -253,9 +238,36 @@ namespace pandora_data_fusion
         VictimHandlerPtr victimHandler_;
     };
 
-      template <class ObjectType>
-        void AlertHandler::victimAlertCallback(
-            const pandora_common_msgs::GeneralAlertVector& msg)
+    /**
+      * @brief tamplated function responsible for initialising each one of the
+      * node's subscribers.
+      * @param name [std::string] string with the name of the subscriber and
+      * of the yaml param
+      * @param callback [void] pointer to the Callback of the subscriber
+      * @return void
+      */
+    template <class ObjectType>
+      void AlertHandler::setSubscriber()
+      {
+        std::string name = ObjectType::getObjectType();
+        std::string param;
+        if (nh_->getParam("subscribed_topic_names/" + name, param))
+        {
+          ros::Subscriber sub;
+          sub = nh_->subscribe(param, 1,
+                               &AlertHandler::alertCallback<ObjectType>, this);
+          //!< Store the subscriber to the std::map
+          subscribers_[name] = sub;
+        }
+        else
+        {
+          ROS_FATAL("[ALERT_HANDLER] %s topic name param not found", name.c_str());
+          ROS_BREAK();
+        }
+      }
+
+    template <class ObjectType>
+      void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
       {
         if (map_->data.size() == 0)
           return;
@@ -276,37 +288,41 @@ namespace pandora_data_fusion
 
         objectHandler_->handleObjects<ObjectType>(objectsVectorPtr);
 
-        victimHandler_->inspect();
-
-        publishVictims();
+        if (ObjectType::isVictimAlert)
+        {
+          victimHandler_->inspect();
+          publishVictims();
+        }
       }
 
-      /**
-       * @brief tamplated function responsible for initialising each one of the
-       * node's subscribers.
-       * @param name [std::string] string with the name of the subscriber and
-       * of the yaml param
-       * @param callback [void] pointer to the Callback of the subscriber
-       * @return void
-       */
-      template <class MsgType, class ClassType>
-        void AlertHandler::setSubscriber(const std::string name,
-          void (ClassType::*callback)(MsgType))
-        {
-          std::string param;
-          if (nh_->getParam("subscribed_topic_names/" + name, param))
-          {
-            ros::Subscriber sub;
-            sub = nh_->subscribe(param, 1, callback, this);
-            //!< Store the subscriber to the std::map
-            subscribers_[name] = sub;
-          }
-          else
-          {
-            ROS_FATAL("[ALERT_HANDLER] %s topic name param not found", name.c_str());
-            ROS_BREAK();
-          }
-        }
+  template <>
+    void AlertHandler::alertCallback<Hole>(
+        const typename Hole::AlertVector& msg)
+    {
+      if (map_->data.size() == 0)
+        return;
+
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          Hole::getObjectType() << " ALERT ARRIVED!");
+
+      HolePtrVectorPtr holesVectorPtr;
+      try
+      {
+        holesVectorPtr = objectFactory_->makeHoles(msg);
+      }
+      catch (TfException ex)
+      {
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+        return;
+      }
+
+      tf::Transform transform = objectFactory_->getCurrentHoleTransform();
+      objectHandler_->handleHoles(holesVectorPtr, transform);
+
+      victimHandler_->notify();
+
+      publishVictims();
+    }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

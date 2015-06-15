@@ -41,6 +41,9 @@
 
 #include <vector>
 
+#include "pandora_vision_msgs/HazmatAlertVector.h"
+#include "pandora_vision_msgs/HazmatAlert.h"
+
 #include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
@@ -64,7 +67,15 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<List> ListPtr;
         typedef boost::shared_ptr< const ObjectList<Hazmat> > ListConstPtr;
 
+        typedef pandora_vision_msgs::HazmatAlertVector AlertVector;
+        typedef pandora_vision_msgs::HazmatAlert Alert;
+
       public:
+        static void setUpObject(const Ptr& ptr, const Alert& msg)
+        {
+          ptr->setPattern(msg.patternType);
+        }
+
         /**
          * @brief Constructor
          */

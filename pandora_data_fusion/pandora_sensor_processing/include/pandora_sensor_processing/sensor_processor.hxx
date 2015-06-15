@@ -117,7 +117,7 @@ namespace pandora_sensor_processing
       ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Publishing alert.", name_.c_str());
       pandora_common_msgs::GeneralAlertVector alertVector;
       alertVector.header = alert_.header;
-      alertVector.generalAlerts.push_back(alert_.info);
+      alertVector.alerts.push_back(alert_.info);
       alertPublisher_.publish(alertVector);
     }
 

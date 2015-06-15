@@ -154,8 +154,29 @@ namespace pandora_data_fusion
       }
     }
 
+    template <>
+    void ObjectHandler::handleObjects<Qr>(const typename Qr::PtrVectorPtr& newQrs)
+    {
+      for (int ii = 0; ii < newQrs->size(); ++ii)
+      {
+        if (Qr::getList()->add(newQrs->at(ii)))
+        {
+          pandora_data_fusion_msgs::QrNotificationMsg newQrNofifyMsg;
+          newQrNofifyMsg.header.stamp = newQrs->at(ii)->getTimeFound();
+          newQrNofifyMsg.header.frame_id = newQrs->at(ii)->getFrameId();
+          newQrNofifyMsg.x = newQrs->at(ii)->getPose().position.x;
+          newQrNofifyMsg.y = newQrs->at(ii)->getPose().position.y;
+          newQrNofifyMsg.content = newQrs->at(ii)->getContent();
+          qrPublisher_.publish(newQrNofifyMsg);
+          std_msgs::Int32 updateScoreMsg;
+          roboCupScore_ += Qr::getObjectScore();
+          updateScoreMsg.data = roboCupScore_;
+          scorePublisher_.publish(updateScoreMsg);
+        }
+      }
+    }
+
     /**
-     * TODO
      * @details Sound and CO2 pois give us spatial information in a 2d
      * surface on their sensors' tf frame's plane. We should not search for them
      * in a sphere but in a cylinder.
@@ -168,15 +189,8 @@ namespace pandora_data_fusion
 
       while (iter != objectsPtr->end()) {
         bool valid = false;
-        if (ObjectType::getObjectType() == Sound::getObjectType() ||
-            ObjectType::getObjectType() == Co2::getObjectType()) {
-          valid = victimsToGoList_->isObjectPoseInList(
-              (*iter), VICTIM_CLUSTER_RADIUS);
-        }
-        else {
-          valid = victimsToGoList_->isObjectPoseInList(
-              (*iter), VICTIM_CLUSTER_RADIUS);
-        }
+        valid = victimsToGoList_->isObjectPoseInList(
+            (*iter), VICTIM_CLUSTER_RADIUS);
         // valid = valid ||
         //   victimsVisitedList_->isObjectPoseInList((*iter), VICTIM_CLUSTER_RADIUS);
         if (!valid)

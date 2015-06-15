@@ -81,7 +81,7 @@ namespace pandora_data_fusion
         virtual int getId() const = 0;
         virtual bool getLegit() const = 0;
         virtual float getProbability() const = 0;
-        virtual const Pose& getPose() const = 0;
+        virtual Pose getPose() const = 0;
         virtual std::string getFrameId() const = 0;
         virtual void setId(int id) = 0;
         virtual void setLegit(bool legit) = 0;
