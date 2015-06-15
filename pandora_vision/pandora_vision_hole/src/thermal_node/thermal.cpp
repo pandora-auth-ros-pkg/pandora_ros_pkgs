@@ -211,42 +211,55 @@ namespace pandora_vision
       poisStamped->frameHeight = thermalImage.rows;
 
       // For each hole found by thermal node
-      for(unsigned int i = 0; i < holes.size(); i++)
+      std::vector<HoleConveyor>::iterator iter = holes.holes.begin();
+
+      while (iter != holes.holes.end())
       {
+        // dynamic parameter of minimum probability
+        if (iter->holeProbability < 0.3)
+        {
+          iter = holes.holes.erase(iter);
+          continue;
+        }
 
         POIPtr poi(new POI);
 
         // Set the keypoint
-        poi->point.x = holes.holes[i].keypoint.pt.x;
-        poi->point.y = holes.holes[i].keypoint.pt.y;
+        poi->point.x = iter->keypoint.pt.x;
+        poi->point.y = iter->keypoint.pt.y;
 
         // Fill the probabilities
-        poi->probability = holes.holes[i].holeProbability;
+        poi->probability = iter->holeProbability;
 
         poisStamped->pois.push_back(poi);
+
+        ++iter;
       }
 
-      GeneralAlertConverter converter;
-
-      pandora_common_msgs::GeneralAlertVector alert =
-        converter.getGeneralAlertInfo(ros::this_node::getName(),
-          nodeHandle_, poisStamped);
-
-      for(unsigned int i = 0; i < alert.alerts.size(); i++)
+      if (poisStamped->pois.size() > 0)
       {
-        // Fill the temperature of the thermal message for each hole
-        thermalMsg.temperature = holes.holes[i].holeTemperature;
+        GeneralAlertConverter converter;
 
-        thermalMsg.info = alert.alerts.at(i);
+        pandora_common_msgs::GeneralAlertVector alert =
+          converter.getGeneralAlertInfo(ros::this_node::getName(),
+            nodeHandle_, poisStamped);
 
-        // Push back into vector of messages
-        thermalMsgVector.alerts.push_back(thermalMsg);
+        for(unsigned int i = 0; i < alert.alerts.size(); i++)
+        {
+          // Fill the temperature of the thermal message for each hole
+          thermalMsg.temperature = holes.holes[i].holeTemperature;
+
+          thermalMsg.info = alert.alerts.at(i);
+
+          // Push back into vector of messages
+          thermalMsgVector.alerts.push_back(thermalMsg);
+        }
+        // Fill the thermal message header to be sent
+        thermalMsgVector.header = alert.header;
+
+        // Publish the thermal message
+        dataFusionThermalPublisher_.publish(thermalMsgVector);
       }
-      // Fill the thermal message header to be sent
-      thermalMsgVector.header = alert.header;
-
-      // Publish the thermal message
-      dataFusionThermalPublisher_.publish(thermalMsgVector);
     }
 
     #ifdef DEBUG_TIME
