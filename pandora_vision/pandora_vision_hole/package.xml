@@ -36,9 +36,10 @@
   <depend>pcl_ros</depend>
   <depend>message_filters</depend>
   <depend>urdf</depend>
-  
+
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni2_launch</exec_depend>
+  <exec_depend>camera_calibration</exec_depend>
 
   <!-- Test Depends -->
   <test_depend>pandora_testing_tools</test_depend>
