@@ -130,20 +130,20 @@ class AlertDeliveryBoy():
         msg = GeneralAlertVector()
         msg.header.stamp = rospy.get_rostime()
         msg.header.frame_id = self.frame_id
-        msg.generalAlerts = []
-        msg.generalAlerts.append(self.makeGeneralAlertInfo(yaw, pitch, probability))
+        msg.alerts = []
+        msg.alerts.append(self.makeGeneralAlertInfo(yaw, pitch, probability))
         return msg
 
     def deliverHoleOrder(self, orderYaw,
                         orderPitch, orderProbability=1, orderId=1, publish=True):
 
         self.hole_msg.header.stamp = rospy.get_rostime()
-        self.hole_msg.holesDirections = []
+        self.hole_msg.alerts = []
         msg = HoleDirectionAlert(
                 info=self.makeGeneralAlertInfo(orderYaw, orderPitch, orderProbability),
                 holeId=orderId)
         print msg
-        self.hole_msg.holesDirections.append(msg)
+        self.hole_msg.alerts.append(msg)
         rospy.loginfo(self.hole_msg)
         if publish:
             self.hole_pub.publish(self.hole_msg)
@@ -155,11 +155,11 @@ class AlertDeliveryBoy():
                           orderPitch, orderPattern, publish=True):
 
         self.hazmat_msg.header.stamp = rospy.get_rostime()
-        self.hazmat_msg.hazmatAlerts = []
+        self.hazmat_msg.alerts = []
         msg = HazmatAlert(
                 info=self.makeGeneralAlertInfo(orderYaw, orderPitch, 1),
                 patternType=orderPattern)
-        self.hazmat_msg.hazmatAlerts.append(msg)
+        self.hazmat_msg.alerts.append(msg)
         if publish:
             self.hazmat_pub.publish(self.hazmat_msg)
             rospy.sleep(0.1)
@@ -170,11 +170,11 @@ class AlertDeliveryBoy():
                              orderPitch, orderAngles, publish=True):
 
         self.landoltc_msg.header.stamp = rospy.get_rostime()
-        self.landoltc_msg.landoltcAlerts = []
+        self.landoltc_msg.alerts = []
         msg = LandoltcAlert(
                 info=self.makeGeneralAlertInfo(orderYaw, orderPitch, 1),
                 angles=orderAngles)
-        self.landoltc_msg.landoltcAlerts.append(msg)
+        self.landoltc_msg.alerts.append(msg)
         if publish:
             self.landoltc_pub.publish(self.landoltc_msg)
             rospy.sleep(0.1)
@@ -184,11 +184,11 @@ class AlertDeliveryBoy():
     def deliverQrOrder(self, orderYaw, orderPitch, orderContent, publish=True):
 
         self.qr_msg.header.stamp = rospy.get_rostime()
-        self.qr_msg.qrAlerts = []
+        self.qr_msg.alerts = []
         msg = QRAlert(
                 info=self.makeGeneralAlertInfo(orderYaw, orderPitch, 1),
                 QRcontent=orderContent)
-        self.qr_msg.qrAlerts.append(msg)
+        self.qr_msg.alerts.append(msg)
         if publish:
             self.qr_pub.publish(self.qr_msg)
             rospy.sleep(0.1)
@@ -199,11 +199,11 @@ class AlertDeliveryBoy():
             publish=True):
 
         self.dataMatrix_msg.header.stamp = rospy.get_rostime()
-        self.dataMatrix_msg.dataMatrixAlerts = []
+        self.dataMatrix_msg.alerts = []
         msg = DataMatrixAlert(
                 info=self.makeGeneralAlertInfo(orderYaw, orderPitch, 1),
                 datamatrixContent=orderContent)
-        self.dataMatrix_msg.dataMatrixAlerts.append(msg)
+        self.dataMatrix_msg.alerts.append(msg)
         if publish:
             self.dataMatrix_pub.publish(self.dataMatrix_msg)
             rospy.sleep(0.1)
