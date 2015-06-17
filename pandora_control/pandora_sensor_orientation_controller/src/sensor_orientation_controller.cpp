@@ -34,11 +34,12 @@
 *
 * Author:  Evangelos Apostolidis
 * Author:  Chris Zalidis
+* Author:  Kostas Peppas
 *********************************************************************/
 
-#include <string>
-
 #include <pandora_sensor_orientation_controller/sensor_orientation_controller.h>
+
+#include <string>
 
 namespace pandora_control
 {
@@ -56,6 +57,21 @@ namespace pandora_control
     // get params from param server
     if (getcontrollerParams())
     {
+      scanYawTimer_ = nodeHandle_.createTimer(
+                      ros::Duration(scanRate_),
+                      &SensorOrientationActionServer::scan,
+                      this);
+      scanPitchTimer_ = nodeHandle_.createTimer(
+                       ros::Duration(pitchRate_),
+                       &SensorOrientationActionServer::stabilizePitch,
+                       this);
+
+      pointSensorTimer_ = nodeHandle_.createTimer(
+                         ros::Duration(pitchRate_),
+                         &SensorOrientationActionServer::pointSensor,
+                         this);
+      stopPreviousTimers();
+
       if (scanRate_ <= 0)
       {
         ROS_DEBUG_STREAM("[" << actionName_ << "] Wrong scan rate value: "
@@ -80,7 +96,8 @@ namespace pandora_control
       sensorPitchPublisher_.publish(targetPosition);
       sensorYawPublisher_.publish(targetPosition);
       position_ = START;
-
+      actionServer_.registerPreemptCallback(
+        boost::bind(&SensorOrientationActionServer::preemptCallback, this));
       actionServer_.start();
     }
   }
@@ -93,25 +110,37 @@ namespace pandora_control
       const pandora_sensor_orientation_controller::MoveSensorGoalConstPtr& goal)
   {
     command_ = goal->command;
-    if (command_ == pandora_sensor_orientation_controller::MoveSensorGoal::TEST)
+    pointOfInterest_ = goal->point_of_interest;
+    pointThreshold_ = laxMovementThreshold_;
+    stopPreviousTimers();
+    if (command_ ==
+        pandora_sensor_orientation_controller::MoveSensorGoal::TEST)
     {
       testSensor();
     }
-    else if (command_ == pandora_sensor_orientation_controller::MoveSensorGoal::CENTER)
+    else if (command_ ==
+             pandora_sensor_orientation_controller::MoveSensorGoal::CENTER)
     {
       centerSensor();
     }
-    else if (command_ == pandora_sensor_orientation_controller::MoveSensorGoal::MOVE)
+    else if (command_ ==
+             pandora_sensor_orientation_controller::MoveSensorGoal::MOVE)
     {
-      scan();
+      scanYawTimer_.start();
+      scanPitchTimer_.start();
     }
-    else if (command_ == pandora_sensor_orientation_controller::MoveSensorGoal::POINT)
+    else if (command_ ==
+             pandora_sensor_orientation_controller::MoveSensorGoal::POINT)
     {
-      pointSensor(goal->point_of_interest, movementThreshold_);
+      pointThreshold_ = movementThreshold_;
+      pointSensorTimer_.start();
+
     }
-    else if (command_ == pandora_sensor_orientation_controller::MoveSensorGoal::LAX_POINT)
+    else if (command_ ==
+             pandora_sensor_orientation_controller::MoveSensorGoal::LAX_POINT)
     {
-      pointSensor(goal->point_of_interest, laxMovementThreshold_);
+      pointThreshold_ = laxMovementThreshold_;
+      pointSensorTimer_.start();
     }
     else
     {
@@ -119,6 +148,16 @@ namespace pandora_control
       // set the action state to aborted
       actionServer_.setAborted();
     }
+    while (actionServer_.isActive())
+    {
+    }
+  }
+
+  void SensorOrientationActionServer::preemptCallback()
+  {
+    ROS_DEBUG("%s: Preempted", actionName_.c_str());
+    actionServer_.setPreempted();
+    stopPreviousTimers();
   }
 
   bool SensorOrientationActionServer::getcontrollerParams()
@@ -132,8 +171,10 @@ namespace pandora_control
     nodeHandle_.param(actionName_ + "/offset_pitch", offsetPitch_, 0.0);
     nodeHandle_.param(actionName_ + "/offset_yaw", offsetYaw_, 0.0);
     nodeHandle_.param(actionName_ + "/command_timeout", commandTimeout_, 3.0);
-    nodeHandle_.param(actionName_ + "/movement_threshold", movementThreshold_, 0.017);
-    nodeHandle_.param(actionName_ + "/lax_movement_threshold", laxMovementThreshold_, 0.2);
+    nodeHandle_.param(actionName_ + "/movement_threshold",
+                      movementThreshold_, 0.017);
+    nodeHandle_.param(actionName_ + "/lax_movement_threshold",
+                      laxMovementThreshold_, 0.2);
     if (pitchStep_ > maxPitch_ || pitchStep_ < minPitch_)
     {
       if (maxPitch_ < fabs(minPitch_))
@@ -168,6 +209,8 @@ namespace pandora_control
       ROS_FATAL("Failed to get param pitch_command_topic shuting down");
       return false;
     }
+
+    nodeHandle_.param(actionName_ + "/pitch_rate", pitchRate_, 0.2);
 
     if (nodeHandle_.getParam(actionName_ + "/yaw_command_topic",
       yawCommandTopic_))
@@ -239,33 +282,31 @@ namespace pandora_control
 
   void SensorOrientationActionServer::testSensor()
   {
-    std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-    pitchTargetPosition.data = pitchStep_;
-    yawTargetPosition.data = yawStep_;
+    pitchTargetPosition_.data = pitchStep_;
+    yawTargetPosition_.data = yawStep_;
     position_ = UNKNOWN;
-    lastPitchTarget_ = pitchTargetPosition.data;
-    lastYawTarget_ = yawTargetPosition.data;
-    sensorPitchPublisher_.publish(pitchTargetPosition);
-    sensorYawPublisher_.publish(yawTargetPosition);
+    lastPitchTarget_ = pitchTargetPosition_.data;
+    lastYawTarget_ = yawTargetPosition_.data;
+    sensorPitchPublisher_.publish(pitchTargetPosition_);
+    sensorYawPublisher_.publish(yawTargetPosition_);
 
     setGoalState(
-      checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data));
+      checkGoalCompletion());
   }
 
   void SensorOrientationActionServer::centerSensor()
   {
     if (position_ != START  || position_ != CENTER)
     {
-      std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-      pitchTargetPosition.data = offsetPitch_;
-      yawTargetPosition.data = offsetYaw_;
-      lastPitchTarget_ = pitchTargetPosition.data;
-      lastYawTarget_ = yawTargetPosition.data;
-      sensorPitchPublisher_.publish(pitchTargetPosition);
-      sensorYawPublisher_.publish(yawTargetPosition);
+      pitchTargetPosition_.data = offsetPitch_;
+      yawTargetPosition_.data = offsetYaw_;
+      lastPitchTarget_ = pitchTargetPosition_.data;
+      lastYawTarget_ = yawTargetPosition_.data;
+      sensorPitchPublisher_.publish(pitchTargetPosition_);
+      sensorYawPublisher_.publish(yawTargetPosition_);
       position_ = START;
       setGoalState(
-        checkGoalCompletion(pitchTargetPosition.data, yawTargetPosition.data));
+        checkGoalCompletion());
     }
     else
     {
@@ -274,164 +315,146 @@ namespace pandora_control
     }
   }
 
-  void SensorOrientationActionServer::scan()
+
+  void SensorOrientationActionServer::scan(const ros::TimerEvent& event)
   {
-    ros::Rate rate(scanRate_);
-    std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-    double baseRoll, basePitch, baseYaw;
-
-    while (ros::ok())
+    switch (position_)
     {
-      if (actionServer_.isPreemptRequested() || !ros::ok())
-      {
-        ROS_DEBUG("%s: Preempted", actionName_.c_str());
-        actionServer_.setPreempted();
-        return;
-      }
+      case START:
+        yawTargetPosition_.data = yawStep_;
+        position_ = LEFT;
+        break;
+      case LEFT:
+        yawTargetPosition_.data = 0;
+        position_ = CENTER;
+        break;
+      case CENTER:
+        yawTargetPosition_.data = -yawStep_;
+        position_ = RIGHT;
+        break;
+      case RIGHT:
+        yawTargetPosition_.data = 0;
+        position_ = START;
+        break;
+      case UNKNOWN:
+        yawTargetPosition_.data = 0;
+        position_ = START;
+        break;
+    }
+    yawTargetPosition_.data += offsetYaw_;
+  }
 
-      tf::StampedTransform baseTransform;
-      try
-      {
-        tfListener_.lookupTransform(
-          "map", "base_link",
-          ros::Time(0), baseTransform);
-      }
-      catch (tf::TransformException ex)
-      {
-        ROS_ERROR("%s", ex.what());
-        continue;
-      }
-      baseTransform.getBasis().getRPY(baseRoll, basePitch, baseYaw);
-
-      switch (position_)
-      {
-        case START:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = yawStep_;
-          position_ = LEFT;
-          break;
-        case LEFT:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = 0;
-          position_ = CENTER;
-          break;
-        case CENTER:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = -yawStep_;
-          position_ = RIGHT;
-          break;
-        case RIGHT:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = 0;
-          position_ = START;
-          break;
-        case UNKNOWN:
-          pitchTargetPosition.data = pitchStep_;
-          yawTargetPosition.data = 0;
-          position_ = START;
-          break;
-      }
-      pitchTargetPosition.data += offsetPitch_ - basePitch;
-      checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
-      lastPitchTarget_ = pitchTargetPosition.data;
-      yawTargetPosition.data += offsetYaw_;
-      lastYawTarget_ = yawTargetPosition.data;
-      sensorPitchPublisher_.publish(pitchTargetPosition);
-      sensorYawPublisher_.publish(yawTargetPosition);
-      rate.sleep();
+  void SensorOrientationActionServer::stabilizePitch(
+    const ros::TimerEvent& event)
+  {
+    double baseRoll, basePitch, baseYaw;
+    tf::StampedTransform baseTransform;
+    try
+    {
+      tfListener_.lookupTransform(
+        "map", "base_link",
+        ros::Time(0), baseTransform);
+    }
+    catch (tf::TransformException ex)
+    {
+      ROS_ERROR("%s", ex.what());
+      return;
+    }
+    baseTransform.getBasis().getRPY(baseRoll, basePitch, baseYaw);
+    pitchTargetPosition_.data = pitchStep_;
+    pitchTargetPosition_.data += offsetPitch_ - basePitch;
+    checkAngleLimits();
+    if (fabs(lastPitchTarget_ - pitchTargetPosition_.data) > pointThreshold_
+      || fabs(lastYawTarget_ - yawTargetPosition_.data) > pointThreshold_)
+    {
+      lastPitchTarget_ = pitchTargetPosition_.data;
+      lastYawTarget_ = yawTargetPosition_.data;
+      sensorPitchPublisher_.publish(pitchTargetPosition_);
+      sensorYawPublisher_.publish(yawTargetPosition_);
     }
   }
 
-  void SensorOrientationActionServer::pointSensor(std::string pointOfInterest,
-    double movementThreshold)
+  void SensorOrientationActionServer::pointSensor(const ros::TimerEvent& event)
   {
     ros::Time lastTf = ros::Time::now();
-    ros::Rate rate(5);
-    std_msgs::Float64 pitchTargetPosition, yawTargetPosition;
-
-    while (ros::ok())
+    tf::StampedTransform sensorTransform;
+    try
     {
-      if (actionServer_.isPreemptRequested() || !ros::ok())
+      tfListener_.lookupTransform(
+        "/base_link", sensorFrame_,
+        ros::Time(0), sensorTransform);
+    }
+    catch (tf::TransformException ex)
+    {
+      ROS_ERROR("%s", ex.what());
+    }
+
+    tf::StampedTransform targetTransform;
+    try
+    {
+      tfListener_.lookupTransform(
+        "/base_link", pointOfInterest_,
+        ros::Time(0), targetTransform);
+    }
+    catch (tf::TransformException ex)
+    {
+      if (ros::Time::now() - lastTf > ros::Duration(1))
       {
-        ROS_DEBUG("%s: Preempted", actionName_.c_str());
-        // set the action state to preempted
-        actionServer_.setPreempted();
+        ROS_DEBUG_STREAM("Is " << pointOfInterest_ << " broadcasted?");
+        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        // set the action state to succeeded
+        actionServer_.setAborted();
+        stopPreviousTimers();
         return;
       }
-      tf::StampedTransform sensorTransform;
-      try
+      else
       {
-        tfListener_.lookupTransform(
-          "/base_link", sensorFrame_,
-          ros::Time(0), sensorTransform);
+        return;
       }
-      catch (tf::TransformException ex)
-      {
-        ROS_ERROR("%s", ex.what());
-      }
+    }
+    lastTf = ros::Time::now();
+    tf::Vector3 desiredVectorX;
+    desiredVectorX = targetTransform.getOrigin() - sensorTransform.getOrigin();
+    desiredVectorX = desiredVectorX.normalized();
 
-      tf::StampedTransform targetTransform;
-      try
-      {
-        tfListener_.lookupTransform(
-          "/base_link", pointOfInterest,
-          ros::Time(0), targetTransform);
-      }
-      catch (tf::TransformException ex)
-      {
-        if (ros::Time::now() - lastTf > ros::Duration(1))
-        {
-          ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-          ROS_DEBUG("%s: Aborted", actionName_.c_str());
-          // set the action state to succeeded
-          actionServer_.setAborted();
-          return;
-        }
-        else
-        {
-          continue;
-        }
-      }
-      lastTf = ros::Time::now();
+    tf::Vector3 baseVectorZ = targetTransform.getBasis().getColumn(2);
 
-      tf::Vector3 desiredVectorX;
-      desiredVectorX = targetTransform.getOrigin() - sensorTransform.getOrigin();
-      desiredVectorX = desiredVectorX.normalized();
+    tf::Vector3 desiredVectorZ = baseVectorZ
+      - desiredVectorX*tfDot(desiredVectorX, baseVectorZ);
+    desiredVectorZ = desiredVectorZ.normalized();
+    tf::Vector3 desiredVectorY = tfCross(desiredVectorZ, desiredVectorX);
+    desiredVectorY = desiredVectorY.normalized();
 
-      tf::Vector3 baseVectorZ = targetTransform.getBasis().getColumn(2);
+    tf::Matrix3x3 desiredCameraBasis(
+      desiredVectorX[0], desiredVectorY[0], desiredVectorZ[0],
+      desiredVectorX[1], desiredVectorY[1], desiredVectorZ[1],
+      desiredVectorX[2], desiredVectorY[2], desiredVectorZ[2]);
 
-      tf::Vector3 desiredVectorZ = baseVectorZ
-        - desiredVectorX*tfDot(desiredVectorX, baseVectorZ);
-      desiredVectorZ = desiredVectorZ.normalized();
+    double roll, pitch, yaw;
+    desiredCameraBasis.getRPY(roll, pitch, yaw);
 
-      tf::Vector3 desiredVectorY = tfCross(desiredVectorZ, desiredVectorX);
-      desiredVectorY = desiredVectorY.normalized();
-
-      tf::Matrix3x3 desiredCameraBasis(
-        desiredVectorX[0], desiredVectorY[0], desiredVectorZ[0],
-        desiredVectorX[1], desiredVectorY[1], desiredVectorZ[1],
-        desiredVectorX[2], desiredVectorY[2], desiredVectorZ[2]);
-
-      double roll, pitch, yaw;
-      desiredCameraBasis.getRPY(roll, pitch, yaw);
-
-      pitchTargetPosition.data = pitch + offsetPitch_;
-      yawTargetPosition.data = yaw + offsetYaw_;
-      checkAngleLimits(&pitchTargetPosition, &yawTargetPosition);
-      if (fabs(lastPitchTarget_ - pitchTargetPosition.data) > movementThreshold
-        || fabs(lastYawTarget_ - yawTargetPosition.data) > movementThreshold)
-      {
-        lastPitchTarget_ = pitchTargetPosition.data;
-        lastYawTarget_ = yawTargetPosition.data;
-        sensorPitchPublisher_.publish(pitchTargetPosition);
-        sensorYawPublisher_.publish(yawTargetPosition);
-        position_ = UNKNOWN;
-      }
-      rate.sleep();
+    pitchTargetPosition_.data = pitch + offsetPitch_;
+    yawTargetPosition_.data = yaw + offsetYaw_;
+    checkAngleLimits();
+    if (fabs(lastPitchTarget_ - pitchTargetPosition_.data) > pointThreshold_
+      || fabs(lastYawTarget_ - yawTargetPosition_.data) > pointThreshold_)
+    {
+      lastPitchTarget_ = pitchTargetPosition_.data;
+      lastYawTarget_ = yawTargetPosition_.data;
+      sensorPitchPublisher_.publish(pitchTargetPosition_);
+      sensorYawPublisher_.publish(yawTargetPosition_);
+      position_ = UNKNOWN;
     }
   }
-  int SensorOrientationActionServer::checkGoalCompletion(
-    double pitchCommand, double yawCommand)
+
+  void SensorOrientationActionServer::stopPreviousTimers()
+  {
+    scanYawTimer_.stop();
+    scanPitchTimer_.stop();
+    pointSensorTimer_.stop();
+  }
+
+  int SensorOrientationActionServer::checkGoalCompletion()
   {
     ros::Time begin = ros::Time::now();
     tf::StampedTransform pitchTransform;
@@ -441,8 +464,8 @@ namespace pandora_control
     yaw = 3.14;
 
     while (ros::ok() && (
-      fabs(pitch - pitchCommand) >= movementThreshold_ ||
-      fabs(yaw - yawCommand) >= movementThreshold_))
+      fabs(pitch - pitchTargetPosition_.data) >= pointThreshold_ ||
+      fabs(yaw - yawTargetPosition_.data) >= pointThreshold_))
     {
       try
       {
@@ -498,24 +521,23 @@ namespace pandora_control
         break;
     }
   }
-  void SensorOrientationActionServer::checkAngleLimits(
-    std_msgs::Float64 *pitchTargetPosition, std_msgs::Float64 *yawTargetPosition)
+  void SensorOrientationActionServer::checkAngleLimits()
   {
-    if (pitchTargetPosition->data < minPitch_)
+    if (pitchTargetPosition_.data < minPitch_)
     {
-      pitchTargetPosition->data = minPitch_;
+      pitchTargetPosition_.data = minPitch_;
     }
-    else if (pitchTargetPosition->data > maxPitch_)
+    else if (pitchTargetPosition_.data > maxPitch_)
     {
-      pitchTargetPosition->data = maxPitch_;
+      pitchTargetPosition_.data = maxPitch_;
     }
-    if (yawTargetPosition->data < minYaw_)
+    if (yawTargetPosition_.data < minYaw_)
     {
-      yawTargetPosition->data = minYaw_;
+      yawTargetPosition_.data = minYaw_;
     }
-    else if (yawTargetPosition->data > maxYaw_)
+    else if (yawTargetPosition_.data > maxYaw_)
     {
-      yawTargetPosition->data = maxYaw_;
+      yawTargetPosition_.data = maxYaw_;
     }
   }
 }  // namespace pandora_control

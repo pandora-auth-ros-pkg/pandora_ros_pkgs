@@ -31,9 +31,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Voulgarakis George
+# Author: Peppas Kostas
 
-move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
-move_kinect_topic = '/control/move_kinect_action'
-move_head_topic = '/control/move_head_action'
-move_linear_topic = '/control/linear_movement_action'
+# Needs to be in accordance to client_factory
+
+CLIENTS =[
+  'sensor_client'
+]

@@ -31,9 +31,20 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Voulgarakis George
+# Author: Peppas Kostas
 
-move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
-move_kinect_topic = '/control/move_kinect_action'
-move_head_topic = '/control/move_head_action'
-move_linear_topic = '/control/linear_movement_action'
+import roslib
+roslib.load_manifest('pandora_end_effector_controller')
+import rospy
+
+from mocks.action_servers import MockActionServer
+from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
+from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_end_effector_controller.topics import move_end_effector_controller_topic, move_kinect_topic, \
+    move_head_topic, move_linear_topic
+
+if __name__ == '__main__':
+    rospy.init_node('mock_servers')
+    sensorServer = MockActionServer('mock/kinect', move_kinect_topic, MoveSensorAction)
+    linearServer = MockActionServer('mock/linear', move_linear_topic, MoveLinearAction)
+    rospy.spin()

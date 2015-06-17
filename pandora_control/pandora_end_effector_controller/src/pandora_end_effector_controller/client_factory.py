@@ -31,9 +31,36 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Voulgarakis George
+# Author: Peppas Kostas
 
-move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
-move_kinect_topic = '/control/move_kinect_action'
-move_head_topic = '/control/move_head_action'
-move_linear_topic = '/control/linear_movement_action'
+import rospy
+from effector_clients import SensorClient, LinearClient, HeadClient
+
+class ClientFactory(object):
+
+  def __init__(self):
+    ''' Factory initialized '''
+
+    rospy.loginfo('Initializing factory...')
+    self.return_client ={
+      'sensor_client' : self.return_sensor,
+      'linear_client' : self.return_linear,
+      'head_client' : self.return_head
+    }
+
+  def make_client(self, client_name):
+    ''' Making appropriate client '''
+    rospy.loginfo('Making client... ' + client_name)
+    return self.return_client[client_name]()
+
+  def return_sensor(self):
+    ''' Returning SensorClient instance '''
+    return SensorClient()
+
+  def return_linear(self):
+    ''' Returning LinearClient instance '''
+    return LinearClient()
+
+  def return_head(self):
+    ''' Returning HeadClient instance '''
+    return HeadClient()

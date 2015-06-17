@@ -1,0 +1,9 @@
+<launch>
+  <node
+    name="action_servers_node"
+    pkg="pandora_end_effector_controller"
+    type="action_servers.py"
+    respawn="false"
+    output="screen"/>
+
+</launch>

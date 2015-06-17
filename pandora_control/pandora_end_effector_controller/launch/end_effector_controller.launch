@@ -1,6 +1,6 @@
 <launch>
-  <!--Smach -->
-  <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller_smach.launch" />
+  <!--Node -->
+  <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller_node.launch" />
   <!--Linear -->
   <!-- <include file="$(find pandora_linear_movement_controller)/launch/linear_movement_controller.launch" /> -->
   <!--Sensors -->

@@ -31,9 +31,37 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Voulgarakis George
+# Author: Peppas Kostas
 
-move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
-move_kinect_topic = '/control/move_kinect_action'
-move_head_topic = '/control/move_head_action'
-move_linear_topic = '/control/linear_movement_action'
+from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
+from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
+from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+
+translate_command ={
+  'to_sensor' :
+  {
+    MoveEndEffectorGoal.TEST : MoveSensorGoal.TEST,
+    MoveEndEffectorGoal.PARK : MoveSensorGoal.CENTER,
+    MoveEndEffectorGoal.TRACK : MoveSensorGoal.POINT,
+    MoveEndEffectorGoal.LAX_TRACK : MoveSensorGoal.LAX_POINT,
+    MoveEndEffectorGoal.SCAN : MoveSensorGoal.MOVE
+  },
+
+  'to_linear' :
+  {
+    MoveEndEffectorGoal.TEST : MoveLinearGoal.TEST,
+    MoveEndEffectorGoal.PARK : MoveLinearGoal.LOWER,
+    MoveEndEffectorGoal.TRACK : MoveLinearGoal.MOVE,
+    MoveEndEffectorGoal.LAX_TRACK : MoveLinearGoal.LAX_MOVE,
+    MoveEndEffectorGoal.SCAN : MoveLinearGoal.LOWER
+  },
+
+  'to_head' :
+  {
+    MoveEndEffectorGoal.TEST : MoveSensorGoal.TEST,
+    MoveEndEffectorGoal.PARK : MoveSensorGoal.CENTER,
+    MoveEndEffectorGoal.TRACK : MoveSensorGoal.POINT,
+    MoveEndEffectorGoal.LAX_TRACK : MoveSensorGoal.LAX_POINT,
+    MoveEndEffectorGoal.SCAN : MoveSensorGoal.MOVE
+  }
+}

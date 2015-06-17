@@ -31,9 +31,27 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Voulgarakis George
+# Author: Peppas Kostas
 
-move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
-move_kinect_topic = '/control/move_kinect_action'
-move_head_topic = '/control/move_head_action'
-move_linear_topic = '/control/linear_movement_action'
+from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
+from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from topics import move_end_effector_controller_topic, move_kinect_topic, \
+    move_head_topic, move_linear_topic
+
+sensor_client ={ 
+  'goal' : MoveSensorGoal(),
+  'topic' : move_kinect_topic,
+  'action' : MoveSensorAction
+}
+
+linear_client ={
+  'goal' : MoveLinearGoal(),
+  'topic' : move_linear_topic,
+  'action' : MoveLinearAction
+}
+
+head_client ={
+  'goal' : MoveSensorGoal(),
+  'topic' : move_head_topic,
+  'action' : MoveSensorAction
+}

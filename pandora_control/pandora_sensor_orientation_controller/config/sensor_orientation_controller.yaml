@@ -9,14 +9,15 @@ move_kinect_action:
   max_yaw: 1
   offset_pitch: -0.1
   offset_yaw: 0
-  scan_rate: 0.5
+  scan_rate: 2.0
+  pitch_rate: 0.2
   command_timeout: 10.0
   movement_threshold: 0.05
   lax_movement_threshold: 0.5
   pitch_command_topic: /kinect_pitch_controller/command
   yaw_command_topic: /kinect_yaw_controller/command
   pitch_joint_parent: base_link
-  pitch_joint_child: kinect_servo_link
-  yaw_joint_parent: kinect_servo_link
-  yaw_joint_child: kinect_base_link
+  pitch_joint_child: kinect_pitch_servo_link
+  yaw_joint_parent: kinect_yaw_servo_link
+  yaw_joint_child: kinect_platform_link
   sensor_frame: kinect_frame

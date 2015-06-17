@@ -61,7 +61,7 @@ namespace pandora_control
 
   class SensorOrientationActionServer
   {
-    private:
+   private:
       ros::NodeHandle nodeHandle_;
       std::string actionName_;
       actionlib::SimpleActionServer<
@@ -69,6 +69,9 @@ namespace pandora_control
 
       ros::Publisher sensorPitchPublisher_;
       ros::Publisher sensorYawPublisher_;
+      ros::Timer scanYawTimer_;
+      ros::Timer scanPitchTimer_;
+      ros::Timer pointSensorTimer_;
 
       int position_;
       int command_;
@@ -81,7 +84,9 @@ namespace pandora_control
       double offsetPitch_;
       double offsetYaw_;
       double scanRate_;
+      double pitchRate_;
       double commandTimeout_;
+      double pointThreshold_;
       double movementThreshold_;
       double laxMovementThreshold_;
       std::string pitchJointParent_;
@@ -91,23 +96,29 @@ namespace pandora_control
       std::string pitchCommandTopic_;
       std::string yawCommandTopic_;
       std::string sensorFrame_;
+      std::string pointOfInterest_;
       double lastPitchTarget_;
       double lastYawTarget_;
+
+      std_msgs::Float64 pitchTargetPosition_;
+      std_msgs::Float64 yawTargetPosition_;
 
       tf::TransformListener tfListener_;
 
       void callback(const pandora_sensor_orientation_controller::MoveSensorGoalConstPtr& goal);
+      void preemptCallback();
 
       bool getcontrollerParams();
       void testSensor();
       void centerSensor();
-      void scan();
-      void pointSensor(std::string pointOfInterest, double movementThreshold);
-      int checkGoalCompletion(double pitchCommand, double yawCommand);
+      void scan(const ros::TimerEvent& event);
+      void pointSensor(const ros::TimerEvent& event);
+      int checkGoalCompletion();
       void setGoalState(int state);
-      void checkAngleLimits(std_msgs::Float64 *pitchTargetPosition,
-        std_msgs::Float64 *yawTargetPosition);
-    public:
+      void checkAngleLimits();
+      void stopPreviousTimers();
+      void stabilizePitch(const ros::TimerEvent& event);
+   public:
       SensorOrientationActionServer(
         std::string name,
         ros::NodeHandle nodeHandle_);
