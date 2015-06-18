@@ -214,7 +214,7 @@
     </joint>
 
     <link name="imu" >
-      <xacro:solid_cuboid_inertial mass="0.05" x="0.057" y="0.045" z="0.024" >
+      <xacro:solid_cuboid_inertial mass="0.050" x="0.057" y="0.045" z="0.024" >
         <xacro:default_origin />
       </xacro:solid_cuboid_inertial>
     </link>/

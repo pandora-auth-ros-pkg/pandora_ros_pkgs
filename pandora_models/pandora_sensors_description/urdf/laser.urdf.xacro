@@ -53,7 +53,7 @@
     </link>
 
     <link name="laser_main_link" >
-      <xacro:solid_cuboid_inertial mass="0.160" x="0.048" y="0.051" z="0.80" >
+      <xacro:solid_cuboid_inertial mass="0.160" x="0.048" y="0.051" z="0.080" >
         <origin xyz="0.00041 -0.00007 0.04539" />
       </xacro:solid_cuboid_inertial>
       <visual>
