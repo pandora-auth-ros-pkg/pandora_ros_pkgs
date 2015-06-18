@@ -15,7 +15,7 @@
                         parent="linear_elevator_link" >
 
       <origin xyz="0.0195 -0.0051 0.3270"
-              rpy="${zero}" />
+              rpy="0.0 0.0 ${ PI }" />
 
     </xacro:sonar_caster>
     
@@ -27,7 +27,7 @@
                         parent="base_link" >
 
       <origin xyz="-0.15026 0.06429 0.39925"
-              rpy="0.0 0.0 ${ 5 * PI_6 }" />
+              rpy="0.0 0.0 ${ - PI_6 }" />
 
     </xacro:sonar_caster>
     
@@ -39,7 +39,7 @@
                         parent="base_link" >
 
       <origin xyz="-0.15026 -0.06429 0.39925"
-              rpy="0.0 0.0 ${ 7 * PI_6 }" />
+              rpy="0.0 0.0 ${ PI_6 }" />
 
     </xacro:sonar_caster>
     
