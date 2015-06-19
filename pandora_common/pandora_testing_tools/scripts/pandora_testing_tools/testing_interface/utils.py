@@ -8,6 +8,10 @@ def distance(a, b):
 
     return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
 
+def distance_keypoints(a, b):
+
+    return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
+
 def isOrientationReversed(a, b):
 
     roll, pitch, yaw = euler_from_quaternion([a.x, a.y, a.z, a.w])
