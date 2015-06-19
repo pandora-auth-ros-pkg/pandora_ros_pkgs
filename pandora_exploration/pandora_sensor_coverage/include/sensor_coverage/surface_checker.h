@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -48,7 +48,7 @@
 
 #include "sensor_coverage/coverage_checker.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -66,6 +66,7 @@ namespace pandora_data_fusion
          * @param frameName [std::string const&] frame whose view is to be tracked
          */
         SurfaceChecker(const NodeHandlePtr& nh, const std::string& frameName);
+        virtual ~SurfaceChecker();
 
         /**
          * @override
@@ -107,11 +108,11 @@ namespace pandora_data_fusion
 
         /**
          * @brief Getter checker's coverage map
-         * @return boost::shared_ptr<octomap::ColorOcTree>
+         * @return octomap::ColorOcTree*
          */
-        boost::shared_ptr<octomap::ColorOcTree> getCoverageMap3d() const
+        octomap::ColorOcTree* getCoverageMap3d() const
         {
-          return coveredSurface_;
+          return coveredSurfacePtr_;
         }
 
       protected:
@@ -161,7 +162,7 @@ namespace pandora_data_fusion
         //!< map3d_'s resolution.
         double blurFactor_;
         //!< Sensor's surface coverage patch.
-        boost::shared_ptr<octomap::ColorOcTree> coveredSurface_;
+        octomap::ColorOcTree* coveredSurfacePtr_;
 
         /*  Parameters  */
         //!< Radius in which a surface is considered to be planar.
@@ -172,7 +173,7 @@ namespace pandora_data_fusion
     };
 
 }  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
+}  // namespace pandora_exploration
 
 #endif  // SENSOR_COVERAGE_SURFACE_CHECKER_H
 

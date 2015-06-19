@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_sensor_coverage)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
-  roslint
   pandora_alert_handler
   state_manager
   state_manager_msgs
   octomap_msgs
   octomap_ros
+  roslint
   )
 
 find_package(octomap REQUIRED)
@@ -108,6 +110,15 @@ if(CATKIN_ENABLE_TESTING)
   add_subdirectory(test)
 endif()
 
+################################  Roslint  #####################################
+
+file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
+  RELATIVE ${PROJECT_SOURCE_DIR}
+    include/**/*.h
+    include/**/*.hxx
+    src/**/*.cpp
+    )
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 ##################### Install targets ###############################
 

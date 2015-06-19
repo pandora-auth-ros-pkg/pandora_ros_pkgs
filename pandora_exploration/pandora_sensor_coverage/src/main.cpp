@@ -40,7 +40,7 @@
 
 #include "sensor_coverage/sensor_coverage.h"
 
-using pandora_data_fusion::pandora_sensor_coverage::SensorCoverage;
+using pandora_exploration::pandora_sensor_coverage::SensorCoverage;
 
 int main(int argc, char** argv)
 {
@@ -53,8 +53,8 @@ int main(int argc, char** argv)
       ros::console::notifyLoggerLevelsChanged();
     }
   }
-  SensorCoverage sensorCoverage("/data_fusion/sensor_coverage");
-  ROS_INFO("[DATA_FUSION] Beginning Sensor Coverage node");
+  SensorCoverage sensorCoverage("/exploration/sensor_coverage");
+  ROS_INFO("[exploration] Beginning Sensor Coverage node");
   ros::spin();
   return 0;
 }

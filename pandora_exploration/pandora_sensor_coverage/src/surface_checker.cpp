@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -42,7 +42,7 @@
 
 #include "sensor_coverage/surface_checker.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -50,8 +50,7 @@ namespace pandora_data_fusion
     SurfaceChecker::SurfaceChecker(const NodeHandlePtr& nh, const std::string& frameName)
       : CoverageChecker(nh, frameName)
     {
-      double resolution = map3d_->getResolution() / blurFactor_;
-      coveredSurface_.reset( new octomap::ColorOcTree(resolution) );
+      coveredSurfacePtr_ = NULL;
 
       std::string topic;
       if (nh_->getParam(frameName_+"/published_topic_names/surface_coverage", topic))
@@ -80,6 +79,12 @@ namespace pandora_data_fusion
       getParameters();
     }
 
+    SurfaceChecker::~SurfaceChecker()
+    {
+      if (coveredSurfacePtr_ != NULL)
+        delete coveredSurfacePtr_;
+    }
+
     double SurfaceChecker::ORIENTATION_CIRCLE = 0.03;
 
     void SurfaceChecker::findCoverage(
@@ -105,17 +110,17 @@ namespace pandora_data_fusion
           yaw_curr = sensorYaw_ + h_angle;
           pitch_curr = sensorPitch_ + v_angle;
           octomap::point3d direction(1, 0, 0);
-          if (map3d_->castRay(sensorPosition_,
+          if ((*map3dPtrPtr_)->castRay(sensorPosition_,
                 direction.rotate_IP(sensorRoll_, pitch_curr, yaw_curr),
                 pointOnWall,
                 false,
                 SENSOR_RANGE))
           {
-            if (coveredSurface_->insertRay(sensorPosition_,
+            if (coveredSurfacePtr_->insertRay(sensorPosition_,
                 pointOnWall,
                 SENSOR_RANGE))
             {
-              octomap::ColorOcTreeNode* node = coveredSurface_->search(pointOnWall);
+              octomap::ColorOcTreeNode* node = coveredSurfacePtr_->search(pointOnWall);
               if (node != NULL)
               {
                 unsigned char coverage = findPointCoverage(pointOnWall, direction);
@@ -127,7 +132,7 @@ namespace pandora_data_fusion
           }
         }
       }
-      // coveredSurface_->updateInnerOccupancy();
+      // coveredSurfacePtr_->updateInnerOccupancy();
     }
 
     unsigned char SurfaceChecker::findPointCoverage(const octomap::point3d& pointOnWall,
@@ -168,8 +173,8 @@ namespace pandora_data_fusion
         x = point.x() + ORIENTATION_CIRCLE * cos((i / 180.0) * PI);
         y = point.y() + ORIENTATION_CIRCLE * sin((i / 180.0) * PI);
 
-        if (map3d_->search(x, y, point.z())->getOccupancy()
-            > map3d_->getOccupancyThres())
+        if ((*map3dPtrPtr_)->search(x, y, point.z())->getOccupancy()
+            > (*map3dPtrPtr_)->getOccupancyThres())
         {
           octomap::point3d temp;
           temp.x() = x;
@@ -201,8 +206,8 @@ namespace pandora_data_fusion
         dz = sqrt((1 - pow(lambda, 2)) * pow(ORIENTATION_CIRCLE, 2));
         x = point.x() + lambda * dx;
         y = point.y() + lambda * dy;
-        if (map3d_->search(x, y, point.z() + dz)->getOccupancy()
-            > map3d_->getOccupancyThres())
+        if ((*map3dPtrPtr_)->search(x, y, point.z() + dz)->getOccupancy()
+            > (*map3dPtrPtr_)->getOccupancyThres())
         {
           octomap::point3d temp;
           temp.x() = x;
@@ -210,8 +215,8 @@ namespace pandora_data_fusion
           temp.z() = point.z() + dz;
           points.push_back(temp);
         }
-        if (map3d_->search(x, y, point.z() - dz)->getOccupancy()
-            > map3d_->getOccupancyThres())
+        if ((*map3dPtrPtr_)->search(x, y, point.z() - dz)->getOccupancy()
+            > (*map3dPtrPtr_)->getOccupancyThres())
         {
           octomap::point3d temp;
           temp.x() = x;
@@ -267,25 +272,26 @@ namespace pandora_data_fusion
 
     void SurfaceChecker::publishCoverage(const std::string& frame)
     {
-      coveredSurface_->toMaxLikelihood();
-      coveredSurface_->prune();
+      coveredSurfacePtr_->toMaxLikelihood();
+      coveredSurfacePtr_->prune();
       octomap_msgs::Octomap msg;
       msg.header.stamp = ros::Time::now();
       msg.header.frame_id = frame;
       msg.binary = false;
-      msg.id = coveredSurface_->getTreeType();
+      msg.id = coveredSurfacePtr_->getTreeType();
       ROS_DEBUG("Tree class type: %s", msg.id.c_str());
-      msg.resolution = coveredSurface_->getResolution();
-      if (octomap_msgs::fullMapToMsg(*coveredSurface_, msg))
+      msg.resolution = coveredSurfacePtr_->getResolution();
+      if (octomap_msgs::fullMapToMsg(*coveredSurfacePtr_, msg))
         coveragePublisher_.publish(msg);
     }
 
     void SurfaceChecker::resetCoverage()
     {
-      double resolution = map3d_->getResolution() / blurFactor_;
-      coveredSurface_.reset( new octomap::ColorOcTree(resolution) );
+      if (coveredSurfacePtr_ != NULL)
+        delete coveredSurfacePtr_;
+      double resolution = (*map3dPtrPtr_)->getResolution() / blurFactor_;
+      coveredSurfacePtr_ = new octomap::ColorOcTree(resolution);
     }
 
 }  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
-
+}  // namespace pandora_exploration

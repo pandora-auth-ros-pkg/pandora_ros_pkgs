@@ -32,15 +32,18 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
 #include <string>
+#include <boost/shared_ptr.hpp>
+
+#include "nav_msgs/OccupancyGrid.h"
 
 #include "sensor_coverage/sensor.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -49,6 +52,8 @@ namespace pandora_data_fusion
         const std::string& frameName, const std::string& mapOrigin)
       : nh_(nh), frameName_(frameName)
     {
+      initialized_ = false;
+
       if (!nh_->getParam(frameName_+"/produces_surface_coverage", surfaceCoverage_))
       {
         ROS_FATAL("%s produces surface coverage param not found", frameName_.c_str());
@@ -58,8 +63,6 @@ namespace pandora_data_fusion
       {
         spaceChecker_.reset( new SpaceChecker<octomap::ColorOcTree>(nh_, frameName_) );
         surfaceChecker_.reset( new SurfaceChecker(nh_, frameName_) );
-        boost::dynamic_pointer_cast< SpaceChecker<octomap::ColorOcTree> >(spaceChecker_)->
-          setCoverageMap3d(surfaceChecker_->getCoverageMap3d());
       }
       else
       {
@@ -72,8 +75,9 @@ namespace pandora_data_fusion
           &Sensor::coverageUpdate, this);
     }
 
-    boost::shared_ptr<octomap::OcTree> Sensor::map3d_ = boost::shared_ptr<octomap::OcTree>();
-    nav_msgs::OccupancyGridPtr Sensor::map2d_;
+    boost::shared_ptr<octomap::OcTree*> Sensor::map3dPtrPtr_ = boost::
+      shared_ptr<octomap::OcTree*>();
+    nav_msgs::OccupancyGridPtr Sensor::map2dPtr_ = nav_msgs::OccupancyGridPtr();
     std::string Sensor::GLOBAL_FRAME;
     std::string Sensor::ROBOT_BASE_FRAME;
 
@@ -110,8 +114,25 @@ namespace pandora_data_fusion
       // If sensor is not open and working, do not update coverage patch.
       if (!sensorWorking_)
         return;
-      if (map2d_->data.size() == 0 || (surfaceCoverage_ && map3d_.get() == NULL))
+      if (map2dPtr_->data.size() == 0 || (surfaceCoverage_ && *map3dPtrPtr_ == NULL))
         return;
+      else if (!initialized_)
+      {
+        if (surfaceCoverage_)
+        {
+          surfaceChecker_->resetCoverage();
+          boost::dynamic_pointer_cast< SpaceChecker<octomap::ColorOcTree> >(
+              spaceChecker_)->setCoverageMap3d(surfaceChecker_->getCoverageMap3d());
+        }
+        else
+        {
+          boost::dynamic_pointer_cast< SpaceChecker<octomap::OcTree> >(
+              spaceChecker_)->setCoverageMap3d(*map3dPtrPtr_);
+          // DANGER ZONE dereferencing boost shr_ptr to share ptr
+        }
+        initialized_ = true;
+      }
+
       // If it does, fetch current transformation.
       ros::Time timeNow = ros::Time::now();
       tf::StampedTransform sensorTransform, baseTransform;
@@ -160,7 +181,5 @@ namespace pandora_data_fusion
         ROS_BREAK();
       }
     }
-
-}  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
-
+}
+}

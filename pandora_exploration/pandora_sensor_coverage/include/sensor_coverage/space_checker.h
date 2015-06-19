@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -44,7 +44,7 @@
 
 #include "sensor_coverage/coverage_checker.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -96,9 +96,9 @@ namespace pandora_data_fusion
            * map which will be projected down to find area and space coverage.
            * @return void
            */
-          void setCoverageMap3d(const boost::shared_ptr<TreeType>& map)
+          void setCoverageMap3d(TreeType* mapPtr)
           {
-            coverageMap3d_ = map;
+            coverageMap3d_ = mapPtr;
           }
 
         private:
@@ -133,7 +133,7 @@ namespace pandora_data_fusion
           nav_msgs::OccupancyGridPtr coveredSpace_;
 
           //!< 3d coverage map produced when surfacing checking.
-          boost::shared_ptr<TreeType> coverageMap3d_;
+          TreeType* coverageMap3d_;
 
           //!< Total area covered with this sensor.
           float totalAreaCovered_;
@@ -147,7 +147,7 @@ namespace pandora_data_fusion
       };
 
 }  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
+}  // namespace pandora_exploration
 
 #include "sensor_coverage/space_checker.hxx"
 

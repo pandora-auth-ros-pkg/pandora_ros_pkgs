@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -51,7 +51,7 @@
 #include "sensor_coverage/space_checker.h"
 #include "sensor_coverage/surface_checker.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -93,26 +93,26 @@ namespace pandora_data_fusion
         void flushCoverage();
 
         /**
-         * @brief Setter for static variable map2d_
-         * @param map2d [nav_msgs::OccupancyGridPtr const&] map
+         * @brief Setter for static variable map2dPtr_
+         * @param map2dPtr [nav_msgs::OccupancyGridPtr const&] map
          * @return void
          */
-        static void setMap2d(const nav_msgs::OccupancyGridPtr& map2d)
+        static void setMap2d(const nav_msgs::OccupancyGridPtr& map2dPtr)
         {
-          map2d_ = map2d;
-          CoverageChecker::setMap2d(map2d);
+          map2dPtr_ = map2dPtr;
+          CoverageChecker::setMap2d(map2dPtr);
         }
 
         /**
-         * @brief Setter for static variable map3d_
-         * @param map3d [boost::shared_ptr<octomap::OcTree> const&] map
+         * @brief Setter for static variable map3dPtrPtr_
+         * @param map3dPtrPtr [boost::shared_ptr<octomap::OcTree*> const&] map
          * @note Will reset to null, deleting reference, if a null ptr is passed.
          * @return void
          */
-        static void setMap3d(const boost::shared_ptr<octomap::OcTree>& map3d)
+        static void setMap3d(const boost::shared_ptr<octomap::OcTree*>& map3dPtrPtr)
         {
-          map3d_ = map3d;
-          CoverageChecker::setMap3d(map3d);
+          map3dPtrPtr_ = map3dPtrPtr;
+          CoverageChecker::setMap3d(map3dPtrPtr);
         }
 
         /**
@@ -174,6 +174,8 @@ namespace pandora_data_fusion
         std::string frameName_;
         //!< Is surface coverage needed?
         bool surfaceCoverage_;
+        //!< Are coveraged maps in checkers initialized?
+        bool initialized_;
 
         //!< Abstract transformation listener.
         TfListenerPtr listener_;
@@ -184,8 +186,8 @@ namespace pandora_data_fusion
         boost::shared_ptr<SurfaceChecker> surfaceChecker_;
 
         //!< Global 3d and 2d maps as they are sent by SLAM
-        static boost::shared_ptr<octomap::OcTree> map3d_;
-        static nav_msgs::OccupancyGridPtr map2d_;
+        static boost::shared_ptr<octomap::OcTree*> map3dPtrPtr_;
+        static nav_msgs::OccupancyGridPtr map2dPtr_;
 
         /*  Params  */
         static std::string GLOBAL_FRAME;
@@ -206,6 +208,6 @@ namespace pandora_data_fusion
     typedef boost::shared_ptr<Sensor> SensorPtr;
 
 }  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
+}  // namespace pandora_exploration
 
 #endif  // SENSOR_COVERAGE_SENSOR_H

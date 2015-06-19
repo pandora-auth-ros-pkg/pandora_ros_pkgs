@@ -1,13 +1,13 @@
 <package format="2">
   <name>pandora_sensor_coverage</name>
   <version>0.0.0</version>
-  <description>Data Fusion Sensor Coverage</description>
+  <description>Pandora's exploration sensor coverage map module</description>
   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
-  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_exploration/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_exploration.git</url>
 
   <author>Tsirigotis Christos</author>
 
@@ -21,8 +21,8 @@
   <depend>octomap</depend>
   <depend>octomap_msgs</depend>
   <depend>octomap_ros</depend>
+
   <build_depend>roslint</build_depend>
-  <!--<build_depend>pandora_vision_hole_detector</build_depend>-->
 
   <!--  Test Dependencies  -->
   <test_depend>rostest</test_depend>

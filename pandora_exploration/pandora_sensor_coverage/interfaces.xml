@@ -1,11 +1,11 @@
 <package>
 
   <node>
-    /data_fusion/sensor_coverage
+    /exploration/sensor_coverage
     <subscriber>/slam_map/map</subscriber>
     <subscriber>/tf</subscriber>
 
-    <publisher>/data_fusion/sensor_coverage/coverage_map</publisher>
+    <publisher>/exploration/sensor_coverage/coverage_map</publisher>
     
   </node>
   

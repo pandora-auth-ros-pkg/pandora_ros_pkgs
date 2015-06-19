@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
+ * Authors:
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -41,7 +41,7 @@
 
 #include "std_msgs/Float32.h"
 
-namespace pandora_data_fusion
+namespace pandora_exploration
 {
   namespace pandora_sensor_coverage
   {
@@ -52,8 +52,6 @@ namespace pandora_data_fusion
       : CoverageChecker(nh, frameName)
     {
       resetCoverage();
-
-      coverageMap3d_ = boost::dynamic_pointer_cast<TreeType>(map3d_);
 
       std::string topic;
 
@@ -98,7 +96,7 @@ namespace pandora_data_fusion
 
       // Declare helper variables
       CoverageChecker::findCoverage(sensorTransform, baseTransform);
-      const float resolution = map2d_->info.resolution;
+      const float resolution = map2dPtr_->info.resolution;
       float currX = sensorPosition_.x();
       float currY = sensorPosition_.y();
       float fov = (SENSOR_HFOV / 180.0) * PI;
@@ -112,7 +110,7 @@ namespace pandora_data_fusion
         cell.x() = resolution * cos(sensorYaw_ + angle) + currX;
         cell.y() = resolution * sin(sensorYaw_ + angle) + currY;
 
-        while (CELL(cell.x(), cell.y(), map2d_)
+        while (CELL(cell.x(), cell.y(), map2dPtr_)
             < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100)
             && Utils::distanceBetweenPoints2D(octomap::pointOctomapToMsg(sensorPosition_),
               octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
@@ -140,7 +138,7 @@ namespace pandora_data_fusion
       {
         for (int jj = 0; jj < coveredSpace_->info.height; ++jj)
         {
-          if (map2d_->data[ii + jj * map2d_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
+          if (map2dPtr_->data[ii + jj * map2dPtr_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
           {
             coveredSpace_->data[ii + jj * coveredSpace_->info.width] = 0;
           }
@@ -218,6 +216,7 @@ namespace pandora_data_fusion
           else if (node->getOccupancy() <= coverageMap3d_->getOccupancyThres())
           {
             occupied = false;
+            // """ why set coversSpace to true?? """
             coversSpace = true;
             startZ = coverageMap3d_->keyToCoord(*it).z();
           }
@@ -264,7 +263,7 @@ namespace pandora_data_fusion
     void SpaceChecker<TreeType>::alignCoverageWithMap()
     {
       int oldSize = coveredSpace_->data.size();
-      int newSize = map2d_->data.size();
+      int newSize = map2dPtr_->data.size();
       int8_t* oldCoverage = new int8_t[oldSize];
       nav_msgs::MapMetaData oldMetaData;
       if (oldSize != 0 && oldSize != newSize)
@@ -277,9 +276,9 @@ namespace pandora_data_fusion
           oldCoverage[ii] = coveredSpace_->data[ii];
         }
       }
-      // Reset coveredSpace_->and copy map2D_'s metadata.
-      coveredSpace_->header = map2d_->header;
-      coveredSpace_->info = map2d_->info;
+      // Reset coveredSpace_->and copy map2dPtr_'s metadata.
+      coveredSpace_->header = map2dPtr_->header;
+      coveredSpace_->info = map2dPtr_->info;
       if (oldSize != newSize)
       {
         ROS_WARN("[SENSOR_COVERAGE_SPACE_CHECKER %d] Resizing space coverage...", __LINE__);
@@ -304,10 +303,18 @@ namespace pandora_data_fusion
               y = jj * oldMetaData.resolution;
               xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
               yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-              int coords = static_cast<int>(round((xn + yn * coveredSpace_->info.width)
-                    / coveredSpace_->info.resolution));
-              coveredSpace_->data[coords] = oldCoverage[ii + jj * oldMetaData.width];
-              coverageDilation(2, coords);
+              int coords = static_cast<int>(round(xn / coveredSpace_->info.resolution) +
+                   round(yn * coveredSpace_->info.width / coveredSpace_->info.resolution));
+              if ((coords > newSize) || (coords < 0))
+              {
+                ROS_WARN("Error resizing to: %d\nCoords Xn: %f, Yn: %f\n", newSize, xn, yn);
+              }
+              else
+              {
+                uint8_t temp = oldCoverage[ii + jj * oldMetaData.width];
+                coveredSpace_->data[coords] = temp;
+                coverageDilation(2, coords);
+              }
             }
           }
         }
@@ -383,5 +390,5 @@ namespace pandora_data_fusion
     }
 
 }  // namespace pandora_sensor_coverage
-}  // namespace pandora_data_fusion
+}  // namespace pandora_exploration
 
