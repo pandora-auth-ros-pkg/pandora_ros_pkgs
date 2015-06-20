@@ -1,14 +1,10 @@
 <launch>
     
 <!-- ###################################################################### -->
-
-  <arg name="robot" default="woody" />
-    
-<!-- ###################################################################### -->
             
   <!-- Load Skid Steer -->
   <include file="$(find pandora_motor_hardware_interface)/motor_controllers/launch/skid_steer_drive_controller.launch" >
-    <arg name="robot" value="$(arg robot)" />
+    <arg name="robot" value="gears" />
     <arg name="namespace" value="/" />
   </include>
     
@@ -49,19 +45,19 @@
   
   <!-- Laser -->
   <rosparam command="load" ns="/"
-            file="$(find pandora_gazebo_controllers)/config/position_controllers/pandora_laser_controllers.yaml" />
+            file="$(find pandora_gazebo_controllers)/config/gears/pandora_controllers/pandora_laser_controllers.yaml" />
   
   <!-- Kinect -->
   <rosparam command="load" ns="/"
-            file="$(find pandora_gazebo_controllers)/config/position_controllers/pandora_kinect_controllers.yaml" />
+            file="$(find pandora_gazebo_controllers)/config/gears/pandora_controllers/pandora_kinect_controllers.yaml" />
   
   <!-- Linear Elevator -->
   <rosparam command="load" ns="/"
-            file="$(find pandora_gazebo_controllers)/config/position_controllers/pandora_linear_elevator_controller.yaml" />
+            file="$(find pandora_gazebo_controllers)/config/gears/pandora_controllers/pandora_linear_elevator_controller.yaml" />
   
   <!-- Linear Head -->
   <rosparam command="load" ns="/"
-            file="$(find pandora_gazebo_controllers)/config/position_controllers/pandora_linear_head_controllers.yaml" />
+            file="$(find pandora_gazebo_controllers)/config/gears/pandora_controllers/pandora_linear_head_controllers.yaml" />
     
 <!-- ###################################################################### -->
   

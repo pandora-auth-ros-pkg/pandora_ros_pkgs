@@ -7,29 +7,25 @@
   <arg name="control" default="true" />
   <arg name="interface" default="true" />
   
-  <arg name="sensors_viz" default="false" />
   <arg name="tune" default="false" />
     
 <!-- ###################################################################### -->
   
   <group if="$(arg control)" >
-  
     <group if="$(arg interface)" >
-      <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_position_controllers.launch" >
-        <arg name="robot" value="woody" />
-      </include>
+      <include file="$(find pandora_gazebo_controllers)/launch/woody/pandora_woody_controllers.launch" />
     </group>
     
     <group unless="$(arg interface)" >
-      <include file="$(find pandora_gazebo_controllers)/launch/pandora_gazebo_effort_controllers.launch" />
+      <include file="$(find pandora_gazebo_controllers)/launch/woody/default_woody_controllers.launch" />
     </group>
-    
   </group>
     
 <!-- ###################################################################### -->
 
   <param name="robot_description"
-         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/woody/woody.gazebo.xacro' control:=$(arg control) interface:=$(arg interface) sensors_viz:=$(arg sensors_viz) tune:=$(arg tune)"/>
+         command="$(find xacro)/xacro.py '$(find pandora_gazebo_description)/urdf/woody/woody.gazebo.xacro'
+                  control:=$(arg control) interface:=$(arg interface) tune:=$(arg tune)"/>
     
 <!-- ###################################################################### -->
   

@@ -12,6 +12,7 @@ find_package(
   pandora_imu_hardware_interface
   pandora_xmega_hardware_interface
   pandora_arm_hardware_interface
+  pandora_sensor_msgs
   pluginlib
 )
 
@@ -30,6 +31,7 @@ catkin_package(
     pandora_imu_hardware_interface
     pandora_xmega_hardware_interface
     pandora_arm_hardware_interface
+    pandora_sensor_msgs
     pluginlib
 #  DEPENDS
 )
@@ -46,10 +48,18 @@ link_directories(
 set(CMAKE_BUILD_TYPE Debug)
 
 add_library(
-  ${PROJECT_NAME}
-  src/gazebo_interface.cpp)
+  ${PROJECT_NAME}_gears_gazebo_interface
+  src/gears_gazebo_interface.cpp)
 target_link_libraries(
-  ${PROJECT_NAME}
+  ${PROJECT_NAME}_gears_gazebo_interface
+  ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES})
+
+add_library(
+  ${PROJECT_NAME}_woody_gazebo_interface
+  src/woody_gazebo_interface.cpp)
+target_link_libraries(
+  ${PROJECT_NAME}_woody_gazebo_interface
   ${catkin_LIBRARIES}
   ${GAZEBO_LIBRARIES})
 

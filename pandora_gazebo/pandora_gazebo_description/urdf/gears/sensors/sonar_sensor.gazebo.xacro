@@ -5,7 +5,7 @@
 <!-- ###################################################################### -->
 
   <xacro:macro name="sonar_gazebo_sensor"
-               params="name publish_msg" >
+               params="name" >
   
     <gazebo reference="${name}_sonar_frame" >
 
@@ -43,16 +43,13 @@
         <plugin name="sonar2ros"
                 filename="libpandora_gazebo_plugins_pandora_sonar_plugin.so" >
 
-          <!--============================================================= -->
-          <robotNamespace></robotNamespace>
+          <robotNamespace>gazebo_sensors</robotNamespace>
           <!--============================================================= -->
           <frameName>${name}_sonar_frame</frameName>
           <!--============================================================= -->
-          <topicName>/sensors/sonar</topicName> <!-- FIXME -->
+          <topicName>range</topicName>
           <!--============================================================= -->
           <gaussianNoise>0.0</gaussianNoise>
-          <!--============================================================= -->
-          <publishMsg>${publish_msg}</publishMsg>
           <!--============================================================= -->
 
         </plugin>

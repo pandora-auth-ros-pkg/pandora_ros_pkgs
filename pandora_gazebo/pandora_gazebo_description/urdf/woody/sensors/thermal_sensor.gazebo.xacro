@@ -5,7 +5,7 @@
 <!-- ###################################################################### -->
 
   <xacro:macro name="thermal_gazebo_sensor"
-               params="prefix_y publish_msg publish_viz" >
+               params="prefix_y" >
   
     <gazebo reference="${prefix_y}_thermal_frame" >
     
@@ -17,14 +17,8 @@
           <horizontal_fov>0.8</horizontal_fov> <!-- FIXME -->
           <!--============================================================= -->
           <image>
-            <xacro:if value="${publish_viz}" >
-              <width>640</width>
-              <height>480</height>
-            </xacro:if>
-            <xacro:unless value="${publish_viz}" >
-              <width>8</width>
-              <height>8</height>
-            </xacro:unless>
+            <width>8</width>
+            <height>8</height>
           </image>
           <!--============================================================= -->
           <clip> <!-- FIXME -->
@@ -37,14 +31,11 @@
         <plugin name="thermal2ros"
                 filename="libpandora_gazebo_plugins_pandora_thermal_plugin.so" >
 
+          <robotNamespace>gazebo_sensors</robotNamespace>
           <!--============================================================= -->
           <frameName>${prefix_y}_thermal_optical_frame</frameName>
           <!--============================================================= -->
-          <topicName>sensors/thermal</topicName>
-          <!--============================================================= -->
-          <publishMsg>${publish_msg}</publishMsg>
-          <!--============================================================= -->
-          <publishViz>${publish_viz}</publishViz>
+          <topicName>thermal</topicName>
           <!--============================================================= -->
 
         </plugin>
