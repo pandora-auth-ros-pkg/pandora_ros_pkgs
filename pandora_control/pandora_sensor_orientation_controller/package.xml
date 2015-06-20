@@ -24,6 +24,7 @@
   <depend>sensor_msgs</depend>
   <depend>actionlib</depend>
   <depend>actionlib_msgs</depend>
+  <depend>pandora_sensor_msgs</depend>
   <depend>tf</depend>
   <depend>urdf</depend>
 

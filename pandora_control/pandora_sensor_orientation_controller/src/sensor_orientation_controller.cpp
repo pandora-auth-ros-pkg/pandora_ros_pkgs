@@ -37,9 +37,23 @@
 * Author:  Kostas Peppas
 *********************************************************************/
 
+#include <string>
+#include <algorithm>
+
 #include <pandora_sensor_orientation_controller/sensor_orientation_controller.h>
 
-#include <string>
+namespace
+{
+
+  double clamp(
+      const double val,
+      const double min_val,
+      const double max_val)
+  {
+    return std::min(std::max(val, min_val), max_val);
+  }
+
+}  // namespace
 
 namespace pandora_control
 {
@@ -89,6 +103,18 @@ namespace pandora_control
           yawCommandTopic_,
           5, true);
 
+      imuSubscriber_ = nodeHandle_.subscribe(
+        imuTopic_,
+        1,
+        &SensorOrientationActionServer::imuCallback,
+        this);
+
+      for (int ii = 0; ii < bufferSize_; ii++)
+      {
+        pitchBuffer_.push_back(0);
+      }
+      bufferCounter_ = 0;
+
       std_msgs::Float64 targetPosition;
       targetPosition.data = 0;
       lastPitchTarget_ = 0;
@@ -134,7 +160,6 @@ namespace pandora_control
     {
       pointThreshold_ = movementThreshold_;
       pointSensorTimer_.start();
-
     }
     else if (command_ ==
              pandora_sensor_orientation_controller::MoveSensorGoal::LAX_POINT)
@@ -175,6 +200,7 @@ namespace pandora_control
                       movementThreshold_, 0.017);
     nodeHandle_.param(actionName_ + "/lax_movement_threshold",
                       laxMovementThreshold_, 0.2);
+    nodeHandle_.param("buffer_size", bufferSize_, 5);
     if (pitchStep_ > maxPitch_ || pitchStep_ < minPitch_)
     {
       if (maxPitch_ < fabs(minPitch_))
@@ -198,6 +224,17 @@ namespace pandora_control
       }
     }
     nodeHandle_.param(actionName_ + "/scan_rate", scanRate_, 1.0);
+
+    if (nodeHandle_.getParam(actionName_ + "/imu_topic",
+      imuTopic_))
+    {
+      ROS_INFO_STREAM("Got param imu_topic: " << imuTopic_);
+    }
+    else
+    {
+      ROS_FATAL("Failed to get param imu_topic shuting down");
+      return false;
+    }
 
     if (nodeHandle_.getParam(actionName_ + "/pitch_command_topic",
       pitchCommandTopic_))
@@ -343,36 +380,53 @@ namespace pandora_control
     }
     pitchScan_ = pitchStep_;
 
-    publishScanCommands();
+    publishScanPitchCommand();
+    publishScanYawCommand();
   }
 
   void SensorOrientationActionServer::stabilizePitch(const ros::TimerEvent& event)
   {
-    tf::StampedTransform baseTransform;
-    try
-    {
-      tfListener_.lookupTransform(
-        "map", "base_link",
-        ros::Time(0), baseTransform);
-    }
-    catch (tf::TransformException ex)
-    {
-      ROS_ERROR("%s", ex.what());
-      return;
-    }
-    baseTransform.getBasis().getRPY(baseRoll_, basePitch_, baseYaw_);
-
-    publishScanCommands();
+    publishScanPitchCommand();
   }
 
-  void SensorOrientationActionServer::publishScanCommands()
+  void SensorOrientationActionServer::imuCallback(
+    const pandora_sensor_msgs::ImuRPYConstPtr& msg)
+  {
+    double imuPitch;
+    std_msgs::Float64 str;
+
+    imuPitch = msg->pitch;
+
+    pitchBuffer_[bufferCounter_] = imuPitch;
+    bufferCounter_ = fmod(bufferCounter_ + 1, bufferSize_);
+
+    stabilizedPitch_ = 0;
+
+    for (int ii = 0; ii < bufferSize_; ii++)
+    {
+      stabilizedPitch_ += pitchBuffer_[ii] / bufferSize_;
+    }
+
+    // Invert command in order to stabilize
+    stabilizedPitch_ *= -1;
+
+    // Convert degs to rads
+    stabilizedPitch_ *= 2 * boost::math::constants::pi<double>() / 360.0;
+  }
+
+  void SensorOrientationActionServer::publishScanPitchCommand()
+  {
+    pitchTargetPosition_.data = offsetPitch_ + pitchScan_ + stabilizedPitch_;
+    clamp(pitchTargetPosition_.data, minPitch_, maxPitch_);
+    lastPitchTarget_ = pitchTargetPosition_.data;
+    sensorPitchPublisher_.publish(pitchTargetPosition_);
+  }
+
+  void SensorOrientationActionServer::publishScanYawCommand()
   {
     yawTargetPosition_.data = yawScan_ + offsetYaw_;
-    pitchTargetPosition_.data = pitchScan_ + offsetPitch_ - basePitch_;
-    checkAngleLimits();
-    lastPitchTarget_ = pitchTargetPosition_.data;
+    clamp(yawTargetPosition_.data, minYaw_, maxYaw_);
     lastYawTarget_ = yawTargetPosition_.data;
-    sensorPitchPublisher_.publish(pitchTargetPosition_);
     sensorYawPublisher_.publish(yawTargetPosition_);
   }
 
@@ -525,22 +579,8 @@ namespace pandora_control
   }
   void SensorOrientationActionServer::checkAngleLimits()
   {
-    if (pitchTargetPosition_.data < minPitch_)
-    {
-      pitchTargetPosition_.data = minPitch_;
-    }
-    else if (pitchTargetPosition_.data > maxPitch_)
-    {
-      pitchTargetPosition_.data = maxPitch_;
-    }
-    if (yawTargetPosition_.data < minYaw_)
-    {
-      yawTargetPosition_.data = minYaw_;
-    }
-    else if (yawTargetPosition_.data > maxYaw_)
-    {
-      yawTargetPosition_.data = maxYaw_;
-    }
+    clamp(pitchTargetPosition_.data, minPitch_, maxPitch_);
+    clamp(yawTargetPosition_.data, minYaw_, maxYaw_);
   }
 }  // namespace pandora_control
 

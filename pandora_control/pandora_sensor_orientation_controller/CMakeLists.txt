@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   actionlib
   actionlib_msgs
+  pandora_sensor_msgs
   message_generation
   tf
   urdf
@@ -35,6 +36,7 @@ catkin_package(
     sensor_msgs
     actionlib
     actionlib_msgs
+  pandora_sensor_msgs
     tf
     urdf
     message_runtime

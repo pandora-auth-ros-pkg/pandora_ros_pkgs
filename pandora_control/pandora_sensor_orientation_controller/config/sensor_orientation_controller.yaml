@@ -14,6 +14,8 @@ move_kinect_action:
   command_timeout: 10.0
   movement_threshold: 0.05
   lax_movement_threshold: 0.5
+  imu_topic: /sensors/imu_rpy
+  buffer_size: 5
   pitch_command_topic: /kinect_pitch_controller/command
   yaw_command_topic: /kinect_yaw_controller/command
   pitch_joint_parent: base_link

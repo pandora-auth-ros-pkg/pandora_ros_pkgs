@@ -39,6 +39,9 @@
 #define PANDORA_SENSOR_ORIENTATION_CONTROLLER_SENSOR_ORIENTATION_CONTROLLER_H
 
 #include <string>
+#include <vector>
+
+#include <boost/math/constants/constants.hpp>
 
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
@@ -47,6 +50,7 @@
 #include <std_msgs/Float64.h>
 
 #include <pandora_sensor_orientation_controller/MoveSensorAction.h>
+#include <pandora_sensor_msgs/ImuRPY.h>
 
 namespace pandora_control
 {
@@ -70,6 +74,8 @@ namespace pandora_control
       ros::Publisher sensorPitchPublisher_;
       ros::Publisher sensorYawPublisher_;
 
+      ros::Subscriber imuSubscriber_;
+
       ros::Timer scanYawTimer_;
       ros::Timer scanPitchTimer_;
       ros::Timer pointSensorTimer_;
@@ -92,19 +98,21 @@ namespace pandora_control
       std::string pitchJointChild_;
       std::string yawJointParent_;
       std::string yawJointChild_;
+      std::string imuTopic_;
       std::string pitchCommandTopic_;
       std::string yawCommandTopic_;
       std::string sensorFrame_;
       std::string pointOfInterest_;
 
+      std::vector<double> pitchBuffer_;
+      double stabilizedPitch_;
+      int bufferSize_;
+      int bufferCounter_;
+
       double pitchScan_;
-      double basePitch_;
       double offsetPitch_;
       double yawScan_;
       double offsetYaw_;
-
-      double baseYaw_;
-      double baseRoll_;
 
       double lastPitchTarget_;
       double lastYawTarget_;
@@ -114,6 +122,7 @@ namespace pandora_control
 
       tf::TransformListener tfListener_;
 
+      void imuCallback(const pandora_sensor_msgs::ImuRPYConstPtr& msg);
       void callback(const pandora_sensor_orientation_controller::MoveSensorGoalConstPtr& goal);
       void preemptCallback();
 
@@ -124,7 +133,8 @@ namespace pandora_control
       void stabilizePitch(const ros::TimerEvent& event);
       void pointSensor(const ros::TimerEvent& event);
 
-      void publishScanCommands();
+      void publishScanPitchCommand();
+      void publishScanYawCommand();
 
       int checkGoalCompletion();
       void setGoalState(int state);
