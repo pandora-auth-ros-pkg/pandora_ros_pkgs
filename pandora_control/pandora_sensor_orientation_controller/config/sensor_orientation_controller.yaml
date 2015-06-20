@@ -2,15 +2,15 @@ action_name:
   - move_kinect_action
 move_kinect_action:
   pitch_step: 0.0
+  min_pitch: -0.785
+  max_pitch: 0.785
+  offset_pitch: -0.05
   yaw_step: 0.7
-  min_pitch: -0.45
-  min_yaw: -0.7
-  max_pitch: 0.75
-  max_yaw: 1
-  offset_pitch: -0.1
+  min_yaw: -1.308
+  max_yaw: 1.308
   offset_yaw: 0
   scan_rate: 1.0
-  pitch_rate: 5.0
+  pitch_rate: 0.1
   command_timeout: 10.0
   movement_threshold: 0.05
   lax_movement_threshold: 0.5
