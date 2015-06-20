@@ -165,13 +165,13 @@ namespace pandora_control
     command[0] = command[0] * 2 * boost::math::constants::pi<double>() / 360.0;
     command[1] = command[1] * 2 * boost::math::constants::pi<double>() / 360.0;
 
-    // Check commands' limits
-    clamp(command[0], minRoll_, maxRoll_);
-    clamp(command[1], minPitch_, maxPitch_);
-
     // Add offsets
     command[0] += rollOffset_;
     command[1] += pitchOffset_;
+
+    // Check commands' limits
+    clamp(command[0], minRoll_, maxRoll_);
+    clamp(command[1], minPitch_, maxPitch_);
 
     // Publish roll command
     str.data = command[0];
