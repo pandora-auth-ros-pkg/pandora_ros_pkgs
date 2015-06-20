@@ -128,7 +128,7 @@ namespace pandora_data_fusion
 
         /**
          * @brief Fills victimsMsg with information about victims to go.
-         * (PoseStamped, probability, sensors)
+         * (geometry_msgs::PoseStamped, probability, sensors)
          * @param victimsMsg [pandora_data_fusion_msgs::VictimsMsg*] msg to be filled
          * @return void
          */

@@ -1,10 +1,11 @@
 <launch>
 
   <!--  Alert Handler  -->
-  <!-- <env name="ROSCONSOLE_CONFIG_FILE"                                               -->
-  <!--   value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg" /> -->
+  <env name="ROSCONSOLE_CONFIG_FILE"
+    value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg" />
   <node type="alert_handler_node" name="alert_handler"
       pkg="pandora_alert_handler" respawn="false" output="screen" ns="data_fusion" />
+      <!-- launch-prefix="gdb -ex run -->
   <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_params.yaml"
     command="load" ns="data_fusion/alert_handler" />
 

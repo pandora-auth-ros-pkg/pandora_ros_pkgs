@@ -202,7 +202,7 @@ namespace pandora_data_fusion
             << std::endl << "z : " << getStdDevZ());
         ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
             "before measurement probability = " << this->getProbability());
-        Point measurementPosition = measurement->getPose().position;
+        geometry_msgs::Point measurementPosition = measurement->getPose().position;
         MatrixWrapper::ColumnVector newPosition(1);
         //!< Filter's input vector
         MatrixWrapper::ColumnVector input(1);
@@ -228,7 +228,7 @@ namespace pandora_data_fusion
             input, measurementModels[2].get(), newPosition);
 
         //!< Updating existing object's expected pose.
-        Pose newObjectPose;
+        geometry_msgs::Pose newObjectPose;
         newObjectPose.position.x = filterX_->PostGet()
           ->ExpectedValueGet()(1);
         newObjectPose.position.y = filterY_->PostGet()

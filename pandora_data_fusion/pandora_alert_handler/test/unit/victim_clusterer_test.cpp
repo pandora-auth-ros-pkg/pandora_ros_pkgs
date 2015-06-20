@@ -152,7 +152,7 @@ namespace pandora_data_fusion
           objConstPtrVectPtr->push_back(holePtr2);
         }
 
-        Pose makePose(float x, float y, float z, float yaw = 0)
+        geometry_msgs::Pose makePose(float x, float y, float z, float yaw = 0)
         {
           geometry_msgs::Pose pose;
           pose.position.x = x;
@@ -169,7 +169,7 @@ namespace pandora_data_fusion
           return victimClustererPtr_->groupObjects(allObjects);
         }
 
-        geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects)
+        geometry_msgs::geometry_msgs::Point findGroupCenterPoint(const ObjectConstPtrVector& objects)
         {
           return victimClustererPtr_->findGroupCenterPoint(objects);
         }

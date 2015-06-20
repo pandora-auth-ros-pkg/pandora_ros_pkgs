@@ -74,19 +74,19 @@ namespace pandora_data_fusion
       public:
         virtual void update(const ConstPtr& measurement) = 0;
         virtual bool isSameObject(const ConstPtr& object) const = 0;
-        virtual PoseStamped getPoseStamped() const = 0;
+        virtual geometry_msgs::PoseStamped getPoseStamped() const = 0;
         virtual void getVisualization(visualization_msgs::
             MarkerArray* markers) const = 0;
         virtual std::string getType() const = 0;
         virtual int getId() const = 0;
         virtual bool getLegit() const = 0;
         virtual float getProbability() const = 0;
-        virtual Pose getPose() const = 0;
+        virtual geometry_msgs::Pose getPose() const = 0;
         virtual std::string getFrameId() const = 0;
         virtual void setId(int id) = 0;
         virtual void setLegit(bool legit) = 0;
         virtual void setProbability(float probability) = 0;
-        virtual void setPose(const Pose& pose) = 0;
+        virtual void setPose(const geometry_msgs::Pose& pose) = 0;
 
         /**
          * @brief setter for static variable globalFrame_

@@ -135,7 +135,7 @@ namespace pandora_data_fusion
 
         /* Helper functions */
 
-        float distance(Pose pose1, Pose pose2)
+        float distance(geometry_msgs::Pose pose1, geometry_msgs::Pose pose2)
         {
           float x = pose1.position.x - pose2.position.x;
           float y = pose1.position.y - pose2.position.y;
@@ -145,8 +145,8 @@ namespace pandora_data_fusion
 
         /* Variables */
 
-        geometry_msgs::Pose pose1_;
-        geometry_msgs::Pose pose2_;
+        geometry_msgs::geometry_msgs::Pose pose1_;
+        geometry_msgs::geometry_msgs::Pose pose2_;
         QrPtr qr1_;
         QrPtr qr2_;
         HazmatPtr hazmat1_;
@@ -232,7 +232,7 @@ namespace pandora_data_fusion
       ASSERT_GE(qr2_->getProbability(), 0.5);
       float probabilityBefore = qr1_->getProbability();
       float stdDevBefore = qr1_->getStdDevX();
-      Pose poseBefore = qr1_->getPose();
+      geometry_msgs::Pose poseBefore = qr1_->getPose();
       EXPECT_FALSE(qr1_->getLegit());
       qr1_->update(qr2_);
       EXPECT_FALSE(qr1_->getLegit());
@@ -258,7 +258,7 @@ namespace pandora_data_fusion
     //   qr2_->initializeObjectFilter();
     //   float probabilityBefore = qr1_->getProbability();
     //   float stdDevBefore = qr1_->getStdDevX();
-    //   Pose poseBefore = qr1_->getPose();
+    //   geometry_msgs::Pose poseBefore = qr1_->getPose();
     //   qr1_->update(qr2_);
     //   EXPECT_FALSE(qr1_->getLegit());
     //   EXPECT_LT(qr1_->getProbability(), probabilityBefore);

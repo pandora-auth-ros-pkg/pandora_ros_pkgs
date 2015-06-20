@@ -81,7 +81,7 @@ namespace pandora_data_fusion
 
           seed = time(NULL);
 
-          Pose pose;
+          geometry_msgs::Pose pose;
 
           Qr::setDistanceThres(0.5);
           Qr::setProbabilityThres(0.75);
@@ -144,7 +144,7 @@ namespace pandora_data_fusion
 
           for (int ii = 0; ii < n; ++ii)
           {
-            Pose pose;
+            geometry_msgs::Pose pose;
             pose.position.x =
               static_cast<double>(rand_r(&seed) - RAND_MAX/2)/(RAND_MAX/2) * 10000;
             pose.position.y=
@@ -177,7 +177,7 @@ namespace pandora_data_fusion
 
 
         //!< Returns distance between 2 qrs.
-        float distance(const Pose& pose1, const Pose& pose2)
+        float distance(const geometry_msgs::Pose& pose1, const geometry_msgs::Pose& pose2)
         {
           float x_ = pose1.position.x - pose2.position.x;
           float y_ = pose1.position.y - pose2.position.y;
@@ -187,7 +187,7 @@ namespace pandora_data_fusion
 
         void set(float x, float y, float z, QrPtr qr)
         {
-          Pose pose;
+          geometry_msgs::Pose pose;
           pose.position.x = x;
           pose.position.y = y;
           pose.position.z = z;

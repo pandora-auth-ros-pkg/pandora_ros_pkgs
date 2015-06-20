@@ -66,9 +66,9 @@ namespace pandora_data_fusion
             geometry_msgs::Quaternion result, expected;
             expected.x = 0;
             expected.y = 0;
-            Point framePoint;
+            geometry_msgs::Point framePoint;
             framePoint.z = 0;
-            Point alertPoint;
+            geometry_msgs::Point alertPoint;
             alertPoint.z = 0;
             expected.z = expectedZ;
             expected.w = expectedW;
@@ -85,8 +85,8 @@ namespace pandora_data_fusion
 
 
         /* Accessors for private methods of PoseFinder */
-        Point
-          positionOnWall(Point startPoint, float angle) const
+        geometry_msgs::Point
+          positionOnWall(geometry_msgs::Point startPoint, float angle) const
           {
             return poseFinder_->positionOnWall(startPoint, angle);
           }
@@ -98,13 +98,13 @@ namespace pandora_data_fusion
           }
 
         geometry_msgs::Quaternion
-          findNormalVectorOnWall(Point framePoint, Point alertPoint) const
+          findNormalVectorOnWall(geometry_msgs::Point framePoint, geometry_msgs::Point alertPoint) const
           {
             return poseFinder_->findNormalVectorOnWall(framePoint, alertPoint);
           }
 
-        std::pair<Point, Point>
-          findDiameterEndPointsOnWall(std::vector<Point> points) const
+        std::pair<geometry_msgs::Point, geometry_msgs::Point>
+          findDiameterEndPointsOnWall(std::vector<geometry_msgs::Point> points) const
           {
             return poseFinder_->findDiameterEndPointsOnWall(points);
           }
@@ -204,15 +204,15 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 1, 0.5);
 
       // Make a tfTransform [tf::Transform], check for various yaw [float]
-      // and pitches [float] for the expected Pose
+      // and pitches [float] for the expected geometry_msgs::Pose
 
       float alertYaw, alertPitch;
       tf::Transform transform;
-      Point position;
+      geometry_msgs::Point position;
       geometry_msgs::Quaternion orientation;
       orientation.x = 0;
       orientation.y = 0;
-      Pose expected, result;
+      geometry_msgs::Pose expected, result;
 
       alertYaw = -0.785398;
       alertPitch = 0.52360;
@@ -240,10 +240,10 @@ namespace pandora_data_fusion
     {
       poseFinder_->updateParams(0.3, 1.5, 0, 20, 10);
 
-      // With given map [OccupancyGrid], make points [Point] and test
+      // With given map [OccupancyGrid], make points [geometry_msgs::Point] and test
       // their supposed positions on wall with various angles [float]
 
-      Point startPoint, expected, result;
+      geometry_msgs::Point startPoint, expected, result;
       startPoint.z = 0;
       expected.z = 0;
       float angle;
@@ -322,7 +322,7 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.25);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       testOrientation(-0.70711, 0.70711, 5, 5, 5.76, 5.76);
     }
@@ -332,7 +332,7 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.25);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       testOrientation(1, 0, 7, 1, 7.86, 1);
     }
@@ -342,7 +342,7 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.25);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       testOrientation(1, 0, 10.0, 12.3, 10.5, 12.6);
     }
@@ -352,7 +352,7 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.25);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       testOrientation(0, 1, 12, 11, 11.5, 11);
     }
@@ -363,7 +363,7 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.15);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       testOrientation(0.70171 , 0.70711, 4.14, 4.7, 3, 3.58);
     }
@@ -373,15 +373,15 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.2);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       // Near corner (inside)
 
       float expectedYaw = 0;
       geometry_msgs::Quaternion result;
-      Point framePoint;
+      geometry_msgs::Point framePoint;
       framePoint.z = 0;
-      Point alertPoint;
+      geometry_msgs::Point alertPoint;
       alertPoint.z = 0;
       framePoint.x = 5.25;
       framePoint.y = 8.33;
@@ -403,15 +403,15 @@ namespace pandora_data_fusion
       poseFinder_->updateParams(0.5, 1.5, 0, 0.5, 0.2);
       // Test if the returned normal vector on wall is right
       // [geometry_msgs::Quaternion] with the given map [OccupancyGrid]
-      // and various frame points [Point] and alert points [Point]
+      // and various frame points [geometry_msgs::Point] and alert points [geometry_msgs::Point]
 
       // Near corner (outside)
 
       float expectedYaw = 0;
       geometry_msgs::Quaternion result;
-      Point framePoint;
+      geometry_msgs::Point framePoint;
       framePoint.z = 0;
-      Point alertPoint;
+      geometry_msgs::Point alertPoint;
       alertPoint.z = 0;
       framePoint.x = 4.7;
       framePoint.y = 7.34;
@@ -432,24 +432,24 @@ namespace pandora_data_fusion
     {
       poseFinder_->updateParams(0.5, 1.5, 0, 20, 10);
 
-      // Given various vectors of points [std::vector<Point>] test if the
+      // Given various vectors of points [std::vector<geometry_msgs::Point>] test if the
       // largest distance between them id given by the two points
-      // [std::pair<Point, Point>] returned.
+      // [std::pair<geometry_msgs::Point, geometry_msgs::Point>] returned.
 
-      std::vector<Point> points;
-      std::pair<Point, Point> result;
+      std::vector<geometry_msgs::Point> points;
+      std::pair<geometry_msgs::Point, geometry_msgs::Point> result;
 
       points.clear();
       EXPECT_THROW(findDiameterEndPointsOnWall(points), AlertException);
 
-      Point first;
+      geometry_msgs::Point first;
       first.x = 0;
       first.y = 0;
       first.z = 0;
       points.push_back(first);
       EXPECT_THROW(findDiameterEndPointsOnWall(points), AlertException);
 
-      Point second;
+      geometry_msgs::Point second;
       second.x = 1;
       second.y = 0;
       second.z = 0;
@@ -462,7 +462,7 @@ namespace pandora_data_fusion
       EXPECT_NEAR(second.y, result.second.y, 0.0001);
       EXPECT_NEAR(second.z, result.second.z, 0.0001);
 
-      Point third;
+      geometry_msgs::Point third;
       third.x = 0;
       third.y = 0;
       third.z = 0;
@@ -475,7 +475,7 @@ namespace pandora_data_fusion
       EXPECT_NEAR(second.y, result.second.y, 0.0001);
       EXPECT_NEAR(second.z, result.second.z, 0.0001);
 
-      Point fourth;
+      geometry_msgs::Point fourth;
       fourth.x = 0;
       fourth.y = -1;
       fourth.z = 0;
@@ -488,7 +488,7 @@ namespace pandora_data_fusion
       EXPECT_NEAR(fourth.y, result.second.y, 0.0001);
       EXPECT_NEAR(fourth.z, result.second.z, 0.0001);
 
-      Point fifth;
+      geometry_msgs::Point fifth;
       fifth.x = 41;
       fifth.y = 2.42;
       fifth.z = -12;
@@ -501,7 +501,7 @@ namespace pandora_data_fusion
       EXPECT_NEAR(fifth.y, result.second.y, 0.0001);
       EXPECT_NEAR(fifth.z, result.second.z, 0.0001);
 
-      Point sixth;
+      geometry_msgs::Point sixth;
       sixth.x = 10000;
       sixth.y = 10000;
       sixth.z = 10000;

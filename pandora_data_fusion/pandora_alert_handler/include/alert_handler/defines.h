@@ -40,6 +40,7 @@
 #define ALERT_HANDLER_DEFINES_H
 
 #include <vector>
+#include <cmath>
 #include <boost/math/constants/constants.hpp>
 
 #include <geometry_msgs/Pose.h>
@@ -57,8 +58,8 @@
 #define DEGREE (PI / 180.0)
 
 //!< Macro to convert to map coordinates from meters.
-#define COORDS(X, Y, MAP) static_cast<int>(round((X - MAP->info.origin.position.x)\
-    / MAP->info.resolution) + round((Y - MAP->info.origin.position.y)\
+#define COORDS(X, Y, MAP) static_cast<int>(floor((X - MAP->info.origin.position.x)\
+    / MAP->info.resolution) + floor((Y - MAP->info.origin.position.y)\
       / MAP->info.resolution) * MAP->info.width)
 
 //!< Macro to convert to map coordinates from meters.
@@ -66,14 +67,10 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
-  {
+namespace pandora_alert_handler
+{
 
-    using geometry_msgs::Point;
-    using geometry_msgs::Pose;
-    using geometry_msgs::PoseStamped;
-
-    typedef std::vector<PoseStamped> PoseStampedVector;
+    typedef std::vector<geometry_msgs::PoseStamped> PoseStampedVector;
     typedef nav_msgs::OccupancyGrid Map;
     typedef nav_msgs::OccupancyGridPtr MapPtr;
     typedef nav_msgs::OccupancyGridConstPtr MapConstPtr;

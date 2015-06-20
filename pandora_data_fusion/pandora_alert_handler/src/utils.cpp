@@ -45,13 +45,13 @@ namespace pandora_data_fusion
   namespace pandora_alert_handler
   {
 
-    Point Utils::point2DAndHeight2Point3D(Point position, float height)
+    geometry_msgs::Point Utils::point2DAndHeight2Point3D(geometry_msgs::Point position, float height)
     {
       position.z = height;
       return position;
     }
 
-    float Utils::distanceBetweenPoints2D(Point a, Point b)
+    float Utils::distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b)
     {
       float xDist = a.x - b.x;
       float yDist = a.y - b.y;
@@ -59,7 +59,7 @@ namespace pandora_data_fusion
       return sqrt((xDist * xDist) + (yDist * yDist));
     }
 
-    float Utils::distanceBetweenPoints3D(Point a, Point b)
+    float Utils::distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b)
     {
       float xDist = a.x - b.x;
       float yDist = a.y - b.y;
@@ -68,7 +68,7 @@ namespace pandora_data_fusion
       return sqrt((xDist * xDist) + (yDist * yDist) + (zDist * zDist));
     }
 
-    float Utils::distanceBetweenPoints(Point a, Point b, bool is3D)
+    float Utils::distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D)
     {
       float distance = 0;
       if (is3D)
@@ -82,18 +82,18 @@ namespace pandora_data_fusion
       return distance;
     }
 
-    geometry_msgs::Quaternion Utils::calculateQuaternion(Point a, Point b)
+    geometry_msgs::Quaternion Utils::calculateQuaternion(geometry_msgs::Point a, geometry_msgs::Point b)
     {
       tfScalar yaw;
 
       yaw = atan2(b.y - a.y, b.x - a.x);
 
-      return tf::createQuaternionMsgFromRollPitchYaw(0, 0, yaw);
+      return tf::createQuaternionMsgFromYaw(yaw);
     }
 
-    Point Utils::vector3ToPoint(tf::Vector3 vector)
+    geometry_msgs::Point Utils::vector3ToPoint(tf::Vector3 vector)
     {
-      Point point;
+      geometry_msgs::Point point;
       point.x = vector[0];
       point.y = vector[1];
       point.z = vector[2];
@@ -101,15 +101,20 @@ namespace pandora_data_fusion
       return point;
     }
 
-    bool Utils::arePointsInRange(Point pointA, Point pointB,
+    bool Utils::arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
         bool is3D, float sensor_range)
     {
       float dist = distanceBetweenPoints(pointA, pointB, is3D);
+      return dist <= sensor_range;
+    }
 
-      if (dist > sensor_range)
-        return false;
-      else
-        return true;
+    bool Utils::isOrientationClose(geometry_msgs::Quaternion orientA,
+        geometry_msgs::Quaternion orientB,
+        float diff_thres)
+    {
+      double yawA = tf::getYaw(orientA);
+      double yawB = tf::getYaw(orientB);
+      return fabs(yawA - yawB) < diff_thres;
     }
 
     float Utils::probabilityFromStdDev(float boundingRadius, float deviation)

@@ -168,7 +168,7 @@ namespace pandora_data_fusion
 
         //!< We create manually thermal1(2, 3, 4) thermal2(4, 3, 2) thermal3(0, 4, 2)
         //!< Yaw = PI/4
-        Pose makePose(float x, float y, float z, float yaw = 0)
+        geometry_msgs::Pose makePose(float x, float y, float z, float yaw = 0)
         {
           geometry_msgs::Pose pose;
           pose.position.x = x;

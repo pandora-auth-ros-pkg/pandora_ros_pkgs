@@ -81,7 +81,7 @@ namespace pandora_data_fusion
 
         void dynamicReconfigForward(float occupiedCellThres,
             float highThres, float lowThres,
-            float orientationCircle, float orientationDist);
+            float orientationCircle);
 
       private:
         /**

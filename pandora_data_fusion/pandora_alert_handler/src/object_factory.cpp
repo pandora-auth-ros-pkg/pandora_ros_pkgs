@@ -76,12 +76,10 @@ namespace pandora_data_fusion
     }
 
     void ObjectFactory::dynamicReconfigForward(float occupiedCellThres,
-        float highThres, float lowThres,
-        float orientationCircle, float orientationDist)
+        float highThres, float lowThres, float orientationCircle)
     {
       poseFinder_->updateParams(occupiedCellThres,
-          highThres, lowThres,
-          orientationDist, orientationCircle);
+          highThres, lowThres, orientationCircle);
     }
 
 }  // namespace pandora_alert_handler

@@ -42,13 +42,14 @@
 #define ALERT_HANDLER_UTILS_H
 
 #include <utility>
+#include <cmath>
 #include <boost/utility.hpp>
 
 #include <ros/ros.h>
-#include <tf/transform_listener.h>
+#include <tf/transform_datatypes.h>
 
-#include <std_msgs/Empty.h>
 #include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Quaternion.h>
 
 #include "alert_handler/exceptions.h"
 #include "alert_handler/defines.h"
@@ -61,15 +62,18 @@ namespace pandora_data_fusion
     class Utils : private boost::noncopyable
     {
       public:
-        static Point point2DAndHeight2Point3D(Point position, float height);
-        static float distanceBetweenPoints2D(Point a, Point b);
-        static float distanceBetweenPoints3D(Point a, Point b);
-        static float distanceBetweenPoints(Point a, Point b, bool is3D);
-        static bool arePointsInRange(Point pointA, Point pointB,
+        static geometry_msgs::Point point2DAndHeight2Point3D(geometry_msgs::Point position, float height);
+        static float distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b);
+        static float distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b);
+        static float distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D);
+        static bool arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
             bool is3D, float sensor_range);
-        static geometry_msgs::Quaternion calculateQuaternion(Point a,
-            Point b);
-        static Point vector3ToPoint(tf::Vector3 vector);
+        static bool isOrientationClose(geometry_msgs::Quaternion orientA,
+            geometry_msgs::Quaternion orientB,
+            float diff_thres);
+        static geometry_msgs::Quaternion calculateQuaternion(geometry_msgs::Point a,
+            geometry_msgs::Point b);
+        static geometry_msgs::Point vector3ToPoint(tf::Vector3 vector);
         static float probabilityFromStdDev(float boundingRadius, float deviation);
         static float stdDevFromProbability(float boundingRadius, float probability);
     };

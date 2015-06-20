@@ -348,11 +348,12 @@ namespace pandora_data_fusion
     {
       objectFactory_->dynamicReconfigForward(config.occupiedCellThres,
           config.highThres, config.lowThres,
-          config.orientationCircle, config.orientationDist);
+          config.orientationCircle);
 
       Hole::setObjectScore(-1);
       Hole::setProbabilityThres(config.holeMinProbability);
       Hole::setDistanceThres(config.holeMinDistance);
+      Hole::setOrientDiff(config.holeOrientDiff);
       Hole::setMergeDistance(config.objectMergeDistance);
       Hole::getFilterModel()->initializeSystemModel(config.holeSystemNoiseSD);
       Hole::getFilterModel()->initializeMeasurementModel(config.holeMeasurementSD);
@@ -360,6 +361,7 @@ namespace pandora_data_fusion
       Hazmat::setObjectScore(config.hazmatScore);
       Hazmat::setProbabilityThres(config.hazmatMinProbability);
       Hazmat::setDistanceThres(config.hazmatMinDistance);
+      Hazmat::setOrientDiff(config.hazmatOrientDiff);
       Hazmat::setMergeDistance(config.objectMergeDistance);
       Hazmat::getFilterModel()->initializeSystemModel(config.hazmatSystemNoiseSD);
       Hazmat::getFilterModel()->initializeMeasurementModel(config.hazmatMeasurementSD);
@@ -367,6 +369,7 @@ namespace pandora_data_fusion
       Qr::setObjectScore(config.qrScore);
       Qr::setProbabilityThres(config.qrMinProbability);
       Qr::setDistanceThres(config.qrMinDistance);
+      Qr::setOrientDiff(config.qrOrientDiff);
       Qr::setMergeDistance(config.objectMergeDistance);
       Qr::getFilterModel()->initializeSystemModel(config.qrSystemNoiseSD);
       Qr::getFilterModel()->initializeMeasurementModel(config.qrMeasurementSD);
@@ -374,6 +377,7 @@ namespace pandora_data_fusion
       DataMatrix::setObjectScore(config.dataMatrixScore);
       DataMatrix::setProbabilityThres(config.dataMatrixMinProbability);
       DataMatrix::setDistanceThres(config.dataMatrixMinDistance);
+      DataMatrix::setOrientDiff(config.dataMatrixOrientDiff);
       DataMatrix::setMergeDistance(config.objectMergeDistance);
       DataMatrix::getFilterModel()->initializeSystemModel(config.dataMatrixSystemNoiseSD);
       DataMatrix::getFilterModel()->initializeMeasurementModel(config.dataMatrixMeasurementSD);
@@ -381,6 +385,7 @@ namespace pandora_data_fusion
       Landoltc::setObjectScore(config.landoltcScore);
       Landoltc::setProbabilityThres(config.landoltcMinProbability);
       Landoltc::setDistanceThres(config.landoltcMinDistance);
+      Landoltc::setOrientDiff(config.landoltcOrientDiff);
       Landoltc::setMergeDistance(config.objectMergeDistance);
       Landoltc::getFilterModel()->initializeSystemModel(config.landoltcSystemNoiseSD);
       Landoltc::getFilterModel()->initializeMeasurementModel(config.landoltcMeasurementSD);
@@ -388,6 +393,7 @@ namespace pandora_data_fusion
       Thermal::setObjectScore(config.thermalScore);
       Thermal::setProbabilityThres(config.thermalMinProbability);
       Thermal::setDistanceThres(config.thermalMinDistance);
+      Thermal::setOrientDiff(config.thermalOrientDiff);
       Thermal::setMergeDistance(config.objectMergeDistance);
       Thermal::getFilterModel()->initializeSystemModel(config.thermalSystemNoiseSD);
       Thermal::getFilterModel()->initializeMeasurementModel(config.thermalMeasurementSD);
@@ -395,6 +401,7 @@ namespace pandora_data_fusion
       VictimImage::setObjectScore(config.victimImageScore);
       VictimImage::setProbabilityThres(config.victimImageMinProbability);
       VictimImage::setDistanceThres(config.victimImageMinDistance);
+      VictimImage::setOrientDiff(config.victimImageOrientDiff);
       VictimImage::setMergeDistance(config.objectMergeDistance);
       VictimImage::getFilterModel()->initializeSystemModel(config.victimImageSystemNoiseSD);
       VictimImage::getFilterModel()->initializeMeasurementModel(config.victimImageMeasurementSD);
@@ -402,6 +409,7 @@ namespace pandora_data_fusion
       Motion::setObjectScore(config.motionScore);
       Motion::setProbabilityThres(config.motionMinProbability);
       Motion::setDistanceThres(config.motionMinDistance);
+      Motion::setOrientDiff(config.motionOrientDiff);
       Motion::setMergeDistance(config.objectMergeDistance);
       Motion::getFilterModel()->initializeSystemModel(config.motionSystemNoiseSD);
       Motion::getFilterModel()->initializeMeasurementModel(config.motionMeasurementSD);
@@ -409,6 +417,7 @@ namespace pandora_data_fusion
       Sound::setObjectScore(config.soundScore);
       Sound::setProbabilityThres(config.soundMinProbability);
       Sound::setDistanceThres(config.soundMinDistance);
+      Sound::setOrientDiff(config.soundOrientDiff);
       Sound::setMergeDistance(config.objectMergeDistance);
       Sound::getFilterModel()->initializeSystemModel(config.soundSystemNoiseSD);
       Sound::getFilterModel()->initializeMeasurementModel(config.soundMeasurementSD);
@@ -416,6 +425,7 @@ namespace pandora_data_fusion
       Co2::setObjectScore(config.co2Score);
       Co2::setProbabilityThres(config.co2MinProbability);
       Co2::setDistanceThres(config.co2MinDistance);
+      Co2::setOrientDiff(config.co2OrientDiff);
       Co2::setMergeDistance(config.objectMergeDistance);
       Co2::getFilterModel()->initializeSystemModel(config.co2SystemNoiseSD);
       Co2::getFilterModel()->initializeMeasurementModel(config.co2MeasurementSD);

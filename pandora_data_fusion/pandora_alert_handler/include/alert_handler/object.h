@@ -43,6 +43,7 @@
 #include <string>
 
 #include "alert_handler/base_object.h"
+#include "alert_handler/defines.h"
 #include "alert_handler/object_list.h"
 
 namespace pandora_data_fusion
@@ -103,6 +104,15 @@ namespace pandora_data_fusion
         }
 
         /**
+         * @brief Getter for static orientation difference threshold
+         * @return float orientDiff
+         */
+        static float getOrientDiff()
+        {
+          return orientDiff_;
+        }
+
+        /**
          * @brief Getter for static merge threshold.
          * @return float mergeDistance
          */
@@ -137,6 +147,16 @@ namespace pandora_data_fusion
         static void setDistanceThres(float distanceThres)
         {
           distanceThres_ = distanceThres;
+        }
+
+        /**
+         * @brief Setter for static orientation difference threshold
+         * @param orientDiff [float] difference threshold in degrees
+         * @return float orientDiff
+         */
+        static void setOrientDiff(float orientDiff)
+        {
+          orientDiff_ = orientDiff * DEGREE;
         }
 
         /**
@@ -187,6 +207,8 @@ namespace pandora_data_fusion
       protected:
         //!< Variable with objects' min distance.
         static float distanceThres_;
+        //!< Variable with object's maximum orientation difference (in yaw)
+        static float orientDiff_;
         //!< Variable with objects' merge distance.
         static float mergeDistance_;
         //!< Variable containing object type's score.
@@ -218,7 +240,7 @@ namespace pandora_data_fusion
          * @brief Returns the object's pose
          * @return geometry_msgs::PoseStamped The object's pose
          */
-        virtual PoseStamped getPoseStamped() const;
+        virtual geometry_msgs::PoseStamped getPoseStamped() const;
 
         /**
          * @brief Updates this object with the measurement.
@@ -277,7 +299,7 @@ namespace pandora_data_fusion
          * @brief Getter for member pose_
          * @return geometry_msgs::Pose& The object's pose
          */
-        Pose getPose() const
+        geometry_msgs::Pose getPose() const
         {
           return pose_;
         }
@@ -336,7 +358,7 @@ namespace pandora_data_fusion
          * @param pose [const geometry_msgs::Pose&] The new pose value
          * @return void
          */
-        void setPose(const Pose& pose)
+        void setPose(const geometry_msgs::Pose& pose)
         {
           pose_ = pose;
         }
@@ -354,7 +376,7 @@ namespace pandora_data_fusion
         ros::Time timeFound_;
 
         //!< The object's pose in 3d space
-        Pose pose_;
+        geometry_msgs::Pose pose_;
 
       private:
         friend class ObjectListTest;
@@ -373,6 +395,8 @@ namespace pandora_data_fusion
     template <class DerivedObject>
       float Object<DerivedObject>::distanceThres_ = 0.5;
     template <class DerivedObject>
+      float Object<DerivedObject>::orientDiff_ = 45.0;
+    template <class DerivedObject>
       float Object<DerivedObject>::mergeDistance_ = 0.03;
     template <class DerivedObject>
       float Object<DerivedObject>::probabilityThres_ = 0;
@@ -384,9 +408,9 @@ namespace pandora_data_fusion
       typename Object<DerivedObject>::ListPtr Object<DerivedObject>::listPtr_;
 
     template <class DerivedObject>
-      PoseStamped Object<DerivedObject>::getPoseStamped() const
+      geometry_msgs::PoseStamped Object<DerivedObject>::getPoseStamped() const
       {
-        PoseStamped objPoseStamped;
+        geometry_msgs::PoseStamped objPoseStamped;
         objPoseStamped.pose = pose_;
         objPoseStamped.header.frame_id = frame_id_;
         objPoseStamped.header.stamp = ros::Time::now();
@@ -398,9 +422,13 @@ namespace pandora_data_fusion
       {
         if (type_ != object->getType())
           return false;
-        return Utils::arePointsInRange(
+        bool isSame = Utils::arePointsInRange(
             pose_.position, object->getPose().position,
             DerivedObject::is3D, distanceThres_);
+        if (!isSame) return false;
+        isSame = Utils::isOrientationClose(pose_.orientation,
+            object->getPose().orientation, orientDiff_);
+        return isSame;
       }
 
     template <class DerivedObject>

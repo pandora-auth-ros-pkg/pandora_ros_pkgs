@@ -89,7 +89,7 @@ namespace pandora_data_fusion
 
         /* Helper functions */
 
-        Pose makePose(float x, float y, float z, float yaw = 0)
+        geometry_msgs::Pose makePose(float x, float y, float z, float yaw = 0)
         {
           geometry_msgs::Pose pose;
           pose.position.x = x;
