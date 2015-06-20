@@ -36,9 +36,22 @@
 *********************************************************************/
 
 #include <string>
-#include <vector>
+#include <algorithm>
 
 #include "pandora_stabilizer_control/stabilizer_control.h"
+
+namespace
+{
+
+  double clamp(
+      const double val,
+      const double min_val,
+      const double max_val)
+  {
+    return std::min(std::max(val, min_val), max_val);
+  }
+
+}  // namespace
 
 namespace pandora_control
 {
@@ -140,32 +153,32 @@ namespace pandora_control
 
     for (int ii = 0; ii < bufferSize_; ii++)
     {
-      command[0] = command[0] - rollBuffer_[ii] / bufferSize_;
-      command[1] = command[1] - pitchBuffer_[ii] / bufferSize_;
+      command[0] += rollBuffer_[ii] / bufferSize_;
+      command[1] += pitchBuffer_[ii] / bufferSize_;
     }
 
+    // Invert commands in order to stabilize
+    command[0] *= -1;
+    command[1] *= -1;
+
+    // Convert degs to rads
     command[0] = command[0] * 2 * boost::math::constants::pi<double>() / 360.0;
-    command[1] = -command[1] * 2 * boost::math::constants::pi<double>() / 360.0;
+    command[1] = command[1] * 2 * boost::math::constants::pi<double>() / 360.0;
 
-    if (command[0] < minRoll_)
-    {
-      command[0] = minRoll_;
-    }
-    else if (command[0] > maxRoll_)
-    {
-      command[0] = maxRoll_;
-    }
-    if (command[1] < minPitch_)
-    {
-      command[1] = minPitch_;
-    }
-    else if (command[1] > maxPitch_)
-    {
-      command[1] = maxPitch_;
-    }
-    str.data = command[0] + rollOffset_;
+    // Check commands' limits
+    clamp(command[0], minRoll_, maxRoll_);
+    clamp(command[1], minPitch_, maxPitch_);
+
+    // Add offsets
+    command[0] += rollOffset_;
+    command[1] += pitchOffset_;
+
+    // Publish roll command
+    str.data = command[0];
     laserRollPublisher_.publish(str);
-    str.data = command[1] + pitchOffset_;
+
+    // Publish pitch command
+    str.data = command[1];
     laserPitchPublisher_.publish(str);
   }
 }  // namespace pandora_control
