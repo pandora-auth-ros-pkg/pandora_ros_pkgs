@@ -82,7 +82,7 @@ namespace imu
       void read();
 
       /**
-      @brief Roll and Pitch dynamic reconfigure callback
+      @brief Roll, pitch and yaw dynamic reconfigure callback
       @return void
       **/
       void dynamicReconfigureCallback(
@@ -117,6 +117,7 @@ namespace imu
 
       double rollOffset_;  //!< offset to be applied to roll measurements
       double pitchOffset_;  //!< offset to be applied to pitch measurements
+      double yawOffset_;  //!< offset to be applied to yaw measurements
   };
 }  // namespace imu
 }  // namespace pandora_hardware_interface

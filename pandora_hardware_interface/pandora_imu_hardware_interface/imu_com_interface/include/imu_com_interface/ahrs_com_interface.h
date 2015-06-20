@@ -146,7 +146,7 @@ namespace imu
     //!< expression used to extract yaw, pitch, roll from packet
     const boost::regex regex_;
 
-    // current time and last_time trax was reset
+    //!< current time, and last_time trax was reset
     ros::Time now_, last_reset_;
   };
 }  // namespace imu

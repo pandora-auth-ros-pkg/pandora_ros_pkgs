@@ -108,15 +108,10 @@ namespace imu
     char charBuffer[51];
     strncpy(charBuffer, buffer.c_str(), 51);
 
-    if (
-      check(buffer, calcCrc((unsigned char*)buffer.c_str(), 51, false)))
-    {
+    if (check(buffer, calcCrc((unsigned char*)buffer.c_str(), 51, false)))
       parse(buffer);  // parse data packet
-    }
     else
-    {
-      ROS_ERROR("Check CRC failed");
-    }
+      ROS_DEBUG("Check CRC failed");
 
     now_ = ros::Time::now();
     if (now_ - last_reset_ > ros::Duration(1.0 * 60.0))
@@ -208,9 +203,12 @@ namespace imu
           data[ii + 7].str().c_str(),
           sizeof(float));
       }
+
+      // invert pitch reading to comply with pandora conventions
+      pitch_ = -pitch_;
     }
     else
-      ROS_ERROR("Did not match received packet to desirable pattern");
+      ROS_DEBUG("Did not match received packet to desirable pattern");
   }
 }  // namespace imu
 }  // namespace pandora_hardware_interface
