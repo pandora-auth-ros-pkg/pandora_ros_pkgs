@@ -9,8 +9,8 @@ move_kinect_action:
   max_yaw: 1
   offset_pitch: -0.1
   offset_yaw: 0
-  scan_rate: 2.0
-  pitch_rate: 0.2
+  scan_rate: 1.0
+  pitch_rate: 3.0
   command_timeout: 10.0
   movement_threshold: 0.05
   lax_movement_threshold: 0.5

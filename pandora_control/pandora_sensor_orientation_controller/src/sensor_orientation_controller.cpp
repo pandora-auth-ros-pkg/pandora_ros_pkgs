@@ -111,7 +111,7 @@ namespace pandora_control
   {
     command_ = goal->command;
     pointOfInterest_ = goal->point_of_interest;
-    pointThreshold_ = laxMovementThreshold_;
+    pointThreshold_ = movementThreshold_;
     stopPreviousTimers();
     if (command_ ==
         pandora_sensor_orientation_controller::MoveSensorGoal::TEST)
