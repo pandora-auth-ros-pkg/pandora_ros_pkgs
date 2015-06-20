@@ -321,33 +321,33 @@ namespace pandora_control
     switch (position_)
     {
       case START:
-        yawTargetPosition_.data = yawStep_;
+        yawScan_ = yawStep_;
         position_ = LEFT;
         break;
       case LEFT:
-        yawTargetPosition_.data = 0;
+        yawScan_ = 0;
         position_ = CENTER;
         break;
       case CENTER:
-        yawTargetPosition_.data = -yawStep_;
+        yawScan_ = -yawStep_;
         position_ = RIGHT;
         break;
       case RIGHT:
-        yawTargetPosition_.data = 0;
+        yawScan_ = 0;
         position_ = START;
         break;
       case UNKNOWN:
-        yawTargetPosition_.data = 0;
+        yawScan_ = 0;
         position_ = START;
         break;
     }
-    yawTargetPosition_.data += offsetYaw_;
+    pitchScan_ = pitchStep_;
+
+    publishScanCommands();
   }
 
-  void SensorOrientationActionServer::stabilizePitch(
-    const ros::TimerEvent& event)
+  void SensorOrientationActionServer::stabilizePitch(const ros::TimerEvent& event)
   {
-    double baseRoll, basePitch, baseYaw;
     tf::StampedTransform baseTransform;
     try
     {
@@ -360,18 +360,20 @@ namespace pandora_control
       ROS_ERROR("%s", ex.what());
       return;
     }
-    baseTransform.getBasis().getRPY(baseRoll, basePitch, baseYaw);
-    pitchTargetPosition_.data = pitchStep_;
-    pitchTargetPosition_.data += offsetPitch_ - basePitch;
+    baseTransform.getBasis().getRPY(baseRoll_, basePitch_, baseYaw_);
+
+    publishScanCommands();
+  }
+
+  void SensorOrientationActionServer::publishScanCommands()
+  {
+    yawTargetPosition_.data = yawScan_ + offsetYaw_;
+    pitchTargetPosition_.data = pitchScan_ + offsetPitch_ - basePitch_;
     checkAngleLimits();
-    if (fabs(lastPitchTarget_ - pitchTargetPosition_.data) > pointThreshold_
-      || fabs(lastYawTarget_ - yawTargetPosition_.data) > pointThreshold_)
-    {
-      lastPitchTarget_ = pitchTargetPosition_.data;
-      lastYawTarget_ = yawTargetPosition_.data;
-      sensorPitchPublisher_.publish(pitchTargetPosition_);
-      sensorYawPublisher_.publish(yawTargetPosition_);
-    }
+    lastPitchTarget_ = pitchTargetPosition_.data;
+    lastYawTarget_ = yawTargetPosition_.data;
+    sensorPitchPublisher_.publish(pitchTargetPosition_);
+    sensorYawPublisher_.publish(yawTargetPosition_);
   }
 
   void SensorOrientationActionServer::pointSensor(const ros::TimerEvent& event)

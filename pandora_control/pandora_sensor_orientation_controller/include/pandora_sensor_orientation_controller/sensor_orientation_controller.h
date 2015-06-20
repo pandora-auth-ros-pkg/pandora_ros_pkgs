@@ -69,6 +69,7 @@ namespace pandora_control
 
       ros::Publisher sensorPitchPublisher_;
       ros::Publisher sensorYawPublisher_;
+
       ros::Timer scanYawTimer_;
       ros::Timer scanPitchTimer_;
       ros::Timer pointSensorTimer_;
@@ -81,8 +82,6 @@ namespace pandora_control
       double minYaw_;
       double maxPitch_;
       double maxYaw_;
-      double offsetPitch_;
-      double offsetYaw_;
       double scanRate_;
       double pitchRate_;
       double commandTimeout_;
@@ -97,6 +96,16 @@ namespace pandora_control
       std::string yawCommandTopic_;
       std::string sensorFrame_;
       std::string pointOfInterest_;
+
+      double pitchScan_;
+      double basePitch_;
+      double offsetPitch_;
+      double yawScan_;
+      double offsetYaw_;
+
+      double baseYaw_;
+      double baseRoll_;
+
       double lastPitchTarget_;
       double lastYawTarget_;
 
@@ -112,12 +121,16 @@ namespace pandora_control
       void testSensor();
       void centerSensor();
       void scan(const ros::TimerEvent& event);
+      void stabilizePitch(const ros::TimerEvent& event);
       void pointSensor(const ros::TimerEvent& event);
+
+      void publishScanCommands();
+
       int checkGoalCompletion();
       void setGoalState(int state);
       void checkAngleLimits();
       void stopPreviousTimers();
-      void stabilizePitch(const ros::TimerEvent& event);
+
    public:
       SensorOrientationActionServer(
         std::string name,
@@ -126,4 +139,5 @@ namespace pandora_control
       ~SensorOrientationActionServer(void);
   };
 }  // namespace pandora_control
+
 #endif  // PANDORA_SENSOR_ORIENTATION_CONTROLLER_SENSOR_ORIENTATION_CONTROLLER_H
