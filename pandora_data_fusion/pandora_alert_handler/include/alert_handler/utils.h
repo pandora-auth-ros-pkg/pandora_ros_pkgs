@@ -56,27 +56,27 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
-  {
+namespace pandora_alert_handler
+{
 
-    class Utils : private boost::noncopyable
-    {
-      public:
-        static geometry_msgs::Point point2DAndHeight2Point3D(geometry_msgs::Point position, float height);
-        static float distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b);
-        static float distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b);
-        static float distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D);
-        static bool arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
-            bool is3D, float sensor_range);
-        static bool isOrientationClose(geometry_msgs::Quaternion orientA,
-            geometry_msgs::Quaternion orientB,
-            float diff_thres);
-        static geometry_msgs::Quaternion calculateQuaternion(geometry_msgs::Point a,
-            geometry_msgs::Point b);
-        static geometry_msgs::Point vector3ToPoint(tf::Vector3 vector);
-        static float probabilityFromStdDev(float boundingRadius, float deviation);
-        static float stdDevFromProbability(float boundingRadius, float probability);
-    };
+  class Utils : private boost::noncopyable
+  {
+    public:
+      static geometry_msgs::Point point2DAndHeight2Point3D(geometry_msgs::Point position, float height);
+      static float distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b);
+      static float distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b);
+      static float distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D);
+      static bool arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
+          bool is3D, float sensor_range);
+      static bool isOrientationClose(geometry_msgs::Quaternion orientA,
+          geometry_msgs::Quaternion orientB,
+          float diff_thres);
+      static geometry_msgs::Quaternion calculateQuaternion(geometry_msgs::Point a,
+          geometry_msgs::Point b);
+      static geometry_msgs::Point vector3ToPoint(const tf::Vector3& vector);
+      static float probabilityFromStdDev(float boundingRadius, float deviation);
+      static float stdDevFromProbability(float boundingRadius, float probability);
+  };
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

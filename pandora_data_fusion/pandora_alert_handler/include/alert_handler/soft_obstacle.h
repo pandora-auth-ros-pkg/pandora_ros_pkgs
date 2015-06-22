@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,44 +33,59 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
+#ifndef PANDORA_ALERT_HANDLER_SOFT_OBSTACLE_H
+#define PANDORA_ALERT_HANDLER_SOFT_OBSTACLE_H
 
-#include <stdexcept>
+#include <vector>
 #include <string>
+
+#include "pandora_vision_msgs/ObstacleAlert.h"
+#include "pandora_vision_msgs/ObstacleAlertVector.h"
+
+#include "alert_handler/obstacle.h"
 
 namespace pandora_data_fusion
 {
 namespace pandora_alert_handler
 {
 
-  class TfException : public std::runtime_error
+  /**
+    * @class SoftObstacle
+    * @brief: Concrete class representing a soft obstacle (like curtains of
+    * paper) in the world. Inherits from Obstacle
+    */
+  class SoftObstacle : public Obstacle
   {
-    public:
-      explicit TfException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
+   public:
+    //!< Type Definitions
+    typedef boost::shared_ptr<SoftObstacle> Ptr;
+    typedef boost::shared_ptr<SoftObstacle const> ConstPtr;
+    typedef std::vector<Ptr> PtrVector;
+    typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
+    typedef ObjectList<SoftObstacle> List;
+    typedef boost::shared_ptr< List > ListPtr;
+    typedef boost::shared_ptr< List const > ListConstPtr;
+
+   public:
+    SoftObstacle ();
+    virtual ~SoftObstacle ();
+
+    virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+    virtual std::string setFrameId(int id);
   };
 
-  class AlertException : public std::runtime_error
-  {
-    public:
-      explicit AlertException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
-
-  class ObstacleTypeException : public std::runtime_error
-  {
-    public:
-      explicit ObstacleTypeException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+  typedef SoftObstacle::Ptr SoftObstaclePtr;
+  typedef SoftObstacle::ConstPtr SoftObstacleConstPtr;
+  typedef SoftObstacle::PtrVector SoftObstaclePtrVector;
+  typedef SoftObstacle::PtrVectorPtr SoftObstaclePtrVectorPtr;
+  typedef SoftObstacle::List SoftObstacleList;
+  typedef SoftObstacle::ListPtr SoftObstacleListPtr;
+  typedef SoftObstacle::ListConstPtr SoftObstacleListConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_EXCEPTIONS_H
+#endif  // PANDORA_ALERT_HANDLER_SOFT_OBSTACLE_H

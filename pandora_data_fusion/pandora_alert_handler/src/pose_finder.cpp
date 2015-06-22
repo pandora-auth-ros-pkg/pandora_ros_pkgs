@@ -33,8 +33,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -42,6 +40,9 @@
 #include <limits>
 #include <vector>
 #include <string>
+
+#include <geometry_msgs/Pose.h>
+#include <tf/LinearMath/Vector3.h>
 
 #include "alert_handler/pose_finder.h"
 
@@ -65,7 +66,7 @@ namespace pandora_alert_handler
       ORIENTATION_CIRCLE = orientationCircle;
     }
 
-    geometry_msgs::Pose PoseFinder::findAlertPose(float alertYaw, float alertPitch,
+    geometry_msgs::Pose PoseFinder::findAlertPose(double alertYaw, double alertPitch,
         const tf::Transform& tfTransform)
     {
       geometry_msgs::Pose outPose;
@@ -89,6 +90,41 @@ namespace pandora_alert_handler
       outPose.orientation = findAppropriateOrientation(framePosition, outPose.position);
 
       return outPose;
+    }
+
+    geometry_msgs::Pose PoseFinder::findPoseFromPoints(
+        const boost::array<double, 4>& pointsYaw,
+        const boost::array<double, 4>& pointsPitch,
+        const boost::array<double, 4>& pointsDepth,
+        const tf::Transform& tfTransform, double* length)
+    {
+      geometry_msgs::Point leftPoint = projectAlertPosition(pointsYaw[3],
+          pointsPitch[3], pointsDepth[3], tfTransform);
+      geometry_msgs::Point rightPoint = projectAlertPosition(pointsYaw[1],
+          pointsPitch[1], pointsDepth[1], tfTransform);
+      geometry_msgs::Quaternion orientation = Utils::calculateQuaternion(leftPoint, rightPoint);
+      *length = Utils::distanceBetweenPoints2D(leftPoint, rightPoint);
+      geometry_msgs::Pose outPose;
+      outPose.orientation = orientation;
+      outPose.position.x = (leftPoint.x + rightPoint.x) / 2;
+      outPose.position.y = (leftPoint.y + rightPoint.y) / 2;
+      return outPose;
+    }
+
+    geometry_msgs::Point PoseFinder::projectAlertPosition(
+        double alertYaw, double alertPitch,
+        double depth, const tf::Transform& tfTransform)
+    {
+      tf::Quaternion alertOrientation, sensorOrientation;
+      tfTransform.getBasis().getRotation(sensorOrientation);
+      tf::Vector3 origin = tfTransform.getOrigin();
+
+      alertOrientation.setRPY(0, alertPitch, alertYaw);
+      tf::Transform newTf(sensorOrientation * alertOrientation, origin);
+
+      tf::Vector3 projection = depth * newTf.getBasis().getColumn(0);
+
+      return Utils::vector3ToPoint(origin + projection);
     }
 
     float PoseFinder::calcHeight(const tf::Transform& transform, float distFromAlert)

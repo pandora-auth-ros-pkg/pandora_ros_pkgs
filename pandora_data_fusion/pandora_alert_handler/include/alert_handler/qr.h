@@ -100,7 +100,7 @@ namespace pandora_data_fusion
          * @brief Setter for member content_
          * @return void
          */
-        void setContent(std::string content)
+        void setContent(const std::string& content)
         {
           content_ = content;
         }

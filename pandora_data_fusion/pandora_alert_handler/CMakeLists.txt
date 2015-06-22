@@ -97,6 +97,10 @@ add_library(${PROJECT_NAME}_objects
   src/motion.cpp
   src/sound.cpp
   src/co2.cpp
+  src/obstacle.cpp
+  src/barrel.cpp
+  src/soft_obstacle.cpp
+  src/hard_obstacle.cpp
   )
 target_link_libraries(${PROJECT_NAME}_objects
   ${catkin_LIBRARIES}

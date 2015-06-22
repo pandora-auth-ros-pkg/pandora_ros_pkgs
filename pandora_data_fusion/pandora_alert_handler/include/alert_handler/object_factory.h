@@ -46,13 +46,7 @@
 
 #include <nav_msgs/OccupancyGrid.h>
 
-#include "pandora_vision_msgs/HoleDirectionAlertVector.h"
-#include "pandora_vision_msgs/QRAlertVector.h"
-#include "pandora_vision_msgs/HazmatAlertVector.h"
-#include "pandora_vision_msgs/DataMatrixAlertVector.h"
-#include "pandora_vision_msgs/LandoltcAlertVector.h"
-#include "pandora_common_msgs/GeneralAlertVector.h"
-#include "pandora_common_msgs/GeneralAlertInfo.h"
+#include "pandora_vision_msgs/ObstacleAlert.h"
 
 #include "alert_handler/pose_finder.h"
 #include "alert_handler/objects.h"
@@ -60,146 +54,210 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+namespace pandora_alert_handler
+{
+
+  class ObjectFactory : private boost::noncopyable
   {
+    public:
+      ObjectFactory(const MapPtr& map, const std::string& mapType);
 
-    class ObjectFactory : private boost::noncopyable
-    {
-      public:
-        ObjectFactory(const MapPtr& map, const std::string& mapType);
+      template <class ObjectType>
+        typename ObjectType::PtrVectorPtr makeObjects(
+            const typename ObjectType::AlertVector& msg);
 
-        HolePtrVectorPtr makeHoles(
-            const pandora_vision_msgs::HoleDirectionAlertVector& msg);
-        template <class ObjectType>
-          typename ObjectType::PtrVectorPtr makeObjects(
-              const typename ObjectType::AlertVector& msg);
-
-        tf::Transform getCurrentTransform() const
-        {
-          return currentTransform_;
-        }
-
-        void dynamicReconfigForward(float occupiedCellThres,
-            float highThres, float lowThres,
-            float orientationCircle);
-
-      private:
-        /**
-         * @brief Sets this Object up according to the info from the Alert.
-         * @param objectPtr [const ObjectPtr&] Pointer to Object
-         * variable to be filled.
-         * @param msg [const ..._communications::...Msg&]
-         * Incoming ros message containing info.
-         * @return void
-         */
-        template <class ObjectType>
-          void setUpObject(
-              const typename ObjectType::Ptr& objectPtr,
-              const typename ObjectType::Alert& msg,
-              const ros::Time& timeFound,
-              const tf::Transform& transform);
-
-      private:
-        tf::Transform currentTransform_;
-
-        PoseFinderPtr poseFinder_;
-    };
-
-    template <class ObjectType>
-    typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
-        const typename ObjectType::AlertVector& msg)
-    {
-      currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
-
-      typename ObjectType::PtrVectorPtr objectsVectorPtr(
-          new typename ObjectType::PtrVector);
-      for (int ii = 0; ii < msg.alerts.size(); ++ii) {
-        try
-        {
-          typename ObjectType::Ptr newObject( new ObjectType );
-          setUpObject<ObjectType>(newObject, msg.alerts[ii],
-                                  msg.header.stamp, currentTransform_);
-          objectsVectorPtr->push_back(newObject);
-        }
-        catch (AlertException ex)
-        {
-          ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
-        }
+      tf::Transform getCurrentTransform() const
+      {
+        return currentTransform_;
       }
 
-      return objectsVectorPtr;
+      void dynamicReconfigForward(float occupiedCellThres,
+          float highThres, float lowThres,
+          float orientationCircle, double soft_obstacle_width);
+
+    private:
+      /**
+        * @brief Sets this Object up according to the info from the Alert.
+        * @param objectPtr [const ObjectPtr&] Pointer to Object
+        * variable to be filled.
+        * @param msg [const ..._communications::...Msg&]
+        * Incoming ros message containing info.
+        * @return void
+        */
+      template <class ObjectType>
+        void setUpObject(
+            const typename ObjectType::Ptr& objectPtr,
+            const typename ObjectType::Alert& msg,
+            const ros::Time& timeFound,
+            const tf::Transform& transform);
+      // template <> void setUpObject<Obstacle>(
+      //       const typename Obstacle::Ptr& objectPtr,
+      //       const typename Obstacle::Alert& msg,
+      //       const ros::Time& timeFound,
+      //       const tf::Transform& transform);
+
+    private:
+      tf::Transform currentTransform_;
+
+      PoseFinderPtr poseFinder_;
+
+      double SOFT_OBSTACLE_WIDTH;
+  };
+
+  template <class ObjectType>
+  void ObjectFactory::setUpObject(
+      const typename ObjectType::Ptr& objectPtr,
+      const typename ObjectType::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    objectPtr->setPose(poseFinder_->findAlertPose(msg.info.yaw,
+          msg.info.pitch, transform));
+    objectPtr->setProbability(msg.info.probability);
+    objectPtr->setTimeFound(timeFound);
+    ObjectType::setUpObject(objectPtr, msg);
+    objectPtr->initializeObjectFilter();
+  }
+
+  template <>
+  void ObjectFactory::setUpObject<Motion>(
+      const typename Motion::Ptr& objectPtr,
+      const typename Motion::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+          msg.pitch, transform));
+    objectPtr->setProbability(msg.probability);
+    objectPtr->setTimeFound(timeFound);
+    objectPtr->initializeObjectFilter();
+  }
+  template <>
+  void ObjectFactory::setUpObject<Sound>(
+      const typename Sound::Ptr& objectPtr,
+      const typename Sound::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+          msg.pitch, transform));
+    objectPtr->setProbability(msg.probability);
+    objectPtr->setTimeFound(timeFound);
+    objectPtr->initializeObjectFilter();
+  }
+  template <>
+  void ObjectFactory::setUpObject<Co2>(
+      const typename Co2::Ptr& objectPtr,
+      const typename Co2::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+          msg.pitch, transform));
+    objectPtr->setProbability(msg.probability);
+    objectPtr->setTimeFound(timeFound);
+    objectPtr->initializeObjectFilter();
+  }
+  template <>
+  void ObjectFactory::setUpObject<VictimImage>(
+      const typename VictimImage::Ptr& objectPtr,
+      const typename VictimImage::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+          msg.pitch, transform));
+    objectPtr->setProbability(msg.probability);
+    objectPtr->setTimeFound(timeFound);
+    objectPtr->initializeObjectFilter();
+  }
+  template <>
+  void ObjectFactory::setUpObject<Obstacle>(
+      const typename Obstacle::Ptr& objectPtr,
+      const typename Obstacle::Alert& msg,
+      const ros::Time& timeFound,
+      const tf::Transform& transform)
+  {
+    double length;
+    geometry_msgs::Pose obstaclePose = poseFinder_->findPoseFromPoints(
+        msg.pointsYaw, msg.pointsPitch, msg.pointsDepth, transform, &length);
+    objectPtr->setPose(obstaclePose);
+    if (msg.type == pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE) {
+      objectPtr->setLength(length);
+      objectPtr->setWidth(SOFT_OBSTACLE_WIDTH);
+    }
+    objectPtr->setProbability(msg.probability);
+    objectPtr->setTimeFound(timeFound);
+    objectPtr->initializeObjectFilter();
+  }
+
+  template <class ObjectType>
+  typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
+      const typename ObjectType::AlertVector& msg)
+  {
+    currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
+
+    typename ObjectType::PtrVectorPtr objectsVectorPtr(
+        new typename ObjectType::PtrVector);
+    for (int ii = 0; ii < msg.alerts.size(); ++ii) {
+      try
+      {
+        typename ObjectType::Ptr newObject( new ObjectType );
+        setUpObject<ObjectType>(newObject, msg.alerts[ii],
+                                msg.header.stamp, currentTransform_);
+        objectsVectorPtr->push_back(newObject);
+      }
+      catch (AlertException ex)
+      {
+        ROS_WARN_NAMED("ALERT_HANDLER",
+            "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
+      }
     }
 
-    template <class ObjectType>
-    void ObjectFactory::setUpObject(
-        const typename ObjectType::Ptr& objectPtr,
-        const typename ObjectType::Alert& msg,
-        const ros::Time& timeFound,
-        const tf::Transform& transform)
-    {
-      objectPtr->setPose(poseFinder_->findAlertPose(msg.info.yaw,
-            msg.info.pitch, transform));
-      objectPtr->setProbability(msg.info.probability);
-      objectPtr->setTimeFound(timeFound);
-      ObjectType::setUpObject(objectPtr, msg);
-      objectPtr->initializeObjectFilter();
+    return objectsVectorPtr;
+  }
+
+  template <>
+  typename Obstacle::PtrVectorPtr ObjectFactory::makeObjects<Obstacle>(
+      const typename Obstacle::AlertVector& msg)
+  {
+    currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
+
+    typename Obstacle::PtrVectorPtr obstacleVectorPtr(new typename Obstacle::PtrVector);
+    for (int ii = 0; ii < msg.alerts.size(); ++ii) {
+      try
+      {
+        typename Obstacle::Ptr newObstacle;
+        switch (msg.alerts[ii].type) {
+          case pandora_vision_msgs::ObstacleAlert::BARREL:
+            newObstacle.reset( new Barrel );
+            break;
+          case pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE:
+            newObstacle.reset( new SoftObstacle );
+            break;
+          case pandora_vision_msgs::ObstacleAlert::HARD_OBSTACLE:
+            newObstacle.reset( new HardObstacle );
+            break;
+          default:
+            throw ObstacleTypeException(
+                "Non-registered obstacle type "+boost::to_string(msg.alerts[ii].type));
+            break;
+        }
+        setUpObject<Obstacle>(newObstacle, msg.alerts[ii],
+                              msg.header.stamp, currentTransform_);
+        obstacleVectorPtr->push_back(newObstacle);
+      }
+      catch (AlertException ex)
+      {
+        ROS_WARN_NAMED("ALERT_HANDLER",
+            "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
+      }
     }
 
-    template <>
-    void ObjectFactory::setUpObject<Motion>(
-        const typename Motion::Ptr& objectPtr,
-        const typename Motion::Alert& msg,
-        const ros::Time& timeFound,
-        const tf::Transform& transform)
-    {
-      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
-            msg.pitch, transform));
-      objectPtr->setProbability(msg.probability);
-      objectPtr->setTimeFound(timeFound);
-      objectPtr->initializeObjectFilter();
-    }
-    template <>
-    void ObjectFactory::setUpObject<Sound>(
-        const typename Sound::Ptr& objectPtr,
-        const typename Sound::Alert& msg,
-        const ros::Time& timeFound,
-        const tf::Transform& transform)
-    {
-      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
-            msg.pitch, transform));
-      objectPtr->setProbability(msg.probability);
-      objectPtr->setTimeFound(timeFound);
-      objectPtr->initializeObjectFilter();
-    }
-    template <>
-    void ObjectFactory::setUpObject<Co2>(
-        const typename Co2::Ptr& objectPtr,
-        const typename Co2::Alert& msg,
-        const ros::Time& timeFound,
-        const tf::Transform& transform)
-    {
-      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
-            msg.pitch, transform));
-      objectPtr->setProbability(msg.probability);
-      objectPtr->setTimeFound(timeFound);
-      objectPtr->initializeObjectFilter();
-    }
-    template <>
-    void ObjectFactory::setUpObject<VictimImage>(
-        const typename VictimImage::Ptr& objectPtr,
-        const typename VictimImage::Alert& msg,
-        const ros::Time& timeFound,
-        const tf::Transform& transform)
-    {
-      objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
-            msg.pitch, transform));
-      objectPtr->setProbability(msg.probability);
-      objectPtr->setTimeFound(timeFound);
-      objectPtr->initializeObjectFilter();
-    }
+    return obstacleVectorPtr;
+  }
 
-    typedef boost::scoped_ptr<ObjectFactory> ObjectFactoryPtr;
+  typedef boost::scoped_ptr<ObjectFactory> ObjectFactoryPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

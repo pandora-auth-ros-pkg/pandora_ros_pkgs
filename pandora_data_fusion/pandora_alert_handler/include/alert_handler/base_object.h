@@ -75,6 +75,9 @@ namespace pandora_data_fusion
         virtual void update(const ConstPtr& measurement) = 0;
         virtual bool isSameObject(const ConstPtr& object) const = 0;
         virtual geometry_msgs::PoseStamped getPoseStamped() const = 0;
+        virtual geometry_msgs::PoseStamped getTfInfo() const = 0;
+        virtual void fillGeotiff(pandora_data_fusion_msgs::
+            GeotiffSrv::Response* res) const = 0;
         virtual void getVisualization(visualization_msgs::
             MarkerArray* markers) const = 0;
         virtual std::string getType() const = 0;

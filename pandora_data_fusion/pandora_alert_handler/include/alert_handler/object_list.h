@@ -92,13 +92,13 @@ namespace pandora_data_fusion
           void removeInRangeOfObject(const ObjectConstPtr& object, float range);
 
           void getObjectsPosesStamped(PoseStampedVector* poses) const;
-          void fillGeotiff(
-              pandora_data_fusion_msgs::GeotiffSrv::Response* res) const;
+          void getObjectsTfInfo(PoseStampedVector* poses) const;
+          void fillGeotiff(pandora_data_fusion_msgs::GeotiffSrv::Response* res) const;
           void getVisualization(visualization_msgs::MarkerArray* markers) const;
-
-        protected:
           bool isAnExistingObject(
               const ConstPtr& object, IteratorList* iteratorListPtr);
+
+        protected:
 
           virtual void updateObjects(const ConstPtr& object,
               const IteratorList& iteratorList);
@@ -254,12 +254,20 @@ namespace pandora_data_fusion
     }
 
     template <class ObjectType>
-    void ObjectList<ObjectType>::getObjectsPosesStamped(
-        PoseStampedVector* poses) const
+    void ObjectList<ObjectType>::getObjectsPosesStamped(PoseStampedVector* poses) const
     {
       for (const_iterator it = this->begin(); it != this->end(); ++it)
       {
         poses->push_back((*it)->getPoseStamped());
+      }
+    }
+
+    template <class ObjectType>
+    void ObjectList<ObjectType>::getObjectsTfInfo(PoseStampedVector* poses) const
+    {
+      for (const_iterator it = this->begin(); it != this->end(); ++it)
+      {
+        poses->push_back((*it)->getTfInfo());
       }
     }
 

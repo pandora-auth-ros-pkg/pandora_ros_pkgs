@@ -42,471 +42,483 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+namespace pandora_alert_handler
+{
+
+  AlertHandler::AlertHandler(const std::string& ns)
   {
+    nh_.reset( new ros::NodeHandle(ns) );
+    map_.reset( new Map );
 
-    AlertHandler::AlertHandler(const std::string& ns)
+    holes_.reset( new HoleList );
+    obstacles_.reset( new ObstacleList );
+    qrs_.reset( new QrList );
+    hazmats_.reset( new HazmatList );
+    thermals_.reset( new ThermalList );
+    victimImages_.reset( new VictimImageList );
+    motions_.reset( new MotionList );
+    sounds_.reset( new SoundList );
+    co2s_.reset( new Co2List );
+    landoltcs_.reset( new LandoltcList );
+    dataMatrices_.reset( new DataMatrixList );
+
+    Hole::setList(holes_);
+    Obstacle::setList(obstacles_);
+    Qr::setList(qrs_);
+    Hazmat::setList(hazmats_);
+    Thermal::setList(thermals_);
+    VictimImage::setList(victimImages_);
+    Motion::setList(motions_);
+    Sound::setList(sounds_);
+    Co2::setList(co2s_);
+    Landoltc::setList(landoltcs_);
+    DataMatrix::setList(dataMatrices_);
+
+    std::string param;
+
+    nh_->param<std::string>("object_names/hazmat", param, "hazmat");
+    Hazmat::setObjectType(param);
+    nh_->param<std::string>("object_names/qr", param, "qr");
+    Qr::setObjectType(param);
+    nh_->param<std::string>("object_names/landoltc", param, "landoltc");
+    Landoltc::setObjectType(param);
+    nh_->param<std::string>("object_names/data_matrix", param, "data_matrix");
+    DataMatrix::setObjectType(param);
+
+    nh_->param<std::string>("object_names/hole", param, "hole");
+    Hole::setObjectType(param);
+    nh_->param<std::string>("object_names/obstacle", param, "obstacle");
+    Obstacle::setObjectType(param);
+    nh_->param<std::string>("object_names/thermal", param, "thermal");
+    Thermal::setObjectType(param);
+    nh_->param<std::string>("object_names/victim_image", param, "victim_image");
+    VictimImage::setObjectType(param);
+    nh_->param<std::string>("object_names/motion", param, "motion");
+    Motion::setObjectType(param);
+    nh_->param<std::string>("object_names/sound", param, "sound");
+    Sound::setObjectType(param);
+    nh_->param<std::string>("object_names/co2", param, "co2");
+    Co2::setObjectType(param);
+
+    Hazmat::is3D = true;
+    Qr::is3D = true;
+    Landoltc::is3D = true;
+    DataMatrix::is3D = true;
+    Sound::is3D = false;
+    Co2::is3D = false;
+    Hole::is3D = true;
+    Obstacle::is3D = false;
+    Thermal::is3D = true;
+    Motion::is3D = true;
+    VictimImage::is3D = true;
+
+    Hazmat::isVictimAlert = false;
+    Qr::isVictimAlert = false;
+    Landoltc::isVictimAlert = false;
+    DataMatrix::isVictimAlert = false;
+    Sound::isVictimAlert = true;
+    Co2::isVictimAlert = true;
+    Hole::isVictimAlert = true;
+    Obstacle::isVictimAlert = false;
+    Thermal::isVictimAlert = true;
+    Motion::isVictimAlert = true;
+    VictimImage::isVictimAlert = true;
+
+    victimsToGo_.reset( new VictimList );
+    victimsVisited_.reset( new VictimList );
+
+    if (!nh_->getParam("map_type", param))
     {
-      nh_.reset( new ros::NodeHandle(ns) );
-      map_.reset( new Map );
-
-      holes_.reset( new HoleList );
-      qrs_.reset( new QrList );
-      hazmats_.reset( new HazmatList );
-      thermals_.reset( new ThermalList );
-      victimImages_.reset( new VictimImageList );
-      motions_.reset( new MotionList );
-      sounds_.reset( new SoundList );
-      co2s_.reset( new Co2List );
-      landoltcs_.reset( new LandoltcList );
-      dataMatrices_.reset( new DataMatrixList );
-
-      Hole::setList(holes_);
-      Qr::setList(qrs_);
-      Hazmat::setList(hazmats_);
-      Thermal::setList(thermals_);
-      VictimImage::setList(victimImages_);
-      Motion::setList(motions_);
-      Sound::setList(sounds_);
-      Co2::setList(co2s_);
-      Landoltc::setList(landoltcs_);
-      DataMatrix::setList(dataMatrices_);
-
-      std::string param;
-
-      nh_->param<std::string>("object_names/hazmat", param, "hazmat");
-      Hazmat::setObjectType(param);
-      nh_->param<std::string>("object_names/qr", param, "qr");
-      Qr::setObjectType(param);
-      nh_->param<std::string>("object_names/landoltc", param, "landoltc");
-      Landoltc::setObjectType(param);
-      nh_->param<std::string>("object_names/data_matrix", param, "data_matrix");
-      DataMatrix::setObjectType(param);
-
-      nh_->param<std::string>("object_names/hole", param, "hole");
-      Hole::setObjectType(param);
-      nh_->param<std::string>("object_names/thermal", param, "thermal");
-      Thermal::setObjectType(param);
-      nh_->param<std::string>("object_names/victim_image", param, "victim_image");
-      VictimImage::setObjectType(param);
-      nh_->param<std::string>("object_names/motion", param, "motion");
-      Motion::setObjectType(param);
-      nh_->param<std::string>("object_names/sound", param, "sound");
-      Sound::setObjectType(param);
-      nh_->param<std::string>("object_names/co2", param, "co2");
-      Co2::setObjectType(param);
-
-      Hazmat::is3D = true;
-      Qr::is3D = true;
-      Landoltc::is3D = true;
-      DataMatrix::is3D = true;
-      Sound::is3D = false;
-      Co2::is3D = false;
-      Hole::is3D = true;
-      Thermal::is3D = true;
-      Motion::is3D = true;
-      VictimImage::is3D = true;
-
-      Hazmat::isVictimAlert = false;
-      Qr::isVictimAlert = false;
-      Landoltc::isVictimAlert = false;
-      DataMatrix::isVictimAlert = false;
-      Sound::isVictimAlert = true;
-      Co2::isVictimAlert = true;
-      Hole::isVictimAlert = true;
-      Thermal::isVictimAlert = true;
-      Motion::isVictimAlert = true;
-      VictimImage::isVictimAlert = true;
-
-      victimsToGo_.reset( new VictimList );
-      victimsVisited_.reset( new VictimList );
-
-      if (!nh_->getParam("map_type", param))
-      {
-        ROS_FATAL("[ALERT_HANDLER] map_type param not found");
-        ROS_BREAK();
-      }
-
-      objectFactory_.reset( new ObjectFactory(map_, param) );
-      objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
-      victimHandler_.reset( new VictimHandler(nh_, victimsToGo_, victimsVisited_) );
-
-      if (!nh_->getParam("global_frame", param))
-      {
-        ROS_FATAL("[ALERT_HANDLER] global_frame param not found");
-        ROS_BREAK();
-      }
-      BaseObject::setGlobalFrame(param);
-
-      initRosInterfaces();
+      ROS_FATAL("[ALERT_HANDLER] map_type param not found");
+      ROS_BREAK();
     }
 
-    /**
-     * [AlertHandler::publishVictims description]
-     */
-    void AlertHandler::publishVictims()
+    objectFactory_.reset( new ObjectFactory(map_, param) );
+    objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
+    victimHandler_.reset( new VictimHandler(nh_, victimsToGo_, victimsVisited_) );
+
+    if (!nh_->getParam("global_frame", param))
     {
-      pandora_data_fusion_msgs::WorldModelMsg worldModelMsg;
-      victimHandler_->getVictimsInfo(&worldModelMsg);
-      worldModelPublisher_.publish(worldModelMsg);
+      ROS_FATAL("[ALERT_HANDLER] global_frame param not found");
+      ROS_BREAK();
+    }
+    BaseObject::setGlobalFrame(param);
+
+    initRosInterfaces();
+  }
+
+  /**
+    * [AlertHandler::publishVictims description]
+    */
+  void AlertHandler::publishVictims()
+  {
+    pandora_data_fusion_msgs::WorldModelMsg worldModelMsg;
+    victimHandler_->getVictimsInfo(&worldModelMsg);
+    worldModelPublisher_.publish(worldModelMsg);
+  }
+
+  void AlertHandler::initRosInterfaces()
+  {
+    // Alert-concerned Subscribers
+
+    setSubscriber<Qr>();
+    setSubscriber<Hazmat>();
+    setSubscriber<Landoltc>();
+    setSubscriber<DataMatrix>();
+    setSubscriber<Hole>();
+    setSubscriber<Thermal>();
+    setSubscriber<VictimImage>();
+    setSubscriber<Co2>();
+    setSubscriber<Motion>();
+    setSubscriber<Sound>();
+    setSubscriber<Obstacle>();
+
+    // Map Subscriber
+    std::string param;
+    if (nh_->getParam("subscribed_topic_names/map", param))
+    {
+      mapSubscriber_ = nh_->subscribe(param, 1, &AlertHandler::updateMap, this);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] map topic name param not found");
+      ROS_BREAK();
     }
 
-    void AlertHandler::initRosInterfaces()
+    // Publishers
+    if (nh_->getParam("published_topic_names/world_model", param))
     {
-      // Alert-concerned Subscribers
-
-      setSubscriber<Qr>();
-      setSubscriber<Hazmat>();
-      setSubscriber<Landoltc>();
-      setSubscriber<DataMatrix>();
-      setSubscriber<Hole>();
-      setSubscriber<Thermal>();
-      setSubscriber<VictimImage>();
-      setSubscriber<Co2>();
-      setSubscriber<Motion>();
-      setSubscriber<Sound>();
-
-      // Map Subscriber
-      std::string param;
-      if (nh_->getParam("subscribed_topic_names/map", param))
-      {
-        mapSubscriber_ = nh_->subscribe(param, 1, &AlertHandler::updateMap, this);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] map topic name param not found");
-        ROS_BREAK();
-      }
-
-      // Publishers
-      if (nh_->getParam("published_topic_names/world_model", param))
-      {
-        worldModelPublisher_ = nh_->
-          advertise<pandora_data_fusion_msgs::WorldModelMsg>(param, 10);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] world_model topic name param not found");
-        ROS_BREAK();
-      }
-
-      // Action Servers
-
-      if (nh_->getParam("action_server_names/delete_victim", param))
-      {
-        deleteVictimServer_.reset(new DeleteVictimServer(*nh_, param, false));
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] delete_victim action name param not found");
-        ROS_BREAK();
-      }
-      deleteVictimServer_->registerGoalCallback(
-          boost::bind(&AlertHandler::deleteVictimCallback, this));
-      deleteVictimServer_->start();
-
-      if (nh_->getParam("action_server_names/validate_victim", param))
-      {
-        validateVictimServer_.reset(
-            new ValidateVictimServer(*nh_, param, false));
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] validate_victim action name param not found");
-        ROS_BREAK();
-      }
-      validateVictimServer_->registerGoalCallback(
-          boost::bind(&AlertHandler::validateVictimCallback, this));
-      validateVictimServer_->start();
-
-      // Service Servers
-      if (nh_->getParam("service_server_names/flush_queues", param))
-      {
-        flushService_ = nh_->advertiseService(param,
-            &AlertHandler::flushQueues, this);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] flush_queues service name param not found");
-        ROS_BREAK();
-      }
-
-      if (nh_->getParam("service_server_names/get_objects", param))
-      {
-        getObjectsService_ = nh_->advertiseService(param,
-            &AlertHandler::getObjectsServiceCb, this);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] get_objects service name param not found");
-        ROS_BREAK();
-      }
-
-      if (nh_->getParam("service_server_names/get_markers", param))
-      {
-        getMarkersService_ = nh_->advertiseService(param,
-            &AlertHandler::getMarkersServiceCb, this);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] get_markers service name param not found");
-        ROS_BREAK();
-      }
-
-      if (nh_->getParam("service_server_names/geotiff", param))
-      {
-        geotiffService_ = nh_->advertiseService(param,
-            &AlertHandler::geotiffServiceCb, this);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] geotiffSrv service name param not found");
-        ROS_BREAK();
-      }
-
-      // Dynamic Reconfigure Server
-      dynReconfServer_.setCallback(boost::bind(
-            &AlertHandler::dynamicReconfigCallback, this, _1, _2));
-
-      // Timers
-      tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1),
-          &AlertHandler::tfPublisherCallback, this);
+      worldModelPublisher_ = nh_->
+        advertise<pandora_data_fusion_msgs::WorldModelMsg>(param, 10);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] world_model topic name param not found");
+      ROS_BREAK();
     }
 
-    /*  Other Callbacks  */
+    // Action Servers
 
-    void AlertHandler::tfPublisherCallback(const ros::TimerEvent& event)
+    if (nh_->getParam("action_server_names/delete_victim", param))
     {
-      PoseStampedVector objectsPosesStamped;
-      qrs_->getObjectsPosesStamped(&objectsPosesStamped);
-      hazmats_->getObjectsPosesStamped(&objectsPosesStamped);
-      thermals_->getObjectsPosesStamped(&objectsPosesStamped);
-      victimImages_->getObjectsPosesStamped(&objectsPosesStamped);
-      motions_->getObjectsPosesStamped(&objectsPosesStamped);
-      sounds_->getObjectsPosesStamped(&objectsPosesStamped);
-      co2s_->getObjectsPosesStamped(&objectsPosesStamped);
-      landoltcs_->getObjectsPosesStamped(&objectsPosesStamped);
-      dataMatrices_->getObjectsPosesStamped(&objectsPosesStamped);
-      victimsToGo_->getObjectsPosesStamped(&objectsPosesStamped);
-      victimsVisited_->getObjectsPosesStamped(&objectsPosesStamped);
+      deleteVictimServer_.reset(new DeleteVictimServer(*nh_, param, false));
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] delete_victim action name param not found");
+      ROS_BREAK();
+    }
+    deleteVictimServer_->registerGoalCallback(
+        boost::bind(&AlertHandler::deleteVictimCallback, this));
+    deleteVictimServer_->start();
 
-      broadcastPoseVector(objectsPosesStamped);
+    if (nh_->getParam("action_server_names/validate_victim", param))
+    {
+      validateVictimServer_.reset(
+          new ValidateVictimServer(*nh_, param, false));
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] validate_victim action name param not found");
+      ROS_BREAK();
+    }
+    validateVictimServer_->registerGoalCallback(
+        boost::bind(&AlertHandler::validateVictimCallback, this));
+    validateVictimServer_->start();
+
+    // Service Servers
+    if (nh_->getParam("service_server_names/flush_queues", param))
+    {
+      flushService_ = nh_->advertiseService(param,
+          &AlertHandler::flushQueues, this);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] flush_queues service name param not found");
+      ROS_BREAK();
     }
 
-    void AlertHandler::broadcastPoseVector(const PoseStampedVector& poseVector)
+    if (nh_->getParam("service_server_names/get_objects", param))
     {
-      for (PoseStampedVector::const_iterator it = poseVector.begin();
-          it != poseVector.end(); ++it)
-      {
-        tf::Quaternion tfQuaternion(it->pose.orientation.x,
-            it->pose.orientation.y,
-            it->pose.orientation.z,
-            it->pose.orientation.w);
-        tf::Vector3 vec(it->pose.position.x,
-            it->pose.position.y,
-            it->pose.position.z);
-        tf::Transform tfObject(tfQuaternion, vec);
-
-        objectsBroadcaster_.sendTransform(
-            tf::StampedTransform(tfObject, it->header.stamp,
-              BaseObject::getGlobalFrame(), it->header.frame_id));
-      }
+      getObjectsService_ = nh_->advertiseService(param,
+          &AlertHandler::getObjectsServiceCb, this);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] get_objects service name param not found");
+      ROS_BREAK();
     }
 
-    void AlertHandler::deleteVictimCallback()
+    if (nh_->getParam("service_server_names/get_markers", param))
     {
-      int victimId = deleteVictimServer_->acceptNewGoal()->victimId;
-      bool deleted = victimHandler_->deleteVictim(victimId);
-      publishVictims();
-      if (!deleted)
-        deleteVictimServer_->setAborted();
-      deleteVictimServer_->setSucceeded();
+      getMarkersService_ = nh_->advertiseService(param,
+          &AlertHandler::getMarkersServiceCb, this);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] get_markers service name param not found");
+      ROS_BREAK();
     }
 
-    void AlertHandler::validateVictimCallback()
+    if (nh_->getParam("service_server_names/geotiff", param))
     {
-      GoalConstPtr goal = validateVictimServer_->acceptNewGoal();
-      bool validated = victimHandler_->validateVictim(goal->victimId, goal->victimValid);
-      publishVictims();
-      if (!validated)
-        validateVictimServer_->setAborted();
-      validateVictimServer_->setSucceeded();
+      geotiffService_ = nh_->advertiseService(param,
+          &AlertHandler::geotiffServiceCb, this);
+    }
+    else
+    {
+      ROS_FATAL("[ALERT_HANDLER] geotiffSrv service name param not found");
+      ROS_BREAK();
     }
 
-    void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
+    // Dynamic Reconfigure Server
+    dynReconfServer_.setCallback(boost::bind(
+          &AlertHandler::dynamicReconfigCallback, this, _1, _2));
+
+    // Timers
+    tfPublisherTimer_ = nh_->createTimer(ros::Duration(0.1),
+        &AlertHandler::tfPublisherCallback, this);
+  }
+
+  /*  Other Callbacks  */
+
+  void AlertHandler::tfPublisherCallback(const ros::TimerEvent& event)
+  {
+    PoseStampedVector objectsTfInfo;
+    obstacles_->getObjectsTfInfo(&objectsTfInfo);
+    qrs_->getObjectsTfInfo(&objectsTfInfo);
+    hazmats_->getObjectsTfInfo(&objectsTfInfo);
+    thermals_->getObjectsTfInfo(&objectsTfInfo);
+    victimImages_->getObjectsTfInfo(&objectsTfInfo);
+    motions_->getObjectsTfInfo(&objectsTfInfo);
+    sounds_->getObjectsTfInfo(&objectsTfInfo);
+    co2s_->getObjectsTfInfo(&objectsTfInfo);
+    landoltcs_->getObjectsTfInfo(&objectsTfInfo);
+    dataMatrices_->getObjectsTfInfo(&objectsTfInfo);
+    victimsToGo_->getObjectsTfInfo(&objectsTfInfo);
+    victimsVisited_->getObjectsTfInfo(&objectsTfInfo);
+
+    broadcastPoseVector(objectsTfInfo);
+  }
+
+  void AlertHandler::broadcastPoseVector(const PoseStampedVector& poseVector)
+  {
+    for (PoseStampedVector::const_iterator it = poseVector.begin();
+        it != poseVector.end(); ++it)
     {
-      prevxMin = msg->info.origin.position.x / msg->info.resolution
-        + msg->info.width / 2;
-      prevyMin = msg->info.origin.position.y / msg->info.resolution
-        + msg->info.height / 2;
+      tf::Quaternion tfQuaternion(it->pose.orientation.x,
+          it->pose.orientation.y,
+          it->pose.orientation.z,
+          it->pose.orientation.w);
+      tf::Vector3 vec(it->pose.position.x,
+          it->pose.position.y,
+          it->pose.position.z);
+      tf::Transform tfObject(tfQuaternion, vec);
 
-      *map_ = *msg;
+      objectsBroadcaster_.sendTransform(
+          tf::StampedTransform(tfObject, it->header.stamp,
+            BaseObject::getGlobalFrame(), it->header.frame_id));
     }
+  }
 
-    void AlertHandler::dynamicReconfigCallback(
-        const ::pandora_alert_handler::AlertHandlerConfig& config, uint32_t level)
-    {
-      objectFactory_->dynamicReconfigForward(config.occupiedCellThres,
-          config.highThres, config.lowThres,
-          config.orientationCircle);
+  void AlertHandler::deleteVictimCallback()
+  {
+    int victimId = deleteVictimServer_->acceptNewGoal()->victimId;
+    bool deleted = victimHandler_->deleteVictim(victimId);
+    publishVictims();
+    if (!deleted)
+      deleteVictimServer_->setAborted();
+    deleteVictimServer_->setSucceeded();
+  }
 
-      Hole::setObjectScore(-1);
-      Hole::setProbabilityThres(config.holeMinProbability);
-      Hole::setDistanceThres(config.holeMinDistance);
-      Hole::setOrientDiff(config.holeOrientDiff);
-      Hole::setMergeDistance(config.objectMergeDistance);
-      Hole::getFilterModel()->initializeSystemModel(config.holeSystemNoiseSD);
-      Hole::getFilterModel()->initializeMeasurementModel(config.holeMeasurementSD);
+  void AlertHandler::validateVictimCallback()
+  {
+    GoalConstPtr goal = validateVictimServer_->acceptNewGoal();
+    bool validated = victimHandler_->validateVictim(goal->victimId, goal->victimValid);
+    publishVictims();
+    if (!validated)
+      validateVictimServer_->setAborted();
+    validateVictimServer_->setSucceeded();
+  }
 
-      Hazmat::setObjectScore(config.hazmatScore);
-      Hazmat::setProbabilityThres(config.hazmatMinProbability);
-      Hazmat::setDistanceThres(config.hazmatMinDistance);
-      Hazmat::setOrientDiff(config.hazmatOrientDiff);
-      Hazmat::setMergeDistance(config.objectMergeDistance);
-      Hazmat::getFilterModel()->initializeSystemModel(config.hazmatSystemNoiseSD);
-      Hazmat::getFilterModel()->initializeMeasurementModel(config.hazmatMeasurementSD);
+  void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
+  {
+    *map_ = *msg;
+  }
 
-      Qr::setObjectScore(config.qrScore);
-      Qr::setProbabilityThres(config.qrMinProbability);
-      Qr::setDistanceThres(config.qrMinDistance);
-      Qr::setOrientDiff(config.qrOrientDiff);
-      Qr::setMergeDistance(config.objectMergeDistance);
-      Qr::getFilterModel()->initializeSystemModel(config.qrSystemNoiseSD);
-      Qr::getFilterModel()->initializeMeasurementModel(config.qrMeasurementSD);
+  void AlertHandler::dynamicReconfigCallback(
+      const ::pandora_alert_handler::AlertHandlerConfig& config, uint32_t level)
+  {
+    objectFactory_->dynamicReconfigForward(config.occupiedCellThres,
+        config.highThres, config.lowThres,
+        config.orientationCircle, config.softObstacleWidth);
 
-      DataMatrix::setObjectScore(config.dataMatrixScore);
-      DataMatrix::setProbabilityThres(config.dataMatrixMinProbability);
-      DataMatrix::setDistanceThres(config.dataMatrixMinDistance);
-      DataMatrix::setOrientDiff(config.dataMatrixOrientDiff);
-      DataMatrix::setMergeDistance(config.objectMergeDistance);
-      DataMatrix::getFilterModel()->initializeSystemModel(config.dataMatrixSystemNoiseSD);
-      DataMatrix::getFilterModel()->initializeMeasurementModel(config.dataMatrixMeasurementSD);
+    Hole::setObjectScore(-1);
+    Hole::setProbabilityThres(config.holeMinProbability);
+    Hole::setDistanceThres(config.holeMinDistance);
+    Hole::setOrientDiff(config.holeOrientDiff);
+    Hole::setMergeDistance(config.objectMergeDistance);
+    Hole::getFilterModel()->initializeSystemModel(config.holeSystemNoiseSD);
+    Hole::getFilterModel()->initializeMeasurementModel(config.holeMeasurementSD);
 
-      Landoltc::setObjectScore(config.landoltcScore);
-      Landoltc::setProbabilityThres(config.landoltcMinProbability);
-      Landoltc::setDistanceThres(config.landoltcMinDistance);
-      Landoltc::setOrientDiff(config.landoltcOrientDiff);
-      Landoltc::setMergeDistance(config.objectMergeDistance);
-      Landoltc::getFilterModel()->initializeSystemModel(config.landoltcSystemNoiseSD);
-      Landoltc::getFilterModel()->initializeMeasurementModel(config.landoltcMeasurementSD);
+    Obstacle::setObjectScore(config.obstacleScore);
+    Obstacle::setProbabilityThres(config.obstacleMinProbability);
+    Obstacle::setDistanceThres(config.obstacleMinDistance);
+    Obstacle::setOrientDiff(config.obstacleOrientDiff);
+    Obstacle::setMergeDistance(config.objectMergeDistance);
+    Obstacle::getFilterModel()->initializeSystemModel(config.obstacleSystemNoiseSD);
+    Obstacle::getFilterModel()->initializeMeasurementModel(config.obstacleMeasurementSD);
 
-      Thermal::setObjectScore(config.thermalScore);
-      Thermal::setProbabilityThres(config.thermalMinProbability);
-      Thermal::setDistanceThres(config.thermalMinDistance);
-      Thermal::setOrientDiff(config.thermalOrientDiff);
-      Thermal::setMergeDistance(config.objectMergeDistance);
-      Thermal::getFilterModel()->initializeSystemModel(config.thermalSystemNoiseSD);
-      Thermal::getFilterModel()->initializeMeasurementModel(config.thermalMeasurementSD);
+    Hazmat::setObjectScore(config.hazmatScore);
+    Hazmat::setProbabilityThres(config.hazmatMinProbability);
+    Hazmat::setDistanceThres(config.hazmatMinDistance);
+    Hazmat::setOrientDiff(config.hazmatOrientDiff);
+    Hazmat::setMergeDistance(config.objectMergeDistance);
+    Hazmat::getFilterModel()->initializeSystemModel(config.hazmatSystemNoiseSD);
+    Hazmat::getFilterModel()->initializeMeasurementModel(config.hazmatMeasurementSD);
 
-      VictimImage::setObjectScore(config.victimImageScore);
-      VictimImage::setProbabilityThres(config.victimImageMinProbability);
-      VictimImage::setDistanceThres(config.victimImageMinDistance);
-      VictimImage::setOrientDiff(config.victimImageOrientDiff);
-      VictimImage::setMergeDistance(config.objectMergeDistance);
-      VictimImage::getFilterModel()->initializeSystemModel(config.victimImageSystemNoiseSD);
-      VictimImage::getFilterModel()->initializeMeasurementModel(config.victimImageMeasurementSD);
+    Qr::setObjectScore(config.qrScore);
+    Qr::setProbabilityThres(config.qrMinProbability);
+    Qr::setDistanceThres(config.qrMinDistance);
+    Qr::setOrientDiff(config.qrOrientDiff);
+    Qr::setMergeDistance(config.objectMergeDistance);
+    Qr::getFilterModel()->initializeSystemModel(config.qrSystemNoiseSD);
+    Qr::getFilterModel()->initializeMeasurementModel(config.qrMeasurementSD);
 
-      Motion::setObjectScore(config.motionScore);
-      Motion::setProbabilityThres(config.motionMinProbability);
-      Motion::setDistanceThres(config.motionMinDistance);
-      Motion::setOrientDiff(config.motionOrientDiff);
-      Motion::setMergeDistance(config.objectMergeDistance);
-      Motion::getFilterModel()->initializeSystemModel(config.motionSystemNoiseSD);
-      Motion::getFilterModel()->initializeMeasurementModel(config.motionMeasurementSD);
+    DataMatrix::setObjectScore(config.dataMatrixScore);
+    DataMatrix::setProbabilityThres(config.dataMatrixMinProbability);
+    DataMatrix::setDistanceThres(config.dataMatrixMinDistance);
+    DataMatrix::setOrientDiff(config.dataMatrixOrientDiff);
+    DataMatrix::setMergeDistance(config.objectMergeDistance);
+    DataMatrix::getFilterModel()->initializeSystemModel(config.dataMatrixSystemNoiseSD);
+    DataMatrix::getFilterModel()->initializeMeasurementModel(config.dataMatrixMeasurementSD);
 
-      Sound::setObjectScore(config.soundScore);
-      Sound::setProbabilityThres(config.soundMinProbability);
-      Sound::setDistanceThres(config.soundMinDistance);
-      Sound::setOrientDiff(config.soundOrientDiff);
-      Sound::setMergeDistance(config.objectMergeDistance);
-      Sound::getFilterModel()->initializeSystemModel(config.soundSystemNoiseSD);
-      Sound::getFilterModel()->initializeMeasurementModel(config.soundMeasurementSD);
+    Landoltc::setObjectScore(config.landoltcScore);
+    Landoltc::setProbabilityThres(config.landoltcMinProbability);
+    Landoltc::setDistanceThres(config.landoltcMinDistance);
+    Landoltc::setOrientDiff(config.landoltcOrientDiff);
+    Landoltc::setMergeDistance(config.objectMergeDistance);
+    Landoltc::getFilterModel()->initializeSystemModel(config.landoltcSystemNoiseSD);
+    Landoltc::getFilterModel()->initializeMeasurementModel(config.landoltcMeasurementSD);
 
-      Co2::setObjectScore(config.co2Score);
-      Co2::setProbabilityThres(config.co2MinProbability);
-      Co2::setDistanceThres(config.co2MinDistance);
-      Co2::setOrientDiff(config.co2OrientDiff);
-      Co2::setMergeDistance(config.objectMergeDistance);
-      Co2::getFilterModel()->initializeSystemModel(config.co2SystemNoiseSD);
-      Co2::getFilterModel()->initializeMeasurementModel(config.co2MeasurementSD);
+    Thermal::setObjectScore(config.thermalScore);
+    Thermal::setProbabilityThres(config.thermalMinProbability);
+    Thermal::setDistanceThres(config.thermalMinDistance);
+    Thermal::setOrientDiff(config.thermalOrientDiff);
+    Thermal::setMergeDistance(config.objectMergeDistance);
+    Thermal::getFilterModel()->initializeSystemModel(config.thermalSystemNoiseSD);
+    Thermal::getFilterModel()->initializeMeasurementModel(config.thermalMeasurementSD);
 
-      objectHandler_->updateParams(config.sensorRange, config.clusterRadius);
+    VictimImage::setObjectScore(config.victimImageScore);
+    VictimImage::setProbabilityThres(config.victimImageMinProbability);
+    VictimImage::setDistanceThres(config.victimImageMinDistance);
+    VictimImage::setOrientDiff(config.victimImageOrientDiff);
+    VictimImage::setMergeDistance(config.objectMergeDistance);
+    VictimImage::getFilterModel()->initializeSystemModel(config.victimImageSystemNoiseSD);
+    VictimImage::getFilterModel()->initializeMeasurementModel(config.victimImageMeasurementSD);
 
-      victimHandler_->updateParams(config.clusterRadius, config.sameVictimRadius);
-    }
+    Motion::setObjectScore(config.motionScore);
+    Motion::setProbabilityThres(config.motionMinProbability);
+    Motion::setDistanceThres(config.motionMinDistance);
+    Motion::setOrientDiff(config.motionOrientDiff);
+    Motion::setMergeDistance(config.objectMergeDistance);
+    Motion::getFilterModel()->initializeSystemModel(config.motionSystemNoiseSD);
+    Motion::getFilterModel()->initializeMeasurementModel(config.motionMeasurementSD);
 
-    ///////////////////////////////////////////////////////
+    Sound::setObjectScore(config.soundScore);
+    Sound::setProbabilityThres(config.soundMinProbability);
+    Sound::setDistanceThres(config.soundMinDistance);
+    Sound::setOrientDiff(config.soundOrientDiff);
+    Sound::setMergeDistance(config.objectMergeDistance);
+    Sound::getFilterModel()->initializeSystemModel(config.soundSystemNoiseSD);
+    Sound::getFilterModel()->initializeMeasurementModel(config.soundMeasurementSD);
 
-    bool AlertHandler::getObjectsServiceCb(
-        pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
-        pandora_data_fusion_msgs::GetObjectsSrv::Response &rs)
-    {
-      holes_->getObjectsPosesStamped(&rs.holes);
-      qrs_->getObjectsPosesStamped(&rs.qrs);
-      hazmats_->getObjectsPosesStamped(&rs.hazmats);
-      thermals_->getObjectsPosesStamped(&rs.thermals);
-      victimImages_->getObjectsPosesStamped(&rs.victimImages);
-      motions_->getObjectsPosesStamped(&rs.motions);
-      sounds_->getObjectsPosesStamped(&rs.sounds);
-      co2s_->getObjectsPosesStamped(&rs.co2s);
-      landoltcs_->getObjectsPosesStamped(&rs.landoltcs);
-      dataMatrices_->getObjectsPosesStamped(&rs.dataMatrices);
+    Co2::setObjectScore(config.co2Score);
+    Co2::setProbabilityThres(config.co2MinProbability);
+    Co2::setDistanceThres(config.co2MinDistance);
+    Co2::setOrientDiff(config.co2OrientDiff);
+    Co2::setMergeDistance(config.objectMergeDistance);
+    Co2::getFilterModel()->initializeSystemModel(config.co2SystemNoiseSD);
+    Co2::getFilterModel()->initializeMeasurementModel(config.co2MeasurementSD);
 
-      victimHandler_->getVictimsPosesStamped(&rs.victimsToGo, &rs.victimsVisited);
+    objectHandler_->updateParams(config.sensorRange, config.clusterRadius);
 
-      return true;
-    }
+    victimHandler_->updateParams(config.clusterRadius, config.sameVictimRadius);
+  }
 
-    bool AlertHandler::getMarkersServiceCb(
-        pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
-        pandora_data_fusion_msgs::GetMarkersSrv::Response &rs)
-    {
-      holes_->getVisualization(&rs.holes);
-      qrs_->getVisualization(&rs.hazmats);
-      hazmats_->getVisualization(&rs.qrs);
-      thermals_->getVisualization(&rs.thermals);
-      victimImages_->getVisualization(&rs.victimImages);
-      motions_->getVisualization(&rs.motions);
-      sounds_->getVisualization(&rs.sounds);
-      co2s_->getVisualization(&rs.co2s);
-      landoltcs_->getVisualization(&rs.landoltcs);
-      dataMatrices_->getVisualization(&rs.dataMatrices);
+  ///////////////////////////////////////////////////////
 
-      victimHandler_->getVisualization(&rs.victimsVisited, &rs.victimsToGo);
+  bool AlertHandler::getObjectsServiceCb(
+      pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
+      pandora_data_fusion_msgs::GetObjectsSrv::Response &rs)
+  {
+    holes_->getObjectsPosesStamped(&rs.holes);
+    obstacles_->getObjectsPosesStamped(&rs.obstacles);
+    qrs_->getObjectsPosesStamped(&rs.qrs);
+    hazmats_->getObjectsPosesStamped(&rs.hazmats);
+    thermals_->getObjectsPosesStamped(&rs.thermals);
+    victimImages_->getObjectsPosesStamped(&rs.victimImages);
+    motions_->getObjectsPosesStamped(&rs.motions);
+    sounds_->getObjectsPosesStamped(&rs.sounds);
+    co2s_->getObjectsPosesStamped(&rs.co2s);
+    landoltcs_->getObjectsPosesStamped(&rs.landoltcs);
+    dataMatrices_->getObjectsPosesStamped(&rs.dataMatrices);
 
-      return true;
-    }
+    victimHandler_->getVictimsPosesStamped(&rs.victimsToGo, &rs.victimsVisited);
 
-    bool AlertHandler::geotiffServiceCb(
-        pandora_data_fusion_msgs::GeotiffSrv::Request &req,
-        pandora_data_fusion_msgs::GeotiffSrv::Response &res)
-    {
-      qrs_->getObjectsPosesStamped(&res.qrs);
-      hazmats_->getObjectsPosesStamped(&res.hazmats);
+    return true;
+  }
 
-      victimHandler_->fillGeotiff(&res);
+  bool AlertHandler::getMarkersServiceCb(
+      pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
+      pandora_data_fusion_msgs::GetMarkersSrv::Response &rs)
+  {
+    holes_->getVisualization(&rs.holes);
+    obstacles_->getVisualization(&rs.obstacles);
+    qrs_->getVisualization(&rs.hazmats);
+    hazmats_->getVisualization(&rs.qrs);
+    thermals_->getVisualization(&rs.thermals);
+    victimImages_->getVisualization(&rs.victimImages);
+    motions_->getVisualization(&rs.motions);
+    sounds_->getVisualization(&rs.sounds);
+    co2s_->getVisualization(&rs.co2s);
+    landoltcs_->getVisualization(&rs.landoltcs);
+    dataMatrices_->getVisualization(&rs.dataMatrices);
 
-      return true;
-    }
+    victimHandler_->getVisualization(&rs.victimsVisited, &rs.victimsToGo);
 
-    bool AlertHandler::flushQueues(
-        std_srvs::Empty::Request& rq,
-        std_srvs::Empty::Response &rs)
-    {
-      ROS_INFO_NAMED("ALERT_HANDLER_FLUSH_SERVICE", "Flushing lists!");
-      holes_->clear();
-      qrs_->clear();
-      hazmats_->clear();
-      thermals_->clear();
-      victimImages_->clear();
-      motions_->clear();
-      sounds_->clear();
-      co2s_->clear();
-      landoltcs_->clear();
-      dataMatrices_->clear();
-      victimHandler_->flush();
-      return true;
-    }
+    return true;
+  }
+
+  bool AlertHandler::geotiffServiceCb(
+      pandora_data_fusion_msgs::GeotiffSrv::Request &req,
+      pandora_data_fusion_msgs::GeotiffSrv::Response &res)
+  {
+    qrs_->getObjectsPosesStamped(&res.qrs);
+    hazmats_->getObjectsPosesStamped(&res.hazmats);
+    victimHandler_->fillGeotiff(&res);
+    return true;
+  }
+
+  bool AlertHandler::flushQueues(
+      std_srvs::Empty::Request& rq,
+      std_srvs::Empty::Response &rs)
+  {
+    ROS_INFO_NAMED("ALERT_HANDLER_FLUSH_SERVICE", "Flushing lists!");
+    holes_->clear();
+    obstacles_->clear();
+    qrs_->clear();
+    hazmats_->clear();
+    thermals_->clear();
+    victimImages_->clear();
+    motions_->clear();
+    sounds_->clear();
+    co2s_->clear();
+    landoltcs_->clear();
+    dataMatrices_->clear();
+    victimHandler_->flush();
+    return true;
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

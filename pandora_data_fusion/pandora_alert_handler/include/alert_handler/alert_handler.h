@@ -80,250 +80,247 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+namespace pandora_alert_handler
+{
+
+  //!< Type Definitions
+  typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
+  typedef actionlib::SimpleActionServer
+    <pandora_data_fusion_msgs::DeleteVictimAction> DeleteVictimServer;
+  typedef actionlib::SimpleActionServer
+    <pandora_data_fusion_msgs::ValidateVictimAction>
+    ValidateVictimServer;
+  typedef boost::shared_ptr<const ValidateVictimServer::Goal> GoalConstPtr;
+
+  class AlertHandler : private boost::noncopyable
   {
+    public:
+      /**
+        * @brief Constructor
+        * @param ns [std::string const&] Has the namespace of the node.
+        */
+      explicit AlertHandler(const std::string& ns);
 
-    //!< Type Definitions
-    typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
-    typedef actionlib::SimpleActionServer
-      <pandora_data_fusion_msgs::DeleteVictimAction> DeleteVictimServer;
-    typedef actionlib::SimpleActionServer
-      <pandora_data_fusion_msgs::ValidateVictimAction>
-      ValidateVictimServer;
-    typedef boost::shared_ptr<const ValidateVictimServer::Goal> GoalConstPtr;
+      /* Victim-concerned Goal Callbacks */
 
-    class AlertHandler : private boost::noncopyable
+      /**
+        * @brief Client is Agent. Order to delete Victim.
+        * @return void
+        */
+      void deleteVictimCallback();
+
+      /**
+        * @brief Client is Agent. Order to validate current victim (identification mode).
+        * @return void
+        */
+      void validateVictimCallback();
+
+      /*  Dynamic Reconfiguration Callback  */
+      void dynamicReconfigCallback(
+          const ::pandora_alert_handler::AlertHandlerConfig &config,
+          uint32_t level);
+
+    private:
+      /**
+        * @brief Templated subscriber for all objects
+        */
+      template <class ObjectType>
+        void setSubscriber();
+
+      /*  Alert-concerned Callback  */
+
+      template <class ObjectType>
+        void alertCallback(const typename ObjectType::AlertVector& msg);
+
+      /*  Map Subsriber Callback - Communication with SLAM  */
+
+      /**
+        * @brief Communication with SLAM. Gets current global map.
+        * @param msg [const nav_msgs::OccupancyGridConstPtr&] Contains map info.
+        * @return void
+        */
+      void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
+
+      /*  Map Visualization Callbacks  */
+
+      bool geotiffServiceCb(
+          pandora_data_fusion_msgs::GeotiffSrv::Request &req,
+          pandora_data_fusion_msgs::GeotiffSrv::Response &res);
+
+      bool getMarkersServiceCb(
+          pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
+          pandora_data_fusion_msgs::GetMarkersSrv::Response &rs);
+
+      /*  Services Callbacks  */
+
+      bool getObjectsServiceCb(
+          pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
+          pandora_data_fusion_msgs::GetObjectsSrv::Response &rs);
+
+      bool flushQueues(
+          std_srvs::Empty::Request& rq,
+          std_srvs::Empty::Response& rs);
+
+      /**
+        * @brief Function that posts objects' transformations periodically.
+        * Triggered by a timer.
+        * @param event [ros::TimerEvent const&]
+        * @return void
+        */
+      void tfPublisherCallback(const ros::TimerEvent& event);
+
+      /**
+        * @brief Broadcasts transformations from /world according to
+        * stamped poses given.
+        * @param poseVector [PoseStampedVector const&] vector containing pose info
+        * @return void
+        */
+      void broadcastPoseVector(const PoseStampedVector& poseVector);
+
+      /**
+        * @brief Takes info from VictimsToGo_ and publishes it to the Agent.
+        * @return void
+        */
+      void publishVictims();
+
+      void initRosInterfaces();
+
+    private:
+      NodeHandlePtr nh_;
+
+      //!< Holds the subscribers using a key
+      std::map<std::string, ros::Subscriber> subscribers_;
+      ros::Subscriber mapSubscriber_;
+
+      ros::ServiceServer getMarkersService_;
+      ros::ServiceServer geotiffService_;
+
+      ros::ServiceServer flushService_;
+      ros::ServiceServer getObjectsService_;
+
+      ros::Publisher worldModelPublisher_;
+
+      tf::TransformBroadcaster objectsBroadcaster_;
+      ros::Timer tfPublisherTimer_;
+
+      boost::shared_ptr<DeleteVictimServer> deleteVictimServer_;
+      boost::shared_ptr<ValidateVictimServer> validateVictimServer_;
+
+      dynamic_reconfigure::Server< ::pandora_alert_handler::AlertHandlerConfig >
+        dynReconfServer_;
+
+      MapPtr map_;
+
+      //!< The alerts list
+      QrListPtr qrs_;
+      HazmatListPtr hazmats_;
+      LandoltcListPtr landoltcs_;
+      DataMatrixListPtr dataMatrices_;
+
+      HoleListPtr holes_;
+      ObstacleListPtr obstacles_;
+      ThermalListPtr thermals_;
+      MotionListPtr motions_;
+      VictimImageListPtr victimImages_;
+      SoundListPtr sounds_;
+      Co2ListPtr co2s_;
+
+      //!< The unvisited victims list
+      VictimListPtr victimsToGo_;
+      //!< The visited victims list
+      VictimListPtr victimsVisited_;
+
+      ObjectFactoryPtr objectFactory_;
+      ObjectHandlerPtr objectHandler_;
+      VictimHandlerPtr victimHandler_;
+  };
+
+  /**
+    * @brief tamplated function responsible for initialising each one of the
+    * node's subscribers.
+    * @param name [std::string] string with the name of the subscriber and
+    * of the yaml param
+    * @param callback [void] pointer to the Callback of the subscriber
+    * @return void
+    */
+  template <class ObjectType>
+    void AlertHandler::setSubscriber()
     {
-      public:
-        /**
-         * @brief Constructor
-         * @param ns [std::string const&] Has the namespace of the node.
-         */
-        explicit AlertHandler(const std::string& ns);
-
-        /* Victim-concerned Goal Callbacks */
-
-        /**
-         * @brief Client is Agent. Order to delete Victim.
-         * @return void
-         */
-        void deleteVictimCallback();
-
-        /**
-         * @brief Client is Agent. Order to validate current victim (identification mode).
-         * @return void
-         */
-        void validateVictimCallback();
-
-        /*  Dynamic Reconfiguration Callback  */
-        void dynamicReconfigCallback(
-            const ::pandora_alert_handler::AlertHandlerConfig &config,
-            uint32_t level);
-
-      private:
-        /**
-         * @brief Templated subscriber for all objects
-         */
-        template <class ObjectType>
-          void setSubscriber();
-
-        /*  Alert-concerned Callback  */
-
-        template <class ObjectType>
-          void alertCallback(const typename ObjectType::AlertVector& msg);
-
-        /*  Map Subsriber Callback - Communication with SLAM  */
-
-        /**
-         * @brief Communication with SLAM. Gets current global map.
-         * @param msg [const nav_msgs::OccupancyGridConstPtr&] Contains map info.
-         * @return void
-         */
-        void updateMap(const nav_msgs::OccupancyGridConstPtr& msg);
-
-        /*  Map Visualization Callbacks  */
-
-        bool geotiffServiceCb(
-            pandora_data_fusion_msgs::GeotiffSrv::Request &req,
-            pandora_data_fusion_msgs::GeotiffSrv::Response &res);
-
-        bool getMarkersServiceCb(
-            pandora_data_fusion_msgs::GetMarkersSrv::Request& rq,
-            pandora_data_fusion_msgs::GetMarkersSrv::Response &rs);
-
-        /*  Services Callbacks  */
-
-        bool getObjectsServiceCb(
-            pandora_data_fusion_msgs::GetObjectsSrv::Request& rq,
-            pandora_data_fusion_msgs::GetObjectsSrv::Response &rs);
-
-        bool flushQueues(
-            std_srvs::Empty::Request& rq,
-            std_srvs::Empty::Response& rs);
-
-        /**
-         * @brief Function that posts objects' transformations periodically.
-         * Triggered by a timer.
-         * @param event [ros::TimerEvent const&]
-         * @return void
-         */
-        void tfPublisherCallback(const ros::TimerEvent& event);
-
-        /**
-         * @brief Broadcasts transformations from /world according to
-         * stamped poses given.
-         * @param poseVector [PoseStampedVector const&] vector containing pose info
-         * @return void
-         */
-        void broadcastPoseVector(const PoseStampedVector& poseVector);
-
-        /**
-         * @brief Takes info from VictimsToGo_ and publishes it to the Agent.
-         * @return void
-         */
-        void publishVictims();
-
-        void initRosInterfaces();
-
-      private:
-        NodeHandlePtr nh_;
-
-        //!< Holds the subscribers using a key
-        std::map<std::string, ros::Subscriber> subscribers_;
-        ros::Subscriber mapSubscriber_;
-
-        ros::ServiceServer getMarkersService_;
-        ros::ServiceServer geotiffService_;
-
-        ros::ServiceServer flushService_;
-        ros::ServiceServer getObjectsService_;
-
-        ros::Publisher worldModelPublisher_;
-
-        tf::TransformBroadcaster objectsBroadcaster_;
-        ros::Timer tfPublisherTimer_;
-
-        boost::shared_ptr<DeleteVictimServer> deleteVictimServer_;
-        boost::shared_ptr<ValidateVictimServer> validateVictimServer_;
-
-        dynamic_reconfigure::Server< ::pandora_alert_handler::AlertHandlerConfig >
-          dynReconfServer_;
-
-        MapPtr map_;
-
-        //!< save for geotiff
-        int prevxMin;
-        int prevyMin;
-
-        //!< The alerts list
-        QrListPtr qrs_;
-        HazmatListPtr hazmats_;
-        LandoltcListPtr landoltcs_;
-        DataMatrixListPtr dataMatrices_;
-
-        HoleListPtr holes_;
-        ThermalListPtr thermals_;
-        MotionListPtr motions_;
-        VictimImageListPtr victimImages_;
-        SoundListPtr sounds_;
-        Co2ListPtr co2s_;
-
-        //!< The unvisited victims list
-        VictimListPtr victimsToGo_;
-        //!< The visited victims list
-        VictimListPtr victimsVisited_;
-
-        ObjectFactoryPtr objectFactory_;
-        ObjectHandlerPtr objectHandler_;
-        VictimHandlerPtr victimHandler_;
-    };
-
-    /**
-      * @brief tamplated function responsible for initialising each one of the
-      * node's subscribers.
-      * @param name [std::string] string with the name of the subscriber and
-      * of the yaml param
-      * @param callback [void] pointer to the Callback of the subscriber
-      * @return void
-      */
-    template <class ObjectType>
-      void AlertHandler::setSubscriber()
+      std::string name = ObjectType::getObjectType();
+      std::string param;
+      if (nh_->getParam("subscribed_topic_names/" + name, param))
       {
-        std::string name = ObjectType::getObjectType();
-        std::string param;
-        if (nh_->getParam("subscribed_topic_names/" + name, param))
-        {
-          ros::Subscriber sub;
-          sub = nh_->subscribe(param, 1,
-                               &AlertHandler::alertCallback<ObjectType>, this);
-          //!< Store the subscriber to the std::map
-          subscribers_[name] = sub;
-        }
-        else
-        {
-          ROS_FATAL("[ALERT_HANDLER] %s topic name param not found", name.c_str());
-          ROS_BREAK();
-        }
+        ros::Subscriber sub;
+        sub = nh_->subscribe(param, 1,
+                              &AlertHandler::alertCallback<ObjectType>, this);
+        //!< Store the subscriber to the std::map
+        subscribers_[name] = sub;
       }
-
-    template <class ObjectType>
-      void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
+      else
       {
-        if (map_->data.size() == 0)
-          return;
-
-        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-            ObjectType::getObjectType() << " ALERT ARRIVED!");
-
-        typename ObjectType::PtrVectorPtr objectsVectorPtr;
-        try
-        {
-          objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
-        }
-        catch (TfException ex)
-        {
-          ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-          return;
-        }
-
-        tf::Transform transform = objectFactory_->getCurrentTransform();
-        objectHandler_->handleObjects<ObjectType>(objectsVectorPtr, transform);
-
-        if (ObjectType::isVictimAlert)
-        {
-          victimHandler_->inspect();
-          publishVictims();
-        }
+        ROS_FATAL("[ALERT_HANDLER] %s topic name param not found", name.c_str());
+        ROS_BREAK();
       }
+    }
 
-    template <>
-      void AlertHandler::alertCallback<Hole>(
-          const typename Hole::AlertVector& msg)
+  template <class ObjectType>
+    void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
+    {
+      if (map_->data.size() == 0)
+        return;
+
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          ObjectType::getObjectType() << " ALERT ARRIVED!");
+
+      typename ObjectType::PtrVectorPtr objectsVectorPtr;
+      try
       {
-        if (map_->data.size() == 0)
-          return;
-
-        ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-            Hole::getObjectType() << " ALERT ARRIVED!");
-
-        HolePtrVectorPtr holesVectorPtr;
-        try
-        {
-          holesVectorPtr = objectFactory_->makeHoles(msg);
-        }
-        catch (TfException ex)
-        {
-          ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-          return;
-        }
+        objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
+      }
+      catch (std::runtime_error& ex)
+      {
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+        return;
+      }
 
       tf::Transform transform = objectFactory_->getCurrentTransform();
-      objectHandler_->handleHoles(holesVectorPtr, transform);
+      objectHandler_->handleObjects<ObjectType>(objectsVectorPtr, transform);
 
-      victimHandler_->notify();
-
-      publishVictims();
+      if (ObjectType::isVictimAlert)
+      {
+        victimHandler_->inspect();
+        publishVictims();
+      }
     }
+
+  template <>
+    void AlertHandler::alertCallback<Hole>(
+        const typename Hole::AlertVector& msg)
+    {
+      if (map_->data.size() == 0)
+        return;
+
+      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+          Hole::getObjectType() << " ALERT ARRIVED!");
+
+      HolePtrVectorPtr holesVectorPtr;
+      try
+      {
+        holesVectorPtr = objectFactory_->makeObjects<Hole>(msg);
+      }
+      catch (std::runtime_error& ex)
+      {
+        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+        return;
+      }
+
+    tf::Transform transform = objectFactory_->getCurrentTransform();
+    objectHandler_->handleHoles(holesVectorPtr, transform);
+
+    victimHandler_->notify();
+
+    publishVictims();
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

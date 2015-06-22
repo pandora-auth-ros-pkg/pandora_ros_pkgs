@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,44 +33,70 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
+#ifndef PANDORA_ALERT_HANDLER_OBSTACLE_H
+#define PANDORA_ALERT_HANDLER_OBSTACLE_H
 
-#include <stdexcept>
+#include <vector>
 #include <string>
+
+#include "pandora_vision_msgs/ObstacleAlert.h"
+#include "pandora_vision_msgs/ObstacleAlertVector.h"
+
+#include "alert_handler/kalman_object.h"
 
 namespace pandora_data_fusion
 {
 namespace pandora_alert_handler
 {
 
-  class TfException : public std::runtime_error
+  /**
+    * @class Obstacle
+    * @brief: Concrete class representing an obstacle in the world. Inherits
+    * from KalmanObject
+    */
+  class Obstacle : public KalmanObject<Obstacle>
   {
-    public:
-      explicit TfException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
+   public:
+    //!< Type Definitions
+    typedef pandora_vision_msgs::ObstacleAlert Alert;
+    typedef pandora_vision_msgs::ObstacleAlertVector AlertVector;
+
+   public:
+    Obstacle ();
+    virtual ~Obstacle ();
+
+    /* public methods */
+    virtual bool isSameObject(const ObjectConstPtr& object) const;
+    virtual void update(const ObjectConstPtr& measurement);
+
+    uint8_t getObstacleType() const;
+    void setObstacleType(uint8_t obstacleType);
+
+    double getLength() const;
+    void setLength(double length);
+
+    double getWidth() const;
+    void setWidth(double width);
+
+   protected:
+    /* data */
+    uint8_t obstacleType_;
+    double length_;
+    double width_;
   };
 
-  class AlertException : public std::runtime_error
-  {
-    public:
-      explicit AlertException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
-
-  class ObstacleTypeException : public std::runtime_error
-  {
-    public:
-      explicit ObstacleTypeException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+  typedef Obstacle::Ptr ObstaclePtr;
+  typedef Obstacle::ConstPtr ObstacleConstPtr;
+  typedef Obstacle::PtrVector ObstaclePtrVector;
+  typedef Obstacle::PtrVectorPtr ObstaclePtrVectorPtr;
+  typedef Obstacle::List ObstacleList;
+  typedef Obstacle::ListPtr ObstacleListPtr;
+  typedef Obstacle::ListConstPtr ObstacleListConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_EXCEPTIONS_H
+#endif  // PANDORA_ALERT_HANDLER_OBSTACLE_H

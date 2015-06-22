@@ -12,28 +12,34 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
-  VictimInfoMsg.msg
-  WorldModelMsg.msg
-  QrNotificationMsg.msg
-  GlobalProbabilitiesMsg.msg
+    VictimInfoMsg.msg
+    ObstacleInfo.msg
+    WorldModelMsg.msg
+    QrNotificationMsg.msg
+    GlobalProbabilitiesMsg.msg
   )
 
 add_service_files(
   FILES
-  GetObjectsSrv.srv
-  GeotiffSrv.srv
-  QrCsvSrv.srv
-  GetMarkersSrv.srv
+    GetObjectsSrv.srv
+    GeotiffSrv.srv
+    QrCsvSrv.srv
+    GetMarkersSrv.srv
   )
 
 add_action_files(
   FILES
-  DeleteVictim.action
-  ValidateVictim.action
+    DeleteVictim.action
+    ValidateVictim.action
   )
 
 generate_messages(
-  DEPENDENCIES std_msgs actionlib_msgs geometry_msgs visualization_msgs std_srvs
+  DEPENDENCIES
+    std_msgs
+    actionlib_msgs
+    geometry_msgs
+    visualization_msgs
+    std_srvs
   )
 
 catkin_package(

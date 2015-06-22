@@ -33,8 +33,6 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
@@ -45,6 +43,7 @@
 #include <vector>
 #include <string>
 #include <boost/utility.hpp>
+#include <boost/array.hpp>
 
 #include <tf/transform_broadcaster.h>
 
@@ -66,9 +65,15 @@ namespace pandora_alert_handler
    public:
     PoseFinder(const MapPtr& map, const std::string& mapType);
 
-    geometry_msgs::Pose findAlertPose(float alertYaw, float alertPitch,
+    geometry_msgs::Pose findAlertPose(double alertYaw, double alertPitch,
                        const tf::Transform& tfTransform);
-
+    geometry_msgs::Pose findPoseFromPoints(
+        const boost::array<double, 4>& pointsYaw,
+        const boost::array<double, 4>& pointsPitch,
+        const boost::array<double, 4>& pointsDepth,
+        const tf::Transform& tfTransform, double* length);
+    geometry_msgs::Point projectAlertPosition(double alertYaw, double alertPitch,
+        double depth, const tf::Transform& tfTransform);
     tf::Transform lookupTransformFromWorld(const std_msgs::Header& header);
 
     geometry_msgs::Quaternion findAppropriateOrientation(

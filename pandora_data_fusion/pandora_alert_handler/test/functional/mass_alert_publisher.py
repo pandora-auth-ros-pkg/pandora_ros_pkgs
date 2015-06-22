@@ -3,7 +3,7 @@
 __version__ = "0.0.1"
 __status__ = "Production"
 __license__ = "BSD"
-__copyright__ = "Copyright (c) 2014, P.A.N.D.O.R.A. Team. All rights reserved."
+__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -54,6 +54,7 @@ class MassPublisher:
         self.dyn_reconf_srv = Server(MassAlertPublisherConfig, self.dyn_reconf_callback)
 
         self.qr_post = False
+        self.obstacle_post = False
         self.hazmat_post = False
         self.landoltc_post = False
         self.dataMatrix_post = False
@@ -145,6 +146,14 @@ class MassPublisher:
                         self.config.hole_2_pitch,
                         self.config.hole_2_probability,
                         self.config.hole_2_id)
+
+                if self.config.obstacle_post:
+                    self.alertDeliveryBoy.deliverObstacleOrder(
+                        (0.0, self.config.obstacle_2_yaw, 0.0, self.config.obstacle_1_yaw),
+                        (0.0, self.config.obstacle_2_pitch, 0.0, self.config.obstacle_1_pitch),
+                        (0.0, self.config.obstacle_2_depth, 0.0, self.config.obstacle_1_depth),
+                        self.config.obstacle_probability,
+                        self.config.obstacle_type)
             rospy.sleep(0.5)
 
 if __name__ == '__main__':

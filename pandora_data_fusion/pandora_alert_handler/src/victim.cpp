@@ -112,8 +112,7 @@ namespace pandora_data_fusion
       markers->markers.push_back(victimDescription);
     }
 
-    void Victim::fillGeotiff(pandora_data_fusion_msgs::
-        GeotiffSrv::Response* res) const
+    void Victim::fillGeotiff(pandora_data_fusion_msgs::GeotiffSrv::Response* res) const
     {
       if (valid_)
       {

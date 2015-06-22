@@ -42,45 +42,23 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+namespace pandora_alert_handler
+{
+
+  ObjectFactory::ObjectFactory(const MapPtr& map, const std::string& mapType)
   {
+    poseFinder_.reset( new PoseFinder(map, mapType) );
+    SOFT_OBSTACLE_WIDTH = 1.0;
+  }
 
-    ObjectFactory::ObjectFactory(const MapPtr& map, const std::string& mapType)
-    {
-      poseFinder_.reset( new PoseFinder(map, mapType) );
-    }
-
-    HolePtrVectorPtr ObjectFactory::makeHoles(
-        const pandora_vision_msgs::HoleDirectionAlertVector& msg)
-    {
-      currentTransform_ = poseFinder_->lookupTransformFromWorld(msg.header);
-
-      HolePtrVectorPtr holesVectorPtr( new HolePtrVector );
-      for (int ii = 0; ii < msg.alerts.size(); ++ii)
-      {
-        try
-        {
-          HolePtr newHole( new Hole );
-          setUpObject<Hole>(newHole, msg.alerts[ii], msg.header.stamp,
-              currentTransform_);
-          holesVectorPtr->push_back(newHole);
-        }
-        catch (AlertException ex)
-        {
-          ROS_WARN_NAMED("ALERT_HANDLER",
-              "[ALERT_HANDLER_OBJECT_FACTORY %d] %s", __LINE__, ex.what());
-        }
-      }
-
-      return holesVectorPtr;
-    }
-
-    void ObjectFactory::dynamicReconfigForward(float occupiedCellThres,
-        float highThres, float lowThres, float orientationCircle)
-    {
-      poseFinder_->updateParams(occupiedCellThres,
-          highThres, lowThres, orientationCircle);
-    }
+  void ObjectFactory::dynamicReconfigForward(float occupiedCellThres,
+      float highThres, float lowThres, float orientationCircle,
+      double soft_obstacle_width)
+  {
+    SOFT_OBSTACLE_WIDTH = soft_obstacle_width;
+    poseFinder_->updateParams(occupiedCellThres,
+        highThres, lowThres, orientationCircle);
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,44 +33,59 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
+#ifndef PANDORA_ALERT_HANDLER_BARREL_H
+#define PANDORA_ALERT_HANDLER_BARREL_H
 
-#include <stdexcept>
+#include <vector>
 #include <string>
+
+#include "pandora_vision_msgs/ObstacleAlert.h"
+#include "pandora_vision_msgs/ObstacleAlertVector.h"
+
+#include "alert_handler/obstacle.h"
 
 namespace pandora_data_fusion
 {
 namespace pandora_alert_handler
 {
 
-  class TfException : public std::runtime_error
+  /**
+    * @class Barrel
+    * @brief: Concrete class representing a barrel in the world. Inherits
+    * from Obstacle
+    */
+  class Barrel : public Obstacle
   {
-    public:
-      explicit TfException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
+   public:
+    //!< Type Definitions
+    typedef boost::shared_ptr<Barrel> Ptr;
+    typedef boost::shared_ptr<Barrel const> ConstPtr;
+    typedef std::vector<Ptr> PtrVector;
+    typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
+    typedef ObjectList<Barrel> List;
+    typedef boost::shared_ptr< List > ListPtr;
+    typedef boost::shared_ptr< List const > ListConstPtr;
+
+   public:
+    Barrel ();
+    virtual ~Barrel ();
+
+    virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+    virtual std::string setFrameId(int id);
   };
 
-  class AlertException : public std::runtime_error
-  {
-    public:
-      explicit AlertException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
-
-  class ObstacleTypeException : public std::runtime_error
-  {
-    public:
-      explicit ObstacleTypeException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+  typedef Barrel::Ptr BarrelPtr;
+  typedef Barrel::ConstPtr BarrelConstPtr;
+  typedef Barrel::PtrVector BarrelPtrVector;
+  typedef Barrel::PtrVectorPtr BarrelPtrVectorPtr;
+  typedef Barrel::List BarrelList;
+  typedef Barrel::ListPtr BarrelListPtr;
+  typedef Barrel::ListConstPtr BarrelListConstPtr;
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
 
-#endif  // ALERT_HANDLER_EXCEPTIONS_H
+#endif  // PANDORA_ALERT_HANDLER_BARREL_H

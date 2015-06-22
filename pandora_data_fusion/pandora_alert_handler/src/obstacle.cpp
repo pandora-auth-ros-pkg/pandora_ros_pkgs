@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,44 +33,74 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
-
-#include <stdexcept>
-#include <string>
+#include "alert_handler/obstacle.h"
 
 namespace pandora_data_fusion
 {
 namespace pandora_alert_handler
 {
+  Obstacle::Obstacle() {}
+  Obstacle::~Obstacle() {}
 
-  class TfException : public std::runtime_error
+  bool Obstacle::isSameObject(const ObjectConstPtr& object) const
   {
-    public:
-      explicit TfException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    bool isSame = Object<Obstacle>::isSameObject(object);
+    if (!isSame) return false;
+    isSame = obstacleType_ == boost::dynamic_pointer_cast<Obstacle const>(
+        object)->getObstacleType();
+    return isSame;
+  }
 
-  class AlertException : public std::runtime_error
+  void Obstacle::update(const ObjectConstPtr& measurement)
   {
-    public:
-      explicit AlertException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    KalmanObject<Obstacle>::update(measurement);
 
-  class ObstacleTypeException : public std::runtime_error
+    ObstacleConstPtr obstacleMeas = boost::dynamic_pointer_cast<Obstacle const>(measurement);
+    geometry_msgs::Pose newPose = this->getPose();
+    newPose.orientation = obstacleMeas->getPose().orientation;
+    this->setPose(newPose);
+    double newLength = obstacleMeas->getLength();
+    if (newLength > length_) {
+      length_ = newLength;
+    }
+    double newWidth = obstacleMeas->getWidth();
+    if (newWidth > width_) {
+      width_ = newWidth;
+    }
+  }
+
+  uint8_t Obstacle::getObstacleType() const
   {
-    public:
-      explicit ObstacleTypeException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    return obstacleType_;
+  }
+
+  void Obstacle::setObstacleType(uint8_t obstacleType)
+  {
+    obstacleType_ = obstacleType;
+  }
+
+  double Obstacle::getLength() const
+  {
+    return length_;
+  }
+
+  void Obstacle::setLength(double length)
+  {
+    length_ = length;
+  }
+
+  double Obstacle::getWidth() const
+  {
+    return width_;
+  }
+
+  void Obstacle::setWidth(double width)
+  {
+    width_ = width;
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-
-#endif  // ALERT_HANDLER_EXCEPTIONS_H

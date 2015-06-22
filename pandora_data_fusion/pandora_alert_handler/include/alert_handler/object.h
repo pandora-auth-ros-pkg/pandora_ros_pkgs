@@ -63,8 +63,9 @@ namespace pandora_data_fusion
         typedef boost::shared_ptr<DerivedObject const> ConstPtr;
         typedef std::vector<Ptr> PtrVector;
         typedef boost::shared_ptr<PtrVector> PtrVectorPtr;
-        typedef boost::shared_ptr< ObjectList<DerivedObject> > ListPtr;
-        typedef boost::shared_ptr< const ObjectList<DerivedObject> > ListConstPtr;
+        typedef ObjectList<DerivedObject> List;
+        typedef boost::shared_ptr< List > ListPtr;
+        typedef boost::shared_ptr< List const > ListConstPtr;
 
         /**
          * @brief Setter for member type_
@@ -242,6 +243,11 @@ namespace pandora_data_fusion
          */
         virtual geometry_msgs::PoseStamped getPoseStamped() const;
 
+        virtual geometry_msgs::PoseStamped getTfInfo() const;
+
+        virtual void fillGeotiff(pandora_data_fusion_msgs::
+            GeotiffSrv::Response* res) const;
+
         /**
          * @brief Updates this object with the measurement.
          * @return void
@@ -321,7 +327,7 @@ namespace pandora_data_fusion
         void setId(int id)
         {
           id_ = id;
-          frame_id_ = type_ + "_" + boost::to_string(id_);
+          frame_id_ = setFrameId(id);
         }
 
         /**
@@ -363,10 +369,15 @@ namespace pandora_data_fusion
           pose_ = pose;
         }
 
+        virtual std::string setFrameId(int id)
+        {
+          return type_ + "_" + boost::to_string(id);
+        }
+
       protected:
         //!< The object's id
         int id_;
-        //!< The reference frame for object.
+        //!< The tf frame name for object.
         std::string frame_id_;
         //!< True if we have confidence that this object is eligible for use
         bool legit_;
@@ -412,10 +423,24 @@ namespace pandora_data_fusion
       {
         geometry_msgs::PoseStamped objPoseStamped;
         objPoseStamped.pose = pose_;
+        objPoseStamped.header.frame_id = DerivedObject::getGlobalFrame();
+        objPoseStamped.header.stamp = ros::Time::now();
+        return objPoseStamped;
+      }
+
+    template <class DerivedObject>
+      geometry_msgs::PoseStamped Object<DerivedObject>::getTfInfo() const
+      {
+        geometry_msgs::PoseStamped objPoseStamped;
+        objPoseStamped.pose = pose_;
         objPoseStamped.header.frame_id = frame_id_;
         objPoseStamped.header.stamp = ros::Time::now();
         return objPoseStamped;
       }
+
+    template <class DerivedObject>
+    void Object<DerivedObject>::fillGeotiff(
+        pandora_data_fusion_msgs::GeotiffSrv::Response* res) const {}
 
     template <class DerivedObject>
       bool Object<DerivedObject>::isSameObject(const ObjectConstPtr& object) const

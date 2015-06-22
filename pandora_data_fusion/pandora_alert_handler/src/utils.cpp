@@ -91,7 +91,7 @@ namespace pandora_data_fusion
       return tf::createQuaternionMsgFromYaw(yaw);
     }
 
-    geometry_msgs::Point Utils::vector3ToPoint(tf::Vector3 vector)
+    geometry_msgs::Point Utils::vector3ToPoint(const tf::Vector3& vector)
     {
       geometry_msgs::Point point;
       point.x = vector[0];

@@ -2,6 +2,7 @@ map_type: SLAM
 global_frame: /map
 object_names:
   hole: hole
+  obstacle: obstacle
   hazmat: hazmat
   qr: qr
   thermal: thermal
@@ -15,6 +16,7 @@ object_names:
 
 subscribed_topic_names:
   hole: /vision/holes_direction_alert
+  obstacle: /vision/obstacle_alert
   thermal: /vision/thermal_direction_alert
   qr: /vision/qr_alert
   hazmat: /vision/hazmat_alert
@@ -28,6 +30,7 @@ subscribed_topic_names:
 published_topic_names:
   world_model: /data_fusion/world_model
   qr_notification: /data_fusion/qr_notification
+  obstacle_info: /data_fusion/obstacle_info
   robocup_score: /data_fusion/robocup_score
   global_probabilities: /data_fusion/signs_of_life
 action_server_names:

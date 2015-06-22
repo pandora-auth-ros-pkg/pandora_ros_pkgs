@@ -42,57 +42,67 @@
 
 namespace pandora_data_fusion
 {
-  namespace pandora_alert_handler
+namespace pandora_alert_handler
+{
+
+  ObjectHandler::ObjectHandler(const NodeHandlePtr& nh,
+      const VictimListConstPtr& victimsToGoList,
+      const VictimListConstPtr& victimsVisitedList) :
+    victimsToGoList_(victimsToGoList),
+    victimsVisitedList_(victimsVisitedList)
   {
+    std::string param;
 
-    ObjectHandler::ObjectHandler(const NodeHandlePtr& nh,
-        const VictimListConstPtr& victimsToGoList,
-        const VictimListConstPtr& victimsVisitedList) :
-      victimsToGoList_(victimsToGoList),
-      victimsVisitedList_(victimsVisitedList)
+    roboCupScore_ = 0;
+
+    if (nh->getParam("published_topic_names/qr_notification", param))
     {
-      std::string param;
-
-      roboCupScore_ = 0;
-
-      if (nh->getParam("published_topic_names/qr_notification", param))
-      {
-        qrPublisher_ = nh->advertise<
-          pandora_data_fusion_msgs::QrNotificationMsg>(param, 10);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] qr_notification topic name param not found");
-        ROS_BREAK();
-      }
-
-      if (nh->getParam("published_topic_names/robocup_score", param))
-      {
-        scorePublisher_ = nh->advertise<std_msgs::Int32>(param, 10);
-      }
-      else
-      {
-        ROS_FATAL("[ALERT_HANDLER] robocup_score topic name param not found");
-        ROS_BREAK();
-      }
+      qrPublisher_ = nh->advertise<
+        pandora_data_fusion_msgs::QrNotificationMsg>(param, 10);
+    }
+    else
+    {
+      ROS_FATAL("[ObjectHandler %d] qr_notification topic name param not found", __LINE__);
+      ROS_BREAK();
     }
 
-    void ObjectHandler::handleHoles(const HolePtrVectorPtr& newHoles,
-        const tf::Transform& transform)
+    if (nh->getParam("published_topic_names/robocup_score", param))
     {
-      keepValidObjects<Hole>(newHoles, transform);
-
-      for (int ii = 0; ii < newHoles->size(); ++ii)
-      {
-        Hole::getList()->add(newHoles->at(ii));
-      }
+      scorePublisher_ = nh->advertise<std_msgs::Int32>(param, 10);
+    }
+    else
+    {
+      ROS_FATAL("[ObjectHandler %d] robocup_score topic name param not found", __LINE__);
+      ROS_BREAK();
     }
 
-    void ObjectHandler::updateParams(float sensor_range, float victim_cluster_radius)
+    if (nh->getParam("published_topic_names/obstacle_info", param))
     {
-      SENSOR_RANGE = sensor_range;
-      VICTIM_CLUSTER_RADIUS = victim_cluster_radius;
+      obstaclePublisher_ = nh->advertise<pandora_data_fusion_msgs::ObstacleInfo>(param, 10);
     }
+    else
+    {
+      ROS_FATAL("[ObjectHandler %d] obstacle_info topic name param not found", __LINE__);
+      ROS_BREAK();
+    }
+  }
+
+  void ObjectHandler::handleHoles(const HolePtrVectorPtr& newHoles,
+      const tf::Transform& transform)
+  {
+    keepValidObjects<Hole>(newHoles, transform);
+
+    for (int ii = 0; ii < newHoles->size(); ++ii)
+    {
+      Hole::getList()->add(newHoles->at(ii));
+    }
+  }
+
+  void ObjectHandler::updateParams(float sensor_range, float victim_cluster_radius)
+  {
+    SENSOR_RANGE = sensor_range;
+    VICTIM_CLUSTER_RADIUS = victim_cluster_radius;
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

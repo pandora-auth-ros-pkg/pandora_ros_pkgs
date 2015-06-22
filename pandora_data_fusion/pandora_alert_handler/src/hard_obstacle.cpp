@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,44 +33,76 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef ALERT_HANDLER_EXCEPTIONS_H
-#define ALERT_HANDLER_EXCEPTIONS_H
-
-#include <stdexcept>
 #include <string>
+
+#include <geometry_msgs/Point.h>
+
+#include "pandora_vision_msgs/ObstacleAlert.h"
+
+#include "alert_handler/hard_obstacle.h"
 
 namespace pandora_data_fusion
 {
 namespace pandora_alert_handler
 {
-
-  class TfException : public std::runtime_error
+  HardObstacle::HardObstacle()
   {
-    public:
-      explicit TfException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    obstacleType_ = pandora_vision_msgs::ObstacleAlert::HARD_OBSTACLE;
+  }
+  HardObstacle::~HardObstacle() {}
 
-  class AlertException : public std::runtime_error
+  void HardObstacle::getVisualization(visualization_msgs::MarkerArray* markers) const
   {
-    public:
-      explicit AlertException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    visualization_msgs::Marker marker;
+    marker.header.frame_id = HardObstacle::getGlobalFrame();
+    marker.header.stamp = ros::Time::now();
+    marker.ns = type_;
+    marker.id = id_;
+    marker.pose = pose_;
+    marker.type = visualization_msgs::Marker::CUBE_LIST;
+    marker.scale.x = 0.1;
+    marker.scale.y = 0.1;
+    marker.scale.z = 0.1;
+    marker.color.r = 0;
+    marker.color.g = 1;
+    marker.color.b = 0.8;
+    marker.color.a = 1.0;
+    int iSize = length_ / 0.1;
+    int jSize = width_ / 0.1;
+    for (int i = -iSize/2; i < iSize/2 + 1; i++) {
+      for (int j = -jSize/2; j < jSize/2 + 1; j++) {
+        geometry_msgs::Point cube;
+        cube.x = i * 0.1;
+        cube.y = j * 0.1;
+        marker.points.push_back(cube);
+      }
+    }
+    markers->markers.push_back(marker);
 
-  class ObstacleTypeException : public std::runtime_error
+    visualization_msgs::Marker description;
+    description.header.frame_id = HardObstacle::getGlobalFrame();
+    description.header.stamp = ros::Time::now();
+    description.ns = type_ + "_BRIEF";
+    description.id = id_;
+    description.pose = pose_;
+    description.pose.position.z = pose_.position.z + 0.1;
+    description.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+    description.text = getFrameId();
+    description.scale.z = 0.1;
+    description.color.r = 0;
+    description.color.g = 0;
+    description.color.b = 1;
+    description.color.a = 0.7;
+    markers->markers.push_back(description);
+  }
+
+  std::string HardObstacle::setFrameId(int id)
   {
-    public:
-      explicit ObstacleTypeException(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
-  };
+    return "hard_obstacle_" + boost::to_string(id);
+  }
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion
-
-#endif  // ALERT_HANDLER_EXCEPTIONS_H

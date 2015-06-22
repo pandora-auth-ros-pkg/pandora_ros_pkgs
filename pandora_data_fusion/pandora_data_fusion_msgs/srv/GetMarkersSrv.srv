@@ -2,6 +2,7 @@
 visualization_msgs/MarkerArray victimsToGo
 visualization_msgs/MarkerArray victimsVisited
 visualization_msgs/MarkerArray holes
+visualization_msgs/MarkerArray obstacles
 visualization_msgs/MarkerArray hazmats
 visualization_msgs/MarkerArray landoltcs
 visualization_msgs/MarkerArray qrs
