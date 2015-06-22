@@ -11,6 +11,7 @@ class ObjectVisualization
     ros::Publisher _landoltc_marker_pub ;
     ros::Publisher _dataMatrix_marker_pub ;
     ros::Publisher _hole_marker_pub ;
+    ros::Publisher _obstacle_marker_pub ;
     ros::Publisher _qr_marker_pub ;
     ros::Publisher _thermal_marker_pub ;
     ros::Publisher _sound_marker_pub ;
@@ -51,6 +52,7 @@ ObjectVisualization::ObjectVisualization()
   _landoltc_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("landoltc_markers", 1);
   _dataMatrix_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("datamatrix_markers", 1);
   _hole_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("holes_markers", 1);
+  _obstacle_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("obstacle_markers", 1);
   _qr_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("qrs_markers", 1);
   _thermal_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("thermals_markers", 1);
   _sound_marker_pub = _nh.advertise<visualization_msgs::MarkerArray>("sounds_markers", 1);
@@ -72,6 +74,7 @@ void ObjectVisualization::broadcastTimerCb(const ros::TimerEvent& event)
   }
 
   _hole_marker_pub.publish(_markersSrv.response.holes);
+  _obstacle_marker_pub.publish(_markersSrv.response.obstacles);
   _hazmat_marker_pub.publish(_markersSrv.response.qrs);
   _qr_marker_pub.publish(_markersSrv.response.hazmats);
   _thermal_marker_pub.publish(_markersSrv.response.thermals);
