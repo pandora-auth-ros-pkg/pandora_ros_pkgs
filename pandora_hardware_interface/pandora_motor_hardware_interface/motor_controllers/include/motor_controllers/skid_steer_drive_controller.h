@@ -156,6 +156,9 @@ namespace motor
     SpeedLimiter limiter_lin_;
     SpeedLimiter limiter_ang_;
 
+    // True when running in simulation
+    bool sim_;
+
     bool hasSlippage_;
     std::vector<double> expectedAngular_;
     std::vector<double> actualAngular_;

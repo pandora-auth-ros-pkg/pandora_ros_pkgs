@@ -2,6 +2,9 @@
   <arg name="robot" default="woody" />
   <arg name="namespace" default="motor" />
 
+  <arg name="sim" default="false" />
+  <param name="sim" value="$(arg sim)" />
+
   <rosparam
     command="load"
     file="$(find pandora_motor_hardware_interface)/motor_controllers/config/skid_steer_drive_controller.yaml"

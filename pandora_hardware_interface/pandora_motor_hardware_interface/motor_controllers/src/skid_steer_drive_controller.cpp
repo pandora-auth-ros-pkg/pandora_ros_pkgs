@@ -137,6 +137,8 @@ namespace motor
     std::string left_front_wheel_name, right_front_wheel_name;
     std::string left_rear_wheel_name, right_rear_wheel_name;
 
+    root_nh.param<bool>("sim", sim_, false);
+
     bool res = controller_nh.hasParam("left_front_wheel");
     if (!res || !controller_nh.getParam("left_front_wheel", left_front_wheel_name))
     {
@@ -330,8 +332,11 @@ namespace motor
     double ws = wheel_separation_multiplier_ * wheel_separation_;
     const double wr = wheel_radius_multiplier_ * wheel_radius_;
 
-    slipFactor_ = getAngularMultiplier(curr_cmd.ang);
-    ws = ws * slipFactor_;
+    if (!sim_)
+    {
+      slipFactor_ = getAngularMultiplier(curr_cmd.ang);
+      ws = ws * slipFactor_;
+    }
 
     // Compute wheels velocities:
     const double vel_left  = (curr_cmd.lin - curr_cmd.ang * ws / 2.0)/wr;
