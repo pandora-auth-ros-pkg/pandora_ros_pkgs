@@ -78,47 +78,55 @@ namespace arm
 
   void ArmHardwareInterface::read()
   {
-    uint16_t value;
+    uint8_t *u8Array = new uint8_t[GEYE_NBYTES];
+    uint16_t uValue;
+    float fValue;
+
     // ROS_INFO("Will read CO2");
     // read CO2 percentage from CO2 sensors
     for (int ii = 0; ii < co2SensorName_.size(); ii++)
     {
-      arm_->readCo2Value(&co2Percentage_[ii]);
+      if (arm_->readCo2Value(&fValue) > 0)
+        co2Percentage_[ii] = fValue;
     }
 
     // read thermal image from grideye sensors
     for (int ii = 0; ii < thermalSensorName_.size(); ii++)
     {
       // ROS_INFO("Will read GEYE loop/n");
-      arm_->readGrideyeValues(thermalSensorCode_[ii], thermalData_[ii]);
+      if (arm_->readGrideyeValues(thermalSensorCode_[ii], u8Array) > 0)
+        memcpy(thermalData_[ii], u8Array, GEYE_NBYTES * sizeof(uint8_t));
     }
 
     // ROS_INFO("Will read SONARS");
     // read distances from range sensors
     for (int ii = 0; ii < rangeSensorName_.size(); ii++)
     {
-      arm_->readSonarValues(rangeSensorCode_[ii], &value);
-      range_[ii] = static_cast<double>(value) / 100;
+      if (arm_->readSonarValues(rangeSensorCode_[ii], &uValue) > 0)
+        range_[ii] = static_cast<double>(uValue) / 100;
     }
     // ROS_INFO("Will read BATTERIES");
     // read voltage of batteries
     for (int ii = 0; ii < batteryName_.size(); ii++)
     {
-        arm_->readBatteryValues(batteryCode_[ii], &value);
-        voltage_[ii] = value / 4096.0 * 33.0;
+        if (arm_->readBatteryValues(batteryCode_[ii], &uValue) > 0)
+          voltage_[ii] = uValue / 4096.0 * 33.0;
     }
     // read encoder degrees
-    double pi = boost::math::constants::pi<double>();
-    arm_->readEncoderValue(&value);
-    double degrees = static_cast<double>(value) * 360.0 / 1024.0;
-    double radians = degrees / 180.0 * pi + encoder_offset_;
+    if (arm_->readEncoderValue(&uValue) > 0)
+    {
+      double degrees = static_cast<double>(uValue) * 360.0 / 1024.0;
+      double radians =
+        degrees / 180.0 * boost::math::constants::pi<double>() +
+        encoder_offset_;
 
-    // make radians value between [-pi, pi]
-    if (radians > pi)
-      radians = radians - 2 * pi;
+      // make radians value between [-pi, pi]
+      if (radians > boost::math::constants::pi<double>())
+        radians = radians - 2 * boost::math::constants::pi<double>();
 
-    position_[0] = radians;
-    position_[1] = -radians;
+      position_[0] = radians;
+      position_[1] = -radians;
+    }
   }
 
 
