@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="devantech_srf05"
+               params="parent name *origin" >
+
+    <!-- Links -->
+    <link name="${name}_sonar_link" >
+      <inertial>
+        <origin xyz="0.005 0.0 0.0" />
+        <mass value="0.010" />
+        <inertia ixx="4.2416E-7"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="2.0166E-6"
+                 iyz="0.0"
+                 izz="1.6341E-6" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/sonar/meshes/devantech_srf05.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0075 0.0 0.0"
+                rpy="0 0 0" />
+        <geometry>
+          <box size="0.015 0.044 0.022" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joints -->
+    <joint name="${name}_sonar_parent_joint"
+           type="fixed" >
+      <parent link="${parent}" />
+      <child link="${name}_sonar_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+    
+    <!-- Frames -->
+    <link name="${name}_sonar_frame" >
+      <xacro:point_mass_inertial />
+    </link>
+
+    <joint name="${name}_sonar_joint"
+           type="fixed" >
+      <parent link="${name}_sonar_link" />
+      <child link="${name}_sonar_frame" />
+      <origin xyz="0.015 0.0 0.0" 
+              rpy="0.0 0.0 3.1415" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/microphone/urdf/*.urdf.xacro" />
+
+  <xacro:macro name="microphone" >
+    <xacro:kinect_array parent="linear_head_main_link" >
+      <origin xyz="-0.02175 -0.0374 0.09643"
+              rpy="${zero}" />
+    </xacro:kinect_array>
+  </xacro:macro>
+
+</robot>

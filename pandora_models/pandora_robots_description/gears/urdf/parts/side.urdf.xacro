@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="side"
+               params="prefix_y reflect_y" >
+               
+    <link name="${prefix_y}_side_link" >
+      <inertial>
+        <origin xyz="${ reflect_y * ( -8.21E-06 ) } ${ reflect_y * ( 0.00188403 ) } -0.04035954" />
+        <mass value="1.81542748" />
+        <inertia ixx="0.000596450"
+                 ixy="-0.000025495"
+                 ixz="${ reflect_y * ( 0.000000573 ) }"
+                 iyy="0.016130501"
+                 iyz="${ reflect_y * ( -0.000066532 ) }"
+                 izz="0.015779275" />
+      </inertial>
+      <visual>
+        <origin xyz="${zero}"
+                rpy="0.0 0.0 ${ ( 1 - reflect_y ) * PI_2 }" />
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gears/meshes/side_link.dae" />
+        </geometry>
+        <material name="side" />
+      </visual>
+      <collision>
+        <origin xyz="${zero}"
+                rpy="0.0 0.0 ${ ( 1 - reflect_y ) * PI_2 }" />
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gears/meshes/side_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+    
+    <joint name="${prefix_y}_side_joint"
+           type="revolute" >
+      <parent link="base_link" />
+      <child link="${prefix_y}_side_link" />
+      <origin xyz="0.0 ${ reflect_y * ( 0.10314 ) } 0.0"
+              rpy="${zero}" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.0" />
+      <limit lower="${side_joint_min_limit}"
+             upper="${side_joint_max_limit}"
+             effort="150.0"
+             velocity="150.0" />
+    </joint>
+    
+  </xacro:macro>
+
+</robot>

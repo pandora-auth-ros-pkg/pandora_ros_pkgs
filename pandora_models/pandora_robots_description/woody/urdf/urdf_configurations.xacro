@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- Joint limits -->
+  <xacro:property name="side_joint_min_limit" value="-0.785" />
+  <xacro:property name="side_joint_max_limit" value="0.785" />
+  <xacro:property name="laser_roll_joint_min_limit" value="-0.523" />
+  <xacro:property name="laser_roll_joint_max_limit" value="0.523" />
+  <xacro:property name="laser_pitch_joint_min_limit" value="-0.523" />
+  <xacro:property name="laser_pitch_joint_max_limit" value="0.523" />
+  <xacro:property name="kinect_pitch_joint_min_limit" value="-0.785" />
+  <xacro:property name="kinect_pitch_joint_max_limit" value="0.785" />
+  <xacro:property name="kinect_yaw_joint_min_limit" value="-1.308" />
+  <xacro:property name="kinect_yaw_joint_max_limit" value="1.308" />
+
+  <!-- Coefficients -->
+  <xacro:property name="max_robot_linear_velocity" value="2.0" />
+  <xacro:property name="max_robot_angular_velocity" value="2.0" />
+  <xacro:property name="max_kinect_angular_velocity" value="2.5" />
+  <xacro:property name="max_laser_angular_velocity" value="2.5" />
+  
+  <xacro:property name="max_robot_linear_acceleration" value="1.0" />
+  <xacro:property name="max_robot_angular_acceleration" value="0.2" />
+  <xacro:property name="max_kinect_angular_acceleration" value="0.0" />
+  <xacro:property name="max_laser_angular_acceleration" value="0.0" />
+
+  <!-- Dimensions -->
+  <xacro:property name="wheel_length" value="0.07985" />
+  <xacro:property name="wheel_radius" value="0.09794" />
+  
+  <xacro:property name="track" value="0.344" />
+  <xacro:property name="wheelbase" value="0.34678" />
+
+</robot>

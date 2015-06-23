@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/laser/urdf/*.urdf.xacro" />
+
+  <xacro:macro name="laser_04" >
+    <xacro:hokuyo_urg_04lx parent="base_link"
+                           roll_min_limit="${laser_roll_joint_min_limit}" 
+                           roll_max_limit="${laser_roll_joint_max_limit}"
+                           pitch_min_limit="${laser_pitch_joint_min_limit}" 
+                           pitch_max_limit="${laser_pitch_joint_max_limit}" >
+      <origin xyz="0.1974 0.0 0.09679"
+              rpy="${zero}" />
+    </xacro:hokuyo_urg_04lx>
+  </xacro:macro>
+
+</robot>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/webcam/urdf/*.urdf.xacro" />
+  
+  <xacro:macro name="left_webcam" >
+    <xacro:logitech_c310hd parent="base_link"
+                           prefix_y="left" >
+      <origin xyz="-0.08308 0.08308 0.23081"
+              rpy="0.0 0.0 ${ 3 * PI_4 }" />
+    </xacro:logitech_c310hd>
+  </xacro:macro>
+  
+  <xacro:macro name="right_webcam" >
+    <xacro:logitech_c310hd parent="base_link"
+                           prefix_y="right" >
+      <origin xyz="-0.08308 -0.08308 0.23081"
+              rpy="0.0 0.0 ${ 5 * PI_4 }" />
+    </xacro:logitech_c310hd>
+  </xacro:macro>
+
+</robot>

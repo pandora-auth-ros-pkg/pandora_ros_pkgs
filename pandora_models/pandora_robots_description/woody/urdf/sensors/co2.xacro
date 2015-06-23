@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/co2/urdf/*.urdf.xacro" />
+
+  <xacro:macro name="co2" >
+    <xacro:dynament_gold parent="kinect_link" >
+      <origin xyz="0.0173 -0.0595 0.0"
+              rpy="${zero}" />
+    </xacro:dynament_gold>
+  </xacro:macro>
+
+</robot>

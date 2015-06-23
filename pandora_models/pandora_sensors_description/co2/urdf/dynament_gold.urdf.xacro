@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="dynament_gold"
+               params="parent *origin" >
+
+    <!-- Links -->
+    <link name="co2_link" >
+      <inertial>
+        <origin xyz="0.005 0.0 0.0" />
+        <mass value="0.005" />
+        <inertia ixx="2.1208E-7"
+                 ixy="0"
+                 ixz="0"
+                 iyy="4.033E-7"
+                 iyz="0"
+                 izz="2.1208E-7" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/co2/meshes/dynament_gold.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0075 0.0 0.0"
+                rpy="0 0 0" />
+        <geometry>
+          <box size="0.015 0.022 0.022" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joints -->
+    <joint name="co2_parent_joint"
+           type="fixed" >
+      <parent link="${parent}" />
+      <child link="co2_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+    
+    <!-- Frames -->
+    <link name="co2_frame" >
+      <xacro:point_mass_inertial />
+    </link>
+
+    <joint name="co2_joint"
+           type="fixed" >
+      <parent link="co2_link" />
+      <child link="co2_frame" />
+      <origin xyz="0.015 0.0 0.0" 
+              rpy="0.0 0.0 0.0" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

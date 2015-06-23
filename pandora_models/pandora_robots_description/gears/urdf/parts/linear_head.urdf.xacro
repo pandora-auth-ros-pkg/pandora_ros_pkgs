@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="linear_head" >
+  
+    <link name="linear_head_base_link" >
+      <xacro:solid_cuboid_inertial mass="0.057" x="0.041" y="0.050" z="0.035" >
+        <origin xyz="0.00234 0.01566 -0.0002" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <origin xyz="${zero}"
+                rpy="0.0 ${-PI_2} ${-PI_2}" />
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gears/meshes/servo_motor.dae" />
+        </geometry>
+        <material name="linear_head_base" />
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.00152 0.02409"
+                rpy="0.0 ${-PI_2} ${-PI_2}" />
+        <geometry>
+          <box size="0.050 0.032 0.041" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="linear_head_main_link" >
+      <inertial>
+        <origin xyz="-0.00329 -0.02726 0.05623" />
+        <mass value="0.16491" />
+        <inertia ixx="0.00030418"
+                 ixy="-1.3735E-05"
+                 ixz="-2.3947E-05"
+                 iyy="0.00015881"
+                 iyz="-7.9817E-06"
+                 izz="0.00024855" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gears/meshes/linear_head_main_link.dae" />
+        </geometry>
+        <material name="linear_head_main" />
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gears/meshes/linear_head_main_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="linear_head_yaw_joint"
+           type="revolute" >
+      <parent link="linear_elevator_link" />
+      <child link="linear_head_base_link" />
+      <origin xyz="-0.0035 0.06177 0.31517"
+              rpy="${zero}" />
+      <axis xyz="0 0 1" />
+      <dynamics damping="0.0" />
+      <limit lower="${linear_head_yaw_joint_min_limit}"
+             upper="${linear_head_yaw_joint_max_limit}"
+             effort="50.0"
+             velocity="50.0" />
+    </joint>
+
+    <joint name="linear_head_pitch_joint"
+           type="revolute" >
+      <parent link="linear_head_base_link" />
+      <child link="linear_head_main_link" />
+      <origin xyz="0.0 0.00026 0.03689"
+              rpy="${zero}" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.0" />
+      <limit lower="${linear_head_pitch_joint_min_limit}"
+             upper="${linear_head_pitch_joint_max_limit}"
+             effort="50.0"
+             velocity="50.0" />
+    </joint>
+    
+  </xacro:macro>
+
+</robot>
