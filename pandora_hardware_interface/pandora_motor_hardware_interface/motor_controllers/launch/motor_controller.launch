@@ -15,7 +15,7 @@
 
   <param
     name="robot_description"
-    command="$(find xacro)/xacro.py '$(find pandora_robots_description)/urdf/$(arg robot)/bringup.urdf.xacro'"/>
+    command="$(find xacro)/xacro.py '$(find pandora_robots_description)/$(arg robot)/urdf/$(arg robot).urdf.xacro'"/>
 
   <!-- spawn controller -->
   <node
