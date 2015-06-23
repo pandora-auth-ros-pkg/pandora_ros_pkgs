@@ -5,16 +5,9 @@
   <xacro:macro name="base" >
   
     <link name="base_link" >
-      <inertial>
-        <origin xyz="-0.00968 -0.00122 0.19369" />
-        <mass value="8.25079" />
-        <inertia ixx="0.112701442"
-                 ixy="-0.000233829"
-                 ixz="-0.014681510"
-                 iyy="0.096589855"
-                 iyz="-0.000177925"
-                 izz="0.083438037" />
-      </inertial>
+      <xacro:solid_cuboid_inertial mass="1.750" x="0.349" y="0.222" z="0.325" >
+        <origin xyz="0.01767 0.00008 0.12635" />
+      </xacro:solid_cuboid_inertial>
       <visual>
         <geometry>
           <mesh filename="package://pandora_robots_description/woody/meshes/base_link.dae" />
@@ -208,7 +201,7 @@
     </joint>
 
     <link name="imu" >
-      <xacro:solid_cuboid_inertial mass="0.05" x="0.057" y="0.045" z="0.024" >
+      <xacro:solid_cuboid_inertial mass="0.050" x="0.057" y="0.045" z="0.024" >
         <xacro:default_origin />
       </xacro:solid_cuboid_inertial>
     </link>/

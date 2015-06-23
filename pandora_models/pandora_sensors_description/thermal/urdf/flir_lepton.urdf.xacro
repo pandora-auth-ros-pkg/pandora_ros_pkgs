@@ -7,16 +7,9 @@
 
     <!-- Links -->
     <link name="flir_link" >
-      <inertial>
+      <xacro:solid_cuboid_inertial mass="0.020" x="0.004" y="0.020" z="0.037" >
         <origin xyz="0.00126 0.0 0.0" />
-        <mass value="0.005" />
-        <inertia ixx="2.1208E-7"
-                 ixy="0"
-                 ixz="0"
-                 iyy="4.033E-7"
-                 iyz="0"
-                 izz="2.1208E-7" />
-      </inertial>
+      </xacro:solid_cuboid_inertial>
       <visual>
         <geometry>
           <mesh filename="package://pandora_sensors_description/thermal/meshes/flir_lepton.dae" />

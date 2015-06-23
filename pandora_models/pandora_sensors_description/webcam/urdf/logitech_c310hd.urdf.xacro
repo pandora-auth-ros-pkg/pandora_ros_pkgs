@@ -7,17 +7,9 @@
 
     <!-- Links -->
     <link name="${prefix_y}_camera_link" >
-
-      <inertial>
+      <xacro:solid_cuboid_inertial mass="0.099" x="0.049" y="0.095" z="0.073" >
         <origin xyz="0.00972 0.0 0.04428" />
-        <mass value="0.005" />
-        <inertia ixx="2.1208E-7"
-                 ixy="0"
-                 ixz="0"
-                 iyy="4.033E-7"
-                 iyz="0"
-                 izz="2.1208E-7" />
-      </inertial>
+      </xacro:solid_cuboid_inertial>
       <visual>
         <geometry>
           <mesh filename="package://pandora_sensors_description/webcam/meshes/logitech_c310hd.dae" />

@@ -7,16 +7,9 @@
 
     <!-- Links -->
     <link name="${name}_sonar_link" >
-      <inertial>
+      <xacro:solid_cuboid_inertial mass="0.017" x="0.015" y="0.044" z="0.022" >
         <origin xyz="0.005 0.0 0.0" />
-        <mass value="0.010" />
-        <inertia ixx="4.2416E-7"
-                 ixy="0.0"
-                 ixz="0.0"
-                 iyy="2.0166E-6"
-                 iyz="0.0"
-                 izz="1.6341E-6" />
-      </inertial>
+      </xacro:solid_cuboid_inertial>
       <visual>
         <geometry>
           <mesh filename="package://pandora_sensors_description/sonar/meshes/devantech_srf05.dae" />
