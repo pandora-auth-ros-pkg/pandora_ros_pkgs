@@ -43,12 +43,12 @@
 namespace
 {
 
-  double clamp(
-      const double val,
+  void clamp(
+      double& val,
       const double min_val,
       const double max_val)
   {
-    return std::min(std::max(val, min_val), max_val);
+    val = std::min(std::max(val, min_val), max_val);
   }
 
 }  // namespace
