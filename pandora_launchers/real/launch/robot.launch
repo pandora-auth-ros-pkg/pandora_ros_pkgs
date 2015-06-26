@@ -51,7 +51,7 @@
 
   <!--Robot Description -->
   <include if="$(arg robot_description)"
-    file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch"/>
+    file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch"/>
 
   <group if="$(arg hardware_interface)">
     <!--Hardware Interface -->

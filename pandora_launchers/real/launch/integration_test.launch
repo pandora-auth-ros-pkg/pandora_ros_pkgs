@@ -34,7 +34,7 @@
 
   <!-- Robot description -->
   <group if="$(arg description)">
-    <include file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch"/>
+    <include file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch"/>
   </group>
 
   <!-- State manager -->
