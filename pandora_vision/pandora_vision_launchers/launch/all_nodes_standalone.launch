@@ -2,7 +2,7 @@
   <arg name="robot" default="woody" />
   
   <!-- Robot Description -->
-  <include file="$(find pandora_robots_description)/launch/$(arg robot)/$(arg robot)_description.launch" />
+  <include file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch" />
 
   <!-- State Manager -->
   <include file="$(find state_manager)/launch/stateManager.launch" />

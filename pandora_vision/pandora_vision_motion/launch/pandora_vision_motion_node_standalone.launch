@@ -38,6 +38,6 @@
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
  
   <include file="$(find pandora_vision_motion)/launch/pandora_vision_motion_node.launch" />
-  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
   
 </launch>

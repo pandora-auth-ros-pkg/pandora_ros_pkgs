@@ -19,7 +19,7 @@
   
   <include file="$(find pandora_vision_landoltc)/launch/predator_landoltc_3d_node.launch" />
   
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
   
 </launch>
 

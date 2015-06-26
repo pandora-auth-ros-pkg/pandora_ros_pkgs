@@ -20,7 +20,7 @@
   </group>
 
   
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
 
   <include file="$(find pandora_vision_victim)/launch/victim_train_node.launch">
     <arg name="output" value="screen" />

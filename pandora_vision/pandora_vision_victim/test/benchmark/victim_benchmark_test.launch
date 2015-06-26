@@ -7,7 +7,7 @@
   <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
     command="load"/>
 
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
 
   <param name="publisherTopic" value="/camera/depth_registered/points" />
   <param name="publisherMessagePackage" value="sensor_msgs" />

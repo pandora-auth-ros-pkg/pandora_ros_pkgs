@@ -4,7 +4,7 @@
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
-  <!-- <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" /> -->
+  <!-- <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" /> -->
 
   <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
   <param name="dataset_camera" value="kinect"/>

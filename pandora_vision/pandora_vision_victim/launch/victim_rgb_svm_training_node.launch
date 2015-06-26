@@ -16,6 +16,6 @@
     <param name="model_url" type="str" 
       value="https://pandora.ee.auth.gr/vision/model.xml"/>  
 
-    <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+    <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
 
 </launch>

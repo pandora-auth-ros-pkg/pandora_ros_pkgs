@@ -6,7 +6,7 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
 
-  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
 
   <group if="$(arg xtion)">
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />

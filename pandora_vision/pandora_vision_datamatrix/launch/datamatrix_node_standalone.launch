@@ -28,7 +28,7 @@
   
   <include file="$(find pandora_vision_datamatrix)/launch/datamatrix_node.launch" />
   
-  <include file="$(find pandora_robots_description)/launch/gears/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
 
   
 </launch>
