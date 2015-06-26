@@ -40,7 +40,12 @@ skid_steer_drive_controller:
     - 1.0
     - 1.0
     - 1.0
-  angular_slippage:
+  linear_fit_degree: 5
+  angular_fit_degree: 7
+  measured_linear_velocities:
+    - expected: 0.00
+      actual: 0.00000
+  measured_angular_velocities:
     - expected: 1.25
       actual: 0.60531
     - expected: 1.00
@@ -64,4 +69,4 @@ skid_steer_drive_controller:
     - expected: 0.02
       actual: 0.00937
     - expected: 0.00
-      actual: 0.0000
+      actual: 0.00000

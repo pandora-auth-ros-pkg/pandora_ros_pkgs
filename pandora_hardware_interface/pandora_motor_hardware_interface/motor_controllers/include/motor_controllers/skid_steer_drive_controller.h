@@ -40,6 +40,8 @@
 #ifndef MOTOR_CONTROLLERS_SKID_STEER_DRIVE_CONTROLLER_H
 #define MOTOR_CONTROLLERS_SKID_STEER_DRIVE_CONTROLLER_H
 
+#include <gsl/gsl_multifit.h>
+
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <pluginlib/class_list_macros.h>
@@ -143,7 +145,6 @@ namespace motor
     /// Wheel separation and radius calibration multipliers:
     double wheel_separation_multiplier_;
     double wheel_radius_multiplier_;
-    double slipFactor_;
 
     /// Timeout to consider cmd_vel commands old:
     double cmd_vel_timeout_;
@@ -159,9 +160,15 @@ namespace motor
     // True when running in simulation
     bool sim_;
 
-    bool hasSlippage_;
+    std::vector<double> expectedLinear_;
+    std::vector<double> actualLinear_;
     std::vector<double> expectedAngular_;
     std::vector<double> actualAngular_;
+
+    int linearFitDegree_;
+    int angularFitDegree_;
+    std::vector<double> linearFitCoefficients_;
+    std::vector<double> angularFitCoefficients_;
 
   private:
     /**
@@ -192,7 +199,15 @@ namespace motor
      */
     void setOdomPubFields(ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh);
 
-    double getAngularMultiplier(double velocity);
+    void remapVelocities(
+        double& linear,
+        double& angular);
+
+    void polynomialFit(
+        const int& degree,
+        const std::vector<double>& actualValues,
+        const std::vector<double>& expectedValues,
+        std::vector<double>& coefficients);
   };
 
   PLUGINLIB_EXPORT_CLASS(

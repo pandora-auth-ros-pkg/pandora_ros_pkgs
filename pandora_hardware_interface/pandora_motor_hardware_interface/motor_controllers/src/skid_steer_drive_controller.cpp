@@ -219,6 +219,11 @@ namespace motor
     controller_nh.param("angular/z/min_acceleration",
       limiter_ang_.min_acceleration, -limiter_ang_.max_acceleration);
 
+    controller_nh.param("linear_fit_degree", linearFitDegree_, 5);
+    linearFitDegree_++;
+    controller_nh.param("angular_fit_degree", angularFitDegree_, 7);
+    angularFitDegree_++;
+
     if (!setOdomParamsFromUrdf(root_nh, left_front_wheel_name, right_front_wheel_name))
       return false;
 
@@ -237,38 +242,66 @@ namespace motor
 
     sub_command_ = controller_nh.subscribe("/cmd_vel", 1, &SkidSteerDriveController::cmdVelCallback, this);
 
-    XmlRpc::XmlRpcValue slippageList;
-    res = controller_nh.hasParam("angular_slippage");
-    if (res && controller_nh.getParam("angular_slippage", slippageList))
+    XmlRpc::XmlRpcValue linearMeasurementsList;
+    res = controller_nh.hasParam("measured_linear_velocities");
+    if (res && controller_nh.getParam("measured_linear_velocities", linearMeasurementsList))
     {
-      hasSlippage_ = true;
       ROS_ASSERT(
-        slippageList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+        linearMeasurementsList.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
       std::string key;
-      for (int ii = 0; ii < slippageList.size(); ii++)
+      for (int ii = 0; ii < linearMeasurementsList.size(); ii++)
       {
         ROS_ASSERT(
-          slippageList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+          linearMeasurementsList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
 
         key = "expected";
         ROS_ASSERT(
-          slippageList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-        expectedAngular_.push_back(
-          static_cast<double>(slippageList[ii][key]));
+          linearMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        expectedLinear_.push_back(
+          static_cast<double>(linearMeasurementsList[ii][key]));
 
         key = "actual";
         ROS_ASSERT(
-          slippageList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-        actualAngular_.push_back(
-          static_cast<double>(slippageList[ii][key]));
+          linearMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        actualLinear_.push_back(
+          static_cast<double>(linearMeasurementsList[ii][key]));
       }
     }
-    else
+
+    XmlRpc::XmlRpcValue angularMeasurementsList;
+    res = controller_nh.hasParam("measured_angular_velocities");
+    if (res && controller_nh.getParam("measured_angular_velocities", angularMeasurementsList))
     {
-      hasSlippage_ = false;
+      ROS_ASSERT(
+        angularMeasurementsList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+      std::string key;
+      for (int ii = 0; ii < angularMeasurementsList.size(); ii++)
+      {
+        ROS_ASSERT(
+          angularMeasurementsList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+
+        key = "expected";
+        ROS_ASSERT(
+          angularMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        expectedAngular_.push_back(
+          static_cast<double>(angularMeasurementsList[ii][key]));
+
+        key = "actual";
+        ROS_ASSERT(
+          angularMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        actualAngular_.push_back(
+          static_cast<double>(angularMeasurementsList[ii][key]));
+      }
     }
-    slipFactor_ = 1;
+
+    linearFitCoefficients_.resize(linearFitDegree_);
+    angularFitCoefficients_.resize(angularFitDegree_);
+
+    polynomialFit(linearFitDegree_, actualLinear_, expectedLinear_, linearFitCoefficients_);
+    polynomialFit(angularFitDegree_, actualAngular_, expectedAngular_, angularFitCoefficients_);
+
     return true;
   }
 
@@ -276,7 +309,7 @@ namespace motor
   {
     // COMPUTE AND PUBLISH ODOMETRY
     // Estimate linear and angular velocity using joint information
-    odometry_.update(left_front_wheel_joint_.getPosition(), right_front_wheel_joint_.getPosition(), time, slipFactor_);
+    odometry_.update(left_front_wheel_joint_.getPosition(), right_front_wheel_joint_.getPosition(), time, 1);
 
     // Publish odometry message
     if (last_state_publish_time_ + publish_period_ < time)
@@ -297,17 +330,6 @@ namespace motor
         odom_pub_->msg_.twist.twist.angular.z = odometry_.getAngularEstimated();
         odom_pub_->unlockAndPublish();
       }
-
-      // Publish tf /odom frame
-      // ~ if(tf_odom_pub_->trylock())
-      // ~ {
-        // ~ odom_frame_.header.stamp = time;
-        // ~ odom_frame_.transform.translation.x = odometry_.getX();
-        // ~ odom_frame_.transform.translation.y = odometry_.getY();
-        // ~ odom_frame_.transform.rotation = orientation;
-        // ~ tf_odom_pub_->msg_.transforms[0] = odom_frame_;
-        // ~ tf_odom_pub_->unlockAndPublish();
-      // ~ }
     }
 
     // MOVE ROBOT
@@ -332,15 +354,18 @@ namespace motor
     double ws = wheel_separation_multiplier_ * wheel_separation_;
     const double wr = wheel_radius_multiplier_ * wheel_radius_;
 
+    double newLinearVel = curr_cmd.lin;
+    double newAngularVel = curr_cmd.ang;
+
     if (!sim_)
     {
-      slipFactor_ = getAngularMultiplier(curr_cmd.ang);
-      ws = ws * slipFactor_;
+      // Remap velocities according to the polynomial function
+      remapVelocities(newLinearVel, newAngularVel);
     }
 
     // Compute wheels velocities:
-    const double vel_left  = (curr_cmd.lin - curr_cmd.ang * ws / 2.0)/wr;
-    const double vel_right = (curr_cmd.lin + curr_cmd.ang * ws / 2.0)/wr;
+    const double vel_left  = (newLinearVel - newAngularVel * ws / 2.0)/wr;
+    const double vel_right = (newLinearVel + newAngularVel * ws / 2.0)/wr;
 
     // Set wheels velocities:
     left_front_wheel_joint_.setCommand(vel_left);
@@ -539,28 +564,67 @@ namespace motor
     odom_frame_.header.frame_id = "odom";
   }
 
-  double SkidSteerDriveController::getAngularMultiplier(double velocity)
+  void SkidSteerDriveController::remapVelocities(
+      double& linear,
+      double& angular)
   {
-    if (hasSlippage_)
+    double new_linear = 0;
+    for (int i = 0; i < linearFitDegree_; i++)
     {
-      for (int ii = 0; ii < expectedAngular_.size() - 1; ii++)
-      {
-        if (fabs(velocity) == actualAngular_[ii])
-        {
-          return  expectedAngular_[ii] / actualAngular_[ii];
-        }
-        else if (fabs(velocity) < actualAngular_[ii] &&
-          fabs(velocity) > actualAngular_[ii + 1])
-        {
-          double target;
-          target = (expectedAngular_[ii] - expectedAngular_[ii + 1]) *
-            (fabs(velocity) - actualAngular_[ii + 1]) /
-            (actualAngular_[ii] - actualAngular_[ii + 1]) + expectedAngular_[ii + 1];
-          return target / fabs(velocity);
-        }
-      }
+      new_linear += linearFitCoefficients_[i] * pow(linear, i);
     }
-    return 1;
+
+    double new_angular = 0;
+    for (int i = 0; i < angularFitDegree_; i++)
+    {
+      new_angular += angularFitCoefficients_[i] * pow(angular, i);
+    }
+
+    linear = new_linear;
+    angular = new_angular;
+  }
+
+  void SkidSteerDriveController::polynomialFit(
+      const int& degree,
+      const std::vector<double>& actualValues,
+      const std::vector<double>& expectedValues,
+      std::vector<double>& coefficients)
+  {
+    int obs = actualValues.size();
+
+    gsl_multifit_linear_workspace *ws;
+    gsl_matrix *cov, *X;
+    gsl_vector *y, *c;
+    double chisq;
+
+    X = gsl_matrix_alloc(obs, degree);
+    y = gsl_vector_alloc(obs);
+    c = gsl_vector_alloc(degree);
+    cov = gsl_matrix_alloc(degree, degree);
+
+    for (int i = 0; i < obs; i++)
+    {
+      gsl_matrix_set(X, i, 0, 1.0);
+      for (int j = 0; j < degree; j++)
+      {
+        gsl_matrix_set(X, i, j, pow(actualValues[i], j));
+      }
+      gsl_vector_set(y, i, expectedValues[i]);
+    }
+
+    ws = gsl_multifit_linear_alloc(obs, degree);
+    gsl_multifit_linear(X, y, c, cov, &chisq, ws);
+
+    for (int i = 0; i < degree; i++)
+    {
+      coefficients[i] = gsl_vector_get(c, i);
+    }
+
+    gsl_multifit_linear_free(ws);
+    gsl_matrix_free(X);
+    gsl_matrix_free(cov);
+    gsl_vector_free(y);
+    gsl_vector_free(c);
   }
 }  // namespace motor
 }  // namespace pandora_hardware_interface
