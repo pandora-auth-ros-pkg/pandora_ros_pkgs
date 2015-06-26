@@ -22,7 +22,7 @@
                            pitch_min_limit="${laser_pitch_joint_min_limit}" 
                            pitch_max_limit="${laser_pitch_joint_max_limit}" >
       <origin xyz="0.19015 -0.00248 0.12722"
-              rpy="0.0 0.0 0.035" /> <!-- yaw offset -->
+              rpy="0.0 0.0 0.0" />
     </xacro:hokuyo_ust_20lx>
   </xacro:macro>
 
