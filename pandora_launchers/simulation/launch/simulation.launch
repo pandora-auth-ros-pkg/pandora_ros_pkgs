@@ -1,33 +1,43 @@
 <launch>
 
-  <arg name="slam" default="true"/>
-  <arg name="control" default="true"/>
+  <arg name="robot" default="woody"/>
   <arg name="gazebo" default="false"/>
+
+  <arg name="state_manager" default="true"/>
+
+  <arg name="stabilizer" default="true"/>
+  <arg name="eef" default="true"/>
+
   <arg name="navigation" default="true"/>
+
+  <arg name="slam" default="true"/>
+
   <arg name="fusion" default="true"/>
+
+  <arg name="bag" default="false"/>
+
   <arg name="rviz" default="true"/>
+
+  <!-- If not using gazebo spawn robot_description -->
+  <group unless="$(arg gazebo)">
+    <include file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch"/>
+  </group>
 
   <!-- State manager -->
   <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!-- Control -->
+  <group if="$(arg stabilizer)">
+    <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+  </group>
+  <group if="$(arg eef)">
+    <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller.launch" />
+  </group>
 
   <!-- Slam -->
   <group if="$(arg slam)">
     <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d.launch" />
     <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
-  </group>
-
-  <!-- Control -->
-  <group if="$(arg gazebo)">
-    <group if="$(arg control)">
-      <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
-      <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller.launch" />
-      <node name="move_eef_script" pkg="pandora_end_effector_planner" type="move_eef_script.py" args="1" />
-    </group>
-  </group>
-
-  <!-- If not using gazebo spawn robot_description -->
-  <group unless="$(arg gazebo)">
-    <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
   </group>
 
   <!-- Navigation -->
@@ -36,16 +46,21 @@
     <include file="$(find pandora_explorer)/launch/explorer.launch" />
   </group>
 
-  <!-- Visualization -->
-  <group unless="$(arg fusion)">
-    <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/rviz/rviz.launch" />
-  </group>
-
   <!-- Fusion -->
   <group if="$(arg fusion)">
     <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
     <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
   </group>
 
+  <!-- Visualization -->
+  <group unless="$(arg fusion)">
+    <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/rviz/rviz.launch" />
+  </group>
+
+  <!-- Rosbag -->
+  <group if="$(arg bag)">
+    <node name="bag" type="record" pkg="rosbag"
+      args="-b 0 /kinect/rgb/image_raw/compressed /kinect/depth_registered/points /sensors/imu_rpy /tf /laser/scan /slam/map" />
+  </group>
 
 </launch>

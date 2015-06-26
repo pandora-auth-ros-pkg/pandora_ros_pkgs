@@ -109,6 +109,7 @@
     <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
   </group>
 
+  <!-- Rosbag -->
   <group if="$(arg bag)">
     <node name="bag" type="record" pkg="rosbag"
       args="-b 0 /kinect/rgb/image_raw/compressed /kinect/depth_registered/points /sensors/imu_rpy /tf /laser/scan /slam/map" />
