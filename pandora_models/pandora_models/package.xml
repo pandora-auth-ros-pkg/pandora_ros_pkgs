@@ -17,6 +17,7 @@
   
   <exec_depend>pandora_sensors_description</exec_depend>
   <exec_depend>pandora_robots_description</exec_depend>
+  <exec_depend>pandora_urdf_properties</exec_depend>
 
   <export>
     <metapackage/>
