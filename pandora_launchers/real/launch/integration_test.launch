@@ -7,7 +7,6 @@
 
   <arg name="motors" default="true"/>
   <arg name="linear" default="false"/>
-  <arg name="pixy" default="false"/>
   <arg name="dynamixel" default="true"/>
   <arg name="imu" default="true"/>
   <arg name="imu_device" default="trax"/>
@@ -53,11 +52,6 @@
   </group>
   <group if="$(arg linear)">
     <include file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/launch/linear_motor_hardware_interface_and_controllers.launch" >
-      <arg name="robot" value="$(arg robot)" />
-    </include>
-  </group>
-  <group if="$(arg pixy)">
-    <include file="$(find pandora_pixy_hardware_interface)/pixy_hardware_interface/launch/pixy_hardware_interface_and_controllers.launch" >
       <arg name="robot" value="$(arg robot)" />
     </include>
   </group>
