@@ -165,6 +165,11 @@ namespace motor
     std::vector<double> expectedAngular_;
     std::vector<double> actualAngular_;
 
+    double maxMeasuredLinear_;
+    double maxMeasuredAngular_;
+    double minMeasuredLinear_;
+    double minMeasuredAngular_;
+
     int linearFitDegree_;
     int angularFitDegree_;
     std::vector<double> linearFitCoefficients_;

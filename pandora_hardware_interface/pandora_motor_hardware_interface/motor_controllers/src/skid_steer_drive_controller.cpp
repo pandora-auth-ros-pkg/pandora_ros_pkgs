@@ -45,6 +45,19 @@
 
 #include <motor_controllers/skid_steer_drive_controller.h>
 
+namespace
+{
+
+  void clamp(
+      double& val,
+      const double min_val,
+      const double max_val)
+  {
+    val = std::min(std::max(val, min_val), max_val);
+  }
+
+}  // namespace
+
 static double euclideanOfVectors(const urdf::Vector3& vec1, const urdf::Vector3& vec2)
 {
   return std::sqrt(
@@ -295,6 +308,11 @@ namespace motor
           static_cast<double>(angularMeasurementsList[ii][key]));
       }
     }
+
+    maxMeasuredLinear_ = *std::max_element(actualLinear_.begin(), actualLinear_.end());
+    minMeasuredLinear_ = *std::min_element(actualLinear_.begin(), actualLinear_.end());
+    maxMeasuredAngular_ = *std::max_element(actualAngular_.begin(), actualAngular_.end());
+    minMeasuredAngular_ = *std::min_element(actualAngular_.begin(), actualAngular_.end());
 
     linearFitCoefficients_.resize(linearFitDegree_);
     angularFitCoefficients_.resize(angularFitDegree_);
@@ -568,20 +586,26 @@ namespace motor
       double& linear,
       double& angular)
   {
-    double new_linear = 0;
+    double newLinear;
+    double newAngular;
+
+    clamp(linear, minMeasuredLinear_, maxMeasuredLinear_);
+    clamp(angular, minMeasuredAngular_, maxMeasuredAngular_);
+
+    newLinear = 0;
     for (int i = 0; i < linearFitDegree_; i++)
     {
-      new_linear += linearFitCoefficients_[i] * pow(linear, i);
+      newLinear += linearFitCoefficients_[i] * pow(linear, i);
     }
 
-    double new_angular = 0;
+    newAngular = 0;
     for (int i = 0; i < angularFitDegree_; i++)
     {
-      new_angular += angularFitCoefficients_[i] * pow(angular, i);
+      newAngular += angularFitCoefficients_[i] * pow(angular, i);
     }
 
-    linear = new_linear;
-    angular = new_angular;
+    linear = newLinear;
+    angular = newAngular;
   }
 
   void SkidSteerDriveController::polynomialFit(
