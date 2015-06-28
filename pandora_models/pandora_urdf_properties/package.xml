@@ -1,17 +1,16 @@
-<?xml version="1.0"?>
 <package format="2">
   <name>pandora_urdf_properties</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>Containts tools and properties for urdf and xacro</description>
 
-  <maintainer email="geromidg@gmail.com">Geromichalos Dimitrios Panagiotis</maintainer>
+  <maintainer email="geromidg@gmail.com">Dimitris Geromichalos</maintainer>
 
   <license>BSD</license>
 
   <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_models/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_models</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_models.git</url>
 
-  <author>Geromichalos Dimitrios Panagiotis</author>
+  <author>Dimitris Geromichalos</author>
   
   <buildtool_depend>catkin</buildtool_depend>
   
@@ -20,5 +19,4 @@
   
   <export>
   </export>
-  
 </package>
