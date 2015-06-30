@@ -39,6 +39,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 #include "pandora_vision_victim/utilities/file_utilities.h"
 
@@ -68,14 +69,14 @@ namespace file_utilities
     std::string varName = prefix + "features_mat";
     saveToFile(featuresFileName, varName, featuresMat);
 
-    std::cout << featuresFileName << std::endl;
-    std::cout << "Size = " << featuresMat.size() << std::endl;
+    std::cout << "The path to the features files is : " << featuresFileName << std::endl;
+    std::cout << "[Cols, Rows] = " << featuresMat.size() << std::endl;
 
     varName = prefix + "labels_mat";
     saveToFile(labelsFileName, varName, labelsMat);
 
-    std::cout << labelsFileName << std::endl;
-    std::cout << "Size = " << labelsMat.size() << std::endl;
+    std::cout << "The path to the training labels files is : " << labelsFileName << std::endl;
+    std::cout << "[Cols, Rows] = " << labelsMat.size() << std::endl;
 
     std::string featuresMatrixCsvFile = prefix + imageType + "matrix.csv";
     std::string featuresMatCsvFilePath = filesDirectory + featuresMatrixCsvFile;
@@ -311,10 +312,10 @@ namespace file_utilities
           getline(ss, x2, ',');
           getline(ss, y2);
 
-          rect.x = atoi(x1.c_str());
-          rect.y = atoi(y1.c_str());
-          rect.width = atoi(x2.c_str()) - atoi(x1.c_str());
-          rect.height = atoi(y2.c_str()) - atoi(y1.c_str());
+          rect.x = std::min(atoi(x1.c_str()), atoi(x2.c_str()));
+          rect.y = std::min(atoi(y1.c_str()), atoi(y2.c_str()));
+          rect.width = abs(atoi(x2.c_str()) - atoi(x1.c_str()));
+          rect.height = abs(atoi(y2.c_str()) - atoi(y1.c_str()));
           category = atoi(temp.c_str());
           ROS_INFO_STREAM("Loading Annotation no: " << ii + 1 << " for "
                           << imgName);

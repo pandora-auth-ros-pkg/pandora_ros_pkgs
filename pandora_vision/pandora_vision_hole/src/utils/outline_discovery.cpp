@@ -156,8 +156,7 @@ namespace pandora_vision
       blobOutlineVector->push_back(
         cv::Point2f(
           static_cast<int>(*it) % edgesImage->cols,
-          static_cast<int>(*it) / edgesImage->cols)
-        );
+          static_cast<int>(*it) / edgesImage->cols));
     }
 
     // The area of the blob is essentialy the number of points visited
@@ -325,7 +324,6 @@ namespace pandora_vision
   void OutlineDiscovery::getOutlineOfMask(const cv::Mat& image,
     std::vector<cv::Point2f>* outline)
   {
-
     #ifdef DEBUG_TIME
     Timer::start("getOutlineFromMask", "mergeHoles");
     #endif
@@ -377,7 +375,7 @@ namespace pandora_vision
     @param[in,out] inImage [cv::Mat*] The input image
     @return void
    **/
-  void OutlineDiscovery::getShapesClearBorder (cv::Mat* inImage)
+  void OutlineDiscovery::getShapesClearBorder(cv::Mat* inImage)
   {
     if (inImage->type() != CV_8UC1)
     {
@@ -390,9 +388,9 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Before clear blorders";
       msgs.push_back(msg);
       cv::Mat tmp;
@@ -476,7 +474,7 @@ namespace pandora_vision
     // The total number of images needed to obtain a clear result
     int numImages = 0;
 
-    while(!isFloodFillFinished)
+    while (!isFloodFillFinished)
     {
       // Invert the image to facilitate floodfill's operation
       for (unsigned int rows = 0; rows < inImage->rows; rows++)
@@ -574,16 +572,16 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After clear borders";
       msgs.push_back(msg);
       cv::Mat tmp;
       inImage->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
       Visualization::multipleShow("getShapesClearBorder function", imgs, msgs,
         1200, 1);
@@ -605,7 +603,7 @@ namespace pandora_vision
     @param[in,out] inImage [cv::Mat*] The input image
     @return void
    **/
-  void OutlineDiscovery::getShapesClearBorderSimple (cv::Mat* inImage)
+  void OutlineDiscovery::getShapesClearBorderSimple(cv::Mat* inImage)
   {
     if (inImage->type() != CV_8UC1)
     {
@@ -617,9 +615,9 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Before clear blorders";
       msgs.push_back(msg);
       cv::Mat tmp;
@@ -721,16 +719,16 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : After clear borders";
       msgs.push_back(msg);
       cv::Mat tmp;
       inImage->copyTo(tmp);
       imgs.push_back(tmp);
     }
-    if(Parameters::Debug::show_get_shapes_clear_border) // Debug
+    if (Parameters::Debug::show_get_shapes_clear_border)  // Debug
     {
       Visualization::multipleShow("getShapesClearBorderSimple function",
         imgs, msgs, 1200, 1);
@@ -796,7 +794,7 @@ namespace pandora_vision
       // We will select only the first one found
       std::vector<cv::Point2f> singleRayPotentialOutlinePoints;
 
-      while(!outlineFound)
+      while (!outlineFound)
       {
         // Advance the tip of the ray forwards
         counter++;
@@ -853,7 +851,7 @@ namespace pandora_vision
             }
           }
         }
-      } // End {while outline not found} loop
+      }  // End {while outline not found} loop
 
 
       // From the, at most 5, outline points found,
@@ -908,11 +906,11 @@ namespace pandora_vision
     cv::Mat canvas = cv::Mat::zeros(edgesImage->size(), CV_8UC1);
 
     // Draw the connected outline of the i-th hole onto canvas
-    for(unsigned int j = 0; j < keypointOutline.size(); j++)
+    for (unsigned int j = 0; j < keypointOutline.size(); j++)
     {
       cv::line(canvas, keypointOutline[j],
         keypointOutline[(j + 1) % keypointOutline.size()],
-        cv::Scalar(255, 0, 0), 1, 8 );
+        cv::Scalar(255, 0, 0), 1, 8);
     }
 
     // Clear the outline vector. It will be filled with the points
@@ -995,4 +993,4 @@ namespace pandora_vision
     Timer::tick("raycastKeypoint");
     #endif
   }
-} // namespace pandora_vision
+}  // namespace pandora_vision

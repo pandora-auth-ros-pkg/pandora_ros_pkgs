@@ -98,7 +98,6 @@ namespace pandora_vision
     std::vector<pandora_vision_msgs::Blob> blobs;
 
     for (unsigned int i = 0; i < size(); i++) {
-
       // A single hole
       pandora_vision_msgs::Blob blob;
 
@@ -238,7 +237,7 @@ namespace pandora_vision
   {
     return this->blobVector_.blobs[index];
   }
-  
+
   pandora_vision_msgs::Blob
   BlobVector::
   getBlob(int index) const
@@ -391,7 +390,8 @@ namespace pandora_vision
       rectangleVertices.push_back(MessageConversions::cvToMsg(vertex_3));
       rectangleVertices.push_back(MessageConversions::cvToMsg(vertex_4));
     }
-    else {
+    else
+    {
       cv::Point2f a[] = {vertex_1, vertex_2, vertex_3, vertex_4};
 
       cv::Mat canvas = cv::Mat::zeros(480, 640, CV_8UC1);

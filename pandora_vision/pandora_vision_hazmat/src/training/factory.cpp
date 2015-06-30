@@ -32,51 +32,50 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
+#include <string>
 #include "pandora_vision_hazmat/training/factory.h"
 
 namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-/**
- @brief Function used to produce the correct Hazmat Trainer object. 
- @param featureType[const std::string&] : The type of the feature which the
- trainer model will use to describe the training objects. 
-**/  
+    /**
+     * @brief Function used to produce the correct Hazmat Trainer object.
+     * @param featureType[const std::string&] : The type of the feature which the
+     * trainer model will use to describe the training objects.
+     */
+    PlanarPatternTrainer* PlanarPatternTrainerFactory::createObject(
+        const std::string &featureType)
+    {
+      std::locale loc;
+      std::string feature;
+      for (std::string::size_type i = 0; i < featureType.length() ; ++i)
+        feature += std::toupper(featureType[i], loc);
 
-PlanarPatternTrainer* PlanarPatternTrainerFactory::createObject(
-    const std::string &featureType)
-{
-  std::locale loc;
-  std::string feature;
-  for (std::string::size_type i = 0; i < featureType.length() ; ++i)
-    feature += std::toupper(featureType[i], loc);
-
-  if( !feature.compare("SIFT"))
-  {
-    ROS_INFO("Creating new SIFT Trainer!\n");
-    return new SiftTrainer();
-  } 
-  else if ( !feature.compare("SURF"))
-  {
-      ROS_INFO("Creating new SURF Trainer!\n");
-      return new SurfTrainer();
-  } 
-  else if ( !featureType.compare("ORB"))
-  {
-      ROS_INFO("Creating new ORB Trainer!\n");
-      return new OrbTrainer();
-  }
-  else
-  {
-      ROS_FATAL("Invalid feature type! Detection cannot continue!\n");
+      if (!feature.compare("SIFT"))
+      {
+        ROS_INFO("Creating new SIFT Trainer!\n");
+        return new SiftTrainer();
+      }
+      else if (!feature.compare("SURF"))
+      {
+        ROS_INFO("Creating new SURF Trainer!\n");
+        return new SurfTrainer();
+      }
+      else if (!featureType.compare("ORB"))
+      {
+        ROS_INFO("Creating new ORB Trainer!\n");
+        return new OrbTrainer();
+      }
+      else
+      {
+        ROS_FATAL("Invalid feature type! Detection cannot continue!\n");
+        return NULL;
+      }
       return NULL;
-  }
-  return NULL;
-}
-  
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+    }
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision

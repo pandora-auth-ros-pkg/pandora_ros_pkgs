@@ -40,14 +40,15 @@
 #ifndef PANDORA_VISION_VICTIM_VICTIM_IMAGE_PROCESSOR_H
 #define PANDORA_VISION_VICTIM_VICTIM_IMAGE_PROCESSOR_H
 
+#include <string>
+#include <vector>
+
 #include "sensor_processor/processor.h"
 #include "pandora_vision_common/pois_stamped.h"
 #include "pandora_vision_victim/enhanced_image_stamped.h"
 #include "pandora_vision_victim/victim_poi.h"
 #include "pandora_vision_victim/victim_parameters.h"
-#include "pandora_vision_victim/svm_classifier/rgb_svm_validator.h"
-#include "pandora_vision_victim/svm_classifier/depth_svm_validator.h"
-
+#include "pandora_vision_victim/classifiers/svm_validator.h"
 
 namespace pandora_vision
 {
@@ -76,15 +77,15 @@ namespace pandora_vision
       @param
       @return void
       **/ 
-      std::vector<VictimPOIPtr> victimFusion(const EnhancedImageStampedConstPtr& input, 
+      std::vector<VictimPOIPtr> victimFusion(const EnhancedImageStampedConstPtr& input,
         bool depthEnable);
 
       std::vector<cv::Mat> _rgbdImages;
 
       /// Instance of RGB SVM Validator
-      boost::shared_ptr<RgbSvmValidator> rgbSvmValidatorPtr_;
+      boost::shared_ptr<SvmValidator> rgbSvmValidatorPtr_;
       /// Instance of Depth SVM Validator
-      boost::shared_ptr<DepthSvmValidator> depthSvmValidatorPtr_;
+      boost::shared_ptr<SvmValidator> depthSvmValidatorPtr_;
 
       /// Debug purposes
       image_transport::Publisher _debugVictimsPublisher;
@@ -97,5 +98,4 @@ namespace pandora_vision
       std::vector<float> depth_svm_p;
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_VICTIM_IMAGE_PROCESSOR_H

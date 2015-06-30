@@ -305,14 +305,14 @@
        <item>
         <widget class="QLineEdit" name="bagLineEdit">
          <property name="text">
-          <string>positive1-1.bag</string>
+          <string>thermal8.bag</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="rosTopicLineEdit">
          <property name="text">
-          <string>/vision/enhanced_images</string>
+          <string>/flir_lepton/fused_msg</string>
          </property>
         </widget>
        </item>
@@ -355,25 +355,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="imageLabel">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>30</y>
-      <width>651</width>
-      <height>631</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
@@ -406,6 +387,85 @@
      </rect>
     </property>
    </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>80</y>
+      <width>639</width>
+      <height>479</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::NoContextMenu</enum>
+    </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="horizontalScrollBarPolicy">
+     <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>624</width>
+       <height>464</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::WheelFocus</enum>
+     </property>
+     <widget class="QLabel" name="imageLabel">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>640</width>
+        <height>480</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <zorder>scrollArea</zorder>
+   <zorder>widget</zorder>
+   <zorder>statusLabel</zorder>
+   <zorder>framesListWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

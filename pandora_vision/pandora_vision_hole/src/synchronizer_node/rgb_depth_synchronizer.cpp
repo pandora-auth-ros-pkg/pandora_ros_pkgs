@@ -54,7 +54,7 @@ namespace pandora_vision
     // hole fusion node to unlock him
     isLocked_ = true;
 
-    // The synchronizer node starts off in life locked for thermal standalone 
+    // The synchronizer node starts off in life locked for thermal standalone
     // procedure , waiting for the thermal cropper node to unlock him.
     thermalLocked_ = true;
 
@@ -94,25 +94,25 @@ namespace pandora_vision
 
     // Advertise the synchronized point cloud
     synchronizedPointCloudPublisher_ = nodeHandle_.advertise
-      <PointCloud>(synchronizedPointCloudTopic_, 1000);
+      <PointCloud>(synchronizedPointCloudTopic_, 1);
 
     // Advertise the synchronized depth image
     synchronizedDepthImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1000);
+      <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1);
 
     // Advertise the synchronized rgb image
     synchronizedRGBImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1000);
+      <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1);
 
     // Advertise the synchronized thermal image and its index
     synchronizedThermalImagePublisher_ = nodeHandle_.advertise
       <pandora_vision_msgs::IndexedThermal>
-      (synchronizedThermalImageTopic_, 1000);
+      (synchronizedThermalImageTopic_, 1);
 
     // Advertise the synchronized rgb and depth image to thermal cropper node
     synchronizedRgbDepthCropperImagesPublisher_ = nodeHandle_.advertise
       <pandora_vision_msgs::EnhancedImage>
-      (synchronizedRgbDepthCropperImagesTopic_, 1000);
+      (synchronizedRgbDepthCropperImagesTopic_, 1);
 
     ROS_INFO_NAMED(PKG_NAME, "[Synchronizer node] Initiated");
   }
@@ -183,16 +183,28 @@ namespace pandora_vision
     @param void
     @return void
    **/
-  void RgbDepthSynchronizer::getTopicNames ()
+  void RgbDepthSynchronizer::getTopicNames()
   {
     // The namespace dictated in the launch file
     std::string ns = nodeHandle_.getNamespace();
+
+    // This variable indicates the mode in which Hole-Package is running
+    // If is set to true -> Rgb-D-T mode
+    // Else Rgb-D mode
+    if (nodeHandle_.getParam("/hole_detector/thermal", mode_))
+    {
+      ROS_INFO("[Synchronizer Node] Packages Mode has been found");
+    }
+    else
+    {
+      ROS_ERROR("[Synchronizer] Could not find Packages Mode");
+    }
 
     // Read the name of the topic from where the synchronizer node acquires the
     // input synchronized thermal and pointcloud info
     if (nodeHandle_.getParam(
         ns + "/synchronizer_node/subscribed_topics/synchronized_topic",
-        inputSynchronizedTopic_ ))
+        inputSynchronizedTopic_))
     {
       // Make the topic's name absolute
       inputSynchronizedTopic_ = ns + "/" + inputSynchronizedTopic_;
@@ -371,7 +383,6 @@ namespace pandora_vision
       ROS_ERROR_NAMED(PKG_NAME,
         "[Synchronizer Node] Could not find topic rgb_depth_images_cropper_topic");
     }
-
   }
 
 
@@ -383,7 +394,7 @@ namespace pandora_vision
     If the synchronizer node is unlocked, it extracts a depth image from
     the input point cloud's depth measurements, an RGB image from the colour
     measurements of the input point cloud and thermal info.
-    Then publishes these images 
+    Then publishes these images
     to their respective recipients. Finally, the input point cloud is
     published directly to the hole fusion node.
     @param[in] synchronizedMessage [pandora_vision_msgs::SynchronizedMsg&]
@@ -396,9 +407,9 @@ namespace pandora_vision
     // This block is responsible to sent the thermal image to thermal node.
     // This way thermal node runs autonomously but it also provides its
     // information to hole fusion node.
-    if(!thermalLocked_ || !isLocked_)
+    if (!thermalLocked_ || !isLocked_)
     {
-      // This variable informs thermal node if it must publish to hole fusion
+      //  This variable informs thermal node if it must publish to hole fusion
       //  to thermal cropper node or both.
       //  If it is set as "thermal" --> post to thermal cropper node.
       //  If it is set as "hole" --> post to hole fusion node.
@@ -416,7 +427,7 @@ namespace pandora_vision
       // one so that these can be set manually if and when needed
       PointCloudPtr pointCloud(new PointCloud);
       pcl::copyPointCloud(*copiedPc_, *pointCloud);
-      
+
       // The input point cloud is unorganized, in other words,
       // simulation is running. Variables are needed to be set in order for
       // the point cloud to be functionally exploitable.
@@ -449,15 +460,15 @@ namespace pandora_vision
       depthImageMessagePtr->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
       depthImageMessagePtr->image = depthImage;
 
-      // This condition is crucial for the synchronization of thermal, rgb and 
-      // depth images to be sent for further processing. This block is 
+      // This condition is crucial for the synchronization of thermal, rgb and
+      // depth images to be sent for further processing. This block is
       // is responsible for the autonomous thermal procedure and sends
       // an enhanced message to thermal cropper node.
-      if(!thermalLocked_)
+      if (!thermalLocked_)
       {
         // Lock the thermal procedure; aka prevent
         // the execution of this if-block without the explicit request
-        // of the thermal cropper node.This way we can synchronize the rgb depth 
+        // of the thermal cropper node.This way we can synchronize the rgb depth
         // and thermal images sent to thermal cropper.
         thermalLocked_ = true;
 
@@ -469,7 +480,7 @@ namespace pandora_vision
         enhancedCropperMsg.header.stamp = synchronizedMessage.header.stamp;
         enhancedCropperMsg.depthImage = *depthImageMessagePtr->toImageMsg();
         enhancedCropperMsg.rgbImage = *rgbImageMessagePtr->toImageMsg();
-        enhancedCropperMsg.thermalImage = synchronizedMessage.thermalInfo;
+        enhancedCropperMsg.thermalImage = synchronizedMessage.thermalImage;
 
         // Publish the synchronized depth and rgb images to thermal cropper node
         synchronizedRgbDepthCropperImagesPublisher_.publish(enhancedCropperMsg);
@@ -478,8 +489,8 @@ namespace pandora_vision
         thermalIndex = thermalIndex + "thermal";
       }
 
-      // This condition is crucial for the synchronization of thermal, rgb and 
-      // depth images to be sent for further processing. This block is 
+      // This condition is crucial for the synchronization of thermal, rgb and
+      // depth images to be sent for further processing. This block is
       // is responsible for hole exctraction procedure and sends rgb and depth
       // images to their respective nodes.
       if (!isLocked_)
@@ -506,15 +517,15 @@ namespace pandora_vision
         if (ticks_ > 1)
         {
           meanProcessingTime_ += t;
-        }     
- 
+        }
+
         ROS_INFO_NAMED(PKG_NAME,
           "Mean processing time :                  %fs",
           (meanProcessingTime_ / (ticks_ - 1)));
 
         ROS_INFO_NAMED(PKG_NAME,
           "=================================================");
-      
+
         invocationTime_ = ros::Time::now().toSec();
 
         Timer::start("synchronizedCallback", "", true);
@@ -527,7 +538,7 @@ namespace pandora_vision
         // Publish the synchronized depth image
         synchronizedDepthImagePublisher_.publish(
           depthImageMessagePtr->toImageMsg());
-     
+
         // Publish the synchronized point cloud
         synchronizedPointCloudPublisher_.publish(pointCloud);
 
@@ -539,25 +550,29 @@ namespace pandora_vision
         Timer::printAllMeansTree();
         #endif
       }
-      
-      // Fill the thermal message
-      pandora_vision_msgs::IndexedThermal thermalMsg;
 
-      thermalMsg.header.stamp = synchronizedMessage.header.stamp;
-      thermalMsg.thermalImage = synchronizedMessage.thermalInfo;
-      thermalMsg.temperatures = synchronizedMessage.temperatures;
-      // Fill the header of the thermal image
-      thermalMsg.thermalImage.header.stamp = 
-        synchronizedMessage.thermalInfo.header.stamp;
+      // Check if Thermal is enabled to run with hole-detection Package
+      if (mode_)
+      {
+        // Fill the thermal message
+        pandora_vision_msgs::IndexedThermal thermalMsg;
 
-      thermalMsg.thermalIndex = thermalIndex;
-      thermalMsg.thermalImage.encoding = "mono8";
-      thermalMsg.thermalImage.height = 60;
-      thermalMsg.thermalImage.width = 80;
-      thermalMsg.thermalImage.step = 80 * sizeof(uint8_t);
+        thermalMsg.header.stamp = synchronizedMessage.header.stamp;
+        thermalMsg.thermalImage = synchronizedMessage.thermalImage;
+        thermalMsg.temperatures = synchronizedMessage.temperatures;
+        // Fill the header of the thermal image
+        thermalMsg.thermalImage.header.stamp =
+          synchronizedMessage.thermalImage.header.stamp;
 
-      // Publish the synchronized thermal message to thermal node
-      synchronizedThermalImagePublisher_.publish(thermalMsg);
+        thermalMsg.thermalIndex = thermalIndex;
+        thermalMsg.thermalImage.encoding = "mono8";
+        thermalMsg.thermalImage.height = 60;
+        thermalMsg.thermalImage.width = 80;
+        thermalMsg.thermalImage.step = 80 * sizeof(uint8_t);
+
+        // Publish the synchronized thermal message to thermal node
+        synchronizedThermalImagePublisher_.publish(thermalMsg);
+      }
     }
   }
 
@@ -574,7 +589,7 @@ namespace pandora_vision
    **/
   void RgbDepthSynchronizer::leaveSubscriptionToInputPointCloudCallback(
     const std_msgs::Empty& msg)
-  { 
+  {
     // Shutdown the input thermal subscriber
     inputSynchronizedSubscriber_.shutdown();
   }
@@ -599,7 +614,6 @@ namespace pandora_vision
     inputSynchronizedSubscriber_ = nodeHandle_.subscribe(
      inputSynchronizedTopic_, 1,
      &RgbDepthSynchronizer::inputPointCloudThermalCallback, this);
-
   }
 
   /**
@@ -626,9 +640,9 @@ namespace pandora_vision
   }
 
   /**
-    @brief The callback from thermal node. Set's a lock variable that is 
+    @brief The callback from thermal node. Set's a lock variable that is
     responsible for the message that is sent to thermal node from
-    synchronizer node.  
+    synchronizer node.
     @paramp[in] lockMsg [const std_msgs::Empty&] An empty message used to
     trigger the callback for thermal procedure.
    **/
@@ -638,4 +652,4 @@ namespace pandora_vision
     thermalLocked_ = false;
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

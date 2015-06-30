@@ -32,46 +32,46 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
-
 
 #ifndef PANDORA_VISION_HAZMAT_DETECTION_SURF_DETECTOR_H
 #define PANDORA_VISION_HAZMAT_DETECTION_SURF_DETECTOR_H
- 
+
+#include <vector>
+
 #include "pandora_vision_hazmat/detection/feature_matching_detector.h"
 
 namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    /*
+    /**
      * @class SurfDetector
      * @brief : A planar object detector that uses SURF features to match
      * the pattern with any candidates on the frame.
-    */
-    class SurfDetector : public FeatureMatchingDetector 
+     */
+    class SurfDetector : public FeatureMatchingDetector
     {
       public:
-
-        /*
+        /**
          * @brief : The constructor for the SURF detector objects
          */
         SurfDetector();
 
-        /*
+        /**
          * @brief : The destructor for the SURF detector objects that deletes
-         *          the memory allocated for the matcher object.
+         * the memory allocated for the matcher object.
          */
         ~SurfDetector()
         {
           delete[] matchers_;
         };
 
-        /*
+        /**
          * @brief: Function used to produce the necessary keypoints and their
-         *          corresponding descriptors for an image. 
-         * @param frame[const cv::Mat&] : The images that will be processed to 
+         * corresponding descriptors for an image.
+         * @param frame[const cv::Mat&] : The images that will be processed to
          * extract features and keypoints.
          * @param mask[const cv::Mat&] : A mask defines the image regions that
          * will be processed.
@@ -80,17 +80,13 @@ namespace pandora_vision
          * @param keyPoints[std::vector<cv::KeyPoint>*] : A pointer to the
          * vector containing the Keypoints detected in the current image.
          */
-        void virtual getFeatures( const cv::Mat &frame , const cv::Mat &mask
-            , cv::Mat *descriptors , std::vector<cv::KeyPoint> *keyPoints );
+        void virtual getFeatures(const cv::Mat &frame , const cv::Mat &mask,
+            cv::Mat *descriptors, std::vector<cv::KeyPoint> *keyPoints);
 
       private:
-
-        cv::SURF s_; //<! The object that calculates SURF keypoints 
-        //<! and descriptors.
-
+        cv::SURF s_;  //!< The object that calculates SURF keypoints
+        //!< and descriptors.
     };
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
-
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_SURF_DETECTOR_H_

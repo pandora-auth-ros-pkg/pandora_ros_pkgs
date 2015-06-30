@@ -36,8 +36,8 @@
  *          Christos Tsirigotis <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef UTILS_BLOB_VECTOR_H
-#define UTILS_BLOB_VECTOR_H
+#ifndef PANDORA_VISION_HOLE_UTILS_BLOB_VECTOR_H
+#define PANDORA_VISION_HOLE_UTILS_BLOB_VECTOR_H
 
 #include "pandora_vision_msgs/BlobVector.h"
 #include "pandora_vision_msgs/Blob.h"
@@ -58,12 +58,12 @@ namespace pandora_vision
   class BlobVector
   {
   public:
-    BlobVector ();
-    BlobVector (const pandora_vision_msgs::BlobVector& src);
-    BlobVector (const pandora_vision_msgs::BlobVector& src,
+    BlobVector();
+    explicit BlobVector(const pandora_vision_msgs::BlobVector& src);
+    BlobVector(const pandora_vision_msgs::BlobVector& src,
         int raycastKeypointPartitions);
     virtual
-      ~BlobVector ();
+      ~BlobVector();
 
     pandora_vision_msgs::BlobVector createMessage(const cv::Mat& image,
         const std::string& encoding, const std_msgs::Header& header);
@@ -205,7 +205,6 @@ namespace pandora_vision
      * @param[in] conveyor [const BlobVector&] The conveyor
      * @param[in] id [int] The identifier of a specific hole
      * @return void
-     * TODO
      */
     void
       print(int id = -1) const;
@@ -231,6 +230,6 @@ namespace pandora_vision
     pandora_vision_msgs::BlobVector blobVector_;
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_BLOB_VECTOR_H
+#endif  // PANDORA_VISION_HOLE_UTILS_BLOB_VECTOR_H

@@ -208,7 +208,7 @@ namespace pandora_vision
           cv::Scalar(255, 0, 0),
           1,
           CV_AA,
-          0);  
+          0);
     }
 
     cv::imshow(windowName, canvas);

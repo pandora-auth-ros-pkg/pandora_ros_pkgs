@@ -47,7 +47,6 @@ namespace pandora_vision
   class HoleDetectorTest : public ::testing::Test
   {
     protected:
-
       HoleDetectorTest() {}
 
       /**
@@ -62,84 +61,81 @@ namespace pandora_vision
         imprinted on
         return void
        **/
-      void generateDepthRectangle (
+      void generateDepthRectangle(
         const cv::Point2f& upperLeft,
         const int& x,
         const int& y,
         const float& depthIn,
         cv::Mat* image );
 
-      //! Sets up one image: squares_,
-      //! which features three squares of size 100.
-      //! The first one (order matters here) has its upper left vertex at
-      //! (100, 100),
-      //! the second one has its upper right vertex at (WIDTH - 3, 3)
-      //! (so that the blob it represents can barely be identified)
-      //! and the the third one has its lower right vertex at
-      //! (WIDTH - 1, HEIGHT - 1)
+      // Sets up one image: squares_,
+      // which features three squares of size 100.
+      // The first one (order matters here) has its upper left vertex at
+      // (100, 100),
+      // the second one has its upper right vertex at (WIDTH - 3, 3)
+      // (so that the blob it represents can barely be identified)
+      // and the the third one has its lower right vertex at
+      // (WIDTH - 1, HEIGHT - 1)
       virtual void SetUp()
       {
         WIDTH = 640;
         HEIGHT = 480;
 
         // The image upon which the squares will be inprinted
-        squares_ = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
+        squares_ = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
         // Construct the squares_ image
 
         // Set the depth for each point of the squares_ image to 1.0
-        for ( int rows = 0; rows < squares_.rows; rows++ )
+        for (int rows = 0; rows < squares_.rows; rows++)
         {
-          for ( int cols = 0; cols < squares_.cols; cols++ )
+          for (int cols = 0; cols < squares_.cols; cols++)
           {
-            squares_.at< float >( rows, cols ) = 1.0;
+            squares_.at<float>(rows, cols) = 1.0;
           }
         }
 
         // Construct the lower right square
-        cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1 );
+        cv::Mat lowerRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
         HoleDetectorTest::generateDepthRectangle
-          ( cv::Point2f ( WIDTH - 100, HEIGHT - 100 ),
+          (cv::Point2f(WIDTH - 100, HEIGHT - 100),
             100,
             100,
             1.2,
-            &lowerRightSquare );
+            &lowerRightSquare);
 
         // Construct the upper right image
-        cv::Mat upperRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1 );
+        cv::Mat upperRightSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
         HoleDetectorTest::generateDepthRectangle
-          ( cv::Point2f ( WIDTH - 103, 3 ),
+          (cv::Point2f(WIDTH - 103, 3),
             100,
             100,
             2.2,
-            &upperRightSquare );
+            &upperRightSquare);
 
         // Construct the upper left square
-        cv::Mat upperLeftSquare = cv::Mat::zeros( HEIGHT, WIDTH, CV_32FC1 );
+        cv::Mat upperLeftSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
         // Construct the square_ image
         HoleDetectorTest::generateDepthRectangle
-          ( cv::Point2f ( 100, 100 ),
+          (cv::Point2f(100, 100),
             100,
             100,
             1.8,
-            &upperLeftSquare );
+            &upperLeftSquare);
 
         // Synthesize the final squares_ image
         squares_ += lowerRightSquare + upperRightSquare + upperLeftSquare;
 
       }
-
-
       // The images' width and height
       int WIDTH;
       int HEIGHT;
 
       // The image that will be used to locate blobs in
       cv::Mat squares_;
-
   };
 
 
@@ -156,19 +152,19 @@ namespace pandora_vision
     imprinted on
     return void
    **/
-  void HoleDetectorTest::generateDepthRectangle (
+  void HoleDetectorTest::generateDepthRectangle(
     const cv::Point2f& upperLeft,
     const int& x,
     const int& y,
     const float& depthIn,
-    cv::Mat* image )
+    cv::Mat* image)
   {
     // Fill the inside of the desired rectangle with the @param depthIn provided
-    for( int rows = upperLeft.y; rows < upperLeft.y + y; rows++ )
+    for (int rows = upperLeft.y; rows < upperLeft.y + y; rows++)
     {
-      for ( int cols = upperLeft.x; cols < upperLeft.x + x; cols++ )
+      for (int cols = upperLeft.x; cols < upperLeft.x + x; cols++)
       {
-        image->at< float >( rows, cols ) = depthIn;
+        image->at<float>(rows, cols) = depthIn;
       }
     }
   }
@@ -176,10 +172,10 @@ namespace pandora_vision
 
 
   //! Tests HoleDetector::findHoles
-  TEST_F ( HoleDetectorTest, findHolesTest )
+  TEST_F(HoleDetectorTest, findHolesTest)
   {
     // Run HoleDetector:findHoles
-    HolesConveyor conveyor = HoleDetector::findHoles ( squares_ );
+    HolesConveyor conveyor = HoleDetector::findHoles(squares_);
 
     // The number of keypoints found
     int size = conveyor.size();
@@ -188,23 +184,22 @@ namespace pandora_vision
     // and the one of the upper right square. The lower right square is
     // adjacent to the edges of the image and will be clipped by the
     // edge contamination method
-    ASSERT_EQ ( 2, size );
+    ASSERT_EQ(2, size);
 
     // For every keypoint found, make assertions and expectations
-    for ( int k = 0; k < size; k++ )
+    for (int k = 0; k < size; k++)
     {
       // The location of the keypoint should be near the center of the square
       // in which it lies
-      EXPECT_NEAR ( conveyor.holes[k].keypoint.pt.x,
-        conveyor.holes[k].rectangle[0].x + 50, 1 );
+      EXPECT_NEAR(conveyor.holes[k].keypoint.pt.x,
+        conveyor.holes[k].rectangle[0].x + 50, 1);
 
       // The hole should have exactly four vertices
-      EXPECT_EQ ( 4, conveyor.holes[k].rectangle.size() );
+      EXPECT_EQ (4, conveyor.holes[k].rectangle.size());
 
       // There should be 400 outline points
-      EXPECT_EQ ( 400, conveyor.holes[k].outline.size() );
+      EXPECT_EQ (400, conveyor.holes[k].outline.size());
     }
-
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

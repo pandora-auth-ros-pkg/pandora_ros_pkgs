@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias,Angelos Triantafyllidis
  *********************************************************************/
 
-#ifndef THERMAL_NODE_HOLE_DETECTOR_H
-#define THERMAL_NODE_HOLE_DETECTOR_H
+#ifndef PANDORA_VISION_HOLE_THERMAL_NODE_HOLE_DETECTOR_H
+#define PANDORA_VISION_HOLE_THERMAL_NODE_HOLE_DETECTOR_H
 
 #include "utils/blob_detection.h"
 #include "utils/holes_conveyor.h"
@@ -56,7 +56,6 @@ namespace pandora_vision
   class HoleDetector
   {
     public:
-
       /**
         @brief Finds the holes provided a thermal image in CV_8UC1 format
 
@@ -68,9 +67,8 @@ namespace pandora_vision
         @return HolesConveyor The struct that contains the holes found
        **/
       static HolesConveyor findHoles(const cv::Mat& thermalImage);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // THERMAL_NODE_HOLE_DETECTOR_H
+#endif  // PANDORA_VISION_HOLE_THERMAL_NODE_HOLE_DETECTOR_H

@@ -1,19 +1,14 @@
 <?xml version="1.0"?>
 <launch>
-    
-    <arg name="output" default="log" />
-    
-    <node name="victim_node" type="pandora_vision_victim_node" pkg="pandora_vision_victim"  
-      respawn="False" output="$(arg output)" ns="/pandora_vision"/>
-    
-    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml" 
-        command="load" ns="/pandora_vision/pandora_vision_victim"/>
-    
-    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml" 
-        command="load" ns="/pandora_vision/pandora_vision_victim"/>
-            
-    <!-- Url for model.xml /-->
-    <param name="model_url" type="str" 
-      value="https://pandora.ee.auth.gr/vision/model.xml"/>  
 
+    <arg name="output" default="log" />
+
+    <node name="victim_node" type="pandora_vision_victim_node" pkg="pandora_vision_victim"
+      respawn="False" output="$(arg output)" ns="/pandora_vision"/>
+
+    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
+        command="load" ns="/pandora_vision/pandora_vision_victim"/>
+
+    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
+        command="load" ns="/pandora_vision/pandora_vision_victim"/>
 </launch>

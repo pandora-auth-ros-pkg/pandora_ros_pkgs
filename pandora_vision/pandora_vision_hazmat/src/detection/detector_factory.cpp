@@ -32,9 +32,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
+#include <string>
 
 #include "pandora_vision_hazmat/detection/detector_factory.h"
 
@@ -42,8 +43,7 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-
-    /*
+    /**
      * @brief : The main factory method that creates the different feature
      * detectors
      * @param featureType(const std::string&): The name of the feature that
@@ -55,32 +55,32 @@ namespace pandora_vision
       std::locale loc;
       std::string feature;
       // Convert the input string to upper case format.
-      for (std::string::size_type i = 0; i < featureType.length() ; ++i)
+      for (std::string::size_type i = 0; i < featureType.length(); ++i)
         feature += std::toupper(featureType[i], loc);
 
-      if( !feature.compare("SIFT"))
+      if (!feature.compare("SIFT"))
       {
         ROS_INFO_STREAM("[Hazmat Detection]: Creating new SIFT Detector!");
         return new SiftDetector();
-      } 
-      else if ( !feature.compare("SURF"))
+      }
+      else if (!feature.compare("SURF"))
       {
         ROS_INFO_STREAM("[Hazmat Detection]: Creating new SURF Detector!");
         return new SurfDetector();
-      } 
-      else if ( !featureType.compare("ORB"))
+      }
+      else if (!featureType.compare("ORB"))
       {
         ROS_INFO_STREAM("[Hazmat Detection]: Creating new ORB Detector!");
         return new OrbDetector();
       }
       else
       {
-        ROS_FATAL_STREAM("[Hazmat Detection]: Invalid feature type!" 
+        ROS_FATAL_STREAM("[Hazmat Detection]: Invalid feature type!"
             << " Detection cannot continue!");
         return NULL;
       }
       return NULL;
     }
 
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision

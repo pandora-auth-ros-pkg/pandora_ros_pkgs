@@ -36,23 +36,27 @@
 *********************************************************************/
 
 #include <vector>
+#include <string>
 
-#include "gtest/gtest.h"
+#include <ros/package.h>
+
+#include <gtest/gtest.h>
 
 #include "pandora_vision_victim/feature_extractors/sift_extractor.h"
-#include "ros/package.h"
 
 namespace pandora_vision
 {
   class SiftExtractorTest : public ::testing::Test
   {
   public:
-    SiftExtractorTest (){}
+    SiftExtractorTest()
+    {
+    }
 
     virtual void SetUp()
     {
       std::string packagePath = ros::package::getPath("pandora_vision_victim");
-      testImg = cv::imread(packagePath + "/data/box.png");      
+      testImg = cv::imread(packagePath + "/data/box.png");
 
       ASSERT_TRUE(testImg.data != NULL) << "Could not read the test image!";
     }
@@ -60,14 +64,15 @@ namespace pandora_vision
     virtual ~SiftExtractorTest()
     {
     }
+
     virtual void TearDown()
     {
       delete siftExtractorTestFixture_;
     }
 
     /*
-     * @brief : Creates a keypoint detector. 
-     * @param detectorName[const std::string&]: The type of the keypoint 
+     * @brief : Creates a keypoint detector.
+     * @param detectorName[const std::string&]: The type of the keypoint
      *  detector we wish to create.
      * @return : The pointer to the keypoint detector.
      */
@@ -76,53 +81,53 @@ namespace pandora_vision
     {
       return cv::FeatureDetector::create(detectorName);
     }
-    
+
     /*
-     * @brief : Creates a descriptor extractor. 
+     * @brief : Creates a descriptor extractor.
      * @param extractorName[const std::string&]: The type of the descriptor
      *  extractor we wish to create.
      * @return : The pointer to the descriptor extractor.
      */
-    cv::Ptr<cv::DescriptorExtractor> create_extractor(const std::string&
-                                                      extractorName)
+    cv::Ptr<cv::DescriptorExtractor> create_extractor(
+        const std::string& extractorName)
     {
       return cv::DescriptorExtractor::create(extractorName);
     }
-  
-    //<! The image used for testingg purposes.
+
+    /// The image used for testingg purposes.
     cv::Mat testImg;
 
-    //<! A pointer to the extractor siftExtractorTestFixture_ that will be tested.
+    /// A pointer to the extractor siftExtractorTestFixture_ that will be tested.
     SiftExtractor* siftExtractorTestFixture_;
 
-    //<! The pointer the keypoint detector that produces the correct results.
+    /// The pointer the keypoint detector that produces the correct results.
     cv::Ptr<cv::FeatureDetector> detector;
-    //<! The pointer to the feature extractor that produces the correct
-    //<! results.
+    /// The pointer to the feature extractor that produces the correct
+    /// results.
     cv::Ptr<cv::DescriptorExtractor> extractor;
   };
 
 
   TEST_F(SiftExtractorTest, SiftTest)
   {
-    // Create the SIFT siftExtractorTestFixture_ 
+    // Create the SIFT siftExtractorTestFixture_
     siftExtractorTestFixture_ = new SiftExtractor("SIFT", "SIFT");
-    ASSERT_TRUE(siftExtractorTestFixture_ != NULL) << "Could not Feature Extractor Object!"; 
+    ASSERT_TRUE(siftExtractorTestFixture_ != NULL) << "Could not Feature Extractor Object!";
 
     // Create the SIFT keypoint detector.
     detector = create_detector("SIFT");
-    ASSERT_TRUE(detector != NULL) << "Could not create SIFT keypoint" << 
+    ASSERT_TRUE(detector != NULL) << "Could not create SIFT keypoint" <<
       " detector!";
     // Create the SIFT feature extractor.
     extractor = create_extractor("SIFT");
-    ASSERT_TRUE(extractor != NULL) << "Could not create SIFT feature" 
-      << " extractor!"; 
+    ASSERT_TRUE(extractor != NULL) << "Could not create SIFT feature"
+      << " extractor!";
 
     cv::Mat grayImg;
     // Check that the image was read successfully.
     // Convert the image to gray scale.
     if (testImg.channels() > 1)
-      cv::cvtColor(testImg, grayImg, CV_BGR2GRAY); 
+      cv::cvtColor(testImg, grayImg, CV_BGR2GRAY);
     else
       grayImg = testImg;
 
@@ -146,12 +151,10 @@ namespace pandora_vision
       for (int j = 0; j < trueDescriptors.rows; ++j)
       {
         ASSERT_FLOAT_EQ(trueDescriptors.at<float>(i, j),
-                        descriptors.at<float>(i, j)); 
+                        descriptors.at<float>(i, j));
       }
-      
     }
-
-  } // End of SiftTest
+  }  // End of SiftTest
 
   TEST_F(SiftExtractorTest, DenseSiftTest)
   {
@@ -159,17 +162,17 @@ namespace pandora_vision
     ASSERT_TRUE(siftExtractorTestFixture_ != NULL) << "Could not Feature Extractor Object!";
 
     detector = create_detector("Dense");
-    ASSERT_TRUE(detector != NULL) << "Could not create SIFT keypoint" << 
+    ASSERT_TRUE(detector != NULL) << "Could not create SIFT keypoint" <<
       " detector!";
     extractor = create_extractor("SIFT");
-    ASSERT_TRUE(extractor != NULL) << "Could not create SIFT feature" 
-      << " extractor!"; 
+    ASSERT_TRUE(extractor != NULL) << "Could not create SIFT feature"
+      << " extractor!";
 
     cv::Mat grayImg;
 
     // Convert the image to gray scale.
     if (testImg.channels() > 1)
-      cv::cvtColor(testImg, grayImg, CV_BGR2GRAY); 
+      cv::cvtColor(testImg, grayImg, CV_BGR2GRAY);
     else
       grayImg = testImg;
 
@@ -190,15 +193,11 @@ namespace pandora_vision
 
     for (int i = 0; i < trueDescriptors.cols; ++i)
     {
-
       for (int j = 0; j < trueDescriptors.rows; ++j)
       {
         ASSERT_FLOAT_EQ(trueDescriptors.at<float>(i, j),
-                        descriptors.at<float>(i, j)); 
+                        descriptors.at<float>(i, j));
       }
-      
     }
-
-  } // End of DenseSiftTest
-
-} // namespace pandora_vision
+  }  // End of DenseSiftTest
+}  // namespace pandora_vision

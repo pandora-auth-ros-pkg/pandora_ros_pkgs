@@ -44,7 +44,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-
+#include <math.h>
 
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
@@ -77,6 +77,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QFileDialog>
 #include <QtGui/QLabel>
+#include <QtGui/QScrollArea>
 #include <QtGui/QLineEdit>
 #include <QtGui/QListWidget>
 #include <QtGui/QPainter>
@@ -97,6 +98,7 @@
 #include <QtGui/QTimeEdit>
 #include <QtGui/QFont>
 
+#include "distrib_msgs/flirLeptonMsg.h"
 #include "pandora_vision_msgs/Predator.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
 
@@ -147,6 +149,12 @@ namespace pandora_vision
 
     //!< indicates if secondpoint for bbox is ginven
     static bool secondpoint;
+    
+    //!< the image's original setWidth
+    static int originalWidth;
+    
+    //!< the image's original height
+    static int originalHeight;
 
     /**
     @brief function that writes annotations of current frame to file
@@ -222,6 +230,14 @@ namespace pandora_vision
     @return void
     **/
     static void getLastFrameIndex(const std::string& filename, int* index);
+
+    /**
+    @brief function that sets original Image dimensions 
+    @param  width [int] the image's original width
+    @param height [int] the image's original img_height
+    @return void
+    **/
+    static void setOriginalImgDimensions(int width, int height);
   };
 
 }// namespace pandora_vision

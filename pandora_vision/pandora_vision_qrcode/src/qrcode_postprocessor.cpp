@@ -37,6 +37,8 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_common_msgs/GeneralAlertVector.h"
 #include "pandora_vision_qrcode/qrcode_postprocessor.h"
 

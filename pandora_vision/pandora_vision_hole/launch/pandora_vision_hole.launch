@@ -4,6 +4,12 @@
 
   <arg name="namespace" default="hole_detector" />
 
+  <!-- ========================== Thermal Enable =========================== -->
+  <!-- Set both to true if Thermal must be included -->
+
+  <param name="/hole_detector/thermal" value="true" />
+  <arg name="open_thermal" default="true" />
+
   <!-- ================== Parameters for yaw pitch extraction ============== -->
 
   <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
@@ -18,30 +24,20 @@
         type="synchronizer_node"
         pkg="pandora_vision_hole"
         respawn="False"
-        ns="$(arg namespace)">
+        ns="$(arg namespace)" >
 
     <!-- The width and height variables needed when in simulation mode -->
     <param name="width" value="640" />
     <param name="height" value="480" />
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_node_topics.yaml"
+    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_nodes_cfg/rgbdt_synchronizer_params.yaml"
               command="load" />
   </node>
 
   <!-- ======================= RGBDT Synchronizer node ===================== -->
 
-  <node name="rgb_depth_thermal_synchronizer_node"
-        type="rgb_depth_thermal_synchronizer.py"
-        pkg="pandora_vision_hole"
-        respawn="false"
-        output="$(arg output)"
-        ns="$(arg namespace)">
-
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_node_topics.yaml"
-              command="load" />
-
-  </node>
+  <include file="$(find pandora_vision_hole)/launch/synchronizer_nodes/pandora_pc_thermal_synchronizer.launch"
+      ns="$(arg namespace)" />
 
   <!-- ============================ Depth node ============================= -->
 
@@ -68,37 +64,40 @@
               command="load" />
   </node>
 
-  <!-- ============================= Thermal node ========================== -->
+  <group if="$(arg open_thermal)">
+    <!-- =========================== Thermal node ========================== -->
 
-  <node
-    name="thermal_camera_node"
-    type="thermal_camera_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="$(arg output)"
-    ns="$(arg namespace)">
+    <node
+      name="thermal_camera_node"
+      type="thermal_camera_node"
+      pkg="pandora_vision_hole"
+      respawn="False"
+      output="$(arg output)"
+      ns="$(arg namespace)">
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
-    command="load" />
+      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
+      command="load" />
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_matching_variables.yaml"
-    command="load" />
+      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_matching_variables.yaml"
+      command="load" />
 
-  </node>
+    </node>
 
-  <!-- ====================== Thermal Cropper node ========================= -->
-  <node
-    name="thermal_cropper_node"
-    type="thermal_cropper_node"
-    pkg="pandora_vision_hole"
-    respawn="False"
-    output="$(arg output)"
-    ns="$(arg namespace)">
+    <!-- ====================== Thermal Cropper node ======================= -->
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
-    command="load" />
+    <node
+      name="thermal_cropper_node"
+      type="thermal_cropper_node"
+      pkg="pandora_vision_hole"
+      respawn="False"
+      output="$(arg output)"
+      ns="$(arg namespace)">
 
-  </node>
+      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
+      command="load" />
+
+    </node>
+  </group>
 
   <!-- ========================= Hole Fusion node ========================== -->
 

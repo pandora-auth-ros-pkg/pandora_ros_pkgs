@@ -35,8 +35,8 @@
  * Author: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
-#ifndef RGB_NODE_HOLE_DETECTOR_H
-#define RGB_NODE_HOLE_DETECTOR_H
+#ifndef PANDORA_VISION_HOLE_RGB_NODE_HOLE_DETECTOR_H
+#define PANDORA_VISION_HOLE_RGB_NODE_HOLE_DETECTOR_H
 
 #define SHOW_DEBUG_IMAGE
 
@@ -58,10 +58,8 @@ namespace pandora_vision
   class HoleDetector
   {
     public:
-
       /**
         @brief Finds holes, provided a RGB image in CV_8UC3 format.
-
         First, the edges of the RGB image are detected.
         Then, keypoints of blobs are detected in the above image.
         Finally, the potential holes' outline is found, along with the bounding
@@ -74,9 +72,8 @@ namespace pandora_vision
        **/
       static HolesConveyor findHoles(const cv::Mat& rgbImage,
         const std::vector<cv::MatND>& histogram);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // RGB_NODE_HOLE_DETECTOR_H
+#endif  // PANDORA_VISION_HOLE_RGB_NODE_HOLE_DETECTOR_H

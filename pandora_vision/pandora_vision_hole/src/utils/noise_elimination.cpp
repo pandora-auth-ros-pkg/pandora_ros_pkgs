@@ -69,15 +69,15 @@ namespace pandora_vision
 
     bool finished = false;
 
-    while(!finished)
+    while (!finished)
     {
       finished = true;
 
-      for(unsigned int i = 1; i < outImage->rows - 1; i++)
+      for (unsigned int i = 1; i < outImage->rows - 1; i++)
       {
-        for(unsigned int j = 1; j < outImage->cols - 1; j++)
+        for (unsigned int j = 1; j < outImage->cols - 1; j++)
         {
-          if(outImage->at<float>(i, j) == 0.0)  // Found black
+          if (outImage->at<float>(i, j) == 0.0)  // Found black
           {
             brushfireNearStep(outImage, i * outImage->cols + j);
             finished = false;
@@ -85,7 +85,7 @@ namespace pandora_vision
           }
         }
 
-        if(!finished)
+        if (!finished)
         {
           break;
         }
@@ -130,13 +130,13 @@ namespace pandora_vision
     current.push_back(x * image->cols + y);
     visited.insert(x * image->cols + y);
 
-    while(current.size() != 0)
+    while (current.size() != 0)
     {
-      for(int i = 0; i < current.size(); i++)
+      for (int i = 0; i < current.size(); i++)
       {
-        for(int m = -1 ; m < 2 ; m++)
+        for (int m = -1 ; m < 2 ; m++)
         {
-          for(int n = -1 ; n < 2 ; n++)
+          for (int n = -1 ; n < 2 ; n++)
           {
             x = current[i] / image->cols + m;
             y = current[i] % image->cols + n;
@@ -149,7 +149,7 @@ namespace pandora_vision
               continue;
             }
 
-            if((image->at<float>(x, y) == 0.0) &&
+            if ((image->at<float>(x, y) == 0.0) &&
               visited.find(x * image->cols + y) == visited.end())
             {
               next.push_back(x * image->cols + y);
@@ -170,7 +170,7 @@ namespace pandora_vision
     float val = 0.0;
     const float noise = 0.0;
 
-    for(std::set<int>::iterator it = visited.begin();
+    for (std::set<int>::iterator it = visited.begin();
       it != visited.end(); it++)
     {
       x = *it / image->cols;
@@ -193,7 +193,7 @@ namespace pandora_vision
           if (m != 0 && n != 0)
           {
             val = image->at<float>(x + m, y + n);
-            if(val < lower && val != noise)
+            if (val < lower && val != noise)
             {
               lower = val;
             }
@@ -208,7 +208,7 @@ namespace pandora_vision
       // Now that the lowest value of non-zero neighboring pixels of
       // this black concentration of pixels has been found,
       // assign it to the whole of the concentration
-      for(std::set<int>::iterator it = visited.begin();
+      for (std::set<int>::iterator it = visited.begin();
         it != visited.end(); it++)
       {
         image->at<float>(*it / image->cols, *it % image->cols) = lower;
@@ -247,12 +247,12 @@ namespace pandora_vision
     // The mean distance of the non-noisy points from the depth sensor
     float mean = 0.0;
 
-    for(unsigned int i = 0 ; i < image.rows ; i++)
+    for (unsigned int i = 0 ; i < image.rows ; i++)
     {
-      for(unsigned int j = 0 ; j < image.cols ; j++)
+      for (unsigned int j = 0 ; j < image.cols ; j++)
       {
         float d = image.at<float>(i, j);
-        if(d == 0.0)
+        if (d == 0.0)
         {
           blacks++;
         }
@@ -268,11 +268,11 @@ namespace pandora_vision
     // The percentage of noise in the depth image
     float bper = static_cast<float>(blacks) / (image.rows * image.cols);
 
-    if(bper > 0.7)  // Choose close
+    if (bper > 0.7)  // Choose close
     {
       Parameters::Depth::interpolation_method = 2;
     }
-    else if(mean < 0.7)
+    else if (mean < 0.7)
     {
       Parameters::Depth::interpolation_method = 1;
     }
@@ -557,19 +557,19 @@ namespace pandora_vision
 
     chooseInterpolationMethod(inImage);
 
-    switch(Parameters::Depth::interpolation_method)
+    switch (Parameters::Depth::interpolation_method)
     {
-      case 0: // Thinning-like interpolation
+      case 0:  // Thinning-like interpolation
         {
           interpolation(inImage, outImage);
           break;
         }
-      case 1: // Produce the near brushfire image
+      case 1:  // Produce the near brushfire image
         {
           brushfireNear(inImage, outImage);
           break;
         }
-      case 2: // Produce the white noise image
+      case 2:  // Produce the white noise image
         {
           transformNoiseToWhite(inImage, outImage);
           break;
@@ -598,11 +598,11 @@ namespace pandora_vision
 
     inImage.copyTo(*outImage);
 
-    for(unsigned int i = 0; i < inImage.rows; i++)
+    for (unsigned int i = 0; i < inImage.rows; i++)
     {
-      for(unsigned int j = 0; j < inImage.cols; j++)
+      for (unsigned int j = 0; j < inImage.cols; j++)
       {
-        if(inImage.at<float>(i, j) == 0.0)
+        if (inImage.at<float>(i, j) == 0.0)
         {
           outImage->at<float>(i, j) = 4.0;
         }
@@ -614,4 +614,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

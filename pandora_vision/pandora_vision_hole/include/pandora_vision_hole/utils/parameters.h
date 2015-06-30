@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_PARAMETERS_H
-#define UTILS_PARAMETERS_H
+#ifndef PANDORA_VISION_HOLE_UTILS_PARAMETERS_H
+#define PANDORA_VISION_HOLE_UTILS_PARAMETERS_H
 
 #include "utils/defines.h"
 #include "utils/parameters.h"
@@ -63,8 +63,8 @@ namespace pandora_vision
     hole detector package
    **/
   struct Parameters
-  {       
-    //! Blob detection - specific parameters
+  {
+    //  Blob detection - specific parameters
     struct Blob
     {
       static int min_threshold;
@@ -83,36 +83,36 @@ namespace pandora_vision
 
 
 
-    //! Debug-specific parameters
+    //  Debug-specific parameters
     struct Debug
     {
-      //publish the enhanced Images
+      //  publish the enhanced Images
       static bool publish_enhanced_Images;
 
-      // Show the depth image that arrives in the depth node
+      //  Show the depth image that arrives in the depth node
       static bool show_depth_image;
 
-      //Show the thermal image that arrives in the thermal node
+      //  Show the thermal image that arrives in the thermal node
       static bool show_thermal_image;
 
-      // Show the rgb image that arrives in the rgb node
+      //  Show the rgb image that arrives in the rgb node
       static bool show_rgb_image;
 
-      // Show the holes that each of the depth and RGB nodes transmit to the
-      // hole fusion node, on top of their respective origin images
+      //  Show the holes that each of the depth and RGB nodes transmit to the
+      //  hole fusion node, on top of their respective origin images
       static bool show_respective_holes;
 
-      // Show all valid holes, from either the Depth or RGB source, or
-      // the merges between them
+      //  Show all valid holes, from either the Depth or RGB source, or
+      //  the merges between them
       static bool show_valid_holes;
 
-      // The product of this package: unique, valid holes
+      //  The product of this package: unique, valid holes
       static bool show_final_holes;
 
-      // In the terminal's window, show the probabilities of candidate holes
+      //  In the terminal's window, show the probabilities of candidate holes
       static bool show_probabilities;
 
-      // Show the texture's watersheded backprojection
+      //  Show the texture's watersheded backprojection
       static bool show_texture;
 
       static bool show_find_holes;
@@ -140,134 +140,143 @@ namespace pandora_vision
 
 
 
-    //! Parameters specific to the Depth node
+    //  Parameters specific to the Depth node
     struct Depth
     {
-      // The interpolation method for noise removal
-      // 0 for averaging the pixel's neighbor values
-      // 1 for brushfire near
-      // 2 for brushfire far
+      //  The interpolation method for noise removal
+      //  0 for averaging the pixel's neighbor values
+      //  1 for brushfire near
+      //  2 for brushfire far
       static int interpolation_method;
     };
 
-    //! Parameters specific to the Thermal node
+    //  Parameters specific to the Thermal node
     struct Thermal
     {
-      // The probability extraction method
-      // 0 for Gaussian function
-      // 1 for Logistic function
+      // The thermal detection method
+      // If set to 0 process the binary image acquired from temperatures MultiArray
+      // If set to 1 process the sensor/Image from thermal sensor
+      static int detection_method;
+
+      //  The probability extraction method
+      //  0 for Gaussian function
+      //  1 for Logistic function
       static int probability_method;
 
-      // Gausian variables
+      //  Gausian variables
       static float optimal_temperature;
       static float tolerance;
 
-      // Logistic variables
+      //  Logistic variables
       static float low_acceptable_temperature;
       static float high_acceptable_temperature;
 
       static float left_tolerance;
       static float right_tolerance;
+
+      //  Low and High acceptable temperatures for thresholding
+      static float low_temperature;
+      static float high_temperature;
     };
 
-    //! Thermal image parameters
+    //  Thermal image parameters
     struct ThermalImage
     {
-      // Thermal image width and height
+      //  Thermal image width and height
       static int WIDTH;
       static int HEIGHT;
     };
 
-    //! Edge detection specific parameters
+    //  Edge detection specific parameters
     struct Edge
     {
-      // canny parameters
+      //  canny parameters
       static int canny_ratio;
       static int canny_kernel_size;
       static int canny_low_threshold;
       static int canny_blur_noise_kernel_size;
 
-      // The opencv edge detection method:
-      // 0 for the Canny edge detector
-      // 1 for the Scharr edge detector
-      // 2 for the Sobel edge detector
-      // 3 for the Laplacian edge detector
-      // 4 for mixed Scharr / Sobel edge detection
+      //  The opencv edge detection method:
+      //  0 for the Canny edge detector
+      //  1 for the Scharr edge detector
+      //  2 for the Sobel edge detector
+      //  3 for the Laplacian edge detector
+      //  4 for mixed Scharr / Sobel edge detection
       static int edge_detection_method;
 
-      // Threshold parameters
+      //  Threshold parameters
       static int denoised_edges_threshold;
 
-      // When mixed edge detection is selected, this toggle switch
-      // is needed in order to shift execution from one edge detector
-      // to the other.
-      // 1 for the Scharr edge detector,
-      // 2 for the Sobel edge detector
+      //  When mixed edge detection is selected, this toggle switch
+      //  is needed in order to shift execution from one edge detector
+      //  to the other.
+      //  1 for the Scharr edge detector,
+      //  2 for the Sobel edge detector
       static int mixed_edges_toggle_switch;
     };
 
 
 
-    //! Parameters specific to the execution of filters
+    //  Parameters specific to the execution of filters
     struct Filters
     {
-      //! Parameters specific to the execution of the
-      //! DepthDiff filter
+      //  Parameters specific to the execution of the
+      //  DepthDiff filter
       struct DepthDiff
       {
         static int priority;
         static float threshold;
 
-        // 0 for binary probability assignment on positive depth difference
-        // 1 for gaussian probability assignment on positive depth difference
+        //  0 for binary probability assignment on positive depth difference
+        //  1 for gaussian probability assignment on positive depth difference
         static int probability_assignment_method;
 
-        // The mean stardard deviation for the normal distribution
-        // incorporated in the depth diff filter.
+        //  The mean stardard deviation for the normal distribution
+        //  incorporated in the depth diff filter.
         static float gaussian_mean;
         static float gaussian_stddev;
 
-        // Min difference in depth between the inside and the outside of a hole
+        //  Min difference in depth between the inside and the outside of a hole
         static float min_depth_cutoff;
 
-        // Max difference in depth between the inside and the outside of a hole
+        //  Max difference in depth between the inside and the outside of a hole
         static float max_depth_cutoff;
       };
 
-      //! Parameters specific to the execution of the
-      //! DepthArea filter
+      //  Parameters specific to the execution of the
+      //  DepthArea filter
       struct DepthArea
       {
         static int priority;
         static float threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! DepthHomogeneity filter
+      //  Parameters specific to the execution of the
+      //  DepthHomogeneity filter
       struct DepthHomogeneity
       {
         static int priority;
         static float threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! RectanglePlaneConstitution filter
+      //  Parameters specific to the execution of the
+      //  RectanglePlaneConstitution filter
       struct RectanglePlaneConstitution
       {
         static int priority;
         static float threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! IntermediatePointsPlaneConstitution filter
+      //  Parameters specific to the execution of the
+      //  IntermediatePointsPlaneConstitution filter
       struct IntermediatePointsPlaneConstitution
       {
         static int priority;
         static float threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! ColourHomogeneity filter
+      //  Parameters specific to the execution of the
+      //  ColourHomogeneity filter
       struct ColourHomogeneity
       {
         static int rgbd_priority;
@@ -277,8 +286,8 @@ namespace pandora_vision
         static float rgb_threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! LuminosityDiff filter
+      //  Parameters specific to the execution of the
+      //  LuminosityDiff filter
       struct LuminosityDiff
       {
         static int rgbd_priority;
@@ -288,8 +297,8 @@ namespace pandora_vision
         static float rgb_threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! TextureDiff filter
+      //  Parameters specific to the execution of the
+      //  TextureDiff filter
       struct TextureDiff
       {
         static int rgbd_priority;
@@ -298,15 +307,15 @@ namespace pandora_vision
         static float rgbd_threshold;
         static float rgb_threshold;
 
-        // The threshold for texture matching
+        //  The threshold for texture matching
         static float match_texture_threshold;
 
-        // The threshold for texture mismatching
+        //  The threshold for texture mismatching
         static float mismatch_texture_threshold;
       };
 
-      //! Parameters specific to the execution of the
-      //! TextureBackprojection filter
+      //  Parameters specific to the execution of the
+      //  TextureBackprojection filter
       struct TextureBackprojection
       {
         static int rgbd_priority;
@@ -315,12 +324,11 @@ namespace pandora_vision
         static float rgbd_threshold;
         static float rgb_threshold;
       };
-
     };
 
 
 
-    //! Histogram related parameters
+    //  Histogram related parameters
     struct Histogram
     {
       static int number_of_hue_bins;
@@ -331,24 +339,24 @@ namespace pandora_vision
 
 
 
-    //! Parameters specific to the Hole Fusion node
+    //  Parameters specific to the Hole Fusion node
     struct HoleFusion
     {
-      //! Parameters specific to the validation of candidate holes
+      //  Parameters specific to the validation of candidate holes
       struct Validation
       {
-        // The holes' validation process identifier
+        //  The holes' validation process identifier
         static int validation_process;
 
-        // Normal : when depth analysis is applicable
+        //  Normal : when depth analysis is applicable
         static float rgbd_validity_threshold;
 
-        // Urgent : when depth analysis is not applicable, we can only rely
-        // on RGB analysis
+        //  Urgent : when depth analysis is not applicable, we can only rely
+        //  on RGB analysis
         static float rgb_validity_threshold;
       };
 
-      //! Parameters specific to detection of planes
+      //  Parameters specific to detection of planes
       struct Planes
       {
         static float filter_leaf_size;
@@ -357,109 +365,108 @@ namespace pandora_vision
         static double point_to_plane_distance_threshold;
       };
 
-      //! Parameters specific to the merging of holes
+      //  Parameters specific to the merging of holes
       struct Merger
       {
-        // Option to enable or disable the merging of holes
+        //  Option to enable or disable the merging of holes
         static bool merge_holes;
 
-        // Holes connection - merger
+        //  Holes connection - merger
         static float connect_holes_min_distance;
         static float connect_holes_max_distance;
 
-        // Merger parameters
+        //  Merger parameters
         static float depth_diff_threshold;
         static float depth_area_threshold;
       };
 
-      // The inflation size of holes' bounding rectangles.
+      //  The inflation size of holes' bounding rectangles.
       static int rectangle_inflation_size;
     };
 
 
 
-    //! Image representation specific parameters
+    //  Image representation specific parameters
     struct Image
     {
-      // The depth sensor's horizontal field of view
+      //  The depth sensor's horizontal field of view
       static float horizontal_field_of_view;
 
-      // The depth sensor's vertical field of view
+      //  The depth sensor's vertical field of view
       static float vertical_field_of_view;
 
-      // Fallback values. See the input point cloud callback of the
-      // synchronizer node
+      //  Fallback values. See the input point cloud callback of the
+      //  synchronizer node
       static int HEIGHT;
       static int WIDTH;
 
-      // Depth and RGB images' representation method.
-      // 0 if image used is used as obtained from the image sensor
-      // 1 through wavelet analysis
+      //  Depth and RGB images' representation method.
+      //  0 if image used is used as obtained from the image sensor
+      //  1 through wavelet analysis
       static int image_representation_method;
 
-      // Method to scale the CV_32F images to CV_8UC1
+      //  Method to scale the CV_32F images to CV_8UC1
       static int scale_method;
 
-      // Term criteria for segmentation purposes
+      //  Term criteria for segmentation purposes
       static int term_criteria_max_iterations;
       static double term_criteria_max_epsilon;
     };
 
 
 
-    //! Outline discovery specific parameters
+    //  Outline discovery specific parameters
     struct Outline
     {
-      // The detection method used to obtain the outline of a blob
-      // 0 for detecting by means of brushfire
-      // 1 for detecting by means of raycasting
+      //  The detection method used to obtain the outline of a blob
+      //  0 for detecting by means of brushfire
+      //  1 for detecting by means of raycasting
       static int outline_detection_method;
 
-      // When using raycast instead of brushfire to find the (approximate here)
-      // outline of blobs, raycast_keypoint_partitions dictates the number of
-      // rays, or equivalently, the number of partitions in which the blob is
-      // partitioned in search of the blob's borders
+      //  When using raycast instead of brushfire to find the (approximate here)
+      //  outline of blobs, raycast_keypoint_partitions dictates the number of
+      //  rays, or equivalently, the number of partitions in which the blob is
+      //  partitioned in search of the blob's borders
       static int raycast_keypoint_partitions;
 
-      // Loose ends connection parameters
+      //  Loose ends connection parameters
       static int AB_to_MO_ratio;
       static int minimum_curve_points;
     };
 
 
 
-    //! Parameters specific to the RGB node
+    //  Parameters specific to the RGB node
     struct Rgb
     {
-      // Selects the method for extracting a RGB image's edges.
-      // Choices are via segmentation and via backprojection
+      //  Selects the method for extracting a RGB image's edges.
+      //  Choices are via segmentation and via backprojection
       static int edges_extraction_method;
 
-      // The threshold applied to the backprojection of the RGB image
-      // captured by the image sensor
+      //  The threshold applied to the backprojection of the RGB image
+      //  captured by the image sensor
       static int backprojection_threshold;
 
-      // Parameters specific to the pyrMeanShiftFiltering method
+      //  Parameters specific to the pyrMeanShiftFiltering method
       static int spatial_window_radius;
       static int color_window_radius;
       static int maximum_level_pyramid_segmentation;
 
-      // True to posterize the product of the segmentation
+      //  True to posterize the product of the segmentation
       static bool posterize_after_segmentation;
 
-      // FloodFill options regarding minimum and maximum colour difference
+      //  FloodFill options regarding minimum and maximum colour difference
       static int floodfill_lower_colour_difference;
       static int floodfill_upper_colour_difference;
 
-      // Watershed-specific parameters
+      //  Watershed-specific parameters
       static int watershed_foreground_dilation_factor;
       static int watershed_foreground_erosion_factor;
       static int watershed_background_dilation_factor;
       static int watershed_background_erosion_factor;
     };
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_PARAMETERS_H
+#endif  // PANDORA_VISION_HOLE_UTILS_PARAMETERS_H

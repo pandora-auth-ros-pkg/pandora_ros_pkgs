@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef HOLE_FUSION_NODE_HOLE_VALIDATION_H
-#define HOLE_FUSION_NODE_HOLE_VALIDATION_H
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H
 
 #include "utils/defines.h"
 #include "utils/holes_conveyor.h"
@@ -61,7 +61,6 @@ namespace pandora_vision
   class HoleValidation
   {
     public:
-
       /**
         @brief Validates candidate holes, meaning that having a two dimensional
         array that is the product of a series of validity ascertainers that
@@ -156,9 +155,8 @@ namespace pandora_vision
       static std::map<int, float> validateHolesViaThresholding(
         const std::vector<std::vector<float> >& probabilitiesVector2D,
         const int& filteringMode);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_HOLE_VALIDATION_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H

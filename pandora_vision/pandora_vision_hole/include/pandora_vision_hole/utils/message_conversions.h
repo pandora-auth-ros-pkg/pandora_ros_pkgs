@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_MESSAGE_CONVERSIONS_H
-#define UTILS_MESSAGE_CONVERSIONS_H
+#ifndef PANDORA_VISION_HOLE_UTILS_MESSAGE_CONVERSIONS_H
+#define PANDORA_VISION_HOLE_UTILS_MESSAGE_CONVERSIONS_H
 
 #include "utils/defines.h"
 #include "utils/outline_discovery.h"
@@ -58,7 +58,6 @@ namespace pandora_vision
   class MessageConversions
   {
     public:
-
       /**
         @brief Converts a cv::Mat image into a sensor_msgs::Image message
         @param[in] image [const cv::Mat&] The image
@@ -208,6 +207,6 @@ namespace pandora_vision
         const std_msgs::Float32MultiArray& inArray);
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_MESSAGE_CONVERSIONS_H
+#endif  // PANDORA_VISION_HOLE_UTILS_MESSAGE_CONVERSIONS_H

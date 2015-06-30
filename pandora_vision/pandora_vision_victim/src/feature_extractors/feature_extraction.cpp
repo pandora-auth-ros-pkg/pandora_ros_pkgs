@@ -50,7 +50,7 @@ namespace pandora_vision
   /**
    * @brief Default Constructor
    */
-  FeatureExtraction::FeatureExtraction()
+  FeatureExtraction::FeatureExtraction(const std::string& classifierType)
   {
     if (!featureVector_.empty())
       featureVector_.clear();
@@ -88,7 +88,7 @@ namespace pandora_vision
     {
       cv::Mat descriptors;
       featureFactoryPtrMap_["sift"]->extractFeatures(inImage, &descriptors);
-      std::cout << "SIFT descriptors:" << descriptors.rows << std::endl;
+      std::cout << "SIFT descriptors : " << descriptors.rows << std::endl;
       if (!descriptors.empty())
         bowTrainerPtr_->addDescriptors(descriptors);
     }
@@ -264,8 +264,19 @@ namespace pandora_vision
       }
     }
 
-    std::cout << "Creating visual Vocabulary" << std::endl;
+
+    std::cout << "Creating Visual Vocabulary" << std::endl;
+
+
+    struct timeval startwtime, endwtime;
+    gettimeofday(&startwtime , NULL);
     bowTrainerPtr_->createVocabulary();
+    gettimeofday(&endwtime , NULL);
+    double vocCreationTime = static_cast<double>((endwtime.tv_usec -
+          startwtime.tv_usec) / 1.0e6
+        + endwtime.tv_sec - startwtime.tv_sec);
+    std::cout << "The vocabulary was created after " << vocCreationTime << " seconds" << std::endl;
+
     return true;
   }
 
@@ -291,6 +302,11 @@ namespace pandora_vision
   cv::Mat FeatureExtraction::getBagOfWordsVocabulary() const
   {
     return bowTrainerPtr_->getVocabulary();
+  }
+
+  int FeatureExtraction::getFeatureNumber()
+  {
+    return numFeatures_;
   }
 
   /**

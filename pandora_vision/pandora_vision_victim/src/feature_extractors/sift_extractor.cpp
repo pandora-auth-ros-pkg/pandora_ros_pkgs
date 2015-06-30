@@ -88,11 +88,11 @@ namespace pandora_vision
     std::vector<cv::KeyPoint> keyPoints;
     featureDetector_->detect(inImage, keyPoints);
 
-    //cv::Mat imageWithKeyPoints;
-    //cv::drawKeypoints(inImage, keyPoints, imageWithKeyPoints, cv::Scalar::all(-1),
-        //cv::DrawMatchesFlags::DEFAULT);
-    //cv::imshow("Image Keypoints", imageWithKeyPoints);
-    //cvWaitKey(0);
+    // cv::Mat imageWithKeyPoints;
+    // cv::drawKeypoints(inImage, keyPoints, imageWithKeyPoints, cv::Scalar::all(-1),
+        // cv::DrawMatchesFlags::DEFAULT);
+    // cv::imshow("Image Keypoints", imageWithKeyPoints);
+    // cvWaitKey(0);
     descriptorExtractor_->compute(inImage, keyPoints, *descriptors);
   }
 }  // namespace pandora_vision

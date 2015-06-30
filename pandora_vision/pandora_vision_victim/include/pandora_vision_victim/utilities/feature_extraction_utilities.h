@@ -111,15 +111,6 @@ namespace pandora_vision
       void performZScoreNormalization(cv::Mat* image,
           const std::vector<double>& meanVec,
           const std::vector<double>& stdDevVec);
-
-      /**
-       * @brief This function performs PCA analysis to reduce the feature
-       * dimensions.
-       * @param featuresMat [cv::Mat*] Feature matrix to be used in the PCA
-       * analysis.
-       * @return void
-       */
-      cv::Mat performPcaAnalysis(const cv::Mat& featuresMat, int nEigens);
   };
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_FEATURE_EXTRACTION_UTILITIES_H

@@ -32,13 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Angelos Triantafyllidis<aggelostriadafillidis@gmail.com>, 
+ * Authors: Angelos Triantafyllidis<aggelostriadafillidis@gmail.com>,
  * Manos Tsardoulias
  *********************************************************************/
 
 
-#ifndef UTILS_IMAGE_MATCHING_H
-#define UTILS_IMAGE_MATCHING_H
+#ifndef PANDORA_VISION_HOLE_UTILS_IMAGE_MATCHING_H
+#define PANDORA_VISION_HOLE_UTILS_IMAGE_MATCHING_H
 
 #include "utils/holes_conveyor.h"
 #include "utils/parameters.h"
@@ -58,13 +58,12 @@ namespace pandora_vision
   class ImageMatching
   {
     public:
-
       /**
         @brief Converts Conveyors which represent each hole and include all
         necessary information about it to match with rgb and depth images.
-        After transformation checks if the point of interest is outside of rgb 
+        After transformation checks if the point of interest is outside of rgb
         image borders. If so that hole will be rejected.
-        @param[out] conveyor [HolesConveyor* conveyor] 
+        @param[out] conveyor [HolesConveyor* conveyor]
         The input conveyor to be converted and sent back as output.
         @param[in] x_th [double] The x coordinate of thermal image in rgb image
         @param[in] y_th [double] The y coordinate of thermal image in rgb image
@@ -72,7 +71,7 @@ namespace pandora_vision
         Found as matchedthermal_x/rgb_x
         @param[in] c_y [double] The c factor on y-axis.
         Found as matchedthermal_y/rgb_y
-        @param[in] angle [double] The rotation of thermal image in rads. 
+        @param[in] angle [double] The rotation of thermal image in rads.
         Clockwise is positive. Point of reference is he center of thermal image.
         @return void
        **/
@@ -80,9 +79,9 @@ namespace pandora_vision
         double y_th, double c_x, double c_y, double angle);
 
       /**
-        @brief The function that is responsible for the linear and rotational 
+        @brief The function that is responsible for the linear and rotational
         transformation of the points given as arguments.
-        @param[in] point [const cv::Point2f&]. 
+        @param[in] point [const cv::Point2f&].
         The input point coordinates to be converted.
         @return float. The final point in Rgb or Depth image.
         @param[in] xInit [double] The initial x coordinate of thermal image in rgb image
@@ -100,7 +99,7 @@ namespace pandora_vision
         @brief Set up the variables needed to convert the points.Takes variables
         from yaml file so that if one (or both) camera's position is changed
         on the robot they can be changed too.
-        @param[in] nh [ros::Nodehandle&] The nodehandle of the class that
+        @param[in] nh [const ros::Nodehandle&] The nodehandle of the class that
         calls this function.
         @param[in] x_th [double] The x coordinate of thermal image in rgb image
         @param[in] y_th [double] The y coordinate of thermal image in rgb image
@@ -108,19 +107,19 @@ namespace pandora_vision
         Found as matchedthermal_x/rgb_x
         @param[in] c_y [double] The c factor on y-axis.
         Found as matchedthermal_y/rgb_y
-        @param[out] angle [double] The angle in rads that thermal image been 
+        @param[out] angle [double] The angle in rads that thermal image been
         rotated.Point of reference is the center of thermal image.
         @return void
         **/
-      static void variableSetUp(ros::NodeHandle& nh, double* x_th, double* y_th,
-        double* c_x, double* c_y, double* angle);
+      static void variableSetUp(const ros::NodeHandle& nh, double* x_th,
+        double* y_th, double* c_x, double* c_y, double* angle);
 
       /**
-        @brief When the outline points of the thermal image are matched on 
+        @brief When the outline points of the thermal image are matched on
         the rgb image they are not connected anymore. So this function connects
-        all the matched outline points and extracts the new matched 
+        all the matched outline points and extracts the new matched
         outline vector.
-        @param[out] conveyor [const HolesConveyor&]. The final struct with 
+        @param[out] conveyor [const HolesConveyor&]. The final struct with
         the connected points.
         @return void
        **/
@@ -128,9 +127,9 @@ namespace pandora_vision
 
       /**
         @brief The vector of the outline points must have the points in
-        order so they can be connected in the next step. The order is produced 
-        based on the distance between them. For that reason checks one 
-        point with all the others. In the next loop that point is beeing 
+        order so they can be connected in the next step. The order is produced
+        based on the distance between them. For that reason checks one
+        point with all the others. In the next loop that point is beeing
         taken out of consideration.
         @param[out] conveyor [HolesConveyor*].
         The new conveyor with the points in order.
@@ -139,6 +138,6 @@ namespace pandora_vision
       static void outlinePointsInOrder(HolesConveyor* conveyor);
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_IMAGE_MATCHING_H
+#endif  // PANDORA_VISION_HOLE_UTILS_IMAGE_MATCHING_H

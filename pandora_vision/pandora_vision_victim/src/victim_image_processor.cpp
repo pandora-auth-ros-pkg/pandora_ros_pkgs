@@ -37,12 +37,16 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+#include <vector>
+
 #include "pandora_vision_victim/victim_image_processor.h"
 
 namespace pandora_vision
 {
-  VictimImageProcessor::VictimImageProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : sensor_processor::Processor<EnhancedImageStamped, 
+  VictimImageProcessor::VictimImageProcessor(const std::string& ns,
+    sensor_processor::Handler* handler)
+    : sensor_processor::Processor<EnhancedImageStamped,
       POIsStamped>(ns, handler)
   {
     params_.configVictim(*this->accessPublicNh());
@@ -50,15 +54,17 @@ namespace pandora_vision
     _debugVictimsPublisher = image_transport::ImageTransport(
       *this->accessProcessorNh()).advertise(params_.victimDebugImg, 1, true);
 
-    rgbSvmValidatorPtr_.reset(new RgbSvmValidator(params_));
-    depthSvmValidatorPtr_.reset(new DepthSvmValidator(params_));
+    rgbSvmValidatorPtr_.reset(new SvmValidator(*this->accessPublicNh(), "rgb", "svm"));
+    depthSvmValidatorPtr_.reset(new SvmValidator(*this->accessPublicNh(), "depth", "svm"));
 
     ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
 
-  VictimImageProcessor::VictimImageProcessor() : sensor_processor::Processor<EnhancedImageStamped, 
-    POIsStamped>(){}
+  VictimImageProcessor::VictimImageProcessor()
+    : sensor_processor::Processor<EnhancedImageStamped, POIsStamped>()
+  {
+  }
 
   VictimImageProcessor::~VictimImageProcessor()
   {
@@ -79,23 +85,23 @@ namespace pandora_vision
       depth_svm_p.clear();
     }
 
-    bool depthEnable = input->getDepth();  
+    bool depthEnable = input->getDepth();
 
     std::vector<VictimPOIPtr> final_victims = victimFusion(input, depthEnable);
 
-    //!< Message alert creation
+    /// Message alert creation
     for (int i = 0;  i < final_victims.size() ; i++)
     {
       if (final_victims[i]->getClassLabel() == 1)
       {
-        //!< Debug purposes
+        /// Debug purposes
         if (params_.debug_img || params_.debug_img_publisher)
         {
           cv::Point victimPOI = final_victims[i]->getPoint();
           victimPOI.x -= final_victims[i]->getWidth() / 2;
           victimPOI.y -= final_victims[i]->getHeight() / 2;
           cv::KeyPoint kp(final_victims[i]->getPoint(), 10);
-          cv::Rect re(victimPOI, cv::Size(final_victims[i]->getWidth(), 
+          cv::Rect re(victimPOI, cv::Size(final_victims[i]->getWidth(),
             final_victims[i]->getHeight()));
 
           switch (final_victims[i]->getSource())
@@ -186,7 +192,7 @@ namespace pandora_vision
     return final_victims;
   }
 
-  std::vector<VictimPOIPtr> VictimImageProcessor::victimFusion(const EnhancedImageStampedConstPtr& input, 
+  std::vector<VictimPOIPtr> VictimImageProcessor::victimFusion(const EnhancedImageStampedConstPtr& input,
     bool depthEnable)
   {
     std::vector<VictimPOIPtr> finalProbability;
@@ -195,7 +201,7 @@ namespace pandora_vision
     VictimPOIPtr depthSvmProbability(new VictimPOI);
     cv::Point p;
 
-    //VictimPOIPtr temp(new VictimPOI);
+    // VictimPOIPtr temp(new VictimPOI);
     float probability, classLabel;
     p.x = input->getRgbImage().rows/2;
     p.y = input->getRgbImage().cols/2;
@@ -209,7 +215,7 @@ namespace pandora_vision
     rgbSvmProbability->setSource(RGB_SVM);
 
     if (depthEnable)
-    { 
+    {
       p.x = input->getDepthImage().rows/2;
       p.y = input->getDepthImage().cols/2;
       depthSvmValidatorPtr_->calculatePredictionProbability(input->getDepthImage(), &classLabel, &probability);
@@ -223,17 +229,16 @@ namespace pandora_vision
     }
 
     finalProbability.push_back(rgbSvmProbability);
-    if(depthEnable)
+    if (depthEnable)
     {
       finalProbability.push_back(depthSvmProbability);
     }
 
-    //......
-    
+    // ......
     return finalProbability;  // vector??
   }
 
-  bool VictimImageProcessor::process(const EnhancedImageStampedConstPtr& input, 
+  bool VictimImageProcessor::process(const EnhancedImageStampedConstPtr& input,
     const POIsStampedPtr& output)
   {
     output->header = input->getHeader();

@@ -172,7 +172,7 @@ add_dependencies(${PROJECT_NAME}_node
 )
 
 ############### Download necessary data to detect patterns ##################
-if(DOWNLOAD_DATA or FUNCTIONAL_TEST or BENCHMARK)
+if(DOWNLOAD_DATA OR FUNCTIONAL_TEST OR BENCHMARK)
   download_extra_data(${PROJECT_NAME}_download_training_results
                       EXTRA_FILES data/extra_files.yaml)
 endif()
@@ -216,14 +216,14 @@ endif()
 ############################## Node code Lint ##############################
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  src/**/*.cpp
-  include/**/*.h
+  src/*.cpp
+  include/*.h
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST_SRC
   RELATIVE ${PROJECT_SOURCE_DIR}
-  test/**/*.cpp
+  test/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_TEST_SRC})
 

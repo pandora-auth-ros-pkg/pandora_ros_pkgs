@@ -37,8 +37,8 @@
 *   Marios Protopapas <protopapas_marios@hotmail.com>
 *********************************************************************/
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <boost/shared_ptr.hpp>
 
@@ -59,19 +59,27 @@ namespace pandora_vision
   /**
    * @brief Default Constructor
    */
-  RgbFeatureExtraction::RgbFeatureExtraction() : FeatureExtraction()
+  RgbFeatureExtraction::RgbFeatureExtraction(const std::string& classifierType) : FeatureExtraction(classifierType)
   {
-    std::string paramFile = packagePath_ + "/config/rgb_svm_training_params.yaml";
+    std::string paramFile = packagePath_ + "/config/rgb_victim_training_params.yaml";
     cv::FileStorage fs(paramFile, cv::FileStorage::READ);
     fs.open(paramFile, cv::FileStorage::READ);
+    if (!fs.isOpened())
+    {
+      std::cout << "Could not open " << paramFile << std::endl;
+      // TO DO(Vassilis Choutas) : Change to ROS_BREAK().
+      exit(-1);
+    }
+    cv::FileNode classifierNode = fs[classifierType];
 
-    std::string channelsStatisticsFeatures = fs["extract_channels_statistics_features"];
-    std::string edgeOrientationFeatures = fs["extract_edge_orientation_features"];
-    std::string haralickFeatures = fs["extract_haralick_features"];
-    std::string siftFeatures = fs["extract_sift_features"];
-    std::string hogFeatures = fs["extract_hog_features"];
-    std::string histogramFeatures = fs["extract_color_histograms"];
+    std::string channelsStatisticsFeatures = classifierNode["extract_channels_statistics_features"];
+    std::string edgeOrientationFeatures = classifierNode["extract_edge_orientation_features"];
+    std::string haralickFeatures = classifierNode["extract_haralick_features"];
+    std::string siftFeatures = classifierNode["extract_sift_features"];
+    std::string hogFeatures = classifierNode["extract_hog_features"];
+    std::string histogramFeatures = classifierNode["extract_color_histograms"];
 
+    numFeatures_ = 0;
     bool extractChannelsStatisticsFeatures =
       channelsStatisticsFeatures.compare("true") == 0;
     bool extractEdgeOrientationFeatures =
@@ -82,18 +90,19 @@ namespace pandora_vision
     bool extractColorHistogramFeatures =
       histogramFeatures.compare("true") == 0;
 
-    std::string viewDescriptor = fs["visualization"];
+    std::string viewDescriptor = classifierNode["visualization"];
     visualization_ = viewDescriptor.compare("true") == 0;
 
-    std::string saveDescriptors = fs["save_descriptors"];
+    std::string saveDescriptors = classifierNode["save_descriptors"];
     saveDescriptors_ = saveDescriptors.compare("true") == 0;
 
-    std::string loadDescriptors = fs["load_descriptors"];
+    std::string loadDescriptors = classifierNode["load_descriptors"];
     loadDescriptors_ = loadDescriptors.compare("true") == 0;
 
-    dictionarySize_ = static_cast<int>(fs["dictionary_size"]);
+    dictionarySize_ = static_cast<int>(classifierNode["dictionary_size"]);
 
     fs.release();
+
 
     chosenFeatureTypesMap_["channels_statistics"] =
         extractChannelsStatisticsFeatures;
@@ -102,7 +111,7 @@ namespace pandora_vision
     chosenFeatureTypesMap_["haralick"] = extractHaralickFeatures;
     chosenFeatureTypesMap_["sift"] = extractSiftFeatures;
     chosenFeatureTypesMap_["hog"] = extractHogFeatures;
-    chosenFeatureTypesMap_["color_histograms"] = extractColorHistogramFeatures; 
+    chosenFeatureTypesMap_["color_histograms"] = extractColorHistogramFeatures;
 
     if (chosenFeatureTypesMap_["sift"] == true)
     {
@@ -127,6 +136,15 @@ namespace pandora_vision
         HistogramExtractor(fs));
       featureFactoryPtrMap_["histogram"] = histPtr;
     }
+
+    if (extractHaralickFeatures)
+      numFeatures_ += 13;
+    if (extractEdgeOrientationFeatures)
+      numFeatures_ += 80;
+    if (extractChannelsStatisticsFeatures)
+      numFeatures_ += 28;
+    if (extractSiftFeatures)
+      numFeatures_ += dictionarySize_;
 
     imageType_ = "rgb_";
   }
@@ -216,7 +234,7 @@ namespace pandora_vision
       featureFactoryPtrMap_["color_histograms"]->extractFeatures(inImage,
           &colorHistogramFeatures);
 
-      // Plot the features if the visualization flag is true. 
+      // Plot the features if the visualization flag is true.
        if (visualization_)
         featureFactoryPtrMap_["color_histograms"]->plotFeatures(
             colorHistogramFeatures);

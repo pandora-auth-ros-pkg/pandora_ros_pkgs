@@ -69,11 +69,11 @@ namespace pandora_vision
 
     // Find the rotated rectangles for each blob based on its outline
     std::vector<cv::RotatedRect> minRect;
-    for(unsigned int i = 0; i < blobsOutlineVector.size(); i++)
+    for (unsigned int i = 0; i < blobsOutlineVector.size(); i++)
     {
       // The area of the blob should be greater than a threshold,
       // so that tiny formations of pixels are not identified as blobs
-      if(blobsArea[i] >= Parameters::Blob::min_area)
+      if (blobsArea[i] >= Parameters::Blob::min_area)
       {
         minRect.push_back(minAreaRect(cv::Mat(blobsOutlineVector[i])));
       }
@@ -83,7 +83,7 @@ namespace pandora_vision
     // For each rotated rectangle whose corresponding blob exceeds the minimum
     // area threshold, if its vertices reside within the image's boundaries,
     // store its vertices
-    for(unsigned int i = 0; i < minRect.size(); i++)
+    for (unsigned int i = 0; i < minRect.size(); i++)
     {
       // The for vertices of the rotated rectangle
       cv::Point2f rect_points[4];
@@ -116,7 +116,7 @@ namespace pandora_vision
       // Same as rect_points array, but vector
       std::vector<cv::Point2f> rect_points_vector;
 
-      for(int j = 0; j < 4; j++)
+      for (int j = 0; j < 4; j++)
       {
         rect_points_vector.push_back(rect_points[j]);
       }
@@ -130,4 +130,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

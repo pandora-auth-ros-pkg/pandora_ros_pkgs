@@ -110,9 +110,9 @@ namespace pandora_vision
           // points of the current mask
           if (holesMasksImageVector[i].at<unsigned char>(rows, cols) != 0)
           {
-            blueColourSet.insert(inImage_.at<cv::Vec3b>( rows, cols ).val[0]);
-            greenColourSet.insert(inImage_.at<cv::Vec3b>( rows, cols ).val[1]);
-            redColourSet.insert(inImage_.at<cv::Vec3b>( rows, cols ).val[2]);
+            blueColourSet.insert(inImage_.at<cv::Vec3b>(rows, cols).val[0]);
+            greenColourSet.insert(inImage_.at<cv::Vec3b>(rows, cols).val[1]);
+            redColourSet.insert(inImage_.at<cv::Vec3b>(rows, cols).val[2]);
           }
         }
       }
@@ -130,7 +130,6 @@ namespace pandora_vision
       probabilitiesVector->at(i) = static_cast<float>(numberOfColours) / 4096;
 
       msgs->push_back(TOSTR(probabilitiesVector->at(i)));
-
     }
 
     #ifdef DEBUG_TIME
@@ -519,4 +518,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

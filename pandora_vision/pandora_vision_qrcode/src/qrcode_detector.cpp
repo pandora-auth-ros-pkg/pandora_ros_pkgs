@@ -38,11 +38,13 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <vector>
+
 #include "pandora_vision_qrcode/qrcode_detector.h"
 
 namespace pandora_vision
 {
-  /*
+  /**
    * @brief: The main constructor for the QR detector objects.
    * @param gaussianSharpenBlur[int]: The standard deviation in the x axis
    * for the Gaussian Filter.
@@ -54,7 +56,7 @@ namespace pandora_vision
   QrCodeDetector::QrCodeDetector(int gaussianSharpenBlur,
       float gaussianSharpenWeight, bool debugCode)
   {
-    // Initiliaze the zbar scanner_.
+    // Initiliaze the zbar scanner
     scanner_.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 0);
     scanner_.set_config(zbar::ZBAR_QRCODE, zbar::ZBAR_CFG_ENABLE, 1);
 
@@ -62,15 +64,15 @@ namespace pandora_vision
     gaussianSharpenWeight_ = gaussianSharpenWeight;
     debugQrcode_ = debugCode;
   }
-  
+
   /**
-    @brief Creates view for debugging purposes.
-    @param image [zbar::Image&] The QR image. 
-    @param inputFrame[const cv::Mat&]: The input frame of the system.
-    @param constrastImage[const cv::Mat&]: The image with the enhanced 
-    contrast used to detect the QR codes.
-    @return void
-   **/
+   * @brief Creates view for debugging purposes.
+   * @param image [zbar::Image&] The QR image. 
+   * @param inputFrame[const cv::Mat&]: The input frame of the system.
+   * @param constrastImage[const cv::Mat&]: The image with the enhanced 
+   * contrast used to detect the QR codes.
+   * @return void
+   */
   void QrCodeDetector::debugShow(const zbar::Image& image,
       const cv::Mat& inputFrame, const cv::Mat& contrastImage)
   {
@@ -166,5 +168,4 @@ namespace pandora_vision
 
     return qrCodeList_;
   }
-
 }  // namespace pandora_vision

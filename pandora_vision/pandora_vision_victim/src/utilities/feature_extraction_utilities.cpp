@@ -148,26 +148,5 @@ namespace pandora_vision
         divide(image->col(ii), stdDevVec.at(ii), image->col(ii));
     }
   }
-
-  /**
-   * @brief This function performs PCA analysis to reduce the feature
-   * dimensions.
-   * @param featuresMat [cv::Mat*] Feature matrix to be used in the PCA
-   * analysis.
-   * @return void
-   */
-  cv::Mat FeatureExtractionUtilities::performPcaAnalysis(
-      const cv::Mat& featuresMat, int nEigens)
-  {
-    cv::Mat projectedFeaturesMat;
-    cv::PCA pca(featuresMat, cv::Mat(), CV_PCA_DATA_AS_ROW);
-    cv::Mat mean = pca.mean.clone();
-    cv::Mat eigenvalues = pca.eigenvalues.clone();
-    cv::Mat eigenvectors = pca.eigenvectors.clone();
-    std::cout << "EigenValues" << eigenvalues << std::endl;
-    std::cout << "EigenVectors " << eigenvectors.size() << std::endl;
-    pca.project(featuresMat, projectedFeaturesMat);
-    return projectedFeaturesMat;
-  }
 }  // namespace pandora_vision
 

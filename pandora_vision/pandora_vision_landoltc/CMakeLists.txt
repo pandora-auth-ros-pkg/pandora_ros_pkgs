@@ -128,38 +128,21 @@ add_dependencies(${PROJECT_NAME}_3d_node
 )
 
 
-#~ To check lint : catkin_make roslint_pandora_vision_landoltc
+# To check lint : catkin_make roslint_pandora_vision_landoltc
 set(ROSLINT_CPP_OPTS
-    "--filter=-whitespace/end_of_line, -build/include_what_you_use, -whitespace/empty_loop_body")
+   "--filter=-whitespace/empty_loop_body")
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
 
   include/landoltc_2d/*
   src/landoltc_2d/*
-  #~ include/landoltc_3d/landoltc3d_detector.h
-  #~ include/landoltc_3d/landoltc3d_detection.h
-  #~ include/landoltc_2d/landoltc_detector.h
-  #~ include/landoltc_2d/landoltc_detection.h
-  #~ include/landoltc_2d/landoltc_parameters.h
-  #~ include/landoltc_3d/landoltc3d_parameters.h
-  #~ src/landoltc_2d/landoltc_detector.cpp
-  #~ src/landoltc_3d/landoltc3d_detector.cpp
-  #~ src/landoltc_3d/landoltc3d_detection.cpp
-  #~ src/landoltc_3d/landoltc3d_node.cpp
-  #~ src/landoltc_2d/landoltc_detection.cpp
-  #~ src/landoltc_2d/landoltc_node.cpp
-  #~ src/landoltc_2d/landoltc_parameters.cpp
-  #~ src/landoltc_3d/landoltc3d_parameters.cpp
+  test/unit/*.cpp
+  # include/landoltc_3d/*.h
+  # src/landoltc_3d/*.cpp
 )
 
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
-
-file(GLOB_RECURSE ${PROJECT_NAME}_LINT_TEST
-  RELATIVE ${PROJECT_SOURCE_DIR}
-    test/unit/*.cpp
-    )
-roslint_cpp(${${PROJECT_NAME}_LINT_TEST})
 
 ##################################### Testing ##################################
 

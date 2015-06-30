@@ -35,8 +35,8 @@
  * Authors: Victor Daropoulos, Alexandros Philotheou
  *********************************************************************/
 
-#ifndef UTILS_WAVELETS_H
-#define UTILS_WAVELETS_H
+#ifndef PANDORA_VISION_HOLE_UTILS_WAVELETS_H
+#define PANDORA_VISION_HOLE_UTILS_WAVELETS_H
 
 #include <iostream>
 #include <stdio.h>
@@ -59,7 +59,6 @@ namespace pandora_vision
   class Wavelets
   {
     public:
-
       static cv::Mat convCols(const cv::Mat& in,
         const std::vector<float>& kernel);
 
@@ -92,9 +91,8 @@ namespace pandora_vision
         @return void
        **/
       static void getLowLow(const cv::Mat& inImage, cv::Mat* outImage);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_WAVELETS_H
+#endif  // PANDORA_VISION_HOLE_UTILS_WAVELETS_H

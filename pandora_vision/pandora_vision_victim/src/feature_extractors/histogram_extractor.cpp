@@ -35,6 +35,9 @@
 * Author: Choutas Vassilis <vasilis4ch@gmail.com>
 *********************************************************************/
 
+#include <vector>
+#include <string>
+
 #include "pandora_vision_victim/feature_extractors/histogram_extractor.h"
 
 /**
@@ -62,8 +65,8 @@ namespace pandora_vision
         colorSpace, false);
   }
 
-  /*
-   * @brief: The main constructor for the class that takes as input the 
+  /**
+   * @brief: The main constructor for the class that takes as input the
    * desired parameters so as to create the histogram for each desired
    * channel of the input image.
    * @param channels[const std::vector<int>&]: The image channels whose
@@ -83,16 +86,16 @@ namespace pandora_vision
       const std::string& colorSpace, bool jointHistogram)
   {
     // Copy the channel vector.
-    channels_ = channels; 
+    channels_ = channels;
 
     // Get the histogram dimensions.
     dims_ = dims;
-  
+
     // Copy the histogram size in each dimension.
     histBins_ =  histBins;
-    
+
     // Copy the range of the histogram for each channel.
-    ranges_ = histRanges; 
+    ranges_ = histRanges;
 
     // Convert the input color code to an OpenCV compliant format.
     colorSpace_ = stringToCvColorCode(colorSpace);
@@ -101,7 +104,7 @@ namespace pandora_vision
     jointHistogram_ = jointHistogram;
   }
 
-  /*
+  /**
    * @brief: Constructor for the histogram extractor class that parses
    * the necessary parameters from an xml/yaml file.
    * @param [const cv::FileStorage&]: The file from which the parameters
@@ -123,7 +126,7 @@ namespace pandora_vision
       exit(-1);
     }
 
-    cv::FileNodeIterator it = n.begin(), it_end = n.end(); // Go through the node
+    cv::FileNodeIterator it = n.begin(), it_end = n.end();  // Go through the node
     for (; it != it_end; ++it)
     {
       channels_.push_back(static_cast<int>(*it));
@@ -137,7 +140,7 @@ namespace pandora_vision
       exit(-1);
     }
     it = n.begin();
-    it_end = n.end(); // Go through the node
+    it_end = n.end();  // Go through the node
     for (; it != it_end; ++it)
     {
       ranges_.push_back(static_cast<float>(*it));
@@ -175,12 +178,12 @@ namespace pandora_vision
     }
     else
       jointHistogram_ = false;
-
   }
-  /*
+
+  /**
    * @brief: Converts the string color format to an OpenCV color conversion
    * flag.
-   * @param colorSpace_[const std::string&]: A string the specifies the 
+   * @param colorSpace_[const std::string&]: A string the specifies the
    * desired color space.
    * @return The OpenCV enum value that is used to convert an image from the
    * BGR color space to the specified one.
@@ -189,13 +192,13 @@ namespace pandora_vision
   {
     if (colorSpace_.compare("BGR") == 0)
       return -1;
-    
+
     if (colorSpace_.compare("HSV") == 0)
       return CV_BGR2HSV;
 
     if (colorSpace_.compare("YCrCb") == 0)
       return CV_BGR2YCrCb;
-    
+
     if (colorSpace_.compare("LAB") == 0)
       return CV_BGR2Lab;
 
@@ -205,12 +208,12 @@ namespace pandora_vision
     return -1;
   }
 
-  /*
+  /**
    * @brief: Creates color histograms from the image channels and concatenate
    * them to form a feature vector.
    * @param inImage[const cv::Mat&]: The input image from which the features
    * will be extracted.
-   * @param descriptors[cv::Mat*]: The output feature vector that describes 
+   * @param descriptors[cv::Mat*]: The output feature vector that describes
    * the image
    */
   void HistogramExtractor::extractFeatures(const cv::Mat& inImage,
@@ -227,7 +230,7 @@ namespace pandora_vision
 
     // Convert the image to another color space if necessary.
     if (colorSpace_ >= 0)
-      cv::cvtColor(inImage, img, colorSpace_); 
+      cv::cvtColor(inImage, img, colorSpace_);
     else
       img = inImage.clone();
 
@@ -248,16 +251,16 @@ namespace pandora_vision
       float range[] = {ranges_[2 * i], ranges_[2 * i + 1]};
       const float *histRange = {range};
       // Calculate the histogram for the current channel.
-      cv::calcHist(&imgChannels[index], 1, 0, cv::Mat(), 
+      cv::calcHist(&imgChannels[index], 1, 0, cv::Mat(),
           tempHist, 1, &histBins_[i], &histRange);
-      // Normalize the histogram to convert it to a probability 
+      // Normalize the histogram to convert it to a probability
       // distribution.
       cv::normalize(tempHist, tempHist, 0, 1, cv::NORM_MINMAX);
       // Store the resulting histogram.
       histograms[i] = tempHist;
       totalElements += tempHist.rows;
     }
-   
+
     // Concatenate the histograms so as to form a compact feature vector.
     *descriptors = cv::Mat(totalElements, 1, CV_32FC1);
     int offset = 0;
@@ -272,10 +275,10 @@ namespace pandora_vision
     return;
   }
 
-  /*
+  /**
    * @brief: Plots the input histogram.
    * @param histogram[const cv::Mat&]: The histogram that will be drawn.
-  */
+   */
   void HistogramExtractor::plotFeatures(const cv::Mat& featureVector)
   {
     int windowHeight = featureVector.rows;
@@ -289,10 +292,10 @@ namespace pandora_vision
           green,
           1,
           CV_AA,
-          0);  
+          0);
     }
-    cv::namedWindow("calcHist Demo", CV_WINDOW_NORMAL );
-    cv::imshow("calcHist Demo", canvas );
+    cv::namedWindow("calcHist Demo", CV_WINDOW_NORMAL);
+    cv::imshow("calcHist Demo", canvas);
     cv::waitKey(0);
 
     return;

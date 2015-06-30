@@ -48,7 +48,7 @@
 
 namespace pandora_vision
 {
-  class QrCodeHandler : public VisionHandler<QrCodePreProcessor, QrCodeProcessor, 
+  class QrCodeHandler : public VisionHandler<QrCodePreProcessor, QrCodeProcessor,
     QrCodePostProcessor>
   {
     public:
@@ -59,5 +59,4 @@ namespace pandora_vision
       virtual void completeTransition();
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_QRCODE_QRCODE_HANDLER_H

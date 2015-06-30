@@ -32,19 +32,19 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: 
- *   Choutas Vassilis 
+ * Authors:
+ *   Choutas Vassilis
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
 #include "pandora_vision_hazmat/detection/hazmat_handler.h"
 
 /**
-  @brief Main function of the face node
-  @param argc [int] Number of input arguments
-  @param argv [char**] The input arguments
-  @return int : 0 for success
- **/
+ * @brief Main function of the face node
+ * @param argc [int] Number of input arguments
+ * @param argv [char**] The input arguments
+ * @return int : 0 for success
+ */
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "hazmat_node");

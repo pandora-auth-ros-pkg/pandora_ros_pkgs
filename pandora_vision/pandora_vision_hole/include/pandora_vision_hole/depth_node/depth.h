@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef DEPTH_NODE_DEPTH_H
-#define DEPTH_NODE_DEPTH_H
+#ifndef PANDORA_VISION_HOLE_DEPTH_NODE_DEPTH_H
+#define PANDORA_VISION_HOLE_DEPTH_NODE_DEPTH_H
 
 #include "depth_node/hole_detector.h"
 #include "utils/parameters.h"
@@ -115,7 +115,6 @@ namespace pandora_vision
 
 
     public:
-
       /**
         @brief Default constructor. Initiates communications, loads parameters.
         @return void
@@ -127,9 +126,8 @@ namespace pandora_vision
         @return void
        **/
       ~Depth(void);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // DEPTH_NODE_DEPTH_H
+#endif  // PANDORA_VISION_HOLE_DEPTH_NODE_DEPTH_H

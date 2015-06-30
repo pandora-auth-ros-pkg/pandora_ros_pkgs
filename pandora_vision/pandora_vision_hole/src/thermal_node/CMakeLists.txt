@@ -1,8 +1,6 @@
 add_library(${PROJECT_NAME}_thermal
   thermal.cpp
   hole_detector.cpp
-  temperatures.cpp
-  temperatures_parameters.cpp
   )
 
 add_library(${PROJECT_NAME}_thermalcropper
@@ -22,14 +20,9 @@ add_dependencies(${PROJECT_NAME}_thermal
   ${catkin_EXPORTED_TARGETS})
 
 add_executable(thermal_camera_node thermal_node.cpp)
-add_executable(thermal_temperatures_node temperatures_node.cpp)
 add_executable(thermal_cropper_node thermal_cropper_node.cpp)
 
 target_link_libraries(thermal_camera_node
-  ${PROJECT_NAME}_thermal
-  ${catkin_LIBRARIES})
-
-target_link_libraries(thermal_temperatures_node
   ${PROJECT_NAME}_thermal
   ${catkin_LIBRARIES})
 

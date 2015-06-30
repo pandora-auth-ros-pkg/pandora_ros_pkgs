@@ -35,8 +35,8 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#ifndef UTILS_OUTLINE_DISCOVERY_H
-#define UTILS_OUTLINE_DISCOVERY_H
+#ifndef PANDORA_VISION_HOLE_UTILS_OUTLINE_DISCOVERY_H
+#define PANDORA_VISION_HOLE_UTILS_OUTLINE_DISCOVERY_H
 
 #include "utils/morphological_operators.h"
 
@@ -53,7 +53,6 @@ namespace pandora_vision
   class OutlineDiscovery
   {
     public:
-
       /**
         @brief Implements the brushfire algorithm for one blob keypoint
         in order to find its outline points
@@ -123,7 +122,7 @@ namespace pandora_vision
         @param[in,out] inImage [cv::Mat*] The input image
         @return void
        **/
-      static void getShapesClearBorder (cv::Mat* inImage);
+      static void getShapesClearBorder(cv::Mat* inImage);
 
       /**
         @brief With an binary input image (quantized in 0 and 255 levels),
@@ -137,7 +136,7 @@ namespace pandora_vision
         @param[in,out] inImage [cv::Mat*] The input image
         @return void
        **/
-      static void getShapesClearBorderSimple (cv::Mat* inImage);
+      static void getShapesClearBorderSimple(cv::Mat* inImage);
 
       /**
         @brief Implements a raycast algorithm for a blob keypoint in order
@@ -185,9 +184,8 @@ namespace pandora_vision
         const int& partitions,
         std::vector<std::vector<cv::Point2f> >* blobsOutlineVector,
         std::vector<float>* blobsArea);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_OUTLINE_DISCOVERY_H
+#endif  // PANDORA_VISION_HOLE_UTILS_OUTLINE_DISCOVERY_H

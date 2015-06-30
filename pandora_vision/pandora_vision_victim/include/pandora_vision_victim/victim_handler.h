@@ -41,6 +41,8 @@
 #define PANDORA_VISION_VICTIM_VICTIM_HANDLER_H
 
 #include <string>
+#include <vector>
+
 #include "sensor_processor/handler.h"
 #include "pandora_vision_victim/victim_image_preprocessor.h"
 #include "pandora_vision_victim/victim_hole_preprocessor.h"
@@ -59,7 +61,7 @@ namespace pandora_vision
     private:
       virtual void startTransition(int newState);
       virtual void completeTransition();
-      
+
     private:
       std::vector<int> holeActiveStates_;
       std::vector<int> imageActiveStates_;

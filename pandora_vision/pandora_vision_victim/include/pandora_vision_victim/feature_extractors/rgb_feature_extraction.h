@@ -38,6 +38,9 @@
 #ifndef PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_RGB_FEATURE_EXTRACTION_H
 #define PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_RGB_FEATURE_EXTRACTION_H
 
+
+#include <string>
+
 #include "pandora_vision_victim/feature_extractors/feature_extraction.h"
 #include "pandora_vision_victim/feature_extractors/channels_statistics_extractor.h"
 #include "pandora_vision_victim/feature_extractors/edge_orientation_extractor.h"
@@ -59,7 +62,7 @@ namespace pandora_vision
       /**
        * @brief Default Constructor
        */
-      RgbFeatureExtraction();
+      RgbFeatureExtraction(const std::string& classifierType = std::string("svm"));
 
       /**
        * @brief Default Destructor

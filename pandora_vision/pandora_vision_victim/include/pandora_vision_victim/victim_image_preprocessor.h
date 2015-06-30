@@ -50,19 +50,18 @@
 
 namespace pandora_vision
 {
-  class VictimImagePreProcessor : public sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
+  class VictimImagePreProcessor : public sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
   EnhancedImageStamped>
   {
     protected:
-       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage> EnhancedImagePtr;
+      typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage> EnhancedImagePtr;
       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage const> EnhancedImageConstPtr;
-    
+
     public:
       VictimImagePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
       virtual ~VictimImagePreProcessor();
-      
+
       virtual bool preProcess(const EnhancedImageConstPtr& input, const EnhancedImageStampedPtr& output);
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_VICTIM_IMAGE_PREPROCESSOR_H

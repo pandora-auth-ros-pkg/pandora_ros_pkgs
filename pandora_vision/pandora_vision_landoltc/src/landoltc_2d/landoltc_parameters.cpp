@@ -51,11 +51,11 @@ namespace pandora_vision
     nh.param("/visualization", visualization, false);
     nh.param("/timerThreshold", timerThreshold, 0.16);
   }
-  
+
   /**
   @brief The function called when a parameter is changed
   @param[in] config [const pandora_vision_landoltc::landoltc_cfgConfig&]
-  @param[in] level [const uint32_t] The level 
+  @param[in] level [const uint32_t] The level
   @return void
   **/
   void LandoltcParameters::parametersCallback(
@@ -67,7 +67,7 @@ namespace pandora_vision
     centerThreshold = config.centerThreshold;
     huMomentsPrec = config.huMomentsPrec;
     adaptiveThresholdSubtractSize = config.adaptiveThresholdSubtractSize;
-    visualization = config.visualization;    
-    timerThreshold = config.timerThreshold;    
+    visualization = config.visualization;
+    timerThreshold = config.timerThreshold;
   }
 }  // namespace pandora_vision

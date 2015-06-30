@@ -931,4 +931,4 @@ namespace pandora_vision
     return valid;
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

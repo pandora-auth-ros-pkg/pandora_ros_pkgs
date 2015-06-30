@@ -255,12 +255,13 @@ namespace pandora_vision
     bag.open(filename, rosbag::bagmode::Read);
     rosbag::View view(bag, rosbag::TopicQuery(topic));
     
-    // Load all messages 
+    // Load all messages
     BOOST_FOREACH(rosbag::MessageInstance const m, view)
     {
       sensor_msgs::Image::ConstPtr img = m.instantiate<sensor_msgs::Image>();
       sensor_msgs::PointCloud2::ConstPtr pc =m.instantiate<sensor_msgs::PointCloud2>();
       pandora_vision_msgs::EnhancedImage::ConstPtr enhanced = m.instantiate<pandora_vision_msgs::EnhancedImage>();
+      distrib_msgs::flirLeptonMsg::Ptr flirMsg = m.instantiate<distrib_msgs::flirLeptonMsg>();
 
       if(enhanced != NULL)
       {
@@ -276,6 +277,11 @@ namespace pandora_vision
       if (pc != NULL)
       {
         receivePointCloud(pc);
+      }
+
+      if (flirMsg != NULL)
+      {
+        receiveThermalImage(flirMsg);
       }
     }
     connector_.setFrames(frames, offset);
@@ -598,6 +604,44 @@ namespace pandora_vision
      }
   }
 
+  /**
+  @brief Function called when new ROS message appears, from any topic
+  posting an flirLeptonMsg  kind of msg
+  @param msg [const pandora_common_msgs::flirLeptonMsgConstPtr& ] The message
+  @return void
+  **/
+  void CController::receiveThermalImage(const distrib_msgs::flirLeptonMsgPtr& msg)
+  {
+    distrib_msgs::flirLeptonMsgPtr flirMsg;
+    cv_bridge::CvImagePtr in_msg;
+    cv::Mat temp;
+    flirMsg = msg;
+    msg->thermalImage.encoding = "mono8";
+    msg->thermalImage.height = 60;
+    msg->thermalImage.width = 80;
+    msg->thermalImage.step = 80 * sizeof(uint8_t);
+
+    in_msg = cv_bridge::toCvCopy(msg->thermalImage);//,
+    //sensor_msgs::image_encodings::TYPE_8UC3);
+        //ROS_INFO_STREAM("enc" << in_msg->encoding);
+
+    cv::cvtColor(in_msg->image, temp, CV_GRAY2RGB);
+
+    if(!onlinemode)
+    {
+      frames.push_back(temp);
+      msgHeader_.push_back(msg->header);
+    }
+
+    else
+    {
+      QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
+      dest.bits(); // enforce deep copy, see documentation
+      connector_.setImage(dest);
+      connector_.msgTimeStamp(msg->header);
+      Q_EMIT updateImage();
+    }
+  }
   /**
   @brief Initializes the ROS spin and Qt threads
   @return bool

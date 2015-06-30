@@ -55,7 +55,7 @@ namespace pandora_vision
     public:
       typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
 
-      /*
+      /**
        * @brief: The main constructor for the QR detector objects.
        * @param gaussianSharpenBlur[int]: The standard deviation in the x axis
        * for the Gaussian Filter.
@@ -63,15 +63,20 @@ namespace pandora_vision
        * that is used to sharpen the image.
        * @param debugCode[bool]: A boolean flag that specifies whether the
        * input and result images will be displayed.
-      */
+       */
       QrCodeDetector(int gaussianSharpenBlur, float gaussianSharpenWeight,
           bool debugCode);
 
-      /*
-       * @brief : The default constructor for the QR detector objects.
-      */
-      QrCodeDetector(){}
-      virtual ~QrCodeDetector() {}
+      /**
+       * @brief The default constructor for the QR detector objects.
+       */
+      QrCodeDetector()
+      {
+      }
+
+      virtual ~QrCodeDetector()
+      {
+      }
 
       void set_debug(bool flag)
       {
@@ -89,29 +94,29 @@ namespace pandora_vision
       }
 
       /**
-        @brief Detects qrcodes and stores them in a vector.
-        @param frame [cv::Mat] The image in which the QRs are detected
-        @return void
-       **/
+       * @brief Detects qrcodes and stores them in a vector.
+       * @param frame [cv::Mat] The image in which the QRs are detected
+       * @return void
+       */
       std::vector<POIPtr> detectQrCode(const cv::Mat& frame);
 
     private:
-      //!< Filter Parameters
+      /// Filter Parameters
       int gaussianSharpenBlur_;
       double gaussianSharpenWeight_;
 
-      //!< Debug image topic
+      /// Debug image topic
       std::string debugTopic_;
 
-      //!< Debug images publisher flag
+      /// Debug images publisher flag
       bool debugQrcode_;
 
-      //!< QrCode scanner
+      /// QrCode scanner
       zbar::ImageScanner scanner_;
 
-      //!< List of detected qrcodes
+      /// List of detected qrcodes
       std::vector<POIPtr> qrCodeList_;
-      
+
       /**
         @brief Creates view for debugging purposes.
         @param image [zbar::Image&] The QR image. 
@@ -122,9 +127,8 @@ namespace pandora_vision
        **/
       void debugShow(const zbar::Image& image, const cv::Mat& inputFrame,
           const cv::Mat& contrastImage);
-      
+
       friend class QrCodeDetectorTest;
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H

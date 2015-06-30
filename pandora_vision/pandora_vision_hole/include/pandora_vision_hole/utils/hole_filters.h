@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_HOLE_FILTERS_H
-#define UTILS_HOLE_FILTERS_H
+#ifndef PANDORA_VISION_HOLE_UTILS_HOLE_FILTERS_H
+#define PANDORA_VISION_HOLE_UTILS_HOLE_FILTERS_H
 
 #include "utils/noise_elimination.h"
 #include "utils/edge_detection.h"
@@ -58,7 +58,6 @@ namespace pandora_vision
   class HoleFilters
   {
     public:
-
       /**
         @brief Given a set of keypoints and an edges image, this function
         returns the valid keypoints and for each one, its respective, least
@@ -108,9 +107,8 @@ namespace pandora_vision
         const std::vector<float>& inRectanglesArea,
         const std::vector<std::vector<cv::Point2f> >& inContours,
         HolesConveyor* conveyor);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_HOLE_FILTERS_H
+#endif  // PANDORA_VISION_HOLE_UTILS_HOLE_FILTERS_H

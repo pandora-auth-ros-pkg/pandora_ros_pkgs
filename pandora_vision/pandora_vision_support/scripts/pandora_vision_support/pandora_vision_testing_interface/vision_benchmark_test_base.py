@@ -57,7 +57,6 @@ from sensor_msgs.msg import PointCloud2
 class VisionBenchmarkTestBase(test_base.TestBase):
 
     alertEvent = threading.Event()
-    datasetCamera = ""
 
     def readImages(self, imagePath, fileName):
         rosimage = Image()
@@ -174,7 +173,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             if line.startswith("#"):
                 continue
             (frameName, objectType, xTopLeftPoint, yTopLeftPoint,
-                xBottomRightPoint, yBottomRightPoint) = line.split(",")
+                xBottomRightPoint, yBottomRightPoint) = line.split(", ")
             if self.algorithm != "Victim" and "depth" in frameName:
                 continue
             yBottomRightPoint = yBottomRightPoint.replace("\n", "")
@@ -334,6 +333,18 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         rospy.loginfo("F-measure: %f", fMeasure)
         rospy.loginfo("Mean Squared Error from POI: %f", self.meanSquaredError)
 
+        if self.algorithm == "Victim":
+            results_data = open(self.results_file, "w")
+            results_data.write(str(self.truePositives) + "\n")
+            results_data.write(str(self.falsePositives) + "\n")
+            results_data.write(str(self.trueNegatives) + "\n")
+            results_data.write(str(self.falseNegatives) + "\n")
+            results_data.write(str(accuracy) + "\n")
+            results_data.write(str(precision) + "\n")
+            results_data.write(str(recall) + "\n")
+            results_data.write(str(fMeasure) + "\n")
+            results_data.close()
+
     def calculateRecallResults(self):
         for dictKeyTP, dictValuesTP in self.actualPositivesBenchmarkDict.iteritems():
             if dictKeyTP in self.truePositivesBenchmarkDict:
@@ -362,15 +373,33 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         return imageX, imageY
 
     @classmethod
+    def mockPublish(cls, input_topic, output_topic, data):
+        cls.block.clear()
+        cls.alertEvent.clear()
+
+        if not isinstance(data, cls.publishedTypes[input_topic]):
+            rospy.logerr("[mockPublish] Publishes wrong message type.")
+        cls.publishers[input_topic].publish(data)
+        if not cls.benchmarking:
+            rospy.sleep(cls.publish_wait_duration)
+        cls.block.wait()
+        rospy.loginfo("Wait for the alert to arrive")
+        # Wait for the alert to arrive.
+        cls.alertEvent.wait()
+
+    @classmethod
     def mockCallback(cls, data, output_topic):
-        rospy.logdebug("Got message from topic : " + str(output_topic))
-        rospy.logdebug(data)
+        rospy.logdebug("Got message from topic : " + str(output_topic) + " " +
+                str(data))
         cls.messageList[output_topic].append(data)
         cls.repliedList[output_topic] = True
         # Set the processor block to notify the program that the processor
         # answered
         if "processor" in output_topic:
             cls.block.set()
+            if not data.success:
+                cls.alertEvent.set()
+                return None
         # Notify the program that an alert has been received.
         if "alert" in output_topic:
             cls.alertEvent.set()
@@ -399,18 +428,14 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             self.readBenchmarkFile(imagePath)
 
         errorThreshold = 900.0
-        maxWaitTime = 1.0
         bridge = CvBridge()
         if self.algorithm == "Hole":
             suffix = "sDirections"
         else:
-            suffix = "Alerts"
+            suffix = "alerts"
 
         queueIndex = 0
         count = 0
-
-        # Read Images Sequentially
-        rospy.loginfo("Reading Images")
 
         if not os.path.isdir(imagePath):
             rospy.logerr("ERROR : Incorrect Path for image dataset")
@@ -421,6 +446,10 @@ class VisionBenchmarkTestBase(test_base.TestBase):
         for fileName in sorted(os.listdir(imagePath)):
             self.images = []
             self.names = []
+
+            # Read Images Sequentially
+            rospy.loginfo("Reading Images")
+
             if self.algorithm == "Hole" or self.algorithm == "Victim":
                 self.readRosBags(imagePath, fileName)
             else:
@@ -435,27 +464,48 @@ class VisionBenchmarkTestBase(test_base.TestBase):
             # Confirm the authenticity of the alert using the annotator
             # groundtruth set.
             for image, imageName in zip(self.images, self.names):
-                self.alertEvent.clear()
                 rospy.logdebug("Sending Image %s", imageName)
+                for topic in outputTopic:
+                    self.messageList[topic] = []
+                    self.repliedList[topic] = False
+
                 startTime = time.time()
                 self.mockPublish(inputTopic, outputTopic[1], image)
                 elapsedTime = time.time() - startTime
 
-                response = self.messageList[outputTopic[0]][-1]
-                if response.success:
-                    # Wait for the alert to arrive.
-                    self.alertEvent.wait()
+                responseFlag = True
+                for topic in outputTopic:
+                    if "processor_log" in topic:
+                        if responseFlag and len(self.messageList[topic]) > 0:
+                            response = self.messageList[topic][-1].success
+                            responseFlag = responseFlag and response
+
+                rospy.logdebug("Response Flag for image " + imageName + ": " +
+                        str(responseFlag))
+                if responseFlag:
                     rospy.logdebug("Alert found in Image %s", imageName)
                     rospy.logdebug("Time passed: %f seconds", elapsedTime)
                     truePositivesInImage = 0
                     # Estimate alert center point from message parameters
-                    alerts = getattr(
+                    print self.messageList[outputTopic[1]][-1]
+                    if self.algorithm == "Victim":
+                        alerts = getattr(
+                            self.messageList[outputTopic[1]][-1],
+                            suffix)
+                    else:
+                        alerts = getattr(
                             self.messageList[outputTopic[1]][-1],
                             self.algorithm.lower()+suffix)
                     queueIndex += 1
+                    print alerts
                     for iiAlert in xrange(len(alerts)):
-                        imageYaw = float(alerts[iiAlert].info.yaw)
-                        imagePitch = float(alerts[iiAlert].info.pitch)
+                        if self.algorithm == "Victim":
+                            imageYaw = float(alerts[iiAlert].yaw)
+                            imagePitch = float(alerts[iiAlert].pitch)
+                        else:
+                            imageYaw = float(alerts[iiAlert].info.yaw)
+                            imagePitch = float(alerts[iiAlert].info.pitch)
+
                         rospy.logdebug("Yaw: %f Degrees",
                                        imageYaw * 180 / math.pi)
                         rospy.logdebug("Pitch: %f Degrees",

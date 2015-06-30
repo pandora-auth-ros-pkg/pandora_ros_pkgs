@@ -32,16 +32,20 @@
 *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 *  POSSIBILITY OF SUCH DAMAGE.
 *
-* Author: Vassilis Choutas 
+* Author: Vassilis Choutas
 *********************************************************************/
+
+#include <unistd.h>
 
 #include <vector>
 #include <map>
 #include <algorithm>
-#include <unistd.h>
+#include <utility>
+#include <string>
 
-#include "gtest/gtest.h"
-#include "ros/package.h"
+#include <gtest/gtest.h>
+#include <ros/package.h>
+
 #include "pandora_vision_victim/feature_extractors/histogram_extractor.h"
 
 namespace pandora_vision
@@ -49,7 +53,9 @@ namespace pandora_vision
   class HistogramExtractorTest: public ::testing::Test
   {
     public:
-      HistogramExtractorTest(){}
+      HistogramExtractorTest()
+      {
+      }
 
       virtual void SetUp()
       {
@@ -91,14 +97,13 @@ namespace pandora_vision
         channelPermutations_.push_back(permutation);
 
         int myints[] = {0, 1, 2};
-        std::sort (myints, myints + 3);
+        std::sort(myints, myints + 3);
 
         // Store all the possible 3-permutations of the image channels.
         channelPermutations_.push_back(std::vector<int>(myints, myints + 3));
 
         while (std::next_permutation(myints, myints + 3))
           channelPermutations_.push_back(std::vector<int>(myints, myints + 3));
-
       }
 
       virtual ~HistogramExtractorTest()
@@ -107,7 +112,7 @@ namespace pandora_vision
 
       virtual void TearDown()
       {
-        delete histExtractorTestFixturePtr_; 
+        delete histExtractorTestFixturePtr_;
       }
 
       void createRangeCombinations(
@@ -126,9 +131,9 @@ namespace pandora_vision
             ranges[permutation[0] * 2] = k * step;
             ranges[permutation[0] * 2 + 1] = (k + 1) * step - 1;
             outputRanges->push_back(ranges);
-          } 
+          }
         }
-        else if(permutation.size() == 2)
+        else if (permutation.size() == 2)
         {
           int step1 = maxRanges[1] / binSizes[0];
           int step2 = maxRanges[3] / binSizes[1];
@@ -168,12 +173,11 @@ namespace pandora_vision
               }
             }
           }
-
-        }  
+        }
       }
 
       void createSingleChannelImage(cv::Mat* outputImage,
-          const std::pair<float, float>& range, 
+          const std::pair<float, float>& range,
           int width_, int height_)
       {
         *outputImage = cv::Mat::zeros(width_, height_, CV_8UC1);
@@ -183,8 +187,8 @@ namespace pandora_vision
       }
 
 
-      /*
-       * @brief: Creates a multi channel image in the RGB color Space 
+      /**
+       * @brief: Creates a multi channel image in the RGB color Space
        * with values for each channel in the corresponding range and the
        * given size.
        */
@@ -202,24 +206,23 @@ namespace pandora_vision
             std::pair<float, float> range(ranges[2 * i], ranges[2 * i + 1]);
             createSingleChannelImage(&tempImage, range, width, height);
           }
-          else 
+          else
             tempImage = cv::Mat::zeros(height, width, CV_8UC1);
           channels.push_back(tempImage);
         }
         cv::merge(channels, *outputImage);
-
       }
 
-      //<! The width_ of the test images.
+      /// The width_ of the test images.
       int width_;
-      //<! The height_ of the test images.
+      /// The height_ of the test images.
       int height_;
       std::vector<std::vector<int> > channelPermutations_;
       std::map<std::string, std::vector<float> > colorRanges_;
-      HistogramExtractor* histExtractorTestFixturePtr_; 
+      HistogramExtractor* histExtractorTestFixturePtr_;
   };
 
-  TEST_F(HistogramExtractorTest, BGRHistTest)  
+  TEST_F(HistogramExtractorTest, BGRHistTest)
   {
     cv::Mat testImage;
     int bins[] = {32, 32, 32};
@@ -236,7 +239,7 @@ namespace pandora_vision
         // permutation of the image channels.
         histBins.push_back(bins[channelPermutations_[i][j]]);
 
-        // Do the same for the range of values of each channel of the 
+        // Do the same for the range of values of each channel of the
         // current color space. The resulting vector has size equal to two
         // times the number of channels we want for our histogram. The even
         // values are the lower bounds and the odd values are the upper bounds
@@ -250,7 +253,7 @@ namespace pandora_vision
       // Create the correct extractor for this configuration.
       histExtractorTestFixturePtr_ = new HistogramExtractor(
           channelPermutations_[i],
-          1, histBins, histRanges, 
+          1, histBins, histRanges,
           std::string("BGR"), false);
 
       // Check that the histogram feature extractor has been created.
@@ -266,9 +269,9 @@ namespace pandora_vision
       else
         // Set all the necessary channel flags.
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
-          validChannels[channelPermutations_[i][j]] = true;          
-      
-      // Create all possible combinations for the histogram range values 
+          validChannels[channelPermutations_[i][j]] = true;
+
+      // Create all possible combinations for the histogram range values
       // for the current channel permutation.
       std::vector< std::vector<float> > rangeCombinations;
 
@@ -281,7 +284,7 @@ namespace pandora_vision
         featureVectorExpectedSize += histBins[ii];
 
       cv::Mat features;
-      // Iterate over all the above created values. 
+      // Iterate over all the above created values.
       for (int ii = 0; ii < rangeCombinations.size(); ++ii)
       {
         // Create a new test image by assigning non-zero values only to the
@@ -293,12 +296,12 @@ namespace pandora_vision
 
         // Check that the returned vector has the size we expect.
         ASSERT_EQ(featureVectorExpectedSize, features.rows) << "The expected"
-          << " size of the feature vector is not equal to the one returned" 
+          << " size of the feature vector is not equal to the one returned"
           " by the feature extraction function!";
 
         int offset = 0;
         int pos;
-        // For each channel of the image that will be included in the 
+        // For each channel of the image that will be included in the
         // histogram:
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
         {
@@ -308,13 +311,13 @@ namespace pandora_vision
             // Get the position of the non-zero values for the histogram
             // by finding the bin that corresponds to the values we assigned
             // during the image creation.
-            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] / 
+            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] /
               histRanges[2 * j + 1] * histBins[j];
             // Add an offset so as to get to the correct block of the feature
             // vector(the block that corresponds to the current channel).
             pos = pos + offset;
             ASSERT_FLOAT_EQ(features.at<float>(pos), 1.0f) << "The value of "
-              "the feature vector is not equal to the expected one at " 
+              "the feature vector is not equal to the expected one at "
               << "position : " << pos << " of the feature vector!";
           }
           // Update the offset by the number of bins.
@@ -328,7 +331,6 @@ namespace pandora_vision
       histRanges.clear();
       validChannels.clear();
     }
-    
   }  // End of BGR color histogram extractor test.
 
   TEST_F(HistogramExtractorTest, HSVHistTest)
@@ -348,7 +350,7 @@ namespace pandora_vision
         // permutation of the image channels.
         histBins.push_back(bins[channelPermutations_[i][j]]);
 
-        // Do the same for the range of values of each channel of the 
+        // Do the same for the range of values of each channel of the
         // current color space. The resulting vector has size equal to two
         // times the number of channels we want for our histogram. The even
         // values are the lower bounds and the odd values are the upper bounds
@@ -362,7 +364,7 @@ namespace pandora_vision
       // Create the correct extractor for this configuration.
       histExtractorTestFixturePtr_ = new HistogramExtractor(
           channelPermutations_[i],
-          1, histBins, histRanges, 
+          1, histBins, histRanges,
           std::string(""), false);
 
       // Check that the histogram feature extractor has been created.
@@ -380,11 +382,11 @@ namespace pandora_vision
         // Set all the necessary channel flags.
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
         {
-          validChannels[channelPermutations_[i][j]] = true;          
+          validChannels[channelPermutations_[i][j]] = true;
           count++;
         }
 
-      // Create all possible combinations for the histogram range values 
+      // Create all possible combinations for the histogram range values
       // for the current channel permutation.
       std::vector< std::vector<float> > rangeCombinations;
 
@@ -397,7 +399,7 @@ namespace pandora_vision
         featureVectorExpectedSize += histBins[ii];
 
       cv::Mat features;
-      // Iterate over all the above created values. 
+      // Iterate over all the above created values.
       for (int ii = 0; ii < rangeCombinations.size(); ++ii)
       {
         // Create a new test image by assigning non-zero values only to the
@@ -410,12 +412,12 @@ namespace pandora_vision
 
         // Check that the returned vector has the size we expect.
         ASSERT_EQ(featureVectorExpectedSize, features.rows) << "The expected"
-          << " size of the feature vector is not equal to the one returned" 
+          << " size of the feature vector is not equal to the one returned"
           " by the feature extraction function!";
 
         int offset = 0;
         int pos;
-        // For each channel of the image that will be included in the 
+        // For each channel of the image that will be included in the
         // histogram:
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
         {
@@ -425,13 +427,13 @@ namespace pandora_vision
             // Get the position of the non-zero values for the histogram
             // by finding the bin that corresponds to the values we assigned
             // during the image creation.
-            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j] + 1] / 
+            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j] + 1] /
               (histRanges[2 * j + 1] / histBins[j]);
             // Add an offset so as to get to the correct block of the feature
             // vector(the block that corresponds to the current channel).
             pos = pos + offset;
             ASSERT_FLOAT_EQ(features.at<float>(pos), 1.0f) << "The value of "
-              "the feature vector is not equal to the expected one at " 
+              "the feature vector is not equal to the expected one at "
               << "position : " << pos << " of the feature vector!";
           }
           // Update the offset by the number of bins.
@@ -445,10 +447,9 @@ namespace pandora_vision
       histRanges.clear();
       validChannels.clear();
     }
+  }  // End of HSV color histogram extractor test.
 
-  } // End of HSV color histogram extractor test.
-
-  TEST_F(HistogramExtractorTest, YCrCbHistTest) 
+  TEST_F(HistogramExtractorTest, YCrCbHistTest)
   {
     cv::Mat testImage;
     int bins[] = {32, 32, 32};
@@ -465,7 +466,7 @@ namespace pandora_vision
         // permutation of the image channels.
         histBins.push_back(bins[channelPermutations_[i][j]]);
 
-        // Do the same for the range of values of each channel of the 
+        // Do the same for the range of values of each channel of the
         // current color space. The resulting vector has size equal to two
         // times the number of channels we want for our histogram. The even
         // values are the lower bounds and the odd values are the upper bounds
@@ -479,7 +480,7 @@ namespace pandora_vision
       // Create the correct extractor for this configuration.
       histExtractorTestFixturePtr_ = new HistogramExtractor(
           channelPermutations_[i],
-          1, histBins, histRanges, 
+          1, histBins, histRanges,
           std::string(""), false);
 
       // Check that the histogram feature extractor has been created.
@@ -495,9 +496,9 @@ namespace pandora_vision
       else
         // Set all the necessary channel flags.
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
-          validChannels[channelPermutations_[i][j]] = true;          
+          validChannels[channelPermutations_[i][j]] = true;
 
-      // Create all possible combinations for the histogram range values 
+      // Create all possible combinations for the histogram range values
       // for the current channel permutation.
       std::vector< std::vector<float> > rangeCombinations;
 
@@ -510,7 +511,7 @@ namespace pandora_vision
         featureVectorExpectedSize += histBins[ii];
 
       cv::Mat features;
-      // Iterate over all the above created values. 
+      // Iterate over all the above created values.
       for (int ii = 0; ii < rangeCombinations.size(); ++ii)
       {
         // Create a new test image by assigning non-zero values only to the
@@ -523,12 +524,12 @@ namespace pandora_vision
 
         // Check that the returned vector has the size we expect.
         ASSERT_EQ(featureVectorExpectedSize, features.rows) << "The expected"
-          << " size of the feature vector is not equal to the one returned" 
+          << " size of the feature vector is not equal to the one returned"
           " by the feature extraction function!";
 
         int offset = 0;
         int pos;
-        // For each channel of the image that will be included in the 
+        // For each channel of the image that will be included in the
         // histogram:
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
         {
@@ -538,13 +539,13 @@ namespace pandora_vision
             // Get the position of the non-zero values for the histogram
             // by finding the bin that corresponds to the values we assigned
             // during the image creation.
-            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] / 
+            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] /
               histRanges[2 * j + 1] * histBins[j];
             // Add an offset so as to get to the correct block of the feature
             // vector(the block that corresponds to the current channel).
             pos = pos + offset;
             ASSERT_FLOAT_EQ(features.at<float>(pos), 1.0f) << "The value of "
-              "the feature vector is not equal to the expected one at " 
+              "the feature vector is not equal to the expected one at "
               << "position : " << pos << " of the feature vector!";
           }
           // Update the offset by the number of bins.
@@ -558,8 +559,7 @@ namespace pandora_vision
       histRanges.clear();
       validChannels.clear();
     }
-
-  } // End of YCrCb color histogram extractor test.
+  }  // End of YCrCb color histogram extractor test.
 
   TEST_F(HistogramExtractorTest, CIELabHistTest)
   {
@@ -578,7 +578,7 @@ namespace pandora_vision
         // permutation of the image channels.
         histBins.push_back(bins[channelPermutations_[i][j]]);
 
-        // Do the same for the range of values of each channel of the 
+        // Do the same for the range of values of each channel of the
         // current color space. The resulting vector has size equal to two
         // times the number of channels we want for our histogram. The even
         // values are the lower bounds and the odd values are the upper bounds
@@ -592,7 +592,7 @@ namespace pandora_vision
       // Create the correct extractor for this configuration.
       histExtractorTestFixturePtr_ = new HistogramExtractor(
           channelPermutations_[i],
-          1, histBins, histRanges, 
+          1, histBins, histRanges,
           std::string(""), false);
 
       // Check that the histogram feature extractor has been created.
@@ -608,9 +608,9 @@ namespace pandora_vision
       else
         // Set all the necessary channel flags.
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
-          validChannels[channelPermutations_[i][j]] = true;          
+          validChannels[channelPermutations_[i][j]] = true;
 
-      // Create all possible combinations for the histogram range values 
+      // Create all possible combinations for the histogram range values
       // for the current channel permutation.
       std::vector< std::vector<float> > rangeCombinations;
 
@@ -623,7 +623,7 @@ namespace pandora_vision
         featureVectorExpectedSize += histBins[ii];
 
       cv::Mat features;
-      // Iterate over all the above created values. 
+      // Iterate over all the above created values.
       for (int ii = 0; ii < rangeCombinations.size(); ++ii)
       {
         // Create a new test image by assigning non-zero values only to the
@@ -635,12 +635,12 @@ namespace pandora_vision
 
         // Check that the returned vector has the size we expect.
         ASSERT_EQ(featureVectorExpectedSize, features.rows) << "The expected"
-          << " size of the feature vector is not equal to the one returned" 
+          << " size of the feature vector is not equal to the one returned"
           " by the feature extraction function!";
 
         int offset = 0;
         int pos;
-        // For each channel of the image that will be included in the 
+        // For each channel of the image that will be included in the
         // histogram:
         for (int j = 0; j < channelPermutations_[i].size(); ++j)
         {
@@ -650,13 +650,13 @@ namespace pandora_vision
             // Get the position of the non-zero values for the histogram
             // by finding the bin that corresponds to the values we assigned
             // during the image creation.
-            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] / 
+            pos = rangeCombinations[ii][2 *  channelPermutations_[i][j]] /
               histRanges[2 * j + 1] * histBins[j];
             // Add an offset so as to get to the correct block of the feature
-            // vector(the block that corresponds to the current channel).
+            // vector(the block that corresponds to the current channel)
             pos = pos + offset;
             ASSERT_FLOAT_EQ(features.at<float>(pos), 1.0f) << "The value of "
-              "the feature vector is not equal to the expected one at " 
+              "the feature vector is not equal to the expected one at "
               << "position : " << pos << " of the feature vector!";
           }
           // Update the offset by the number of bins.
@@ -670,8 +670,5 @@ namespace pandora_vision
       histRanges.clear();
       validChannels.clear();
     }
-
-  } // End of CIELab color histogram extractor test.
-
-
-} // namespace pandora_vision
+  }  // End of CIELab color histogram extractor test.
+}  // namespace pandora_vision

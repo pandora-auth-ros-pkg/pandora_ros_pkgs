@@ -1,15 +1,27 @@
 cascade_path: /data/rgb_cascade.xml
-model_path: /data/model_dolls.xml
-rgb_classifier_path: /data/rgb_svm_classifier.xml
-depth_classifier_path: /data/depth_svm_classifier.xml
-model_url: https://pandora.ee.auth.gr/vision/model.xml
-model_image_width: 128
-model_image_height: 96
 
-rgb_svm_C: 312.5
-rgb_svm_gamma: 0.50625
+rgb_classifier: svm
+depth_classifier: svm
 
-depth_svm_C: 312.5
-depth_svm_gamma: 0.50625
-depth_svm_prob_scaling: 0.5
-depth_svm_prob_translation: 7.0
+svm:
+  rgb:
+    classifier_path: /data/rgb_svm_classifier.xml
+    probability_scaling: 4.7
+    probability_translation: 1.0
+
+  depth:
+    classifier_path: /data/depth_svm_classifier.xml
+    probability_scaling: 4.7
+    probability_translation: 1.0
+
+rf:
+  rgb:
+    classifier_path: /data/rgb_rf_classifier.xml
+  depth:
+    classifier_path: /data/depth_rf_classifier.xml
+
+ann:
+  rgb:
+    classifier_path: /data/rgb_ann_classifier.xml
+  depth:
+    classifier_path: /data/depth_ann_classifier.xml

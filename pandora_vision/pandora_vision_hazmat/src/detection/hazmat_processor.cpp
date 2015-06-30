@@ -32,8 +32,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
+
+#include <string>
 
 #include "pandora_vision_hazmat/detection/hazmat_processor.h"
 
@@ -41,7 +43,7 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    HazmatProcessor::HazmatProcessor(const std::string& ns, 
+    HazmatProcessor::HazmatProcessor(const std::string& ns,
       sensor_processor::Handler* handler) :
       VisionProcessor(ns, handler), dynamicReconfServer_(*(this->accessProcessorNh()))
     {
@@ -50,7 +52,7 @@ namespace pandora_vision
           this->accessProcessorNh()->getNamespace().c_str());
 
       // Get the path of the current package.
-      std::string packagePath = ros::package::getPath("pandora_vision_hazmat");   
+      std::string packagePath = ros::package::getPath("pandora_vision_hazmat");
 
       PlanarObjectDetector::setFileName(packagePath);
 
@@ -90,15 +92,15 @@ namespace pandora_vision
       dynamicReconfServer_.setCallback(boost::bind(
             &HazmatProcessor::dynamicReconfigCallback, this, _1, _2));
     }
-    
+
     HazmatProcessor::HazmatProcessor() : VisionProcessor() {}
-    
+
     HazmatProcessor::~HazmatProcessor()
     {
       ROS_INFO("[%s] Stopping Hazmat Detection!", this->getName().c_str());
       delete detector_;
     }
-    
+
     void HazmatProcessor::dynamicReconfigCallback(
         const ::pandora_vision_hazmat::DisplayConfig& config, uint32_t level)
     {
@@ -124,26 +126,26 @@ namespace pandora_vision
       this->debugMsgFlag_ = config.Debug_Messages;
       this->visualizationFlag_ = config.Visualization_Flag;
     }
-    
-    bool HazmatProcessor::process(const CVMatStampedConstPtr& input, 
+
+    bool HazmatProcessor::process(const CVMatStampedConstPtr& input,
       const POIsStampedPtr& output)
     {
       output->header = input->getHeader();
       output->frameWidth = input->getImage().cols;
       output->frameHeight = input->getImage().rows;
-      
+
       std::stringstream ss;
       const clock_t begin_time = clock();
       PlanarObjectDetector::setDims(input->getImage());
-      
+
       ROS_DEBUG_NAMED(this->getName().c_str(), "Detecting...");
-      
+
       bool found = detector_->detect(input->getImage(), &output->pois);
-      
+
       ROS_DEBUG_NAMED(this->getName().c_str(), "Detection done!!");
-      double execTime = ( clock () - begin_time ) /  
-        static_cast<double>(CLOCKS_PER_SEC );
-        
+      double execTime = (clock() - begin_time) /
+        static_cast<double>(CLOCKS_PER_SEC);
+
       // Check if the debug message printing is enabled.
       if (found && debugMsgFlag_)
       {
@@ -155,16 +157,17 @@ namespace pandora_vision
               this->getName().c_str(),
               hazmatPOIPtr->getPattern());
         }
-        ROS_DEBUG_NAMED("detection", "[%s] : Number of Hazmats" 
+        ROS_DEBUG_NAMED("detection", "[%s] : Number of Hazmats"
             " Found = %d", this->getName().c_str(),
             static_cast<int>(output->pois.size()));
       }
 
       if (execTimerFlag_)
-        ROS_DEBUG_NAMED(this->getName().c_str(), "Detection Execution Time" 
+        ROS_DEBUG_NAMED(this->getName().c_str(), "Detection Execution Time"
             " is : %f!", execTime);
 
-      if (visualizationFlag_) {
+      if (visualizationFlag_)
+      {
         cv::imshow("Input Image", input->getImage());
         char key = cv::waitKey(10);
         if ( key == 27)

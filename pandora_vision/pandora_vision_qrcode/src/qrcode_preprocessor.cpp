@@ -37,18 +37,21 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_qrcode/qrcode_preprocessor.h"
 
 namespace pandora_vision
 {
-  QrCodePreProcessor::QrCodePreProcessor(const std::string& ns, 
+  QrCodePreProcessor::QrCodePreProcessor(const std::string& ns,
     sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
     sensor_msgs::image_encodings::BGR8)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
-  
-  QrCodePreProcessor::~QrCodePreProcessor() {}
 
+  QrCodePreProcessor::~QrCodePreProcessor()
+  {
+  }
 }  // namespace pandora_vision

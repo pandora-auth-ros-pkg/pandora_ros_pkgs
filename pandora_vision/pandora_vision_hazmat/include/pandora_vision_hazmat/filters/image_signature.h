@@ -32,10 +32,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
-#ifndef PANDORA_VISION_HAZMAT_FILTERS_IMAGE_SIGNATURE_H 
+#ifndef PANDORA_VISION_HAZMAT_FILTERS_IMAGE_SIGNATURE_H
 #define PANDORA_VISION_HAZMAT_FILTERS_IMAGE_SIGNATURE_H
 
 #include "ros/ros.h"
@@ -52,49 +52,46 @@ namespace pandora_vision
   namespace pandora_vision_hazmat
   {
     /**
-      @class ImageSignature 
-      @brief Class that implements the image signature saliency map.
-     **/
-
+     * @class ImageSignature
+     * @brief Class that implements the image signature saliency map.
+     */
     class ImageSignature
     {
-      public : 
-
-        /* 
+      public:
+        /**
          * @brief : Calculates the signature of the image.
          * @param image[const cv::Mat&] : The input image.
          * @param imgSign[cv::Mat *]: The output saliency map.
          */
-        static void calculateSignature(const cv::Mat& image , 
+        static void calculateSignature(const cv::Mat& image ,
             cv::Mat* imgSign);
 
-        /*
+        /**
          * @brief : Creates a mask for the frame based on the saliency map
          * produced by the algorithm.
          * @param frame[const cv::Mat&] : The input image.
          * @param mask[cv::Mat*] : The output matsk.
          */
-        static void createSaliencyMapMask(const cv::Mat& frame , 
+        static void createSaliencyMapMask(const cv::Mat& frame ,
             cv::Mat* mask);
 
         /**
-          @brief Calculates the signs of an arbitrary 1-channel matrix.
-          @param image [const cv::Mat &] : The input image
-          @param signs[cv::Mat *] : The output matrix with the signs of the 
-          image.
-         **/
+         * @brief Calculates the signs of an arbitrary 1-channel matrix.
+         * @param image [const cv::Mat &] : The input image
+         * @param signs[cv::Mat *] : The output matrix with the signs of the
+         * image.
+         */
         static void signFunction(const cv::Mat& array, cv::Mat* signs);
 
-        /*
+        /**
          * @brief : Default Empty Constructor.
          */
-        ImageSignature() {};
+        ImageSignature()
+        {
+        };
 
-      private :
-
+      private:
     };
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
-
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_FILTERS_IMAGE_SIGNATURE_H

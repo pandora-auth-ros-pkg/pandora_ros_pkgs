@@ -64,18 +64,24 @@ namespace pandora_vision
     // Advertise the candidate holes found by the thermal node to hole fusion
     candidateHolesPublisher_ = nodeHandle_.advertise
       <pandora_vision_hole::CandidateHolesVectorMsg>(
-      candidateHolesTopic_, 1000);
+      candidateHolesTopic_, 1);
 
     // Advertise the candidate holes found by the thermal
     // node to thermal cropper
     thermalToCropperPublisher_ = nodeHandle_.advertise
       <pandora_vision_hole::CandidateHolesVectorMsg>(
-      thermalToCropperTopic_, 1000);
+      thermalToCropperTopic_, 1);
 
     // Advertise the candidate holes found by the thermal node to hole fusion
     dataFusionThermalPublisher_ = nodeHandle_.advertise
       <pandora_vision_msgs::ThermalAlertVector>
-      (dataFusionThermalTopic_, 1000);
+      (dataFusionThermalTopic_, 1);
+
+    // Advertise the topic where any external node(e.g. a functional test node)
+    // will be subscribed to know that the hole node has finished processing
+    // the current candidate holes as well as the result of the procedure.
+    processEndPublisher_ = nodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
+        processEndTopic_, 1, true);
 
     // The dynamic reconfigure (thermal) parameter's callback
     server.setCallback(boost::bind(&Thermal::parametersCallback, this, _1, _2));
@@ -119,31 +125,43 @@ namespace pandora_vision
     // Obtain the thermal image. Since the image is in a format of
     // sensor_msgs::Image, it has to be transformed into a cv format in order
     // to be processed. Its cv format will be CV_8UC1.
+    cv::Mat thermalSensorImage;
+    MessageConversions::extractImageFromMessage(msg.thermalImage,
+      &thermalSensorImage, sensor_msgs::image_encodings::TYPE_8UC1);
 
-    cv::Mat thermalImage;
-    MessageConversions::extractImageFromMessage(msg.thermalImage, &thermalImage,
-      sensor_msgs::image_encodings::TYPE_8UC1);
-
-    // Obtain the thermal message and extract the temperature information.
-    // Convert this information to cv::Mat in order to be processed.
-    // It's format will be CV_8UC1
-    //cv::Mat thermalImage = MessageConversions::convertFloat32MultiArrayToMat
-      //(msg.temperatures);
+    //  Obtain the thermal message and extract the temperature information.
+    //  Convert this
+    //  information to cv::Mat in order to be processed.
+    //  It's format will be CV_8UC1
+    cv::Mat thermalImage = MessageConversions::convertFloat32MultiArrayToMat
+      (msg.temperatures);
 
     // Apply double threshold(up and down) in the temperature image.
     // The threshold is set by configuration
-    //cv::inRange(
-      //thermalImage, cv::Scalar(30), cv::Scalar(40), thermalImage);
+    cv::inRange(
+      thermalImage, cv::Scalar(Parameters::Thermal::low_temperature),
+      cv::Scalar(Parameters::Thermal::high_temperature), thermalImage);
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_thermal_image)
     {
-      Visualization::showScaled("Thermal image", thermalImage, 1);
+      Visualization::showScaled("Thermal image", thermalSensorImage, 1);
     }
     #endif
 
-    // Locate potential holes in the thermal image
-    HolesConveyor holes = HoleDetector::findHoles(thermalImage);
+    HolesConveyor holes;
+    // Detection method = 0 --> process the binary image acquired from temperatures
+    // Detection method = 1 --> process the sensor image acuired from sensor
+    if (Parameters::Thermal::detection_method == 0)
+    {
+      // Locate potential holes in the thermal image
+      holes = HoleDetector::findHoles(thermalImage);
+    }
+    else
+    {
+      // Locate potential holes in the thermal image
+      holes = HoleDetector::findHoles(thermalSensorImage);
+    }
 
     // Find the average temperature of each point of interest that we found
     // and their probability.
@@ -157,7 +175,7 @@ namespace pandora_vision
 
     // Resize the thermal image to match the rgb-d images, of course the thermal
     // image will not be further processed.
-    cv::resize(thermalImage, thermalImage, cvSize(
+    cv::resize(thermalSensorImage, thermalSensorImage, cvSize(
         Parameters::Image::WIDTH, Parameters::Image::HEIGHT));
 
     // Create the candidate holes message
@@ -169,7 +187,7 @@ namespace pandora_vision
     // or thermal cropper node based on the index of thermal message acquired
     // from the synchronizer node
     MessageConversions::createCandidateHolesVectorMessage(holes,
-      thermalImage,
+      thermalSensorImage,
       &thermalCandidateHolesMsg,
       sensor_msgs::image_encodings::TYPE_8UC1,
       msg.thermalImage);
@@ -177,7 +195,7 @@ namespace pandora_vision
     // Check the index and send the message to its proper receiver
     // The index takes only three values from synchronized node
     // "thermal", "hole" or "thermalhole".
-    if(msg.thermalIndex == "thermal")
+    if (msg.thermalIndex == "thermal")
     {
       // Publish the candidate holes message to thermal cropper node
       thermalToCropperPublisher_.publish(thermalCandidateHolesMsg);
@@ -194,10 +212,15 @@ namespace pandora_vision
       candidateHolesPublisher_.publish(thermalCandidateHolesMsg);
     }
 
+    // Used for functional test
+    sensor_processor::ProcessorLogInfo resultMsg;
+    resultMsg.success = (holes.size() > 0);
+    processEndPublisher_.publish(resultMsg);
+
     // Finally find the yaw and pitch of each candidate hole found and
     // send it to data fusion if a hole exists. The message to be sent is
     // ThermalAlertsVectorMsg type.
-    if(holes.size() > 0)
+    if (holes.size() > 0)
     {
       // Fill the thermal message to be sent
       pandora_vision_msgs::ThermalAlert thermalMsg;
@@ -207,8 +230,8 @@ namespace pandora_vision
 
       poisStamped->header.stamp = msg.header.stamp;
       poisStamped->header.frame_id = "/kinect_rgb_optical_frame";
-      poisStamped->frameWidth = thermalImage.cols;
-      poisStamped->frameHeight = thermalImage.rows;
+      poisStamped->frameWidth = thermalSensorImage.cols;
+      poisStamped->frameHeight = thermalSensorImage.rows;
 
       // For each hole found by thermal node
       std::vector<HoleConveyor>::iterator iter = holes.holes.begin();
@@ -244,7 +267,7 @@ namespace pandora_vision
           converter.getGeneralAlertInfo(ros::this_node::getName(),
             nodeHandle_, poisStamped);
 
-        for(unsigned int i = 0; i < alert.alerts.size(); i++)
+        for (unsigned int i = 0; i < alert.alerts.size(); i++)
         {
           // Fill the temperature of the thermal message for each hole
           thermalMsg.temperature = holes.holes[i].holeTemperature;
@@ -285,9 +308,8 @@ namespace pandora_vision
     // unadulterated thermal image and store it in a private member variable
     if (nodeHandle_.getParam(
         ns + "/thermal_camera_node/subscribed_topics/thermal_image_topic",
-        thermalImageTopic_ ))
+        thermalImageTopic_))
     {
-
       // Make topic's name absolute
       thermalImageTopic_ = ns + "/" + thermalImageTopic_;
 
@@ -354,6 +376,22 @@ namespace pandora_vision
         "[Thermal Node] Could not find topic thermal_data_fusion_topic");
     }
 
+    // Get the topic where the process end will be advertised
+    if (nodeHandle_.getParam(
+        ns + "/thermal_camera_node/published_topics/processor_log_topic",
+        processEndTopic_))
+    {
+       // Make the topic's name absolute
+       processEndTopic_ = ns + "/" + processEndTopic_;
+
+       ROS_INFO_NAMED(PKG_NAME,
+       "[Thermal Node] Advertising to the Process End topic");
+    }
+    else
+    {
+      ROS_ERROR_NAMED(PKG_NAME,
+        "[Thermal Node] Could not find topic Process end Topic");
+    }
   }
 
 
@@ -375,7 +413,7 @@ namespace pandora_vision
     int height = temperatures.layout.dim[0].size;
 
     // For each hole find its probability
-    for(unsigned int i = 0; i < holes->size(); i++)
+    for (unsigned int i = 0; i < holes->size(); i++)
     {
       float average = 0;
 
@@ -390,13 +428,13 @@ namespace pandora_vision
       // Find the average temperature around the keypoint
 
       // Check if the keypoint is on the edges of the image
-      if(tempX > 0 && tempX < 60 && tempY > 0 && tempY < 80)
+      if (tempX > 0 && tempX < 60 && tempY > 0 && tempY < 80)
       {
         int counter = 0;
 
-        for(unsigned int k = (tempY - 1); k < (tempY + 2); k++)
+        for (unsigned int k = (tempY - 1); k < (tempY + 2); k++)
         {
-          for(unsigned int o = (tempX - 1); o < (tempX + 2); o++)
+          for (unsigned int o = (tempX - 1); o < (tempX + 2); o++)
           {
             average += temperatures.data[k * width + o];
             counter++;
@@ -414,7 +452,7 @@ namespace pandora_vision
       holes->holes[i].holeTemperature = average;
 
       // Apply gaussian function on the average temperature found
-      if(method == 0)
+      if (method == 0)
       {
         float probability = exp(
           - pow((average - Parameters::Thermal::optimal_temperature), 2)
@@ -424,10 +462,10 @@ namespace pandora_vision
         holes->holes[i].holeProbability = probability;
       }
       // Apply logistic function on the average temperature found
-      else if(method == 1)
+      else if (method == 1)
       {
-        float probability = 1/(1 + exp( -Parameters::Thermal::left_tolerance *
-            (average - Parameters::Thermal::low_acceptable_temperature ) ))
+        float probability = 1/(1 + exp(-Parameters::Thermal::left_tolerance *
+            (average - Parameters::Thermal::low_acceptable_temperature)))
             - 1/(1 + exp(- Parameters::Thermal::right_tolerance *
             (average - Parameters::Thermal::high_acceptable_temperature)));
 
@@ -448,6 +486,11 @@ namespace pandora_vision
     const uint32_t& level)
   {
     ROS_INFO_NAMED(PKG_NAME, "[Thermal node] Parameters callback called");
+
+    ///////////////////// The thermal detection method ////////////////////////
+    // If set to 0 process the binary image acquired from temperatures MultiArray
+    // If set to 1 process the sensor/Image from thermal sensor
+    Parameters::Thermal::detection_method = config.detection_method;
 
     //////////////////// Blob detection - specific parameters //////////////////
 
@@ -601,6 +644,11 @@ namespace pandora_vision
     // right is for the right side of the destributions curve
     Parameters::Thermal::left_tolerance = config.left_tolerance;
     Parameters::Thermal::right_tolerance = config.right_tolerance;
+
+    //-------------- Low and High accepted Temperatures ---------------------
+
+    Parameters::Thermal::low_temperature = config.low_temperature;
+    Parameters::Thermal::high_temperature = config.high_temperature;
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

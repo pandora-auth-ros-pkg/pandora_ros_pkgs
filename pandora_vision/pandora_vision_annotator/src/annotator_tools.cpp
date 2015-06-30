@@ -43,6 +43,8 @@ namespace pandora_vision
 { 
   int ImgAnnotations::annPerImage = 0;
   bool ImgAnnotations::secondpoint = false;
+  int ImgAnnotations::originalHeight = 480;
+  int ImgAnnotations::originalWidth = 640;
   std::vector<annotation> ImgAnnotations::annotations;
   std::ofstream ImgAnnotations::outFile;
   std::ifstream ImgAnnotations::inFile;
@@ -198,10 +200,14 @@ namespace pandora_vision
             }           
             else
               getline (ss, y2);
-            ImgAnnotations::temp.x1 = atoi(x1.c_str());
-            ImgAnnotations::temp.y1 = atoi(y1.c_str());
-            ImgAnnotations::temp.x2 = atoi(x2.c_str());
-            ImgAnnotations::temp.y2 = atoi(y2.c_str());
+            ImgAnnotations::temp.x1 = floor((640.0f / ImgAnnotations::originalWidth) * 
+                                      atoi(x1.c_str()));
+            ImgAnnotations::temp.y1 = floor((480.0f / ImgAnnotations::originalHeight) *
+                                      atoi(y1.c_str()));
+            ImgAnnotations::temp.x2 = floor((640.0f / ImgAnnotations::originalWidth) *
+                                      atoi(x2.c_str()));
+            ImgAnnotations::temp.y2 = floor((480.0f / ImgAnnotations::originalHeight) *
+                                      atoi(y2.c_str()));
 
             ROS_INFO_STREAM("Loading Annotation no: " << i+1 <<" for "<< frame << "\n");
             ROS_INFO_STREAM(ImgAnnotations::temp.imgName << ","
@@ -240,21 +246,33 @@ namespace pandora_vision
         ROS_INFO("Writing to file" );
         for (unsigned int i = 0; i < annotations.size(); i++)
         {
-          outFile << ImgAnnotations::annotations[i].imgName << ","
-                  << ImgAnnotations::annotations[i].category << ","
-                  << ImgAnnotations::annotations[i].x1 << ","
-                  << ImgAnnotations::annotations[i].y1 << ","
-                  << ImgAnnotations::annotations[i].x2 << ","
-                  << ImgAnnotations::annotations[i].y2;
-          if (ImgAnnotations::annotations[i].category == "Hazmat")
-            outFile << ","<< ImgAnnotations::annotations[i].type;
+          ImgAnnotations::temp.imgName = ImgAnnotations::annotations[i].imgName;
+          ImgAnnotations::temp.category = ImgAnnotations::annotations[i].category;
+          ImgAnnotations::temp.x1 = floor((ImgAnnotations::originalWidth / 640.0f) *
+                                    ImgAnnotations::annotations[i].x1);
+          ImgAnnotations::temp.x2 = floor((ImgAnnotations::originalWidth / 640.0f) *
+                                    ImgAnnotations::annotations[i].x2);
+          ImgAnnotations::temp.y1 = floor((ImgAnnotations::originalHeight / 480.0f) *
+                                    ImgAnnotations::annotations[i].y1);
+          ImgAnnotations::temp.y2 = floor((ImgAnnotations::originalHeight / 480.0f) *
+                                    ImgAnnotations::annotations[i].y2);
+          ImgAnnotations::temp.type = ImgAnnotations::annotations[i].type;
+          
+          outFile << ImgAnnotations::temp.imgName << ","
+                  << ImgAnnotations::temp.category << ","
+                  << ImgAnnotations::temp.x1 << ","
+                  << ImgAnnotations::temp.y1 << ","
+                  << ImgAnnotations::temp.x2 << ","
+                  << ImgAnnotations::temp.y2;
+          if (ImgAnnotations::temp.category == "Hazmat")
+            outFile << ","<< ImgAnnotations::temp.type;
           outFile << std::endl;
-          qDebug("%s %s %d %d %d %d\n", ImgAnnotations::annotations[i].imgName.c_str(),
-                  ImgAnnotations::annotations[i].category.c_str(),
-                  ImgAnnotations::annotations[i].x1,
-                  ImgAnnotations::annotations[i].y1,
-                  ImgAnnotations::annotations[i].x2,
-                  ImgAnnotations::annotations[i].y2);
+          qDebug("%s %s %d %d %d %d\n", ImgAnnotations::temp.imgName.c_str(),
+                  ImgAnnotations::temp.category.c_str(),
+                  ImgAnnotations::temp.x1,
+                  ImgAnnotations::temp.y1,
+                  ImgAnnotations::temp.x2,
+                  ImgAnnotations::temp.y2);
          }
       }
     }
@@ -355,5 +373,20 @@ namespace pandora_vision
       ImgAnnotations::temp.y1 = y;
       ImgAnnotations::secondpoint = true;
     }
+  }
+  
+  /**
+  @brief function that sets original Image dimensions 
+  @param  width [int] the image's original width
+  @param height [int] the image's original img_height
+  @return void
+  **/
+  void ImgAnnotations::setOriginalImgDimensions(int width, int height)
+  {
+    ImgAnnotations::originalWidth = width;
+    ImgAnnotations::originalHeight = height;
+    ROS_INFO_STREAM("save Original img dimensions" << ImgAnnotations::originalWidth 
+                                                   << " " << ImgAnnotations::originalHeight);
+      
   }
 }// namespace pandora_vision

@@ -49,7 +49,6 @@ generate_dynamic_reconfigure_options(
   cfg/hole_fusion_node_cfg/general_cfg.cfg
   cfg/hole_fusion_node_cfg/validity_cfg.cfg
   cfg/rgb_node_cfg/rgb_cfg.cfg
-  cfg/temperatures_node_cfg/temperatures_cfg.cfg
   )
 
 add_message_files(
@@ -155,11 +154,18 @@ endif()
 ################################# ROSLINT ######################################
 # Execute via lint : catkin_make roslint_{PACKAGE_NAME}
 
+#set(ROSLINT_CPP_OPTS
+  #"--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
+
 set(ROSLINT_CPP_OPTS
-  "--filter=-whitespace/end_of_line, -build/include_order, -whitespace/blank_line, -whitespace/parens, -whitespace/comments, -build/include_what_you_use, -whitespace/braces, -whitespace/newline, -readability/multiline_string, -runtime/printf, -readability/streams")
+  "--filter=-build/include_what_you_use")
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
+
+  include/*.h
+  src/*.cpp
+  #test/*.cpp
 
   ## depth_node ##
 
@@ -170,6 +176,14 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   src/depth_node/depth_node.cpp
   src/depth_node/hole_detector.cpp
 
+  ## thermal_node ##
+
+  include/thermal_node/thermal.h
+  include/thermal_node/hole_detector.h
+
+  src/thermal_node/thermal.cpp
+  src/thermal_node/thermal_node.cpp
+  src/thermal_node/hole_detector.cpp
 
   ## utils ##
 
@@ -188,6 +202,7 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   #include/utils/timer.h
   include/utils/visualization.h
   include/utils/wavelets.h
+  include/utils/image_matching.h
 
   src/utils/blob_detection.cpp
   src/utils/bounding_box_detection.cpp
@@ -204,6 +219,7 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   #src/utils/timer.cpp
   src/utils/visualization.cpp
   src/utils/wavelets.cpp
+  src/utils/image_matching.cpp
 
 
   ## hole_fusion_node ##
@@ -250,31 +266,31 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   ##################### tests #####################
 
   ##################### utils #####################
-  test/unit/utils/bounding_box_detection_test.cpp
-  test/unit/utils/blob_detection_test.cpp
-  test/unit/utils/edge_detection_test.cpp
-  test/unit/utils/hole_filters_test.cpp
-  test/unit/utils/holes_conveyor_test.cpp
-  test/unit/utils/message_conversions_test.cpp
-  test/unit/utils/morphological_operators_test.cpp
-  test/unit/utils/noise_elimination_test.cpp
-  test/unit/utils/outline_discovery_test.cpp
-  test/unit/utils/wavelets_test.cpp
+  #test/unit/utils/bounding_box_detection_test.cpp
+  #test/unit/utils/blob_detection_test.cpp
+  #test/unit/utils/edge_detection_test.cpp
+  #test/unit/utils/hole_filters_test.cpp
+  #test/unit/utils/holes_conveyor_test.cpp
+  #test/unit/utils/message_conversions_test.cpp
+  #test/unit/utils/morphological_operators_test.cpp
+  #test/unit/utils/noise_elimination_test.cpp
+  #test/unit/utils/outline_discovery_test.cpp
+  #test/unit/utils/wavelets_test.cpp
 
   ################## depth node ###################
-  test/unit/depth_node/hole_detector_test.cpp
+  #test/unit/depth_node/hole_detector_test.cpp
 
   ################### rgb node ####################
-  test/unit/rgb_node/hole_detector_test.cpp
+  #test/unit/rgb_node/hole_detector_test.cpp
 
   ############### hole fusion node ################
-  test/unit/hole_fusion_node/depth_filters_test.cpp
-  test/unit/hole_fusion_node/filters_resources_test.cpp
-  test/unit/hole_fusion_node/hole_merger_test.cpp
-  test/unit/hole_fusion_node/hole_validation_test.cpp
-  test/unit/hole_fusion_node/hole_uniqueness_test.cpp
-  test/unit/hole_fusion_node/planes_detection_test.cpp
-  test/unit/hole_fusion_node/rgb_filters_test.cpp
+  #test/unit/hole_fusion_node/depth_filters_test.cpp
+  #test/unit/hole_fusion_node/filters_resources_test.cpp
+  #test/unit/hole_fusion_node/hole_merger_test.cpp
+  #test/unit/hole_fusion_node/hole_validation_test.cpp
+  #test/unit/hole_fusion_node/hole_uniqueness_test.cpp
+  #test/unit/hole_fusion_node/planes_detection_test.cpp
+  #test/unit/hole_fusion_node/rgb_filters_test.cpp
 
   )
 

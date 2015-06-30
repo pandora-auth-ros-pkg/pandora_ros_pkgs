@@ -37,74 +37,80 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_victim/victim_handler.h"
 
 namespace pandora_vision
 {
-  VictimHandler::VictimHandler(const std::string& ns) : 
+  VictimHandler::VictimHandler(const std::string& ns) :
     sensor_processor::Handler(ns)
   {
     holeActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION);
     holeActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD);
     holeActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
-    
-    //imageActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
+
+    // imageActiveStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
   }
-  
+
   void VictimHandler::startTransition(int newState)
   {
     currentState_ = newState;
-    
+
     bool holePreviouslyOff = true;
     bool imagePreviouslyOff = true;
-    
+
     bool holeCurrentlyOn = false;
     bool imageCurrentlyOn = false;
-    
+
     for (int ii = 0; ii < holeActiveStates_.size(); ii++)
     {
       holePreviouslyOff = (holePreviouslyOff && previousState_ != holeActiveStates_[ii]);
       holeCurrentlyOn = (holeCurrentlyOn || currentState_ == holeActiveStates_[ii]);
     }
-    
-    /* for (int ii = 0; ii < imageActiveStates_.size(); ii++)*/
-    //{
-      //imagePreviouslyOff = (imagePreviouslyOff && previousState_ != imageActiveStates_[ii]);
-      //imageCurrentlyOn = (imageCurrentlyOn || currentState_ == imageActiveStates_[ii]);
-    /*}*/
-   
+
+    /*
+    for (int ii = 0; ii < imageActiveStates_.size(); ii++)
+    {
+      imagePreviouslyOff = (imagePreviouslyOff && previousState_ != imageActiveStates_[ii]);
+      imageCurrentlyOn = (imageCurrentlyOn || currentState_ == imageActiveStates_[ii]);
+    }
+    // */
+
     if (holePreviouslyOff && holeCurrentlyOn)
     {
       preProcPtr_.reset(new VictimHolePreProcessor("~/preprocessor", this));
       processorPtr_.reset(new VictimHoleProcessor("~/processor", this));
       postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
     }
-    /* else if (imagePreviouslyOff && imageCurrentlyOn)*/
-    //{
-      //preProcPtr_.reset(new VictimImagePreProcessor("~/preprocessor", this));
-      //processorPtr_.reset(new VictimImageProcessor("~/processor", this));
-      //postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
-    /*}*/
+    /*
+    else if (imagePreviouslyOff && imageCurrentlyOn)
+    {
+      preProcPtr_.reset(new VictimImagePreProcessor("~/preprocessor", this));
+      processorPtr_.reset(new VictimImageProcessor("~/processor", this));
+      postProcPtr_.reset(new VictimPostProcessor("~/postprocessor", this));
+    }
+    // */
     else if ((!holePreviouslyOff || !imagePreviouslyOff) && (!holeCurrentlyOn && !imageCurrentlyOn))
     {
       preProcPtr_.reset();
       processorPtr_.reset();
       postProcPtr_.reset();
     }
-    
+
     if (currentState_ == state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
     {
       preProcPtr_.reset();
       processorPtr_.reset();
       postProcPtr_.reset();
-      
+
       ros::shutdown();
       return;
     }
     previousState_ = currentState_;
     transitionComplete(currentState_);
   }
-  
+
   void VictimHandler::completeTransition()
   {
   }

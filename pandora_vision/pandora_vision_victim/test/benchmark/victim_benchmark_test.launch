@@ -1,29 +1,39 @@
 <launch>
 
+  <arg name="frame_id" default="kinect_rgb_frame"/>
+
   <include file="$(find state_manager)/launch/stateManager.launch" />
-
+  <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
   <include file="$(find pandora_vision_victim)/launch/victim_node.launch" />
-  
-  <rosparam file="$(find pandora_vision_support)/config/camera_benchmark_params.yaml" 
-    command="load"/>
 
-  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
+  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
 
-  <param name="publisherTopic" value="/camera/depth_registered/points" />
+  <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
+  <param name="dataset_camera" value="kinect"/>
+
+  <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
+  <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
+
+  <param name="benchmarkFlag" value="False" />
+  <param name="publisherTopic" value="/kinect/depth_registered/points" />
   <param name="publisherMessagePackage" value="sensor_msgs" />
   <param name="publisherMessageType" value="PointCloud2"/>
-  
-  <param name="subscriberTopic" value="/vision/qr_alert" />
-  <param name="subscriberMessagePackage" value="pandora_common_msgs" />
-  <param name="subscriberMessageType" value="GeneralAlertMsg"/>
-  
-  <remap from="/camera/depth_registered/points" to="/kinect/depth_registered/points" />
-  
+
+  <param name="syncSubscriberTopic" value="/pandora_vision/victim_node/processor_log" />
+  <param name="subscriberMessagePackage" value="sensor_processor" />
+  <param name="subscriberMessageType" value="ProcessorLogInfo"/>
+
+  <param name="subscriberAlertTopic" value="/vision/victim_direction_alert" />
+  <param name="subscriberAlertMessagePackage" value="pandora_common_msgs" />
+  <param name="subscriberAlertMessageType" value="GeneralAlertVector"/>
+
+  <param name="holeSubscriberTopic" value="/hole_detector/processor_log" />
+  <param name="holeSubscriberMessagePackage" value="sensor_processor" />
+  <param name="holeSubscriberMessageType" value="ProcessorLogInfo"/>
+
   <param name="algorithm" value="Victim"/>
-  <param name="dataset_camera" value="kinect"/>
-  <param name="dataset_path" value="/home/miltos/Documents/pandora_supplementary_material/vision/benchmark_dataset/bags_pcl"/>
-  
+
   <test test-name="VictimBenchmarkTest" pkg="pandora_vision_victim"
-    type="victim_benchmark_test.py" time-limit="2000.0"/>
-  
+    type="victim_benchmark_test.py" time-limit="20000.0"/>
+
 </launch>

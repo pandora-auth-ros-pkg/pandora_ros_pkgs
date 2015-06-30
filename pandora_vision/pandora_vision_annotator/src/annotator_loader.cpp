@@ -52,7 +52,7 @@ namespace pandora_vision
     argv_(argv)
   {
     setupUi(this);
-    
+    //scrollArea->setWidget(imageLabel);
     close_signal_ = false;
   }
   

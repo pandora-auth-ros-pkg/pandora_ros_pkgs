@@ -168,6 +168,14 @@ namespace pandora_vision
       @return void
       **/
       void receiveEnhancedImage(const pandora_vision_msgs::EnhancedImageConstPtr& msg);
+      
+      /**
+      @brief Function called when new ROS message appears, from any topic
+      posting an flirLeptonMsg  kind of msg
+      @param msg [const pandora_common_msgs::flirLeptonMsgConstPtr& ] The message
+      @return void
+      **/
+      void receiveThermalImage(const distrib_msgs::flirLeptonMsgPtr& msg);
 
       /**
       @brief function that loads the bag

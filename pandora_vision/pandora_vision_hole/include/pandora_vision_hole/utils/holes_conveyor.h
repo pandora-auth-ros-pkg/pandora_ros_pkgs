@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_HOLES_CONVEYOR_H
-#define UTILS_HOLES_CONVEYOR_H
+#ifndef PANDORA_VISION_HOLE_UTILS_HOLES_CONVEYOR_H
+#define PANDORA_VISION_HOLE_UTILS_HOLES_CONVEYOR_H
 
 #include <std_msgs/Header.h>
 
@@ -89,7 +89,6 @@ namespace pandora_vision
     {
       return holes.size();
     }
-
   };
 
   typedef boost::shared_ptr<HolesConveyor> HolesConveyorPtr;
@@ -102,7 +101,6 @@ namespace pandora_vision
   class HolesConveyorUtils
   {
     public:
-
       /**
         @brief Appends one HolesConveyor struct to another.
         @param[in] src [const HolesConveyor&] The source conveyor
@@ -235,9 +233,8 @@ namespace pandora_vision
         @return void
        **/
       static void shuffle(HolesConveyor* src);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_HOLES_CONVEYOR_H
+#endif  // PANDORA_VISION_HOLE_UTILS_HOLES_CONVEYOR_H

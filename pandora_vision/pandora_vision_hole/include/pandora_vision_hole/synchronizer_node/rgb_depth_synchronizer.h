@@ -35,15 +35,13 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias, Angelos Triantafyllidis
  *********************************************************************/
 
-#ifndef SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H
-#define SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H
+#ifndef PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H
+#define PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H
 
 #include "utils/message_conversions.h"
 #include <utils/defines.h>
 #include <utils/parameters.h>
 #include <std_msgs/Empty.h>
-#include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
 #include "pandora_vision_msgs/SynchronizedMsg.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
 #include "pandora_vision_msgs/IndexedThermal.h"
@@ -62,10 +60,9 @@ namespace pandora_vision
   class RgbDepthSynchronizer
   {
     private:
-
       // The ROS node handle
       ros::NodeHandle nodeHandle_;
-   
+
       // The subscriber to the Rgbd-T synchronizer node that aquires
       // the SynchronizedMsg (pointcloud and thermal synchronized info)
       ros::Subscriber inputSynchronizedSubscriber_;
@@ -105,7 +102,7 @@ namespace pandora_vision
       // The subscriber to thermal node.
       ros::Subscriber unlockThermalProcedureSubscriber_;
 
-      // The name of the topic that thermal node publishes unlock information 
+      // The name of the topic that thermal node publishes unlock information
       // to synchronizer node
       std::string unlockThermalProcedureTopic_;
 
@@ -115,7 +112,7 @@ namespace pandora_vision
       ros::Publisher synchronizedPointCloudPublisher_;
       ros::Publisher synchronizedDepthImagePublisher_;
       ros::Publisher synchronizedRGBImagePublisher_;
-      
+
       // The publisher which will advertise the synchronized rgb and depth
       // images extracted from the point cloud to thermal cropper node.
       ros::Publisher synchronizedRgbDepthCropperImagesPublisher_;
@@ -145,6 +142,10 @@ namespace pandora_vision
       // Booleans that tell the synchronizer where to publish.
       bool isLocked_;
       bool thermalLocked_;
+
+      // The mode in which the package is running
+      // If true Thermal process is enabled, else only Rgb-D.
+      bool mode_;
 
       // Records the time for each synchronizer invocation
       double invocationTime_;
@@ -236,18 +237,17 @@ namespace pandora_vision
         @return void
        **/
       void unlockCallback(const std_msgs::Empty& lockMsg);
-      
+
       /**
-        @brief The callback from thermal node. Set's a lock variable that is 
+        @brief The callback from thermal node. Set's a lock variable that is
         responsible for the message that is sent to thermal node from
-        synchronizer node.  
+        synchronizer node.
         @paramp[in] lockMsg [const std_msgs::Empty&] An empty message used to
         trigger the callback for thermal procedure.
        **/
       void unlockThermalProcessCallback(const std_msgs::Empty& lockMsg);
 
     public:
-
       /**
         @brief The constructor
        **/
@@ -259,6 +259,6 @@ namespace pandora_vision
       ~RgbDepthSynchronizer(void);
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H
+#endif  // PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_RGB_DEPTH_SYNCHRONIZER_H

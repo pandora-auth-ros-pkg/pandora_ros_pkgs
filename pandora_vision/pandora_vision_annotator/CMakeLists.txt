@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   sensor_msgs
   pandora_vision_msgs
+  distrib_msgs
   pcl_ros
 )
 
@@ -46,7 +47,8 @@ catkin_package(
     rosbag
     roslib
     sensor_msgs
-   pandora_vision_msgs
+    pandora_vision_msgs
+    distrib_msgs
     cv_bridge
     pcl_ros
   INCLUDE_DIRS include

@@ -35,8 +35,8 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#ifndef HOLE_FUSION_NODE_FILTERS_H
-#define HOLE_FUSION_NODE_FILTERS_H
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_H
 
 #include <math.h>
 #include "hole_fusion_node/planes_detection.h"
@@ -64,7 +64,6 @@ namespace pandora_vision
   class Filters
   {
     public:
-
       /**
         @brief Applies a specific active filter, either from an RGB
         or a Depth sources.
@@ -192,9 +191,8 @@ namespace pandora_vision
         const std::vector<std::set<unsigned int> >& intermediatePointsSetVector,
         const std::vector<cv::Mat>& intermediatePointsImageVector,
         std::vector<std::vector<float> >* probabilitiesVector);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_FILTERS_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_H

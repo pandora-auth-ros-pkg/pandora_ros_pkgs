@@ -32,12 +32,13 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
-
 
 #ifndef PANDORA_VISION_HAZMAT_DETECTION_DETECTOR_INTERFACE_H
 #define PANDORA_VISION_HAZMAT_DETECTION_DETECTOR_INTERFACE_H
+
+#include <vector>
 
 #include "pandora_vision_hazmat/detection/utilities.h"
 #include "pandora_vision_hazmat/detection/hazmat_poi.h"
@@ -46,47 +47,46 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    /*
+    /**
      * @class Detector
      * @brief Interface for the detector objects.
      */
-
     class Detector
     {
-      public : 
-
-        /*
-         * @brief : This function is used to detect the desired 
+      public:
+        /**
+         * @brief : This function is used to detect the desired
          * objects in the current frame .
          * @param frame[const cv::Mat&] : The frame that will be processed.
          * @param detectedObjects[std::vector<Object>*] : A vector containing
          * all the objects detected in the scene.
          * @return bool : True if an object has been detected,false otherwise.
          */
-        bool virtual detect(const cv::Mat &frame , std::vector<POIPtr>*
-            detectedObjects ) = 0;
+        bool virtual detect(const cv::Mat &frame, std::vector<POIPtr>*
+            detectedObjects) = 0;
 
         /**
-          @brief Function used to read the necessary training data for
-          the detector to function.
-          @return [bool] : A flag that tells us whether we succeeded in 
-          reading the data.
-         **/
-        bool virtual readData( void ) = 0;
+         * @brief Function used to read the necessary training data for
+         * the detector to function.
+         * @return [bool] : A flag that tells us whether we succeeded in
+         * reading the data.
+         */
+        bool virtual readData(void) = 0;
 
-        /*
+        /**
          * @brief : The default empty constructor.
          */
-        Detector() {}
+        Detector()
+        {
+        }
 
-        /*
+        /**
          * @brief : The default destructor.
          */
-        virtual ~Detector() {};
-
+        virtual ~Detector()
+        {
+        };
     };
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
-
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_DETECTOR_INTERFACE_H

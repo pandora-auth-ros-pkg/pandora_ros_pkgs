@@ -32,31 +32,30 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
 #ifndef PANDORA_VISION_HAZMAT_MOCK_MOCK_FEATURE_DETECTOR_H
 #define PANDORA_VISION_HAZMAT_MOCK_MOCK_FEATURE_DETECTOR_H
 
+#include <vector>
 #include "pandora_vision_hazmat/detection/feature_matching_detector.h"
 
 namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    /*
+    /**
      * @class MockFeatureDetector
      * @brief : Mock feature Detector class used for testing.
-     **/
-
+     */
     class MockFeatureDetector : public FeatureMatchingDetector
     {
       public:
-
-        /*
+        /**
          * @brief: Function used to produce the necessary keypoints and their
-         *          corresponding descriptors for an image. 
-         * @param frame[const cv::Mat&] : The images that will be processed to 
+         * corresponding descriptors for an image.
+         * @param frame[const cv::Mat&] : The images that will be processed to
          * extract features and keypoints.
          * @param mask[const cv::Mat&] : A mask defines the image regions that
          * will be processed.
@@ -64,14 +63,14 @@ namespace pandora_vision
          * used to store the descriptors of the current image.
          * @param keyPoints[std::vector<cv::KeyPoint>*] : A pointer to the
          * vector containing the Keypoints detected in the current image.
-         **/
-        void virtual getFeatures( const cv::Mat &frame , const cv::Mat &mask
-            , cv::Mat *descriptors , std::vector<cv::KeyPoint> *keyPoints )
+         */
+        void virtual getFeatures(const cv::Mat &frame, const cv::Mat &mask,
+            cv::Mat *descriptors, std::vector<cv::KeyPoint> *keyPoints)
         {
           // The class creates mock object so no functionality is necessary.
         }
 
-        /*
+        /**
          * @brief : Default empty constructor.
          */
         MockFeatureDetector() : FeatureMatchingDetector()
@@ -80,8 +79,6 @@ namespace pandora_vision
 
       private:
     };
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
-
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_MOCK_MOCK_FEATURE_DETECTOR_H

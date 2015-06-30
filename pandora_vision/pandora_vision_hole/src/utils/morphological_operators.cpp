@@ -59,7 +59,7 @@ namespace pandora_vision
 
     for (unsigned int i = 0; i < steps; i++)
     {
-      if(visualize)
+      if (visualize)
       {
         Visualization::show("Closing iteration", *img, 500);
       }
@@ -93,20 +93,20 @@ namespace pandora_vision
 
     static unsigned int p = 0;
 
-    for(unsigned int s = 0 ; s < steps ; s++)
+    for (unsigned int s = 0 ; s < steps ; s++)
     {
-      if(visualize)
+      if (visualize)
       {
         Visualization::show("dilation iteration", *img, 500);
       }
 
-      for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
+      for (unsigned int i = 1 ; i < img->rows - 1 ; i++)
       {
-        for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
+        for (unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           p = i * img->cols + j;
 
-          if (img->data[p] == 0) // That's foreground
+          if (img->data[p] == 0)  // That's foreground
           {
             // Check for all adjacent
             if (img->data[p + img->cols + 1] != 0)
@@ -295,22 +295,22 @@ namespace pandora_vision
 
     static unsigned int p = 0;
 
-    for(unsigned int s = 0 ; s < steps ; s++)
+    for (unsigned int s = 0 ; s < steps ; s++)
     {
-      if(visualize)
+      if (visualize)
       {
         Visualization::show("dilationRelative iteration", *img, 500);
       }
 
-      for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
+      for (unsigned int i = 1 ; i < img->rows - 1 ; i++)
       {
-        for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
+        for (unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           unsigned char max = 0;
 
           p = i * img->cols + j;
 
-          if(img->data[p] == 0) // That's foreground
+          if (img->data[p] == 0)  // That's foreground
           {
             // Check for all adjacent
             if (img->data[p + img->cols + 1] > max)
@@ -515,58 +515,58 @@ namespace pandora_vision
 
     static unsigned int p = 0;
 
-    for(unsigned int s = 0 ; s < steps ; s++)
+    for (unsigned int s = 0 ; s < steps ; s++)
     {
-      if(visualize)
+      if (visualize)
       {
         Visualization::show("Erosion iteration", *img, 500);
       }
 
-      for(unsigned int i = 1 ; i < img->rows - 1 ; i++)
+      for (unsigned int i = 1 ; i < img->rows - 1 ; i++)
       {
-        for(unsigned int j = 1 ; j < img->cols - 1 ; j++)
+        for (unsigned int j = 1 ; j < img->cols - 1 ; j++)
         {
           p = i * img->cols + j;
 
-          if(img->data[p] != 0) // That's foreground
+          if (img->data[p] != 0)  // That's foreground
           {
             // Check for all adjacent
-            if(img->data[p + img->cols + 1] == 0)
+            if (img->data[p + img->cols + 1] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p + img->cols] == 0)
+            if (img->data[p + img->cols] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p + img->cols - 1] == 0)
+            if (img->data[p + img->cols - 1] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p + 1] == 0)
+            if (img->data[p + 1] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p - 1] == 0)
+            if (img->data[p - 1] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p - img->cols - 1] == 0)
+            if (img->data[p - img->cols - 1] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p - img->cols] == 0)
+            if (img->data[p - img->cols] == 0)
             {
               helper.data[p] = 0;
               continue;
             }
-            if(img->data[p - img->cols + 1] == 0)
+            if (img->data[p - img->cols + 1] == 0)
             {
               helper.data[p] = 0;
               continue;
@@ -711,16 +711,16 @@ namespace pandora_vision
     static unsigned char *ptr;
     ptr = (unsigned char *) img.data;
 
-    for(int i = -1; i <= 1; i++)
+    for (int i = -1; i <= 1; i++)
     {
-      for(int j = -1; j <= 1; j++)
+      for (int j = -1; j <= 1; j++)
       {
-        if(kernel[j + 1][i + 1] == 0 &&
+        if (kernel[j + 1][i + 1] == 0 &&
           ptr[ (center.y + j) * img.cols + center.x + i ] != 0)
         {
           return false;
         }
-        else if(kernel[j + 1][i + 1] == 1 &&
+        else if (kernel[j + 1][i + 1] == 1 &&
           ptr[(center.y + j) * img.cols + center.x + i] == 0)
         {
           return false;
@@ -748,7 +748,7 @@ namespace pandora_vision
 
     for (unsigned int i = 0; i < steps; i++)
     {
-      if(visualize)
+      if (visualize)
       {
         Visualization::show("Opening iteration", *img, 500);
       }
@@ -823,12 +823,12 @@ namespace pandora_vision
     {
       for (unsigned int cols = 1; cols < img->cols - 1; cols++)
       {
-        if(img->at<unsigned char>(rows, cols) != 0)
+        if (img->at<unsigned char>(rows, cols) != 0)
         {
           // Check for initial stuff
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(cols, rows)))
+            if (kernelCheck(kernels[i], *img, cv::Point(cols, rows)))
             {
               current.insert(rows * img->cols + cols);
               break;
@@ -844,7 +844,7 @@ namespace pandora_vision
       next.clear();
       isRunning = false;
 
-      for(std::set<unsigned int>::iterator it = current.begin() ;
+      for (std::set<unsigned int>::iterator it = current.begin() ;
         it != current.end() ; it++)
       {
         static unsigned int x = 0;
@@ -854,98 +854,98 @@ namespace pandora_vision
 
         img->at<unsigned char>(x, y) = 0;
 
-        if(img->at<unsigned char>(x - 1, y - 1) != 0)
+        if (img->at<unsigned char>(x - 1, y - 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y - 1, x - 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y - 1, x - 1)))
             {
               isRunning = true;
-              next.insert( (x - 1) * img->cols + (y - 1) );
+              next.insert((x - 1) * img->cols + (y - 1) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x - 1, y) != 0)
+        if (img->at<unsigned char>(x - 1, y) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y, x - 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y, x - 1)))
             {
               isRunning = true;
-              next.insert( (x - 1) * img->cols + (y) );
+              next.insert((x - 1) * img->cols + (y) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x - 1, y + 1) != 0)
+        if (img->at<unsigned char>(x - 1, y + 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y + 1, x - 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y + 1, x - 1)))
             {
               isRunning = true;
-              next.insert( (x - 1) * img->cols + (y + 1) );
+              next.insert((x - 1) * img->cols + (y + 1) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x, y - 1) != 0)
+        if (img->at<unsigned char>(x, y - 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y - 1, x)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y - 1, x)))
             {
               isRunning = true;
-              next.insert( (x) * img->cols + (y - 1) );
+              next.insert((x) * img->cols + (y - 1) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x, y + 1) != 0)
+        if (img->at<unsigned char>(x, y + 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y + 1, x)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y + 1, x)))
             {
               isRunning = true;
-              next.insert( (x) * img->cols + (y + 1) );
+              next.insert((x) * img->cols + (y + 1) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x + 1, y - 1) != 0)
+        if (img->at<unsigned char>(x + 1, y - 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y - 1, x + 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y - 1, x + 1)))
             {
               isRunning = true;
-              next.insert( (x + 1) * img->cols + (y - 1) );
+              next.insert((x + 1) * img->cols + (y - 1) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x + 1, y) != 0)
+        if (img->at<unsigned char>(x + 1, y) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y, x + 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y, x + 1)))
             {
               isRunning = true;
-              next.insert( (x + 1) * img->cols + (y) );
+              next.insert((x + 1) * img->cols + (y) );
               break;
             }
           }
         }
-        if(img->at<unsigned char>(x + 1, y + 1) != 0)
+        if (img->at<unsigned char>(x + 1, y + 1) != 0)
         {
-          for(unsigned int i = 0 ; i < nOfKernels ; i++)
+          for (unsigned int i = 0 ; i < nOfKernels ; i++)
           {
-            if(kernelCheck(kernels[i], *img, cv::Point(y + 1, x + 1)))
+            if (kernelCheck(kernels[i], *img, cv::Point(y + 1, x + 1)))
             {
               isRunning = true;
-              next.insert( (x + 1) * img->cols + (y + 1) );
+              next.insert((x + 1) * img->cols + (y + 1) );
               break;
             }
           }
@@ -1030,7 +1030,7 @@ namespace pandora_vision
     {
       for (unsigned int cols = 1; cols < outImage->cols - 1; cols++)
       {
-        if(inImage.data[rows * inImage.cols + cols] != 0)
+        if (inImage.data[rows * inImage.cols + cols] != 0)
         {
           pts[limit]= rows * inImage.cols + cols;
           limit++;
@@ -1044,7 +1044,7 @@ namespace pandora_vision
 
       for (int kernelId = 0; kernelId < 8; kernelId++)
       {
-        for(unsigned int i = 0; i < limit; i++)
+        for (unsigned int i = 0; i < limit; i++)
         {
           if (kernelCheck(kernels[kernelId], *outImage,
               cv::Point(pts[i] % outImage->cols, pts[i] / outImage->cols)))
@@ -1070,4 +1070,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

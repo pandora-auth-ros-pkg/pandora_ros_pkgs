@@ -38,19 +38,21 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_qrcode/qrcode_processor.h"
 
 namespace pandora_vision
 {
 
-  /*
+  /**
    * @brief The default constructor of the QR processor class
    */
   QrCodeProcessor::QrCodeProcessor() : VisionProcessor()
   {
   }
 
-  /*
+  /**
    * @brief: The Main constructor for the QR code Processor objects.
    * @param ns[const std::string&]: The namespace for the node.
    * @param handler[sensor_processor::Handler*]: A pointer to the handler
@@ -71,7 +73,7 @@ namespace pandora_vision
     ROS_DEBUG_STREAM("debugQrCode : " << (debugQrCode ? "True": "False"));
 
     int gaussianSharpenBlur;
-    //!< Get the buffer size parameter if available;
+    /// Get the buffer size parameter if available
     if (!this->accessPublicNh()->getParam("qrCodeSharpenBlur",
           gaussianSharpenBlur))
       gaussianSharpenBlur = 5;
@@ -79,7 +81,7 @@ namespace pandora_vision
     ROS_DEBUG_STREAM("qrCodeSharpenBlur : " << gaussianSharpenBlur);
 
     double gaussianSharpenWeight;
-    //!< Get the difference threshold parameter if available;
+    /// Get the difference threshold parameter if available
     if (!this->accessPublicNh()->getParam("qrCodeSharpenWeight",
           gaussianSharpenWeight))
       gaussianSharpenWeight = 0.8;
@@ -90,17 +92,17 @@ namespace pandora_vision
     detectorPtr_.reset(new QrCodeDetector(gaussianSharpenBlur,
         gaussianSharpenWeight, debugQrCode));
 
-    //!< The dynamic reconfigure parameter's callback
+    /// The dynamic reconfigure parameter's callback
     server.setCallback(boost::bind(&QrCodeProcessor::parametersCallback,
           this, _1, _2));
   }
-  
+
   /**
-    @brief The function called when a parameter is changed
-    @param[in] config [const pandora_vision_qrcode::qrcode_cfgConfig&]
-    @param[in] level [const uint32_t] The level 
-    @return void
-  **/
+   * @brief The function called when a parameter is changed
+   * @param[in] config [const pandora_vision_qrcode::qrcode_cfgConfig&]
+   * @param[in] level [const uint32_t] The level
+   * @return void
+   */
   void QrCodeProcessor::parametersCallback(
     const pandora_vision_qrcode::qrcode_cfgConfig& config,
     const uint32_t& level)
@@ -110,20 +112,20 @@ namespace pandora_vision
     detectorPtr_->setSharpenWeight(config.sharpenWeight);
   }
 
-  /*
+  /**
    * @brief: The main process function that will be used to detect the QR
-   * patterns on the current frame
+   * patterns on the current frame.
    * @param input[const CVMatStampedConstPtr&]: The input image.
    * @param output[const POIsStampedPtr&]: The output regions of interest.
    * @return: True if any patterns were detected, false otherwise.
-  */
+   */
   bool QrCodeProcessor::process(const CVMatStampedConstPtr& input,
       const POIsStampedPtr& output)
   {
     output->header = input->getHeader();
     output->frameWidth = input->getImage().cols;
     output->frameHeight = input->getImage().rows;
-    
+
     output->pois = detectorPtr_->detectQrCode(input->getImage());
 
     if (output->pois.empty())

@@ -32,8 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
+
+#include <map>
+#include <string>
+#include <vector>
+#include <utility>
+#include <algorithm>
 
 #include "pandora_vision_hazmat/training/planar_pattern_trainer.h"
 
@@ -41,18 +47,15 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-
-    /*
-     * @brief Main training function that reads input images and stores 
+    /**
+     * @brief Main training function that reads input images and stores
      * the results in a corresponding xml file.
      * @return bool : Flags that indicates success.
-     */ 
-
+     */
     bool PlanarPatternTrainer::train()
     {
-
       ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : Starting Training!");
-      const clock_t startingTime = clock();  
+      const clock_t startingTime = clock();
 
       // The number of images.
       int imgNum;
@@ -67,13 +70,13 @@ namespace pandora_vision
 
       std::vector<std::string> inputDataNames;
 
-      // Open the file with the different pattern names .
+      // Open the file with the different pattern names.
       std::string fileName;
       std::string line;
 
-      //ROS_INFO("Reading the names of the patterns.");
+      // ROS_INFO("Reading the names of the patterns.");
 
-      // Initialize the path to the data that will be used to train the system. 
+      // Initialize the path to the data that will be used to train the system.
       boost::filesystem::path trainingInputPath(packagePath_ +
           "/data/training_input/");
 
@@ -99,10 +102,9 @@ namespace pandora_vision
       // Sort the resulting data.
       sort(trainingInputContents.begin(), trainingInputContents.end());
 
-
-      bool iterationFlag = false; 
+      bool iterationFlag = false;
       // Iterate over all the files/paths in the subdirectory.
-      for (std::vector<boost::filesystem::path>::iterator 
+      for (std::vector<boost::filesystem::path>::iterator
           dirIterator(trainingInputContents.begin());
           dirIterator != trainingInputContents.end(); dirIterator++)
       {
@@ -119,7 +121,7 @@ namespace pandora_vision
             }
 
             // Check if it is a directory.
-            else if(boost::filesystem::is_directory(*dirIterator))
+            else if (boost::filesystem::is_directory(*dirIterator))
             {
               ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : %s is a "
                   "directory !", dirIterator->c_str());
@@ -127,7 +129,6 @@ namespace pandora_vision
                   "all the files in the directory!");
 
               iterationFlag |= directoryProcessor(*dirIterator);
-
             }
             else
             {
@@ -136,26 +137,24 @@ namespace pandora_vision
                   dirIterator->c_str());
               continue;
             }
-
           }
           else
           {
             ROS_ERROR("[PANDORA_VISION_HAZMAT_TRAINER] : Invalid path!");
             continue;
           }
-
         }
         catch(const boost::filesystem3::filesystem_error& ex)
         {
           ROS_ERROR("%s", ex.what());
         }
-
       }
+
       const clock_t endingTime = clock();
       ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : Features calculated and saved.");
       ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : Training is over !");
       ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : Training time was : "
-          "%f seconds", ( endingTime - startingTime ) /
+          "%f seconds", (endingTime - startingTime) /
           static_cast<double>(CLOCKS_PER_SEC));
 
       // If true then at least the training data for one pattern was acquired
@@ -163,7 +162,7 @@ namespace pandora_vision
       return iterationFlag;
     }
 
-    /*
+    /**
      * @brief This method iterates over a directory, reads every
      * instance/synthetic view,calculates features and keypoints for every
      * single one of them and stores them in a corresponding xml file.
@@ -195,20 +194,20 @@ namespace pandora_vision
       boost::filesystem::path frontalViewPath(
           dirPath.string() + "/" +
           dirPath.filename().string() + std::string(".png"));
-      // Find the path in the container for the current subdirectory. 
+      // Find the path in the container for the current subdirectory.
       frontalViewPathIter = std::find(pathVector.begin(),
-          pathVector.end(), frontalViewPath); 
+          pathVector.end(), frontalViewPath);
 
       // Vector that contains the training set images.
       std::vector<cv::Mat> imageCollection;
       std::vector<std::string> imageNames;
 
       // Check if the path was found.
-      if (frontalViewPathIter == pathVector.end() || 
+      if (frontalViewPathIter == pathVector.end() ||
           !boost::filesystem::exists(*frontalViewPathIter))
       {
         ROS_ERROR("[PANDORA_VISION_HAZMAT_TRAINER] : Could not find the"
-            " frontal view as specified by" 
+            " frontal view as specified by"
             " %s !", frontalViewPath.c_str());
         // Since the frontal view was not found,training cannot continue.
         return false;
@@ -261,7 +260,7 @@ namespace pandora_vision
       {
         // Get the homography matrices.
         bool flag = getHomographyMatrices(homographyPath, &homographies);
-        // If we failed to read the homographies then the training cannot 
+        // If we failed to read the homographies then the training cannot
         // continue.
         if (!flag)
           return false;
@@ -284,8 +283,8 @@ namespace pandora_vision
 
       // Iterate over all the contents of the folder and read all the images
       // it contains.
-      for (std::vector<boost::filesystem::path>::const_iterator it 
-          (pathVector.begin()); 
+      for (std::vector<boost::filesystem::path>::const_iterator it
+          (pathVector.begin());
           it != pathVector.end(); ++it)
       {
         cv::Mat img = cv::imread(it->c_str());
@@ -315,14 +314,14 @@ namespace pandora_vision
           imageCollection, imageNames, homographies);
     }
 
-    /*
-     * @brief This method calculates and saves the features for a list of 
+    /**
+     * @brief This method calculates and saves the features for a list of
      * images in the provided path.
      * @param dirPath[const boost::filesystem::path&]: The path to the images.
      * @param images[const std::vector<cv::Mat>]&: The list of images.
-     * @param imageNames[const std::vector<std::string>&]: The list of image 
+     * @param imageNames[const std::vector<std::string>&]: The list of image
      * names.
-     * @param homographies[const std::map<std::string, cv::Mat>&]: 
+     * @param homographies[const std::map<std::string, cv::Mat>&]:
      * The container that contains for each view the corresponding homography.
      * @return bool : Flags that indicates success.
      */
@@ -335,14 +334,14 @@ namespace pandora_vision
       // The vector that contains all the keypoints found in the training set.
       std::vector<cv::Point2f> multiViewKeypoints;
       // The array of all the descriptors detected in the training set.
-      cv::Mat multiViewDescriptors; 
+      cv::Mat multiViewDescriptors;
 
       cv::Mat frontViewDescriptors;
       std::vector<cv::KeyPoint> frontViewKeyPoints;
       std::vector<cv::Point2f> boundingBox;
-      //Calculate the features for the frontal view of the pattern.
+      // Calculate the features for the frontal view of the pattern.
       this->getFeatures(images[0], &frontViewDescriptors,
-          &frontViewKeyPoints, &boundingBox );
+          &frontViewKeyPoints, &boundingBox);
 
       multiViewDescriptors = frontViewDescriptors;
       std::vector<cv::Mat> synthViewDescriptors;
@@ -384,7 +383,7 @@ namespace pandora_vision
         }
         homography = it->second;
 
-        // Copy the keypoints detected in the i-th view. 
+        // Copy the keypoints detected in the i-th view.
         for (int j = 0 ; j < synthViewKeyPoints[i].size(); j++)
         {
           viewKeyPoints.push_back(synthViewKeyPoints[i][j].pt);
@@ -409,10 +408,10 @@ namespace pandora_vision
       cv::Mat labels;
       cv::Mat centroids;
       cv::kmeans(multiViewDescriptors, frontViewKeyPoints.size(), labels,
-          cv::TermCriteria( cv::TermCriteria::EPS + cv::TermCriteria::COUNT ,
+          cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::COUNT,
             10, 0.1), 3, cv::KMEANS_PP_CENTERS, centroids);
 
-      ROS_INFO("Finished kmeans clustering!"); 
+      ROS_INFO("Finished kmeans clustering!");
       cv::BFMatcher matcher(cv::NORM_L2);
 
       std::vector<std::vector<cv::DMatch> > matches;
@@ -421,11 +420,11 @@ namespace pandora_vision
 
       std::vector<cv::Point2f> bestKeypoints;
 
-      for( int i = 0; i <  matches.size() ; i++ )
-      { 
-        // if( matches[i][0].distance < ratio*matches[i][1].distance )
+      for (int i = 0; i <  matches.size() ; i++)
+      {
+        // if(matches[i][0].distance < ratio*matches[i][1].distance)
         bestKeypoints.push_back(
-            frontViewKeyPoints[matches[i][0].queryIdx].pt );
+            frontViewKeyPoints[matches[i][0].queryIdx].pt);
         std::cout << matches[i][0].distance << std::endl;
       }
 
@@ -439,11 +438,9 @@ namespace pandora_vision
       return saveFlag;
     }
 
-
-
-    /*
+    /**
      * @brief This method reads the image whose path is dirPath,
-     * calculates features and keypoints and stores them in a 
+     * calculates features and keypoints and stores them in a
      * corresponding xml file.
      * @param dirPath[const boost::filesystem::path&]: The path to the current
      * pattern.
@@ -456,7 +453,7 @@ namespace pandora_vision
           dirPath.filename().c_str());
       cv::Mat descriptors;
       std::vector<cv::KeyPoint> keyPoints;
-      std::vector<cv::Point2f> boundingBox; 
+      std::vector<cv::Point2f> boundingBox;
 
       cv::Mat img = cv::imread(dirPath.c_str());
       if (!img.data)
@@ -465,29 +462,28 @@ namespace pandora_vision
             "proceeding to next pattern!");
         return false;
       }
-      //Calculate the image features.
-      this->getFeatures(img, &descriptors, &keyPoints, &boundingBox );
-      //Save the training data for the i-th image.
+      // Calculate the image features.
+      this->getFeatures(img, &descriptors, &keyPoints, &boundingBox);
+      // Save the training data for the i-th image.
 
       this->saveDataToFile(dirPath, descriptors, keyPoints,
           boundingBox);
       return true;
     }
 
-    /*
+    /**
      * @brief Saves the training data to a proper XML file.
      * @param patternName [const std::string &] : The name of the pattern.
      * @param descriptors [const cv::Mat &] : The descriptors of the pattern.
      * @param keyPoints [const std::vector<cv::Point2f>] : The key points
      * detected on the pattern.
      * @return bool : Flags that indicates success.
-     */                  
-
+     */
     bool PlanarPatternTrainer::saveDataToFile(
         const boost::filesystem::path &patternPath,
         const cv::Mat &descriptors ,
         const std::vector<cv::Point2f> &keyPoints,
-        const std::vector<cv::Point2f> &boundingBox) 
+        const std::vector<cv::Point2f> &boundingBox)
     {
       // Create the file name where the results will be stored.
       std::string fileName(patternPath.filename().string());
@@ -498,7 +494,7 @@ namespace pandora_vision
 
       // Properly choose the name of the data file.
       // TO DO : Change hard coded strings to yaml params.
-      boost::filesystem::path resultPath(packagePath_ + "/data" + "/training" 
+      boost::filesystem::path resultPath(packagePath_ + "/data" + "/training"
           + "/" + this->getFeatureType() + "/" + fileName);
 
       // fileName = path + fileName;
@@ -507,7 +503,7 @@ namespace pandora_vision
           resultPath.c_str());
 
       // Opening the xml file for writing .
-      cv::FileStorage fs( resultPath.string() + ".xml",
+      cv::FileStorage fs(resultPath.string() + ".xml",
           cv::FileStorage::WRITE);
 
       if (!fs.isOpened())
@@ -527,13 +523,13 @@ namespace pandora_vision
       int keyPointsNum = keyPoints.size();
       // Store the detected keypoints.
       fs << "PatternKeypoints" << "[";
-      for (int i = 0 ; i < keyPointsNum ; i++ )
+      for (int i = 0 ; i < keyPointsNum; i++)
         fs << "{" << "Keypoint" <<  keyPoints[i] << "}";
       fs << "]";
 
       // Store the bounding box for the pattern.
       fs << "BoundingBox" << "[";
-      for (int i = 0 ; i < boundingBox.size() ; i++ )
+      for (int i = 0 ; i < boundingBox.size(); i++)
         fs << "{" << "Corner" <<  boundingBox[i] << "}";
 
       fs << "]";
@@ -544,24 +540,22 @@ namespace pandora_vision
       return true;
     }
 
-    /*
+    /**
      * @brief Saves the training data to a proper XML file.
      * @param patternName [const std::string &] : The name of the pattern.
      * @param descriptors [const cv::Mat &] : The descriptors of the pattern.
      * @param keyPoints [const std::vector<cv::Keypoint>] : The key points
      * detected on the pattern.
-     * @param boundingBox[const std::vector<cv::Point2f>&] : The vector 
+     * @param boundingBox[const std::vector<cv::Point2f>&] : The vector
      * containing the bounding box of the pattern.
      * @return bool : Flag that indicates success.
-     */                  
-
+     */
     bool PlanarPatternTrainer::saveDataToFile(
         const boost::filesystem::path& patternPath,
         const cv::Mat& descriptors ,
         const std::vector<cv::KeyPoint>& keyPoints,
-        const std::vector<cv::Point2f>& boundingBox) 
+        const std::vector<cv::Point2f>& boundingBox)
     {
-
       // Create the file name where the results will be stored.
       std::string fileName(patternPath.filename().string());
 
@@ -617,17 +611,16 @@ namespace pandora_vision
       return true;
     }
 
-    /*
+    /**
      * @brief Iterate over the file containing the homographies and store them
      * in a vector.
      * @param homographyFilePath[const boost::filesystem::path&]: The path to
      * the file containing the homographies used to create each synthetic
-     * view. Each line must have the name of the image it corresponds and 
+     * view. Each line must have the name of the image it corresponds and
      * the matrix in  row wise form as csv values.
      * @param homographyMatrices[std::map<cv::Mat>*]: A mapping from the image
      * names to the corresponding homography matrices.
      */
-
     bool PlanarPatternTrainer::getHomographyMatrices(
         const boost::filesystem::path& homographyFilePath,
         std::map<std::string, cv::Mat>* homographyMatrices)
@@ -635,7 +628,7 @@ namespace pandora_vision
       // A container for each line.
       std::string line;
       // Open the file.
-      std::fstream file(homographyFilePath.c_str(), std::fstream::in); 
+      std::fstream file(homographyFilePath.c_str(), std::fstream::in);
       // The vector for the tokens.
       std::vector<std::string> tokens;
       // The vector used to parse to separate the float values.
@@ -657,7 +650,7 @@ namespace pandora_vision
         return false;
       }
       // Iterate over each line of the file.
-      while(std::getline(file, line))
+      while (std::getline(file, line))
       {
         if (line.empty())
           continue;
@@ -708,20 +701,17 @@ namespace pandora_vision
         {
           ROS_INFO("[PANDORA_VISION_HAZMAT_TRAINER] : Value for key : %s"
               " is already present and will not be "
-              "changed!\n Check your dataset!", imageName.c_str()); 
+              "changed!\n Check your dataset!", imageName.c_str());
         }
 
         matrix.clear();
         coeffs.clear();
         tokens.clear();
-
       }
       file.close();
 
       // Check if any homography was read.
       return homographyMatrices->size() > 0;
-
     }
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision

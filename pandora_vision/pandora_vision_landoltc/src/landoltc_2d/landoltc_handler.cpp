@@ -37,11 +37,13 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_landoltc/landoltc_2d/landoltc_handler.h"
 
 namespace pandora_vision
 {
-  LandoltCHandler::LandoltCHandler(const std::string& ns) : 
+  LandoltCHandler::LandoltCHandler(const std::string& ns) :
     VisionHandler<LandoltCPreProcessor, LandoltCDetector, LandoltCPostProcessor>(ns)
   {
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
@@ -49,7 +51,7 @@ namespace pandora_vision
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD);
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
   }
-  
+
   void LandoltCHandler::completeTransition()
   {
   }

@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
 
@@ -44,6 +44,6 @@ namespace pandora_vision
   {
 
 
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+  }  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 

@@ -138,7 +138,7 @@ namespace pandora_vision
     hue one. 1 for the Saturation channel, 2 for the Value channel
     @return void
    **/
-  void Histogram::getHistogram (
+  void Histogram::getHistogram(
     std::vector<cv::MatND>* histogram,
     const int& secondaryChannel)
   {
@@ -198,7 +198,7 @@ namespace pandora_vision
         }
       }
 
-      closedir (directory);
+      closedir(directory);
     }
 
     // Traverse all textures and create a histogram for each one
@@ -210,7 +210,8 @@ namespace pandora_vision
       std::string tempWallPicturesPath =
         packagePath + "/walls/texture_" + "%d/";
 
-      sprintf(wallPicturesPath, tempWallPicturesPath.c_str(), texture);
+      snprintf(wallPicturesPath, sizeof(wallPicturesPath),
+        tempWallPicturesPath.c_str(), texture);
 
       int fileLength;
 
@@ -239,7 +240,7 @@ namespace pandora_vision
           }
         }
 
-        closedir (directory);
+        closedir(directory);
       }
 
       // If no images are found in the "texture_X" directory, shutdown.
@@ -256,7 +257,7 @@ namespace pandora_vision
       // Read the pictures inside the wallPicturesPath, convert them to HSV
       // and calculate their histogram
       cv::Mat* wallImagesHSV = new cv::Mat[numPictures];
-      for(int i = 0; i < numPictures; i++)
+      for (int i = 0; i < numPictures; i++)
       {
         char temp_name[250];
 
@@ -264,7 +265,7 @@ namespace pandora_vision
 
         std::string temp = wallPicturesPathString + "%d.png";
 
-        sprintf(temp_name, temp.c_str(), i);
+        snprintf(temp_name, sizeof(temp_name), temp.c_str(), i);
 
         cv::cvtColor(
           Visualization::scaleImageForVisualization(cv::imread(temp_name),
@@ -320,4 +321,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

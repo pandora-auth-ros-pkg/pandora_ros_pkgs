@@ -35,8 +35,8 @@
  * Authors: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
-#ifndef RGB_NODE_RGB_H
-#define RGB_NODE_RGB_H
+#ifndef PANDORA_VISION_HOLE_RGB_NODE_RGB_H
+#define PANDORA_VISION_HOLE_RGB_NODE_RGB_H
 
 #include "pandora_vision_hole/CandidateHolesVectorMsg.h"
 #include "utils/message_conversions.h"
@@ -59,7 +59,6 @@ namespace pandora_vision
   class Rgb
   {
     private:
-
       // The NodeHandle
       ros::NodeHandle nodeHandle_;
 
@@ -120,7 +119,6 @@ namespace pandora_vision
 
 
     public:
-
       // The constructor
       Rgb();
 
@@ -128,6 +126,6 @@ namespace pandora_vision
       ~Rgb();
   };
 
-} //namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // RGB_NODE_RGB_H
+#endif  // PANDORA_VISION_HOLE_RGB_NODE_RGB_H

@@ -46,8 +46,8 @@ namespace pandora_vision
   //////////////////// Blob detection - specific parameters ////////////////////
 
   int Parameters::Blob::min_threshold = 0;
-  int Parameters::Blob::max_threshold = 1255;
-  int Parameters::Blob::threshold_step = 5;
+  int Parameters::Blob::max_threshold = 200;
+  int Parameters::Blob::threshold_step = 100;
   int Parameters::Blob::min_area = 550;
   int Parameters::Blob::max_area = 300000;
   double Parameters::Blob::min_convexity = 0;
@@ -60,15 +60,15 @@ namespace pandora_vision
 
 
   ///////////////////////// Debug-specific parameters //////////////////////////
-  
-  //Publish the enhanced Images
+
+  // Publish the enhanced Images
   bool Parameters::Debug::publish_enhanced_Images = false;
 
   // Show the depth image that arrives in the depth node
   bool Parameters::Debug::show_depth_image = false;
 
-  //Show the thermal image that arrives in the thermal node
-  bool Parameters::Debug::show_thermal_image=false;
+  // Show the thermal image that arrives in the thermal node
+  bool Parameters::Debug::show_thermal_image = false;
 
   // Show the rgb image that arrives in the rgb node
   bool Parameters::Debug::show_rgb_image = false;
@@ -122,11 +122,16 @@ namespace pandora_vision
   int Parameters::Depth::interpolation_method = 0;
 
   ////////////////// Parameters pecific to the Thermal node ////////////////////
-  
+
+  // The thermal detection method
+  // If set to 0 process the binary image acquired from temperatures MultiArray
+  // If set to 1 process the sensor/Image from thermal sensor
+  int Parameters::Thermal::detection_method = 0;
+
   // The probability extraction method
   // 0 for Gaussian function
   // 1 for Logistic function
-  
+
   int Parameters::Thermal::probability_method = 1;
 
   // Gausian variables
@@ -139,6 +144,10 @@ namespace pandora_vision
 
   float Parameters::Thermal::left_tolerance = 4;
   float Parameters::Thermal::right_tolerance = 8;
+
+  ///////////// Parameters of acceptable temperature for threshold /////////////
+  float Parameters::Thermal::low_temperature = 28;
+  float Parameters::Thermal::high_temperature = 40;
 
   ////////////////////// Parameters of the thermal image ///////////////////////
   int Parameters::ThermalImage::WIDTH = 80;
@@ -367,4 +376,4 @@ namespace pandora_vision
   int Parameters::Rgb::watershed_background_dilation_factor = 1;
   int Parameters::Rgb::watershed_background_erosion_factor = 1;
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

@@ -37,18 +37,20 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_hazmat/detection/hazmat_preprocessor.h"
 
 namespace pandora_vision
 {
-  HazmatPreProcessor::HazmatPreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler, 
+  HazmatPreProcessor::HazmatPreProcessor(const std::string& ns,
+    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
     sensor_msgs::image_encodings::BGR8)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
-  
+
   HazmatPreProcessor::~HazmatPreProcessor() {}
 
 }  // namespace pandora_vision

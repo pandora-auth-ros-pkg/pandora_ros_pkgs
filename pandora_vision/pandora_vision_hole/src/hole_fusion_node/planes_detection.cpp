@@ -60,11 +60,11 @@ namespace pandora_vision
     PointCloudXYZPtr cloudOut (new PointCloudXYZ());
 
     pcl::VoxelGrid <pcl::PointXYZ> sor;
-    sor.setInputCloud (cloudIn);
+    sor.setInputCloud(cloudIn);
 
     float leafSize = Parameters::HoleFusion::Planes::filter_leaf_size;
-    sor.setLeafSize (leafSize, leafSize, leafSize);
-    sor.filter (*cloudOut);
+    sor.setLeafSize(leafSize, leafSize, leafSize);
+    sor.filter(*cloudOut);
 
     #ifdef DEBUG_TIME
     Timer::tick("applyVoxelGridFilter");
@@ -101,7 +101,7 @@ namespace pandora_vision
     // Apply voxel filtering
     if (applyVoxelFilter)
     {
-      inCloud = applyVoxelGridFilter (inputCloud);
+      inCloud = applyVoxelGridFilter(inputCloud);
     }
     else
     {
@@ -141,7 +141,7 @@ namespace pandora_vision
     The inliers for each plane
     @return void
    **/
-  void PlanesDetection::locatePlanesUsingSACSegmentation (
+  void PlanesDetection::locatePlanesUsingSACSegmentation(
     const PointCloudXYZPtr& cloudIn,
     std::vector<PointCloudXYZPtr>* planesVector,
     std::vector<pcl::ModelCoefficients>* coefficientsVector,
@@ -157,12 +157,12 @@ namespace pandora_vision
     pcl::SACSegmentation<pcl::PointXYZ> seg;
 
     // Optional
-    seg.setOptimizeCoefficients (true);
+    seg.setOptimizeCoefficients(true);
 
     // Mandatory
-    seg.setModelType (pcl::SACMODEL_PLANE);
-    seg.setMethodType (pcl::SAC_RANSAC);
-    seg.setMaxIterations (Parameters::HoleFusion::Planes::max_iterations);
+    seg.setModelType(pcl::SACMODEL_PLANE);
+    seg.setMethodType(pcl::SAC_RANSAC);
+    seg.setMaxIterations(Parameters::HoleFusion::Planes::max_iterations);
 
     // Maybe a value needs to be set dynamically here, depending on
     // the distance of the kinect to the plane.
@@ -188,8 +188,8 @@ namespace pandora_vision
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
 
       // Segment the largest planar component from the remaining cloud
-      seg.setInputCloud (pointCloudProcessed);
-      seg.segment (*inliers, coefficients);
+      seg.setInputCloud(pointCloudProcessed);
+      seg.segment(*inliers, coefficients);
 
       // Add the coefficients and inliers to their respective vectors
       coefficientsVector->push_back(coefficients);
@@ -207,27 +207,27 @@ namespace pandora_vision
       pcl::ExtractIndices<pcl::PointXYZ> extract;
 
       // Extract the inliers
-      extract.setInputCloud (pointCloudProcessed);
-      extract.setIndices (inliers);
+      extract.setInputCloud(pointCloudProcessed);
+      extract.setIndices(inliers);
 
       // Remove the plane found from pointCloudProcessed and place it in
       // cloud_p. pointCloudProcessed goes unaffected.
-      extract.setNegative (false);
+      extract.setNegative(false);
 
       // The inliers of the largest planar component create cloud_p
       PointCloudXYZPtr cloud_p (new PointCloudXYZ);
-      extract.filter (*cloud_p);
+      extract.filter(*cloud_p);
 
       // Push back the point cloud of the plane found
       planesVector->push_back(cloud_p);
 
       // We want to extract the rest of the points that were found to lie on
       // a plane
-      extract.setNegative (true);
+      extract.setNegative(true);
 
       // In short: cloud_f = pointCloudProcessed - cloud_p
       PointCloudXYZPtr cloud_f (new PointCloudXYZ);
-      extract.filter (*cloud_f);
+      extract.filter(*cloud_f);
 
       // pointCloudProcessed is now without cloud_p, that is,
       // without the points that were
@@ -243,4 +243,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

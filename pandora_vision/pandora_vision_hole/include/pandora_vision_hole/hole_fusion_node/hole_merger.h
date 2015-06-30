@@ -34,8 +34,9 @@
  *
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
-#ifndef HOLE_FUSION_NODE_HOLE_MERGER_H
-#define HOLE_FUSION_NODE_HOLE_MERGER_H
+
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_MERGER_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_MERGER_H
 
 #include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/depth_filters.h"
@@ -45,14 +46,14 @@
 #include "utils/parameters.h"
 #include <math.h>
 
-//! Available merging operations:
-//! Assimilation is the operation performed when a candidate hole completely
-//! overlaps another one. The latter is said to be assimilated by the former.
-//! Amalgamation is the operation performed when a candidate hole partially
-//! overlaps another one. The latter is said to be amalgamated into the former.
-//! Connection is the operation performed when two candidate holes do not
-//! overlap one another. The one with the smaller area is said to be connected
-//! with the one of the larger area.
+// Available merging operations:
+// Assimilation is the operation performed when a candidate hole completely
+// overlaps another one. The latter is said to be assimilated by the former.
+// Amalgamation is the operation performed when a candidate hole partially
+// overlaps another one. The latter is said to be amalgamated into the former.
+// Connection is the operation performed when two candidate holes do not
+// overlap one another. The one with the smaller area is said to be connected
+// with the one of the larger area.
 #define ASSIMILATION 0
 #define AMALGAMATION 1
 #define CONNECTION 2
@@ -71,7 +72,6 @@ namespace pandora_vision
   class HoleMerger
   {
     public:
-
       /**
         @brief Applies a merging operation of @param operationId, until
         every candidate hole, even as it changes through the various merges that
@@ -273,9 +273,8 @@ namespace pandora_vision
         const int& filteringMethod,
         const cv::Mat& interpolatedDepthImage,
         const PointCloudPtr& pointCloud);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_HOLE_MERGER_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_MERGER_H

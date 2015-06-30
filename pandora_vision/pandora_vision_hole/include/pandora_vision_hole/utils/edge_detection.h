@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_EDGE_DETECTION_H
-#define UTILS_EDGE_DETECTION_H
+#ifndef PANDORA_VISION_HOLE_UTILS_EDGE_DETECTION_H
+#define PANDORA_VISION_HOLE_UTILS_EDGE_DETECTION_H
 
 #include "utils/outline_discovery.h"
 #include "utils/histogram.h"
@@ -85,14 +85,13 @@ namespace pandora_vision
   class EdgeDetection
   {
     public:
-
       /**
         @brief Applies the Canny edge detector
         @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
         @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
         @return void
        **/
-      static void applyCanny (const cv::Mat& inImage, cv::Mat* outImage);
+      static void applyCanny(const cv::Mat& inImage, cv::Mat* outImage);
 
       /**
         @brief Applies the Scharr edge transform
@@ -100,7 +99,7 @@ namespace pandora_vision
         @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
         @return void
        **/
-      static void applyScharr (const cv::Mat& inImage, cv::Mat* outImage);
+      static void applyScharr(const cv::Mat& inImage, cv::Mat* outImage);
 
       /**
         @brief Applies the Sobel edge transform
@@ -108,7 +107,7 @@ namespace pandora_vision
         @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
         @return void
        **/
-      static void applySobel (const cv::Mat& inImage, cv::Mat* outImage);
+      static void applySobel(const cv::Mat& inImage, cv::Mat* outImage);
 
       /**
         @brief Applies the Laplacian edge transform
@@ -116,7 +115,7 @@ namespace pandora_vision
         @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
         @return void
        **/
-      static void applyLaplacian (const cv::Mat& inImage, cv::Mat* outImage);
+      static void applyLaplacian(const cv::Mat& inImage, cv::Mat* outImage);
 
       /**
         @brief Applies contamination to an image of edges.
@@ -125,7 +124,7 @@ namespace pandora_vision
         @param[in,out] inImage [cv::Mat*] Input image in CV_8UC1 format
         @return void
        **/
-      static void applyEdgeContamination (cv::Mat* inImage);
+      static void applyEdgeContamination(cv::Mat* inImage);
 
       /**
         @brief Takes as input a depth image containing floats,
@@ -303,7 +302,7 @@ namespace pandora_vision
         format
         @return void
        **/
-      static void produceEdgesViaBackprojection (const cv::Mat& inImage,
+      static void produceEdgesViaBackprojection(const cv::Mat& inImage,
         const std::vector<cv::MatND>& inHistogram, cv::Mat* outImage);
 
       /**
@@ -315,7 +314,7 @@ namespace pandora_vision
         of type CV_8UC1
         @return void
        **/
-      static void produceEdgesViaSegmentation (const cv::Mat& inImage,
+      static void produceEdgesViaSegmentation(const cv::Mat& inImage,
         cv::Mat* edges);
 
       /**
@@ -337,9 +336,8 @@ namespace pandora_vision
        **/
       static void watershedViaBackprojection(const cv::Mat& inImage,
         const cv::Mat& backproject, const bool& edges, cv::Mat* outImage);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_EDGE_DETECTION_H
+#endif  // PANDORA_VISION_HOLE_UTILS_EDGE_DETECTION_H

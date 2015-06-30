@@ -63,9 +63,9 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     std::vector<cv::Mat> imgs;
     std::vector<std::string> msgs;
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Thermal image";
       msgs.push_back(msg);
       cv::Mat tmp = Visualization::scaleImageForVisualization(
@@ -80,9 +80,9 @@ namespace pandora_vision
       &thermalImageEdges);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Edges after denoise");
       msgs.push_back(msg);
       cv::Mat tmp;
@@ -97,15 +97,14 @@ namespace pandora_vision
     BlobDetection::detectBlobs(thermalImageEdges, &keyPoints);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Initial keypoints");
       msgs.push_back(msg);
       imgs.push_back(
         Visualization::showKeypoints(msg, thermalImageEdges, -1,
-          keyPoints)
-        );
+          keyPoints));
     }
     #endif
 
@@ -128,9 +127,9 @@ namespace pandora_vision
       &conveyor);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Blobs");
       msgs.push_back(msg);
       imgs.push_back(
@@ -139,13 +138,12 @@ namespace pandora_vision
           thermalImage,
           conveyor,
           -1,
-          std::vector<std::string>())
-        );
+          std::vector<std::string>()));
     }
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
       // A vector of keypoints
       std::vector<cv::KeyPoint> keypointsVector;
@@ -155,7 +153,7 @@ namespace pandora_vision
         keypointsVector.push_back(conveyor.holes[i].keypoint);
       }
 
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Keypoints sent to hole_fusion");
       msgs.push_back(msg);
       imgs.push_back(
@@ -163,10 +161,9 @@ namespace pandora_vision
           msg,
           thermalImage,
           -1,
-          keypointsVector)
-        );
+          keypointsVector));
     }
-    if(Parameters::Debug::show_find_holes)
+    if (Parameters::Debug::show_find_holes)
     {
       Visualization::multipleShow("Thermal node", imgs, msgs,
         Parameters::Debug::show_find_holes_size, 1);
@@ -180,4 +177,4 @@ namespace pandora_vision
     return conveyor;
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

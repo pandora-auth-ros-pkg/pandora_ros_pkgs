@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpc_thermal_synchronizer">
+    <class name="pandora_vision_hole/pc_thermal_synchronizer"
+        type="pandora_vision::pandora_vision_hole::PcThermalSynchronizer" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet for handling and synchronizing pointcloud2 with thermal messages.
+      </description>
+    </class>
+  </library>
+</class_libraries>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+
+    
+    <arg name="output" default="log" />
+    <arg name="classifierType" default="svm" />
+    <arg name="imageType" default="rgb" />
+
+    <node name="victim_training_node" type="victim_training_node" pkg="pandora_vision_victim"
+      output="screen" required="true" >
+      <param name="image_type" value="$(arg imageType)" />
+      <param name="classifier_type" value="$(arg classifierType)" />
+
+      <rosparam file="$(find pandora_vision_victim)/config/victim_training_params.yaml"
+        command="load"/>
+
+      <rosparam file="$(find pandora_vision_victim)/config/neural_network_params.yaml"
+        command="load" />
+
+      <rosparam file="$(find pandora_vision_victim)/config/random_forests_params.yaml"
+        command="load" />
+
+      <rosparam file="$(find pandora_vision_victim)/config/svm_params.yaml"
+        command="load" />
+
+    </node>
+
+</launch>

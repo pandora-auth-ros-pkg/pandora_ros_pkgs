@@ -35,6 +35,10 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
+#include <string>
+#include <algorithm>
+#include <vector>
+
 #include "pandora_vision_landoltc/landoltc_2d/landoltc_detector.h"
 
 namespace pandora_vision
@@ -53,7 +57,7 @@ namespace pandora_vision
 
     initializeReferenceImage();
   }
-  
+
   LandoltCDetector::LandoltCDetector() : VisionProcessor() {}
 
   //!< Destructor
@@ -71,7 +75,7 @@ namespace pandora_vision
   {
     //!< Get the path to the pattern used for detection
     std::string patternPath;
-    
+
     if (this->accessPublicNh()->hasParam("patternPath"))
     {
       this->accessPublicNh()->getParam("patternPath", patternPath);
@@ -85,7 +89,7 @@ namespace pandora_vision
       patternPath.assign(packagePath);
       patternPath.append(temp);
     }
-    
+
     //!< Loading reference image passed as argument to main
     cv::Mat ref;
     ROS_DEBUG_STREAM("path: " << patternPath);
@@ -120,19 +124,19 @@ namespace pandora_vision
     double y = 2 * moment.mu11;
     double x = moment.mu20-moment.mu02;
     double angle = 0.5 * atan2(y, x);
-    
+
     if (angle < 0)
     {
       angle += CV_PI;
     }
-    
+
     int len = std::max(in.cols, in.rows);
     double theta = 180 * (angle - CV_PI / 2) / CV_PI;
     cv::Point2f pt(len / 2., len / 2.);
     cv::Mat r = cv::getRotationMatrix2D(pt, theta, 1.0);
     cv::warpAffine(in, paddedptr, r, cv::Size(len, len));
     cv::Mat left = cv::Mat::zeros(paddedptr.rows, paddedptr.cols, CV_8UC1);
-  
+
     for (int x = 0; x < paddedptr.cols / 2; x++)
     {
       for (int y = 0; y < paddedptr.rows; y++)
@@ -141,9 +145,9 @@ namespace pandora_vision
       }
     }
     cv::findContours(left, left_contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-    
+
     if (left_contours.size() == 2) angle += CV_PI;
-    
+
     // std::cout << "Angle of " << i <<" is: " << (angle*(180/3.14159265359)) << std::endl;
     // ROS_INFO("Angle of %d is %lf \n", i, angle*(180/3.14159265359));
     temp->getAngles().push_back(angle);
@@ -162,7 +166,7 @@ namespace pandora_vision
     cv::Mat paddedptr;
     paddedptr = in.clone();
     thinning(&paddedptr);
-    
+
     unsigned int *pts =new unsigned int[paddedptr.cols * paddedptr.rows];
     int limit = 0;
 
@@ -173,45 +177,45 @@ namespace pandora_vision
         if (paddedptr.data[rows * paddedptr.cols + cols] != 0)
         {
           pts[limit] = rows * paddedptr.cols + cols;
-          limit++;          
+          limit++;
         }
       }
     }
-    for (int j = 0; j < limit; j++) 
+    for (int j = 0; j < limit; j++)
     {
-      find8Neights(pts[j], paddedptr);    
+      find8Neights(pts[j], paddedptr);
     }
-    for (int k = 0; k < _edgePoints.size(); k++)  
+    for (int k = 0; k < _edgePoints.size(); k++)
     {
       cv::circle(paddedptr, _edgePoints[k], 2, 255, -1, 8, 0);
     }
-    
+
     if (_edgePoints.size() == 2)
     {
       int yc = (_edgePoints[0].y + _edgePoints[1].y) / 2;
       int xc = (_edgePoints[0].x + _edgePoints[1].x) / 2;
-      
+
       cv::Point gapCenter(xc, yc);
       cv::circle(paddedptr, gapCenter, 1, 255, -1, 8, 0);
       cv::Point center(paddedptr.cols / 2, paddedptr.rows / 2);
       cv::circle(paddedptr, center, 1, 255, -1, 8, 0);
-    
+
       double angle = atan2(gapCenter.y - center.y, gapCenter.x - center.x);
       if (angle < 0) angle += 2 * CV_PI;
-      
+
       // std::cout << "Angle of " << i <<" is : " << angle*(180/3.14159265359) << std::endl;
       // ROS_INFO("Angle of %d is %lf \n", i, angle*(180/3.14159265359));
       temp->angles.push_back(angle);
     }
-    
+
     if (params.visualization)
     {
-      cv::imshow("paddedptr", paddedptr); 
-      cv::waitKey(5); 
+      cv::imshow("paddedptr", paddedptr);
+      cv::waitKey(5);
     }
     _edges = 0;
     _edgePoints.clear();
-    
+
     delete[] pts;
   }
 
@@ -221,7 +225,7 @@ namespace pandora_vision
     @param index [unsigned int] Index of pixel in matrix
     @param in [cv::Mat&] Input Image
     @return void
-  **/    
+  **/
 
   void LandoltCDetector::find8Neights(unsigned int index, const cv::Mat& in)
   {
@@ -236,11 +240,11 @@ namespace pandora_vision
     unsigned char p6 = in.at<unsigned char>(y + 1, x - 1);
     unsigned char p7 = in.at<unsigned char>(y, x - 1);
     unsigned char p8 = in.at<unsigned char>(y - 1, x - 1);
-  
-    if (p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 == 255) 
+
+    if (p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 == 255)
     {
       _edges++;
-      _edgePoints.push_back(cv::Point(x, y));    
+      _edgePoints.push_back(cv::Point(x, y));
     }
   }
 
@@ -268,7 +272,7 @@ namespace pandora_vision
     if (abs(dx) >= abs(dy))
     {
       if (B.x < A.x) std::swap(A, B);
-      
+
       //!< calculation of values of line, gradient and intercept
       float gradient = (B.y - A.y) / static_cast<float>(B.x - A.x);
       float yIntercept = A.y - gradient * A.x + rounding;
@@ -325,7 +329,7 @@ namespace pandora_vision
         float dx = grX[i];
         float dy = grY[i];
         float mag = dx * dx + dy * dy;
-        if (mag > (params.gradientThreshold 
+        if (mag > (params.gradientThreshold
           * params.gradientThreshold))  // old _minDiff* _minDiff
         {
           mag = sqrt(mag);
@@ -382,20 +386,20 @@ namespace pandora_vision
   void LandoltCDetector::applyMask()
   {
     for (int i = 0; i < _landoltc.size(); i++)
-    {    
+    {
       for (int j = 0; j < _landoltc[i]->getColorVector().size(); j++)
       {
         _mask = cv::Mat::zeros(_coloredContours.rows, _coloredContours.cols, CV_8UC1);
-      
+
         cv::inRange(_coloredContours, _landoltc[i]->getColor(j), _landoltc[i]->getColor(j), _mask);
         cv::Mat out = getWarpPerspectiveTransform(_mask, _landoltc[i]->getBox(j));
-        cv::Mat cropped = _mask(_landoltc[i]->getBox(j)).clone(); 
+        cv::Mat cropped = _mask(_landoltc[i]->getBox(j)).clone();
         cv::Mat padded;
         cv::copyMakeBorder(out, padded, 8, 8, 8, 8, cv::BORDER_CONSTANT, cv::Scalar(0));
-      
+
         if (params.visualization)
         {
-          cv::imshow("padded", padded); 
+          cv::imshow("padded", padded);
           cv::waitKey(5);
         }
         findRotationB(padded, _landoltc[i]);
@@ -408,40 +412,40 @@ namespace pandora_vision
     order to get better angle calculation precision
     @param rec [cv::rec] Rectangle enclosing a 'C'
     @param in [cv::Mat&] Input Image
-    @return [cv::Mat] Output Image 
+    @return [cv::Mat] Output Image
   **/
   cv::Mat LandoltCDetector::getWarpPerspectiveTransform(const cv::Mat& in, cv::Rect rec)
   {
     std::vector<cv::Point2f> corners;
     cv::Mat quad = cv::Mat::zeros(100, 100, CV_8UC1);
-    
+
     corners.clear();
     corners.push_back(rec.tl());
-    
+
     cv::Point2f tr = cv::Point2f(rec.tl().x+rec.width, rec.tl().y);
     corners.push_back(tr);
-    
+
     corners.push_back(rec.br());
     cv::Point2f bl = cv::Point2f(rec.br().x-rec.width, rec.br().y);
     corners.push_back(bl);
-    
+
     // Corners of the destination image
     std::vector<cv::Point2f> quad_pts;
     quad_pts.push_back(cv::Point2f(0, 0));
     quad_pts.push_back(cv::Point2f(quad.cols, 0));
     quad_pts.push_back(cv::Point2f(quad.cols, quad.rows));
     quad_pts.push_back(cv::Point2f(0, quad.rows));
-    
+
     // Get transformation matrix
     cv::Mat transmtx = cv::getPerspectiveTransform(corners, quad_pts);
-    
+
     // Apply perspective transformation
     cv::warpPerspective(in, quad, transmtx, quad.size());
-    
+
     if (params.visualization)
     {
       cv::imshow("warp", quad);
-      cv::waitKey(5);      
+      cv::waitKey(5);
     }
     return quad;
   }
@@ -454,7 +458,7 @@ namespace pandora_vision
     @param ref [std::vector<cv::Point>] Vector containing contour points of reference image
     @return void
   **/
-  void LandoltCDetector::findLandoltContours(const cv::Mat& inImage, int rows, int cols, 
+  void LandoltCDetector::findLandoltContours(const cv::Mat& inImage, int rows, int cols,
     std::vector<cv::Point> ref)
   {
     cv::RNG rng(12345);
@@ -463,7 +467,7 @@ namespace pandora_vision
     std::vector<std::vector<cv::Point> > contours;
     cv::findContours(inImage, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
     std::vector<cv::Moments> mu(contours.size());
-    
+
     for (int i = 0; i < contours.size(); i++)
     {
       mu[i] = moments(contours[i], false);
@@ -479,26 +483,26 @@ namespace pandora_vision
 
     //!< Shape matching using Hu Moments, and contour center proximity
     LandoltCPOIPtr temp( new LandoltCPOI );
-    
+
     for (std::vector<cv::Point>::iterator it = _centers.begin(); it != _centers.end(); ++it)
     {
       int counter = 0;
       bool flag = false;
       _fillColors.clear();
       _rectangles.clear();
-      
+
       for (int i = 0; i < contours.size(); i++)
       {
         approxPolyDP(cv::Mat(contours[i]), approx, arcLength(cv::Mat(contours[i]), true) * 0.02, true);
         std::vector<cv::Point> cnt = contours[i];
         double prec = cv::matchShapes(cv::Mat(ref), cv::Mat(cnt), CV_CONTOURS_MATCH_I3, 0);
-        if (!isContourConvex(cv::Mat(cnt)) && fabs(mc[i].x - (*it).x) < 7 && fabs(mc[i].y - (*it).y) < 7 
+        if (!isContourConvex(cv::Mat(cnt)) && fabs(mc[i].x - (*it).x) < 7 && fabs(mc[i].y - (*it).y) < 7
         && prec < params.huMomentsPrec)
         {
           flag = true;
           cv::Rect bounding_rect = boundingRect((contours[i]));
           cv::Scalar color = cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-          cv::drawContours(_coloredContours, contours, i, color, CV_FILLED, 8, std::vector<cv::Vec4i>(), 0, 
+          cv::drawContours(_coloredContours, contours, i, color, CV_FILLED, 8, std::vector<cv::Vec4i>(), 0,
             cv::Point());
           _fillColors.push_back(color);
           _newCenters.push_back(mc[i]);
@@ -512,7 +516,7 @@ namespace pandora_vision
         temp->setCount(counter);
         temp->setColor(_fillColors);
         temp->setBox(_rectangles);
-        _landoltc.push_back(temp);      
+        _landoltc.push_back(temp);
         // do stuff
         flag = false;
       }
@@ -557,7 +561,7 @@ namespace pandora_vision
     cv::erode(binary, binary, erodeKernel);
 
     findLandoltContours(binary, input.rows, input.cols, _refContours[0]);
-    
+
     for (int i = 0; i < _landoltc.size(); i++)
     {
       for (std::size_t j = 0; j < _landoltc[i]->getBoxVector().size(); j++)
@@ -566,14 +570,14 @@ namespace pandora_vision
       }
     }
     applyMask();
-    
+
     if (params.visualization)
     {
       cv::imshow("Raw", input);
       cv::waitKey(5);
     }
     fusion();
-    
+
     std::vector<POIPtr> landoltc;
     for (int ii = 0; ii < _landoltc.size(); ii++)
     {
@@ -630,7 +634,7 @@ namespace pandora_vision
       else
         _landoltc[i]->setProbability(0);
     }
-  }  
+  }
 
   /**
     @brief Thinning algorith using the Zhang-Suen method
@@ -644,13 +648,13 @@ namespace pandora_vision
     cv::Mat dif;
     in->copyTo(thinned);
 
-    do 
+    do
     {
       thinningIter(in, 1);
       thinningIter(in, 2);
       cv::absdiff(*in, thinned, dif);
       in->copyTo(thinned);;
-    } 
+    }
     while (cv::countNonZero(dif) > 0);
 
     *in = (*in) * 255;
@@ -705,7 +709,7 @@ namespace pandora_vision
     }
     cv::bitwise_and(*in, temp, *in);
   }
-  
+
   /**
    * @brief
    **/
@@ -714,9 +718,9 @@ namespace pandora_vision
     output->header = input->getHeader();
     output->frameWidth = input->getImage().cols;
     output->frameHeight = input->getImage().rows;
-    
+
     output->pois = begin(input->getImage());
-    
+
     if (output->pois.empty())
     {
       return false;

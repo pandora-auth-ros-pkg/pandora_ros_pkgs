@@ -38,6 +38,9 @@
 #ifndef PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H
 #define PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H
 
+#include <string>
+#include <vector>
+
 #include "pandora_vision_victim/victim_parameters.h"
 
 namespace pandora_vision
@@ -46,55 +49,52 @@ namespace pandora_vision
   class VictimVJDetector
   {
     private:
+      std::vector<std::vector<cv::Rect_<int> > > faces;
 
-    std::vector<std::vector<cv::Rect_<int> > > faces;
+      std::vector<cv::Rect_<int> > faces_total;
 
-    std::vector<cv::Rect_<int> > faces_total;
+      /// Cascade classifier for face detection
+      cv::CascadeClassifier trained_cascade;
 
-    //!< Cascade classifier for face detection
-    cv::CascadeClassifier trained_cascade;
+      /// Trained model for face detection
+      cv::Ptr<cv::FaceRecognizer> trained_model;
 
-    //!<Trained model for face detection
-    cv::Ptr<cv::FaceRecognizer> trained_model;
-
-    /**
-    @brief Calls detectMultiscale to scan frame for faces and drawFace
-    to create rectangles around the faces found in each frame
-    @param frame [cv::Mat] the frame to be scaned.
-    @return [int] the number of faces found in each frame
-    **/
-    std::vector<float> detectFace(cv::Mat frame);
+      /**
+      @brief Calls detectMultiscale to scan frame for faces and drawFace
+      to create rectangles around the faces found in each frame
+      @param frame [cv::Mat] the frame to be scaned.
+      @return [int] the number of faces found in each frame
+      **/
+      std::vector<float> detectFace(cv::Mat frame);
 
     public:
+      /// The Constructor
+      VictimVJDetector(std::string cascade_path, std::string model_path);
+      /// Default constructor
+      VictimVJDetector(void){}
 
-    //! The Constructor
-    VictimVJDetector(std::string cascade_path, std::string model_path);
-    //! Default constructor
-    VictimVJDetector(void){}
+      /// The Destructor
+      ~VictimVJDetector();
 
-    //! The Destructor
-    ~VictimVJDetector();
+      /**
+      @brief Searches for faces in current frame.
+      @param frame [cv::Mat] The current frame
+      @return number [int] of faces found in current frame
+      **/
+      std::vector<DetectedVictim> findFaces(cv::Mat frame);
 
-    /**
-    @brief Searches for faces in current frame.
-    @param frame [cv::Mat] The current frame
-    @return number [int] of faces found in current frame
-    **/
-    std::vector<DetectedVictim> findFaces(cv::Mat frame);
+      /**
+      @brief Creates the continuous table of faces found that contains
+      information for each face in every set of 4 values.
+      @return int[] table of face positions and sizes
+      **/
+      std::vector<BoundingBox> getAlertKeypoints();
 
-    /**
-    @brief Creates the continuous table of faces found that contains
-    information for each face in every set of 4 values.
-    @return int[] table of face positions and sizes
-    **/
-    std::vector<BoundingBox> getAlertKeypoints();
-
-    /**
-    @brief Returns the probability of the faces detected in the frame
-    @return [float] probability value
-    **/
-    std::vector<float> predictionToProbability(std::vector<float> predictions);
-
+      /**
+      @brief Returns the probability of the faces detected in the frame
+      @return [float] probability value
+      **/
+      std::vector<float> predictionToProbability(std::vector<float> predictions);
   };
-}// namespace pandora_vision
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H

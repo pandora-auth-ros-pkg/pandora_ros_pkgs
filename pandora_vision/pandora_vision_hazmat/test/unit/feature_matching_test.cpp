@@ -32,10 +32,11 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
-
+#include <algorithm>
+#include <vector>
 #include "pandora_vision_hazmat/mock/mock_feature_detector.h"
 #include "gtest/gtest.h"
 
@@ -47,7 +48,7 @@ namespace pandora_vision
      * @class FeatureMatchingDetectorTest
      * @brief Test fixture class
      */
-    class FeatureMatchingDetectorTest : public ::testing::Test 
+    class FeatureMatchingDetectorTest : public ::testing::Test
     {
       public:
         MockFeatureDetector MockDetector;
@@ -61,18 +62,18 @@ namespace pandora_vision
 
         FeatureMatchingDetectorTest()
         {
-          patternBB.push_back(cv::Point2f(0.0f, 0.0f)); 
+          patternBB.push_back(cv::Point2f(0.0f, 0.0f));
           patternBB.push_back(cv::Point2f(100.0f, 0.0f));
           patternBB.push_back(cv::Point2f(100.0f, 100.0f));
           patternBB.push_back(cv::Point2f(0.0f, 100.0f));
 
           patternKeyPoints.push_back(cv::Point2f(25.0f, 0.0f));
-          patternKeyPoints.push_back(cv::Point2f(75.0f, 0.0f ));
+          patternKeyPoints.push_back(cv::Point2f(75.0f, 0.0f));
           patternKeyPoints.push_back(cv::Point2f(75.0f, 75.0f));
           patternKeyPoints.push_back(cv::Point2f(0.0f, 75.0f));
           patternKeyPoints.push_back(cv::Point2f(50.0f, 50.0f));
 
-          correctBB.push_back(cv::Point2f(0.0f, 0.0f)); 
+          correctBB.push_back(cv::Point2f(0.0f, 0.0f));
           correctBB.push_back(cv::Point2f(100.0f, 0.0f));
           correctBB.push_back(cv::Point2f(100.0f, 100.0f));
           correctBB.push_back(cv::Point2f(0.0f, 100.0f));
@@ -142,7 +143,7 @@ namespace pandora_vision
           testVecP2f, testVecKeypoint, &returnVec, &returnVec);
       ASSERT_FALSE(testFlag);
 
-      // Pass an empty vector of pattern keypoint. The function must return 
+      // Pass an empty vector of pattern keypoint. The function must return
       // false and not perform any calculations.
       testFlag = MockDetector.findKeypointMatches(identityMat, identityMat ,
           emptyVecP2f, testVecKeypoint, &returnVec, &returnVec);
@@ -154,7 +155,7 @@ namespace pandora_vision
           testVecP2f, emptyVec, &returnVec, &returnVec);
       ASSERT_FALSE(testFlag);
 
-      // The function must return false since there are not enough points for 
+      // The function must return false since there are not enough points for
       // the RANSAC algorithm to estimate the homography matrix.
       testFlag = MockDetector.findBoundingBox(emptyVecP2f, testVecP2f,
           testVecP2f, &returnVec);
@@ -167,7 +168,6 @@ namespace pandora_vision
       testFlag = MockDetector.findBoundingBox(testVecP2f, testVecP2f,
           emptyVecP2f, &returnVec);
       ASSERT_FALSE(testFlag);
-
     }
 
     TEST_F(FeatureMatchingDetectorTest, bounding_box_test)
@@ -179,7 +179,7 @@ namespace pandora_vision
 
       angle = -90;
       scale = 1;
-      generateNewRotationTestCase(angle, scale, center, patternBB, &correctBB); 
+      generateNewRotationTestCase(angle, scale, center, patternBB, &correctBB);
       generateNewRotationTestCase(angle, scale, center, patternKeyPoints,
           &sceneKeyPoints);
       testFlag = MockDetector.findBoundingBox(patternKeyPoints, sceneKeyPoints,
@@ -194,7 +194,7 @@ namespace pandora_vision
       // Second rotation test.
       angle = -45;
       scale = 1;
-      generateNewRotationTestCase(angle, scale, center, patternBB, &correctBB); 
+      generateNewRotationTestCase(angle, scale, center, patternBB, &correctBB);
       generateNewRotationTestCase(angle, scale, center, patternKeyPoints,
           &sceneKeyPoints);
 
@@ -270,7 +270,6 @@ namespace pandora_vision
         ASSERT_NEAR(correctBB[i].y, sceneBB[i].y, 0.01);
       }
     }
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 

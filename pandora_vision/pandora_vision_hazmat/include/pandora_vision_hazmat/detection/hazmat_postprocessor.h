@@ -56,7 +56,7 @@ namespace pandora_vision
 
       HazmatPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
       virtual ~HazmatPostProcessor();
-      
+
     virtual bool
       postProcess(const POIsStampedConstPtr& input, const HazmatAlertVectorPtr& output);
   };

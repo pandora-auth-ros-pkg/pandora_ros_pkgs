@@ -1,0 +1,36 @@
+# Parameters for the SVM type
+# C_SVC=100
+# NU_SVC=101
+# ONE_CLASS=102
+# EPS_SVR=103
+# NU_SVR=104
+
+# Parameters for the SVM Kernel Type
+# CUSTOM =-1
+# LINEAR =0
+# POLY =1
+# RBF =2
+# SIGMOID =3
+# CHI2 =4
+# INTER =5
+rgb:
+  svm_type: 100
+  kernel_type: 2
+  degree: 0.0
+  gamma: 0.00225
+  coef0: 0.0
+  C: 62.5
+  nu: 0.0
+  p: 0.0
+  auto_train: true
+
+depth:
+  svm_type: 100
+  kernel_type: 2
+  degree: 0.0
+  gamma: 0.00225
+  coef0: 0.0
+  C: 62.5
+  nu: 0.0
+  p: 0.0
+  auto_train: true

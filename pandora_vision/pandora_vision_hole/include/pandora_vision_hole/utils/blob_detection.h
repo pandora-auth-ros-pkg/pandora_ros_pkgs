@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_BLOB_DETECTION_H
-#define UTILS_BLOB_DETECTION_H
+#ifndef PANDORA_VISION_HOLE_UTILS_BLOB_DETECTION_H
+#define PANDORA_VISION_HOLE_UTILS_BLOB_DETECTION_H
 
 #include "utils/morphological_operators.h"
 
@@ -53,7 +53,6 @@ namespace pandora_vision
   class BlobDetection
   {
     public:
-
       /**
         @brief Detects blobs in an image
         @param[in] inImage [const cv::Mat&] The input image
@@ -62,9 +61,8 @@ namespace pandora_vision
        **/
       static void detectBlobs(const cv::Mat& inImage,
         std::vector<cv::KeyPoint>* keyPointsOut);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_BLOB_DETECTION_H
+#endif  // PANDORA_VISION_HOLE_UTILS_BLOB_DETECTION_H

@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_BOUNDING_BOX_DETECTION_H
-#define UTILS_BOUNDING_BOX_DETECTION_H
+#ifndef PANDORA_VISION_HOLE_UTILS_BOUNDING_BOX_DETECTION_H
+#define PANDORA_VISION_HOLE_UTILS_BOUNDING_BOX_DETECTION_H
 
 #include "utils/morphological_operators.h"
 
@@ -53,7 +53,6 @@ namespace pandora_vision
   class BoundingBoxDetection
   {
     public:
-
       /**
         @brief Finds rotated bounding boxes from blob outlines.
         The blob's area must be larger than
@@ -73,9 +72,8 @@ namespace pandora_vision
         const std::vector<std::vector<cv::Point2f> >& blobsOutlineVector,
         const std::vector<float>& blobsArea,
         std::vector< std::vector<cv::Point2f> >* outRectangles);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_BOUNDING_BOX_DETECTION_H
+#endif  // PANDORA_VISION_HOLE_UTILS_BOUNDING_BOX_DETECTION_H

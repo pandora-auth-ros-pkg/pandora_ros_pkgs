@@ -14,6 +14,7 @@
   <arg name="vision_hole_detector" default="true"/>
   <arg name="vision_hole_exploration" default="false"/>
   <arg name="vision_victim" default="true"/>
+  <arg name="vision_obstacle" default="false"/>
 
 
   <!-- Cameras -->
@@ -51,6 +52,8 @@
      file="$(find pandora_vision_hole_exploration)/launch/pandora_vision_hole_exploration.launch" />
     <include if="$(arg vision_victim)"
      file="$(find pandora_vision_victim)/launch/victim_node.launch" />
+    <include if="$(arg vision_obstacle)"
+     file="$(find pandora_vision_obstacle)/launch/soft_obstacle_node.launch" />
 
   </group>
 </launch>

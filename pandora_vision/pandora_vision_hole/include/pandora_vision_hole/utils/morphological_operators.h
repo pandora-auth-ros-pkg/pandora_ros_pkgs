@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_MORPHOLOGICAL_OPERATORS_H
-#define UTILS_MORPHOLOGICAL_OPERATORS_H
+#ifndef PANDORA_VISION_HOLE_UTILS_MORPHOLOGICAL_OPERATORS_H
+#define PANDORA_VISION_HOLE_UTILS_MORPHOLOGICAL_OPERATORS_H
 
 #include "utils/visualization.h"
 
@@ -53,7 +53,6 @@ namespace pandora_vision
   class Morphology
   {
     public:
-
       /**
         @brief Performs steps of closing
         @param img [cv::Mat*] The input image in CV_8UC1 format
@@ -138,9 +137,8 @@ namespace pandora_vision
        **/
       static void thinning(const cv::Mat& inImage, cv::Mat* outImage,
         const int& steps, const bool& visualize = false);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_MORPHOLOGICAL_OPERATORS_H
+#endif  // PANDORA_VISION_HOLE_UTILS_MORPHOLOGICAL_OPERATORS_H

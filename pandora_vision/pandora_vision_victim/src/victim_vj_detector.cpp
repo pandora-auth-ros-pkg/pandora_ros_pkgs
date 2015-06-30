@@ -35,6 +35,9 @@
 * Author: Despoina Paschalidou
 *********************************************************************/
 
+#include <string>
+#include <vector>
+
 #include "pandora_vision_victim/victim_vj_detector.h"
 
 namespace pandora_vision
@@ -51,12 +54,12 @@ namespace pandora_vision
   @return void
   **/
   VictimVJDetector::VictimVJDetector(
-    std::string cascade_path, 
-    std::string model_path)
+      std::string cascade_path,
+      std::string model_path)
   {
     trained_cascade.load(cascade_path);
-    //~ ROS_ERROR("%s", cascade_path.c_str());
-    if(trained_cascade.empty())
+    // ROS_ERROR("%s", cascade_path.c_str());
+    if (trained_cascade.empty())
     {
       ROS_ERROR("[Face Detector]: Cannot load cascade classifier");
       exit(0);
@@ -75,7 +78,6 @@ namespace pandora_vision
   {
   }
 
-
   /**
   @brief Detects number of faces found in current frame.
   The image buffer contributs to probability.
@@ -88,20 +90,20 @@ namespace pandora_vision
     cv::Mat tmp;
     tmp = cv::Mat::zeros(frame.size().width, frame.size().height , CV_8UC1);
 
-    //! Clear vector of faces before using it for the current frame
+    /// Clear vector of faces before using it for the current frame
     faces_total.clear();
 
     std::vector<DetectedVictim> candidateVictim;
     std::vector<float> preds = detectFace(frame);
     std::vector<float> probs = predictionToProbability(preds);
     std::vector<BoundingBox> keypoints = getAlertKeypoints();
-    
-    if(probs.size() != keypoints.size())
+
+    if (probs.size() != keypoints.size())
     {
       ROS_FATAL("[PANDORA_VICTIM] Something went terribly wrong");
     }
-    
-    for(unsigned int i = 0 ; i < probs.size() ; i++)
+
+    for (unsigned int i = 0 ; i < probs.size() ; i++)
     {
       DetectedVictim dv;
       dv.probability = probs[i];
@@ -109,7 +111,7 @@ namespace pandora_vision
       dv.boundingBox = keypoints[i].bounding_box;
       candidateVictim.push_back(dv);
     }
-    
+
     return candidateVictim;
   }
 
@@ -121,14 +123,12 @@ namespace pandora_vision
   std::vector<BoundingBox> VictimVJDetector::getAlertKeypoints()
   {
     std::vector<BoundingBox> table;
-    for(int ii = 0; ii < faces_total.size(); ii++)
+    for (int ii = 0; ii < faces_total.size(); ii++)
     {
       BoundingBox tbb;
       cv::Rect faceRect = faces_total.at(ii);
-      cv::Point2f p (
-        round( faceRect.x + faceRect.width * 0.5 ),
-        round( faceRect.y + faceRect.height * 0.5 )
-      );
+      cv::Point2f p(round(faceRect.x + faceRect.width * 0.5),
+                    round(faceRect.y + faceRect.height * 0.5));
       tbb.keypoint = p;
       tbb.bounding_box = faceRect;
       table.push_back(tbb);
@@ -139,16 +139,16 @@ namespace pandora_vision
   /**
   @brief Returns the probability of the faces detected in the frame
   @return [float] probability value
-  */  
+  */
   std::vector<float> VictimVJDetector::predictionToProbability
     (std::vector<float> prediction)
   {
     std::vector<float> p;
-    for(unsigned int i = 0 ; i < prediction.size() ; i++)
+    for (unsigned int i = 0 ; i < prediction.size() ; i++)
     {
-      //~ Normalize probability to [-1,1]
+      // Normalize probability to [-1,1]
       float temp_prob = tanh(0.5 * (prediction[i] - 20.0) );
-      //~ Normalize probability to [0,1]
+      // Normalize probability to [0,1]
       temp_prob = (1 + temp_prob) / 2.0;
       ROS_INFO_STREAM("Viola pred/prob :" << prediction[i] << " " << temp_prob);
       p.push_back(temp_prob);
@@ -168,7 +168,7 @@ namespace pandora_vision
     cv::Mat original(img.size().width, img.size().height, CV_8UC1);
     original = img.clone();
     cv::Mat gray(img.size().width, img.size().height, CV_8UC1);
-    if(original.channels() != 1)
+    if (original.channels() != 1)
     {
       cvtColor(original, gray, CV_BGR2GRAY);
     }
@@ -176,31 +176,29 @@ namespace pandora_vision
 
     int im_width = VictimParameters::modelImageWidth;
     int im_height = VictimParameters::modelImageHeight;
-    
-    if(!trained_cascade.empty())
+
+    if (!trained_cascade.empty())
     {
-      //! Find the faces in the frame:
+      /// Find the faces in the frame:
       trained_cascade.detectMultiScale(gray, thrfaces);
-      for(int i = 0; i < thrfaces.size(); i++)
+      for (int i = 0; i < thrfaces.size(); i++)
       {
-        //! Process face by face:
+        /// Process face by face:
         cv::Rect face_i = thrfaces[i];
         cv::Mat face = gray(face_i);
         cv::Mat face_resized;
-        cv::resize(face, face_resized, cv::Size(im_width, im_height), 
+        cv::resize(face, face_resized, cv::Size(im_width, im_height),
           1.0, 1.0, cv::INTER_CUBIC);
         double local_conf = 0.0;
         int pred_label = -1;
         trained_model->predict(face_resized, pred_label, local_conf);
         predictions.push_back(local_conf);
         rectangle(original, face_i, CV_RGB(0, 255, 0), 1);
-        //! Add every element created for each frame, to the total amount of faces
-        faces_total.push_back (thrfaces.at(i));
+        /// Add every element created for each frame, to the total amount of faces
+        faces_total.push_back(thrfaces.at(i));
       }
     }
- 
     thrfaces.clear();
     return predictions;
   }
-
-}// namespace pandora_vision
+}  // namespace pandora_vision

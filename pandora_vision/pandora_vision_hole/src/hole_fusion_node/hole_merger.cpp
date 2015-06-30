@@ -124,7 +124,7 @@ namespace pandora_vision
     std::vector<cv::Point2f> substituteVerticesVector;
 
     // Store the four vertices to the substituteVerticesVector
-    for(int v = 0; v < 4; v++)
+    for (int v = 0; v < 4; v++)
     {
       substituteVerticesVector.push_back(substituteVerticesArray[v]);
     }
@@ -222,7 +222,7 @@ namespace pandora_vision
     // Indicates the end of the merging process
     bool isFuseComplete = false;
 
-    while(!isFuseComplete)
+    while (!isFuseComplete)
     {
       // If a(n) {assimilation, amalgamation, connection} did happen,
       // regenerate the mask sets in order for them to reflect the new
@@ -399,13 +399,13 @@ namespace pandora_vision
           // candidate hole must re-examine all the other holes
           passiveId = 1;
         }
-        else // rgbdHolesConveyor remains unchanged
+        else  // rgbdHolesConveyor remains unchanged
         {
           // passiveId-th hole not merged. let's see about the next one
           passiveId++;
         }
       }
-      else // isAble == false
+      else  // isAble == false
       {
         // passiveId-th hole not merged. let's see about the next one
         passiveId++;
@@ -536,7 +536,7 @@ namespace pandora_vision
     int passiveId = 1;
 
     bool isFuseComplete = false;
-    while(!isFuseComplete)
+    while (!isFuseComplete)
     {
       // The holesMaskSetVector vector is used in the merging processes
       std::vector<std::set<unsigned int> > holesMasksSetVector;
@@ -624,7 +624,7 @@ namespace pandora_vision
         // candidate hole must re-examine all the other holes
         passiveId = 1;
       }
-      else // isAble == false
+      else  // isAble == false
       {
         // passiveId-th hole not merged. let's see about the next one
         passiveId++;
@@ -798,7 +798,7 @@ namespace pandora_vision
     std::vector<cv::Point2f> substituteVerticesVector;
 
     // Store the four vertices to the substituteVerticesVector
-    for(int v = 0; v < 4; v++)
+    for (int v = 0; v < 4; v++)
     {
       substituteVerticesVector.push_back(substituteVerticesArray[v]);
     }
@@ -1165,7 +1165,7 @@ namespace pandora_vision
     std::vector<cv::Mat> canvases;
     std::vector<std::string> titles;
 
-    if(Parameters::Debug::show_merge_holes)
+    if (Parameters::Debug::show_merge_holes)
     {
       // Push back the identifier of each keypoint
       for (int i = 0; i < conveyorBeforeMerge.size(); i++)
@@ -1217,7 +1217,7 @@ namespace pandora_vision
     }
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_merge_holes)
+    if (Parameters::Debug::show_merge_holes)
     {
       msgs.clear();
 
@@ -1248,4 +1248,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

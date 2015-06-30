@@ -37,22 +37,27 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_victim/victim_image_preprocessor.h"
 
 namespace pandora_vision
 {
-  VictimImagePreProcessor::VictimImagePreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
+  VictimImagePreProcessor::VictimImagePreProcessor(const std::string& ns,
+    sensor_processor::Handler* handler)
+    : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
     EnhancedImageStamped>(ns, handler)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
-  
-  VictimImagePreProcessor::~VictimImagePreProcessor() {}
-  
-  bool VictimImagePreProcessor::preProcess(const EnhancedImageConstPtr& input, 
-    const EnhancedImageStampedPtr& output)  
+
+  VictimImagePreProcessor::~VictimImagePreProcessor()
+  {
+  }
+
+  bool VictimImagePreProcessor::preProcess(const EnhancedImageConstPtr& input,
+      const EnhancedImageStampedPtr& output)
   {
     output->setHeader(input->header);
 

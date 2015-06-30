@@ -69,7 +69,7 @@ namespace pandora_vision
     Timer::start("validateBlobs", "findHoles");
     #endif
 
-    switch(detectionMethod)
+    switch (detectionMethod)
     {
       // Locate the outline of blobs via brushfiring
       case 0:
@@ -184,7 +184,7 @@ namespace pandora_vision
     keypoints, outlines and areas
     @return void
    **/
-  void HoleFilters::validateKeypointsToRectangles (
+  void HoleFilters::validateKeypointsToRectangles(
     const std::vector<cv::KeyPoint>& inKeyPoints,
     const std::vector<std::vector<cv::Point2f> >& inRectangles,
     const std::vector<float>& inRectanglesArea,
@@ -265,4 +265,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

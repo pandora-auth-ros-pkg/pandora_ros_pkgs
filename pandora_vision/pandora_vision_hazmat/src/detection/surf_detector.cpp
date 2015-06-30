@@ -32,8 +32,10 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
+
+#include <vector>
 
 #include "pandora_vision_hazmat/detection/surf_detector.h"
 
@@ -41,7 +43,7 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    /*
+    /**
      * @brief : The constructor for the SURF detector objects
      */
     SurfDetector::SurfDetector() :
@@ -49,20 +51,20 @@ namespace pandora_vision
     {
       int patternNum = this->getPatternsNumber();
 
-      // Initialize the matchers that will be used for the 
+      // Initialize the matchers that will be used for the
       // detection of the pattern.
       matchers_ = new cv::Ptr<cv::DescriptorMatcher>[patternNum];
       // A temporary container for the descriptors of each pattern.
       std::vector<cv::Mat> descriptors;
 
-      for (int i = 0 ; i < patternNum ; i++ )
+      for (int i = 0; i < patternNum;  i++)
       {
         matchers_[i] = cv::DescriptorMatcher::create("FlannBased");
-        // Add the descriptors of the i-th pattern to the 
+        // Add the descriptors of the i-th pattern to the
         // container.
-        descriptors.push_back( (*patterns_ )[i].descriptors );
+        descriptors.push_back((*patterns_)[i].descriptors);
         // Add the descriptors to the matcher and train it.
-        matchers_[i]->add( descriptors );
+        matchers_[i]->add(descriptors);
         matchers_[i]->train();
 
         // Clear the container for the next iteration.
@@ -74,10 +76,10 @@ namespace pandora_vision
       s_ = cv::SURF();
     }
 
-    /*
+    /**
      * @brief: Function used to produce the necessary keypoints and their
-     *          corresponding descriptors for an image. 
-     * @param frame[const cv::Mat&] : The images that will be processed to 
+     * corresponding descriptors for an image.
+     * @param frame[const cv::Mat&] : The images that will be processed to
      * extract features and keypoints.
      * @param mask[const cv::Mat&] : A mask defines the image regions that
      * will be processed.
@@ -86,38 +88,38 @@ namespace pandora_vision
      * @param keyPoints[std::vector<cv::KeyPoint>*] : A pointer to the vector
      * containing the Keypoints detected in the current image.
      */
-    void SurfDetector::getFeatures( const cv::Mat &frame , 
-        const cv::Mat &mask , cv::Mat *descriptors , 
-        std::vector<cv::KeyPoint> *keyPoints ) 
+    void SurfDetector::getFeatures(const cv::Mat &frame,
+        const cv::Mat& mask, cv::Mat *descriptors,
+        std::vector<cv::KeyPoint> *keyPoints)
     {
 #ifdef FEATURES_CHRONO
-      gettimeofday( &startwtime , NULL );
+      gettimeofday(&startwtime, NULL);
 #endif
 
       // Detect the Keypoints on the image.
-      s_.detect( frame ,  *keyPoints ,  mask );
+      s_.detect(frame, *keyPoints, mask);
 
 #ifdef FEATURES_CHRONO
-      gettimeofday( &endwtime, NULL );
+      gettimeofday(&endwtime, NULL);
       double keyPointTime = static_cast<double>((endwtime.tv_usec -
             startwtime.tv_usec) / 1.0e6 + endwtime.tv_sec -
           startwtime.tv_sec);
 #endif
 #ifdef FEATURES_CHRONO
-      gettimeofday( &startwtime , NULL );
+      gettimeofday(&startwtime, NULL);
 #endif
 
       // Extract descriptors for the the detected keypoints.
-      s_.compute( frame, *keyPoints , *descriptors);
+      s_.compute(frame, *keyPoints, *descriptors);
 
 
 #ifdef FEATURES_CHRONO
-      gettimeofday( &endwtime, NULL );
+      gettimeofday(&endwtime, NULL);
       double descriptorsTime = static_cast<double>((endwtime.tv_usec -
             startwtime.tv_usec) / 1.0e6 + endwtime.tv_sec -
-          startwtime.tv_sec);  
+          startwtime.tv_sec);
       if (featureTimerFlag_)
-      {  
+      {
         ROS_DEBUG_STREAM_NAMED("detection", "[Hazmat Detection]: ["
             << featuresName_ << "] : Descriptors Computation time : "
             << descriptorsTime);
@@ -128,5 +130,5 @@ namespace pandora_vision
 #endif
     }
 
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision

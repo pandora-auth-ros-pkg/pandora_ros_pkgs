@@ -48,7 +48,7 @@
 
 namespace pandora_vision
 {
-  class HazmatHandler : public VisionHandler<HazmatPreProcessor, 
+  class HazmatHandler : public VisionHandler<HazmatPreProcessor,
     pandora_vision_hazmat::HazmatProcessor, HazmatPostProcessor>
   {
     public:

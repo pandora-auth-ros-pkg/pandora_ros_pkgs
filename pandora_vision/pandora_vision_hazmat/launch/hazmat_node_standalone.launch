@@ -1,6 +1,6 @@
 <launch>
   <include file="$(find state_manager)/launch/stateManager.launch" />
-   
+
   <arg name="openni" default="false" />
 
   <group if="$(arg openni)">
@@ -21,12 +21,12 @@
     </include>
   </group>
 
-  <arg name="usbcamera" default="true" />
+  <arg name="usbcamera" default="false" />
   <arg name="camID" default="/dev/video1" />
 
   <group if="$(arg usbcamera)">
     <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch">
-      <arg name="camID" value="$(arg camID)" /> 
+      <arg name="camID" value="$(arg camID)" />
       <arg name="topic_name" value="/kinect/rgb/image_raw" />
     </include>
   </group>
@@ -35,7 +35,7 @@
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
 
   <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
-   
-  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
+
+  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
 
 </launch>

@@ -34,8 +34,9 @@
  *
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
-#ifndef HOLE_FUSION_NODE_RGB_FILTERS_H
-#define HOLE_FUSION_NODE_RGB_FILTERS_H
+
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_RGB_FILTERS_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_RGB_FILTERS_H
 
 #include <math.h>
 #include "utils/edge_detection.h"
@@ -59,7 +60,6 @@ namespace pandora_vision
   class RgbFilters
   {
     public:
-
       /**
         @brief Checks for colour homogeneity in a region where points are
         constrained inside each hole. The colors of the image are reduced
@@ -200,9 +200,8 @@ namespace pandora_vision
         const std::vector<int>& rectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_RGB_FILTERS_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_RGB_FILTERS_H

@@ -37,22 +37,24 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_victim/victim_hole_preprocessor.h"
 
 namespace pandora_vision
 {
-  VictimHolePreProcessor::VictimHolePreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) :
-    sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, 
+  VictimHolePreProcessor::VictimHolePreProcessor(const std::string& ns,
+    sensor_processor::Handler* handler)
+    : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
     EnhancedImageStamped>(ns, handler)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
-  
+
   VictimHolePreProcessor::~VictimHolePreProcessor() {}
-  
-  bool VictimHolePreProcessor::preProcess(const EnhancedImageConstPtr& input, 
+
+  bool VictimHolePreProcessor::preProcess(const EnhancedImageConstPtr& input,
     const EnhancedImageStampedPtr& output)
   {
     output->setHeader(input->header);
@@ -69,7 +71,7 @@ namespace pandora_vision
 
     for (int ii = 0; ii < input->regionsOfInterest.size(); ii++)
     {
-      Rect2f rect(input->regionsOfInterest[ii].center.x, input->regionsOfInterest[ii].center.y, 
+      Rect2f rect(input->regionsOfInterest[ii].center.x, input->regionsOfInterest[ii].center.y,
         input->regionsOfInterest[ii].width, input->regionsOfInterest[ii].height);
       output->setRegion(ii, rect);
     }

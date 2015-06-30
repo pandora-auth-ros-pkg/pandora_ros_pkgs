@@ -75,16 +75,16 @@ namespace pandora_vision
     cv::Mat big(rows * imgs[0].rows, cols * imgs[0].cols, CV_8UC3);
 
     // Draw images
-    for(unsigned int im = 0 ; im < imgs.size() ; im++)
+    for (unsigned int im = 0 ; im < imgs.size() ; im++)
     {
       unsigned int startRow, startCol;
       startRow = im / cols * imgs[im].rows;
       startCol = im % cols * imgs[im].cols;
-      for(unsigned int i = 0 ; i < imgs[im].rows ; i++)
+      for (unsigned int i = 0 ; i < imgs[im].rows ; i++)
       {
-        for(unsigned int j = 0 ; j < imgs[im].cols ; j++)
+        for (unsigned int j = 0 ; j < imgs[im].cols ; j++)
         {
-          if(imgs[im].channels() == 1)
+          if (imgs[im].channels() == 1)
           {
             big.at<cv::Vec3b>(startRow + i, startCol + j)[0] =
               imgs[im].at<unsigned char>(i, j);
@@ -93,7 +93,7 @@ namespace pandora_vision
             big.at<cv::Vec3b>(startRow + i, startCol + j)[2] =
               imgs[im].at<unsigned char>(i, j);
           }
-          else if(imgs[im].channels() == 3)
+          else if (imgs[im].channels() == 3)
           {
             big.at<cv::Vec3b>(startRow + i, startCol + j) =
               imgs[im].at<cv::Vec3b>(i, j);
@@ -106,7 +106,7 @@ namespace pandora_vision
         cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 255, 0), 1, CV_AA);
     }
 
-    for(unsigned int i = 1 ; i <= rows - 1 ; i++)
+    for (unsigned int i = 1 ; i <= rows - 1 ; i++)
     {
       cv::line(big,
         cv::Point2f(0 , i * imgs[0].rows - 1),
@@ -114,7 +114,7 @@ namespace pandora_vision
         CV_RGB(255, 255, 255), 2, 8);
     }
 
-    for(unsigned int i = 1 ; i <= cols - 1 ; i++)
+    for (unsigned int i = 1 ; i <= cols - 1 ; i++)
     {
       cv::line(big,
         cv::Point2f(i * imgs[0].cols - 1 , 0),
@@ -238,9 +238,9 @@ namespace pandora_vision
     cv::drawKeypoints(img, keypointsVector, img, CV_RGB(0, 255, 0),
       cv::DrawMatchesFlags::DEFAULT);
 
-    for(unsigned int i = 0; i < conveyor.size(); i++)
+    for (unsigned int i = 0; i < conveyor.size(); i++)
     {
-      for(unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
+      for (unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
       {
         img.at<unsigned char>(conveyor.holes[i].outline[j].y,
           3 * conveyor.holes[i].outline[j].x + 2) = 0;
@@ -255,13 +255,13 @@ namespace pandora_vision
 
     for (int i = 0; i < conveyor.size(); i++)
     {
-      for(int j = 0; j < 4; j++)
+      for (int j = 0; j < 4; j++)
       {
         cv::line(img, conveyor.holes[i].rectangle[j],
           conveyor.holes[i].rectangle[(j + 1) % 4], CV_RGB(255, 0, 0), 1, 8);
       }
 
-      if(msgs.size() == conveyor.size())
+      if (msgs.size() == conveyor.size())
       {
         cv::putText(img, msgs[i].c_str(),
           cvPoint(conveyor.holes[i].keypoint.pt.x - 20,
@@ -270,7 +270,7 @@ namespace pandora_vision
       }
     }
 
-    if(hz > 0)
+    if (hz > 0)
     {
       cv::putText(img,
         (TOSTR(hz)+std::string("Hz")).c_str(),
@@ -278,7 +278,7 @@ namespace pandora_vision
         cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(0, 0, 255), 1, CV_AA);
     }
 
-    if(ms >= 0)
+    if (ms >= 0)
     {
       Visualization::show(windowTitle.c_str(), img, ms);
     }
@@ -315,7 +315,7 @@ namespace pandora_vision
     cv::drawKeypoints(img, keypoints, img, CV_RGB(255, 0, 0),
       cv::DrawMatchesFlags::DEFAULT);
 
-    if(ms >= 0)
+    if (ms >= 0)
     {
       Visualization::show(windowTitle.c_str(), img, ms);
     }
@@ -343,4 +343,4 @@ namespace pandora_vision
     cv::waitKey(ms);
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

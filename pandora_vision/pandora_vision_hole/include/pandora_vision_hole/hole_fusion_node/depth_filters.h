@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef HOLE_FUSION_NODE_DEPTH_FILTERS_H
-#define HOLE_FUSION_NODE_DEPTH_FILTERS_H
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_DEPTH_FILTERS_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_DEPTH_FILTERS_H
 
 #include <math.h>
 #include "utils/holes_conveyor.h"
@@ -59,7 +59,6 @@ namespace pandora_vision
   class DepthFilters
   {
     public:
-
       /**
         @brief Checks for valid holes by area / depth comparison
         @param[in] conveyor [const HolesConveyor&] The candidate holes
@@ -214,9 +213,8 @@ namespace pandora_vision
         const std::vector<int>& inflatedRectanglesIndices,
         std::vector<float>* probabilitiesVector,
         std::vector<std::string>* msgs);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_DEPTH_FILTERS_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_DEPTH_FILTERS_H

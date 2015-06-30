@@ -38,12 +38,16 @@
 #ifndef PANDORA_VISION_VICTIM_VICTIM_DETECTION_H
 #define PANDORA_VISION_VICTIM_VICTIM_DETECTION_H
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include <boost/shared_ptr.hpp>
 
 #include "pandora_vision_victim/victim_vj_detector.h"
-//#include "pandora_vision_victim/victim_parameters.h"
-#include "pandora_vision_victim/svm_classifier/rgb_svm_validator.h"
-#include "pandora_vision_victim/svm_classifier/depth_svm_validator.h"
+// #include "pandora_vision_victim/victim_parameters.h"
+#include "pandora_vision_victim/classifiers/rgb_svm_validator.h"
+#include "pandora_vision_victim/classifiers/depth_svm_validator.h"
 
 
 namespace pandora_vision
@@ -76,7 +80,7 @@ namespace pandora_vision
 
       /// Instance of class face_detector
       VictimVJDetector _rgbViolaJonesDetector;
-      //~ VictimVJDetector _victimDetector;
+      // VictimVJDetector _victimDetector;
 
       /// Instance of RGB SVM Validator
       boost::shared_ptr<RgbSvmValidator> rgbSvmValidator_;
@@ -93,8 +97,7 @@ namespace pandora_vision
         bool holesEnabled,
         const cv::Mat& rgbImage,
         const cv::Mat& depthImage,
-        const pandora_vision_msgs::EnhancedHolesVectorMsg& msg
-      );
+        const pandora_vision_msgs::EnhancedHolesVectorMsg& msg);
 
       /**
       @brief This method check in which state we are, according to
@@ -131,7 +134,7 @@ namespace pandora_vision
 
       VictimParameters params;
 
-      //! Debug purposes
+      // Debug purposes
       // The image_transport nodehandle
       image_transport::ImageTransport imageTransport_;
       image_transport::Publisher _debugVictimsPublisher;
@@ -151,7 +154,6 @@ namespace pandora_vision
       std::vector<float> depth_vj_p;
       std::vector<float> depth_svm_p;
 
-      //----------------------------------------------------------------------//
       DetectionImages dImages;
 
       /**
@@ -160,17 +162,16 @@ namespace pandora_vision
       @param [std::vector<cv::Mat>] vector of images to be processed. Size of
       vector can be either 2 or 1, if we have both rgbd information or not
       @return void
-      **/ 
+      **/
       std::vector<DetectedVictim> victimFusion(
         DetectionImages imgs,
-        DetectionMode detectionMode
-      );
+        DetectionMode detectionMode);
 
     public:
-      //!< The Constructor
+      /// The Constructor
       explicit VictimDetection(const std::string& ns);
 
-      //!< The Destructor
+      /// The Destructor
       ~VictimDetection();
 
       /**
@@ -186,7 +187,7 @@ namespace pandora_vision
       **/
       void completeTransition(void);
   };
-}// namespace pandora_vision
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_DETECTION_H
 
 

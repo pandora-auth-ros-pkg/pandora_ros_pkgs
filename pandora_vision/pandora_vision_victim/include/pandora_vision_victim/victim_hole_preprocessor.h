@@ -56,14 +56,13 @@ namespace pandora_vision
     protected:
       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage> EnhancedImagePtr;
       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage const> EnhancedImageConstPtr;
-      
+
     public:
       VictimHolePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
       virtual ~VictimHolePreProcessor();
-      
+
       virtual bool
         preProcess(const EnhancedImageConstPtr& input, const EnhancedImageStampedPtr& output);
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_VICTIM_HOLE_PREPROCESSOR_H

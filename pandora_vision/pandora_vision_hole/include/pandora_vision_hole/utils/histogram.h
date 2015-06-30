@@ -35,8 +35,8 @@
  * Authors: Despoina Paschalidou, Alexandros Philotheou
  *********************************************************************/
 
-#ifndef UTILS_HISTOGRAM_H
-#define UTILS_HISTOGRAM_H
+#ifndef PANDORA_VISION_HOLE_UTILS_HISTOGRAM_H
+#define PANDORA_VISION_HOLE_UTILS_HISTOGRAM_H
 
 #include <dirent.h>
 #include <ros/package.h>
@@ -57,7 +57,6 @@ namespace pandora_vision
   class Histogram
   {
     public:
-
       /**
         @brief Function for calculating the backprojection of an image,
         based on the histogram @param modelHistogram
@@ -85,12 +84,11 @@ namespace pandora_vision
         hue one. 1 for the Saturation channel, 2 for the Value channel
         @return void
        **/
-      static void getHistogram (
+      static void getHistogram(
         std::vector<cv::MatND>* histogram,
         const int& secondaryChannel);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_HISTOGRAM_H
+#endif  // PANDORA_VISION_HOLE_UTILS_HISTOGRAM_H

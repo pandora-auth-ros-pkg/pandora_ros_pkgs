@@ -71,7 +71,7 @@ namespace pandora_vision
     Timer::start("checkHolesDepthArea", "applyFilter");
     #endif
 
-    for(unsigned int i = 0 ; i < conveyor.size() ; i++)
+    for (unsigned int i = 0 ; i < conveyor.size() ; i++)
     {
       // The mean depth value of the points inside the i-th hole
       float mean = 0.0;
@@ -103,7 +103,7 @@ namespace pandora_vision
       float low = singleHoleDepthArea - area - 7000;
 
 
-      if(low < 0 && high > 0)
+      if (low < 0 && high > 0)
       {
         probabilitiesVector->at(i) = 1.0;
       }
@@ -153,12 +153,12 @@ namespace pandora_vision
     Timer::start("checkHolesDepthDiff", "applyFilter");
     #endif
 
-    for(unsigned int i = 0 ; i < inflatedRectanglesIndices.size() ; i++)
+    for (unsigned int i = 0 ; i < inflatedRectanglesIndices.size() ; i++)
     {
       // The mean distance of this hole's bounding box vertices
       float mean = 0.0;
 
-      for(unsigned int j = 0 ; j < 4; j++)
+      for (unsigned int j = 0 ; j < 4; j++)
       {
         int x = inflatedRectanglesVector[i][j].x;
         int y = inflatedRectanglesVector[i][j].y;
@@ -359,7 +359,7 @@ namespace pandora_vision
           initialPointCloud->header.stamp;
 
         int pointCloudPointsIndex = 0;
-        for(std::set<unsigned int>::iterator
+        for (std::set<unsigned int>::iterator
           it = intermediatePointsSetVector[i].begin();
           it != intermediatePointsSetVector[i].end(); it++)
         {
@@ -403,7 +403,6 @@ namespace pandora_vision
         msgs->push_back(TOSTR(
             probabilitiesVector->at(inflatedRectanglesIndices[i])));
       }
-
     }
 
     #ifdef DEBUG_TIME
@@ -462,7 +461,7 @@ namespace pandora_vision
       cv::Mat canvas = cv::Mat::zeros(inImage.size(), CV_8UC1);
 
       // Draw the rectangle that corresponds to it
-      for(int j = 0; j < 4; j++)
+      for (int j = 0; j < 4; j++)
       {
         cv::line(
           canvas,
@@ -498,7 +497,7 @@ namespace pandora_vision
         initialPointCloud->header.stamp;
 
       int pointCloudPointsIndex = 0;
-      for(std::set<unsigned int>::iterator it = visitedPoints.begin();
+      for (std::set<unsigned int>::iterator it = visitedPoints.begin();
         it != visitedPoints.end(); it++)
       {
         edgePointsPointCloud->points[pointCloudPointsIndex].x =
@@ -545,4 +544,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

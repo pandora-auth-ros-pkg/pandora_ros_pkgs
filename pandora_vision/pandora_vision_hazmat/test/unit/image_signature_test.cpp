@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
 
@@ -44,32 +44,32 @@ namespace pandora_vision
   namespace pandora_vision_hazmat
   {
 
-    TEST( ImageSignatureTest , imageSign )
+    TEST(ImageSignatureTest, imageSign)
     {
       // Create a small image with positive elements .
-      cv::Mat testImage( 20 , 20 , CV_32SC3 );
+      cv::Mat testImage(20, 20, CV_32SC3);
       testImage.setTo(100);
 
       cv::Mat signs;
 
-      ImageSignature::signFunction(testImage , &signs );
+      ImageSignature::signFunction(testImage, &signs);
 
       // Since we pass a multi channel matrix the function must return
       // an empty matrix.
       ASSERT_TRUE(signs.data == NULL);
 
       // Create a matrix with positive elements.
-      testImage = cv::Mat( 20 , 20, CV_32FC1 );
+      testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(100);
 
-      ImageSignature::signFunction( testImage , &signs );
+      ImageSignature::signFunction(testImage, &signs);
       ASSERT_TRUE(signs.data != NULL);
 
       // Create a matrix with positive elements.
       testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(100);
 
-      ImageSignature::signFunction(testImage , &signs );
+      ImageSignature::signFunction(testImage, &signs);
 
       // Check that every value is positive.
 
@@ -77,8 +77,8 @@ namespace pandora_vision
       {
         for (int j = 0 ; j < testImage.cols ; j++ )
         {
-          int val = signs.at<float>( i , j );
-          ASSERT_GT(  val , 0 );
+          int val = signs.at<float>(i, j);
+          ASSERT_GT(val, 0);
         }
       }
 
@@ -87,7 +87,7 @@ namespace pandora_vision
       testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(-100);
 
-      ImageSignature::signFunction(testImage , &signs );
+      ImageSignature::signFunction(testImage, &signs);
 
       // Check that every value is negative.
 
@@ -95,12 +95,10 @@ namespace pandora_vision
       {
         for (int j = 0 ; j < testImage.cols ; j++ )
         {
-          int val = signs.at<float>( i , j);
-          ASSERT_LT( val , 0 );
+          int val = signs.at<float>(i, j);
+          ASSERT_LT(val, 0);
         }
       }
-
     }
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision

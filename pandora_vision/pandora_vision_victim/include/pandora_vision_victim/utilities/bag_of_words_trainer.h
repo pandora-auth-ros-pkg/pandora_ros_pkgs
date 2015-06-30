@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
@@ -118,7 +119,7 @@ namespace pandora_vision
 
     private:
       ///
-      FeatureExtractorFactory* factoryExtractor_;
+      boost::shared_ptr<FeatureExtractorFactory> factoryExtractor_;
 
       ///
       cv::Ptr<cv::BOWKMeansTrainer> bowKmeansTrainer_;

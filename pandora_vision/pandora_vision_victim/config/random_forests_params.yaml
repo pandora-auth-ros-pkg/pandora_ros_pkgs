@@ -1,0 +1,23 @@
+rgb:
+  max_depth: 20
+  min_sample_count: 10
+  regression_accuracy: 0.0
+  use_surrogates: false
+  max_categories: 15
+  priors: 0.0
+  calc_var_importance: true
+  nactive_vars: 4
+  max_num_of_trees_in_the_forest: 1000
+  forest_accuracy: 0.001
+
+depth:
+  max_depth: 10
+  min_sample_count: 10
+  regression_accuracy: 0.0
+  use_surrogates: false
+  max_categories: 15
+  priors: 0.0
+  calc_var_importance: true
+  nactive_vars: 4
+  max_num_of_trees_in_the_forest: 1000
+  forest_accuracy: 0.001

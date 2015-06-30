@@ -116,7 +116,7 @@ namespace pandora_vision
     finalMsgs.clear();
     msgs_.clear();
 
-    switch(filteringMethod)
+    switch (filteringMethod)
     {
       // Filter #1 (Color homogeneity inside blob)------------------------------
       case 1 :
@@ -255,18 +255,18 @@ namespace pandora_vision
         }
     }
 
-    for(int i = 0; i < conveyor.size(); i++)
+    for (int i = 0; i < conveyor.size(); i++)
     {
-      if(msgs_.size() == conveyor.size())
+      if (msgs_.size() == conveyor.size())
       {
         finalMsgs.push_back(msgs_[i]);
       }
     }
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_check_holes) // Debug
+    if (Parameters::Debug::show_check_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" ") + windowMsg;
       msgs->push_back(msg);
 
@@ -294,7 +294,6 @@ namespace pandora_vision
 
         imgs->push_back(rgbFiltersImage);
       }
-
     }
     #endif
 
@@ -496,10 +495,10 @@ namespace pandora_vision
         &msgs);
 
       counter++;
-    } // o_it iterator ends
+    }  // o_it iterator ends
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_check_holes) // Debug
+    if (Parameters::Debug::show_check_holes)  // Debug
     {
       Visualization::multipleShow("CheckHoles function", imgs, msgs,
         Parameters::Debug::show_check_holes_size, 1);
@@ -511,4 +510,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

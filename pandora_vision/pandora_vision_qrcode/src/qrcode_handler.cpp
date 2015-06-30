@@ -37,12 +37,14 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_qrcode/qrcode_handler.h"
 
 namespace pandora_vision
 {
-  QrCodeHandler::QrCodeHandler(const std::string& ns) : 
-    VisionHandler<QrCodePreProcessor, QrCodeProcessor, QrCodePostProcessor>(ns)
+  QrCodeHandler::QrCodeHandler(const std::string& ns)
+  : VisionHandler<QrCodePreProcessor, QrCodeProcessor, QrCodePostProcessor>(ns)
   {
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_START_AUTONOMOUS);
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
@@ -53,7 +55,7 @@ namespace pandora_vision
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
     activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING);
   }
-  
+
   void QrCodeHandler::completeTransition()
   {
   }

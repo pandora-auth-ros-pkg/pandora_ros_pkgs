@@ -1,16 +1,53 @@
+/*********************************************************************
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors: Alexandros Philotheou, Manos Tsardoulias
+ *********************************************************************/
+
 #include "utils/timer.h"
 
-std::map<std::string,double> Timer::times = std::map<std::string,double>();
-std::map<std::string,double> Timer::max_time = std::map<std::string,double>();
-std::map<std::string,double> Timer::min_time = std::map<std::string,double>();
-std::map<std::string,double> Timer::mean_time = std::map<std::string,double>();
-std::map<std::string,double> Timer::sum_time = std::map<std::string,double>();
+std::map<std::string, double> Timer::times = std::map<std::string, double>();
+std::map<std::string, double> Timer::max_time = std::map<std::string, double>();
+std::map<std::string, double> Timer::min_time = std::map<std::string, double>();
+std::map<std::string, double> Timer::mean_time = std::map<std::string, double>();
+std::map<std::string, double> Timer::sum_time = std::map<std::string, double>();
 
-std::map<std::string,unsigned long> Timer::count =
-std::map<std::string,unsigned long>();
+std::map<std::string, uint64_t> Timer::count =
+std::map<std::string, uint64_t>();
 
-std::map<std::string,std::set<std::string> > Timer::timer_tree =
-std::map<std::string,std::set<std::string> >();
+std::map<std::string, std::set<std::string> > Timer::timer_tree =
+std::map<std::string, std::set<std::string> >();
 
 std::string Timer::top_node = "";
 
@@ -39,15 +76,15 @@ void Timer::printHoursInternal(double t)
 void Timer::printLiteralInternal(double t)
 {
   int sec = t / 1000.0;
-  if(sec >= 1)
+  if (sec >= 1)
   {
     t -= sec * 1000;
     int min = sec / 60.0;
-    if(min >= 1)
+    if (min >= 1)
     {
       sec -= min * 60;
       int hours = min / 60.0;
-      if(hours >= 1)
+      if (hours >= 1)
       {
         min -= hours * 60;
         ROS_INFO_STREAM_NAMED(PKG_NAME,
@@ -55,18 +92,18 @@ void Timer::printLiteralInternal(double t)
           << sec << " sec " << t << " ms");
       }
       else
-      {	// Mins
+      {  // Mins
         ROS_INFO_STREAM_NAMED(PKG_NAME,
           min << " minutes " << sec << " sec " << t << " ms\n");
       }
     }
     else
-    {	// Sec
+    {  // Sec
       ROS_INFO_STREAM_NAMED(PKG_NAME, sec << " sec " << t << " ms");
     }
   }
   else
-  {	// Ms
+  {  // Ms
     ROS_INFO_STREAM_NAMED(PKG_NAME, t << " ms");
   }
 }
@@ -74,34 +111,36 @@ void Timer::printLiteralInternal(double t)
 void Timer::start(std::string timerId, std::string father, bool top)
 {
   MsdIt it = times.find(timerId);
-  if(it == times.end())
+  if (it == times.end())
   {
     timer_tree.insert(std::pair<std::string, std::set<std::string> >
-      (timerId,std::set<std::string>()));
+      (timerId, std::set<std::string>()));
     gettimeofday(&msTime, NULL);
-    double ms = (double)msTime.tv_sec * 1000 + (double)msTime.tv_usec / 1000 ;
-    times.insert(Psd(timerId,ms));
-    count.insert(Psul(timerId,0));
-    mean_time.insert(Psul(timerId,0));
-    sum_time.insert(Psul(timerId,0));
-    max_time.insert(Psd(timerId,-1.0));
-    min_time.insert(Psd(timerId,1000000000000000.0));
+    double ms = static_cast<double>(msTime.tv_sec) * 1000 +
+      static_cast<double>(msTime.tv_usec) / 1000;
+    times.insert(Psd(timerId, ms));
+    count.insert(Psul(timerId, 0));
+    mean_time.insert(Psul(timerId, 0));
+    sum_time.insert(Psul(timerId, 0));
+    max_time.insert(Psd(timerId, -1.0));
+    min_time.insert(Psd(timerId, 1000000000000000.0));
   }
   else
   {
     gettimeofday(&msTime, NULL);
-    double ms = (double)msTime.tv_sec * 1000 + (double)msTime.tv_usec / 1000 ;
+    double ms = static_cast<double>(msTime.tv_sec) * 1000 +
+      static_cast<double>(msTime.tv_usec) / 1000;
     it->second = ms;
-    mean_time.insert(Psul(timerId,0));
-    sum_time.insert(Psul(timerId,0));
-    max_time.insert(Psd(timerId,-1.0));
-    min_time.insert(Psd(timerId,1000000000000000.0));
+    mean_time.insert(Psul(timerId, 0));
+    sum_time.insert(Psul(timerId, 0));
+    max_time.insert(Psd(timerId, -1.0));
+    min_time.insert(Psd(timerId, 1000000000000000.0));
   }
-  if(father != "")
+  if (father != "")
   {
     timer_tree[father].insert(timerId);
   }
-  if(top)
+  if (top)
   {
     top_node = timerId;
   }
@@ -110,7 +149,7 @@ void Timer::start(std::string timerId, std::string father, bool top)
 double Timer::stop(std::string timerId)
 {
   MsdIt it = times.find(timerId);
-  if(it == times.end())
+  if (it == times.end())
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
     return -1;
@@ -118,7 +157,8 @@ double Timer::stop(std::string timerId)
   else
   {
     gettimeofday(&msTime , NULL);
-    double ms = (double)msTime.tv_sec * 1000 + (double)msTime.tv_usec / 1000 ;
+    double ms = static_cast<double>(msTime.tv_sec) * 1000 +
+      static_cast<double>(msTime.tv_usec) / 1000;
     return ms - it->second;
   }
 }
@@ -126,7 +166,7 @@ double Timer::stop(std::string timerId)
 double Timer::mean(std::string timerId)
 {
   MsdIt it = times.find(timerId);
-  if(it == times.end())
+  if (it == times.end())
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
     return -1;
@@ -140,7 +180,7 @@ double Timer::mean(std::string timerId)
 void Timer::tick(std::string timerId)
 {
   MsdIt it = times.find(timerId);
-  if(it == times.end())
+  if (it == times.end())
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
   }
@@ -148,14 +188,15 @@ void Timer::tick(std::string timerId)
   {
     count[timerId]++;
     gettimeofday(&msTime , NULL);
-    double ms = (double)msTime.tv_sec * 1000 + (double)msTime.tv_usec / 1000 ;
+    double ms = static_cast<double>(msTime.tv_sec) * 1000 +
+      static_cast<double>(msTime.tv_usec) / 1000;
     ms -= it->second;
     times[timerId] = ms;
     sum_time[timerId] += ms;
     mean_time[timerId] = sum_time[timerId] / count[timerId];
-    if(min_time[timerId] > ms)
+    if (min_time[timerId] > ms)
       min_time[timerId] = ms;
-    if(max_time[timerId] < ms)
+    if (max_time[timerId] < ms)
       max_time[timerId] = ms;
   }
 }
@@ -193,7 +234,7 @@ void Timer::printLiteral(std::string timerId)
 void Timer::printLiteralMean(std::string timerId, std::string identation)
 {
   MsdIt it = times.find(timerId);
-  if(it == times.end())
+  if (it == times.end())
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "Invalid timer id : " << timerId << "\n");
   }
@@ -209,7 +250,7 @@ void Timer::printLiteralMean(std::string timerId, std::string identation)
 void Timer::printAll(void)
 {
   ROS_INFO_STREAM_NAMED(PKG_NAME, "Timers available :");
-  for(MsdCIt it = times.begin() ; it != times.end() ; it++)
+  for (MsdCIt it = times.begin() ; it != times.end() ; it++)
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "\t");
     printLiteral(it->first);
@@ -219,11 +260,11 @@ void Timer::printAllMeans(void)
 {
   ROS_INFO_STREAM_NAMED(PKG_NAME, "Timers available :");
   Mfs tms;
-  for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
+  for (MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {
-    tms.insert(std::pair<float,std::string>(it->second,it->first));
+    tms.insert(std::pair<float, std::string>(it->second, it->first));
   }
-  for(MfsIt it = tms.begin() ; it != tms.end() ; it++)
+  for (MfsIt it = tms.begin() ; it != tms.end() ; it++)
   {
     ROS_INFO_STREAM_NAMED(PKG_NAME, "\t"; printLiteralMean(it->second));
   }
@@ -234,19 +275,19 @@ void Timer::printAllMeansTree(void)
   ROS_INFO_STREAM_NAMED(PKG_NAME,
     "Timers available : [curr - min , mean , max - ticks]\n");
   Mfs tms;
-  for(MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
+  for (MsdCIt it = mean_time.begin() ; it != mean_time.end() ; it++)
   {
-    tms.insert(std::pair<float,std::string>(it->second,it->first));
+    tms.insert(std::pair<float, std::string>(it->second, it->first));
   }
-  printIterativeTree(top_node,"");
+  printIterativeTree(top_node, "");
 }
 
 void Timer::printIterativeTree(std::string node, std::string identation)
 {
-  printLiteralMean(node,identation);
-  for(std::set<std::string>::iterator it = timer_tree[node].begin() ; it !=
+  printLiteralMean(node, identation);
+  for (std::set<std::string>::iterator it = timer_tree[node].begin() ; it !=
     timer_tree[node].end() ; it++)
   {
-    printIterativeTree(*it,identation + "|-");
+    printIterativeTree(*it, identation + "|-");
   }
 }

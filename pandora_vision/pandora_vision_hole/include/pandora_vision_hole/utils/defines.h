@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_DEFINES_H
-#define UTILS_DEFINES_H
+#ifndef PANDORA_VISION_HOLE_UTILS_DEFINES_H
+#define PANDORA_VISION_HOLE_UTILS_DEFINES_H
 
 #include <iostream>
 #include <fstream>
@@ -82,29 +82,29 @@
 #define DEBUG_SHOW
 #define DEBUG_TIME
 
-//! Transforms a float number to string
-#define TOSTR( x )      static_cast< std::ostringstream & >( \
-  ( std::ostringstream() << std::dec << x ) ).str()
+//  Transforms a float number to string
+#define TOSTR(x)      static_cast< std::ostringstream & >( \
+  (std::ostringstream() << std::dec << x)).str()
 
-//! Takes the file name from an absolute path
-#define LPATH( x )      x.substr( x.find_last_of("/") + 1 , \
+//  Takes the file name from an absolute path
+#define LPATH(x)      x.substr(x.find_last_of("/") + 1 , \
   x.size() - x.find_last_of("/") - 1)
 
-//! Shortcut to std::string
-#define STR( x )        std::string(x)
+//  Shortcut to std::string
+#define STR(x)        std::string(x)
 
-//! Available processing modes:
-//! In RGBD_MODE, depth-based filters can be utilized along side RGB-based
-//! filters in order to ascerain the validity of candidate holes.
-//! In RGB_ONLY_MODE, depth analysis is not possible due to the overwhelming
-//! amount of noise present in the input depth image, and so the validity
-//! of candidate holes can only be tested through RGB-based filters.
+//  Available processing modes:
+//  In RGBD_MODE, depth-based filters can be utilized along side RGB-based
+//  filters in order to ascerain the validity of candidate holes.
+//  In RGB_ONLY_MODE, depth analysis is not possible due to the overwhelming
+//  amount of noise present in the input depth image, and so the validity
+//  of candidate holes can only be tested through RGB-based filters.
 #define RGBD_MODE 0
 #define RGB_ONLY_MODE 1
 
 
-// The string identifier of the hole detector package.
-// It must comply with the sub-namespace set in the package's launchers
+//  The string identifier of the hole detector package.
+//  It must comply with the sub-namespace set in the package's launchers
 #define PKG_NAME "hole_detector"
 
 /**
@@ -119,6 +119,6 @@ namespace pandora_vision
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
   typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr PointCloudPtr;
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_DEFINES_H
+#endif  // PANDORA_VISION_HOLE_UTILS_DEFINES_H

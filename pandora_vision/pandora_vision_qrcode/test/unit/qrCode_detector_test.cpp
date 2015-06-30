@@ -34,17 +34,22 @@
  * *
  * * Author: Vasilis Bosdelekidis
  * *********************************************************************/
+
+#include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
+#include <ros/ros.h>
+#include <ros/package.h>
+
 #include "pandora_vision_qrcode/qrcode_detector.h"
-#include "gtest/gtest.h"
-#include "ros/ros.h"
-#include "ros/package.h"
 
 namespace pandora_vision
 {
   /**
-   *     @class QrCodeDetectorTests
-   *     @brief Tests the integrity of methods of class QrCodeDetector
-   **/
+   * @class QrCodeDetectorTests
+   * @brief Tests the integrity of methods of class QrCodeDetector
+   */
   class QrCodeDetectorTest : public ::testing::Test
   {
     public:
@@ -52,7 +57,7 @@ namespace pandora_vision
 
       virtual void SetUp()
       {
-        WIDTH = 640;  // getParam
+        WIDTH = 640;
         HEIGHT = 480;
 
         std::string pkgPath = ros::package::getPath("pandora_vision_qrcode");
@@ -81,7 +86,6 @@ namespace pandora_vision
       QrCodeDetector* qrCodeDetectorPtr_;
   };
 
-
   int* QrCodeDetectorTest::locateQrCode(cv::Point2f qrcode_center)
   {
     int* center = new int[2];
@@ -91,19 +95,19 @@ namespace pandora_vision
   }
 
   /**
-    @brief Constructs a chessboard with specific number of blocks.
-    @param blocksNumberH [int] The number of chessboard blocks, horizontal direction
-    @param blocksNumberV [int] The number of chessboard blocks, vertical direction
-    @param image [cv::Mat&] The final chessboard image
-    @return void
-   **/
-  void QrCodeDetectorTest::drawChessboard(int blocksNumberH, int blocksNumberV, 
+   * @brief Constructs a chessboard with specific number of blocks.
+   * @param blocksNumberH [int] The number of chessboard blocks, horizontal direction
+   * @param blocksNumberV [int] The number of chessboard blocks, vertical direction
+   * @param image [cv::Mat&] The final chessboard image
+   * @return void
+   */
+  void QrCodeDetectorTest::drawChessboard(int blocksNumberH, int blocksNumberV,
     cv::Mat& image)
   {
     int imageSize = WIDTH * HEIGHT;
     int blockWidth = static_cast<int>(WIDTH / blocksNumberH);
     int blockHeight = static_cast<int>(HEIGHT / blocksNumberV);
-    cv::Mat chessBoard(HEIGHT, WIDTH, CV_8UC3, cv::Scalar::all(0));          
+    cv::Mat chessBoard(HEIGHT, WIDTH, CV_8UC3, cv::Scalar::all(0));
     unsigned char color = 255;
     for (int i = 0; i < WIDTH - blockWidth; i += blockWidth)
     {
@@ -116,8 +120,8 @@ namespace pandora_vision
     }
     chessBoard.copyTo(image);
   }
-  
-  //!< Tests QrCodeDetector::detectQrCode
+
+  /// Tests QrCodeDetector::detectQrCode
   TEST_F(QrCodeDetectorTest, detectQrCodeBlackImage)
   {
     cv::Mat blackFrame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
@@ -173,5 +177,4 @@ namespace pandora_vision
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
   }
-
 }  // namespace pandora_vision

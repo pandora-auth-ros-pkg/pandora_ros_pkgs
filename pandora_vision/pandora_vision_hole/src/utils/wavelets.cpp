@@ -54,15 +54,15 @@ namespace pandora_vision
 
     cv::Mat temp = cv::Mat(length, in.cols, CV_32FC1);
 
-    for(int k = 0; k < in.cols; k++)
+    for (int k = 0; k < in.cols; k++)
     {
-      for(int i = 0; i < length; i++)
+      for (int i = 0; i < length; i++)
       {
         float y = 0;
 
-        for(int j = 0; j < kernel.size(); j++)
+        for (int j = 0; j < kernel.size(); j++)
         {
-          if((i - j) >= 0 && (i - j) < in.rows)
+          if ((i - j) >= 0 && (i - j) < in.rows)
           {
             y += in.at<float>(i - j, k) * kernel.at(j);
           }
@@ -92,15 +92,15 @@ namespace pandora_vision
 
     cv::Mat temp = cv::Mat(in.rows, length, CV_32FC1);
 
-    for(int k = 0; k < in.rows; k++)
+    for (int k = 0; k < in.rows; k++)
     {
-      for(int i = 0; i < length; i++)
+      for (int i = 0; i < length; i++)
       {
         float y = 0;
 
-        for(int j = 0; j < kernel.size(); j++)
+        for (int j = 0; j < kernel.size(); j++)
         {
-          if((i - j) >= 0 && (i - j) < in.cols)
+          if ((i - j) >= 0 && (i - j) < in.cols)
           {
             y += in.at<float>(k, i - j) * kernel.at(j);
           }
@@ -126,7 +126,7 @@ namespace pandora_vision
 
     cv::Mat tempy0;
 
-    for(int i = 0; i < temp0.rows; i += 2)
+    for (int i = 0; i < temp0.rows; i += 2)
     {
       tempy0.push_back(temp0.row(i));
     }
@@ -137,7 +137,7 @@ namespace pandora_vision
 
     cv::transpose(tempy00, tempy00);
 
-    for(int i = 0; i < tempy00.rows; i += 2)
+    for (int i = 0; i < tempy00.rows; i += 2)
     {
       tempy000.push_back(tempy00.row(i));
     }
@@ -181,16 +181,16 @@ namespace pandora_vision
 
     std::vector<float> H0;
 
-    for(int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++)
     {
       H0.push_back(1 / sqrt(2));
     }
 
     cv::Mat doubled = cv::Mat(temp.rows, temp.cols, CV_32FC1);
 
-    for(int y = 0; y < doubled.rows; y++)
+    for (int y = 0; y < doubled.rows; y++)
     {
-      for(int x = 0; x < doubled.cols; x++)
+      for (int x = 0; x < doubled.cols; x++)
       {
         doubled.at<float>(y, x) =
           static_cast<float>(temp.at<unsigned char>(y, x) / 255.0);
@@ -229,7 +229,7 @@ namespace pandora_vision
 
     std::vector<float> H0;
 
-    for(int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++)
     {
       H0.push_back(1 / sqrt(2));
     }
@@ -240,9 +240,9 @@ namespace pandora_vision
     {
       cv::Mat doubled = cv::Mat(inImage.rows, inImage.cols, CV_32FC1);
 
-      for(int y = 0; y < doubled.rows; y++)
+      for (int y = 0; y < doubled.rows; y++)
       {
-        for(int x = 0; x < doubled.cols; x++)
+        for (int x = 0; x < doubled.cols; x++)
         {
           doubled.at<float>(y, x) =
             inImage.at<unsigned char>(y, 3 * x + i) / 255.0;
@@ -261,9 +261,9 @@ namespace pandora_vision
 
     for (int i = 0; i < 3; i++)
     {
-      for(int y = 0; y < lowLow[i].rows; y++)
+      for (int y = 0; y < lowLow[i].rows; y++)
       {
-        for(int x = 0; x < lowLow[i].cols; x++)
+        for (int x = 0; x < lowLow[i].cols; x++)
         {
           out.at<unsigned char>(y, 3 * x + i) = lowLow[i].at<float>(y, x) * 255;
         }
@@ -278,4 +278,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

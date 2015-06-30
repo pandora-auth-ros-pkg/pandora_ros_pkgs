@@ -5,7 +5,7 @@ subscribed_topics:
   thermal_candidate_holes_topic: thermal/candidate_holes
 
 published_topics:
-  synchronizer_unlock_topic: unlock_rgb_depth_synchronizer
+  synchronizer_unlock_topic: hole_fusion/unlock/synchronizer
   processor_log_topic: processor_log
   hole_detector_output_topic: /vision/holes_direction_alert
   enhanced_holes_topic: /vision/enhanced_holes

@@ -188,7 +188,7 @@ if (${PROJECT_NAME}_download_testing_data)
     )
 
   download_extra_data(${PROJECT_NAME}_download_benchmark_bags
-    EXTRA_FILES benchmark/data/bags_pcl/extra_files.yaml)
+    EXTRA_FILES test/benchmark/data/bags_pcl/extra_files.yaml)
 endif()
 
 if(${PROJECT_NAME}_functional_test)

@@ -35,8 +35,11 @@
  * Author: Angelos Triantafyllidis
  *********************************************************************/
 
+#include <string>
+
+#include <gtest/gtest.h>
+
 #include "pandora_vision_landoltc/landoltc_2d/landoltc_detector.h"
-#include "gtest/gtest.h"
 
 
 namespace pandora_vision
@@ -48,7 +51,7 @@ namespace pandora_vision
   class LandoltcDetectorTest : public ::testing::Test
   {
     public:
-      LandoltcDetectorTest() 
+      LandoltcDetectorTest()
       {
         packagePath = ros::package::getPath("pandora_vision_landoltc");
       }
@@ -61,7 +64,7 @@ namespace pandora_vision
 
     protected:
       LandoltCDetector landoltCDetector;
-      std::string packagePath; 
+      std::string packagePath;
   };
 
   // process input and call findcenters
@@ -69,7 +72,7 @@ namespace pandora_vision
   {
     cv::Mat gradX, gradY;
     cv::Mat gray;
-   
+
     if (input.channels() > 1)
       cv::cvtColor(input, gray, CV_BGR2GRAY);
     else
@@ -88,7 +91,7 @@ namespace pandora_vision
   // returns possible center
   void LandoltcDetectorTest::getCenter(cv::Point *point, const int& index)
   {
-    int vectorSize = landoltCDetector._centers.size();  
+    int vectorSize = landoltCDetector._centers.size();
     ASSERT_NE(0, static_cast<int>(vectorSize));
     ASSERT_GT(vectorSize, index);
     *point = landoltCDetector._centers[index];

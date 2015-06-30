@@ -70,11 +70,11 @@ namespace pandora_vision
     #endif
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
       cv::Mat tmp;
       rgbImage.copyTo(tmp);
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += " : Initial RGB image";
       msgs.push_back(msg);
       imgs.push_back(tmp);
@@ -90,11 +90,11 @@ namespace pandora_vision
       &edges);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
       cv::Mat tmp;
       edges.copyTo(tmp);
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Edges after denoise");
       msgs.push_back(msg);
       imgs.push_back(tmp);
@@ -107,9 +107,9 @@ namespace pandora_vision
     BlobDetection::detectBlobs(edges, &keyPoints);
 
     #ifdef DEBUG_SHOW
-    if(Parameters::Debug::show_find_holes) // Debug
+    if (Parameters::Debug::show_find_holes)  // Debug
     {
-      std::string msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      std::string msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Initial keypoints");
       msgs.push_back(msg);
       imgs.push_back(Visualization::showKeypoints(msg, edges, -1, keyPoints));
@@ -137,7 +137,7 @@ namespace pandora_vision
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_find_holes)
     {
-      msg = LPATH( STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
+      msg = LPATH(STR(__FILE__)) + STR(" ") + TOSTR(__LINE__);
       msg += STR(" : Blobs");
       msgs.push_back(msg);
       imgs.push_back(
@@ -146,8 +146,7 @@ namespace pandora_vision
           rgbImage,
           conveyor,
           -1,
-          std::vector<std::string>())
-        );
+          std::vector<std::string>()));
     }
     #endif
 
@@ -166,4 +165,4 @@ namespace pandora_vision
     return conveyor;
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

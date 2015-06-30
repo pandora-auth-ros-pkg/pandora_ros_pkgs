@@ -41,6 +41,8 @@
 #ifndef PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H
 #define PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H
 
+#include <vector>
+#include <string>
 
 #include <dynamic_reconfigure/server.h>
 #include <cv_bridge/cv_bridge.h>
@@ -55,7 +57,6 @@
 #include "pandora_vision_qrcode/qrcode_detector.h"
 #include "pandora_vision_qrcode/qrcode_cfgConfig.h"
 
-
 namespace pandora_vision
 {
   class QrCodeProcessor : public VisionProcessor
@@ -63,7 +64,7 @@ namespace pandora_vision
     public:
       typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
 
-      /*
+      /**
        * @brief: The Main constructor for the QR code Processor objects.
        * @param ns[const std::string&]: The namespace for the node.
        * @param handler[sensor_processor::Handler*]: A pointer to the handler
@@ -71,9 +72,10 @@ namespace pandora_vision
        */
       QrCodeProcessor(const std::string& ns,
           sensor_processor::Handler* handler);
-      /*
+
+      /**
        * @brief: The default constructor for the QR Code Processor objects
-      */
+       */
       QrCodeProcessor();
       virtual ~QrCodeProcessor() {}
 
@@ -84,35 +86,34 @@ namespace pandora_vision
     private:
       boost::shared_ptr<QrCodeDetector> detectorPtr_;
 
-      //!< Debug image topic
+      /// Debug image topic
       std::string debugTopic_;
 
-      //!< Debug images publisher flag
+      /// Debug images publisher flag
       bool debugPublish_;
-      
-      //!< List of detected qrcodes
+
+      /// List of detected qrcodes
       std::vector<POIPtr> qrcode_list;
-      
-      //!< Debug publisher for QrCodeDetector
+
+      /// Debug publisher for QrCodeDetector
       // boost::shared_ptr<image_transport::Publisher> debugPublisherPtr_;
 
-      //!< The dynamic reconfigure parameters' server
+      /// The dynamic reconfigure parameters' server
       dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
         server;
-      //!< The dynamic reconfigure parameters' callback
+      /// The dynamic reconfigure parameters' callback
       dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
         ::CallbackType f;
 
       /**
-        @brief The function called when a parameter is changed
-        @param[in] config [const pandora_vision_qrcode::qrcode_cfgConfig&]
-        @param[in] level [const uint32_t] The level 
-        @return void
-      **/
+       * @brief The function called when a parameter is changed
+       * @param[in] config [const pandora_vision_qrcode::qrcode_cfgConfig&]
+       * @param[in] level [const uint32_t] The level
+       * @return void
+       */
       void parametersCallback(
         const pandora_vision_qrcode::qrcode_cfgConfig& config,
         const uint32_t& level);
   };
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H

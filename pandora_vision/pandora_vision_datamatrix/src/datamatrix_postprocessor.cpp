@@ -53,7 +53,7 @@ namespace pandora_vision
   {
   }
 
-  bool DataMatrixPostProcessor::postProcess(const POIsStampedConstPtr& input, 
+  bool DataMatrixPostProcessor::postProcess(const POIsStampedConstPtr& input,
     const DataMatrixAlertVectorPtr& output)
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);

@@ -66,7 +66,7 @@ namespace pandora_vision
       /**
        * @brief Default Constructor
        */
-      FeatureExtraction();
+      explicit FeatureExtraction(const std::string& classifierType);
 
       /**
        * @brief Default Destructor
@@ -151,12 +151,27 @@ namespace pandora_vision
        */
       bool bagOfWordsVocabularyNeeded();
 
+      int getDictionarySize(void)
+      {
+        return dictionarySize_;
+      }
+
+      /**
+       * @brief Getter for the number of features
+       * @return [int] The number of features extracted.
+      */
+      int getFeatureNumber();
+
+
       /**
        * @brief
        */
       std::vector<cv::Mat> getBagOfWordsDescriptors() const;
 
     protected:
+      /// The number of features used.
+      int numFeatures_;
+
       /// Flag for displaying the calculated descriptors.
       bool visualization_;
 

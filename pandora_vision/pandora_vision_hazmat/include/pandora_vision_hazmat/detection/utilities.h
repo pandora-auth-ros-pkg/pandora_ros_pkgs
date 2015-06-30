@@ -32,17 +32,16 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
-
 
 #ifndef PANDORA_VISION_HAZMAT_DETECTION_UTILITIES_H
 #define PANDORA_VISION_HAZMAT_DETECTION_UTILITIES_H
 
 /**
-  Header file used for initializing useful data structures and 
-  including the necessary libraries.
-**/
+ * @brief Header file used for initializing useful data structures and
+ * including the necessary libraries.
+ */
 
 #include <cmath>
 #include <iostream>
@@ -67,15 +66,13 @@
 // Filter Libraries.
 #include "pandora_vision_hazmat/filters/image_signature.h"
 
-
-
-//#define CHRONO 
-#define DEBUG 
+// #define CHRONO
+#define DEBUG
 #define FEATURES_CHRONO
 
 #define PI boost::math::constants::pi<float>()
 
-#if defined(CHRONO) || defined(FEATURES_CHRONO) 
+#if defined(CHRONO) || defined(FEATURES_CHRONO)
 #include "sys/time.h"
 #endif
 
@@ -83,20 +80,21 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    /*
+    /**
      * @struct Object
      * @brief : Contains object information.
      */
     struct Object
     {
      public:
-       std::string name; //<! Name of the detected object.
-       int id; //<! A numerical id for the object.
-       cv::Point2f position; //<! The object's position on the image.
-       /*
+       std::string name;  //!< Name of the detected object.
+       int id;  //!< A numerical id for the object.
+       cv::Point2f position;  //!< The object's position on the image.
+
+       /**
         * @brief Costructor for an object instance.
         * @param objectName[const std::string&]: The name of the object
-        * @param objectPosition[const cv::Point2f&]: The position of the 
+        * @param objectPosition[const cv::Point2f&]: The position of the
         * object.
         * param objectID[const int&]: The id of the object.
         */
@@ -111,24 +109,19 @@ namespace pandora_vision
 
     struct Pattern
     {
-     public: 
+      std::string name;  //!< Name of the pattern.
 
-      std::string name; //<! Name of the pattern.
+      /// A vector of 2D points that contatins the bounding box and the center
+      /// of the pattern.
+      std::vector<cv::Point2f> boundingBox;
 
-      std::vector<cv::Point2f> boundingBox; //<! A vector of 2D points that
-                                            //<! contains the bounding box
-                                            //<! and the center of 
-                                            //<!the pattern.
+      /// Vector of detected keypoints in the pattern.
+      std::vector<cv::Point2f> keyPoints;
 
-      std::vector<cv::Point2f> keyPoints; //<! Vector of detected keypoints 
-                                          //<! in the pattern.
+      cv::Mat descriptors;  //!< Matrix of image descriptors.
 
-      cv::Mat descriptors; //<! Matrix of image descriptors .
-
-      cv::Mat histogram; //<! Color histogram of the pattern.
+      cv::Mat histogram;  //!< Color histogram of the pattern.
     };
-  
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
-
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_UTILITIES_H

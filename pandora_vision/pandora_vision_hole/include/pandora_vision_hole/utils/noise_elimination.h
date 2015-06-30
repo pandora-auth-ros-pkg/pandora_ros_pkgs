@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_NOISE_ELIMINATION_H
-#define UTILS_NOISE_ELIMINATION_H
+#ifndef PANDORA_VISION_HOLE_UTILS_NOISE_ELIMINATION_H
+#define PANDORA_VISION_HOLE_UTILS_NOISE_ELIMINATION_H
 
 #include "utils/morphological_operators.h"
 
@@ -53,7 +53,6 @@ namespace pandora_vision
   class NoiseElimination
   {
     public:
-
       /**
         @brief Interpolates the noise produced by the depth sensor.
         The black blobs take the depth value of the closest neighbour obstacles.
@@ -135,9 +134,8 @@ namespace pandora_vision
        **/
       static void transformNoiseToWhite(const cv::Mat& inImage,
         cv::Mat* outImage);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_NOISE_ELIMINATION_H
+#endif  // PANDORA_VISION_HOLE_UTILS_NOISE_ELIMINATION_H

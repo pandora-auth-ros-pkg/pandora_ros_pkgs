@@ -37,12 +37,16 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <vector>
+#include <string>
+
 #include "pandora_vision_victim/victim_hole_processor.h"
 
 namespace pandora_vision
 {
-  VictimHoleProcessor::VictimHoleProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : sensor_processor::Processor<EnhancedImageStamped, 
+  VictimHoleProcessor::VictimHoleProcessor(const std::string& ns,
+    sensor_processor::Handler* handler)
+    : sensor_processor::Processor<EnhancedImageStamped,
       POIsStamped>(ns, handler)
   {
     params_.configVictim(*this->accessPublicNh());
@@ -54,14 +58,38 @@ namespace pandora_vision
       *this->accessProcessorNh()).advertise(
       params_.interpolatedDepthImg, 1, true);
 
-    rgbSvmValidatorPtr_.reset(new RgbSvmValidator(params_));
-    depthSvmValidatorPtr_.reset(new DepthSvmValidator(params_));
+    std::string rgbClassifierType;
+    if (!this->accessPublicNh()->getParam("rgb_classifier", rgbClassifierType))
+    {
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
+          "Could not retrieve the RGB classifier Type from the yaml file!");
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : "
+          + "Shutting Down now!");
+      ROS_BREAK();
+    }
+
+    std::string depthClassifierType;
+    if (!this->accessPublicNh()->getParam("depth_classifier", depthClassifierType))
+    {
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
+          "Could not retrieve the Depth Classifier Type from the yaml file!");
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
+          "Shutting Down now!");
+      ROS_BREAK();
+    }
+
+    validatorFactoryPtr_.reset(new ValidatorFactory(this->accessPublicNh()->getNamespace()));
+
+    rgbValidatorPtr_.reset(validatorFactoryPtr_->createValidator(*this->accessPublicNh(),
+          rgbClassifierType, "rgb"));
+    depthValidatorPtr_.reset(validatorFactoryPtr_->createValidator(*this->accessPublicNh(),
+          depthClassifierType, "depth"));
 
     ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
       this->accessProcessorNh()->getNamespace());
   }
 
-  VictimHoleProcessor::VictimHoleProcessor() : sensor_processor::Processor<EnhancedImageStamped, 
+  VictimHoleProcessor::VictimHoleProcessor() : sensor_processor::Processor<EnhancedImageStamped,
     POIsStamped>() {}
 
   VictimHoleProcessor::~VictimHoleProcessor()
@@ -90,7 +118,7 @@ namespace pandora_vision
     }
 
     DetectionImages imgs;
-    int stateIndicator = 2;// * input->getDepth() + (input->getRegions().size() > 0) + 1;
+    int stateIndicator = 2;  // * input->getDepth() + (input->getRegions().size() > 0) + 1;
     DetectionMode detectionMode;
     switch (stateIndicator)
     {
@@ -110,15 +138,17 @@ namespace pandora_vision
     for (unsigned int i = 0 ; i < input->getRegions().size(); i++)
     {
       cv::Rect rect(input->getRegion(i).x - input->getRegion(i).width / 2,
-        input->getRegion(i).y - input->getRegion(i).height / 2, input->getRegion(i).width, 
+        input->getRegion(i).y - input->getRegion(i).height / 2, input->getRegion(i).width,
         input->getRegion(i).height);
       holes_bounding_boxes.push_back(rect);
 
-      if(input->getRegion(i).x - input->getRegion(i).width / 2 <= 0 &&
+      if (input->getRegion(i).x - input->getRegion(i).width / 2 <= 0 &&
          input->getRegion(i).y - input->getRegion(i).height / 2 <= 0 &&
          input->getRegion(i).width <= 0 &&
          input->getRegion(i).height <= 0)
-          ROS_FATAL("[victim_node] Bounding box sent from hole out of boundaries");
+      {
+        ROS_FATAL("[victim_node] Bounding box sent from hole out of boundaries");
+      }
 
       EnhancedMat emat;
       emat.img = input->getRgbImage()(rect);
@@ -137,20 +167,20 @@ namespace pandora_vision
 
     std::vector<VictimPOIPtr> final_victims = victimFusion(imgs, detectionMode);
 
-    //!< Message alert creation
+    /// Message alert creation
     for (int i = 0;  i < final_victims.size() ; i++)
     {
-      //if (final_victims[i]->getClassLabel() == 1)
-      //{  
-        //counter_++;
-        //!< Debug purposes
+      // if (final_victims[i]->getClassLabel() == 1)
+      // {
+        // counter_++;
+        /// Debug purposes
         if (params_.debug_img || params_.debug_img_publisher)
         {
           cv::Point victimPOI = final_victims[i]->getPoint();
           victimPOI.x -= final_victims[i]->getWidth() / 2;
           victimPOI.y -= final_victims[i]->getHeight() / 2;
           cv::KeyPoint kp(final_victims[i]->getPoint(), 10);
-          cv::Rect re(victimPOI, cv::Size(final_victims[i]->getWidth(), 
+          cv::Rect re(victimPOI, cv::Size(final_victims[i]->getWidth(),
             final_victims[i]->getHeight()));
 
           switch (final_victims[i]->getSource())
@@ -167,7 +197,7 @@ namespace pandora_vision
               break;
           }
         }
-      //}
+      // }
     }
 
     /// Debug image
@@ -212,29 +242,30 @@ namespace pandora_vision
           CV_RGB(0, 0, 0));
       }
 
-      
-      //if(counter_ == params_.positivesCounter)
+      // if (counter_ == params_.positivesCounter)
+      {
+        std::ostringstream convert;
+        convert << "RGB_" << boost::to_upper_copy<std::string>(rgbValidatorPtr_->getClassifierType())
+          << " : " << rgb_svm_keypoints.size();
+        cv::putText(debugImage, convert.str().c_str(),
+          cvPoint(10, 60),
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 255), 1, CV_AA);
+      }
+      /*
+      else
       {
         std::ostringstream convert;
         convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
           cvPoint(10, 60),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 255), 1, CV_AA);
-
+          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
       }
-      /*else*/
-      //{
-        //std::ostringstream convert;
-        //convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
-        //cv::putText(debugImage, convert.str().c_str(),
-          //cvPoint(10, 60),
-          //cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
-      /*} */
-
+      */
 
       {
         std::ostringstream convert;
-        convert << "DEPTH_SVM : "<< depth_svm_keypoints.size();
+        convert << "Depth_" << boost::to_upper_copy<std::string>(depthValidatorPtr_->getClassifierType())
+          << " : " << depth_svm_keypoints.size();
         cv::putText(debugImage, convert.str().c_str(),
           cvPoint(10, 80),
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
@@ -248,7 +279,7 @@ namespace pandora_vision
           cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 0, 0), 1, CV_AA);
       }
     }
-    
+
     if (params_.debug_img_publisher)
     {
       // Convert the image into a message
@@ -260,25 +291,26 @@ namespace pandora_vision
       // Publish the image message
       _debugVictimsPublisher.publish(*msgPtr->toImageMsg());
     }
-    
+
     if (params_.debug_img)
     {
       cv::imshow("Victim Hole processor", debugImage);
       cv::waitKey(30);
     }
-    
+
     if (counter_ >= params_.positivesCounter)
-    { 
+    {
       counter_ = 0;
     }
-    /*else*/
-    //{
-      //final_victims.clear();
-    /*}*/
+    /*
+    else
+    {
+      final_victims.clear();
+    }
+    */
     return final_victims;
   }
-  
-  
+
   /**
   @brief Function that enables suitable subsystems, according
   to the current State
@@ -286,7 +318,7 @@ namespace pandora_vision
   vector can be either 2 or 1, if we have both rgbd information or not
   @return void
   **/
-  std::vector<VictimPOIPtr> VictimHoleProcessor::victimFusion(DetectionImages imgs, 
+  std::vector<VictimPOIPtr> VictimHoleProcessor::victimFusion(DetectionImages imgs,
     DetectionMode detectionMode)
   {
     std::vector<VictimPOIPtr> final_probabilities;
@@ -295,13 +327,13 @@ namespace pandora_vision
     std::vector<VictimPOIPtr> depth_svm_probabilities;
 
     float probability, classLabel;
-    
+
     if (detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH )  // || detectionMode == GOT_RGB
     {
       for (int i = 0 ; i < imgs.rgbMasks.size(); i++)
-      { 
+      {
         VictimPOIPtr temp(new VictimPOI);
-        rgbSvmValidatorPtr_->calculatePredictionProbability(imgs.rgbMasks.at(i).img, &classLabel, &probability);
+        rgbValidatorPtr_->calculatePredictionProbability(imgs.rgbMasks.at(i).img, &classLabel, &probability);
         temp->setProbability(probability);
         temp->setClassLabel(classLabel);
         temp->setPoint(imgs.rgbMasks[i].keypoint);
@@ -311,13 +343,13 @@ namespace pandora_vision
         rgb_svm_probabilities.push_back(temp);
       }
     }
-    
+
     if (detectionMode == GOT_HOLES_AND_DEPTH)
     {
       for (int i = 0 ; i < imgs.depthMasks.size(); i++)
       {
         VictimPOIPtr temp(new VictimPOI);
-        depthSvmValidatorPtr_->calculatePredictionProbability(imgs.depthMasks.at(i).img, &classLabel, &probability);
+        depthValidatorPtr_->calculatePredictionProbability(imgs.depthMasks.at(i).img, &classLabel, &probability);
         temp->setProbability(probability);
         temp->setClassLabel(classLabel);
         temp->setPoint(imgs.depthMasks[i].keypoint);
@@ -334,7 +366,8 @@ namespace pandora_vision
 
     // SVM mask merging
     // Combine rgb & depth probabilities
-    /*if (detectionMode == GOT_HOLES_AND_DEPTH)
+    /*
+    if (detectionMode == GOT_HOLES_AND_DEPTH)
     {
       for (unsigned int i = 0 ; i < depth_svm_probabilities.size() ; i++)
       {
@@ -343,7 +376,7 @@ namespace pandora_vision
         mergedProb = (depth_svm_probabilities[i]->getClassLabel() * params_.depth_svm_weight *
                      depth_svm_probabilities[i]->getProbability() +
                      rgb_svm_probabilities[i]->getClassLabel() * params_.rgb_svm_weight *
-                     rgb_svm_probabilities[i]->getProbability()); 
+                     rgb_svm_probabilities[i]->getProbability());
 
         if (mergedProb >= 0.0f)
         {
@@ -360,13 +393,14 @@ namespace pandora_vision
           counter_--;
 
       }
-    }*/
+    }
+    */
     // Only rgb svm probabilities
 
     if (detectionMode == GOT_HOLES )  // || detectionMode == GOT_RGB
     {
       for (unsigned int i = 0 ; i < rgb_svm_probabilities.size(); i++)
-      { 
+      {
         VictimPOIPtr temp(new VictimPOI);
         if (rgb_svm_probabilities[i]->getClassLabel() == 1)
         {
@@ -385,11 +419,11 @@ namespace pandora_vision
     }
     return final_probabilities;
   }
-  
+
   /**
    * @brief
    **/
-  bool VictimHoleProcessor::process(const EnhancedImageStampedConstPtr& input, 
+  bool VictimHoleProcessor::process(const EnhancedImageStampedConstPtr& input,
     const POIsStampedPtr& output)
   {
     output->header = input->getHeader();

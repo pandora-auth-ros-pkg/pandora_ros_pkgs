@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 
 #include "pandora_vision_hazmat/training/factory.h"
@@ -49,7 +49,7 @@ int main(int argc , char* argv[])
       << std::endl;
     return -1;
   }
-  pandora_vision::pandora_vision_hazmat::PlanarPatternTrainerFactory factory; 
+  pandora_vision::pandora_vision_hazmat::PlanarPatternTrainerFactory factory;
   pandora_vision::pandora_vision_hazmat::PlanarPatternTrainer *trainer =
     factory.createObject(argv[1]);
   if ( trainer == NULL )

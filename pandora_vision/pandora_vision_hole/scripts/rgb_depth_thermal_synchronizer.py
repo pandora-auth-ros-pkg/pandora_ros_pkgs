@@ -76,6 +76,34 @@ def callback(pointCloud, flirLeptonMsg):
     # Publish the message to the synchronizer node
     synch_pub.publish(msg)
 
+def publishRgbD(pointCloud):
+
+    ns = rospy.get_namespace()
+
+    # Check if topic for synchronized message has been given properly if yes pass it to the variable
+    if (rospy.has_param(ns + "/rgb_depth_thermal_synchronizer_node/published_topics/synchronized_topic")):
+        synch_topic = rospy.get_param(ns + "/rgb_depth_thermal_synchronizer_node/published_topics/synchronized_topic")
+
+        # Make topic's name absolute
+        synch_topic = ns + synch_topic
+        #rospy.loginfo("[Rgbdt_synchronizer] is publishing to: %s", synch_topic)
+    else:
+        rospy.logerr( "No synchronized topic found")
+        rospy.signal_shutdown("shutdown RGBDT synchronizer")
+
+    # Publisher of PointCloud2 and flirLeptonMsg messages
+    synch_pub = rospy.Publisher(synch_topic, SynchronizedMsg)
+
+    # Pack the message to be sent.
+    msg = SynchronizedMsg()
+    msg.header.stamp = rospy.get_rostime()
+    msg.pc = pointCloud
+
+    # Publish the message to the synchronizer node
+    synch_pub.publish(msg)
+
+def RgbDCallback(pointCloud):
+    publishRgbD(pointCloud)
 
 if __name__=='__main__':
 
@@ -100,12 +128,26 @@ if __name__=='__main__':
         rospy.logerr("No flir topic found")
         rospy.signal_shutdown("shutdown RGBDT synchronizer")
 
-    # Subscribers of kinect and flir messages
-    kinect_subscriber = message_filters.Subscriber(kinect_topic, PointCloud2)
-    flir_subscriber = message_filters.Subscriber(flir_topic, flirLeptonMsg)
+    # Check in which mode Hole package is running
+    if (rospy.has_param("/hole_detector/thermal")):
+        mode = rospy.get_param("/hole_detector/thermal")
+        rospy.loginfo("[Rgbdt_synchronizer] Packages mode has been found")
+    else:
+        rospy.logerr("Could not find packages mode")
+        rospy.signal_shutdown("shutdown RGBDT synchronizer")
 
-    # Synchronize kinect and flir topics
-    sync = approxsync.ApproximateSynchronizer(0.5, [kinect_subscriber, flir_subscriber], 5000)
-    sync.registerCallback(callback)
+
+    # Continue the process based on packages mode. If mode = true thermal
+    # included
+    if mode:
+        # Subscribers of kinect and flir messages
+        kinect_subscriber = message_filters.Subscriber(kinect_topic, PointCloud2)
+        flir_subscriber = message_filters.Subscriber(flir_topic, flirLeptonMsg)
+
+        # Synchronize kinect and flir topics
+        sync = approxsync.ApproximateSynchronizer(0.5, [kinect_subscriber, flir_subscriber], 5000)
+        sync.registerCallback(callback)
+    else:
+        kinect_subscriber = rospy.Subscriber(kinect_topic, PointCloud2, RgbDCallback)
 
     rospy.spin()

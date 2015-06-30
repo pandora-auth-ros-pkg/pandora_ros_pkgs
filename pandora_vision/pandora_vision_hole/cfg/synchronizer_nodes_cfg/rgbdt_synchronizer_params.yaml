@@ -1,0 +1,12 @@
+subscribed_topics:
+  synchronized_topic: synchronized/message
+  hole_fusion_unlock_topic: hole_fusion/unlock/synchronizer
+  thermal_unlock_topic: thermal/unlock/synchronizer
+  subscribe_to_input: subscribe_to_input
+  leave_subscription_to_input: leave_subscription_to_input
+published_topics:
+  point_cloud_internal_topic: synchronized/depth/points
+  depth_image_topic: synchronized/depth/image
+  rgb_image_topic: synchronized/rgb/image
+  thermal_image_topic: synchronized/thermal/image
+  enhanced_image_topic: synchronized/enhanced/image

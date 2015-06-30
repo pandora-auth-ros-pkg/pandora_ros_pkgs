@@ -50,54 +50,55 @@ namespace pandora_vision
     public:
       typedef boost::shared_ptr<ImagesStamped> Ptr;
       typedef boost::shared_ptr<ImagesStamped const> ConstPtr;
-      
+
     public:
       std_msgs::Header header;
 
       cv::Mat depthImage;
       cv::Mat rgbImage;
-      
+
     public:
       void setHeader(const std_msgs::Header&);
       const std_msgs::Header& getHeader() const;
 
       void setRgbImage(const cv::Mat&);
       cv::Mat getRgbImage() const;
-      
+
       void setDepthImage(const cv::Mat&);
       cv::Mat getDepthImage() const;
   };
-  
+
   void ImagesStamped::setHeader(const std_msgs::Header& headerArg)
   {
     header = headerArg;
   }
+
   const std_msgs::Header& ImagesStamped::getHeader() const
   {
     return header;
   }
-  
+
   void ImagesStamped::setRgbImage(const cv::Mat& imageArg)
   {
     rgbImage = imageArg;
   }
+
   cv::Mat ImagesStamped::getRgbImage() const
   {
     return rgbImage;
   }
-  
+
   void ImagesStamped::setDepthImage(const cv::Mat& imageArg)
   {
     depthImage = imageArg;
   }
+
   cv::Mat ImagesStamped::getDepthImage() const
   {
     return depthImage;
   }
-  
+
   typedef ImagesStamped::Ptr ImagesStampedPtr;
   typedef ImagesStamped::ConstPtr ImagesStampedConstPtr;
-  
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_IMAGES_STAMPED_H

@@ -178,7 +178,7 @@ namespace pandora_vision
 
       cv::Mat canvas = cv::Mat::zeros(480, 640, CV_8UC1);
 
-      for(unsigned int j = 0; j < 4; j++)
+      for (unsigned int j = 0; j < 4; j++)
       {
         cv::line(canvas, a[j], a[(j + 1) % 4], cv::Scalar(255, 0, 0), 1, 8);
       }
@@ -258,7 +258,6 @@ namespace pandora_vision
   {
     // Delete the respective keypoint
     conveyor->holes.erase(conveyor->holes.begin() + id);
-
   }
 
 
@@ -339,4 +338,4 @@ namespace pandora_vision
     }
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

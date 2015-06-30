@@ -37,6 +37,8 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_vision_hazmat/detection/hazmat_postprocessor.h"
 
 namespace pandora_vision

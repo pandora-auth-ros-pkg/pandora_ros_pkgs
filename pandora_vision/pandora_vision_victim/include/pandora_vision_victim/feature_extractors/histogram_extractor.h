@@ -52,18 +52,18 @@
  */
 namespace pandora_vision
 {
-  /*
+  /**
    * @class HistogramExtractor
    * @brief : A feature extractor class that describes an image by its color
    * histograms
-  */
+   */
   class HistogramExtractor : public FeatureExtractorFactory
   {
   public:
     HistogramExtractor();
 
-    /*
-     * @brief: The main constructor for the class that takes as input the 
+    /**
+     * @brief: The main constructor for the class that takes as input the
      * desired parameters so as to create the histogram for each desired
      * channel of the input image.
      * @param channels[const std::vector<int>&]: The image channels whose
@@ -82,35 +82,35 @@ namespace pandora_vision
       const std::vector<float>& histRanges,
       const std::string& colorSpace, bool jointHistogram = false);
 
-    /*
+    /**
      * @brief: Constructor for the histogram extractor class that parses
      * the necessary parameters from an xml/yaml file.
      * @param [const cv::FileStorage&]: The file from which the parameters
      * will be read.
-    */
+     */
     explicit HistogramExtractor(const cv::FileStorage& fs);
 
     virtual void plotFeatures(const cv::Mat& featureVector);
 
-    /*
+    /**
      * @brief: Default Destructor/
-    */
-    virtual ~HistogramExtractor ()
+     */
+    virtual ~HistogramExtractor()
     {
     }
 
-    /*
-   * @brief: Creates color histograms from the image channels and concatenate
-   * them to form a feature vector.
-   * @param inImage[const cv::Mat&]: The input image from which the features
-   * will be extracted.
-   * @param descriptors[cv::Mat*]: The output feature vector that describes 
-   * the image
-   */
+    /**
+     * @brief: Creates color histograms from the image channels and concatenate
+     * them to form a feature vector.
+     * @param inImage[const cv::Mat&]: The input image from which the features
+     * will be extracted.
+     * @param descriptors[cv::Mat*]: The output feature vector that describes
+     * the image
+     */
     virtual void extractFeatures(const cv::Mat& inImage,
         cv::Mat* descriptors);
 
-    /*
+    /**
      * @brief: Converts the string color format to an OpenCV color conversion
      * flag.
      * @param colorCode[const std::string&]: A string the specifies the 
@@ -118,9 +118,9 @@ namespace pandora_vision
      * @return The OpenCV enum value that is used to convert an image from the
      * BGR color space to the specified one.
      */
-    int stringToCvColorCode(const std::string& colorCode); 
+    int stringToCvColorCode(const std::string& colorCode);
 
-    /*
+    /**
      * @brief: Plots the input histogram.
      * @param histogram[const cv::Mat&]: The histogram that will be drawn.
      */
@@ -142,37 +142,34 @@ namespace pandora_vision
     {
     }
 
-    /*
+    /**
      * @brief: Function used to change the color space for the image
      * histograms
-    */
+     */
     void setColorSpace(const std::string& colorSpace)
     {
       colorSpace_ = stringToCvColorCode(colorSpace);
     }
   private:
     /* data */
-    //<! The channels of the image that will be used to create the histogram.
+    /// The channels of the image that will be used to create the histogram.
     std::vector<int> channels_;
 
-    //<! The dimensions of the histogram;
+    /// The dimensions of the histogram;
     int dims_;
 
-    //<! The size of the histogram in each dimension.
+    /// The size of the histogram in each dimension.
     std::vector<int> histBins_;
 
-    //<! The range of the histogram values in each dimension.
+    /// The range of the histogram values in each dimension.
     std::vector<float> ranges_;
-    
-    //<! Flag that specifies whether we should extract a histogram for each
-    //<! channel or a joint histogram for all the specified channels.
+
+    /// Flag that specifies whether we should extract a histogram for each
+    /// channel or a joint histogram for all the specified channels.
     bool jointHistogram_;
 
-    //<! The color space of the histogram.
+    /// The color space of the histogram.
     int colorSpace_;
-
   };
-
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_HISTOGRAM_EXTRACTOR_H

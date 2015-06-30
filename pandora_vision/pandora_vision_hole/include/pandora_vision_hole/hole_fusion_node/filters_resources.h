@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef HOLE_FUSION_NODE_FILTERS_RESOURCES_H
-#define HOLE_FUSION_NODE_FILTERS_RESOURCES_H
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H
 
 #include "utils/defines.h"
 #include "utils/outline_discovery.h"
@@ -56,7 +56,6 @@ namespace pandora_vision
   class FiltersResources
   {
     public:
-
       /**
         @brief Each Depth and RGB filter requires the construction of a set
         of vectors which uses to determine the validity of each hole.
@@ -286,9 +285,8 @@ namespace pandora_vision
         const std::vector<std::vector<cv::Point2f> >& inflatedRectanglesVector,
         const std::vector<int>& inflatedRectanglesIndices,
         std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_FILTERS_RESOURCES_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H

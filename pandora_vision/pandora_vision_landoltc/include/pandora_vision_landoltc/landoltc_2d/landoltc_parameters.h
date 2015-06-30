@@ -52,18 +52,19 @@ namespace pandora_vision
   struct LandoltcParameters
   {
     void configLandoltC(const ros::NodeHandle& nh);
-    
+
     /**
     @brief The function called when a parameter is changed
     @param[in] config [const pandora_vision_landoltc::landoltc_cfgConfig&]
-    @param[in] level [const uint32_t] The level 
+    @param[in] level [const uint32_t] The level
     @return void
     **/
     void parametersCallback(
     const pandora_vision_landoltc::landoltc_cfgConfig& config,
     const uint32_t& level);
-  
+
     dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc_cfgConfig>::CallbackType f;
+    public:
 
     //!< The dynamic reconfigure (landoltc) parameters' server
     dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc_cfgConfig>

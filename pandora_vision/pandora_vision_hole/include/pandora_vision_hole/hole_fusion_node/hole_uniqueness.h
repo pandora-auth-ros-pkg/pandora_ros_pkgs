@@ -35,8 +35,8 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#ifndef HOLE_FUSION_NODE_HOLE_UNIQUENESS_H
-#define HOLE_FUSION_NODE_HOLE_UNIQUENESS_H
+#ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_UNIQUENESS_H
+#define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_UNIQUENESS_H
 
 #include "utils/defines.h"
 #include "utils/holes_conveyor.h"
@@ -55,7 +55,6 @@ namespace pandora_vision
   class HoleUniqueness
   {
     public:
-
       /**
         @brief Given a HolesConveyor container, this method detects
         multiple unique holes and deletes the extra copies.
@@ -86,6 +85,6 @@ namespace pandora_vision
         std::map<int, float>* validHolesMap);
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // HOLE_FUSION_NODE_HOLE_UNIQUENESS_H
+#endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_UNIQUENESS_H

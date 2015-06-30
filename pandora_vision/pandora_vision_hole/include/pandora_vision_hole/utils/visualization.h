@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
-#ifndef UTILS_VISUALIZATION_H
-#define UTILS_VISUALIZATION_H
+#ifndef PANDORA_VISION_HOLE_UTILS_VISUALIZATION_H
+#define PANDORA_VISION_HOLE_UTILS_VISUALIZATION_H
 
 #include "utils/parameters.h"
 #include "utils/holes_conveyor.h"
@@ -54,7 +54,6 @@ namespace pandora_vision
   class Visualization
   {
     public:
-
       /**
         @brief Shows multiple images in one window
         @param[in] title [const std::string&] The window's title
@@ -125,8 +124,7 @@ namespace pandora_vision
         const std::string& windowTitle,
         const cv::Mat& inImage,
         const int& ms,
-        const std::vector<cv::KeyPoint>& keypoints
-        );
+        const std::vector<cv::KeyPoint>& keypoints);
 
       /**
         @brief Overrides the cv::imshow function. Provides image scaling from
@@ -140,9 +138,8 @@ namespace pandora_vision
         const std::string& windowTitle,
         const cv::Mat& inImage,
         const int& ms);
-
   };
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
 
-#endif  // UTILS_VISUALIZATION_H
+#endif  // PANDORA_VISION_HOLE_UTILS_VISUALIZATION_H

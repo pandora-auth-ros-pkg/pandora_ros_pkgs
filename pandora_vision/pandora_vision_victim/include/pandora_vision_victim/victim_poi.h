@@ -50,7 +50,7 @@ namespace pandora_vision
     public:
       typedef boost::shared_ptr<VictimPOI> Ptr;
       typedef boost::shared_ptr<VictimPOI const> ConstPtr;
-    
+
     public:
       virtual ~VictimPOI() {}
 
@@ -67,7 +67,7 @@ namespace pandora_vision
       {
         return source;
       }
-      
+
       void setClassLabel(int classLabelArg)
       {
         classLabel = classLabelArg;
@@ -77,10 +77,8 @@ namespace pandora_vision
         return classLabel;
       }
   };
-  
+
   typedef VictimPOI::Ptr VictimPOIPtr;
   typedef VictimPOI::ConstPtr VictimPOIConstPtr;
-  
 }  // namespace pandora_vision
-
 #endif  // PANDORA_VISION_VICTIM_VICTIM_POI_H

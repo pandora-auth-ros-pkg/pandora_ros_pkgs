@@ -58,20 +58,20 @@ namespace pandora_vision
 
     cv::SimpleBlobDetector::Params params;
 
-    params.minThreshold = Parameters::Blob::min_threshold; //40;
-    params.maxThreshold = Parameters::Blob::max_threshold; //60;
+    params.minThreshold = Parameters::Blob::min_threshold;  // 40;
+    params.maxThreshold = Parameters::Blob::max_threshold;  // 60;
     params.thresholdStep = Parameters::Blob::threshold_step;
 
     params.minArea = Parameters::Blob::min_area;
     params.maxArea = Parameters::Blob::max_area;
 
-    params.minConvexity = Parameters::Blob::min_convexity; //0.6;
+    params.minConvexity = Parameters::Blob::min_convexity;  // 0.6;
     params.maxConvexity = Parameters::Blob::max_convexity;
 
-    params.minInertiaRatio = Parameters::Blob::min_inertia_ratio;//0.5;
+    params.minInertiaRatio = Parameters::Blob::min_inertia_ratio;  // 0.5;
 
     params.maxCircularity = Parameters::Blob::max_circularity;
-    params.minCircularity = Parameters::Blob::min_circularity; //0.3;
+    params.minCircularity = Parameters::Blob::min_circularity;  // 0.3;
 
     params.filterByColor = Parameters::Blob::filter_by_color;
     params.filterByCircularity = Parameters::Blob::filter_by_circularity;
@@ -101,4 +101,4 @@ namespace pandora_vision
     #endif
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision

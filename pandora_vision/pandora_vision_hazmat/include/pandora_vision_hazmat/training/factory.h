@@ -32,12 +32,14 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Choutas Vassilis 
+ * Authors: Choutas Vassilis
  *********************************************************************/
 #ifndef PANDORA_VISION_HAZMAT_TRAINING_FACTORY_H
 #define PANDORA_VISION_HAZMAT_TRAINING_FACTORY_H
-  
-#include "pandora_vision_hazmat/training/sift_trainer.h"  
+
+#include <string>
+
+#include "pandora_vision_hazmat/training/sift_trainer.h"
 #include "pandora_vision_hazmat/training/surf_trainer.h"
 #include "pandora_vision_hazmat/training/orb_trainer.h"
 
@@ -46,31 +48,27 @@ namespace pandora_vision
   namespace pandora_vision_hazmat
   {
     /**
-      @class PlanarPatternTrainerFactory
-      @brief The factory class used to produce the correct hazmat trainer 
-      object.
-     **/        
+     * @class PlanarPatternTrainerFactory
+     * @brief The factory class used to produce the correct hazmat trainer
+     * object.
+     */
     class PlanarPatternTrainerFactory
     {
-
       public:
-
         /**
-          @brief Function used to detect Descriptors for the image.
-
-         **/  
+         * @brief Function used to detect Descriptors for the image.
+         */
         PlanarPatternTrainer *createObject(const std::string& featureType);
 
         /**
-          @brief Hazmat Trainer Factory constructor
-         **/
+         * @brief Hazmat Trainer Factory constructor
+         */
         PlanarPatternTrainerFactory()
-        {};
+        {
+        };
 
       private:
-
     };
-
-} // namespace pandora_vision_hazmat
-} // namespace pandora_vision
+}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_TRAINING_FACTORY_H

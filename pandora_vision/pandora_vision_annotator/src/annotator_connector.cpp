@@ -56,6 +56,7 @@ namespace pandora_vision
   {
     // Event filter for the image area
     loader_.imageLabel->installEventFilter(this);
+    //loader_.scrollArea->installEventFilter(this);
     for (int i = 0; i < 5; i++)
     {
         bbox_ready.push_back(0);
@@ -257,7 +258,7 @@ namespace pandora_vision
                 frames[currFrame].rows, frames[currFrame].step, QImage::Format_RGB888);
     dest.bits(); // enforce deep copy, see documentation
     setImage(dest);
-    Q_EMIT updateImage();
+    updateImage();
   } 
   
   /**
@@ -298,6 +299,9 @@ namespace pandora_vision
   void CConnector::setImage(const QImage& img)
   {
        localImage_ = img.copy();
+       if(currFrame == offset_)
+          ImgAnnotations::setOriginalImgDimensions(localImage_.width(), localImage_.height());
+       localImage_ = localImage_.scaled(640, 480,  Qt::KeepAspectRatio, Qt::SmoothTransformation);
   }
  
   /**
@@ -306,7 +310,8 @@ namespace pandora_vision
   **/
   void CConnector::updateImage()
   {
-    loader_.imageLabel->setPixmap(QPixmap().fromImage(localImage_));
+    loader_.imageLabel->setPixmap(QPixmap::fromImage(localImage_));
+    // loader_.imageLabel->setScaledContents(true);
   }
   
   /**

@@ -458,7 +458,7 @@ namespace pandora_vision
       cv::Mat holeMask = cv::Mat::zeros(image.size(), CV_8UC1);
 
       // Draw the outline points of the i-th hole onto holeMask
-      for(unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
+      for (unsigned int j = 0; j < conveyor.holes[i].outline.size(); j++)
       {
         holeMask.at<unsigned char>(
           conveyor.holes[i].outline[j].y,
@@ -575,7 +575,7 @@ namespace pandora_vision
         inflatedVertices.push_back(
           cv::Point2f(round(vert_x - inflationSize * cos(theta)),
             round(vert_y - inflationSize * sin(theta))));
-      } // end for rectangle's points
+      }  // end for rectangle's points
 
       // If one or more vertices are out of bounds discard the whole
       // inflated rectangle
@@ -589,7 +589,7 @@ namespace pandora_vision
         inflatedRectanglesIndices->push_back(i);
         inflatedRectanglesVector->push_back(inflatedVertices);
       }
-    } // end for each hole
+    }  // end for each hole
 
     #ifdef DEBUG_TIME
     Timer::tick("createInflatedRectanglesVector");
@@ -787,7 +787,7 @@ namespace pandora_vision
 
 
       // Draw the outline of the i-th hole onto holeOutlineFilledImage
-      for(unsigned int j = 0;
+      for (unsigned int j = 0;
         j < conveyor.holes[inflatedRectanglesIndices[i]].outline.size(); j++)
       {
         holeOutlineFilledImage.at<unsigned char>(
@@ -834,13 +834,13 @@ namespace pandora_vision
 
       // Draw the bounding rectangle of the i-th hole onto
       // rectangleOutlineFilledImage
-      for(unsigned int j = 0; j < inflatedRectanglesVector[i].size(); j++)
+      for (unsigned int j = 0; j < inflatedRectanglesVector[i].size(); j++)
       {
         cv::line(rectangleOutlineFilledImage,
           inflatedRectanglesVector[i][j],
           inflatedRectanglesVector[i][(j + 1)
           % inflatedRectanglesVector[i].size()],
-          cv::Scalar(255, 0, 0), 1, 8 );
+          cv::Scalar(255, 0, 0), 1, 8);
       }
 
       // The set of indices of points inside the i-th hole's
@@ -885,7 +885,6 @@ namespace pandora_vision
     #ifdef DEBUG_TIME
     Timer::tick("createIntermediateHolesPointsSetVector");
     #endif
-
   }
 
-} // namespace pandora_vision
+}  // namespace pandora_vision
