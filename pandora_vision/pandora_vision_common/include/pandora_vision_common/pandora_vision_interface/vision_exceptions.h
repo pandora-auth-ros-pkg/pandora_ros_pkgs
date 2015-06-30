@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_VISION_EXCEPTIONS_H
-#define PANDORA_VISION_COMMON_VISION_EXCEPTIONS_H
+#ifndef PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_EXCEPTIONS_H
+#define PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_EXCEPTIONS_H
 
 #include <string>
 
@@ -47,17 +47,17 @@ namespace pandora_vision
 {
   class vision_config_error : public sensor_processor::processor_error
   {
-    public:
-      explicit vision_config_error(const std::string& errorDescription) :
-        sensor_processor::processor_error(errorDescription) {}
+   public:
+    explicit vision_config_error(const std::string& errorDescription) :
+      sensor_processor::processor_error(errorDescription) {}
   };
 
   class vision_processor_error : public sensor_processor::processor_error
   {
-    public:
-      explicit vision_processor_error(const std::string& errorDescription) :
-        sensor_processor::processor_error(errorDescription) {}
+   public:
+    explicit vision_processor_error(const std::string& errorDescription) :
+      sensor_processor::processor_error(errorDescription) {}
   };
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_COMMON_VISION_EXCEPTIONS_H
+#endif  // PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_EXCEPTIONS_H

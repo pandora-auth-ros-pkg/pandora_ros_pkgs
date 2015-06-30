@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,44 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#include <string>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include "pandora_vision_obstacle/obstacle_preprocessor.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  ObstaclePreProcessor::ObstaclePreProcessor(const std::string& ns,
+    sensor_processor::Handler* handler) : sensor_processor::PreProcessor<sensor_msgs::PointCloud2,
+    ImagesStamped>(ns, handler), converterPtr_(new PointCloudToImageConverter)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
   }
+
+  ObstaclePreProcessor::~ObstaclePreProcessor() {}
+
+  bool ObstaclePreProcessor::preProcess(const PointCloud2ConstPtr& input,
+    const ImagesStampedPtr& output)
+  {
+    output->setHeader(input->header);
+
+    output->setRgbImage(converterPtr_->convertPclToImage(input,
+          CV_8UC3));
+    output->setDepthImage(converterPtr_->convertPclToImage(input,
+          CV_32FC1));
+
+    if (output->rgbImage.empty() || output->depthImage.empty())
+    {
+      ROS_ERROR("[Node] No more Frames or something went wrong with bag file");
+      // ros::shutdown();
+      return false;
+    }
+    return true;
+  }
+
 }  // namespace pandora_vision

@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,91 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#ifndef PANDORA_VISION_COMMON_IMAGES_STAMPED_H
+#define PANDORA_VISION_COMMON_IMAGES_STAMPED_H
+
+#include <boost/shared_ptr.hpp>
+#include <opencv2/opencv.hpp>
+#include "std_msgs/Header.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  class ImagesStamped
   {
+   public:
+    typedef boost::shared_ptr<ImagesStamped> Ptr;
+    typedef boost::shared_ptr<ImagesStamped const> ConstPtr;
+
+   public:
+    std_msgs::Header header;
+
+    cv::Mat depthImage;
+    cv::Mat rgbImage;
+    cv::Mat thermalImage;
+
+   public:
+    ImagesStamped() {}
+    virtual ~ImagesStamped() {}
+
+    void setHeader(const std_msgs::Header&);
+    const std_msgs::Header& getHeader() const;
+
+    void setRgbImage(const cv::Mat&);
+    cv::Mat getRgbImage() const;
+
+    void setDepthImage(const cv::Mat&);
+    cv::Mat getDepthImage() const;
+
+    void setThermalImage(const cv::Mat&);
+    cv::Mat getThermalImage() const;
+  };
+
+  void ImagesStamped::setHeader(const std_msgs::Header& headerArg)
+  {
+    header = headerArg;
   }
+
+  const std_msgs::Header& ImagesStamped::getHeader() const
+  {
+    return header;
+  }
+
+  void ImagesStamped::setRgbImage(const cv::Mat& imageArg)
+  {
+    rgbImage = imageArg;
+  }
+
+  cv::Mat ImagesStamped::getRgbImage() const
+  {
+    return rgbImage;
+  }
+
+  void ImagesStamped::setDepthImage(const cv::Mat& imageArg)
+  {
+    depthImage = imageArg;
+  }
+
+  cv::Mat ImagesStamped::getDepthImage() const
+  {
+    return depthImage;
+  }
+
+  void ImagesStamped::setThermalImage(const cv::Mat& imageArg)
+  {
+    thermalImage = imageArg;
+  }
+
+  cv::Mat ImagesStamped::getThermalImage() const
+  {
+    return thermalImage;
+  }
+
+  typedef ImagesStamped::Ptr ImagesStampedPtr;
+  typedef ImagesStamped::ConstPtr ImagesStampedConstPtr;
 }  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_COMMON_IMAGES_STAMPED_H

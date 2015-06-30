@@ -33,67 +33,65 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Tsirigotis Christos <tsirif@gmail.com>
+ *   Alexandros Philotheou
+ *   Manos Tsardoulias
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_CV_MAT_STAMPED_H
-#define PANDORA_VISION_COMMON_CV_MAT_STAMPED_H
+#include <cv_bridge/cv_bridge.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <sensor_msgs/Image.h>
 
-#include <boost/shared_ptr.hpp>
-#include <opencv2/opencv.hpp>
-
-#include <std_msgs/Header.h>
+#include "pandora_vision_common/pandora_vision_utilities/pointcloud_to_image_converter.h"
 
 namespace pandora_vision
 {
-  class CVMatStamped
+  PointCloudToImageConverter::PointCloudToImageConverter()
   {
-   public:
-    typedef boost::shared_ptr<CVMatStamped> Ptr;
-    typedef boost::shared_ptr<CVMatStamped const> ConstPtr;
-
-   public:
-    CVMatStamped() {}
-    virtual ~CVMatStamped() {}
-
-   public:
-    /// Message Header referring to the openCV matrix that corresponds
-    /// to a frame
-    std_msgs::Header header;
-
-    /// OpenCV matrix that corresponds to the current frame to be processed
-    cv::Mat image;
-
-   public:
-    void setHeader(const std_msgs::Header&);
-    std_msgs::Header getHeader() const;
-
-    void setImage(const cv::Mat&);
-    cv::Mat getImage() const;
-  };
-
-  void CVMatStamped::setHeader(const std_msgs::Header& headerArg)
-  {
-    header = headerArg;
   }
 
-  std_msgs::Header CVMatStamped::getHeader() const
+  PointCloudToImageConverter::~PointCloudToImageConverter()
   {
-    return header;
   }
 
-  void CVMatStamped::setImage(const cv::Mat& imageArg)
+  cv::Mat PointCloudToImageConverter::convertPclToImage(const sensor_msgs::PointCloud2ConstPtr& pclPtr,
+      int encoding)
   {
-    image = imageArg;
-  }
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointCloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::fromROSMsg<pcl::PointXYZRGB>(*pclPtr, *pointCloud);
 
-  cv::Mat CVMatStamped::getImage() const
-  {
+    // Prepare the output image
+    cv::Mat image(pointCloud->height, pointCloud->width, encoding);
+
+    // For the depth image
+    if (encoding == CV_32FC1)
+    {
+      for (unsigned int row = 0; row < pointCloud->height; ++row) {
+        for (unsigned int col = 0; col < pointCloud->width; ++col) {
+          image.at<float>(row, col) =
+            pointCloud->points[col + pointCloud->width * row].z;
+
+          // if element is nan make it a zero
+          if (image.at<float>(row, col) != image.at<float>(row, col))
+          {
+            image.at<float>(row, col) = 0.0;
+          }
+        }
+      }
+    }
+    else if (encoding == CV_8UC3)  // For the rgb image
+    {
+      for (unsigned int row = 0; row < pointCloud->height; ++row) {
+        for (unsigned int col = 0; col < pointCloud->width; ++col) {
+          image.at<unsigned char>(row, 3 * col + 2) =
+            pointCloud->points[col + pointCloud->width * row].r;
+          image.at<unsigned char>(row, 3 * col + 1) =
+            pointCloud->points[col + pointCloud->width * row].g;
+          image.at<unsigned char>(row, 3 * col + 0) =
+            pointCloud->points[col + pointCloud->width * row].b;
+        }
+      }
+    }
     return image;
   }
-
-  typedef CVMatStamped::Ptr CVMatStampedPtr;
-  typedef CVMatStamped::ConstPtr CVMatStampedConstPtr;
 }  // namespace pandora_vision
-
-#endif  // PANDORA_VISION_COMMON_CV_MAT_STAMPED_H

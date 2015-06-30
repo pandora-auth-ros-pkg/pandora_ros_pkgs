@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,31 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#ifndef PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_HANDLER_H
+#define PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_HANDLER_H
+
+#include <string>
+#include "pandora_vision_common/vision_handler.h"
+#include "pandora_vision_obstacle/obstacle_preprocessor.h"
+#include "pandora_vision_obstacle/obstacle_postprocessor.h"
+#include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_processor.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  class SoftObstacleHandler : public VisionHandler<ObstaclePreProcessor, SoftObstacleProcessor,
+    ObstaclePostProcessor>
   {
-  }
+    public:
+      explicit SoftObstacleHandler(const std::string& ns);
+      virtual ~SoftObstacleHandler() {}
+
+    private:
+      virtual void completeTransition();
+  };
 }  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_HANDLER_H

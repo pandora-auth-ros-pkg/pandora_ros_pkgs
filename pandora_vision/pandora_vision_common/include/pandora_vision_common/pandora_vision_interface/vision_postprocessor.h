@@ -36,10 +36,15 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H
-#define PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H
+#ifndef PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_POSTPROCESSOR_H
+#define PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_POSTPROCESSOR_H
 
+#include <string>
+
+#include "sensor_processor/handler.h"
 #include "sensor_processor/postprocessor.h"
+
+#include "pandora_vision_common/pois_stamped.h"
 #include "pandora_vision_common/pandora_vision_interface/general_alert_converter.h"
 
 namespace pandora_vision
@@ -63,7 +68,7 @@ namespace pandora_vision
      * @brief Virtual Destructor
      **/
     virtual
-      ~VisionPostProcessor() {}
+    ~VisionPostProcessor() {}
 
     /**
      * @brief Function that gets the Points of Interest with their timestamp and converts them
@@ -75,9 +80,9 @@ namespace pandora_vision
      * @return [bool] whether postprocessing finished
      **/
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const VisionAlertMsgPtr& output) = 0;
+    postProcess(const POIsStampedConstPtr& input, const VisionAlertMsgPtr& output) = 0;
 
-  protected:
+   protected:
     /**
      * @brief Function that calculates parameters yaw and pitch for every POI, given its
      * coordinates, and puts them in a structure with POI's probability and timestamp
@@ -87,27 +92,28 @@ namespace pandora_vision
      * yaw, pitch and probability of every POI in the processed frame and the frame's header
      **/
     pandora_common_msgs::GeneralAlertVector
-      getGeneralAlertInfo(const POIsStampedConstPtr& result);
+    getGeneralAlertInfo(const POIsStampedConstPtr& result);
 
+   private:
     boost::shared_ptr<GeneralAlertConverter> converter_;
   };
 
   template <class VisionAlertMsg>
-    VisionPostProcessor<VisionAlertMsg>::
-    VisionPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-      sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(ns, handler),
-      converter_(new GeneralAlertConverter)
-    {
-    }
+  VisionPostProcessor<VisionAlertMsg>::
+  VisionPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
+    sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(ns, handler),
+    converter_(new GeneralAlertConverter)
+  {
+  }
 
   template <class VisionAlertMsg>
-    pandora_common_msgs::GeneralAlertVector
-    VisionPostProcessor<VisionAlertMsg>::
-    getGeneralAlertInfo(const POIsStampedConstPtr& result)
-    {
-      return converter_->getGeneralAlertInfo(this->getName(), *this->accessPublicNh(), result);
-    }
+  pandora_common_msgs::GeneralAlertVector
+  VisionPostProcessor<VisionAlertMsg>::
+  getGeneralAlertInfo(const POIsStampedConstPtr& result)
+  {
+    return converter_->getGeneralAlertInfo(this->getName(), *this->accessPublicNh(), result);
+  }
 
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_COMMON_VISION_POSTPROCESSOR_H
+#endif  // PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_POSTPROCESSOR_H

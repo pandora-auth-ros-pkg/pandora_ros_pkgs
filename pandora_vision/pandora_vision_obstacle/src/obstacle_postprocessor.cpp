@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,52 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#include <string>
+#include "pandora_common_msgs/GeneralAlertVector.h"
+#include "pandora_vision_obstacle/obstacle_poi.h"
+#include "pandora_vision_obstacle/obstacle_postprocessor.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  ObstaclePostProcessor::ObstaclePostProcessor(const std::string& ns,
+    sensor_processor::Handler* handler) : VisionPostProcessor<
+    pandora_vision_msgs::ObstacleAlertVector>(ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
+        this->accessProcessorNh()->getNamespace());
+  }
+
+  ObstaclePostProcessor::~ObstaclePostProcessor() {}
+
+  bool ObstaclePostProcessor::postProcess(const POIsStampedConstPtr& input,
+    const ObstacleAlertVectorPtr& output)
+  {
+    pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
+    output->header = alertVector.header;
+
+    pandora_vision_msgs::ObstacleAlert obstacleAlert;
+
+    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
+    {
+      obstacleAlert.pointsYaw[ii] = alertVector.alerts[ii].yaw;
+      obstacleAlert.pointsPitch[ii] = alertVector.alerts[ii].pitch;
+      obstacleAlert.probability = alertVector.alerts[ii].probability;
+
+      boost::shared_ptr<ObstaclePOI> obstaclePOI(boost::dynamic_pointer_cast<ObstaclePOI>(
+        input->pois[ii]));
+      obstacleAlert.type = obstaclePOI->getType();
+      obstacleAlert.pointsDepth[ii] = obstaclePOI->getDepth();
+    }
+    output->alerts.push_back(obstacleAlert);
+
+    if (output->alerts.empty())
+    {
+      return false;
+    }
+    return true;
   }
 }  // namespace pandora_vision

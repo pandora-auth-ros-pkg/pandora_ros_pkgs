@@ -46,24 +46,24 @@ namespace pandora_vision
 {
   class BBoxPOI : public POI
   {
-    public:
-      typedef boost::shared_ptr<BBoxPOI> Ptr;
-      typedef boost::shared_ptr<BBoxPOI const> ConstPtr;
+   public:
+    typedef boost::shared_ptr<BBoxPOI> Ptr;
+    typedef boost::shared_ptr<BBoxPOI const> ConstPtr;
 
-    public:
-      /// Width of the bounding box
-      int width;
-      /// Height of the bounding box
-      int height;
+   public:
+    /// Width of the bounding box
+    int width;
+    /// Height of the bounding box
+    int height;
 
-    public:
-      BBoxPOI() {}
-      virtual ~BBoxPOI() {}
+   public:
+    BBoxPOI() {}
+    virtual ~BBoxPOI() {}
 
-      void setWidth(int width);
-      void setHeight(int height);
-      int getWidth() const;
-      int getHeight() const;
+    void setWidth(int width);
+    void setHeight(int height);
+    int getWidth() const;
+    int getHeight() const;
   };
 
   void BBoxPOI::setWidth(int width)
@@ -91,4 +91,3 @@ namespace pandora_vision
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_COMMON_BBOX_POI_H
-

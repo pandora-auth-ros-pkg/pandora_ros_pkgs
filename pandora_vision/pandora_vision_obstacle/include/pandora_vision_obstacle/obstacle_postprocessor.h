@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,31 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#ifndef PANDORA_VISION_OBSTACLE_OBSTACLE_POSTPROCESSOR_H
+#define PANDORA_VISION_OBSTACLE_OBSTACLE_POSTPROCESSOR_H
+
+#include <string>
+#include "pandora_vision_msgs/ObstacleAlert.h"
+#include "pandora_vision_msgs/ObstacleAlertVector.h"
+#include "pandora_vision_common/pandora_vision_interface/vision_postprocessor.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  class ObstaclePostProcessor : public VisionPostProcessor<pandora_vision_msgs::ObstacleAlertVector>
   {
-  }
+    public:
+      typedef boost::shared_ptr<pandora_vision_msgs::ObstacleAlertVector> ObstacleAlertVectorPtr;
+
+      ObstaclePostProcessor(const std::string& ns, sensor_processor::Handler* handler);
+      virtual ~ObstaclePostProcessor();
+
+    virtual bool
+      postProcess(const POIsStampedConstPtr& input, const ObstacleAlertVectorPtr& output);
+  };
 }  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_OBSTACLE_OBSTACLE_POSTPROCESSOR_H

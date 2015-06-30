@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,58 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#include <string>
+#include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_processor.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  SoftObstacleProcessor::SoftObstacleProcessor(const std::string& ns,
+    sensor_processor::Handler* handler) : sensor_processor::Processor<ImagesStamped,
+    POIsStamped>(ns, handler)
   {
+    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
+      this->accessProcessorNh()->getNamespace());
+
+    detector_.reset(new SoftObstacleDetector(this->getName(),
+          *this->accessPublicNh()));
+
+    server.setCallback(boost::bind(&SoftObstacleProcessor::parametersCallback,
+        this, _1, _2));
+  }
+
+  SoftObstacleProcessor::SoftObstacleProcessor() : sensor_processor::Processor<ImagesStamped,
+    POIsStamped>() {}
+
+  void SoftObstacleProcessor::parametersCallback(
+      const pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
+      const uint32_t& level)
+  {
+    detector_->setShowOriginalImage(config.showOriginalImage);
+    detector_->setShowDWTImage(config.showDWTImage);
+    detector_->setShowOtsuImage(config.showOtsuImage);
+    detector_->setShowDilatedImage(config.showDilatedImage);
+    detector_->setShowVerticalLines(config.showVerticalLines);
+    detector_->setShowROI(config.showROI);
+  }
+
+  bool SoftObstacleProcessor::process(const ImagesStampedConstPtr& input,
+    const POIsStampedPtr& output)
+  {
+    output->header = input->getHeader();
+    output->frameWidth = input->getRgbImage().cols;
+    output->frameHeight = input->getRgbImage().rows;
+
+    output->pois = detector_->detectSoftObstacle(
+        input->getRgbImage(), input->getDepthImage());
+
+    if (output->pois.empty())
+    {
+      return false;
+    }
+    return true;
   }
 }  // namespace pandora_vision

@@ -44,26 +44,27 @@
 
 namespace pandora_vision
 {
-  class POI {
-  public:
+  class POI
+  {
+   public:
     typedef boost::shared_ptr<POI> Ptr;
     typedef boost::shared_ptr<POI const> ConstPtr;
 
-  public:
+   public:
     /// Coordinates of Point of Interest
     cv::Point point;
 
     /// The possibility of this actually being a Point of Interest
     float probability;
 
-  public:
+   public:
     POI() {}
     virtual ~POI() {}
 
     void setPoint(const cv::Point&);
     cv::Point getPoint() const;
 
-    void setProbability(float);
+    void setProbability(float probArg);
     float getProbability() const;
   };
 

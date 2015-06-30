@@ -19,11 +19,17 @@
 
   <depend>roscpp</depend>
   <depend>cv_bridge</depend>
+  <depend>pcl_ros</depend>
   <depend>image_transport</depend>
   <depend>sensor_msgs</depend>
-  <depend>pandora_common_msgs</depend>
   <depend>sensor_processor</depend>
+  <depend>pandora_common_msgs</depend>
   <depend>urdf</depend>
+
+  <test_depend>pandora_testing_tools</test_depend>
+  <test_depend>pandora_vision_support</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>rosunit</test_depend>
 
   <export>
   </export>

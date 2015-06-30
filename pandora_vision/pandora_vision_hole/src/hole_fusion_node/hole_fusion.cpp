@@ -1914,10 +1914,10 @@ namespace pandora_vision
       pandora_vision_msgs::HoleDirectionAlert holeMsg;
 
       // The hole's keypoint coordinates relative to the center of the frame
-      float x = conveyor.holes[it->first].keypoint.pt.x
-        - static_cast<float>(width) / 2;
-      float y = static_cast<float>(height) / 2
-        - conveyor.holes[it->first].keypoint.pt.y;
+      float x = static_cast<float>(width) / 2 -
+        conveyor.holes[it->first].keypoint.pt.x;
+      float y = conveyor.holes[it->first].keypoint.pt.y -
+        static_cast<float>(height) / 2;
 
       // The keypoint's yaw and pitch
       float yaw = atan(2 * x / width * tan(hfov / 2));

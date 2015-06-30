@@ -33,67 +33,54 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Tsirigotis Christos <tsirif@gmail.com>
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_CV_MAT_STAMPED_H
-#define PANDORA_VISION_COMMON_CV_MAT_STAMPED_H
+#ifndef PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_PROCESSOR_H
+#define PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_PROCESSOR_H
 
-#include <boost/shared_ptr.hpp>
-#include <opencv2/opencv.hpp>
-
-#include <std_msgs/Header.h>
+#include <string>
+#include <cv_bridge/cv_bridge.h>
+#include <dynamic_reconfigure/server.h>
+#include "sensor_processor/processor.h"
+#include "pandora_vision_common/pois_stamped.h"
+#include "pandora_vision_common/images_stamped.h"
+#include "pandora_vision_obstacle/soft_obstacle_cfgConfig.h"
+#include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_detector.h"
 
 namespace pandora_vision
 {
-  class CVMatStamped
+  class SoftObstacleProcessor : public sensor_processor::Processor<ImagesStamped, POIsStamped>
   {
-   public:
-    typedef boost::shared_ptr<CVMatStamped> Ptr;
-    typedef boost::shared_ptr<CVMatStamped const> ConstPtr;
+    public:
+      SoftObstacleProcessor(const std::string& ns, sensor_processor::Handler* handler);
+      SoftObstacleProcessor();
 
-   public:
-    CVMatStamped() {}
-    virtual ~CVMatStamped() {}
+      virtual ~SoftObstacleProcessor() {}
 
-   public:
-    /// Message Header referring to the openCV matrix that corresponds
-    /// to a frame
-    std_msgs::Header header;
+    public:
+      virtual bool process(const ImagesStampedConstPtr& input,
+        const POIsStampedPtr& output);
 
-    /// OpenCV matrix that corresponds to the current frame to be processed
-    cv::Mat image;
+    private:
+      /**
+       * @brief The function called when a parameter is changed
+       * @param config [const pandora_vision_obstacle::soft_obstacle_cfgConfig&]
+       * @param level [const uint32_t] The level
+      **/
+      void parametersCallback(const pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
+        const uint32_t& level);
 
-   public:
-    void setHeader(const std_msgs::Header&);
-    std_msgs::Header getHeader() const;
+    private:
+      /// The dynamic reconfigure parameters' server
+      dynamic_reconfigure::Server<pandora_vision_obstacle::soft_obstacle_cfgConfig>
+        server;
+      /// The dynamic reconfigure parameters' callback
+      dynamic_reconfigure::Server<pandora_vision_obstacle::soft_obstacle_cfgConfig>
+        ::CallbackType f;
 
-    void setImage(const cv::Mat&);
-    cv::Mat getImage() const;
+      boost::shared_ptr<SoftObstacleDetector> detector_;
   };
-
-  void CVMatStamped::setHeader(const std_msgs::Header& headerArg)
-  {
-    header = headerArg;
-  }
-
-  std_msgs::Header CVMatStamped::getHeader() const
-  {
-    return header;
-  }
-
-  void CVMatStamped::setImage(const cv::Mat& imageArg)
-  {
-    image = imageArg;
-  }
-
-  cv::Mat CVMatStamped::getImage() const
-  {
-    return image;
-  }
-
-  typedef CVMatStamped::Ptr CVMatStampedPtr;
-  typedef CVMatStamped::ConstPtr CVMatStampedConstPtr;
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_COMMON_CV_MAT_STAMPED_H
+#endif  // PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_PROCESSOR_H

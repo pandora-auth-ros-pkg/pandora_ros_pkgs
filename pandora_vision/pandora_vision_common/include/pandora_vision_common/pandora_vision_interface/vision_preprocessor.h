@@ -37,8 +37,10 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_VISION_PREPROCESSOR_H
-#define PANDORA_VISION_COMMON_VISION_PREPROCESSOR_H
+#ifndef PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PREPROCESSOR_H
+#define PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PREPROCESSOR_H
+
+#include <string>
 
 #include <opencv2/opencv.hpp>
 
@@ -46,6 +48,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Image.h>
 
+#include "sensor_processor/handler.h"
 #include "sensor_processor/preprocessor.h"
 
 #include "pandora_vision_common/cv_mat_stamped.h"
@@ -54,47 +57,47 @@ namespace pandora_vision
 {
   class VisionPreProcessor: public sensor_processor::PreProcessor<sensor_msgs::Image, CVMatStamped>
   {
-    protected:
-      typedef boost::shared_ptr<sensor_msgs::Image> ImagePtr;
-      typedef boost::shared_ptr<sensor_msgs::Image const> ImageConstPtr;
+   protected:
+    typedef boost::shared_ptr<sensor_msgs::Image> ImagePtr;
+    typedef boost::shared_ptr<sensor_msgs::Image const> ImageConstPtr;
 
-    public:
-      /**
-       * @brief Constructor
-       * @param ns [const std::string&] The namespace of this preprocessor's nodeHandle
-       * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
-       * handles this preprocessor
-       * @param encoding [int] The image encoding using to transform the image message to 
-       * an OpenCV matrix
-       **/ 
-      VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler, 
-        const std::string& encoding);
-      
-      /**
-       * @brief Virtual Destructor
-       **/ 
-      virtual
-        ~VisionPreProcessor() {}
-      
-      /**
-       * @brief Function that gets a message containing an image and converts it to a matrix
-       * also considering the image's timestamp
-       * @param input [const ImageConstPtr&] A constant reference to a constant shared pointer 
-       * of a sensor_msgs::Image
-       * @param output [const CVMatStampedPtr&] A constant reference to a shared pointer of a 
-       * structure that includes an openCV matrix and a timestamp
-       * @return [bool] whether preprocessing output is full or something went wrong
-       **/ 
-      virtual bool
-        preProcess(const ImageConstPtr& input, const CVMatStampedPtr& output);
-    
-    protected:
-      std::string encoding_;
+   public:
+    /**
+      * @brief Constructor
+      * @param ns [const std::string&] The namespace of this preprocessor's nodeHandle
+      * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
+      * handles this preprocessor
+      * @param encoding [int] The image encoding using to transform the image message to
+      * an OpenCV matrix
+      **/
+    VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler,
+                       const std::string& encoding);
+
+    /**
+      * @brief Virtual Destructor
+      **/
+    virtual
+    ~VisionPreProcessor() {}
+
+    /**
+      * @brief Function that gets a message containing an image and converts it to a matrix
+      * also considering the image's timestamp
+      * @param input [const ImageConstPtr&] A constant reference to a constant shared pointer
+      * of a sensor_msgs::Image
+      * @param output [const CVMatStampedPtr&] A constant reference to a shared pointer of a
+      * structure that includes an openCV matrix and a timestamp
+      * @return [bool] whether preprocessing output is full or something went wrong
+      **/
+    virtual bool
+    preProcess(const ImageConstPtr& input, const CVMatStampedPtr& output);
+
+   protected:
+    std::string encoding_;
   };
 
   VisionPreProcessor::
   VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler,
-    const std::string& encoding) : sensor_processor::PreProcessor<sensor_msgs::Image, 
+    const std::string& encoding) : sensor_processor::PreProcessor<sensor_msgs::Image,
     CVMatStamped>(ns, handler)
   {
     encoding_ = encoding;
@@ -104,7 +107,7 @@ namespace pandora_vision
   VisionPreProcessor::
   preProcess(const ImageConstPtr& input, const CVMatStampedPtr& output)
   {
-    //ROS_DEBUG_STREAM("["+this->accessPublicNh()->getNamespace()+"] Calling vision preprocessor.");
+    // ROS_DEBUG_STREAM("["+this->accessPublicNh()->getNamespace()+"] Calling vision preprocessor.");
     cv_bridge::CvImagePtr inMsg;
     inMsg = cv_bridge::toCvCopy(*input, encoding_);
     output->image = inMsg->image.clone();
@@ -121,4 +124,4 @@ namespace pandora_vision
   }
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_COMMON_VISION_PREPROCESSOR_H
+#endif  // PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PREPROCESSOR_H

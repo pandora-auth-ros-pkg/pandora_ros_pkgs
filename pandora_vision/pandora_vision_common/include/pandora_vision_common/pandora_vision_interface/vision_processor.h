@@ -35,13 +35,14 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_COMMON_COMMON_DETECTOR_H
-#define PANDORA_VISION_COMMON_COMMON_DETECTOR_H
+#ifndef PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PROCESSOR_H
+#define PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PROCESSOR_H
 
 #include <string>
 
 #include <std_msgs/Header.h>
 
+#include "sensor_processor/handler.h"
 #include "sensor_processor/processor.h"
 
 #include "pandora_vision_common/cv_mat_stamped.h"
@@ -51,23 +52,23 @@ namespace pandora_vision
 {
   class VisionProcessor : public sensor_processor::Processor<CVMatStamped, POIsStamped>
   {
-    public:
-      /**
-       * @brief Constructor
-       * @param ns [const std::string&] The namespace of this processor's nodeHandle
-       * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
-       * handles this processor
-       **/
-      VisionProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-        sensor_processor::Processor<CVMatStamped, POIsStamped>(ns, handler) {}
-      VisionProcessor(void) :
-        sensor_processor::Processor<CVMatStamped, POIsStamped>() {}
+   public:
+    /**
+      * @brief Constructor
+      * @param ns [const std::string&] The namespace of this processor's nodeHandle
+      * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
+      * handles this processor
+      **/
+    VisionProcessor(const std::string& ns, sensor_processor::Handler* handler) :
+      sensor_processor::Processor<CVMatStamped, POIsStamped>(ns, handler) {}
+    VisionProcessor(void) :
+      sensor_processor::Processor<CVMatStamped, POIsStamped>() {}
 
-      /**
-       * @brief Virtual Destructor
-       **/
-      virtual ~VisionProcessor() {}
+    /**
+      * @brief Virtual Destructor
+      **/
+    virtual ~VisionProcessor() {}
   };
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_COMMON_COMMON_DETECTOR_H
+#endif  // PANDORA_VISION_COMMON_PANDORA_VISION_INTERFACE_VISION_PROCESSOR_H

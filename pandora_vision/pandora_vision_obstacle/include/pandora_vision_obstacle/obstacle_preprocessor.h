@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,37 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#ifndef PANDORA_VISION_OBSTACLE_OBSTACLE_PREPROCESSOR_H
+#define PANDORA_VISION_OBSTACLE_OBSTACLE_PREPROCESSOR_H
+
+#include <string>
+#include <sensor_msgs/PointCloud2.h>
+#include "sensor_processor/preprocessor.h"
+#include "pandora_vision_common/images_stamped.h"
+#include "pandora_vision_common/pandora_vision_utilities/pointcloud_to_image_converter.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  class ObstaclePreProcessor : public sensor_processor::PreProcessor<sensor_msgs::PointCloud2,
+    ImagesStamped>
   {
-  }
+    public:
+      typedef boost::shared_ptr<sensor_msgs::PointCloud2> PointCloud2Ptr;
+      typedef boost::shared_ptr<sensor_msgs::PointCloud2 const> PointCloud2ConstPtr;
+
+    public:
+      ObstaclePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
+      virtual ~ObstaclePreProcessor();
+
+      virtual bool preProcess(const PointCloud2ConstPtr& input, const ImagesStampedPtr& output);
+
+    private:
+      PointCloudToImageConverterPtr converterPtr_;
+  };
 }  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_OBSTACLE_OBSTACLE_PREPROCESSOR_H

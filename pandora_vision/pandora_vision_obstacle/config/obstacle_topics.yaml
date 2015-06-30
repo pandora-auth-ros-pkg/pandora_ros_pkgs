@@ -1,0 +1,3 @@
+subscribed_topics: 
+  [/kinect/depth_registered/points]
+published_topics: /vision/obstacle_alert

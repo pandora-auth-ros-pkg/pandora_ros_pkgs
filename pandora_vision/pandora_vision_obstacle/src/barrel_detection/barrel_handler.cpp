@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,28 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Alexandros Philotheou, Manos Tsardoulias
+ * Authors:
+ *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_common/pandora_vision_utilities/edge_detection.h"
+#include <string>
+#include "pandora_vision_obstacle/barrel_detection/barrel_handler.h"
 
 namespace pandora_vision
 {
-  /**
-    @brief Applies the Canny edge detector
-    @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
-    @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
-    @return void
-  **/
-  void EdgeDetection::applyCanny(const cv::Mat& inImage, cv::Mat* outImage)
+  BarrelHandler::BarrelHandler(const std::string& ns) :
+    VisionHandler<ObstaclePreProcessor, BarrelProcessor, ObstaclePostProcessor>(ns)
+  {
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_START_AUTONOMOUS);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SEMI_AUTONOMOUS);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_TELEOPERATED_LOCOMOTION);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
+    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING);
+  }
+
+  void BarrelHandler::completeTransition()
   {
   }
 }  // namespace pandora_vision

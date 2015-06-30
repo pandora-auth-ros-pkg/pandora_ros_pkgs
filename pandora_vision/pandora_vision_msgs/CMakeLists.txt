@@ -25,6 +25,8 @@ add_message_files(
   Keypoint.msg
   LandoltcAlert.msg
   LandoltcAlertVector.msg
+  ObstacleAlert.msg
+  ObstacleAlertVector.msg
   Predator.msg
   QRAlert.msg
   QRAlertVector.msg

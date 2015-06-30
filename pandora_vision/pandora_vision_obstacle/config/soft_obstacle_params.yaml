@@ -1,0 +1,17 @@
+gaussianKernelSize: 13
+
+hsvColor:
+  sThreshold: 95
+  vThreshold: 130
+
+erodeKernelSize:
+  rows: 3
+  cols: 3
+dilateKernelSize:
+  rows: 3
+  cols: 3
+
+depthThreshold: 0.3
+
+gradientThreshold: 2.0
+betaThreshold: 3.0

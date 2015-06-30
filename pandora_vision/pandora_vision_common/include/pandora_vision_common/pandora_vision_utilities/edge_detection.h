@@ -34,9 +34,11 @@
  *
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
- 
-#ifndef PANDORA_VISION_COMMON_EDGE_DETECTION_H
-#define PANDORA_VISION_COMMON_EDGE_DETECTION_H
+
+#ifndef PANDORA_VISION_COMMON_PANDORA_VISION_UTILITIES_EDGE_DETECTION_H
+#define PANDORA_VISION_COMMON_PANDORA_VISION_UTILITIES_EDGE_DETECTION_H
+
+#include <opencv2/opencv.hpp>
 
 namespace pandora_vision
 {
@@ -53,7 +55,7 @@ namespace pandora_vision
       @param[out] outImage [cv::Mat*] The processed image in CV_8U depth
       @return void
     **/
-    static void applyCanny (const cv::Mat& inImage, cv::Mat* outImage);
+    static void applyCanny(const cv::Mat& inImage, cv::Mat* outImage);
 
     /**
       @brief Applies the Scharr edge transform
@@ -61,7 +63,7 @@ namespace pandora_vision
       @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
       @return void
     **/
-    static void applyScharr (const cv::Mat& inImage, cv::Mat* outImage);
+    static void applyScharr(const cv::Mat& inImage, cv::Mat* outImage);
 
     /**
       @brief Applies the Sobel edge transform
@@ -69,7 +71,7 @@ namespace pandora_vision
       @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
       @return void
      **/
-    static void applySobel (const cv::Mat& inImage, cv::Mat* outImage);
+    static void applySobel(const cv::Mat& inImage, cv::Mat* outImage);
 
     /**
       @brief Applies the Laplacian edge transform
@@ -77,9 +79,8 @@ namespace pandora_vision
       @param[out] outImage [cv::Mat*] The processed image in CV_8UC1 format
       @return void
      **/
-    static void applyLaplacian (const cv::Mat& inImage, cv::Mat* outImage);
+    static void applyLaplacian(const cv::Mat& inImage, cv::Mat* outImage);
   };
-  
-}// namespace pandora_vision    
-#endif  // PANDORA_VISION_COMMON_EDGE_DETECTION_H
+}  // namespace pandora_vision
 
+#endif  // PANDORA_VISION_COMMON_PANDORA_VISION_UTILITIES_EDGE_DETECTION_H

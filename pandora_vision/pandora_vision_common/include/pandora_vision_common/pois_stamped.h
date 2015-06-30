@@ -39,32 +39,37 @@
 #ifndef PANDORA_VISION_COMMON_POIS_STAMPED_H
 #define PANDORA_VISION_COMMON_POIS_STAMPED_H
 
+#include <vector>
+
 #include <opencv2/opencv.hpp>
-#include "std_msgs/Header.h"
+#include <std_msgs/Header.h>
+
 #include "pandora_vision_common/poi.h"
 
 namespace pandora_vision
 {
-  class POIsStamped {
-    public:
-      typedef boost::shared_ptr<POIsStamped> Ptr;
-      typedef boost::shared_ptr<POIsStamped const> ConstPtr;
+  class POIsStamped
+  {
+   public:
+    typedef boost::shared_ptr<POIsStamped> Ptr;
+    typedef boost::shared_ptr<POIsStamped const> ConstPtr;
 
-    public:
-      virtual ~POIsStamped() {}
+   public:
+    POIsStamped() {}
+    virtual ~POIsStamped() {}
 
-    public:
-      /// Message Header referring to the Points of Interest in a frame
-      std_msgs::Header header;
+   public:
+    /// Message Header referring to the Points of Interest in a frame
+    std_msgs::Header header;
 
-      /// Vector containing shared pointers to Point of Interest structure
-      std::vector<POIPtr> pois;
+    /// Vector containing shared pointers to Point of Interest structure
+    std::vector<POIPtr> pois;
 
-      /// Frame's Width
-      int frameWidth;
+    /// Frame's Width
+    int frameWidth;
 
-      /// Frame's Height
-      int frameHeight;
+    /// Frame's Height
+    int frameHeight;
   };
 
   typedef POIsStamped::Ptr POIsStampedPtr;
