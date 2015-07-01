@@ -1,0 +1,33 @@
+<package format="2">
+
+  <name>pose_finder</name>
+  <version>0.8.0</version>
+  <description>Package with class which handles geometrical world transformations</description>
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
+
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>pandora_data_fusion_utils</depend>
+
+  <!--  Test Dependencies  -->
+  <test_depend>rostest</test_depend>
+  <test_depend>roslib</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
+
+  <export>
+  </export>
+</package>

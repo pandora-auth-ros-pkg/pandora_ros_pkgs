@@ -36,7 +36,6 @@ script:
   - source devel/setup.bash
   - catkin_make roslint_pandora_alert_handler
   - catkin_make roslint_pandora_sensor_processing
-  - catkin_make roslint_pandora_sensor_coverage
   - catkin_make tests # Build all tests, even from other packages. Its not optimal, but...
   - catkin_make run_tests_pandora_alert_handler
   - catkin_make run_tests_pandora_sensor_processing

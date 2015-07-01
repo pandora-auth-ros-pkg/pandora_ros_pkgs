@@ -1,0 +1,12 @@
+<launch>
+
+  <!--  Alert Handler  -->
+  <include file="$(find pandora_alert_handler)/launch/pandora_alert_handler.launch" />
+
+  <!--  Sensor Coverage  -->
+  <!--<include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" />-->
+
+  <!--  Sensor Processing  -->
+  <!--<include file="$(find pandora_sensor_processing)/launch/sensor_processing.launch" />-->
+
+</launch>

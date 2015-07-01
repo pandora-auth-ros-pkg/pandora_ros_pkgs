@@ -1,0 +1,9 @@
+<launch>
+
+  <!--  State manager and Changer  -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!--  Data Fusion  -->
+  <include file="$(find pandora_data_fusion_launchers)/launch/pandora_data_fusion.launch" />
+
+</launch>

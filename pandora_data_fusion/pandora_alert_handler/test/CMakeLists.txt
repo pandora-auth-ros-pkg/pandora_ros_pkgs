@@ -11,15 +11,6 @@ include_directories(
 
 ########################  Unit Tests  ###############################
 
-########################  Utils  ####################################
-
-catkin_add_gtest(utils_test unit/utils_test.cpp)
-target_link_libraries(utils_test
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_utils
-  gtest_main
-  )
-
 #########################  ObjectsTest  #############################
 
 catkin_add_gtest(objects_test unit/objects_test.cpp)
@@ -48,17 +39,6 @@ target_link_libraries(object_factory_test
   ${roslib_LIBRARIES}
   ${pandora_testing_tools_LIBRARIES}
   ${PROJECT_NAME}_object_factory
-  gtest_main
-  )
-
-########################  PoseFinderTest  ############################
-
-catkin_add_gtest(pose_finder_test unit/pose_finder_test.cpp)
-target_link_libraries(pose_finder_test
-  ${catkin_LIBRARIES}
-  ${roslib_LIBRARIES}
-  ${pandora_testing_tools_LIBRARIES}
-  ${PROJECT_NAME}_pose_finder
   gtest_main
   )
 

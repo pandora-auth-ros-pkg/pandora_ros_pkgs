@@ -45,7 +45,8 @@ import math
 
 import unittest
 
-import roslib; roslib.load_manifest(PKG)
+import roslib
+roslib.load_manifest(PKG)
 import rostest
 import rospy
 
@@ -55,6 +56,7 @@ from test_base import direction
 import test_base
 
 DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 class SubscriberTest(test_base.TestBase):
 
@@ -66,7 +68,7 @@ class SubscriberTest(test_base.TestBase):
         self.fillInfo(outs)
 
         # Benchmark new subscriber style...
-	self.assertEqual(len(outs[0].holes), 1)
+        self.assertEqual(len(outs[0].holes), 1)
 
 if __name__ == '__main__':
 
@@ -75,4 +77,3 @@ if __name__ == '__main__':
     SubscriberTest.connect()
     rostest.rosrun(PKG, NAME, SubscriberTest, sys.argv)
     SubscriberTest.disconnect()
-

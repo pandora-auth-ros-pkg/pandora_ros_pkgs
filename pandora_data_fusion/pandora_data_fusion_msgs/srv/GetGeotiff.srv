@@ -1,0 +1,5 @@
+---
+pandora_data_fusion_msgs/VictimInfo[] victims
+pandora_data_fusion_msgs/QrInfo[] qrs
+pandora_data_fusion_msgs/HazmatInfo[] hazmats
+pandora_data_fusion_msgs/ObstacleInfo[] obstacles

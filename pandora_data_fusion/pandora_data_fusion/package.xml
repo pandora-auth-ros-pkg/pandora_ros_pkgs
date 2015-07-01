@@ -1,6 +1,6 @@
 <package format="2">
   <name>pandora_data_fusion</name>
-  <version>0.0.0</version>
+  <version>0.8.0</version>
   <description>Contains pandora data fusion packages</description>
 
   <maintainer email="tsirif@gmail.com">Tsirigotis Christos</maintainer>
@@ -17,10 +17,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>pandora_data_fusion_msgs</exec_depend>
+  <exec_depend>pose_finder</exec_depend>
+  <exec_depend>pandora_data_fusion_utilis</exec_depend>
   <exec_depend>pandora_alert_handler</exec_depend>
   <exec_depend>pandora_data_fusion_launchers</exec_depend>
   <exec_depend>pandora_sensor_processing</exec_depend>
-  <exec_depend>pandora_sensor_coverage</exec_depend>
 
   <export>
     <metapackage/>

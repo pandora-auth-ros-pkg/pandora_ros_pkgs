@@ -25,15 +25,15 @@ target_link_libraries(${PROJECT_NAME}_clusterer_test
 
 ########################  Functional Tests  #########################
 
-#add_rostest(functional/co2_processor_test.launch)
+# add_rostest(functional/co2_processor_test.launch)
 
-if(TARGET tests)
-  add_executable(${PROJECT_NAME}_thermal_processor_test EXCLUDE_FROM_ALL functional/thermal_processor_test.cpp)
-  target_link_libraries(${PROJECT_NAME}_thermal_processor_test
-    ${catkin_LIBRARIES}
-    ${GTEST_LIBRARIES}
-    ${PROJECT_NAME}_thermal_processor
-    )
-  add_dependencies(tests ${PROJECT_NAME}_thermal_processor_test)
-endif()
-#add_rostest(functional/thermal_processor_test.launch)
+# if(TARGET tests)
+#   add_executable(${PROJECT_NAME}_thermal_processor_test EXCLUDE_FROM_ALL functional/thermal_processor_test.cpp)
+#   target_link_libraries(${PROJECT_NAME}_thermal_processor_test
+#     ${catkin_LIBRARIES}
+#     ${GTEST_LIBRARIES}
+#     ${PROJECT_NAME}_thermal_processor
+#     )
+#   add_dependencies(tests ${PROJECT_NAME}_thermal_processor_test)
+# endif()
+# add_rostest(functional/thermal_processor_test.launch)

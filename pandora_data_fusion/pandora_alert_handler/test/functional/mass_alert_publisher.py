@@ -36,7 +36,8 @@ __author__ = "Afouras Triantafyllos and Tsirigotis Christos"
 __maintainer__ = "Tsirigotis Christos"
 __email__ = "tsirif@gmail.com"
 
-import roslib; roslib.load_manifest('pandora_alert_handler')
+import roslib
+roslib.load_manifest('pandora_alert_handler')
 import rospy
 import actionlib
 import sys
@@ -44,6 +45,7 @@ from pandora_testing_tools.testing_interface import alert_delivery
 
 from dynamic_reconfigure.server import Server
 from pandora_alert_handler.cfg import MassAlertPublisherConfig
+
 
 class MassPublisher:
 
@@ -61,7 +63,7 @@ class MassPublisher:
         self.hole_1_post = False
         self.hole_2_post = False
         self.thermal_post = False
-        self.victimImage_post = False
+        self.visualVictim_post = False
         self.motion_post = False
         self.sound_post = False
         self.co2_post = False
@@ -101,7 +103,7 @@ class MassPublisher:
                     self.alertDeliveryBoy.deliverLandoltcOrder(
                         self.config.landoltc_yaw,
                         self.config.landoltc_pitch,
-                        orderAngles = [1, 0, 0.25])
+                        orderAngles=[1, 0, 0.25])
 
                 if self.config.motion_post:
                     self.alertDeliveryBoy.deliverMotionOrder(
@@ -121,11 +123,11 @@ class MassPublisher:
                         self.config.sound_pitch,
                         self.config.sound_probability)
 
-                if self.config.victimImage_post:
-                    self.alertDeliveryBoy.deliverVictimImageOrder(
-                        self.config.victimImage_yaw,
-                        self.config.victimImage_pitch,
-                        self.config.victimImage_probability)
+                if self.config.visualVictim_post:
+                    self.alertDeliveryBoy.deliverVisualVictimOrder(
+                        self.config.visualVictim_yaw,
+                        self.config.visualVictim_pitch,
+                        self.config.visualVictim_probability)
 
                 if self.config.thermal_post:
                     self.alertDeliveryBoy.deliverThermalOrder(

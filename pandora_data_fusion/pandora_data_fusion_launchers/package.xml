@@ -1,8 +1,8 @@
 <package format="2">
   <name>pandora_data_fusion_launchers</name>
-  <version>0.0.0</version>
+  <version>0.8.0</version>
   <description>data_fusion</description>
-  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer> 
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
 
   <license>BSD</license>
 
@@ -15,7 +15,6 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>pandora_alert_handler</exec_depend>
-  <exec_depend>pandora_sensor_coverage</exec_depend>
   <exec_depend>pandora_sensor_processing</exec_depend>
   <exec_depend>state_manager</exec_depend>
 

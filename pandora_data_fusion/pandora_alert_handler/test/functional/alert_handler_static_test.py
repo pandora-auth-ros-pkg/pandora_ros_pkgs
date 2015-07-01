@@ -45,7 +45,8 @@ import math
 
 import unittest
 
-import roslib; roslib.load_manifest(PKG)
+import roslib
+roslib.load_manifest(PKG)
 import rostest
 import rospy
 
@@ -55,6 +56,7 @@ from test_base import direction
 import test_base
 
 DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 class AlertHandlerStaticTest(test_base.TestBase):
 
@@ -78,12 +80,12 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/mixed_order.in')
         outs = []
         while(True):
-            try:      
+            try:
                 self.deliveryBoy.deliverNextOrder()
             except alert_delivery.BadBossOrderFile as exc:
                 break
             self.fillInfo(outs)
-        
+
         self.assertEqual(len(outs[0].holes), 1)
         self.assertEqual(len(outs[0].hazmats), 0)
         self.assertEqual(len(outs[0].qrs), 0)
@@ -206,11 +208,11 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertEqual(len(outs[10].co2s), 1)
 
     def test_kalman_filter_of_one_object(self):
-        
+
         self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/one_kalman_order.in')
         outs = []
         while(True):
-            try:      
+            try:
                 self.deliveryBoy.deliverNextOrder()
             except alert_delivery.BadBossOrderFile as exc:
                 break
@@ -231,7 +233,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         position4 = outs[4].holes[0].pose.position
         position5 = outs[5].holes[0].pose.position
         position6 = outs[6].holes[0].pose.position
-        
+
         # If measurement does not differ from the expected position, the updated
         # expected position will not change.
         self.assertEqual(position0.x, position1.x)
@@ -263,7 +265,7 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/frequent_order.in')
         outs = []
         while(True):
-            try:      
+            try:
                 self.deliveryBoy.deliverNextOrder()
             except alert_delivery.BadBossOrderFile as exc:
                 break
@@ -274,8 +276,8 @@ class AlertHandlerStaticTest(test_base.TestBase):
             self.assertEqual(len(outs[-1].qrs), 0)
             self.assertEqual(len(outs[-1].thermals), 0)
             if len(outs) > 1:
-                self.assertEqual(distance(outs[-1].holes[0].pose.position, 
-                  outs[-2].holes[0].pose.position), 0)
+                self.assertEqual(distance(outs[-1].holes[0].pose.position,
+                                          outs[-2].holes[0].pose.position), 0)
 
         # A measurement off will not throw away very much a stable object.
         self.deliveryBoy.deliverHoleOrder(0.13, 0, 1)
@@ -285,12 +287,12 @@ class AlertHandlerStaticTest(test_base.TestBase):
         distanceLessConviction = distance(position0, position1)
         rospy.logdebug("Less conviction distance: %f", distanceLessConviction)
         self.assertLess(distanceLessConviction, 0.03)
-        
+
         self.setUp()
         self.deliveryBoy.getOrderListFromBoss(DIR + '/orders/frequent_order.in')
         outs = []
         while(True):
-            try:      
+            try:
                 self.deliveryBoy.deliverNextOrder()
             except alert_delivery.BadBossOrderFile as exc:
                 break
@@ -328,10 +330,10 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertEqual(len(out[1].holes), 1)
         self.assertEqual(len(out[1].victimsToGo), 1)
         self.assertEqual(distance(out[1].holes[0].pose.position,
-          out[1].victimsToGo[0].pose.position), 0)
+                                  out[1].victimsToGo[0].pose.position), 0)
         # Filtering makes object resistant to gaussian noise!
         self.assertLess(distance(out[0].holes[0].pose.position,
-          out[1].victimsToGo[0].pose.position), 0.04)
+                                 out[1].victimsToGo[0].pose.position), 0.04)
 
     def test_victim_pipeline(self):
 
@@ -347,24 +349,24 @@ class AlertHandlerStaticTest(test_base.TestBase):
         self.assertEqual(self.worldModelPublished, 4)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 1)
-        self.assertEqual(set(self.currentVictimList[0].sensors), 
-            set(['THERMAL']))
+        self.assertEqual(set(self.currentVictimList[0].sensors),
+                         set(['THERMAL']))
         self.assertGreater(self.currentVictimList[0].probability, 0.6/2)
         self.deliveryBoy.deliverCo2Order(0, 0, 0.8)
         self.deliveryBoy.deliverCo2Order(0, 0, 0.8)
         self.assertEqual(self.worldModelPublished, 6)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 2)
-        self.assertEqual(set(self.currentVictimList[0].sensors), 
-            set(['THERMAL', 'CO2']))
+        self.assertEqual(set(self.currentVictimList[0].sensors),
+                         set(['THERMAL', 'CO2']))
         self.assertGreater(self.currentVictimList[0].probability, (0.6+0.8)/2)
         self.deliveryBoy.deliverFaceOrder(0, 0, 0.9)
         self.deliveryBoy.deliverFaceOrder(0, 0, 0.93)
         self.assertEqual(self.worldModelPublished, 8)
         self.assertEqual(len(self.currentVictimList), 1)
         self.assertEqual(len(self.currentVictimList[0].sensors), 3)
-        self.assertEqual(set(self.currentVictimList[0].sensors), 
-            set(['THERMAL', 'FACE', 'CO2']))
+        self.assertEqual(set(self.currentVictimList[0].sensors),
+                         set(['THERMAL', 'FACE', 'CO2']))
         #self.assertGreater(self.currentVictimList[0].probability, 0.9) #
 
 if __name__ == '__main__':
@@ -374,4 +376,3 @@ if __name__ == '__main__':
     AlertHandlerStaticTest.connect()
     rostest.rosrun(PKG, NAME, AlertHandlerStaticTest, sys.argv)
     AlertHandlerStaticTest.disconnect()
-

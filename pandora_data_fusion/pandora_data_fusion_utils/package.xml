@@ -1,0 +1,29 @@
+<package format="2">
+
+  <name>pandora_data_fusion_utils</name>
+  <version>0.8.0</version>
+  <description>Data Fusion Utilities</description>
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_data_fusion.git</url>
+
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>geometry_msgs</depend>
+
+  <!--  Test Dependencies  -->
+  <test_depend>rostest</test_depend>
+
+  <export>
+  </export>
+</package>

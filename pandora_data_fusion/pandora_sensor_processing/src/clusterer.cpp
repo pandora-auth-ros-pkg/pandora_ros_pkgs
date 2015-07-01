@@ -228,8 +228,8 @@ namespace pandora_sensor_processing
       for (int jj = 0; jj < dataSet_.cols(); ++jj)
       {
         //!< Choosing cluster according to datum euclidean distance from means.
-        if (abs(dataSet_(3, jj) - highest) <
-            abs(dataSet_(3, jj) - lowest) || jj == maxCol)
+        if (fabs(dataSet_(3, jj) - highest) <
+            fabs(dataSet_(3, jj) - lowest) || jj == maxCol)
         {
           //!< Resizing cluster1_ by on column and appending qualified datum.
           cluster1_.conservativeResize(Eigen::NoChange, cluster1_.cols() + 1);

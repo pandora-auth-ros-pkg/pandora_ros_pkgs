@@ -12,24 +12,25 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
-    VictimInfoMsg.msg
+    VictimInfo.msg
     ObstacleInfo.msg
-    WorldModelMsg.msg
-    QrNotificationMsg.msg
-    GlobalProbabilitiesMsg.msg
+    QrInfo.msg
+    HazmatInfo.msg
+    WorldModel.msg
+    VictimProbabilities.msg
   )
 
 add_service_files(
   FILES
-    GetObjectsSrv.srv
-    GeotiffSrv.srv
-    QrCsvSrv.srv
-    GetMarkersSrv.srv
+    GetObjects.srv
+    GetGeotiff.srv
+    GetMarkers.srv
+    GetVictimProbabilities.srv
   )
 
 add_action_files(
   FILES
-    DeleteVictim.action
+    ChooseVictim.action
     ValidateVictim.action
   )
 

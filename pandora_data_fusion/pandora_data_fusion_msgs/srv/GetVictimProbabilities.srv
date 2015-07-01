@@ -1,0 +1,5 @@
+int32 victimId
+---
+bool success
+string[] sensors
+pandora_data_fusion_msgs/VictimProbabilities probabilities

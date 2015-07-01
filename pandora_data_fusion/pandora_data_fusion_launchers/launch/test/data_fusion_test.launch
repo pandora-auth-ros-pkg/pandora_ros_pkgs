@@ -5,13 +5,13 @@
     args="$(find pandora_alert_handler)/test/test_maps/map1.yaml"/>
 
   <node pkg="tf" type="static_transform_publisher"
-    name="world2headCamera" args="1 2 1 0 0 0 /map $(arg camera_frame) 100" />
+    name="world2headCamera" args="1 2 1 -1.507 0 0 /map $(arg camera_frame) 100" />
 
   <node pkg="tf" type="static_transform_publisher"
     name="world2map" args="0 0 0 0 0 0 /world /map 100" />
 
-  <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion_standalone.launch" />
-  <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
+  <include file="$(find pandora_data_fusion_launchers)/launch/pandora_data_fusion_standalone.launch" />
+  <rosparam param="subscribed_topic_names/map" ns="/pandora_data_fusion/pandora_alert_handler">/map</rosparam>
 
   <include file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
 

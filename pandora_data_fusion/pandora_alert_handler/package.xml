@@ -1,6 +1,7 @@
 <package format="2">
+
   <name>pandora_alert_handler</name>
-  <version>0.0.0</version>
+  <version>0.8.0</version>
   <description>Data Fusion Alert Handler</description>
 
   <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
@@ -17,14 +18,19 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roslint</build_depend>
+
   <depend>roscpp</depend>
   <depend>tf</depend>
   <depend>actionlib</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>visualization_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
   <depend>pandora_data_fusion_msgs</depend>
   <depend>pandora_vision_msgs</depend>
   <depend>pandora_common_msgs</depend>
+  <depend>pose_finder</depend>
+  <depend>pandora_data_fusion_utils</depend>
   <depend>bfl</depend>
 
   <!--  Test Dependencies  -->

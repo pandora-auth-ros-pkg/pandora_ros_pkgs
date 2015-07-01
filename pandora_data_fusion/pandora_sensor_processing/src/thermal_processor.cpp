@@ -141,7 +141,7 @@ namespace pandora_sensor_processing
       float mean2 = clusterer->getMean2()(3);
       float diff = mean1 - mean2;
 
-      if (abs(diff) > OPTIMAL_HEAT_DIFFERENCE)
+      if (fabs(diff) > OPTIMAL_HEAT_DIFFERENCE)
       {
         if (mean1 > mean2)
         {

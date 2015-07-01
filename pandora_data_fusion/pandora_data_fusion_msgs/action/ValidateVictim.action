@@ -1,5 +1,6 @@
 #goal
 int32 victimId
+bool victimVerified
 bool victimValid
 ---
 #result

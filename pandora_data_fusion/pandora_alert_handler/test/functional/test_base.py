@@ -43,19 +43,21 @@ import unittest
 import rospy
 
 from pandora_testing_tools.testing_interface import alert_delivery
-from pandora_data_fusion_msgs.msg import WorldModelMsg 
-from pandora_data_fusion_msgs.msg import VictimInfoMsg 
+from pandora_data_fusion_msgs.msg import WorldModelMsg
+from pandora_data_fusion_msgs.msg import VictimInfoMsg
 from pandora_data_fusion_msgs.srv import GetObjectsSrv
 from pandora_data_fusion_msgs.srv import GetObjectsSrvResponse
 from std_srvs.srv import Empty
 from geometry_msgs.msg import Point
 
+
 def distance(a, b):
 
-    return math.sqrt( (a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2 )
+    return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
+
 
 def direction(a, b):
-        
+
     dire = Point()
     norm = distance(a, b)
     dire.x = (b.x - a.x)/norm
@@ -63,25 +65,26 @@ def direction(a, b):
     dire.z = (b.z - a.z)/norm
     return dire
 
+
 class TestBase(unittest.TestCase):
- 
+
     deliveryBoy = alert_delivery.AlertDeliveryBoy("headCamera")
 
     def mockCallback(self, data):
 
-      self.currentVictimList = data.victims
-      self.worldModelPublished += 1
-      #rospy.logdebug("yolo!"+str(self.worldModelPublished))
-      #rospy.logdebug(self.currentVictimList)
+        self.currentVictimList = data.victims
+        self.worldModelPublished += 1
+        #rospy.logdebug("yolo!"+str(self.worldModelPublished))
+        #rospy.logdebug(self.currentVictimList)
 
     @classmethod
     def connect(cls):
-      
+
         cls.get_objects = rospy.ServiceProxy('/data_fusion/get_objects', GetObjectsSrv, True)
         rospy.wait_for_service('/data_fusion/get_objects')
         cls.flush_lists = rospy.ServiceProxy('/data_fusion/flush_queues', Empty, True)
         rospy.wait_for_service('/data_fusion/flush_queues')
-        
+
     @classmethod
     def disconnect(cls):
 
@@ -111,7 +114,7 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
 
         self.subscriber.unregister()
-      
+
     def fillInfo(self, outs):
 
         i = 0
@@ -125,4 +128,3 @@ class TestBase(unittest.TestCase):
                 rospy.logdebug("!< get_objects service failed >! reconnecting and retrying...")
                 i += 1
                 self.connect()
-

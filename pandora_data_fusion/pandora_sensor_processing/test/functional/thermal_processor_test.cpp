@@ -271,7 +271,7 @@ namespace pandora_sensor_processing
     ASSERT_TRUE(responded_);
     ASSERT_EQ(1, incomingAlerts_.size());
     EXPECT_EQ("pur", incomingAlerts_.at(0).header.frame_id);
-    EXPECT_FLOAT_EQ(0.39894228, incomingAlerts_.at(0).generalAlerts[0].probability);
+    EXPECT_FLOAT_EQ(0.39894228, incomingAlerts_.at(0).alerts[0].probability);
 
     // This in not cool because image is not the same size as the other images
     // of frame "pur"
