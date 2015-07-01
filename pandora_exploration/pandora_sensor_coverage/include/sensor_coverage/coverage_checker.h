@@ -51,7 +51,7 @@
 #include "octomap/octomap.h"
 #include "nav_msgs/OccupancyGrid.h"
 
-#include "alert_handler/utils.h"
+#include "pandora_data_fusion_utils/utils.h"
 
 namespace pandora_exploration
 {
@@ -59,7 +59,7 @@ namespace pandora_exploration
   {
 
     //!< Type Definitions
-    using ::pandora_data_fusion::pandora_alert_handler::Utils;
+    using ::pandora_data_fusion::pandora_data_fusion_utils::Utils;
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
 
     /**

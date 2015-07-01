@@ -15,7 +15,7 @@
 
   <depend>roscpp</depend>
   <depend>tf</depend>
-  <depend>pandora_alert_handler</depend>
+  <depend>pandora_data_fusion_utils</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>octomap</depend>

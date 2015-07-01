@@ -44,9 +44,9 @@
 
 #include "state_manager_msgs/RobotModeMsg.h"
 
-#include "alert_handler/tf_finder.h"
-#include "alert_handler/tf_listener.h"
-#include "alert_handler/exceptions.h"
+#include "pandora_data_fusion_utils/tf_finder.h"
+#include "pandora_data_fusion_utils/tf_listener.h"
+#include "pandora_data_fusion_utils/exceptions.h"
 
 #include "sensor_coverage/space_checker.h"
 #include "sensor_coverage/surface_checker.h"
@@ -57,10 +57,10 @@ namespace pandora_exploration
   {
 
     //!< Type Definitions
-    using ::pandora_data_fusion::pandora_alert_handler::TfFinder;
-    using ::pandora_data_fusion::pandora_alert_handler::TfListener;
-    using ::pandora_data_fusion::pandora_alert_handler::TfListenerPtr;
-    using ::pandora_data_fusion::pandora_alert_handler::TfException;
+    using ::pandora_data_fusion::pandora_data_fusion_utils::TfFinder;
+    using ::pandora_data_fusion::pandora_data_fusion_utils::TfListener;
+    using ::pandora_data_fusion::pandora_data_fusion_utils::TfListenerPtr;
+    using ::pandora_data_fusion::pandora_data_fusion_utils::TfException;
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
 
     /**

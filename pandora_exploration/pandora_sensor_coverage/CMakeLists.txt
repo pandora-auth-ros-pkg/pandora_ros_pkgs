@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
-  pandora_alert_handler
+  pandora_data_fusion_utils
   state_manager
   state_manager_msgs
   octomap_msgs
@@ -17,17 +17,14 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(octomap REQUIRED)
 
 catkin_package(
-  #DEPENDS
   CATKIN_DEPENDS
     roscpp
     tf
-    pandora_alert_handler
+    pandora_data_fusion_utils
     state_manager
     state_manager_msgs
     octomap_msgs
     octomap_ros
-  #INCLUDE_DIRS
-  #LIBRARIES
   )
 
 include_directories(
