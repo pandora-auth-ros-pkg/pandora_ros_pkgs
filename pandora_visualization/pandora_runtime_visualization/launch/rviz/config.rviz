@@ -3,9 +3,13 @@ Panels:
     Help Height: 0
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /TF1
+        - /TF1/Frames1
+        - /Map1
+        - /Vitctims to go1/Status1
       Splitter Ratio: 0.5
-    Tree Height: 202
+    Tree Height: 856
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -24,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Robot camera
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -51,85 +55,21 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        axis:
-          Value: true
-        base_footprint:
-          Value: true
-        base_link:
-          Value: true
-        base_stabilized:
-          Value: true
-        battery1:
-          Value: true
-        battery2:
-          Value: true
-        cables:
-          Value: true
-        differential:
-          Value: true
-        epos:
-          Value: true
-        flir_frame:
-          Value: true
-        flir_main_link:
-          Value: true
-        flir_optical_frame:
-          Value: true
-        kinect_base_link:
-          Value: true
-        kinect_depth_frame:
-          Value: true
-        kinect_depth_optical_frame:
-          Value: true
-        kinect_frame:
-          Value: true
-        kinect_main_link:
-          Value: true
-        kinect_optical_frame:
-          Value: true
         kinect_rgb_frame:
-          Value: true
-        kinect_rgb_optical_frame:
-          Value: true
-        kinect_servo_link:
-          Value: true
-        laser_link:
-          Value: true
-        laser_main_link:
-          Value: true
-        laser_servo_link:
-          Value: true
-        left_camera_frame:
-          Value: true
-        left_camera_main_link:
-          Value: true
-        left_camera_optical_frame:
-          Value: true
-        left_front_wheel_link:
-          Value: true
-        left_rear_wheel_link:
-          Value: true
-        left_side_link:
           Value: true
         map:
           Value: true
-        miniitx:
+        soft_obstacle_0:
           Value: true
-        psu:
+        thermal_0:
           Value: true
-        right_camera_frame:
+        victim_0:
           Value: true
-        right_camera_main_link:
+        victim_1:
+          Value: false
+        victim_2:
           Value: true
-        right_camera_optical_frame:
-          Value: true
-        right_front_wheel_link:
-          Value: true
-        right_rear_wheel_link:
-          Value: true
-        right_side_link:
-          Value: true
-        ssd:
+        visual_victim_0:
           Value: true
         world:
           Value: true
@@ -141,65 +81,20 @@ Visualization Manager:
       Tree:
         world:
           map:
-            base_footprint:
-              base_stabilized:
-                base_link:
-                  axis:
-                    {}
-                  battery1:
-                    {}
-                  battery2:
-                    {}
-                  cables:
-                    {}
-                  differential:
-                    {}
-                  epos:
-                    {}
-                  kinect_servo_link:
-                    kinect_base_link:
-                      kinect_main_link:
-                        flir_main_link:
-                          flir_frame:
-                            flir_optical_frame:
-                              {}
-                        kinect_frame:
-                          kinect_depth_frame:
-                            kinect_depth_optical_frame:
-                              {}
-                          kinect_optical_frame:
-                            {}
-                          kinect_rgb_frame:
-                            kinect_rgb_optical_frame:
-                              {}
-                  laser_servo_link:
-                    laser_main_link:
-                      laser_link:
-                        {}
-                  left_camera_main_link:
-                    left_camera_frame:
-                      left_camera_optical_frame:
-                        {}
-                  left_side_link:
-                    left_front_wheel_link:
-                      {}
-                    left_rear_wheel_link:
-                      {}
-                  miniitx:
-                    {}
-                  psu:
-                    {}
-                  right_camera_main_link:
-                    right_camera_frame:
-                      right_camera_optical_frame:
-                        {}
-                  right_side_link:
-                    right_front_wheel_link:
-                      {}
-                    right_rear_wheel_link:
-                      {}
-                  ssd:
-                    {}
+            kinect_rgb_frame:
+              {}
+            soft_obstacle_0:
+              {}
+            thermal_0:
+              {}
+            victim_0:
+              {}
+            victim_1:
+              {}
+            victim_2:
+              {}
+            visual_victim_0:
+              {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -208,7 +103,7 @@ Visualization Manager:
       Draw Behind: true
       Enabled: true
       Name: Map
-      Topic: /slam/map
+      Topic: /map
       Value: true
     - Alpha: 0.5
       Class: rviz/Map
@@ -401,162 +296,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        axis:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        battery1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        battery2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        cables:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        differential:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        epos:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        flir_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        flir_main_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        flir_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        kinect_depth_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_depth_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_main_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        kinect_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_rgb_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_rgb_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        kinect_servo_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        laser_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        laser_main_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        laser_servo_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_camera_main_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_front_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_rear_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        left_side_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        miniitx:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        psu:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_camera_main_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_front_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_rear_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        right_side_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        ssd:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -565,9 +304,15 @@ Visualization Manager:
       Visual Enabled: true
     - Class: octomap_rviz_plugin/OccupancyGrid
       Enabled: false
+      Max. Octree Depth: 16
       Name: Octomaps
+      Octomap Topic: ""
+      Queue Size: 5
+      Value: false
+      Voxel Coloring: Z-Axis
+      Voxel Rendering: Occupied Voxels
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /kinect/rgb/image_raw
       Max Value: 1
       Median window: 5
@@ -576,9 +321,9 @@ Visualization Manager:
       Normalize Range: true
       Queue Size: 2
       Transport Hint: compressed
-      Value: true
+      Value: false
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /left_camera/image
       Max Value: 1
       Median window: 5
@@ -587,9 +332,9 @@ Visualization Manager:
       Normalize Range: true
       Queue Size: 2
       Transport Hint: raw
-      Value: true
+      Value: false
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /right_camera/image
       Max Value: 1
       Median window: 5
@@ -598,7 +343,7 @@ Visualization Manager:
       Normalize Range: true
       Queue Size: 2
       Transport Hint: raw
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -648,7 +393,17 @@ Visualization Manager:
       Marker Topic: /data_fusion/holes_markers
       Name: Holes
       Namespaces:
-        {}
+        hole: true
+        hole_BRIEF: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /data_fusion/obstacle_markers
+      Name: Obstacles
+      Namespaces:
+        obstacle: true
+        obstacle_BRIEF: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -669,7 +424,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /data_fusion/dataMatrix_markers
+      Marker Topic: /data_fusion/datamatrix_markers
       Name: DataMatrix
       Namespaces:
         {}
@@ -677,18 +432,20 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /data_fusion/tpas_markers
+      Marker Topic: /data_fusion/thermals_markers
       Name: Thermal
       Namespaces:
-        {}
+        thermal: true
+        thermal_BRIEF: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /data_fusion/faces_markers
-      Name: Face
+      Marker Topic: /data_fusion/visualVictims_markers
+      Name: VisualVictim
       Namespaces:
-        {}
+        visual_victim: true
+        visual_victim_BRIEF: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -755,7 +512,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.48085
+      Distance: 6.58581
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -767,20 +524,20 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.310398
+      Pitch: 0.514796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.64358
+      Yaw: 2.33859
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 960
+  Height: 1056
   Hide Left Dock: false
   Hide Right Dock: false
   Left Camera:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000001cf00000339fc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000280000010b000000dd00fffffffb000000180052006f0062006f0074002000630061006d0065007200610100000139000000c30000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000387000000170000000000000000fb00000016004c006500660074002000430061006d0065007200610100000202000000940000001600fffffffb0000001800520069006700680074002000430061006d006500720061010000029c000000c50000001600ffffff000000010000014d0000031dfc020000000bfb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060043006f0032000000003e000000160000000000000000fb0000000e0054006800650072006d0061006c0100000112000000dc0000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060063006f003201000001f4000000c60000000000000000fb0000000a0073006f0075006e006401000002c00000009e0000000000000000fb0000000e0054006800650072006d0061006c010000022f000001570000000000000000fb000000060043006f00320100000370000000160000000000000000fb0000000a00560069006500770073000000010e00000250000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006900000003bfc0100000002fb0000000800540069006d0065010000000000000690000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000004bb0000033900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001cf00000399fc020000000cfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002800000399000000dd00fffffffb000000180052006f0062006f0074002000630061006d0065007200610000000158000000db0000001600fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000387000000170000000000000000fb00000016004c006500660074002000430061006d00650072006100000001ba000000db0000001600fffffffb0000001800520069006700680074002000430061006d006500720061000000023b000001860000001600ffffff000000010000014d0000031dfc020000000bfb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060043006f0032000000003e000000160000000000000000fb0000000e0054006800650072006d0061006c0100000112000000dc0000000000000000fb0000000a0053006f0075006e00640000000028000000160000000000000000fb000000060063006f003201000001f4000000c60000000000000000fb0000000a0073006f0075006e006401000002c00000009e0000000000000000fb0000000e0054006800650072006d0061006c010000022f000001570000000000000000fb000000060043006f00320100000370000000160000000000000000fb0000000a00560069006500770073000000010e00000250000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003bfc0100000002fb0000000800540069006d0065010000000000000780000002f600fffffffb0000000800540069006d00650100000000000004500000000000000000000005ab0000039900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Right Camera:
     collapsed: false
   Robot camera:
@@ -793,6 +550,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1680
+  Width: 1920
   X: -7
-  Y: 38
+  Y: 24
