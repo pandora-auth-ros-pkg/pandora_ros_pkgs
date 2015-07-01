@@ -1,0 +1,23 @@
+<launch>
+
+  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+
+  <node
+    machine="rpi2"
+    name="raspicam"
+    pkg="raspicam"
+    type="raspicam_node" >
+  
+    <param name="width" value="640" />
+    <param name="height" value="480" />
+    <param name="framerate" value="30" />
+    <param name="quality" value="100" />
+    <param name="tf_prefix" value="/pi_camera_frame" />
+    <param name="published_topics/image_topic" value="/raspicam/image/compressed" />
+    <param name="published_topics/camera_info" value="/raspicam/camera_info" />
+    <param name="advertised_services/start_capture" value="/raspicam/start_capture" />
+    <param name="advertised_services/stop_capture" value="/raspicam/stop_capture" />
+    <param name="start_capturing" value="True" />
+  </node>
+
+</launch>

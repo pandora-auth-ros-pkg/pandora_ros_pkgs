@@ -1,0 +1,11 @@
+<launch>
+
+ <machine
+    name="rpi2"
+    address="rpi2"
+    user="pandora"
+    timeout="20.0"
+    env-loader="~/pandora_ws/src/rpi_hardware_interface/scripts/raspberry_env.sh" 
+  />
+
+</launch>

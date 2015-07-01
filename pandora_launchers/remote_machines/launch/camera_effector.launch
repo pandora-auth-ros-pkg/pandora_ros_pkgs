@@ -1,0 +1,42 @@
+<launch>
+
+  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+
+  <!-- Flir Lepton Node -->
+  <node
+    machine="rpi2"
+    name="camera_effector"
+    pkg="camera_effector"
+    type="camera_effector_node.py" >
+    
+    <param name="camera_effector_urdf/camera_effector_frame" value="/camera_effector_frame" />
+
+    <!-- Subsciber + Publishing Topics parameters -->
+    <param name="published_topics/camera_effector_joint_states" value="camera_effector/joint_states" />
+    <param name="subscribers/pan_command" value="/camera_effector/pan_command" />
+    <param name="subscribers/tilt_command" value="/camera_effector/tilt_command" />
+
+    <!-- Pan Joint parameters -->
+    <param name="pan_joint/joint_name" value="camera_effector_pan_joint" />
+    <param name="pan_joint/limits/max" value="1.3962" />
+    <param name="pan_joint/limits/min" value="-1.3962" />
+    <param name="pan_joint/offset" value="0" />
+    <param name="pan_joint/servo/name" value="pan" />
+    <param name="pan_joint/servo/pin" value="17" />
+
+    <!-- Tilt Joint parameters -->
+    <param name="tilt_joint/joint_name" value="camera_effector_tilt_joint" />
+    <param name="tilt_joint/limits/max" value="0.6" />
+    <param name="tilt_joint/limits/min" value="-0.6" />
+    <param name="tilt_joint/offset" value="0.65" />
+    <param name="tilt_joint/servo/name" value="tilt" />
+    <param name="tilt_joint/servo/pin" value="18" />
+
+  </node>
+
+  <param name="/servo_controller/servo_params/error_degrees" value="0" />
+  <param name="/servo_controller/servo_params/base_positions/left" value="600" />
+  <param name="/servo_controller/servo_params/base_positions/neutral" value="1500" />
+  <param name="/servo_controller/servo_params/base_positions/right" value="2400" />
+
+</launch>

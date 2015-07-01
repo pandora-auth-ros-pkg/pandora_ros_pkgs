@@ -1,18 +1,32 @@
+<?xml version="1.0"?>
+
 <launch>
 
- <machine
-   name="rpi2"
-   address="rpi2"
-   user="pandora"
-   timeout="20.0"
-   env-loader="~/pandora_ws/src/rpi_hardware_interface/scripts/raspberry_env.sh" />
+  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+  <arg name="hfov" default="53.50" />
+  <arg name="vfov" default="41.41" />
+  <arg name="optical_frame" default="/pi_camera_optical_frame" />
+  
 
- <!-- Flir Lepton -->
- <node
-   machine="rpi2"
-   name="pi_camera"
-   pkg="pi_camera"
-   type="pi_camera_node" />
+  <!-- PI Camera Node -->
+  <node
+    machine="rpi2"
+    name="pi_camera"
+    pkg="pi_camera"
+    type="pi_camera_node.py" 
+    output="screen" >
 
+    <param name="width" value="640" />
+    <param name="height" value="480" />
+    <param name="framerate" value="30" />
+    <param name="image_format" value="rgb" />
+    <param name="use_video_port" value="True" />
+    <param name="exposure_mode" value="fixedfps" />
+    <param name="published_topics/image" value="/rpi2/pi_camera/image" />
+    <param name="pi_camera_urdf/optical_frame" value="$(arg optical_frame)" />
+  </node>
+
+  <param name="$(arg optical_frame)/hfov" value="$(arg hfov)" />
+  <param name="$(arg optical_frame)/vfov" value="$(arg vfov)" />
 
 </launch>

@@ -1,0 +1,27 @@
+<launch>
+
+  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+
+  <node
+    machine="rpi2"
+    name="raspicam"
+    pkg="raspicam"
+    type="raspicam_node" >
+  
+    <param name="width" value="640" />
+    <param name="height" value="480" />
+    <param name="framerate" value="30" />
+    <param name="quality" value="100" />
+    <param name="tf_prefix" value="/pi_camera_frame" />
+  </node>
+
+
+  <node
+    machine="rpi2"
+    name="raspicam_wrapper"
+    pkg="raspicam_wrapper"
+    type="raspicam_wrapper_node"
+    output="screen"
+  />
+
+</launch>
