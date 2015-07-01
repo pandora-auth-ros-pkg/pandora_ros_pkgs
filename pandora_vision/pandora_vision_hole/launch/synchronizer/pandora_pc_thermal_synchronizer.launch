@@ -3,7 +3,7 @@
 
   <node pkg="nodelet" type="nodelet" name="pandora_pc_thermal_synchronizer"
       args="load pandora_vision_hole/pandora_pc_thermal_synchronizer $(arg nodelet_manager)" output="screen" >
-    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_nodes_cfg/pc_thermal_synchronizer_params.yaml"
+    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_cfg/pc_thermal_synchronizer_params.yaml"
               command="load" />
   </node>
 </launch>

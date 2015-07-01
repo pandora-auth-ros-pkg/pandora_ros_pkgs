@@ -17,7 +17,7 @@
 
   <!-- ======================= RGBDT Synchronizer node ===================== -->
 
-  <include file="$(find pandora_vision_hole)/launch/synchronizer_nodes/pandora_pc_thermal_synchronizer.launch"
+  <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch"
       ns="$(arg namespace)" />
 
   <!-- ============================ Depth node ============================= -->
