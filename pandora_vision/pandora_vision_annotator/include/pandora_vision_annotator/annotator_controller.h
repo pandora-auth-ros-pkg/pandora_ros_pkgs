@@ -175,7 +175,7 @@ namespace pandora_vision
       @param msg [const pandora_common_msgs::flirLeptonMsgConstPtr& ] The message
       @return void
       **/
-      void receiveThermalImage(const distrib_msgs::flirLeptonMsgPtr& msg);
+      void receiveThermalImage(const distrib_msgs::FlirLeptonMsgPtr& msg);
 
       /**
       @brief function that loads the bag

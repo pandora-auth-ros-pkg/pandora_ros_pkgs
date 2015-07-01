@@ -98,7 +98,7 @@
 #include <QtGui/QTimeEdit>
 #include <QtGui/QFont>
 
-#include "distrib_msgs/flirLeptonMsg.h"
+#include "distrib_msgs/FlirLeptonMsg.h"
 #include "pandora_vision_msgs/Predator.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
 

@@ -261,7 +261,7 @@ namespace pandora_vision
       sensor_msgs::Image::ConstPtr img = m.instantiate<sensor_msgs::Image>();
       sensor_msgs::PointCloud2::ConstPtr pc =m.instantiate<sensor_msgs::PointCloud2>();
       pandora_vision_msgs::EnhancedImage::ConstPtr enhanced = m.instantiate<pandora_vision_msgs::EnhancedImage>();
-      distrib_msgs::flirLeptonMsg::Ptr flirMsg = m.instantiate<distrib_msgs::flirLeptonMsg>();
+      distrib_msgs::FlirLeptonMsg::Ptr flirMsg = m.instantiate<distrib_msgs::FlirLeptonMsg>();
 
       if(enhanced != NULL)
       {
@@ -610,9 +610,9 @@ namespace pandora_vision
   @param msg [const pandora_common_msgs::flirLeptonMsgConstPtr& ] The message
   @return void
   **/
-  void CController::receiveThermalImage(const distrib_msgs::flirLeptonMsgPtr& msg)
+  void CController::receiveThermalImage(const distrib_msgs::FlirLeptonMsgPtr& msg)
   {
-    distrib_msgs::flirLeptonMsgPtr flirMsg;
+    distrib_msgs::FlirLeptonMsgPtr flirMsg;
     cv_bridge::CvImagePtr in_msg;
     cv::Mat temp;
     flirMsg = msg;
