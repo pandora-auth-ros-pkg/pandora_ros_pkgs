@@ -32,21 +32,38 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Authors: Angelos Triantafyllidis <aggelostriadafillidis@gmail.com>
+ * Authors:
+ *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include "thermal_node/thermal_cropper.h"
+#ifndef PANDORA_VISION_COMMON_POI_STAMPED_H
+#define PANDORA_VISION_COMMON_POI_STAMPED_H
 
-/**
-  @brief Main function of the thermal_cropper node
-  @param argc [int] Number of input arguments
-  @param argv [char**] The input arguments
-  @return int : 0 for success
- **/
-int main(int argc, char** argv)
+#include <boost/shared_ptr.hpp>
+#include <opencv2/opencv.hpp>
+
+#include <std_msgs/Header.h>
+
+#include "pandora_vision_common/poi.h"
+
+namespace pandora_vision
 {
-  ros::init(argc, argv, "thermal_cropper_node");
-  pandora_vision::ThermalCropper thermalCropper;
-  ros::spin();
-  return 0;
-}
+  class POIStamped : public POI
+  {
+   public:
+    typedef boost::shared_ptr<POIStamped> Ptr;
+    typedef boost::shared_ptr<POIStamped const> ConstPtr;
+
+   public:
+    std_msgs::Header header;
+
+   public:
+    POIStamped() {}
+    virtual ~POIStamped() {}
+  };
+
+  typedef POIStamped::Ptr POIStampedPtr;
+  typedef POIStamped::ConstPtr POIStampedConstPtr;
+}  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_COMMON_POI_STAMPED_H

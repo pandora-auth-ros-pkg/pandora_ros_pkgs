@@ -50,6 +50,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleDetector
     @brief Provides the functionalities for detecting holes via analysis
@@ -74,6 +76,7 @@ namespace pandora_vision
         const std::vector<cv::MatND>& histogram);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_RGB_NODE_HOLE_DETECTOR_H

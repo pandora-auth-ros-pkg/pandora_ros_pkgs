@@ -52,6 +52,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Wavelets
     @brief Provides methods for representing images via wavelet transformations
@@ -93,6 +95,7 @@ namespace pandora_vision
       static void getLowLow(const cv::Mat& inImage, cv::Mat* outImage);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_WAVELETS_H

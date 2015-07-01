@@ -113,12 +113,18 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+
   typedef pcl::PointCloud<pcl::PointXYZ> PointCloudXYZ;
   typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudXYZPtr;
+  typedef pcl::PointCloud<pcl::PointXYZ>::ConstPtr PointCloudXYZConstPtr;
 
   typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
   typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr PointCloudPtr;
+  typedef pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr PointCloudConstPtr;
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_DEFINES_H

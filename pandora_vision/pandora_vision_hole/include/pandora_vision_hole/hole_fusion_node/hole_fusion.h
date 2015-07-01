@@ -40,6 +40,8 @@
 
 #include <dirent.h>
 #include <ros/package.h>
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
 #include <std_msgs/Empty.h>
 #include <urdf_parser/urdf_parser.h>
 #include <image_transport/image_transport.h>
@@ -72,16 +74,21 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleFusion
     @brief Provides functionalities and methods for fusing holes obtained
     through Depth and RGB analysis
    **/
-  class HoleFusion : public StateClient
+  class HoleFusion : public StateClient, public nodelet::Nodelet
   {
     private:
       // The main ROS nodehandle
       ros::NodeHandle nodeHandle_;
+
+      // The private ROS nodehandle
+      ros::NodeHandle privateNodeHandle_;
 
       // The ROS nodehandle needed by the general_cfg
       ros::NodeHandle generalNodeHandle_;
@@ -100,6 +107,9 @@ namespace pandora_vision
 
       // The image_transport nodehandle
       image_transport::ImageTransport imageTransport_;
+
+      // Node's distinct name
+      std::string nodeName_;
 
       // The publisher used to inform the world that the hole fusion node
       // has finished processing the hole data.
@@ -274,47 +284,47 @@ namespace pandora_vision
       bool isOn_;
 
       // The dynamic reconfigure server for debugging parameters
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        debug_cfgConfig> serverDebug;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        debug_cfgConfig > serverDebug;
 
       // The dynamic reconfigure callback type for the above server
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        debug_cfgConfig>::CallbackType f_debug;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        debug_cfgConfig >::CallbackType f_debug;
 
       // The dynamic reconfigure server for parameters pertaining to the
       // prioriority of filters' execution
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        filters_priority_cfgConfig> serverFiltersPriority;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        filters_priority_cfgConfig > serverFiltersPriority;
 
       // The dynamic reconfigure callback type for the above server
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        filters_priority_cfgConfig>::CallbackType f_filters_priority;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        filters_priority_cfgConfig >::CallbackType f_filters_priority;
 
       // The dynamic reconfigure server for parameters pertaining to
       // thresholds of filters
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        filters_thresholds_cfgConfig> serverFiltersThresholds;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        filters_thresholds_cfgConfig > serverFiltersThresholds;
 
       // The dynamic reconfigure callback type for the above server
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        filters_thresholds_cfgConfig>::CallbackType f_filters_thresholds;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        filters_thresholds_cfgConfig >::CallbackType f_filters_thresholds;
 
       // The dynamic reconfigure server for general parameters
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        general_cfgConfig> serverGeneral;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        general_cfgConfig > serverGeneral;
 
       // The dynamic reconfigure callback type for the above server
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        general_cfgConfig>::CallbackType f_general;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        general_cfgConfig >::CallbackType f_general;
 
       // The dynamic reconfigure server for parameters pertaining to
       // the validity of holes
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        validity_cfgConfig> serverValidity;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        validity_cfgConfig > serverValidity;
 
       // The dynamic reconfigure callback type for the above server
-      dynamic_reconfigure::Server<pandora_vision_hole::
-        validity_cfgConfig>::CallbackType f_validity;
+      dynamic_reconfigure::Server< ::pandora_vision_hole::
+        validity_cfgConfig >::CallbackType f_validity;
 
 
       /**
@@ -327,13 +337,13 @@ namespace pandora_vision
         the synchronizer and calls for processing of the candidate
         holes.
         @param[in] depthCandidateHolesVector
-        [const pandora_vision_hole::CandidateHolesVectorMsg&]
+        [const ::pandora_vision_hole::CandidateHolesVectorMsg&]
         The message containing the necessary information acquired through
         the depth node
         @return void
        **/
       void depthCandidateHolesCallback(
-          const pandora_vision_hole::CandidateHolesVectorMsg&
+          const ::pandora_vision_hole::CandidateHolesVectorMsg&
           depthCandidateHolesVector);
 
       /**
@@ -352,7 +362,7 @@ namespace pandora_vision
         @return void
        **/
       void thermalCandidateHolesCallback(
-        const pandora_vision_hole::CandidateHolesVectorMsg&
+        const ::pandora_vision_hole::CandidateHolesVectorMsg&
         thermalCandidateHolesVector);
 
       /**
@@ -376,7 +386,7 @@ namespace pandora_vision
         candidate holes from the
         pandora_vision_hole::CandidateHolerMsg message
         @param[in]candidateHolesVector
-        [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
+        [const std::vector<::pandora_vision_hole::CandidateHoleMsg>&]
         The input candidate holes
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
@@ -386,7 +396,7 @@ namespace pandora_vision
         @return void
        **/
       void fromCandidateHoleMsgToConveyor(
-          const std::vector<pandora_vision_hole::CandidateHoleMsg>&
+          const std::vector< ::pandora_vision_hole::CandidateHoleMsg >&
           candidateHolesVector,
           HolesConveyor* conveyor,
           const cv::Mat& inImage);
@@ -444,7 +454,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackDebug(
-          const pandora_vision_hole::debug_cfgConfig& config,
+          const ::pandora_vision_hole::debug_cfgConfig& config,
           const uint32_t& level);
 
       /**
@@ -456,7 +466,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackFiltersPriority(
-          const pandora_vision_hole::filters_priority_cfgConfig& config,
+          const ::pandora_vision_hole::filters_priority_cfgConfig& config,
           const uint32_t& level);
 
       /**
@@ -468,7 +478,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackFiltersThresholds(
-          const pandora_vision_hole::filters_thresholds_cfgConfig& config,
+          const ::pandora_vision_hole::filters_thresholds_cfgConfig& config,
           const uint32_t& level);
 
       /**
@@ -479,7 +489,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackGeneral(
-          const pandora_vision_hole::general_cfgConfig& config,
+          const ::pandora_vision_hole::general_cfgConfig& config,
           const uint32_t& level);
 
       /**
@@ -491,7 +501,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallbackValidity(
-          const pandora_vision_hole::validity_cfgConfig& config,
+          const ::pandora_vision_hole::validity_cfgConfig& config,
           const uint32_t& level);
 
       /**
@@ -590,13 +600,13 @@ namespace pandora_vision
         the synchronizer and calls for processing of the candidate
         holes.
         @param[in] rgbCandidateHolesVector
-        [const pandora_vision_hole::CandidateHolesVectorMsg&]
+        [const ::pandora_vision_hole::CandidateHolesVectorMsg&]
         The message containing the necessary information to filter hole
         candidates acquired through the rgb node
         @return void
        **/
       void rgbCandidateHolesCallback(
-          const pandora_vision_hole::CandidateHolesVectorMsg&
+          const ::pandora_vision_hole::CandidateHolesVectorMsg&
           rgbCandidateHolesVector);
 
       /**
@@ -626,9 +636,9 @@ namespace pandora_vision
       /**
         @brief Unpacks the the HolesConveyor struct for the
         candidate holes, the interpolated depth image and the point cloud
-        from the pandora_vision_hole::CandidateHolesVectorMsg message
+        from the ::pandora_vision_hole::CandidateHolesVectorMsg message
         @param[in] holesMsg
-        [pandora_vision_hole::CandidateHolesVectorMsg&] The input
+        [::pandora_vision_hole::CandidateHolesVectorMsg&] The input
         candidate holes message obtained through the depth node
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
@@ -637,7 +647,7 @@ namespace pandora_vision
         @return void
        **/
       void unpackMessage(
-          const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
+          const ::pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
           HolesConveyor* conveyor,
           cv::Mat* image,
           const std::string& encoding);
@@ -651,7 +661,9 @@ namespace pandora_vision
       /**
         @brief The HoleFusion deconstructor
        **/
-      ~HoleFusion(void);
+      virtual ~HoleFusion(void);
+
+      virtual void onInit();
 
       /**
         @brief The node's state manager.
@@ -677,6 +689,7 @@ namespace pandora_vision
       void completeTransition(void);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_FUSION_H

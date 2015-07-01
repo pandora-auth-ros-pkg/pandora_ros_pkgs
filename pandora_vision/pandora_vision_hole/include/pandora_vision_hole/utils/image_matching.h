@@ -50,6 +50,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class ImageMatching
     @brief Matches the thermal image points of interest
@@ -138,6 +140,7 @@ namespace pandora_vision
       static void outlinePointsInOrder(HolesConveyor* conveyor);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_IMAGE_MATCHING_H

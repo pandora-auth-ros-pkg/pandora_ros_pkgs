@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Appends one HolesConveyor struct to another.
     @param[in] src [const HolesConveyor&] The source conveyor
@@ -338,4 +340,5 @@ namespace pandora_vision
     }
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

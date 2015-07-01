@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Performs steps of closing
     @param img [cv::Mat*] The input image in CV_8UC1 format
@@ -1070,4 +1072,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Shows multiple images in one window
     @param[in] title [const std::string&] The window's title
@@ -343,4 +345,5 @@ namespace pandora_vision
     cv::waitKey(ms);
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

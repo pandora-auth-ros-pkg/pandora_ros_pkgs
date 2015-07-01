@@ -49,6 +49,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   BlobVector::
   BlobVector() {}
 
@@ -416,4 +418,5 @@ namespace pandora_vision
     return rectangleVertices;
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

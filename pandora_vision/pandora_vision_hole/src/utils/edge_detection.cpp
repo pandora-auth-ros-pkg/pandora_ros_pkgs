@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Applies the Canny edge detector
     @param[in] inImage [const cv::Mat&] Input image in CV_8U depth
@@ -2080,4 +2082,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

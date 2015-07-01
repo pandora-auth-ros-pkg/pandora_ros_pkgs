@@ -50,6 +50,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Histogram
     @brief Provides methods pertinent to histograms
@@ -89,6 +91,7 @@ namespace pandora_vision
         const int& secondaryChannel);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_HISTOGRAM_H

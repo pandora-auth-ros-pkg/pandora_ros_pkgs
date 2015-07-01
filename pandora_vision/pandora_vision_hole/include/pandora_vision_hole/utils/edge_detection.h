@@ -54,6 +54,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   struct GraphNode
   {
     GraphNode(int x, int y)
@@ -338,6 +340,7 @@ namespace pandora_vision
         const cv::Mat& backproject, const bool& edges, cv::Mat* outImage);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_EDGE_DETECTION_H

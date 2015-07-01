@@ -47,6 +47,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleUniqueness
     @brief Provides method for making holes inside a
@@ -85,6 +87,7 @@ namespace pandora_vision
         std::map<int, float>* validHolesMap);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_UNIQUENESS_H

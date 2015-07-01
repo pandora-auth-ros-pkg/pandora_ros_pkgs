@@ -1,0 +1,7 @@
+<launch>
+  <node name="rgb_node" type="rgb_node" pkg="pandora_vision_hole" respawn="False"
+    ns="$(arg namespace)">
+    <rosparam file="$(find pandora_vision_hole)/cfg/rgb_node_cfg/rgb_node_topics.yaml"
+          command="load" />
+  </node>
+</launch>

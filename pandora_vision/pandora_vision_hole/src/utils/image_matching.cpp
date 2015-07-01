@@ -45,6 +45,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
 
   /**
     @brief Converts Conveyors which represent each hole and include all
@@ -327,63 +329,39 @@ namespace pandora_vision
   void ImageMatching::variableSetUp(const ros::NodeHandle& nh, double* x_th,
     double* y_th, double* c_x, double* c_y, double* angle)
   {
-    // The namespace dictated in the launch file
-    std::string ns = nh.getNamespace();
-
     // Read values of each variable.
     // x_thermal variable.
-    if (nh.getParam(ns + "/thermal_camera_node/matching_values/x_therm", *x_th))
+    if (!nh.getParam("matching_values/x_therm", *x_th))
     {
-      ROS_INFO("[Thermal_node], x_th variable is loaded for matching");
-    }
-    else
-    {
-      ROS_ERROR("[Thermal_node], Could not find x_th variable");
+      ROS_FATAL("[Thermal_node], Could not find x_th variable");
     }
 
     // y_thermal variable.
-    if (nh.getParam(ns + "/thermal_camera_node/matching_values/y_therm", *y_th))
+    if (!nh.getParam("matching_values/y_therm", *y_th))
     {
-      ROS_INFO("[Thermal_node], y_th variable is loaded for matching");
-    }
-    else
-    {
-      ROS_ERROR("[Thermal_node], Could not find y_th variable");
+      ROS_FATAL("[Thermal_node], Could not find y_th variable");
     }
 
     // C factor on x directions.
-    if (nh.getParam(ns + "/thermal_camera_node/matching_values/c_x", *c_x))
+    if (!nh.getParam("matching_values/c_x", *c_x))
     {
-      ROS_INFO("[Thermal_node], c_x variable is loaded for matching");
-    }
-    else
-    {
-      ROS_ERROR("[Thermal_node], Could not find c_x variable");
+      ROS_FATAL("[Thermal_node], Could not find c_x variable");
     }
 
     // C factor on y directions.
-    if (nh.getParam(ns + "/thermal_camera_node/matching_values/c_y", *c_y))
+    if (!nh.getParam("matching_values/c_y", *c_y))
     {
-      ROS_INFO("[Thermal_node], c_y variable is loaded for matching");
-    }
-    else
-    {
-      ROS_ERROR("[Thermal_node], Could not find c_y variable");
+      ROS_FATAL("[Thermal_node], Could not find c_y variable");
     }
 
     // The angle that thermal image been rotated.
-    if (nh.getParam(ns + "/thermal_camera_node/matching_values/angle", *angle))
+    if (!nh.getParam("matching_values/angle", *angle))
     {
-      // Convert angle in degrees to rads.
-      *angle = *angle * CV_PI / 180;
-
-      ROS_INFO("[Thermal_node], angle variable is loaded for matching");
+      ROS_FATAL("[Thermal_node], Could not find angle variable");
     }
-    else
-    {
-      ROS_ERROR("[Thermal_node], Could not find angle variable");
-    }
+    *angle = *angle * CV_PI / 180;
   }
 
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

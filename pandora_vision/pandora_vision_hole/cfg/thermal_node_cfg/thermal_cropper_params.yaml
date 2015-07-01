@@ -1,0 +1,9 @@
+subscribed_topics:
+  thermal_roi_topic: thermal/cropper/enhanced/image
+  rgb_image_topic: synchronized/rgb/image
+  depth_image_topic: synchronized/depth/image
+
+published_topics:
+  thermal_victim_node_topic: /vision/enhanced_holes
+  thermal_unlock_synchronizer_topic: thermal/unlock/synchronizer
+  processor_log_topic: processor_log

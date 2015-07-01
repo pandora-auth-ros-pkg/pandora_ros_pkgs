@@ -49,6 +49,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class FiltersResources
     @brief Provides methods for obtaining hole-related resources
@@ -287,6 +289,7 @@ namespace pandora_vision
         std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H

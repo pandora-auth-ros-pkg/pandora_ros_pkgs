@@ -119,7 +119,7 @@ target_link_libraries(${PROJECT_NAME}_utils
 add_subdirectory(src/depth_node)
 add_subdirectory(src/hole_fusion_node)
 add_subdirectory(src/rgb_node)
-add_subdirectory(src/synchronizer_node)
+add_subdirectory(src/synchronizer)
 add_subdirectory(src/thermal_node)
 
 # Download extra files not needed when building

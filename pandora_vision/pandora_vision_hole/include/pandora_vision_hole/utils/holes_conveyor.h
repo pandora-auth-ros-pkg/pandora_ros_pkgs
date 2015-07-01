@@ -48,6 +48,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief The structure that represents a single hole.
     @param keypoint [cv::KeyPoint] The hole's keypoint
@@ -235,6 +237,7 @@ namespace pandora_vision
       static void shuffle(HolesConveyor* src);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_HOLES_CONVEYOR_H

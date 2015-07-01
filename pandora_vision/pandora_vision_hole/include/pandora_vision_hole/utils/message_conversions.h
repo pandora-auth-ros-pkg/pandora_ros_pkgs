@@ -50,6 +50,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class MessageConversions
     @brief Provides methods for converting images and point clouds
@@ -88,14 +90,14 @@ namespace pandora_vision
         vectors of the holes' keypoints, bounding rectangles' vertices
         and blobs' outlines
         @param[out] candidateHolesVector
-        [std::vector<pandora_vision_hole::CandidateHolesVectorMsg>*]
+        [std::vector<::::pandora_vision_hole::CandidateHolesVectorMsg>*]
         The vector containing the conveyor's holes in
         pandora_vision_msgs::CandidateHolesVectorMsg format
         @return void
        **/
       static void createCandidateHolesVector(
         const HolesConveyor& conveyor,
-        std::vector<pandora_vision_hole::CandidateHoleMsg>*
+        std::vector< ::pandora_vision_hole::CandidateHoleMsg >*
         candidateHolesVector);
 
       /**
@@ -106,7 +108,7 @@ namespace pandora_vision
         and blobs' outlines
         @param[in] image [cv::Mat&] The image to be packed in the message
         @param[out] candidateHolesVectorMsg
-        [pandora_vision_hole::CandidateHolesVectorMsg*] The output message
+        [::::pandora_vision_hole::CandidateHolesVectorMsg*] The output message
         @param[in] encoding [std::string&] The image's encoding
         @param[in] msg [const sensor_msgs::Image&] Needed to extract
         its header and place it as the header of the output message
@@ -115,7 +117,7 @@ namespace pandora_vision
       static void createCandidateHolesVectorMessage(
         const HolesConveyor& conveyor,
         const cv::Mat& image,
-        pandora_vision_hole::CandidateHolesVectorMsg* candidateHolesVectorMsg,
+        ::pandora_vision_hole::CandidateHolesVectorMsg* candidateHolesVectorMsg,
         const std::string& encoding,
         const sensor_msgs::Image& msg);
 
@@ -133,7 +135,7 @@ namespace pandora_vision
 
       /**
         @brief Extracts a cv::Mat image from a custom ROS message  of type
-        pandora_vision_hole::CandidateHolesVectorMsg
+        ::::pandora_vision_hole::CandidateHolesVectorMsg
         containing the interpolated depth image
         @param[in] msg [const sensor_msgs::ImageConstPtr&] The input ROS message
         @param[out] image [cv::Mat*] The output image
@@ -141,14 +143,14 @@ namespace pandora_vision
         @return void
        **/
       static void extractImageFromMessageContainer(
-        const pandora_vision_hole::CandidateHolesVectorMsg& msg,
+        const ::pandora_vision_hole::CandidateHolesVectorMsg& msg,
         cv::Mat* image, const std::string& encoding);
 
       /**
         @brief Recreates the HolesConveyor struct for the candidate holes
         from the pandora_vision_msgs::CandidateHolerMsg message
         @param[in] candidateHolesVector
-        [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
+        [const std::vector<::pandora_vision_hole::CandidateHoleMsg>&]
         The input candidate holes
         @param[out] conveyor [HolesConveyor*] The output conveyor
         struct
@@ -163,7 +165,7 @@ namespace pandora_vision
         @return void
        **/
       static void fromCandidateHoleMsgToConveyor(
-        const std::vector<pandora_vision_hole::CandidateHoleMsg>&
+        const std::vector< ::pandora_vision_hole::CandidateHoleMsg >&
         candidateHolesVector,
         HolesConveyor* conveyor,
         const cv::Mat& inImage,
@@ -173,7 +175,7 @@ namespace pandora_vision
       /**
         @brief Unpacks the the HolesConveyor struct for the
         candidate holes, the interpolated depth image or the RGB image
-        from the pandora_vision_hole::CandidateHolesVectorMsg message
+        from the ::::pandora_vision_hole::CandidateHolesVectorMsg message
         @param[in] holesMsg
         [pandora_vision_msgs::CandidateHolesVectorMsg&] The input
         candidate holes message obtained through the depth node
@@ -189,7 +191,7 @@ namespace pandora_vision
         @return void
        **/
       static void unpackMessage(
-        const pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
+        const ::pandora_vision_hole::CandidateHolesVectorMsg& holesMsg,
         HolesConveyor* conveyor,
         cv::Mat* image,
         const int& representationMethod,
@@ -199,7 +201,7 @@ namespace pandora_vision
       /**
        @brief Convert the Float32MultiArray data to cv::Mat.
        Its cv format  will be CV_8UC1.
-       @param[in] inArray [const std_msgs::Float32MultiArray&] 
+       @param[in] inArray [const std_msgs::Float32MultiArray&]
        The input MultiArray
        @return cv::Mat
        **/
@@ -207,6 +209,7 @@ namespace pandora_vision
         const std_msgs::Float32MultiArray& inArray);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_MESSAGE_CONVERSIONS_H

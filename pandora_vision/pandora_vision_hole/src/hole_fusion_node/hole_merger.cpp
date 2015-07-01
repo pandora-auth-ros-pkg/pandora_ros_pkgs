@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Intended to use after the check of the
     isCapableOfAmalgamating function, this function modifies the
@@ -1248,4 +1250,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

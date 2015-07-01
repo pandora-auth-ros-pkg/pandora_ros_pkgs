@@ -45,17 +45,17 @@
 #include "sensor_processor/postprocessor.h"
 
 #include "pandora_vision_common/pois_stamped.h"
-#include "pandora_vision_common/pandora_vision_interface/general_alert_converter.h"
+#include "pandora_vision_common/pandora_vision_utilities/general_alert_converter.h"
 
 namespace pandora_vision
 {
   template <class VisionAlertMsg>
   class VisionPostProcessor : public sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>
   {
-  private:
+   private:
     typedef boost::shared_ptr<VisionAlertMsg> VisionAlertMsgPtr;
 
-  public:
+   public:
     /**
      * @brief Constructor
      * @param ns [const std::string&] The namespace of this postprocessor's nodeHandle
@@ -111,7 +111,7 @@ namespace pandora_vision
   VisionPostProcessor<VisionAlertMsg>::
   getGeneralAlertInfo(const POIsStampedConstPtr& result)
   {
-    return converter_->getGeneralAlertInfo(this->getName(), *this->accessPublicNh(), result);
+    return converter_->getGeneralAlertVector(*this->accessPublicNh(), *result);
   }
 
 }  // namespace pandora_vision

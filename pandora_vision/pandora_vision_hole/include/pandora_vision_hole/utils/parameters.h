@@ -39,7 +39,6 @@
 #define PANDORA_VISION_HOLE_UTILS_PARAMETERS_H
 
 #include "utils/defines.h"
-#include "utils/parameters.h"
 #include <dynamic_reconfigure/server.h>
 #include <pandora_vision_hole/thermal_cfgConfig.h>
 #include <pandora_vision_hole/depth_cfgConfig.h>
@@ -56,6 +55,8 @@
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
+{
+namespace pandora_vision_hole
 {
   /**
     @struct Parameters
@@ -162,6 +163,7 @@ namespace pandora_vision
       //  0 for Gaussian function
       //  1 for Logistic function
       static int probability_method;
+      static float min_thermal_probability;
 
       //  Gausian variables
       static float optimal_temperature;
@@ -467,6 +469,7 @@ namespace pandora_vision
     };
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_PARAMETERS_H

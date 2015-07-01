@@ -64,6 +64,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleMerger
     @brief Provides functionalities of merging holes independently of depth
@@ -275,6 +277,7 @@ namespace pandora_vision
         const PointCloudPtr& pointCloud);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_MERGER_H

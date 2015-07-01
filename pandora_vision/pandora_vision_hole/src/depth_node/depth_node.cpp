@@ -46,7 +46,7 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "depth_node");
-  pandora_vision::Depth depth;
+  pandora_vision::pandora_vision_hole::Depth depth;
   ros::spin();
   return 0;
 }

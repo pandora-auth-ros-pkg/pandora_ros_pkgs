@@ -2,7 +2,7 @@
 
   <!-- =========================== The namespace =========================== -->
 
-  <arg name="namespace" default="hole_detector" />
+  <arg name="namespace" default="/pandora_vision/pandora_vision_hole" />
 
   <!-- ========================== Thermal Enable =========================== -->
   <!-- Set both to true if Thermal must be included -->
@@ -12,27 +12,8 @@
 
   <!-- ================== Parameters for yaw pitch extraction ============== -->
 
-  <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
-  <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
-
   <!-- Output selection -->
   <arg name="output" default="screen" />
-
-  <!-- ========================= Synchronizer node ========================= -->
-
-  <node name="synchronizer_node"
-        type="synchronizer_node"
-        pkg="pandora_vision_hole"
-        respawn="False"
-        ns="$(arg namespace)" >
-
-    <!-- The width and height variables needed when in simulation mode -->
-    <param name="width" value="640" />
-    <param name="height" value="480" />
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/synchronizer_nodes_cfg/rgbdt_synchronizer_params.yaml"
-              command="load" />
-  </node>
 
   <!-- ======================= RGBDT Synchronizer node ===================== -->
 
@@ -41,74 +22,26 @@
 
   <!-- ============================ Depth node ============================= -->
 
-  <node name="depth_node"
-        type="depth_node"
-        pkg="pandora_vision_hole"
-        respawn="False"
-        ns="$(arg namespace)">
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/depth_node_topics.yaml"
-              command="load" />
-  </node>
-
+  <include file="$(find pandora_vision_hole)/launch/depth_node/pandora_vision_hole_depth.launch"
+      ns="$(arg namespace)" />
 
   <!-- ============================= RGB node ============================== -->
 
-  <node name="rgb_node"
-        type="rgb_node"
-        pkg="pandora_vision_hole"
-        respawn="False"
-        ns="$(arg namespace)">
+  <include file="$(find pandora_vision_hole)/launch/rgb_node/pandora_vision_hole_rgb.launch"
+    ns="$(arg namespace)" />
 
-    <rosparam file="$(find pandora_vision_hole)/cfg/rgb_node_topics.yaml"
-              command="load" />
-  </node>
+  <include file="$(find pandora_vision_hole)/launch/hole_fusion_node/pandora_vision_hole_fusion_node.launch"
+      ns="$(arg namespace)" />
 
-  <group if="$(arg open_thermal)">
+  <!-- <group if="$(arg open_thermal)"> -->
     <!-- =========================== Thermal node ========================== -->
 
-    <node
-      name="thermal_camera_node"
-      type="thermal_camera_node"
-      pkg="pandora_vision_hole"
-      respawn="False"
-      output="$(arg output)"
-      ns="$(arg namespace)">
-
-      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
-      command="load" />
-
-      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_matching_variables.yaml"
-      command="load" />
-
-    </node>
+  <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch"
+    ns="$(arg namespace)" />
 
     <!-- ====================== Thermal Cropper node ======================= -->
 
-    <node
-      name="thermal_cropper_node"
-      type="thermal_cropper_node"
-      pkg="pandora_vision_hole"
-      respawn="False"
-      output="$(arg output)"
-      ns="$(arg namespace)">
-
-      <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_topics.yaml"
-      command="load" />
-
-    </node>
-  </group>
-
-  <!-- ========================= Hole Fusion node ========================== -->
-
-  <node name="hole_fusion_node"
-        type="hole_fusion_node"
-        pkg="pandora_vision_hole"
-        respawn="False"
-        ns="$(arg namespace)">
-
-    <rosparam file="$(find pandora_vision_hole)/cfg/hole_fusion_node_topics.yaml"
-              command="load" />
-  </node>
+  <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_hole_thermal_cropper.launch"
+    ns="$(arg namespace)" />
 
 </launch>

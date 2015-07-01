@@ -1,0 +1,10 @@
+add_library(pc_thermal_synchronizer
+  pc_thermal_synchronizer.cpp
+  )
+target_link_libraries(pc_thermal_synchronizer
+  ${PROJECT_NAME}_utils
+  ${catkin_LIBRARIES}
+  )
+add_dependencies(pc_thermal_synchronizer
+  ${catkin_EXPORTED_TARGETS}
+  )

@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Given a set of keypoints and an edges image, this function
     returns the valid keypoints and for each one, its respective, least
@@ -265,4 +267,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

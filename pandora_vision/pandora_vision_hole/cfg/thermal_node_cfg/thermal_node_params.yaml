@@ -1,0 +1,24 @@
+subscribed_topics:
+  thermal_image_topic: synchronized/thermal/image
+  thermal_output_receiver_topic: synchronized/thermal/receiver_info
+
+published_topics:
+  candidate_holes_topic: synchronized/thermal/candidate_holes
+  thermal_data_fusion_topic: /vision/thermal_direction_alert
+  thermal_to_cropper_topic: thermal/cropper/enhanced/image
+  processor_log_topic: processor_log
+
+converted_frame: /kinect_rgb_optical_frame
+
+matching_values:
+
+  # The initial position of thermal image after linear transformation
+  x_therm: 12
+  y_therm: 9
+
+  # Thermal image: c_x = new_width/old_width, c_y = new_height/old_height
+  c_x: 7.025
+  c_y: 7.025
+
+  # Angle in degrees. It is positive if its rotated Clockwise
+  angle: 4.62

@@ -53,6 +53,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleValidation
     @brief Provides methods for validating filter-extracted validity
@@ -157,6 +159,7 @@ namespace pandora_vision
         const int& filteringMode);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H

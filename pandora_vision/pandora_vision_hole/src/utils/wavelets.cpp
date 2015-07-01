@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   cv::Mat Wavelets::convCols(const cv::Mat& in,
     const std::vector<float>& kernel)
   {
@@ -278,4 +280,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

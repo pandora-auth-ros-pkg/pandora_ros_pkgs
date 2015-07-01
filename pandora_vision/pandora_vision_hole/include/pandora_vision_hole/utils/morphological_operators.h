@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Morphology
     @brief Provides methods for image binary morphological operators
@@ -139,6 +141,7 @@ namespace pandora_vision
         const int& steps, const bool& visualize = false);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_MORPHOLOGICAL_OPERATORS_H

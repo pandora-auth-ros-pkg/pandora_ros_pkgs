@@ -52,6 +52,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class RgbFilters
     @brief Provides checks and pertinent methods as a means to validate holes
@@ -202,6 +204,7 @@ namespace pandora_vision
         std::vector<std::string>* msgs);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_RGB_FILTERS_H

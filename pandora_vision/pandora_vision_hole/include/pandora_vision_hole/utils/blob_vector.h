@@ -51,6 +51,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
    * @Class BlobVector
    * @brief Wrapper class to BlobVector msg of pandora_vision_msgs
@@ -230,6 +232,7 @@ namespace pandora_vision
     pandora_vision_msgs::BlobVector blobVector_;
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_BLOB_VECTOR_H

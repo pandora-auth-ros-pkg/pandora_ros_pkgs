@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Validates candidate holes, meaning that having a two dimensional
     array that is the product of a series of validity ascertainers that
@@ -931,4 +933,5 @@ namespace pandora_vision
     return valid;
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

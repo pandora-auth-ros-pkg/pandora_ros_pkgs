@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Default constructor. Initiates communications, loads parameters.
     @return void
@@ -60,7 +62,7 @@ namespace pandora_vision
 
     // Advertise the candidate holes found by the depth node
     candidateHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_hole::CandidateHolesVectorMsg>(
+      < ::pandora_vision_hole::CandidateHolesVectorMsg >(
       candidateHolesTopic_, 1);
 
     // The dynamic reconfigure (depth) parameter's callback
@@ -148,7 +150,7 @@ namespace pandora_vision
     HolesConveyor holes = HoleDetector::findHoles(interpolatedDepthImage);
 
     // Create the candidate holes message
-    pandora_vision_hole::CandidateHolesVectorMsg depthCandidateHolesMsg;
+    ::pandora_vision_hole::CandidateHolesVectorMsg depthCandidateHolesMsg;
 
     // Pack information about holes found and the interpolated depth image
     // inside a message.
@@ -230,7 +232,7 @@ namespace pandora_vision
     @return void
    **/
   void Depth::parametersCallback(
-    const pandora_vision_hole::depth_cfgConfig& config,
+    const ::pandora_vision_hole::depth_cfgConfig& config,
     const uint32_t& level)
   {
     ROS_INFO_NAMED(PKG_NAME, "[Depth node] Parameters callback called");
@@ -359,4 +361,5 @@ namespace pandora_vision
     }
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

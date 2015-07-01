@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class OutlineDiscovery
     @brief Provides methods for detection of holes' outlines
@@ -186,6 +188,7 @@ namespace pandora_vision
         std::vector<float>* blobsArea);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_OUTLINE_DISCOVERY_H

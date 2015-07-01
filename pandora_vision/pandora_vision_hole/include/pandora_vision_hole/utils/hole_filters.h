@@ -51,6 +51,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class HoleFilters
     @brief Provides methods for validating blobs
@@ -109,6 +111,7 @@ namespace pandora_vision
         HolesConveyor* conveyor);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_HOLE_FILTERS_H

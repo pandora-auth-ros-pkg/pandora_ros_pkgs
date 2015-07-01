@@ -38,15 +38,29 @@
 #ifndef PANDORA_VISION_HOLE_THERMAL_NODE_THERMAL_CROPPER_H
 #define PANDORA_VISION_HOLE_THERMAL_NODE_THERMAL_CROPPER_H
 
+#include <string>
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
 #include <std_msgs/Empty.h>
-#include "thermal_node/thermal.h"
+
+#include "sensor_msgs/Image.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
+#include "sensor_processor/ProcessorLogInfo.h"
+#include "pandora_vision_msgs/RegionOfInterest.h"
+
+#include "utils/noise_elimination.h"
+#include "utils/message_conversions.h"
 
 /**
   @namespace pandora_vision
   @brief The main namespace for PANDORA vision
  **/
 namespace pandora_vision
+{
+namespace pandora_vision_hole
 {
   /**
     @class ThermalCropper
@@ -56,175 +70,143 @@ namespace pandora_vision
     to victim node, an empty message is sent to synchronizer node to restart
     the whole thermal process.
    **/
-  class ThermalCropper
+  class ThermalCropper : public nodelet::Nodelet
   {
-    private:
-      // The ROS node handle
-      ros::NodeHandle nodeHandle_;
+   public:
+    /**
+      @brief Default constructor. Initiates communications, loads parameters.
+      @return void
+      **/
+    ThermalCropper();
 
-      // Subscriber of thermal node result ( the exctracted point of interest)
-      // and the thermal image
-      ros::Subscriber thermalPoiSubscriber_;
+    /**
+      @brief Default destructor
+      @return void
+      **/
+    virtual
+    ~ThermalCropper();
 
-      // The name of the topic where the thermal poi is acquired from
-      std::string thermalPoiTopic_;
+    virtual void
+    onInit();
 
-      // Subscriber of synchronizer node from where we acquire the synchronized
-      // rgb and depth image
-      ros::Subscriber rgbDepthImagesSubscriber_;
+    /**
+      @brief Callback for the thermal point of interest received
+      by the thermal node.
 
-      // The name of the topic where rgb and depth images are acquired from
-      std::string rgbDepthImagesTopic_;
+      The thermal poi message received by the thermal node is unpacked.
+      A counter is set. When this counter reaches 2 it means both rgb Depth and
+      thermal poi message have been subscribed and are ready to be sent to victim.
+      @param msg [const ::pandora_vision_hole::CandidateHolesVectorMsg&]
+      The thermal image message
+      @return void
+      **/
+    void
+    inputThermalRoiCallback(const pandora_vision_msgs::EnhancedImageConstPtr& msg);
 
-      // Ros publisher for enchanced message directly to victim node.
-      ros::Publisher victimThermalPublisher_;
+    /**
+      @brief Callback for the synchronized rgb and depth images message
+      received by synchronizer node.
 
-      // The name of the topic where the thermal_cropper node publishes
-      // directly to victim node.
-      std::string victimThermalTopic_;
+      The message received by the synchronizer node is stored in private variable.
+      A counter is set. When this counter reaches 2 it means both rgb Depth and
+      thermal poi messages have been subscribed and are ready to be sent to victim.
+      @param msg [const pandora_vision_msgs::EnhancedImage&]
+      The input synchronized rgb and depth images message
+      @return void
+      **/
+    void
+    inputRgbImageCallback(const sensor_msgs::ImageConstPtr& msg);
+    void
+    inputDepthImageCallback(const sensor_msgs::ImageConstPtr& msg);
 
-      // Ros Publisher to synchronizer.
-      // Synchronizer dictates thermal standalone process to start.
-      ros::Publisher unlockThermalProcedurePublisher_;
+   private:
+    void
+    process();
 
-      // The name of the topic where the thermal cropper node publishes
-      // to synchronizer node.
-      std::string unlockThermalProcedureTopic_;
+    /**
+      @brief Acquires topics' names needed to be subscribed by the
+      the thermal_cropper node.
+      @param void
+      @return void
+      **/
+    void
+    getTopicNames();
 
-      // The publisher used to infor that thermal node has finished
-      // processing the input data.
-      ros::Publisher processEndPublisher_;
+    /**
+      @brief Sends an empty message to dictate synchronizer node to unlock
+      the thermal procedure.
+      @param void
+      @return void
+      **/
+    void
+    unlockThermalProcedure();
 
-      // The name of the topic where the process end will be advertised
-      std::string processEndTopic_;
+    /**
+      @brief The enhanced messages that is sent to victim node must have the
+      interpolated depth image. So this fuction must extract the image from the
+      message, interpolate it and convert it again to sensor_msgs/Image type.
+      @param[in] depthImage [const sensor_msgs::Image&] The input depthImage
+      @return [sensor_msgs::Image]
+      The interpolated depth image.
+      **/
+    sensor_msgs::Image
+    interpolateDepthImage(const sensor_msgs::Image& depthImage);
 
-      // Counter to check if both thermalCandidateHoles from thermal node
-      // and enhanced from synchronizer node messages arrived
-      int counter_;
+   private:
+    //!< Node's distinct name
+    std::string nodeName_;
+    //!< The ROS node handle in general namespace
+    ros::NodeHandle nh_;
+    //!< The ROS node handle in private namespace
+    ros::NodeHandle private_nh_;
 
-      // The conveyor of hole candidates received by the thermal node
-      HolesConveyor thermalHolesConveyor_;
+    // Subscriber of thermal node result ( the exctracted point of interest)
+    // and the thermal image
+    ros::Subscriber thermalRoiSubscriber_;
+    // The name of the topic where the thermal poi is acquired from
+    std::string thermalRoiTopic_;
+    pandora_vision_msgs::EnhancedImageConstPtr thermalEnhancedImageConstPtr_;
+    bool isThermalAvailable_;
 
-      // The information received by the synchronizer node
-      ros::Time headerStamp_;
-      sensor_msgs::Image depthImage_;
-      sensor_msgs::Image rgbImage_;
-      sensor_msgs::Image thermalImage_;
-      bool isDepth_;
+    // Subscriber of synchronizer node from where we acquire the synchronized
+    // rgb and depth image
+    ros::Subscriber rgbImageSubscriber_;
+    // The name of the topic where rgb and depth images are acquired from
+    std::string rgbImageTopic_;
+    sensor_msgs::ImageConstPtr rgbImageConstPtr_;
+    bool isRgbAvailable_;
 
-      /**
-        @brief Acquires topics' names needed to be subscribed by the
-        the thermal_cropper node.
-        @param void
-        @return void
-       **/
-      void getTopicNames();
+    // Subscriber of synchronizer node from where we acquire the synchronized
+    // rgb and depth image
+    ros::Subscriber depthImageSubscriber_;
+    // The name of the topic where rgb and depth images are acquired from
+    std::string depthImageTopic_;
+    sensor_msgs::ImageConstPtr depthImageConstPtr_;
+    bool isDepthAvailable_;
 
-      /**
-        @brief Sends an empty message to dictate synchronizer node to unlock
-        the thermal procedure.
-        @param void
-        @return void
-       **/
-      void unlockThermalProcedure();
+    // Ros publisher for enchanced message directly to victim node.
+    ros::Publisher victimThermalPublisher_;
+    // The name of the topic where the thermal_cropper node publishes
+    // directly to victim node.
+    std::string victimThermalTopic_;
 
-      /**
-        @brief Callback for the thermal point of interest received
-        by the thermal node.
+    // Ros Publisher to synchronizer.
+    // Synchronizer dictates thermal standalone process to start.
+    ros::Publisher unlockThermalProcedurePublisher_;
+    // The name of the topic where the thermal cropper node publishes
+    // to synchronizer node.
+    std::string unlockThermalProcedureTopic_;
 
-        The thermal poi message received by the thermal node is unpacked.
-        A counter is set. When this counter reaches 2 it means both rgb Depth and
-        thermal poi message have been subscribed and are ready to be sent to victim.
-        @param msg [const pandora_vision_hole::CandidateHolesVectorMsg&]
-        The thermal image message
-        @return void
-       **/
-      void inputThermalPoiCallback(
-        const pandora_vision_hole::CandidateHolesVectorMsg& msg);
+    // The publisher used to infor that thermal node has finished
+    // processing the input data.
+    ros::Publisher processEndPublisher_;
+    // The name of the topic where the process end will be advertised
+    std::string processEndTopic_;
 
-
-      /**
-        @brief Callback for the synchronized rgb and depth images message
-        received by synchronizer node.
-
-        The message received by the synchronizer node is stored in private variable.
-        A counter is set. When this counter reaches 2 it means both rgb Depth and
-        thermal poi messages have been subscribed and are ready to be sent to victim.
-        @param msg [const pandora_vision_msgs::EnhancedImage&]
-        The input synchronized rgb and depth images message
-        @return void
-       **/
-      void inputRgbDepthImagesCallback(
-        const pandora_vision_msgs::EnhancedImage& msg);
-
-      /**
-        @brief When both messages arrive this function is called, fills the
-        final EnhancedMsg and publishes it to victim node.
-        @param void
-        @return void
-       **/
-      void publishEnhancedMsg();
-
-      /**
-        @brief When EnhancedMsg arrives from synchronizer node it must be unpacked,
-        in order to be further used. The message that arrives consists of a depth
-        image, an rgb image and a boolean variable. These information is stored in
-        private member variables for further use.
-        @param[in] msg [const pandora_vision_msgs::EnhancedImage&] the input message
-        from synchronizer node.
-        @return void
-       **/
-      void unpackEnhancedMsgFromSynchronizer(
-        const pandora_vision_msgs::EnhancedImage& msg);
-
-      /**
-        @brief When CandidateHolesMsg arrives from thermal node it must be unpacked,
-        in order to be further used. These information is stored in
-        private member variable for further use.
-        @param[in] msg [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
-        the input candidate holes
-        @return void
-       **/
-      void unpackThermalMsg(
-        const std::vector<pandora_vision_hole::CandidateHoleMsg>&
-        candidateHolesVector);
-
-      /**
-        @brief This function finds the keypoint, the width and height of each region
-        of interest found by the thermal node.
-        @param[in] thermalHoles [const HolesConveyor&] The thermal holes from
-        thermal node.
-        @return [std::vector<pandora_vision_msgs::RegionOfInterest>]
-        The vector of the regions of interest of each hole.
-       **/
-      std::vector<pandora_vision_msgs::RegionOfInterest> findRegionsOfInterest(
-          const HolesConveyor& thermalHoles);
-
-      /**
-        @brief The enhanced messages that is sent to victim node must have the
-        interpolated depth image. So this fuction must extract the image from the
-        message, interpolate it and convert it again to sensor_msgs/Image type.
-        @param[in] depthImage [const sensor_msgs::Image&] The input depthImage
-        @return [sensor_msgs::Image]
-        The interpolated depth image.
-       **/
-      sensor_msgs::Image interpolateDepthImage(
-        const sensor_msgs::Image& depthImage);
-
-    public:
-      /**
-        @brief Default constructor. Initiates communications, loads parameters.
-        @return void
-       **/
-      ThermalCropper(void);
-
-      /**
-        @brief Default destructor
-        @return void
-       **/
-      ~ThermalCropper(void);
+    bool isDepth_;
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_THERMAL_NODE_THERMAL_CROPPER_H

@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class BlobDetection
     @brief Provides methods for blob detection
@@ -63,6 +65,7 @@ namespace pandora_vision
         std::vector<cv::KeyPoint>* keyPointsOut);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_BLOB_DETECTION_H

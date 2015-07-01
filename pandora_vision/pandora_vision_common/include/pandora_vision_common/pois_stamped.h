@@ -40,8 +40,9 @@
 #define PANDORA_VISION_COMMON_POIS_STAMPED_H
 
 #include <vector>
-
+#include <boost/shared_ptr.hpp>
 #include <opencv2/opencv.hpp>
+
 #include <std_msgs/Header.h>
 
 #include "pandora_vision_common/poi.h"

@@ -35,7 +35,24 @@
  * Authors: Angelos Triantafyllidis <aggelostriadafillidis@gmail.com>
  *********************************************************************/
 
+#include <string>
+#include <boost/algorithm/string.hpp>
+
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <std_msgs/Empty.h>
+
+#include "sensor_msgs/Image.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
+#include "sensor_processor/ProcessorLogInfo.h"
+#include "pandora_vision_msgs/RegionOfInterest.h"
+
+#include "utils/message_conversions.h"
+#include "utils/noise_elimination.h"
 #include "thermal_node/thermal_cropper.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::ThermalCropper, nodelet::Nodelet)
 
 /**
   @namespace pandora_vision
@@ -43,55 +60,70 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Default constructor. Initiates communications, loads parameters.
     @return void
    **/
-  ThermalCropper::ThermalCropper(void)
+  ThermalCropper::
+  ThermalCropper() {}
+
+  /**
+    @brief Default destructor
+    @return void
+   **/
+  ThermalCropper::
+  ~ThermalCropper(void)
   {
-    // Set counter to zero when the node starts
-    counter_ = 0;
+    NODELET_INFO("[%s] Terminated", nodeName_.c_str());
+  }
+
+
+  void
+  ThermalCropper::
+  onInit()
+  {
+    // Take NodeHandlers from nodelet manager
+    nh_ = this->getNodeHandle();
+    private_nh_ = this->getPrivateNodeHandle();
+    nodeName_ = boost::to_upper_copy<std::string>(this->getName());
 
     // Acquire the names of topics which the thermal_cropper node will be having
     // transactionary affairs with
     getTopicNames();
 
     // Subscribe to the thermal poi published by thermal node
-    thermalPoiSubscriber_ = nodeHandle_.subscribe(thermalPoiTopic_, 1,
-      &ThermalCropper::inputThermalPoiCallback, this);
-
+    thermalRoiSubscriber_ = nh_.subscribe(thermalRoiTopic_, 1,
+      &ThermalCropper::inputThermalRoiCallback, this);
+    isThermalAvailable_ = false;
     // Subscribe to rgb and depth images published by synchronizer node.
-    rgbDepthImagesSubscriber_ = nodeHandle_.subscribe(rgbDepthImagesTopic_, 1,
-      &ThermalCropper::inputRgbDepthImagesCallback, this);
+    rgbImageSubscriber_ = nh_.subscribe(rgbImageTopic_, 1,
+      &ThermalCropper::inputRgbImageCallback, this);
+    isRgbAvailable_ = false;
+    depthImageSubscriber_ = nh_.subscribe(depthImageTopic_, 1,
+      &ThermalCropper::inputDepthImageCallback, this);
+    isDepthAvailable_ = false;
 
     // Advertise enhanced message to victim node
-    victimThermalPublisher_ = nodeHandle_.advertise
+    victimThermalPublisher_ = nh_.advertise
       <pandora_vision_msgs::EnhancedImage>(victimThermalTopic_, 1);
 
     // Advertise empty message to synchronizer node so the thermal process
     // circle will start again
-    unlockThermalProcedurePublisher_ = nodeHandle_.advertise
+    unlockThermalProcedurePublisher_ = nh_.advertise
       <std_msgs::Empty>(unlockThermalProcedureTopic_, 1, true);
 
     // Advertise the topic where any external node(e.g. a functional test node)
     // will be subscribed to know that the hole node has finished processing
     // the current candidate holes as well as the result of the procedure.
-    processEndPublisher_ = nodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
-     processEndTopic_, 1, true);
+    processEndPublisher_ = nh_.advertise
+      <sensor_processor::ProcessorLogInfo>(processEndTopic_, 1, true);
 
     // When the node starts from launch file dictates thermal procedure to start
     unlockThermalProcedure();
 
-    ROS_INFO_NAMED(PKG_NAME, "[ThermalCropper node] Initiated");
-  }
-
-  /**
-    @brief Default destructor
-    @return void
-   **/
-  ThermalCropper::~ThermalCropper(void)
-  {
-    ROS_INFO_NAMED(PKG_NAME, "[ThermalCropper node] Terminated");
+    NODELET_INFO("[%s] Initiated", nodeName_.c_str());
   }
 
   /**
@@ -101,162 +133,87 @@ namespace pandora_vision
     The thermal poi message received by the thermal node is unpacked.
     A counter is set. When this counter reach 2 it means both rgb Depth and
     thermal poi message have been subscribed and are ready to be sent to victim.
-    @param msg [const pandora_vision_hole::CandidateHolesVectorMsg&]
+    @param msg [const ::pandora_vision_hole::CandidateHolesVectorMsg&]
     The thermal image message
     @return void
    **/
-  void ThermalCropper::inputThermalPoiCallback(
-    const pandora_vision_hole::CandidateHolesVectorMsg& msg)
+  void
+  ThermalCropper::
+  inputThermalRoiCallback(const pandora_vision_msgs::EnhancedImageConstPtr& msg)
   {
-    ROS_INFO("[ThermalCropper node], ThermalPoi callback called");
+    isThermalAvailable_ = true;
+    thermalEnhancedImageConstPtr_ = msg;
 
-    // Clear the current thermalHolesConveyor struct
-    // (or else keyPoints, rectangles and outlines accumulate)
-    HolesConveyorUtils::clear(&thermalHolesConveyor_);
-
-    // Unpack the message and store the acquired information in private variable
-    unpackThermalMsg(msg.candidateHoles);
-
-    counter_++;
-
-    if (counter_ == 2)
+    if (isRgbAvailable_ && isDepthAvailable_ && isThermalAvailable_)
     {
-      // Set counter to zero to restart the process
-      counter_ = 0;
-
-      unlockThermalProcedure();
-
-      // Fill and publish enhanced message to victim node
-      publishEnhancedMsg();
+      process();
     }
   }
 
-
-  /**
-    @brief Callback for the synchronized rgb and depth images message
-    received by synchronizer node.
-
-    The message received by the synchronizer node is stored in private variable.
-    A counter is set. When this counter reaches 2 it means both rgb Depth and
-    thermal poi message have been subscribed and are ready to be sent to victim.
-    @param msg [const pandora_vision_msgs::EnhancedImage&]
-    The input synchronized rgb and depth images message
-    @return void
-   **/
-  void ThermalCropper::inputRgbDepthImagesCallback(
-    const pandora_vision_msgs::EnhancedImage& msg)
+  void
+  ThermalCropper::
+  inputRgbImageCallback(const sensor_msgs::ImageConstPtr& msg)
   {
-    ROS_INFO("[ThermalCropper node], EnhancedImage callback called");
+    isRgbAvailable_ = true;
+    rgbImageConstPtr_ = msg;
 
-    // Unpack the message and store the acquired information in private variable
-    unpackEnhancedMsgFromSynchronizer(msg);
-
-    counter_++;
-
-    if (counter_ == 2)
+    if (isRgbAvailable_ && isDepthAvailable_ && isThermalAvailable_)
     {
-      // Set counter to zero to restart the process
-      counter_ = 0;
-
-      unlockThermalProcedure();
-
-      // Fill and publish enhanced message to victim node
-      publishEnhancedMsg();
+      process();
     }
   }
 
-  /**
-    @brief When CandidateHolesMsg arrives from thermal node it must be unpacked,
-    in order to be further used. These information is stored in
-    private member variable for further use.
-    @param[in] msg [const std::vector<pandora_vision_hole::CandidateHoleMsg>&]
-    the input candidate holes
-    @return void
-   **/
-  void ThermalCropper::unpackThermalMsg(
-    const std::vector<pandora_vision_hole::CandidateHoleMsg>&
-    candidateHolesVector)
+  void
+  ThermalCropper::
+  inputDepthImageCallback(const sensor_msgs::ImageConstPtr& msg)
   {
-    for (unsigned int i = 0; i < candidateHolesVector.size(); i++)
+    isDepthAvailable_ = true;
+    depthImageConstPtr_ = msg;
+
+    if (isRgbAvailable_ && isDepthAvailable_ && isThermalAvailable_)
     {
-      // A singe hole
-      HoleConveyor hole;
-
-      // The hole's keypoint
-      hole.keypoint.pt.x = candidateHolesVector[i].keypointX;
-      hole.keypoint.pt.y = candidateHolesVector[i].keypointY;
-
-      // The hole's rectangle points
-      std::vector<cv::Point2f> renctangleVertices;
-
-      for (unsigned int v = 0;
-        v < candidateHolesVector[i].verticesX.size(); v++)
-      {
-        cv::Point2f vertex;
-        vertex.x = candidateHolesVector[i].verticesX[v];
-        vertex.y = candidateHolesVector[i].verticesY[v];
-        renctangleVertices.push_back(vertex);
-      }
-
-      hole.rectangle = renctangleVertices;
-
-      // Push hole back into conveyor
-      thermalHolesConveyor_.holes.push_back(hole);
+      process();
     }
   }
 
-  /**
-    @brief When EnhancedMsg arrives from synchronizer node it must be unpacked,
-    in order to be further used. The message that arrives consists of a depth
-    image, an rgb image, a thermal image and a boolean variable.
-    These information is stored in private member variables for further use.
-    @param[in] msg [const pandora_vision_msgs::EnhancedImage&] the input message
-    from synchronizer node.
-    @return void
-   **/
-  void ThermalCropper::unpackEnhancedMsgFromSynchronizer(
-    const pandora_vision_msgs::EnhancedImage& msg)
+  void
+  ThermalCropper::
+  process()
   {
-    headerStamp_ = msg.header.stamp;
-    depthImage_ = msg.depthImage;
-    rgbImage_ = msg.rgbImage;
-    thermalImage_ = msg.thermalImage;
-  }
-
-  /**
-    @brief When both messages arrive this function is called,fills the
-    final EnhancedMsg and publishes it to victim node.
-    @param void
-    @return void
-   **/
-  void ThermalCropper::publishEnhancedMsg()
-  {
-    // The enhanced message
-    pandora_vision_msgs::EnhancedImage enhancedMsg;
-
-    enhancedMsg.header.stamp = headerStamp_;
-
-    // Victim node needs the interpolated depth image
-    // From interpolation we also acquire the isDepth boolean
-    enhancedMsg.depthImage = interpolateDepthImage(depthImage_);
-    enhancedMsg.rgbImage = rgbImage_;
-    enhancedMsg.thermalImage = thermalImage_;
-    enhancedMsg.isDepth = isDepth_;
-
-    // Find keypoint, width and height of each region of interest
-    enhancedMsg.regionsOfInterest =
-      findRegionsOfInterest(thermalHolesConveyor_);
-
-    // Used for functional test
-    sensor_processor::ProcessorLogInfo resultMsg;
-    resultMsg.success = (thermalHolesConveyor_.size() > 0);
-    processEndPublisher_.publish(resultMsg);
-
-    if (thermalHolesConveyor_.size() > 0)
+    if (!isRgbAvailable_ || !isDepthAvailable_ || !isThermalAvailable_)
     {
-      // Publish the enhanced message to victim node
-      victimThermalPublisher_.publish(enhancedMsg);
+      NODELET_ERROR("[%s] Incorrect callback: process has not received enough info",
+          nodeName_.c_str());
+      return;
     }
+    isRgbAvailable_ = false;
+    isDepthAvailable_ = false;
+    isThermalAvailable_ = false;
+
+    unlockThermalProcedure();
+
+    sensor_processor::ProcessorLogInfoPtr processorLogPtr( new sensor_processor::ProcessorLogInfo );
+
+    if (thermalEnhancedImageConstPtr_->regionsOfInterest.size() == 0)
+    {
+      processorLogPtr->success = false;
+      processEndPublisher_.publish(processorLogPtr);
+      return;
+    }
+
+    pandora_vision_msgs::EnhancedImagePtr enhancedImagePtr(
+        new pandora_vision_msgs::EnhancedImage );
+
+    enhancedImagePtr->header = thermalEnhancedImageConstPtr_->header;
+    enhancedImagePtr->thermalImage = thermalEnhancedImageConstPtr_->thermalImage;
+    enhancedImagePtr->rgbImage = *rgbImageConstPtr_;
+    enhancedImagePtr->depthImage = interpolateDepthImage(*depthImageConstPtr_);
+    enhancedImagePtr->isDepth = isDepth_;
+    enhancedImagePtr->regionsOfInterest = thermalEnhancedImageConstPtr_->regionsOfInterest;
+
+    processorLogPtr->success = true;
+    processEndPublisher_.publish(processorLogPtr);
+    victimThermalPublisher_.publish(enhancedImagePtr);
   }
 
   /**
@@ -268,7 +225,7 @@ namespace pandora_vision
     The interpolated depth image.
    **/
   sensor_msgs::Image ThermalCropper::interpolateDepthImage(
-    const sensor_msgs::Image& depthImage)
+      const sensor_msgs::Image& depthImage)
   {
     cv::Mat depthImageMat;
 
@@ -303,55 +260,6 @@ namespace pandora_vision
   }
 
   /**
-    @brief This function finds the keypoint, the width and height of each region
-    of interest found by the thermal node.
-    @param[in] thermalHoles [const HolesConveyor&] The thermal holes from
-    thermal node.
-    @return [std::vector<pandora_vision_msgs::RegionOfInterest>]
-    The vector of the regions of interest of each hole.
-   **/
-  std::vector<pandora_vision_msgs::RegionOfInterest>
-    ThermalCropper::findRegionsOfInterest(const HolesConveyor& thermalHoles)
-  {
-    // The vector of regions of interest that is going to be returned
-    std::vector<pandora_vision_msgs::RegionOfInterest> regions;
-
-    for (unsigned int i = 0; i < thermalHoles.size(); i++)
-    {
-      // The enhanced hole message. Used for one hole only
-      pandora_vision_msgs::RegionOfInterest enhancedHoleMsg;
-
-      // Set the keypoint
-      enhancedHoleMsg.center.x = thermalHoles.holes[i].keypoint.pt.x;
-      enhancedHoleMsg.center.y = thermalHoles.holes[i].keypoint.pt.y;
-
-      // Set the bounding box width and height
-      int minx = thermalHoles.holes[i].rectangle[0].x;
-      int maxx = thermalHoles.holes[i].rectangle[0].x;
-      int miny = thermalHoles.holes[i].rectangle[0].y;
-      int maxy = thermalHoles.holes[i].rectangle[0].y;
-
-      for (unsigned int r = 1; r < thermalHoles.holes[i].rectangle.size(); r++)
-      {
-        int xx = thermalHoles.holes[i].rectangle[r].x;
-        int yy = thermalHoles.holes[i].rectangle[r].y;
-
-        minx = xx < minx ? xx : minx;
-        maxx = xx > maxx ? xx : maxx;
-        miny = yy < miny ? yy : miny;
-        maxy = yy > maxy ? yy : maxy;
-      }
-
-      enhancedHoleMsg.width = maxx - minx;
-      enhancedHoleMsg.height = maxy - miny;
-
-      // Push back into the vector
-      regions.push_back(enhancedHoleMsg);
-    }
-    return regions;
-  }
-
-  /**
     @brief Acquires topics' names needed to be subscribed to and advertise
     to by the thermal_cropper node
     @param void
@@ -359,95 +267,35 @@ namespace pandora_vision
    **/
   void ThermalCropper::getTopicNames()
   {
-    // The namespace dictated in the launch file
-    std::string ns = nodeHandle_.getNamespace();
-
-    // Read the name of the topic from where the thermalcropper node acquires
-    // the thermal poi message and store it in a private member variable
-    if (nodeHandle_.getParam(
-        ns + "/thermal_cropper_node/subscribed_topics/thermal_poi_topic",
-        thermalPoiTopic_))
+    if (!private_nh_.getParam("subscribed_topics/thermal_roi_topic", thermalRoiTopic_))
     {
-      // Make topic's name absolute
-      thermalPoiTopic_ = ns + "/" + thermalPoiTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Subscribed to the input thermal Poi");
+      NODELET_FATAL("[%s] Could not find thermal roi topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-    else
+    if (!private_nh_.getParam("subscribed_topics/rgb_image_topic", rgbImageTopic_))
     {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Could not find topic thermal_Poi_topic");
+      NODELET_FATAL("[%s] Could not find rgb image topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-
-    // Read the name of the topic from where the thermalcropper node acquires
-    // the synchronized rgb and depth images and store it in
-    // a private member variable
-    if (nodeHandle_.getParam(
-        ns + "/thermal_cropper_node/subscribed_topics/rgb_depth_images_topic",
-        rgbDepthImagesTopic_))
+    if (!private_nh_.getParam("subscribed_topics/depth_image_topic", depthImageTopic_))
     {
-      // Make topic's name absolute
-      rgbDepthImagesTopic_ = ns + "/" + rgbDepthImagesTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Subscribed to the input Rgb and depth images");
+      NODELET_FATAL("[%s] Could not find thermal roi topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-    else
+    if (!private_nh_.getParam("published_topics/thermal_victim_node_topic", victimThermalTopic_))
     {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Could not find topic rgb_depth_images_topic");
+      NODELET_FATAL("[%s] Could not find thermal roi topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-
-     // Read the name of the topic to which the thermal node will be publishing
-     // information directly to victim node about the candidate holes found
-     // and store it in a private member variable
-    if (nodeHandle_.getParam(
-        ns + "/thermal_cropper_node/published_topics/thermal_victim_node_topic",
-        victimThermalTopic_))
+    if (!private_nh_.getParam("published_topics/thermal_unlock_synchronizer_topic", unlockThermalProcedureTopic_))
     {
-      ROS_INFO_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Advertising to the Thermal-victim node topic");
+      NODELET_FATAL("[%s] Could not find thermal roi topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-    else
+    if (!private_nh_.getParam("published_topics/processor_log_topic", processEndTopic_))
     {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Could not find topic thermal_victim_node_topic");
-    }
-
-     // Read the name of the topic to which the thermal node will be publishing
-     // information directly to synchronizer node.
-    if (nodeHandle_.getParam(
-        ns + "/thermal_cropper_node/published_topics/thermal_unlock_synchronizer_topic",
-        unlockThermalProcedureTopic_))
-    {
-      // Make the topic's name absolute
-      unlockThermalProcedureTopic_ = ns + "/" + unlockThermalProcedureTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Advertising to the Synchronizer node topic");
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Could not find topic thermal_unlock_synchronizer_topic");
-    }
-
-    // Get the topic where the process end will be advertised
-    if (nodeHandle_.getParam(
-        ns + "/thermal_cropper_node/published_topics/processor_log_topic",
-        processEndTopic_))
-    {
-       // Make the topic's name absolute
-       processEndTopic_ = ns + "/" + processEndTopic_;
-
-       ROS_INFO_NAMED(PKG_NAME,
-       "[ThermalCropper Node] Advertising to the Process End topic");
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[ThermalCropper Node] Could not find topic Process end Topic");
+      NODELET_FATAL("[%s] Could not find thermal roi topic", nodeName_.c_str());
+      ROS_BREAK();
     }
   }
 
@@ -457,11 +305,14 @@ namespace pandora_vision
     @param void
     @return void
    **/
-  void ThermalCropper::unlockThermalProcedure()
+  void
+  ThermalCropper::
+  unlockThermalProcedure()
   {
     // Send message to synchronizer in order for thermal procedure to start.
-    std_msgs::Empty unlockThermalProcedure;
+    std_msgs::EmptyPtr unlockThermalProcedure( new std_msgs::Empty );
     unlockThermalProcedurePublisher_.publish(unlockThermalProcedure);
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

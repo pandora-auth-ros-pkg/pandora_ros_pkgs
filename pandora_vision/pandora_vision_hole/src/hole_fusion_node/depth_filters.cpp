@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Checks for valid holes by area / depth comparison
     @param[in] conveyor [const HolesConveyor&] The candidate holes
@@ -544,4 +546,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

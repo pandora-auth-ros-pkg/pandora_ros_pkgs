@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Constructor
   **/
@@ -65,7 +67,7 @@ namespace pandora_vision
 
     // Advertise the candidate holes found by the rgb node
     candidateHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_hole::CandidateHolesVectorMsg>(
+      < ::pandora_vision_hole::CandidateHolesVectorMsg >(
       candidateHolesTopic_, 1);
 
     // The dynamic reconfigure (RGB) parameter's callback
@@ -135,7 +137,7 @@ namespace pandora_vision
     HolesConveyor conveyor = HoleDetector::findHoles(rgbImage, wallsHistogram_);
 
     // Create the candidate holes message
-    pandora_vision_hole::CandidateHolesVectorMsg rgbCandidateHolesMsg;
+    ::pandora_vision_hole::CandidateHolesVectorMsg rgbCandidateHolesMsg;
 
     // Pack information about holes found and the rgb image inside a message.
     // This message will be published to and received by the hole fusion node
@@ -213,7 +215,7 @@ namespace pandora_vision
     @return void
    **/
   void Rgb::parametersCallback(
-    const pandora_vision_hole::rgb_cfgConfig& config,
+    const ::pandora_vision_hole::rgb_cfgConfig& config,
     const uint32_t& level)
   {
     ROS_INFO_NAMED(PKG_NAME, "[RGB node] Parameters callback called");
@@ -429,4 +431,5 @@ namespace pandora_vision
       config.watershed_background_erosion_factor;
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

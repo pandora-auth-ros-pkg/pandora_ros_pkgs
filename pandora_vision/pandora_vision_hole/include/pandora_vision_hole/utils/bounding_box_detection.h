@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class BoundingBoxDetection
     @brief Provides methods for bounding box detection
@@ -74,6 +76,7 @@ namespace pandora_vision
         std::vector< std::vector<cv::Point2f> >* outRectangles);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_BOUNDING_BOX_DETECTION_H

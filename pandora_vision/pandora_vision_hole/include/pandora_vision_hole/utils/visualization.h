@@ -47,6 +47,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Visualization
     @brief Provides methods for image visualization
@@ -140,6 +142,7 @@ namespace pandora_vision
         const int& ms);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_VISUALIZATION_H

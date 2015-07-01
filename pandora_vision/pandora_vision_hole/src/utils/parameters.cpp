@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   //////////////////// Blob detection - specific parameters ////////////////////
 
   int Parameters::Blob::min_threshold = 0;
@@ -133,6 +135,7 @@ namespace pandora_vision
   // 1 for Logistic function
 
   int Parameters::Thermal::probability_method = 1;
+  float Parameters::Thermal::min_thermal_probability = 0.3;
 
   // Gausian variables
   float Parameters::Thermal::optimal_temperature = 35;
@@ -376,4 +379,5 @@ namespace pandora_vision
   int Parameters::Rgb::watershed_background_dilation_factor = 1;
   int Parameters::Rgb::watershed_background_erosion_factor = 1;
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

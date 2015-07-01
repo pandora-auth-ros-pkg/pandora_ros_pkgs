@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class PlanesDetection
     @brief Provides methods for plane detection and extraction
@@ -100,6 +102,7 @@ namespace pandora_vision
          std::vector<pcl::PointIndices::Ptr>* inliersVector);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_PLANES_DETECTION_H

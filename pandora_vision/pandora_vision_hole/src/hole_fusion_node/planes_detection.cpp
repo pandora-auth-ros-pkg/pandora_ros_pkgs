@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Applies a voxel grid filtering
     (http://pointclouds.org/documentation/tutorials/voxel_grid.php)
@@ -243,4 +245,5 @@ namespace pandora_vision
     #endif
   }
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

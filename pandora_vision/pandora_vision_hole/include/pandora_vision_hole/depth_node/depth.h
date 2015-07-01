@@ -51,6 +51,9 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+
   /**
     @class Depth
     @brief Provides functionalities for locating holes via
@@ -76,11 +79,11 @@ namespace pandora_vision
       std::string candidateHolesTopic_;
 
       // The dynamic reconfigure (depth) parameters' server
-      dynamic_reconfigure::Server<pandora_vision_hole::depth_cfgConfig>
+      dynamic_reconfigure::Server< ::pandora_vision_hole::depth_cfgConfig>
         server;
 
       // The dynamic reconfigure (depth) parameters' callback
-      dynamic_reconfigure::Server<pandora_vision_hole::depth_cfgConfig>
+      dynamic_reconfigure::Server< ::pandora_vision_hole::depth_cfgConfig>
         ::CallbackType f;
 
       /**
@@ -110,7 +113,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallback(
-        const pandora_vision_hole::depth_cfgConfig& config,
+        const ::pandora_vision_hole::depth_cfgConfig& config,
         const uint32_t& level);
 
 
@@ -128,6 +131,7 @@ namespace pandora_vision
       ~Depth(void);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_DEPTH_NODE_DEPTH_H

@@ -51,6 +51,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Rgb
     @brief Provides functionalities for locating holes via
@@ -80,11 +82,11 @@ namespace pandora_vision
       std::vector<cv::MatND> wallsHistogram_;
 
       // The dynamic reconfigure (RGB) parameters' server
-      dynamic_reconfigure::Server<pandora_vision_hole::rgb_cfgConfig>
+      dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig >
         server;
 
       // The dynamic reconfigure (RGB) parameters' callback
-      dynamic_reconfigure::Server<pandora_vision_hole::rgb_cfgConfig>::
+      dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig >::
         CallbackType f;
 
       /**
@@ -114,7 +116,7 @@ namespace pandora_vision
         @return void
        **/
       void parametersCallback(
-        const pandora_vision_hole::rgb_cfgConfig& config,
+        const ::pandora_vision_hole::rgb_cfgConfig& config,
         const uint32_t& level);
 
 
@@ -126,6 +128,7 @@ namespace pandora_vision
       ~Rgb();
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_RGB_NODE_RGB_H

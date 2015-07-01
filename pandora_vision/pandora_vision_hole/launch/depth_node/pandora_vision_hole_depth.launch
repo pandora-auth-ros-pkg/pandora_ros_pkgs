@@ -1,0 +1,11 @@
+<launch>  
+  <node name="depth_node"
+      type="depth_node"
+      pkg="pandora_vision_hole"
+      respawn="False"
+      ns="$(arg namespace)">
+    <rosparam file="$(find pandora_vision_hole)/cfg/depth_node_cfg/depth_node_topics.yaml"
+          command="load" />
+  </node>
+</launch>
+

@@ -46,6 +46,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class NoiseElimination
     @brief Provides methods for elimination of the kinect noise
@@ -136,6 +138,7 @@ namespace pandora_vision
         cv::Mat* outImage);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_UTILS_NOISE_ELIMINATION_H

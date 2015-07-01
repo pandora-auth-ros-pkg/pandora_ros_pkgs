@@ -43,6 +43,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @brief Implements the brushfire algorithm for one blob keypoint
     in order to find its outline points
@@ -993,4 +995,5 @@ namespace pandora_vision
     Timer::tick("raycastKeypoint");
     #endif
   }
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

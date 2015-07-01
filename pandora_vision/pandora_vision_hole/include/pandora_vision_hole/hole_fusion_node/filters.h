@@ -56,6 +56,8 @@
  **/
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
   /**
     @class Filters
     @brief Provides checks and pertinent methods as a means to validate holes
@@ -193,6 +195,7 @@ namespace pandora_vision
         std::vector<std::vector<float> >* probabilitiesVector);
   };
 
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_H
