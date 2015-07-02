@@ -9,8 +9,8 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   * Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions of source code must retain the above copyright
  *   * Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions and the following
  *     disclaimer in the documentation and/or other materials provided
@@ -34,50 +34,21 @@
  *
  * Authors:
  *   Chamzas Konstantinos <chamzask@gmail.com>
+ *   Sideris Konstantinos <siderisk@auth.gr>
  *********************************************************************/
 
+#include "pandora_qr_csv/qr_csv_creator.h"
 
-#ifndef MAPGENERATOR_H
-#define MAPGENERATOR_H
 
-#include <cstdio>
-#include <ros/ros.h>
-#include <ros/console.h>
-#include <pluginlib/class_loader.h>
-#include <std_msgs/String.h>
-
-#include <Eigen/Geometry>
-
-#include <QtGui/QApplication>
-
-#include "pandora_geotiff/SaveMission.h"
-#include "pandora_geotiff/geotiff_creator.h"
-#include "pandora_geotiff/map_writer_plugin_interface.h"
-#include "pandora_geotiff/qr_csv_creator.h"
-
-namespace pandora_geotiff
+int main(int argc, char **argv)
 {
-  
-  class MapGenerator{
-    private:  
-    
-      GeotiffCreator* geotiffCreator;
-      QrCsvCreator* qrCsvCreator; 
-      std::string p_plugin_list_;
-      ros::NodeHandle pn_;
-      ros::ServiceServer save_mission_service;
-      std::vector<boost::shared_ptr<MapWriterPluginInterface> > plugin_vector_;
-      pluginlib::ClassLoader<MapWriterPluginInterface>* plugin_loader_;
-      
-      
-    public:
-      MapGenerator();
-      ~MapGenerator();
-    
-      void writeGeotiff(const std::string& missionName);
-      bool saveGeotiff(SaveMission::Request& req ,
-        SaveMission::Response& res );
-  };
-  
-}//namespace pandora_geotiff
-#endif
+  ros::init(argc, argv, "pandora_qr_csv_node");
+
+  ROS_INFO("Starting QR to CSV service...");
+
+  pandora_qr_csv::QrCsvCreator service;
+
+  ROS_INFO("QR to CSV service started...");
+
+  ros::spin();
+}

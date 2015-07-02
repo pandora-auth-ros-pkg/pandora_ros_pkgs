@@ -9,10 +9,10 @@ include_directories(
 
 ########################  geotiff_creator  ####################################
 
-catkin_add_gtest(geotiff_creator_test unit/geotiff_creator_test.cpp)
-target_link_libraries(geotiff_creator_test
+catkin_add_gtest(qr_csv_creator_test unit/qr_csv_creator_test.cpp)
+target_link_libraries(qr_csv_creator_test
   ${catkin_LIBRARIES}
   ${pandora_testing_tools_LIBRARIES}
-  creator
+  qr_csv_creator
   gtest_main
   )

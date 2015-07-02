@@ -33,40 +33,13 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Chamzas Konstantinos <chamzask@gmail.com>
+ *   Sideris Konstantinos <siderisk@auth.gr>
  *********************************************************************/
 
+#include <vector>
+#include <string>
+#include <ros/package.h>
+#include "gtest/gtest.h"
 
-#ifndef Qr_Csv_Creator_H
-#define Qr_Csv_Creator_H
-
-#include <stdlib.h>
-#include <ros/ros.h>
-#include <pwd.h>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <pandora_data_fusion_msgs/QrCsvSrv.h>
-
-namespace pandora_geotiff{
-  
-  class QrCsvCreator{
-  
-  public:
-  
-   QrCsvCreator();
-   void generateQrCsv(std::string missionName);
-     
-  private:
-   
-    bool gotData_;
-    std::string missionNamePrefix_;
-    std::string getDateAndTime();
-    std::string getQrTime(time_t qrTime);
-    std::vector<pandora_data_fusion_msgs::QrNotificationMsg> qrs_;
-    void getQrsData();
-    };
-}
-#endif
-
+#include "pandora_qr_csv/qr_csv_creator.h"
 

@@ -1,0 +1,17 @@
+
+team:
+    name: "PANDORA"
+    country: "Greece"
+
+robot:
+    name: "Pandora"
+    mode: "A"
+
+csv:
+    prefix: "RC2015"
+    suffix: "_qr.csv"
+    directoryToSave: "/"
+
+services:
+    objects: "data_fusion_geotiff"
+    csv: "qr_csv/createCSV"

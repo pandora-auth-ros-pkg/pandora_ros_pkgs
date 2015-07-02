@@ -1,0 +1,5 @@
+std_msgs/String missionName
+
+---
+
+std_msgs/Bool result

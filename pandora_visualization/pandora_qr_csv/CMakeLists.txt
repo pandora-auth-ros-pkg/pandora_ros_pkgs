@@ -1,26 +1,21 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pandora_geotiff)
+project(pandora_qr_csv)
 find_package(catkin REQUIRED COMPONENTS
   cmake_modules
   roscpp
   roslint
   std_msgs
   message_generation
-  tf
   pandora_data_fusion_msgs
 )
-
-find_package(Qt4 4.6 COMPONENTS QtCore QtGui  REQUIRED)
 
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 add_definitions(${Eigen_DEFINITIONS})
 
-include(${QT_USE_FILE})
-
 add_service_files(
    FILES
-   SaveMission.srv
+   createCSV.srv
  )
 
 generate_messages(
@@ -33,11 +28,10 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     std_msgs
-    tf
     message_runtime
     pandora_data_fusion_msgs
   LIBRARIES
-  DEPENDS Eigen QT
+  DEPENDS Eigen
 )
 
 include_directories(
@@ -45,17 +39,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(creator src/creator.cpp)
-target_link_libraries(creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
+add_library(qr_csv_creator src/qr_csv_creator.cpp)
+target_link_libraries(qr_csv_creator ${catkin_LIBRARIES})
+add_dependencies(qr_csv_creator ${catkin_EXPORTED_TARGETS})
 
-add_library(server src/server.cpp)
-target_link_libraries(server creator ${catkin_LIBRARIES})
-
-add_executable(pandora_geotiff_node src/pandora_geotiff_node.cpp)
-target_link_libraries(pandora_geotiff_node
+add_executable(pandora_qr_csv_node src/pandora_qr_csv_node.cpp)
+target_link_libraries(pandora_qr_csv_node
       ${catkin_LIBRARIES}
-      server
-      creator
+      qr_csv_creator
       )
 
 ############################## ROSLINT ##############################

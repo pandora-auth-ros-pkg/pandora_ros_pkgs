@@ -1,7 +1,7 @@
 <package format="2">
-  <name>pandora_geotiff</name>
+  <name>pandora_qr_csv</name>
   <version>0.0.0</version>
-  <description>Contains pandora geotiff packages</description>
+  <description>Creates the RoboCup CSV file with the QRs</description>
 
   <maintainer email="siderisk@auth.gr">Sideris Konstantinos</maintainer>
 
@@ -12,6 +12,7 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization.git</url>
 
   <author>Chamzas Konstantinos</author>
+  <author>Sideris Konstantinos</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -24,9 +25,6 @@
 
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
-  <build_depend>libqt4-dev</build_depend>
-  <exec_depend>libqt4</exec_depend>
-  <depend>tf</depend>
   <depend>pandora_data_fusion_msgs</depend>
 
   <test_depend>rosunit</test_depend>

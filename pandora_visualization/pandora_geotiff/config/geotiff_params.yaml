@@ -1,0 +1,70 @@
+
+mission:
+  prefix: "/RRL_2015_PANDORA_"
+  extention: ".tiff"
+  color: "DARK_BLUE_F"
+  width: 2
+
+checker:
+  light_color: "LIGHT_GREY"
+  dark_color: "DARK_GREY"
+
+scale:
+  color: "DARK_BLUE_M"
+  width: 2
+
+orientation:
+  color: "DARK_BLUE_M"
+  width: 2
+
+topics:
+  coverage: "/data_fusion/sensor_coverage/kinect_space"
+  map: "/slam/map"
+  trajectory: "/robot_trajectory"
+
+services:
+  data_fusion_objects: "data_fusion_geotiff"
+
+coverage_map:
+  bottom_threshold: 0
+  top_threshold: 100
+  color: "LIGHT_GREEN_MAX"
+
+explored_map:
+  bottom_threshold: 0
+  top_threshold: 50
+  wall_bottom_threshold: 52
+  wall_top_threshold: 255
+  map_color: "WHITE_MAX"
+  wall_color: "SOLID_BLUE"
+
+path:
+  width: 2
+  color: "MAGENTA"
+
+arrow:
+  color: "YELLOW"
+  size: 7
+
+general_objects:
+  txt_color: "WHITE_MAX"
+
+hazmat:
+  color: "SOLID_ORANGE"
+  size: 42
+  shape: "DIAMOND"
+
+victim:
+  color: "SOLID_RED"
+  size: 35
+  shape: "CIRCLE"
+
+qr:
+  color: "SOLID_BLUE"
+  size: 35
+  shape: "CIRCLE"
+
+obstacle:
+    color: "PINK"
+    size: 20
+    shape: "CIRCLE"

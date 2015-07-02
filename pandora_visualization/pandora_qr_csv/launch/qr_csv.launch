@@ -1,0 +1,17 @@
+<launch>
+  <node
+    pkg="pandora_qr_csv"
+    type="pandora_qr_csv_node"
+    name="pandora_qr_csv_node"
+    output="screen">
+
+    <rosparam
+      file="$(find pandora_qr_csv)/config/csv_params.yaml"
+      command="load"
+    />
+  </node>
+
+</launch>
+
+
+

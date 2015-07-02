@@ -8,6 +8,7 @@ install:
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros python-pip
+  - sudo apt-get install libeigen3-dev
   - sudo pip install pandoradep
   - sudo rosdep init
   - rosdep update
@@ -29,8 +30,8 @@ install:
 script: # All commands must exit with code 0 on success. Anything else is considered failure.
   - catkin_make --only-pkg-with-deps $REPOSITORY_NAME
   - source devel/setup.bash
-  #- catkin_make roslint_pandora_geotiff
-  #- catkin_make roslint_pandora_geotiff_plugins
+  - catkin_make roslint_pandora_geotiff
   - catkin_make tests # Build all tests, even from other packages. Its not optimal, but...
   - catkin_make run_tests_pandora_geotiff
+  - catkin_make --only-pkg-with-deps pandora_qr_csv
   - catkin_test_results build

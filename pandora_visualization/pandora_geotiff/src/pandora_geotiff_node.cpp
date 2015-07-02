@@ -34,17 +34,20 @@
  *
  * Authors:
  *   Chamzas Konstantinos <chamzask@gmail.com>
+ *   Sideris Konstantinos <siderisk@auth.gr>
  *********************************************************************/
 
-#include "pandora_geotiff/map_generator.h"
+#include "pandora_geotiff/server.h"
 
 
-  int main(int argc, char **argv){
-    
-    ros::init(argc, argv, "pandora_geotiff_node");
-    ROS_INFO("PANDORA_GEOTIFF_NODE_STARTED");
-    pandora_geotiff::MapGenerator gc;
-    ros::spin();
-  
-  }
-//namespace pandora_geotid
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "pandora_geotiff_node");
+  ROS_INFO("Starting geotiff server...");
+
+  pandora_geotiff::Server server;
+
+  ROS_INFO("Geotiff server started...");
+
+  ros::spin();
+}
