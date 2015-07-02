@@ -39,6 +39,8 @@
 #ifndef SENSOR_PROCESSOR_DUMMY_PROCESSOR_H
 #define SENSOR_PROCESSOR_DUMMY_PROCESSOR_H
 
+#include <string>
+
 #include "std_msgs/Int32.h"
 #include "sensor_processor/processor.h"
 #include "sensor_processor/handler.h"
@@ -50,13 +52,13 @@ namespace sensor_processor
    */
   class DummyProcessor : public Processor<std_msgs::Int32, std_msgs::Int32>
   {
-  public:
-    DummyProcessor (const std::string& ns, Handler* handler);
+   public:
+    DummyProcessor(const std::string& ns, Handler* handler);
 
     virtual bool
       process(const std_msgs::Int32ConstPtr& input, const std_msgs::Int32Ptr& output);
 
-  private:
+   private:
     int data_;
   };
 }  // namespace sensor_processor

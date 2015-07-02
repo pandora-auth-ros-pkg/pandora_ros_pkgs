@@ -29,7 +29,16 @@ catkin_package(
     include
   )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
+  )
+
+file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
+  RELATIVE ${PROJECT_SOURCE_DIR}
+    include/**/*.h
+    src/*.cpp
+    )
+roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 # if(CATKIN_ENABLE_TESTING)
 

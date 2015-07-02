@@ -49,88 +49,85 @@
 
 namespace sensor_processor
 {
-    Handler::Handler(const std::string& ns)
-    {
-      nhPtr_.reset( new ros::NodeHandle(ns) );
-      name_ = ros::this_node::getName();
-      ROS_DEBUG_STREAM("Node "+name_+
-          " has public nh at ns: "+nhPtr_->getNamespace());
-      currentState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
-      previousState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
+  Handler::Handler(const std::string& ns) : privateNh_("~")
+  {
+    nhPtr_.reset( new ros::NodeHandle(ns) );
+    name_ = ros::this_node::getName();
+    currentState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    previousState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
 
-      std::string reportTopicName;
+    std::string reportTopicName;
 
-      nhPtr_->param<std::string>("op_report_topic", reportTopicName,
-          ros::this_node::getName() + "/processor_log");
-      operationReport_ = nhPtr_->advertise<ProcessorLogInfo>(
-          reportTopicName, 10);
+    nhPtr_->param<std::string>("op_report_topic", reportTopicName, "processor_log");
+    operationReport_ = nhPtr_->advertise<ProcessorLogInfo>(
+        reportTopicName, 10);
 
-      clientInitialize();
-      ROS_INFO("[%s] Handler initialized", name_.c_str());
+    clientInitialize();
+    ROS_INFO("[%s] Handler initialized", name_.c_str());
+  }
+
+  Handler::~Handler()
+  {
+    ROS_INFO("[%s] Handler terminated", name_.c_str());
+  }
+
+  ros::NodeHandlePtr Handler::shareNodeHandle()
+  {
+    return nhPtr_;
+  }
+
+  template <class SubType>
+  void Handler::completeProcessCallback(
+      const boost::shared_ptr<SubType const>& subscribedTypePtr)
+  {
+    bool success = true;  //!< checker for success of operations
+    boost::shared_ptr<boost::any> subTypePtr( new boost::any(subscribedTypePtr) );
+    boost::shared_ptr<boost::any> processorInputPtr( new boost::any );
+    boost::shared_ptr<boost::any> processorOutputPtr( new boost::any );
+    boost::shared_ptr<boost::any> processorResultPtr( new boost::any );
+
+    // First a preprocessing operation happens
+    try {
+      success = preProcPtr_->process(subTypePtr, processorInputPtr);
+    }
+    catch (processor_error& e) {
+      completeProcessFinish(false, e.what());
+      return;
+    }
+    if (!success) {
+      completeProcessFinish(success, "PreProcessor");
+      return;
     }
 
-    Handler::~Handler()
-    {
-      ROS_INFO("[%s] Handler terminated", name_.c_str());
+    try {
+      success = processorPtr_->process(processorInputPtr, processorOutputPtr);
+    }
+    catch (processor_error& e) {
+      completeProcessFinish(false, e.what());
+      return;
+    }
+    if (!success) {
+      completeProcessFinish(success, "Processor");
+      return;
     }
 
-    ros::NodeHandlePtr Handler::shareNodeHandle()
-    {
-      return nhPtr_;
+    try {
+      success = postProcPtr_->process(processorOutputPtr, processorResultPtr);
     }
-
-    template <class SubType>
-    void Handler::completeProcessCallback(
-        const boost::shared_ptr<SubType const>& subscribedTypePtr)
-    {
-      bool success = true;  //!< checker for success of operations
-      boost::shared_ptr<boost::any> subTypePtr( new boost::any(subscribedTypePtr) );
-      boost::shared_ptr<boost::any> processorInputPtr( new boost::any );
-      boost::shared_ptr<boost::any> processorOutputPtr( new boost::any );
-      boost::shared_ptr<boost::any> processorResultPtr( new boost::any );
-
-      // First a preprocessing operation happens
-      try {
-        success = preProcPtr_->process(subTypePtr, processorInputPtr);
-      }
-      catch (processor_error& e) {
-        completeProcessFinish(false, e.what());
-        return;
-      }
-      if (!success) {
-        completeProcessFinish(success, "PreProcessor");
-        return;
-      }
-
-      try {
-        success = processorPtr_->process(processorInputPtr, processorOutputPtr);
-      }
-      catch (processor_error& e) {
-        completeProcessFinish(false, e.what());
-        return;
-      }
-      if (!success) {
-        completeProcessFinish(success, "Processor");
-        return;
-      }
-
-      try {
-        success = postProcPtr_->process(processorOutputPtr, processorResultPtr);
-      }
-      catch (processor_error& e) {
-        completeProcessFinish(false, e.what());
-        return;
-      }
-      completeProcessFinish(success, "Finished");
+    catch (processor_error& e) {
+      completeProcessFinish(false, e.what());
+      return;
     }
+    completeProcessFinish(success, "Finished");
+  }
 
-    void Handler::completeProcessFinish(bool success, const std::string& logInfo)
-    {
-      ProcessorLogInfo processorLogInfo;
-      processorLogInfo.success = success;
-      processorLogInfo.logInfo = logInfo;
-      operationReport_.publish(processorLogInfo);
-    }
+  void Handler::completeProcessFinish(bool success, const std::string& logInfo)
+  {
+    ProcessorLogInfo processorLogInfo;
+    processorLogInfo.success = success;
+    processorLogInfo.logInfo = logInfo;
+    operationReport_.publish(processorLogInfo);
+  }
 }  // namespace sensor_processor
 
 #endif  // SENSOR_PROCESSOR_HANDLER_HXX

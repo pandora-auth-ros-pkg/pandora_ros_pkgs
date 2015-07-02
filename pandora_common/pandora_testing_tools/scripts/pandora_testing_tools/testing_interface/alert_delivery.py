@@ -3,7 +3,7 @@
 __version__ = "0.0.1"
 __status__ = "Production"
 __license__ = "BSD"
-__copyright__ = "Copyright (c) 2014, P.A.N.D.O.R.A. Team. All rights reserved."
+__copyright__ = "Copyright (c) 2015, P.A.N.D.O.R.A. Team. All rights reserved."
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -42,6 +42,8 @@ from collections import deque
 import roslib; roslib.load_manifest('pandora_testing_tools')
 import rospy
 
+from pandora_vision_msgs.msg import ObstacleAlert
+from pandora_vision_msgs.msg import ObstacleAlertVector
 from pandora_vision_msgs.msg import HoleDirectionAlert
 from pandora_vision_msgs.msg import HoleDirectionAlertVector
 from pandora_vision_msgs.msg import ThermalAlert
@@ -86,6 +88,9 @@ class AlertDeliveryBoy():
         self.hole_msg = HoleDirectionAlertVector()
         self.hole_msg.header.frame_id = self.frame_id
 
+        self.obstacle_msg = ObstacleAlertVector()
+        self.obstacle_msg.header.frame_id = self.frame_id
+
         self.thermal_msg = ThermalAlertVector()
         self.thermal_msg.header.frame_id = self.frame_id
 
@@ -104,14 +109,17 @@ class AlertDeliveryBoy():
         self.holeDeliveryAddress = '/vision/holes_direction_alert'
         self.hole_pub = rospy.Publisher(self.holeDeliveryAddress,
                                         HoleDirectionAlertVector)
+        self.obstacleDeliveryAddress = '/vision/obstacle_alert'
+        self.obstacle_pub = rospy.Publisher(self.obstacleDeliveryAddress,
+                                            ObstacleAlertVector)
         self.dataMatrixDeliveryAddress = '/vision/dataMatrix_alert'
         self.dataMatrix_pub = rospy.Publisher(self.dataMatrixDeliveryAddress,
                                       DataMatrixAlertVector)
         self.thermalDeliveryAddress = '/vision/thermal_direction_alert'
         self.thermal_pub = rospy.Publisher(self.thermalDeliveryAddress,
                                        ThermalAlertVector)
-        self.victimImageDeliveryAddress = '/vision/victim_direction_alert'
-        self.victimImage_pub = rospy.Publisher(self.victimImageDeliveryAddress,
+        self.visualVictimDeliveryAddress = '/vision/victim_direction_alert'
+        self.visualVictim_pub = rospy.Publisher(self.visualVictimDeliveryAddress,
                                        GeneralAlertVector)
         self.soundDeliveryAddress = '/sensor_processing/sound_direction_alert'
         self.sound_pub = rospy.Publisher(self.soundDeliveryAddress,
@@ -138,6 +146,25 @@ class AlertDeliveryBoy():
         msg.alerts = []
         msg.alerts.append(self.makeGeneralAlertInfo(yaw, pitch, probability))
         return msg
+
+    def deliverObstacleOrder(self, pointsYaw, pointsPitch,
+            pointsDepth, probability, obs_type, publish=True):
+
+        self.obstacle_msg.header.stamp = rospy.get_rostime()
+        self.obstacle_msg.alerts = []
+        msg = ObstacleAlert()
+        msg.type = obs_type
+        msg.probability = probability
+        msg.pointsYaw = pointsYaw
+        msg.pointsPitch = pointsPitch
+        msg.pointsDepth = pointsDepth
+        self.obstacle_msg.alerts.append(msg)
+        rospy.loginfo(self.obstacle_msg)
+        if publish:
+            self.obstacle_pub.publish(self.obstacle_msg)
+            rospy.sleep(0.1)
+        else:
+            return self.hole_msg
 
     def deliverHoleOrder(self, orderYaw,
                         orderPitch, orderProbability=1, orderId=1, publish=True):
@@ -229,11 +256,11 @@ class AlertDeliveryBoy():
         else:
             return self.thermal_msg
 
-    def deliverVictimImageOrder(self, orderYaw, orderPitch, orderProbability,
+    def deliverVisualVictimOrder(self, orderYaw, orderPitch, orderProbability,
             publish=True):
         msg = self.makeGeneralAlertVector(orderYaw, orderPitch, orderProbability)
         if publish:
-            self.victimImage_pub.publish(msg)
+            self.visualVictim_pub.publish(msg)
             rospy.sleep(0.1)
         else:
             return msg
@@ -282,8 +309,8 @@ class AlertDeliveryBoy():
             self.hole_pub.publish(nextOrder[0])
         elif nextOrder[1] == 'thermal':
             self.thermal_pub.publish(nextOrder[0])
-        elif nextOrder[1] == 'victimImage':
-            self.victimImage_pub.publish(nextOrder[0])
+        elif nextOrder[1] == 'visualVictim':
+            self.visualVictim_pub.publish(nextOrder[0])
         elif nextOrder[1] == 'motion':
             self.motion_pub.publish(nextOrder[0])
         elif nextOrder[1] == 'sound':
@@ -351,15 +378,15 @@ class AlertDeliveryBoy():
                     thermal_msg.probability = float(a[3])
                     self.orderWaitingList.append((thermal_msg, 'thermal'))
 
-                elif a[0] == 'victimImage:':
+                elif a[0] == 'visualVictim:':
                     if len(a) != 4:
                         raise BadBossOrderFile("Not right argument numbers.")
-                    victimImage_msg = GeneralAlertInfo()
-                    victimImage_msg.header.frame_id = self.frame_id
-                    victimImage_msg.yaw = float(a[1])
-                    victimImage_msg.pitch = float(a[2])
-                    victimImage_msg.probability = float(a[3])
-                    self.orderWaitingList.append((victimImage_msg, 'victimImage'))
+                    visualVictim_msg = GeneralAlertInfo()
+                    visualVictim_msg.header.frame_id = self.frame_id
+                    visualVictim_msg.yaw = float(a[1])
+                    visualVictim_msg.pitch = float(a[2])
+                    visualVictim_msg.probability = float(a[3])
+                    self.orderWaitingList.append((visualVictim_msg, 'visualVictim'))
 
                 elif a[0] == 'motion:':
                     if len(a) != 4:

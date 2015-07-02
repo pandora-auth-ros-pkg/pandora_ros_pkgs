@@ -37,6 +37,7 @@
  *********************************************************************/
 
 #include <ros/ros.h>
+
 #include "sensor_processor/dummy_handler.h"
 
 int main(int argc, char** argv)

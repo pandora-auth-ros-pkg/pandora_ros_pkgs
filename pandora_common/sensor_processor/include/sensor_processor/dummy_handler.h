@@ -39,18 +39,21 @@
 #ifndef SENSOR_PROCESSOR_DUMMY_HANDLER_H
 #define SENSOR_PROCESSOR_DUMMY_HANDLER_H
 
-#include "sensor_processor/handler.h"
+#include <string>
+
 #include "std_msgs/Int32.h"
+
+#include "sensor_processor/handler.h"
 
 namespace sensor_processor
 {
   typedef std_msgs::Int32 Int32;
   class DummyHandler : public Handler
   {
-  public:
-    DummyHandler(const std::string& ns);
+   public:
+    explicit DummyHandler(const std::string& ns);
 
-  protected:
+   protected:
     virtual void
       startTransition(int newState);
     virtual void

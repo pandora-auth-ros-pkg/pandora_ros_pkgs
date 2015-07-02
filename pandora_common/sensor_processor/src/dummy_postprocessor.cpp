@@ -36,6 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "sensor_processor/dummy_postprocessor.h"
 
 namespace sensor_processor

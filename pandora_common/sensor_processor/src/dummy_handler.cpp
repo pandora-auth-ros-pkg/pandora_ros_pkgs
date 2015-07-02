@@ -36,11 +36,12 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "sensor_processor/dummy_handler.h"
 #include "sensor_processor/dummy_preprocessor.h"
 #include "sensor_processor/dummy_processor.h"
 #include "sensor_processor/dummy_postprocessor.h"
-
 
 namespace sensor_processor
 {

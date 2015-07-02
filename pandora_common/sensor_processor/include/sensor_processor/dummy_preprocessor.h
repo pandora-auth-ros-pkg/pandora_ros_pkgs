@@ -36,8 +36,10 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_PREPROCESSOR_DUMMY_PREPROCESSOR_H
-#define SENSOR_PREPROCESSOR_DUMMY_PREPROCESSOR_H
+#ifndef SENSOR_PROCESSOR_DUMMY_PREPROCESSOR_H
+#define SENSOR_PROCESSOR_DUMMY_PREPROCESSOR_H
+
+#include <string>
 
 #include "std_msgs/Int32.h"
 #include "sensor_processor/preprocessor.h"
@@ -50,15 +52,15 @@ namespace sensor_processor
    */
   class DummyPreProcessor : public PreProcessor<std_msgs::Int32, std_msgs::Int32>
   {
-  public:
-    DummyPreProcessor (const std::string& ns, Handler* handler);
+   public:
+    DummyPreProcessor(const std::string& ns, Handler* handler);
 
     virtual bool
       preProcess(const std_msgs::Int32ConstPtr& input, const std_msgs::Int32Ptr& output);
 
-  private:
+   private:
     int data_;
   };
 }  // namespace sensor_processor
 
-#endif  // SENSOR_PREPROCESSOR_DUMMY_PREPROCESSOR_H
+#endif  // SENSOR_PROCESSOR_DUMMY_PREPROCESSOR_H

@@ -46,9 +46,9 @@ namespace sensor_processor
 {
   class processor_error : public std::runtime_error
   {
-    public:
-      explicit processor_error(const std::string& errorDescription) :
-        std::runtime_error(errorDescription) {}
+   public:
+    explicit processor_error(const std::string& errorDescription) :
+      std::runtime_error(errorDescription) {}
   };
 }  // namespace sensor_processor
 
