@@ -76,7 +76,7 @@ namespace sensor_processor
   {
     this->processorNh_.reset( new ros::NodeHandle(ns) );
     this->publicNh_ = handler->shareNodeHandle();
-    this->name_ = ros::this_node::getName();
+    this->name_ = boost::to_upper_copy<std::string>(this->processorNh_->getNamespace());
   }
 
   ros::NodeHandlePtr GeneralProcessor::accessPublicNh()
