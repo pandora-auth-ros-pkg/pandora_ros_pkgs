@@ -39,7 +39,9 @@
 
 #include <string>
 #include <ctime>
+#include <vector>
 
+#include <pandora_geotiff/utilities.h>
 #include "pandora_qr_csv/qr_csv_creator.h"
 
 
@@ -48,7 +50,7 @@ namespace pandora_qr_csv
   QrCsvCreator::QrCsvCreator()
   {
     std::string nodeName = ros::this_node::getName();
-    qrReceived_ = false;
+    objectsReceived_ = false;
 
     /**
      * Configuration.
@@ -80,7 +82,7 @@ namespace pandora_qr_csv
     createCsvService_ = nh_.advertiseService(qrCsvServiceName_, &QrCsvCreator::handleRequest, this);
   }
 
-  void QrCsvCreator::getQrsData()
+  void QrCsvCreator::getObjects()
   {
     pandora_data_fusion_msgs::GetGeotiff dataFusionSrv;
 
@@ -93,9 +95,10 @@ namespace pandora_qr_csv
     }
 
     ROS_INFO("Service %s responded.", objectClient_.getService().c_str());
-    qrReceived_ = true;
+    objectsReceived_ = true;
 
     qrs_ = dataFusionSrv.response.qrs;
+    obstacles_ = dataFusionSrv.response.obstacles;
   }
 
   bool QrCsvCreator::handleRequest(createCSV::Request &req, createCSV::Response &res)
@@ -106,10 +109,11 @@ namespace pandora_qr_csv
     std::string currentDate = this -> getCurrentDate();
     std::string currentTime = this -> getCurrentTime();
 
-    this -> getQrsData();
+    this -> getObjects();
 
-    if (!qrReceived_) {
-      ROS_ERROR("QR data were not received. Aborting...");
+    if (!objectsReceived_)
+    {
+      ROS_ERROR("QRS and Obstacles were not received. Aborting...");
       res.result.data = false;
       return true;
     }
@@ -136,6 +140,22 @@ namespace pandora_qr_csv
     ROS_INFO("Current time: %s", timeStamp.c_str());
 
     return timeStamp;
+  }
+
+  std::string QrCsvCreator::rosTimeToLocal(ros::Time aTime)
+  {
+    int atime = static_cast<int>(aTime.toSec());
+    time_t t = (time_t)atime;
+
+    struct tm *now = localtime(&t);
+
+    char buf[20];
+    std::stringstream ss;
+
+    strftime(buf, sizeof(buf), "%T", now);
+    ss << buf;
+
+    return std::string(ss.str());
   }
 
   std::string QrCsvCreator::getCurrentDate()
@@ -191,16 +211,61 @@ namespace pandora_qr_csv
     // Body descripion.
     csvFile << "id,time,text,x,y,z,robot,mode" << std::endl;
 
-    for (int i = 0 ; i< qrs_.size(); i++)
+    std::vector<ros::Time> times;
+    std::vector<int> index;
+    int sortedIndex;
+
+    // Sort QRs.
+    for (size_t i = 0; i < qrs_.size(); i++)
     {
-      csvFile << qrs_[i].id << "," << currentTime
-                            << "," << qrs_[i].content
-                            << "," << qrs_[i].qrPose.pose.position.x
-                            << "," << qrs_[i].qrPose.pose.position.y
-                            << "," << qrs_[i].qrPose.pose.position.z
-                            << "," << robotName_
-                            << "," << robotMode_ << std::endl;
+      times.push_back(qrs_[i].timeFound);
     }
+
+    index = pandora_geotiff::getPermutationByTime(times);
+
+    time_t current;
+    // Append QRs to the csv file.
+    for (size_t i = 0 ; i < index.size(); i++)
+    {
+      sortedIndex = index[i];
+      csvFile << i + 1 << ","
+              << rosTimeToLocal(qrs_[sortedIndex].timeFound) << ","
+              << qrs_[sortedIndex].content << ","
+              << qrs_[sortedIndex].qrPose.pose.position.x << ","
+              << qrs_[sortedIndex].qrPose.pose.position.y << ","
+              << qrs_[sortedIndex].qrPose.pose.position.z << ","
+              << robotName_ << ","
+              << robotMode_ << std::endl;
+    }
+
+    times.clear();
+    index.clear();
+
+    // Sort Obstacles.
+    for (size_t i = 0; i < obstacles_.size(); i++ )
+    {
+      times.push_back(obstacles_[i].timeFound);
+    }
+
+    index = pandora_geotiff::getPermutationByTime(times);
+
+    // Append Obstacles to the csv file.
+    for (size_t i = 0; i < index.size(); i++)
+    {
+      sortedIndex = index[i];
+      csvFile << qrs_.size() + i + 1 << ","
+              << rosTimeToLocal(obstacles_[sortedIndex].timeFound) << ","
+              << obstacles_[sortedIndex].type << ","
+              << obstacles_[sortedIndex].obstaclePose.pose.position.x << ","
+              << obstacles_[sortedIndex].obstaclePose.pose.position.y << ","
+              << obstacles_[sortedIndex].obstaclePose.pose.position.z << ","
+              << robotName_ << ","
+              << robotMode_ << std::endl;
+    }
+
+    times.clear();
+    index.clear();
+
     ROS_INFO("Saving file to %s.", filepath.c_str());
 
     csvFile.close();

@@ -73,7 +73,13 @@ namespace pandora_geotiff
       times.push_back(tempTime);
     }
 
-    sortedPoses = sortObjects(poses, times);
+    std::vector<int> index;
+    index = getPermutationByTime(times);
+
+    for (size_t i = 0; i < index.size(); i++)
+    {
+      sortedPoses.push_back(poses[index[i]]);
+    }
 
     ASSERT_EQ(sortedPoses[0].pose.position.x, 9);
     ASSERT_EQ(sortedPoses[0].pose.position.y, 9);

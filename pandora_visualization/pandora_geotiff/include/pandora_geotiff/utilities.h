@@ -42,58 +42,50 @@
 #include <vector>
 #include <algorithm>
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
 
 
 namespace pandora_geotiff
 {
-  struct DataFusionObject
+  struct timeObject
   {
-    geometry_msgs::PoseStamped pose;
-    ros::Time time;
+    ros::Time time_;
+    int idx;
   };
 
-  struct byTimeFound
+  struct byMinTime
   {
-    bool operator()(DataFusionObject const &a, DataFusionObject const &b)
+    bool operator()(const timeObject &a, const timeObject &b)
     {
-      return a.time.toSec() < b.time.toSec();
+      return a.time_.toSec() < b.time_.toSec();
     }
   };
 
   /**
-   * @brief Sorts poses based on time.
+   * @brief Returns the permutations after sorting a vector.
    *
-   * @param poses A series of poses.
-   * @param times The time each pose has been found.
+   * @param times [ros::Time] Vector of times to sort.
    */
 
-  std::vector<geometry_msgs::PoseStamped>
-    sortObjects(std::vector<geometry_msgs::PoseStamped> &poses, std::vector<ros::Time> times)
+  std::vector<int> getPermutationByTime(std::vector<ros::Time> times)
+  {
+    std::vector<timeObject> timeObjects;
+    std::vector<int> index;
+
+    for (size_t i = 0; i < times.size(); i++)
     {
-      if (poses.size() != times.size())
-      {
-        ROS_ERROR("sortObjects: The size of the vectors is not the same.");
-      }
+      timeObject temp = {times[i], i};
+      timeObjects.push_back(temp);
+    }
 
-      std::vector<geometry_msgs::PoseStamped> sortedPoses;
-      std::vector<DataFusionObject> objects;
+    std::sort(timeObjects.begin(), timeObjects.end(), byMinTime());
 
-      for (size_t i = 0; i < poses.size(); i++)
-      {
-        DataFusionObject temp = {poses[i], times[i]};
-        objects.push_back(temp);
-      }
+    for (size_t i = 0; i < timeObjects.size(); i++)
+    {
+      index.push_back(timeObjects[i].idx);
+    }
 
-      std::sort(objects.begin(), objects.end(), byTimeFound());
-
-      for (size_t i = 0; i < objects.size(); i++)
-      {
-        sortedPoses.push_back(objects[i].pose);
-      }
-
-      return sortedPoses;
-    };
+    return index;
+  }
 }  // namespace pandora_geotiff
 
 #endif  // PANDORA_GEOTIFF_UTILITIES_H

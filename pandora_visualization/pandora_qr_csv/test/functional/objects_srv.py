@@ -19,7 +19,7 @@ def random_qr_info(id):
     qr = QrInfo()
     qr.id = id
     qr.qrFrameId = 'map'
-    qr.timeFound = rospy.Time.now()
+    qr.timeFound = rospy.Time.now() + rospy.Duration(id * 20)
     qr.qrPose.pose.position.x = random.randint(2, 10)
     qr.qrPose.pose.position.y = random.randint(2, 10)
     qr.qrPose.pose.position.z = random.randint(2, 10)
@@ -29,13 +29,26 @@ def random_qr_info(id):
     return qr
 
 
+def random_obstacle_info(id):
+    obstacle = ObstacleInfo()
+    obstacle.id = id
+    obstacle.timeFound = rospy.Time.now() + rospy.Duration(id * 60)
+    obstacle.obstaclePose.pose.position.x = random.randint(2, 10)
+    obstacle.obstaclePose.pose.position.y = random.randint(2, 10)
+    obstacle.obstaclePose.pose.position.z = random.randint(2, 10)
+    obstacle.probability = random.random()
+    obstacle.type = random.randint(1, 3)
+
+    return obstacle
+
+
 def send_objects(req):
     print("Service called.")
 
     qrs = [random_qr_info(i + 1) for i in range(6)]
     victims = [VictimInfo() for i in range(3)]
     hazmats = [HazmatInfo() for i in range(3)]
-    obstacles = [ObstacleInfo() for i in range(3)]
+    obstacles = [random_obstacle_info(i + 1) for i in range(3)]
 
     return GetGeotiffResponse(victims=victims,
                               hazmats=hazmats,

@@ -7,10 +7,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   pandora_data_fusion_msgs
+  pandora_geotiff
 )
 
 find_package(Eigen REQUIRED)
-include_directories(${Eigen_INCLUDE_DIRS})
 add_definitions(${Eigen_DEFINITIONS})
 
 add_service_files(
@@ -30,6 +30,7 @@ catkin_package(
     std_msgs
     message_runtime
     pandora_data_fusion_msgs
+    pandora_geotiff
   LIBRARIES
   DEPENDS Eigen
 )
@@ -37,6 +38,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 add_library(qr_csv_creator src/qr_csv_creator.cpp)

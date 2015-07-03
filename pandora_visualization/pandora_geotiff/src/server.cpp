@@ -237,9 +237,9 @@ namespace pandora_geotiff
 
     ROS_INFO("Drawing Data Fusion's objects.");
 
-    std::vector<geometry_msgs::PoseStamped> unsortedPoses;
-    std::vector<geometry_msgs::PoseStamped> sortedPoses;
+    std::vector<int> index;
     std::vector<ros::Time> times;
+    int sortedIndex;
 
     /**
      * Sorting QRs based on time found.
@@ -247,20 +247,19 @@ namespace pandora_geotiff
 
     for (int i = 0; i < qrs_.size(); i++)
     {
-      unsortedPoses.push_back(qrs_[i].qrPose);
       times.push_back(qrs_[i].timeFound);
     }
 
-    sortedPoses = sortObjects(unsortedPoses, times);
+    index = getPermutationByTime(times);
 
     ROS_INFO("Drawing %lu QRs.", qrs_.size());
     for (int i = 0; i < qrs_.size(); i++)
     {
-      this -> drawObject(sortedPoses[i], QR_COLOR, QR_SHAPE, i + 1, QR_SIZE);
+      sortedIndex = index[i];
+      this -> drawObject(qrs_[sortedIndex].qrPose, QR_COLOR, QR_SHAPE, i + 1, QR_SIZE);
     }
 
-    unsortedPoses.clear();
-    sortedPoses.clear();
+    index.clear();
     times.clear();
 
     /**
@@ -269,20 +268,19 @@ namespace pandora_geotiff
 
     for (int i = 0; i < hazmats_.size(); i++)
     {
-      unsortedPoses.push_back(hazmats_[i].hazmatPose);
       times.push_back(hazmats_[i].timeFound);
     }
 
-    sortedPoses = sortObjects(unsortedPoses, times);
+    index = getPermutationByTime(times);
 
     ROS_INFO("Drawing %lu Hazmats.", hazmats_.size());
     for (int i = 0; i < hazmats_.size(); i++)
     {
-      this -> drawObject(sortedPoses[i], HAZMAT_COLOR, HAZMAT_SHAPE, i + 1, HAZMAT_SIZE);
+      sortedIndex = index[i];
+      this -> drawObject(hazmats_[sortedIndex].hazmatPose, HAZMAT_COLOR, HAZMAT_SHAPE, i + 1, HAZMAT_SIZE);
     }
 
-    unsortedPoses.clear();
-    sortedPoses.clear();
+    index.clear();
     times.clear();
 
     /**
@@ -291,20 +289,19 @@ namespace pandora_geotiff
 
     for (int i = 0; i < victims_.size(); i++)
     {
-      unsortedPoses.push_back(victims_[i].victimPose);
       times.push_back(victims_[i].timeFound);
     }
 
-    sortedPoses = sortObjects(unsortedPoses, times);
+    index = getPermutationByTime(times);
 
     ROS_INFO("Drawing %lu Victims.", victims_.size());
     for (int i = 0; i < victims_.size(); i++)
     {
-      this -> drawObject(sortedPoses[i], VICTIM_COLOR, VICTIM_SHAPE, i + 1, VICTIM_SIZE);
+      sortedIndex = index[i];
+      this -> drawObject(victims_[sortedIndex].victimPose, VICTIM_COLOR, VICTIM_SHAPE, i + 1, VICTIM_SIZE);
     }
 
-    unsortedPoses.clear();
-    sortedPoses.clear();
+    index.clear();
     times.clear();
 
     /**
@@ -313,20 +310,20 @@ namespace pandora_geotiff
 
     for (int i = 0; i < obstacles_.size(); i++)
     {
-      unsortedPoses.push_back(obstacles_[i].obstaclePose);
       times.push_back(obstacles_[i].timeFound);
     }
 
-    sortedPoses = sortObjects(unsortedPoses, times);
+    index = getPermutationByTime(times);
 
     ROS_INFO("Drawing %lu Obstacles.", obstacles_.size());
     for (int i = 0; i < obstacles_.size(); i++)
     {
-      this -> drawObject(sortedPoses[i], OBSTACLE_COLOR, OBSTACLE_SHAPE, i + 1, OBSTACLE_SIZE);
+      sortedIndex = index[i];
+      this -> drawObject(obstacles_[sortedIndex].obstaclePose,
+                         OBSTACLE_COLOR, OBSTACLE_SHAPE, qrs_.size() + i + 1, OBSTACLE_SIZE);
     }
 
-    unsortedPoses.clear();
-    sortedPoses.clear();
+    index.clear();
     times.clear();
   }
 

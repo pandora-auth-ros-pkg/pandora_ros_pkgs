@@ -24,6 +24,7 @@
   <exec_depend>message_runtime</exec_depend>
 
   <depend>roscpp</depend>
+  <depend>pandora_geotiff</depend>
   <depend>std_msgs</depend>
   <depend>pandora_data_fusion_msgs</depend>
 

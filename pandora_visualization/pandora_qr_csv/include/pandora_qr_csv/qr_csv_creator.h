@@ -53,6 +53,8 @@
 #include <ros/ros.h>
 
 #include "pandora_qr_csv/createCSV.h"
+#include "pandora_data_fusion_msgs/QrInfo.h"
+#include "pandora_data_fusion_msgs/HazmatInfo.h"
 #include "pandora_data_fusion_msgs/GetGeotiff.h"
 
 
@@ -118,15 +120,21 @@ namespace pandora_qr_csv
       std::string directoryToSave_;
 
       //!< Flag
-      bool qrReceived_;
+      bool objectsReceived_;
 
+      //!< QRs received from DataFusion.
       std::vector<pandora_data_fusion_msgs::QrInfo> qrs_;
 
-      void getQrsData();
+      //!< Obstacles received from DataFusion.
+      std::vector<pandora_data_fusion_msgs::ObstacleInfo> obstacles_;
+
+      void getObjects();
 
       std::string getCurrentDate();
 
       std::string getCurrentTime();
+
+      std::string rosTimeToLocal(ros::Time aTime);
   };
 }  // namespace pandora_qr_csv
 
