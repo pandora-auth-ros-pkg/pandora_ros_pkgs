@@ -50,6 +50,10 @@ target_link_libraries(creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
 
 add_library(server src/server.cpp)
 target_link_libraries(server creator ${catkin_LIBRARIES})
+add_dependencies(server
+    ${catkin_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    )
 
 add_executable(pandora_geotiff_node src/pandora_geotiff_node.cpp)
 target_link_libraries(pandora_geotiff_node
