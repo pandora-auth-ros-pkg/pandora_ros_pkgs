@@ -33,58 +33,68 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Chamzas Konstantinos <chamzask@gmail.com>
+ *   Sideris Konstantinos <siderisk@auth.gr>
  *********************************************************************/
 
-#include <vector>
-#include <string>
-#include <ros/package.h>
-#include "gtest/gtest.h"
+#ifndef PANDORA_GEOTIFF_UTILITIES_H
+#define PANDORA_GEOTIFF_UTILITIES_H
 
-#include "stdr_server/map_loader.h"
-#include "pandora_geotiff/creator.h"
+#include <vector>
+#include <ros/ros.h>
+#include <geometry_msgs/PoseStamped.h>
 
 
 namespace pandora_geotiff
 {
-  class GeotiffCreatorTest : public ::testing::Test
+  /**
+   * @brief Sorts poses based on time.
+   *
+   * @param poses
+   * @param times
+   */
+
+  std::vector<geometry_msgs::PoseStamped>
+  sortObjects(std::vector<geometry_msgs::PoseStamped> &poses, std::vector<ros::Time> times)
   {
-    protected:
-      GeotiffCreatorTest()
+    if (poses.size() != times.size())
+    {
+      //ROS_ERROR("sortObjects: The size of the vectors is not the same.");
+    }
+
+    std::vector<geometry_msgs::PoseStamped> sortedPoses;
+
+    struct DataFusionObject
+    {
+      geometry_msgs::PoseStamped pose;
+      ros::Time time;
+    };
+
+    struct byTimeFound
+    {
+      bool operator()(DataFusionObject const &a, DataFusionObject const &b)
       {
-        ros::Time::init();
-        gc = Creator();
-        std::string packagePath = ros::package::getPath("pandora_geotiff");
-        map = stdr_server::map_loader::loadMap(packagePath + "/test/test_maps/map1.yaml");
-
-        points.resize(250);
-
-        for (int i = 0; i < 251; i++) {
-          points[i] = Eigen::Vector2f(i / 10, i / 10);
-        }
+        return a.time.toSec() < b.time.toSec();
       }
+    };
 
-      std::vector<Eigen::Vector2f> points;
-      Creator gc;
-      nav_msgs::OccupancyGrid map;
+    std::vector<DataFusionObject> objects;
+
+    for (int i = 0; i < poses.size(); i++)
+    {
+      DataFusionObject temp = {poses[i], times[i]};
+      objects.push_back(temp);
+    }
+
+    std::sort(objects.begin(), objects.end(), byTimeFound());
+
+    for (int i = 0; i < objects.size(); i++)
+    {
+      sortedPoses.push_back(objects[i].pose);
+    }
+
+    return sortedPoses;
+
   };
-
-  TEST_F(GeotiffCreatorTest, createBackgroundIm)
-  {
-    gc.drawMap(map, "WHITE_MAX", -5, 5, 1);
-    gc.drawMap(map, "MAGENTA", 80, 110, 0);
-    gc.drawPath(points, "SOLID_ORANGE", 3);
-    gc.drawPOI(Eigen::Vector2f(2, 5), "PINK", "WHITE_MAX", "CIRCLE", "5", 20);
-    gc.drawPOI(Eigen::Vector2f(4, 3), "SOLID_RED", "WHITE_MAX", "DIAMOND", "5", 50);
-    gc.drawPOI(Eigen::Vector2f(7, 6), "SOLID_BLUE", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(6, 7), "SOLID_BLUE", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(6, 6), "MAGENTA", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(0, 0), "YELLOW", "WHITE", "ARROW", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(1, 1), "YELLOW", "WHITE", "ARROW", "5", 10);
-    gc.drawPOI(Eigen::Vector2f(10, 10), "YELLOW", "WHITE", "ARROW", "5", 10);
-    gc.createBackgroundImage();
-
-    // Save to the home directory.
-    gc.saveGeotiff("");
-  }
 }  // namespace pandora_geotiff
+
+#endif

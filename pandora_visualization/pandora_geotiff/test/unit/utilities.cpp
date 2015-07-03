@@ -38,53 +38,57 @@
 
 #include <vector>
 #include <string>
-#include <ros/package.h>
-#include "gtest/gtest.h"
 
-#include "stdr_server/map_loader.h"
-#include "pandora_geotiff/creator.h"
+#include <ros/ros.h>
+#include <gtest/gtest.h>
+
+#include <geometry_msgs/PoseStamped.h>
+
+#include "pandora_geotiff/utilities.h"
 
 
 namespace pandora_geotiff
 {
-  class GeotiffCreatorTest : public ::testing::Test
+  TEST(UtilitiesTest, sortPoses)
   {
-    protected:
-      GeotiffCreatorTest()
-      {
-        ros::Time::init();
-        gc = Creator();
-        std::string packagePath = ros::package::getPath("pandora_geotiff");
-        map = stdr_server::map_loader::loadMap(packagePath + "/test/test_maps/map1.yaml");
+    // Create random poses with times in descending order.
+    std::vector<geometry_msgs::PoseStamped> sortedPoses;
+    std::vector<geometry_msgs::PoseStamped> poses;
+    std::vector<ros::Time> times;
 
-        points.resize(250);
+    ros::Time::init();
 
-        for (int i = 0; i < 251; i++) {
-          points[i] = Eigen::Vector2f(i / 10, i / 10);
-        }
-      }
+    for (int i = 0; i < 10; i++)
+    {
+      geometry_msgs::PoseStamped tempPose;
+      ros::Time tempTime;
 
-      std::vector<Eigen::Vector2f> points;
-      Creator gc;
-      nav_msgs::OccupancyGrid map;
-  };
+      tempPose.pose.position.x = i;
+      tempPose.pose.position.y = i;
+      tempPose.pose.position.z = i;
 
-  TEST_F(GeotiffCreatorTest, createBackgroundIm)
-  {
-    gc.drawMap(map, "WHITE_MAX", -5, 5, 1);
-    gc.drawMap(map, "MAGENTA", 80, 110, 0);
-    gc.drawPath(points, "SOLID_ORANGE", 3);
-    gc.drawPOI(Eigen::Vector2f(2, 5), "PINK", "WHITE_MAX", "CIRCLE", "5", 20);
-    gc.drawPOI(Eigen::Vector2f(4, 3), "SOLID_RED", "WHITE_MAX", "DIAMOND", "5", 50);
-    gc.drawPOI(Eigen::Vector2f(7, 6), "SOLID_BLUE", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(6, 7), "SOLID_BLUE", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(6, 6), "MAGENTA", "WHITE_MAX", "CIRCLE", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(0, 0), "YELLOW", "WHITE", "ARROW", "5", 30);
-    gc.drawPOI(Eigen::Vector2f(1, 1), "YELLOW", "WHITE", "ARROW", "5", 10);
-    gc.drawPOI(Eigen::Vector2f(10, 10), "YELLOW", "WHITE", "ARROW", "5", 10);
-    gc.createBackgroundImage();
+      tempTime = ros::Time::now() + ros::Duration(600/(i + 1));
 
-    // Save to the home directory.
-    gc.saveGeotiff("");
+      poses.push_back(tempPose);
+      times.push_back(tempTime);
+    }
+
+    sortedPoses = sortObjects(poses, times);
+
+    ASSERT_EQ(sortedPoses[0].pose.position.x, 9);
+    ASSERT_EQ(sortedPoses[0].pose.position.y, 9);
+    ASSERT_EQ(sortedPoses[0].pose.position.z, 9);
+
+    ASSERT_EQ(sortedPoses[9].pose.position.x, 0);
+    ASSERT_EQ(sortedPoses[9].pose.position.y, 0);
+    ASSERT_EQ(sortedPoses[9].pose.position.z, 0);
   }
-}  // namespace pandora_geotiff
+}
+
+int main(int argc, char **argv)
+{
+  ros::init(argc, argv, "utilities");
+  testing::InitGoogleTest(&argc, argv);
+
+  return RUN_ALL_TESTS();
+}

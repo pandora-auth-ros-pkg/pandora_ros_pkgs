@@ -39,12 +39,14 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <boost/lexical_cast.hpp>
 
 #include "pandora_data_fusion_msgs/GetGeotiff.h"
 
 #include "pandora_geotiff/SaveMission.h"
+#include "pandora_geotiff/utilities.h"
 #include "pandora_geotiff/server.h"
 #include "pandora_geotiff/creator.h"
 
@@ -235,29 +237,97 @@ namespace pandora_geotiff
 
     ROS_INFO("Drawing Data Fusion's objects.");
 
+    std::vector<geometry_msgs::PoseStamped> unsortedPoses;
+    std::vector<geometry_msgs::PoseStamped> sortedPoses;
+    std::vector<ros::Time> times;
+
+    /**
+     * Sorting QRs based on time found.
+     */
+
     for (int i = 0; i < qrs_.size(); i++)
     {
-      ROS_INFO("Drawing QRs.");
-      this -> drawObject(qrs_[i].qrPose, QR_COLOR, QR_SHAPE, qrs_[i].id, QR_SIZE);
+      unsortedPoses.push_back(qrs_[i].qrPose);
+      times.push_back(qrs_[i].timeFound);
     }
+
+    sortedPoses = sortObjects(unsortedPoses, times);
+
+    ROS_INFO("Drawing %u QRs.", qrs_.size());
+    for (int i = 0; i < qrs_.size(); i++)
+    {
+      this -> drawObject(sortedPoses[i], QR_COLOR, QR_SHAPE, i + 1, QR_SIZE);
+    }
+
+    unsortedPoses.clear();
+    sortedPoses.clear();
+    times.clear();
+
+    /**
+     * Sorting Hazmats based on time found.
+     */
 
     for (int i = 0; i < hazmats_.size(); i++)
     {
-      ROS_INFO("Drawing Hazmats.");
-      this -> drawObject(hazmats_[i].hazmatPose, HAZMAT_COLOR, HAZMAT_SHAPE, hazmats_[i].id, HAZMAT_SIZE);
+      unsortedPoses.push_back(hazmats_[i].hazmatPose);
+      times.push_back(hazmats_[i].timeFound);
     }
+
+    sortedPoses = sortObjects(unsortedPoses, times);
+
+    ROS_INFO("Drawing %u Hazmats.", hazmats_.size());
+    for (int i = 0; i < hazmats_.size(); i++)
+    {
+      this -> drawObject(sortedPoses[i], HAZMAT_COLOR, HAZMAT_SHAPE, i + 1, HAZMAT_SIZE);
+    }
+
+    unsortedPoses.clear();
+    sortedPoses.clear();
+    times.clear();
+
+    /**
+     * Sorting victims based on time found.
+     */
 
     for (int i = 0; i < victims_.size(); i++)
     {
-      ROS_INFO("Drawing Victims.");
-      this -> drawObject(victims_[i].victimPose, VICTIM_COLOR, VICTIM_SHAPE, victims_[i].id, VICTIM_SIZE);
+      unsortedPoses.push_back(victims_[i].victimPose);
+      times.push_back(victims_[i].timeFound);
     }
+
+    sortedPoses = sortObjects(unsortedPoses, times);
+
+    ROS_INFO("Drawing %u Victims.", victims_.size());
+    for (int i = 0; i < victims_.size(); i++)
+    {
+      this -> drawObject(sortedPoses[i], VICTIM_COLOR, VICTIM_SHAPE, i + 1, VICTIM_SIZE);
+    }
+
+    unsortedPoses.clear();
+    sortedPoses.clear();
+    times.clear();
+
+    /**
+     * Sorting obstacles based on time found.
+     */
 
     for (int i = 0; i < obstacles_.size(); i++)
     {
-      ROS_INFO("Drawing Obstacles.");
-      this -> drawObject(obstacles_[i].obstaclePose, OBSTACLE_COLOR, OBSTACLE_SHAPE, obstacles_[i].id, OBSTACLE_SIZE);
+      unsortedPoses.push_back(obstacles_[i].obstaclePose);
+      times.push_back(obstacles_[i].timeFound);
     }
+
+    sortedPoses = sortObjects(unsortedPoses, times);
+
+    ROS_INFO("Drawing %u Obstacles.", obstacles_.size());
+    for (int i = 0; i < obstacles_.size(); i++)
+    {
+      this -> drawObject(sortedPoses[i], OBSTACLE_COLOR, OBSTACLE_SHAPE, i + 1, OBSTACLE_SIZE);
+    }
+
+    unsortedPoses.clear();
+    sortedPoses.clear();
+    times.clear();
   }
 
   bool Server::handleRequest(SaveMission::Request &req, SaveMission::Response &res)
@@ -344,7 +414,7 @@ namespace pandora_geotiff
   {
     ROS_INFO("Starting geotiff creation for mission: %s.", fileName.c_str());
 
-    // TODO(mujx) There errors should be returned when the service is called to notify the client.
+    // TODO(mujx) These errors should be returned when the service is called to notify the client.
     if (!mapReceived_)
       ROS_ERROR("Map is not available.");
 
