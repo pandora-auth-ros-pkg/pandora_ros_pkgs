@@ -83,7 +83,7 @@ namespace pandora_geotiff
     ASSERT_EQ(sortedPoses[9].pose.position.y, 0);
     ASSERT_EQ(sortedPoses[9].pose.position.z, 0);
   }
-}
+}  // namespace pandora_geotiff
 
 int main(int argc, char **argv)
 {

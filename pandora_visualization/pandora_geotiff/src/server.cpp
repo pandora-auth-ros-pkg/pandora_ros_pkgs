@@ -253,7 +253,7 @@ namespace pandora_geotiff
 
     sortedPoses = sortObjects(unsortedPoses, times);
 
-    ROS_INFO("Drawing %u QRs.", qrs_.size());
+    ROS_INFO("Drawing %lu QRs.", qrs_.size());
     for (int i = 0; i < qrs_.size(); i++)
     {
       this -> drawObject(sortedPoses[i], QR_COLOR, QR_SHAPE, i + 1, QR_SIZE);
@@ -275,7 +275,7 @@ namespace pandora_geotiff
 
     sortedPoses = sortObjects(unsortedPoses, times);
 
-    ROS_INFO("Drawing %u Hazmats.", hazmats_.size());
+    ROS_INFO("Drawing %lu Hazmats.", hazmats_.size());
     for (int i = 0; i < hazmats_.size(); i++)
     {
       this -> drawObject(sortedPoses[i], HAZMAT_COLOR, HAZMAT_SHAPE, i + 1, HAZMAT_SIZE);
@@ -297,7 +297,7 @@ namespace pandora_geotiff
 
     sortedPoses = sortObjects(unsortedPoses, times);
 
-    ROS_INFO("Drawing %u Victims.", victims_.size());
+    ROS_INFO("Drawing %lu Victims.", victims_.size());
     for (int i = 0; i < victims_.size(); i++)
     {
       this -> drawObject(sortedPoses[i], VICTIM_COLOR, VICTIM_SHAPE, i + 1, VICTIM_SIZE);
@@ -319,7 +319,7 @@ namespace pandora_geotiff
 
     sortedPoses = sortObjects(unsortedPoses, times);
 
-    ROS_INFO("Drawing %u Obstacles.", obstacles_.size());
+    ROS_INFO("Drawing %lu Obstacles.", obstacles_.size());
     for (int i = 0; i < obstacles_.size(); i++)
     {
       this -> drawObject(sortedPoses[i], OBSTACLE_COLOR, OBSTACLE_SHAPE, i + 1, OBSTACLE_SIZE);
@@ -394,7 +394,7 @@ namespace pandora_geotiff
     std::vector<Eigen::Vector2f> pointVector;
     pointVector.resize(size);
 
-    ROS_INFO("Path size: %u", size);
+    ROS_INFO("Path size: %lu", size);
 
     for (size_t i = 0; i < size; ++i) {
       const geometry_msgs::PoseStamped &pose(path_vector[i]);

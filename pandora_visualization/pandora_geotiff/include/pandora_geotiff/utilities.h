@@ -40,61 +40,60 @@
 #define PANDORA_GEOTIFF_UTILITIES_H
 
 #include <vector>
+#include <algorithm>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 
 
 namespace pandora_geotiff
 {
+  struct DataFusionObject
+  {
+    geometry_msgs::PoseStamped pose;
+    ros::Time time;
+  };
+
+  struct byTimeFound
+  {
+    bool operator()(DataFusionObject const &a, DataFusionObject const &b)
+    {
+      return a.time.toSec() < b.time.toSec();
+    }
+  };
+
   /**
    * @brief Sorts poses based on time.
    *
-   * @param poses
-   * @param times
+   * @param poses A series of poses.
+   * @param times The time each pose has been found.
    */
 
   std::vector<geometry_msgs::PoseStamped>
-  sortObjects(std::vector<geometry_msgs::PoseStamped> &poses, std::vector<ros::Time> times)
-  {
-    if (poses.size() != times.size())
+    sortObjects(std::vector<geometry_msgs::PoseStamped> &poses, std::vector<ros::Time> times)
     {
-      //ROS_ERROR("sortObjects: The size of the vectors is not the same.");
-    }
-
-    std::vector<geometry_msgs::PoseStamped> sortedPoses;
-
-    struct DataFusionObject
-    {
-      geometry_msgs::PoseStamped pose;
-      ros::Time time;
-    };
-
-    struct byTimeFound
-    {
-      bool operator()(DataFusionObject const &a, DataFusionObject const &b)
+      if (poses.size() != times.size())
       {
-        return a.time.toSec() < b.time.toSec();
+        ROS_ERROR("sortObjects: The size of the vectors is not the same.");
       }
+
+      std::vector<geometry_msgs::PoseStamped> sortedPoses;
+      std::vector<DataFusionObject> objects;
+
+      for (size_t i = 0; i < poses.size(); i++)
+      {
+        DataFusionObject temp = {poses[i], times[i]};
+        objects.push_back(temp);
+      }
+
+      std::sort(objects.begin(), objects.end(), byTimeFound());
+
+      for (size_t i = 0; i < objects.size(); i++)
+      {
+        sortedPoses.push_back(objects[i].pose);
+      }
+
+      return sortedPoses;
     };
-
-    std::vector<DataFusionObject> objects;
-
-    for (int i = 0; i < poses.size(); i++)
-    {
-      DataFusionObject temp = {poses[i], times[i]};
-      objects.push_back(temp);
-    }
-
-    std::sort(objects.begin(), objects.end(), byTimeFound());
-
-    for (int i = 0; i < objects.size(); i++)
-    {
-      sortedPoses.push_back(objects[i].pose);
-    }
-
-    return sortedPoses;
-
-  };
 }  // namespace pandora_geotiff
 
-#endif
+#endif  // PANDORA_GEOTIFF_UTILITIES_H
