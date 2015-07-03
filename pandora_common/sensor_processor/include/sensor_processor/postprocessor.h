@@ -59,6 +59,7 @@ namespace sensor_processor
    public:
     PostProcessor(const std::string& ns, Handler* handler)
     {
+      initialize(ns, handler);
     }
     PostProcessor(void) {}
 
@@ -97,7 +98,7 @@ namespace sensor_processor
       }
       catch (boost::bad_any_cast& e)
       {
-        ROS_FATAL("Bad any_cast occured in postprocessor: %s",
+        ROS_FATAL("Bad any_cast occured in postprocessor %s: %s",
             this->getName().c_str(), e.what());
         ROS_BREAK();
       }
