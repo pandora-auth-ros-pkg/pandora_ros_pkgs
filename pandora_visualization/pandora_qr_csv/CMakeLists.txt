@@ -67,6 +67,6 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
 ############################## TESTING ##############################
 
-if(CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
-endif()
+#if(CATKIN_ENABLE_TESTING)
+  #add_subdirectory(test)
+#endif()
