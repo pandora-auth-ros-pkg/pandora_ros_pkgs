@@ -48,7 +48,7 @@
 
   <!-- Fusion -->
   <group if="$(arg fusion)">
-    <include file="$(find pandora_data_fusion_launchers)/launch/data_fusion.launch" />
+    <include file="$(find pandora_data_fusion_launchers)/launch/pandora_data_fusion.launch" />
     <include if="$(arg rviz)" file="$(find pandora_runtime_visualization)/launch/visualization.launch" />
   </group>
 
