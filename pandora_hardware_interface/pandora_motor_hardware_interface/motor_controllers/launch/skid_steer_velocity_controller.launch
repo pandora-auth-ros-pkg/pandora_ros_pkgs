@@ -1,7 +1,9 @@
 <launch>
-  <arg name="robot" default="woody" />
+  <arg name="robot" default="gio" />
   <arg name="namespace" default="motor" />
+
   <arg name="sim" default="false"/>
+
   <rosparam
     command="load"
     file="$(find pandora_motor_hardware_interface)/motor_controllers/config/skid_steer_velocity_controller.yaml"
@@ -10,7 +12,6 @@
   <param
     name="robot_description"
     command="$(find xacro)/xacro.py '$(find pandora_robots_description)/$(arg robot)/urdf/$(arg robot).urdf.xacro'"/>
-
 
   <!-- spawn velocity controller -->
   <node

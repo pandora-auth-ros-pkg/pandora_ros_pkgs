@@ -21,15 +21,14 @@ find_package(catkin REQUIRED COMPONENTS
   angles
   tf
   pandora_sensor_msgs
-  # pandora_motion_control
   pandora_cmake_tools
   dynamic_reconfigure
 )
 
-# add_message_files(
-#   FILES
-#    KinodynamicCommand.msg
-#    )
+add_message_files(
+  FILES
+   KinodynamicCommand.msg
+   )
 
 generate_messages(
   DEPENDENCIES
