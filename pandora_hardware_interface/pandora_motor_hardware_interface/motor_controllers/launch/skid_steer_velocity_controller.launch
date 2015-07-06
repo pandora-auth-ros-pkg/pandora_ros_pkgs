@@ -1,13 +1,7 @@
 <launch>
-  <arg name="robot" default="gio" />
+  <arg name="robot" default="woody" />
   <arg name="namespace" default="motor" />
-
-  <!-- load configuration -->
-  <rosparam
-    command="load"
-    file="$(find pandora_motor_hardware_interface)/motor_controllers/config/joint_state_controller.yaml"
-    ns="$(arg namespace)"/>
-
+  <arg name="sim" default="false"/>
   <rosparam
     command="load"
     file="$(find pandora_motor_hardware_interface)/motor_controllers/config/skid_steer_velocity_controller.yaml"
@@ -17,14 +11,12 @@
     name="robot_description"
     command="$(find xacro)/xacro.py '$(find pandora_robots_description)/$(arg robot)/urdf/$(arg robot).urdf.xacro'"/>
 
-  <!-- spawn controller -->
+
+  <!-- spawn velocity controller -->
   <node
-    name="motor_controller_spawner"
+    name="skid_steer_velocity_controller_spawner"
     pkg="controller_manager"
     type="controller_manager" output="screen"
     ns="$(arg namespace)"
-    args="
-      spawn
-      joint_state_controller
-      skid_steer_velocity_controller" />
+    args="spawn skid_steer_velocity_controller" />
 </launch>

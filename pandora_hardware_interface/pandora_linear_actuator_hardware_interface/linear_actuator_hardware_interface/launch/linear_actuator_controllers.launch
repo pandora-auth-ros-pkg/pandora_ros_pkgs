@@ -1,0 +1,22 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/config/linear_actuator_hardware_interface_and_controllers.yaml"
+    ns="/linear_actuator"/>
+
+  <!-- spawn controller -->
+  <node
+    name="linear_actuator_controller_spawner"
+    pkg="controller_manager"
+    type="controller_manager" output="screen"
+    ns="/linear_actuator"
+    args="
+      spawn
+      joint_state_controller
+      linear_actuator_controller">
+    <remap
+      from="/linear_actuator/linear_actuator_controller/command"
+      to="/linear_actuator_controller/command"/>
+  </node>
+</launch>

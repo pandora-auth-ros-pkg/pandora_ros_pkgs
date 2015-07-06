@@ -6,3 +6,21 @@ motor_joints:
     right_front_joint: right_front_wheel_joint
     left_rear_joint: left_rear_wheel_joint
     right_rear_joint: right_rear_wheel_joint
+
+joint_limits:
+  left_front_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 5.09
+    min_velocity: -5.09
+  right_front_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 5.09
+    min_velocity: -5.09
+  left_rear_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 5.09
+    min_velocity: -5.09
+  right_rear_wheel_joint:
+    has_velocity_limits: true
+    max_velocity: 5.09
+    min_velocity: -5.09

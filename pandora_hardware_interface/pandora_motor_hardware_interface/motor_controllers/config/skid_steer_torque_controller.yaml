@@ -1,0 +1,7 @@
+skid_steer_torque_controller:
+  type: pandora_motor/SkidSteerTorqueController
+  left_front_wheel: left_front_wheel_joint
+  right_front_wheel: right_front_wheel_joint
+  left_rear_wheel: left_rear_wheel_joint
+  right_rear_wheel: right_rear_wheel_joint
+  publish_rate: 50

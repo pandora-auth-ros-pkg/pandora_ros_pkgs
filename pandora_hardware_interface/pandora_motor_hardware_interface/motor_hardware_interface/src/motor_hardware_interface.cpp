@@ -33,6 +33,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author:  Elisavet Papadopoulou
+* Author:  Kostantinos Zisis
 *********************************************************************/
 #include "motor_hardware_interface/motor_hardware_interface.h"
 
@@ -45,10 +47,6 @@ namespace motor
   :
     nodeHandle_(nodeHandle)
   {
-    std::string _portName;
-    int _baudrate;
-    int _timeout;
-
     motors_ = new SerialEpos2Handler();
     readJointNameFromParamServer();
     nodeHandle_.getParam("max_RPM", maxRPM_);
@@ -74,10 +72,49 @@ namespace motor
     {
       hardware_interface::JointHandle jointVelocityHandle(
         jointStateInterface_.getHandle(jointNames_[ii]),
-        &command_[ii]);
+        &vel_command_[ii]);
       velocityJointInterface_.registerHandle(jointVelocityHandle);
     }
     registerInterface(&velocityJointInterface_);
+
+    // Add effortJointInterface!
+    // TODO(zisikons): CHANGE COMMAND_VECTOR
+    for (int ii = 0; ii < jointNames_.size(); ii++)
+    {
+      hardware_interface::JointHandle jointEffortHandle(
+        jointStateInterface_.getHandle(jointNames_[ii]),
+        &torque_command_[ii]);
+      effortJointInterface_.registerHandle(jointEffortHandle);
+    }
+    registerInterface(&effortJointInterface_);
+
+    // Set motor control mode to velocity control mode
+    motors_->setMode(0);
+
+    //Initiallize jointLimits 
+    for (int ii = 0; ii < jointNames_.size(); ii++)
+    {
+
+
+      hardware_interface::JointHandle jointLimitsHandle =
+        velocityJointInterface_.getHandle(jointNames_[ii]);
+
+      // TODO(gkouros): initialize softLimits_
+      if (!joint_limits_interface::getJointLimits(jointNames_[ii], nodeHandle_ , limits_))
+      {
+        ROS_FATAL("[MOTORS]: Joint Limits not specified in the parameter server");
+        exit(-1);
+      }
+      //Register handle in joint limits interface
+      joint_limits_interface::VelocityJointSoftLimitsHandle handle(
+        jointLimitsHandle,  // We read the state and read/write the command
+        limits_,  // Limits spec
+        softLimits_);  // Soft limits spec.Not required in our implementation.
+
+      velocityLimitsInterface_.registerHandle(handle);
+    }
+    registerInterface(&velocityLimitsInterface_);  // to do or not to do ???
+
 
     motorCurrentsMsg_.name.push_back(
       "Node 1, Left_Front Motor, EPOS2 Gateway");
@@ -103,6 +140,7 @@ namespace motor
   {
     int velFeed[4];
     int currFeed[4];
+    double effortFeed[4];
 
     /*--<Read motors actual velocity value from EPOS controllers>--*/
     motors_->getRPM(&velFeed[2], &velFeed[0], &velFeed[3], &velFeed[1]);
@@ -113,6 +151,14 @@ namespace motor
       &currFeed[3]);
     /*-------------------------------------------------------------*/
 
+    /*
+    CHECK AGAIN  !!!!
+    */
+    /*--<Read motors actual torque value from EPOS controllers>---*/
+    motors_->getTorque(&effortFeed[0], &effortFeed[1], &effortFeed[2],
+      &effortFeed[3]);
+    /*-------------------------------------------------------------*/
+
     /*--<Update local velocity, current, and position values>--*/
     for (int ii = 0; ii < 4; ii++)
     {
@@ -121,6 +167,7 @@ namespace motor
       current_[ii] = static_cast<double>(currFeed[ii]);
       motorCurrentsMsg_.current[ii] = current_[ii];
       position_[ii] = position_[ii] + period.toSec() * velocity_[ii];
+      effort_[ii] = effortFeed[ii];
     }
     /*---------------------------------------------------------*/
 
@@ -132,19 +179,43 @@ namespace motor
 
   void MotorHardwareInterface::write()
   {
-    double RPMCommand[2];
-    for (int ii = 0; ii < 2; ii++)
+    if (motors_->getMode() == 0)
     {
-      RPMCommand[ii] = command_[ii] * gearboxRatio_ * 30 / 3.14;
-      if (fabs(RPMCommand[ii]) > maxRPM_)
+      // why period needed ?
+      ros::Duration period(0.1);
+      velocityLimitsInterface_.enforceLimits(period);
+
+      // Velocity Control Mode
+      double RPMCommand[2];
+      for (int ii = 0; ii < 2; ii++)
       {
-        ROS_DEBUG_STREAM("Limiting wheel speed, it's to high");
-        RPMCommand[ii] = copysign(maxRPM_, RPMCommand[ii]);
+        RPMCommand[ii] = vel_command_[ii] * gearboxRatio_ * 30 / 3.14;
+        if (fabs(RPMCommand[ii]) > maxRPM_)
+        {
+          ROS_DEBUG_STREAM("Limiting wheel speed, it's to high");
+          RPMCommand[ii] = copysign(maxRPM_, RPMCommand[ii]);
+        }
       }
+      ROS_DEBUG_STREAM("Commands: " << RPMCommand[0] << ", " << RPMCommand[1]);
+      motors_->writeRPM(RPMCommand[0], RPMCommand[1]);
     }
-    ROS_DEBUG_STREAM("Commands: " << RPMCommand[0] << ", " << RPMCommand[1]);
-    motors_->writeRPM(RPMCommand[0], RPMCommand[1]);
+
+
+    else if (motors_->getMode() == 1)
+    {
+      // Probably add if else struct for controlling torque limits
+      // !!! IMPORTANT : Make sure that torque commands are given in the correct order
+      motors_->writeTorques(
+                            torque_command_[0],
+                            torque_command_[1],
+                            torque_command_[2],
+                            torque_command_[3]);
+
+      ROS_DEBUG_STREAM("Torque Commands: " << torque_command_[0] << ", " << torque_command_[1]
+                                    << ", "  <<  torque_command_[2] << ", " << torque_command_[3]);
+    }
   }
+
 
   void MotorHardwareInterface::readJointNameFromParamServer()
   {
@@ -166,5 +237,6 @@ namespace motor
       name);
     jointNames_.push_back(name);
   }
+
 }  // namespace motor
 }  // namespace pandora_hardware_interface

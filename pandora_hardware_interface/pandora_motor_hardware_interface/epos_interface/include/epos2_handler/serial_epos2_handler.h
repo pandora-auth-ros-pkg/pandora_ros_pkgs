@@ -57,7 +57,7 @@ namespace motor
   };
 
 
-  //====================Serial Epos2 Handler Class========================
+  // ====================Serial Epos2 Handler Class========================
 
   class SerialEpos2Handler: public AbstractEposHandler
   {
@@ -71,6 +71,12 @@ namespace motor
       Epos2Controller* leftFrontMotor_;
       Epos2Controller* leftRearMotor_;
       uint16_t gatewayId_;
+
+      /*
+       * operation_mode_ = 0 ==> velocity mode
+       * operation_mode_ = 1 ==> current mode
+       */
+      int operation_mode_;
 
     public:
       /*!
@@ -111,7 +117,12 @@ namespace motor
         int* rightRearCurrent,
         int* rightFrontCurrent);
 
+
+      /*!
+       * @TODO -- Doxy
+       */
       virtual Error getError();
+
 
       /*!
        * @brief Writes velocity commands (rpm) to motor cotrollers
@@ -121,25 +132,69 @@ namespace motor
        */
       virtual uint16_t writeRPM(const int leftRpm, const int rightRpm);
 
+
       /*!
        * @brief Reads motor controller states and stores the values
        *  in a private scope
        */
       void readStates(void);
 
+
+      /*!
+       * @TODO -- Doxy
+       */
       void stateHandle(void);
 
-      void currentToTorque(
-        int* leftRearTorque,
-        int* leftFrontTorque,
-        int* rightRearTorque,
-        int* rightFrontTorque);
 
-      void torqueToCurrent(
-        const int rightFrontTorque,
-        const int rightRearTorque,
-        const int leftFrontTorque,
-        const int leftRearTorque);
+      /*!
+       * TODO -- Doxy
+       */
+      void getTorque(
+        double* leftRearTorque,
+        double* leftFrontTorque,
+        double* rightRearTorque,
+        double* rightFrontTorque);
+
+
+      /*!
+       * @brief Converts single WHEEL Torque to motor current
+       */
+      int16_t torqueToCurrent(
+        double _input_torque);
+
+
+      /*!
+       * @brief Converts single motor current to WHEEL Torque 
+       */
+      double currentToTorque(
+        int _input_current);
+
+
+      /*!
+       * @brief Writes torque commands to motor controllers 
+       * (needs to convert torques to currents as well)
+       */
+      uint16_t writeTorques(
+        double leftRearTorque,
+        double leftFrontTorque,
+        double rightRearTorque,
+        double rightFrontTorque);
+
+
+      /*!
+       * @brief Switches between current and velocity mode 
+       *        Constuctor defaul = velocity mode 
+       * 
+       * @param mode  mode = 0 => velocity mode
+       *              mode = 1 => current mode
+       */
+      void setMode(int mode);
+
+
+      /*!
+       * @TODO -- Doxy
+       */
+      int getMode(void);
   };
 }  // namespace motor
 }  // namespace pandora_hardware_interface

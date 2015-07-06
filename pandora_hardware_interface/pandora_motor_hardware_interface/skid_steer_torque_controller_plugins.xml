@@ -1,0 +1,11 @@
+<library path="lib/libskid_steer_torque_controller">
+  <class
+    name="pandora_motor/SkidSteerTorqueController"
+    type="pandora_hardware_interface::motor::SkidSteerTorqueController"
+    base_class_type="controller_interface::ControllerBase">
+    <description>
+      SkidSteerDriveController created from diff_drive_controller/DiffDriveController
+    </description>
+  </class>
+
+</library>

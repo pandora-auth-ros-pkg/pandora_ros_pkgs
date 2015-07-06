@@ -1,0 +1,12 @@
+add_library(
+  linear_actuator_hardware_interface
+  src/linear_actuator_hardware_interface.cpp)
+add_executable(
+  linear_actuator_hardware_interface_node
+  src/linear_actuator_hardware_interface_node.cpp)
+target_link_libraries(
+  linear_actuator_hardware_interface_node
+  linear_actuator_hardware_interface
+  jrk_com_interface
+  firgelli_com_interface
+  ${catkin_LIBRARIES})

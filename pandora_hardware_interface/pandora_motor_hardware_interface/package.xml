@@ -21,22 +21,30 @@
   <build_depend>cmake_modules</build_depend>
   <build_depend>roslint</build_depend>
   <build_depend>pandora_cmake_tools</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>libgsl</build_depend>
+
+  <exec_depend>message_runtime</exec_depend>
 
   <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>joint_limits_interface</depend>
   <depend>controller_manager</depend>
   <depend>controller_interface</depend>
   <depend>serial</depend>
-  <depend>geometry_msgs</depend>
   <depend>pluginlib</depend>
-  <depend>nav_msgs</depend>
   <depend>realtime_tools</depend>
   <depend>tf</depend>
   <depend>urdf</depend>
   <depend>angles</depend>
-  <depend>std_msgs</depend>
   <depend>pandora_sensor_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
 
   <export>
     <controller_interface plugin="${prefix}/skid_steer_drive_controller_plugins.xml"/>
+    <controller_interface plugin="${prefix}/skid_steer_velocity_controller_plugins.xml"/>
+    <controller_interface plugin="${prefix}/skid_steer_torque_controller_plugins.xml"/>
   </export>
 </package>

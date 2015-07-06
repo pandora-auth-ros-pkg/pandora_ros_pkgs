@@ -33,71 +33,42 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
-* Author: Konstantinos Panayiotou
-**********************************************************************/
-#ifndef MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
-#define MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+*********************************************************************/
+#ifndef LINEAR_ACTUATOR_HARDWARE_INTERFACE_LINEAR_ACTUATOR_HARDWARE_INTERFACE_H
+#define LINEAR_ACTUATOR_HARDWARE_INTERFACE_LINEAR_ACTUATOR_HARDWARE_INTERFACE_H
 
-
+#include "ros/ros.h"
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 #include <controller_manager/controller_manager.h>
-#include <pandora_sensor_msgs/MotorCurrents.h>
-#include "epos2_handler/serial_epos2_handler.h"
-#include <joint_limits_interface/joint_limits_interface.h>
-#include <joint_limits_interface/joint_limits_rosparam.h>
-#include "ros/ros.h"
-
-typedef pandora_sensor_msgs::MotorCurrents MotorCurrentsMsg;
+#include "linear_actuator_com_interface/jrk_com_interface.h"
+#include "linear_actuator_com_interface/firgelli_com_interface.h"
 
 namespace pandora_hardware_interface
 {
-namespace motor
+namespace linear_actuator
 {
-  class MotorHardwareInterface : public hardware_interface::RobotHW
+  class LinearActuatorHardwareInterface : public hardware_interface::RobotHW
   {
-    private:
-      void readJointNameFromParamServer();
-
     public:
-      explicit MotorHardwareInterface(ros::NodeHandle nodeHandle);
-      ~MotorHardwareInterface();
-      void read(const ros::Duration& period);
+      explicit LinearActuatorHardwareInterface(
+        ros::NodeHandle nodeHandle);
+      ~LinearActuatorHardwareInterface();
+      void read();
       void write();
 
     private:
-      SerialEpos2Handler *motors_;
-
       ros::NodeHandle nodeHandle_;
-      ros::Publisher currentPub_;
-
-      MotorCurrentsMsg motorCurrentsMsg_;
-
-      // interfaces
+      AbstractLinearActuatorComInterface* comInterfacePtr_;
       hardware_interface::JointStateInterface jointStateInterface_;
-      hardware_interface::VelocityJointInterface velocityJointInterface_;
-      hardware_interface::EffortJointInterface effortJointInterface_;
-
-      // joint limits interfaces
-      joint_limits_interface::VelocityJointSoftLimitsInterface
-        velocityLimitsInterface_;
-
-      // joint limits
-      joint_limits_interface::JointLimits limits_;
-      joint_limits_interface::SoftJointLimits softLimits_;
-
-      // Interface Variables
-      std::vector<std::string> jointNames_;
-      double torque_command_[4];
-      double vel_command_[4];
-      double position_[4];
-      double velocity_[4];
-      double effort_[4];
-      double current_[4];
-      double maxRPM_;
-      double gearboxRatio_;
+      hardware_interface::PositionJointInterface positionJointInterface_;
+      std::string jointName_;
+      double command_;
+      double position_;
+      double velocity_;
+      double effort_;
   };
-}  // namespace motor
+}  // namespace linear_actuator
 }  // namespace pandora_hardware_interface
-#endif  // MOTOR_HARDWARE_INTERFACE_MOTOR_HARDWARE_INTERFACE_H
+#endif  // LINEAR_ACTUATOR_HARDWARE_INTERFACE_LINEAR_ACTUATOR_HARDWARE_INTERFACE_H

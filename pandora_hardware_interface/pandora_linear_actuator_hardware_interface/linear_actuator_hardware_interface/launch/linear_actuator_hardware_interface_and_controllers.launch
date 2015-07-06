@@ -1,0 +1,9 @@
+<launch>
+  <!-- Launch controller manager with pandora hardware interface-->
+  <include
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/launch/linear_actuator_hardware_interface.launch" />
+
+  <!-- spawn controllers -->
+  <include
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/launch/linear_actuator_controllers.launch" />
+</launch>

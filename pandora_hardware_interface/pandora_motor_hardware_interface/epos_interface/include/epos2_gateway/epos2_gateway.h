@@ -34,6 +34,7 @@
 *
 * Author:     Konstantinos Panayiotou   <klpanagi@gmail.com>
 * Maintainer: Konstantinos Panayiotou   <klpanagi@gmail.com>
+*
 *********************************************************************/
 
 #ifndef EPOS2_GATEWAY_EPOS2_GATEWAY_H
@@ -43,6 +44,8 @@
 #include "ros/ros.h"
 #include "epos2_gateway/epos2_definitions.h"
 #include <boost/scoped_ptr.hpp>
+//#include <map>
+//#include <cstring.h>
 
 namespace pandora_hardware_interface
 {
@@ -59,6 +62,7 @@ namespace motor
     uint32_t timeout;
     uint32_t error;
   };
+
 
   class Epos2Gateway
   {

@@ -6,7 +6,7 @@
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_arm_hardware_interface/html/">pandora_arm_hardware_interface</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_dynamixel_hardware_interface/html/">pandora_dynamixel_hardware_interface</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_imu_hardware_interface/html/">pandora_imu_hardware_interface</a>
-  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_linear_hardware_interface/html/">pandora_linear_hardware_interface</a>
+  - <a href="http://docs.pandora.ee.auth.gr/api/pandora_actuator_hardware_interface/html/">pandora_actuator_hardware_interface</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_motor_hardware_interface/html/">pandora_motor_hardware_interface</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_sensor_msgs/html/">pandora_sensor_msgs</a>
   - <a href="http://docs.pandora.ee.auth.gr/api/pandora_xmega_hardware_interface/html/">pandora_xmega_hardware_interface</a>

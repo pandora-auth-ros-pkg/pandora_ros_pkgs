@@ -1,0 +1,4 @@
+geometry_msgs/Twist cmd_vel
+float64 terrain_param
+float64 scale_left
+float64 scale_right

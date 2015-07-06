@@ -20,7 +20,7 @@
     <rosparam
     command="load"
     file="$(find pandora_motor_hardware_interface)/epos_interface/config/epos2_gateway.yaml"
-    ns="epos2config"/>
+    ns="/$(arg namespace)/epos2"/>
   </node>
 
 </launch>

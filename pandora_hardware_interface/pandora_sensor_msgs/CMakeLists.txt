@@ -15,6 +15,7 @@ add_message_files(
     MotorCurrents.msg
     Temperature.msg
     ThermalMeanMsg.msg
+    TorqueMsg.msg
     )
 
 generate_messages(

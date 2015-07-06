@@ -1,0 +1,11 @@
+<library path="lib/libskid_steer_velocity_controller">
+  <class
+    name="pandora_motor/SkidSteerVelocityController"
+    type="pandora_hardware_interface::motor::SkidSteerVelocityController"
+    base_class_type="controller_interface::ControllerBase">
+    <description>
+      Panodra Velocity Skid Steer drive Controller.(To be tested)
+    </description>
+  </class>
+
+</library>

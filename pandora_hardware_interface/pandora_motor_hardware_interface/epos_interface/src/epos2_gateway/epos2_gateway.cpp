@@ -520,6 +520,7 @@ namespace motor
 
   uint32_t Epos2Gateway::set_targetCurrent(uint16_t nodeId, int16_t currentMust)
   {
+    ROS_INFO("%d", currentMust);
     uint32_t _errorCode = 0;
     if (VCS_SetCurrentMust(comHandler_, nodeId, currentMust, &_errorCode) == 0)
     {

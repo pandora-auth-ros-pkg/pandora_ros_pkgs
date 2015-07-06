@@ -34,6 +34,7 @@
 *
 * Author:     Konstantinos Panayiotou   <klpanagi@gmail.com>
 * Maintainer: Konstantinos Panayiotou   <klpanagi@gmail.com>
+*
 *********************************************************************/
 
 #include "epos2_handler/serial_epos2_handler.h"
@@ -44,7 +45,7 @@ namespace motor
 {
 
   SerialEpos2Handler::SerialEpos2Handler():
-    epos2_nh_("~/epos2config")
+    epos2_nh_("/motor/epos2")
   {
     std::string _portName, _deviceName, _protocolStackName, _interfaceName;
     int _baudrate, _timeout, _numControllers, _gatewayId;
@@ -107,6 +108,9 @@ namespace motor
     epos2Gateway_->activate_profileVelocityMode(rightRearMotor_->nodeId_);
     epos2Gateway_->activate_profileVelocityMode(leftFrontMotor_->nodeId_);
     epos2Gateway_->activate_profileVelocityMode(leftRearMotor_->nodeId_);
+
+    // Setting operation mode to velocity_mode
+    operation_mode_ = 0;
   }
 
 
@@ -175,13 +179,13 @@ namespace motor
   void SerialEpos2Handler::getRPM(int* leftRearRpm, int* leftFrontRpm,
     int* rightRearRpm, int* rightFrontRpm)
   {
-    epos2Gateway_->read_velocityActual(rightFrontMotor_->nodeId_,
+    epos2Gateway_->read_velocityAvg(rightFrontMotor_->nodeId_,
       &rightFrontMotor_->rpm_);
-    epos2Gateway_->read_velocityActual(rightRearMotor_->nodeId_,
+    epos2Gateway_->read_velocityAvg(rightRearMotor_->nodeId_,
       &rightRearMotor_->rpm_);
-    epos2Gateway_->read_velocityActual(leftFrontMotor_->nodeId_,
+    epos2Gateway_->read_velocityAvg(leftFrontMotor_->nodeId_,
       &leftFrontMotor_->rpm_);
-    epos2Gateway_->read_velocityActual(leftRearMotor_->nodeId_,
+    epos2Gateway_->read_velocityAvg(leftRearMotor_->nodeId_,
       &leftRearMotor_->rpm_);
     *rightFrontRpm = rightFrontMotor_->rpm_;
     *rightRearRpm = rightRearMotor_->rpm_;
@@ -189,16 +193,16 @@ namespace motor
     *leftRearRpm = leftRearMotor_->rpm_;
   }
 
-  void SerialEpos2Handler::getCurrent(int* leftRearCurrent, int* leftFrontCurrent,
-    int* rightRearCurrent, int* rightFrontCurrent)
+  void SerialEpos2Handler::getCurrent(int* leftRearCurrent,
+    int* leftFrontCurrent, int* rightRearCurrent, int* rightFrontCurrent)
   {
-    epos2Gateway_->read_currentActual(rightFrontMotor_->nodeId_,
+    epos2Gateway_->read_currentAvg(rightFrontMotor_->nodeId_,
       &rightFrontMotor_->current_);
-    epos2Gateway_->read_currentActual(rightRearMotor_->nodeId_,
+    epos2Gateway_->read_currentAvg(rightRearMotor_->nodeId_,
       &rightRearMotor_->current_);
-    epos2Gateway_->read_currentActual(leftFrontMotor_->nodeId_,
-      &rightFrontMotor_->current_);
-    epos2Gateway_->read_currentActual(leftRearMotor_->nodeId_,
+    epos2Gateway_->read_currentAvg(leftFrontMotor_->nodeId_,
+      &leftFrontMotor_->current_);
+    epos2Gateway_->read_currentAvg(leftRearMotor_->nodeId_,
       &leftRearMotor_->current_);
     *rightFrontCurrent = static_cast<int>(rightFrontMotor_->current_);
     *rightRearCurrent = static_cast<int>(rightRearMotor_->current_);
@@ -242,52 +246,107 @@ namespace motor
   }
 
 
-  void SerialEpos2Handler::currentToTorque(
-    int* leftRearTorque,
-    int* leftFrontTorque,
-    int* rightRearTorque,
-    int* rightFrontTorque)
+  void SerialEpos2Handler::getTorque(
+    double* leftRearTorque,
+    double* leftFrontTorque,
+    double* rightRearTorque,
+    double* rightFrontTorque)
   {
-    epos2Gateway_->read_currentActual(
-      rightFrontMotor_->nodeId_,
-      &rightFrontMotor_->current_);
-    *rightFrontTorque =
-      static_cast<int>(rightFrontMotor_->current_) * 33.5 * 113;
+    // Define new array to store current values
+    int _currentFeed[4];
 
-    epos2Gateway_->read_currentActual(
-      rightRearMotor_->nodeId_,
-      &rightRearMotor_->current_);
-    *rightRearTorque =
-      static_cast<int>(rightRearMotor_->current_) * 33.5 * 113;
+    // Fill with current values using getCurrent method
+    this->getCurrent(&_currentFeed[0], &_currentFeed[1],
+      &_currentFeed[2], &_currentFeed[3]);
 
-    epos2Gateway_->read_currentActual(
-      leftFrontMotor_->nodeId_,
-      &rightRearMotor_->current_);
-    *leftFrontTorque =
-      static_cast<int>(leftFrontMotor_->current_) * 33.5 * 113;
-
-    epos2Gateway_->read_currentActual(
-      leftRearMotor_->nodeId_,
-      &leftRearMotor_->current_);
-    *leftRearTorque =
-      static_cast<int>(leftRearMotor_->current_) * 33.5 * 113;
+    // Convert to Torques
+    *leftRearTorque = this->currentToTorque(_currentFeed[0]);
+    *leftFrontTorque = this->currentToTorque(_currentFeed[1]);
+    *rightRearTorque = this->currentToTorque(_currentFeed[2]);
+    *rightFrontTorque = this->currentToTorque(_currentFeed[3]);
   }
 
 
-  void SerialEpos2Handler::torqueToCurrent(
-      const int rightFrontTorque,
-      const int rightRearTorque,
-      const int leftFrontTorque,
-      const int leftRearTorque)
+  double SerialEpos2Handler::currentToTorque(int _input_current)
   {
-    rightFrontMotor_->current_ =
-      static_cast<uint16_t>(rightFrontTorque / 33.5 / 113);
-    rightRearMotor_->current_ =
-      static_cast<uint16_t>(rightRearTorque / 33.5 / 113);
-    leftFrontMotor_->current_ =
-      static_cast<uint16_t>(leftFrontTorque / 33.5 / 113);
-    leftRearMotor_->current_ =
-      static_cast<uint16_t>(leftRearTorque / 33.5 / 113);
+    
+    return static_cast<double>(_input_current * 33.5 * 113 / 10 / 10 / 10 );
   }
+
+
+  int16_t SerialEpos2Handler::torqueToCurrent(double _input_torque)
+  {
+    return static_cast<int16_t>(_input_torque / 33.5 / 113 * 1000 );
+  }
+
+  uint16_t SerialEpos2Handler::writeTorques(
+        double leftRearTorque,
+        double leftFrontTorque,
+        double rightRearTorque,
+        double rightFrontTorque)
+  {
+    // Step I :Convert Torques to currents
+    int16_t leftRearCurrent = torqueToCurrent(leftRearTorque);
+    int16_t leftFrontCurrent = torqueToCurrent(leftFrontTorque);
+    int16_t rightRearCurrent = torqueToCurrent(rightRearTorque);
+    int16_t rightFrontCurrent = torqueToCurrent(rightFrontTorque);
+
+
+    // Step II: Send commands to motors
+    ROS_DEBUG("[Motors]: Setting torques %f, %f, %f, %f",
+      leftRearTorque, leftFrontTorque, 
+      rightRearTorque, rightFrontTorque);
+
+    epos2Gateway_->set_targetCurrent(leftRearMotor_->nodeId_,
+      leftRearCurrent);
+    epos2Gateway_->set_targetCurrent(leftFrontMotor_->nodeId_,
+      leftFrontCurrent);
+    epos2Gateway_->set_targetCurrent(rightRearMotor_->nodeId_,
+      rightRearCurrent);
+    epos2Gateway_->set_targetCurrent(rightFrontMotor_->nodeId_,
+      rightFrontCurrent);
+
+    return 1;
+  }
+
+  void SerialEpos2Handler::setMode(int mode)
+  {
+    switch (mode)
+    {
+      case 0:
+        // Activate Velocity Mode
+        ROS_INFO("Entering Velocity Mode");
+        epos2Gateway_->activate_profileVelocityMode(rightFrontMotor_->nodeId_);
+        epos2Gateway_->activate_profileVelocityMode(rightRearMotor_->nodeId_);
+        epos2Gateway_->activate_profileVelocityMode(leftFrontMotor_->nodeId_);
+        epos2Gateway_->activate_profileVelocityMode(leftRearMotor_->nodeId_);
+
+        operation_mode_ = 0;
+
+        break;
+
+      case 1:
+        // Activate Current Mode
+        ROS_INFO("Entering Current Mode");
+        epos2Gateway_->activate_currentMode(rightFrontMotor_->nodeId_);
+        epos2Gateway_->activate_currentMode(rightRearMotor_->nodeId_);
+        epos2Gateway_->activate_currentMode(leftFrontMotor_->nodeId_);
+        epos2Gateway_->activate_currentMode(leftRearMotor_->nodeId_);
+
+        operation_mode_ = 1;
+
+        break;
+
+      default:
+        ROS_WARN("There is no such state");
+        break;
+    }
+  }
+
+  int SerialEpos2Handler::getMode(void)
+  {
+    return operation_mode_;
+  }
+
 }  // namespace motor
 }  // namespace pandora_hardware_interface

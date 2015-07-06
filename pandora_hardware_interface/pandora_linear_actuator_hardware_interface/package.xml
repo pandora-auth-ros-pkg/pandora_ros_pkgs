@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_linear_actuator_hardware_interface</name>
+  <version>0.0.0</version>
+  <description>Contains pandora linear actuator hardware interface.</description>
+
+  <maintainer email="gkourosg@yahoo.gr">George Kouros</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_hardware_interface</url>
+
+  <author>Evangelos Apostolidis</author>
+  <author>George Kouros</author>
+  <author>Vasilis Bosdelekidis</author>
+  <author>Petros Evangelakos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>controller_manager</depend>
+  <depend>controller_interface</depend>
+  <depend>serial</depend>
+  <depend>libusb-1.0-0-dev</depend>
+
+  <export>
+  </export>
+</package>

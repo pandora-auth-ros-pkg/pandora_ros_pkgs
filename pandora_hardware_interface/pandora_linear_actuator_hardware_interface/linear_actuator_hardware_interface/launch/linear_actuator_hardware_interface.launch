@@ -1,0 +1,20 @@
+<launch>
+  <!-- load configuration -->
+  <rosparam
+    command="load"
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/config/linear_actuator_hardware_interface_and_controllers.yaml"
+    ns="/linear_actuator"/>
+
+  <!-- Launch controller manager with pandora hardware interface-->
+  <node
+    name="linear_actuator_hardware_interface_node"
+    pkg="pandora_linear_actuator_hardware_interface"
+    type="linear_actuator_hardware_interface_node"
+    output="screen"
+    ns="/linear_actuator">
+    <remap
+      from="/linear_actuator/linear_actuator_controller/command"
+      to="/linear_actuator_controller/command" />
+  </node>
+
+</launch>

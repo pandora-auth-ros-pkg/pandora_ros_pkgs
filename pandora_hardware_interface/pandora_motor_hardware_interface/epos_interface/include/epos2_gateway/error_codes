@@ -1,0 +1,32 @@
+0x0000 0000, No Communication Error
+0x0503 0000, Toggle Error
+0x0504 0000, SDO Time Out
+0x0504 0001, Client / Server Specifier Error
+0x0504 0004, CRC Error
+0x0504 0005, Out of Memory Error
+0x0601 0000, Access Error
+0x0601 0001, Write Only Error
+0x0601 0002, Read Only Error
+0x0602 0000, Object does not exist Error
+0x0604 0041, PDO mapping Error
+0x0604 0042, PDO Length Error
+0x0604 0043, General Parameter Error
+0x0604 0047, General internal Incompatibility Error
+0x0606 0000, Hardware Error
+0x0607 0010, Service Parameter Error
+0x0607 0012,Service Parameter too long Error
+0x0607 0013,Service Parameter too short Error
+0x0609 0011,Object SubIndex Error
+0x0609 0030,Value Range Error
+0x0609 0031,Value too high Error
+0x0609 0032,Value too low Error
+0x0609 0036,Maximum less Minimum Error
+0x0800 0000,General Error
+0x0800 0020,Transfer or Store Error
+0x0800 0021,Local Control Error
+0x0800 0022,Wrong Device State
+0x0F00 FFC0,Wrong NMT State Error
+0x0F00 FFBF,Illegal Command Error
+0x0F00 FFBE,Password Error
+0x0F00 FFBC,Service Mode Error
+0x0F00 FFB9,CAN ID Error

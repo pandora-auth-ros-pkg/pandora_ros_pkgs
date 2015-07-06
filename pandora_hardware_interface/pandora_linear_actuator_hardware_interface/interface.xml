@@ -1,0 +1,14 @@
+<package>
+  <node>
+    /linear_actuator_hardware_interface_node
+
+    <subscriber>/linear_actuator_controller/command</subscriber>
+
+    <publisher>/linear_actuator_controller/state</publisher>
+    <publisher>/linear_actuator/joint_states</publisher>
+  </node>
+
+  <node>
+    /linear_actuator_controller_spawner
+  </node>
+</package>
