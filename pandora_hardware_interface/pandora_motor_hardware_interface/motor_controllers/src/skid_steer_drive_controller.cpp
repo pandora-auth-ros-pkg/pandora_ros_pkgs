@@ -441,7 +441,7 @@ namespace motor
     // Parse robot description
     const std::string model_param_name = "/robot_description";
     bool res = root_nh.hasParam(model_param_name);
-    std::string robot_model_str="";
+    std::string robot_model_str = "";
     if (!res || !root_nh.getParam(model_param_name, robot_model_str))
     {
       ROS_ERROR_NAMED(name_, "Robot descripion couldn't be retrieved from param server.");

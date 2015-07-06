@@ -2,7 +2,8 @@
   <arg name="robot" default="gio" />
   <arg name="namespace" default="motor" />
 
-  <arg name="sim" default="false"/>
+  <arg name="sim" default="false" />
+  <param name="/sim" value="$(arg sim)" />
 
   <rosparam
     command="load"

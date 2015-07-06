@@ -42,9 +42,8 @@
 
 #include <algorithm>
 
-// min(max(x, minVal), maxVal).
-template<typename T>
-T clamp(T x, T min, T max)
+// min(max(x, minVal), maxVal)
+template<typename T> T clamp(T x, T min, T max)
 {
   return std::min(std::max(min, x), max);
 }
@@ -54,15 +53,15 @@ namespace pandora_hardware_interface
 namespace motor
 {
 
-  bool SkidSteerVelocityController::init(hardware_interface::VelocityJointInterface* hw,
-                                                                  ros::NodeHandle &ns)
+  bool SkidSteerVelocityController::init(
+      hardware_interface::VelocityJointInterface* hw,
+      ros::NodeHandle &ns)
   {
-    // Load Joints from HW Interface , load joint NAMES from YAML
+    // Load parameters
     std::string left_front_wheel_joint_name, right_front_wheel_joint_name;
     std::string left_rear_wheel_joint_name, right_rear_wheel_joint_name;
 
-
-    ROS_INFO("STARTING CONTROLLER");
+    ROS_INFO("Initializing velocity controller...");
 
     if (!ns.getParam("left_front_wheel", left_front_wheel_joint_name))
     {
@@ -85,71 +84,117 @@ namespace motor
       return false;
     }
 
-
     // Get joint Handles from hw interface
     left_front_wheel_joint_ = hw->getHandle(left_front_wheel_joint_name);
     right_front_wheel_joint_ = hw->getHandle(right_front_wheel_joint_name);
     left_rear_wheel_joint_ = hw->getHandle(left_rear_wheel_joint_name);
     right_rear_wheel_joint_ = hw->getHandle(right_rear_wheel_joint_name);
 
-    // Subscirbe to cmd_vel
-    command_listener_ = ns.subscribe("/cmd_vel",
-                                       1,
-                                       &SkidSteerVelocityController::commandCallback,
-                                       this);
+    // Physical properties
+    ns.param("terrain_parameter", terrain_parameter_, 1.0);
+    if (!ns.getParam("wheel_radius", wheel_radius_))
+    {
+      ROS_ERROR("Could not find wheel_radius");
+      return false;
+    }
+    if (!ns.getParam("track", track_))
+    {
+      ROS_ERROR("Could not find track");
+      return false;
+    }
 
-    ROS_INFO("Successfully Initiallized controller!");
+    // Detect if running on simulation
+    ns.param("/sim", sim_, false);
+
+    // Degree of polynoms
+    ns.param("linear_fit_degree", linearFitDegree_, 5);
+    linearFitDegree_++;
+    ns.param("angular_fit_degree", angularFitDegree_, 7);
+    angularFitDegree_++;
+
+    // Measurements for linear velocity
+    XmlRpc::XmlRpcValue linearMeasurementsList;
+    if (ns.hasParam("measured_linear_velocities") &&
+        ns.getParam("measured_linear_velocities", linearMeasurementsList))
+    {
+      ROS_ASSERT(linearMeasurementsList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+      std::string key;
+      for (int ii = 0; ii < linearMeasurementsList.size(); ii++)
+      {
+        ROS_ASSERT(linearMeasurementsList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+
+        key = "expected";
+        ROS_ASSERT(linearMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        expectedLinear_.push_back(static_cast<double>(linearMeasurementsList[ii][key]));
+
+        key = "actual";
+        ROS_ASSERT(linearMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        actualLinear_.push_back(static_cast<double>(linearMeasurementsList[ii][key]));
+      }
+    }
+
+    // Measurements for angular velocity
+    XmlRpc::XmlRpcValue angularMeasurementsList;
+    if (ns.hasParam("measured_angular_velocities") &&
+        ns.getParam("measured_angular_velocities", angularMeasurementsList))
+    {
+      ROS_ASSERT(angularMeasurementsList.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+      std::string key;
+      for (int ii = 0; ii < angularMeasurementsList.size(); ii++)
+      {
+        ROS_ASSERT(angularMeasurementsList[ii].getType() == XmlRpc::XmlRpcValue::TypeStruct);
+
+        key = "expected";
+        ROS_ASSERT(angularMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        expectedAngular_.push_back(static_cast<double>(angularMeasurementsList[ii][key]));
+
+        key = "actual";
+        ROS_ASSERT(angularMeasurementsList[ii][key].getType() == XmlRpc::XmlRpcValue::TypeDouble);
+        actualAngular_.push_back(static_cast<double>(angularMeasurementsList[ii][key]));
+      }
+    }
+
+    // Get limits from measurement velocities
+    maxMeasuredLinear_ = *std::max_element(actualLinear_.begin(), actualLinear_.end());
+    minMeasuredLinear_ = *std::min_element(actualLinear_.begin(), actualLinear_.end());
+    maxMeasuredAngular_ = *std::max_element(actualAngular_.begin(), actualAngular_.end());
+    minMeasuredAngular_ = *std::min_element(actualAngular_.begin(), actualAngular_.end());
+
+    // Calculate coefficients
+    linearFitCoefficients_.resize(linearFitDegree_, 1);
+    angularFitCoefficients_.resize(angularFitDegree_, 1);
+    polynomialFit(linearFitDegree_, actualLinear_, expectedLinear_, linearFitCoefficients_);
+    polynomialFit(angularFitDegree_, actualAngular_, expectedAngular_, angularFitCoefficients_);
+
+    // Subscirbe to cmd_vel
+    command_listener_ = ns.subscribe(
+        "/cmd_vel",
+        1,
+        &SkidSteerVelocityController::commandCallbackTwist,
+        // &SkidSteerVelocityController::commandCallbackKinodynamic,
+        this);
+
+    ROS_INFO("Successfully initiallized velocity controller!");
     return true;
   }
 
   void SkidSteerVelocityController::update(const ros::Time& time, const ros::Duration& period)
   {
-    // Update with latest cmd_vel commands
-    double w = command_struct_.ang;
-    double v = command_struct_.lin;
-    double a = 1.5;
-    // double a = command_struct_.terrain_parameter;
-    double B = 0.35;
-    // double il = command_struct_.slip_factor_left;
-    // double ir = command_struct_.slip_factor_right;
-    double wheel_radius = 0.0975;
+    // Update cmd_vel commands
+    double angular = command_struct_.ang;
+    double linear = command_struct_.lin;
+    // double terrain_parameter_ = command_struct_.terrain_parameter;
 
-    // velocity limits (m/s and m/s^2) linear.
-    double max_vel = 0.5;
-    double min_vel = -0.5;
+    if (!sim_)
+    {
+      remapVelocities(linear, angular);
+    }
 
-    // velocity limits (r/s) angular.
-    double max_ang = 0.8;
-    double min_ang = -0.8;
-
-    // motor velocity limits (r/s) (5500 motor rpm->5.09 wheel r/s)
-    double min_velocity = -5.09;
-    double max_velocity = 5.09;
-
-    // Limiting cmd_vel.
-    // If velocities over the limits,clamp.
-
-    // v=clamp(v,min_vel,max_vel);
-    // w=clamp(w,min_ang,max_ang);
-
-
-    // Compute wheels velocities:  (1.Equations pandora_skid_steering.pdf )
-    double vel_left  = (1/wheel_radius)*v-((a*B)/(2*wheel_radius))*w;
-    double vel_right = (1/wheel_radius)*v+((a*B)/(2*wheel_radius))*w;
-    // BEWARE!! : invert axes !! (paper vs URDF)
-
-    // Compute wheels velocities:  (2.Equations pandora_skid_steering.pdf )
-
-    // vel_right = v/(wheel_radius*(1-il)) + w/(2*wheel_radius*(1-il));
-    // vel_left = v/(wheel_radius*(1-ir)) - w/(2*wheel_radius*(1-ir));
-
-    // Limiting motor velocities
-
-    // vel_left=clamp(vel_left, min_velocity, max_velocity);
-    // vel_right=clamp(vel_right, min_velocity, max_velocity);
-
-    // Set Joint Commands
-    // ROS_INFO("%f %f",vel_left,vel_right);
+    // Compute wheels velocities
+    double vel_left  = (1 / wheel_radius_) * linear - ((terrain_parameter_ * track_) / (2 * wheel_radius_)) * angular;
+    double vel_right = (1 / wheel_radius_) * linear + ((terrain_parameter_ * track_) / (2 * wheel_radius_)) * angular;
 
     left_front_wheel_joint_.setCommand(vel_left);
     left_rear_wheel_joint_.setCommand(vel_left);
@@ -157,35 +202,92 @@ namespace motor
     right_rear_wheel_joint_.setCommand(vel_right);
   }
 
-  void SkidSteerVelocityController::commandCallback(const geometry_msgs::Twist& command)
+  void SkidSteerVelocityController::commandCallbackTwist(const geometry_msgs::Twist& command)
   {
-    // Update command struct
-    // Update command struct
-    // add terrain_parameter
     command_struct_.ang   = command.angular.z;
     command_struct_.lin   = command.linear.x;
-    // command_struct_.terrain_parameter = command.terrain_param;
-    // command_struct_.slip_factor_left = command.scale_left;
-    // command_struct_.slip_factor_right = command.scale_right;
 
     command_struct_.stamp = ros::Time::now();
   }
 
-  /*
-  void SkidSteerVelocityController::commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command)
+  void SkidSteerVelocityController::commandCallbackKinodynamic(
+      const pandora_motor_hardware_interface::KinodynamicCommand& command)
   {
-    // Update command struct
-    // Update command struct
-    // add terrain_parameter
     command_struct_.ang   = command.cmd_vel.angular.z;
     command_struct_.lin   = command.cmd_vel.linear.x;
     command_struct_.terrain_parameter = command.terrain_param;
-    // command_struct_.slip_factor_left = command.scale_left;
-    // command_struct_.slip_factor_right = command.scale_right;
 
     command_struct_.stamp = ros::Time::now();
   }
-  */
+
+  void SkidSteerVelocityController::remapVelocities(
+      double& linear,
+      double& angular)
+  {
+    double newLinear;
+    double newAngular;
+
+    clamp(linear, minMeasuredLinear_, maxMeasuredLinear_);
+    clamp(angular, minMeasuredAngular_, maxMeasuredAngular_);
+
+    newLinear = 0;
+    for (int i = 0; i < linearFitDegree_; i++)
+    {
+      newLinear += linearFitCoefficients_[i] * pow(linear, i);
+    }
+
+    newAngular = 0;
+    for (int i = 0; i < angularFitDegree_; i++)
+    {
+      newAngular += angularFitCoefficients_[i] * pow(angular, i);
+    }
+
+    linear = newLinear;
+    angular = newAngular;
+  }
+
+  void SkidSteerVelocityController::polynomialFit(
+      const int& degree,
+      const std::vector<double>& actualValues,
+      const std::vector<double>& expectedValues,
+      std::vector<double>& coefficients)
+  {
+    int obs = actualValues.size();
+
+    gsl_multifit_linear_workspace *ws;
+    gsl_matrix *cov, *X;
+    gsl_vector *y, *c;
+    double chisq;
+
+    X = gsl_matrix_alloc(obs, degree);
+    y = gsl_vector_alloc(obs);
+    c = gsl_vector_alloc(degree);
+    cov = gsl_matrix_alloc(degree, degree);
+
+    for (int i = 0; i < obs; i++)
+    {
+      gsl_matrix_set(X, i, 0, 1.0);
+      for (int j = 0; j < degree; j++)
+      {
+        gsl_matrix_set(X, i, j, pow(actualValues[i], j));
+      }
+      gsl_vector_set(y, i, expectedValues[i]);
+    }
+
+    ws = gsl_multifit_linear_alloc(obs, degree);
+    gsl_multifit_linear(X, y, c, cov, &chisq, ws);
+
+    for (int i = 0; i < degree; i++)
+    {
+      coefficients[i] = gsl_vector_get(c, i);
+    }
+
+    gsl_multifit_linear_free(ws);
+    gsl_matrix_free(X);
+    gsl_matrix_free(cov);
+    gsl_vector_free(y);
+    gsl_vector_free(c);
+  }
 
 }  // namespace motor
 }  // namespace pandora_hardware_interface

@@ -41,6 +41,8 @@
 #ifndef MOTOR_CONTROLLERS_SKID_STEER_VELOCITY_CONTROLLER_H
 #define MOTOR_CONTROLLERS_SKID_STEER_VELOCITY_CONTROLLER_H
 
+#include <gsl/gsl_multifit.h>
+
 #include <ros/ros.h>
 #include <controller_interface/controller.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -48,7 +50,8 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Float64.h>
-// #include <pandora_motor_hardware_interface/KinodynamicCommand.h>
+
+#include <pandora_motor_hardware_interface/KinodynamicCommand.h>
 
 namespace pandora_hardware_interface
 {
@@ -58,7 +61,6 @@ namespace motor
       : public controller_interface::Controller<hardware_interface::VelocityJointInterface>
   {
     public:
-      // Controller Functions
       SkidSteerVelocityController() {}
 
      /**
@@ -66,19 +68,29 @@ namespace motor
      * \param hw            Velocity joint interface for the wheels
      * \param controller_nh Node handle inside the controller namespace
      */
-      bool init(hardware_interface::VelocityJointInterface* hw,
-                ros::NodeHandle &ns);
-      // bool init(hardware_interface::JointLimitsINterface* hw,
-                // ros::NodeHandle &ns);
+      bool init(
+          hardware_interface::VelocityJointInterface* hw,
+          ros::NodeHandle &ns);
 
       void update(const ros::Time& time, const ros::Duration& period);
       void starting(const ros::Time& time) { }
       void stopping(const ros::Time& time) { }
 
-      // Callback message changed to new tsirigotis message.
-      void commandCallback(const geometry_msgs::Twist& command);
-      // if callback Twist enabled it doesnt run.
-      // void commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command);
+      void commandCallbackTwist(const geometry_msgs::Twist& command);
+      void commandCallbackKinodynamic(const pandora_motor_hardware_interface::KinodynamicCommand& command);
+
+    private:
+      // Remap velocities using the calculated polynom
+      void remapVelocities(
+          double& linear,
+          double& angular);
+
+      // Calculate polynom's coefficients using polynomial regression
+      void polynomialFit(
+          const int& degree,
+          const std::vector<double>& actualValues,
+          const std::vector<double>& expectedValues,
+          std::vector<double>& coefficients);
 
     private:
       /// Hardware joint handles:
@@ -86,11 +98,6 @@ namespace motor
       hardware_interface::JointHandle right_front_wheel_joint_;
       hardware_interface::JointHandle left_rear_wheel_joint_;
       hardware_interface::JointHandle right_rear_wheel_joint_;
-
-      // Joint limits
-      // hardware_interface::JointLimits limits;
-
-      // hardware_interface::JointLimits joint_limits_interface_;
 
       // cmd_vel ROS subscriber
       ros::Subscriber command_listener_;
@@ -100,14 +107,39 @@ namespace motor
       {
         double lin;
         double ang;
-        float terrain_parameter;  // Parameter a 1.Equation Zyganitidis
-        float slip_factor_left;  // il 2.Equotation Zyganitidis
-        float slip_factor_right;  // ir 2.Equation Zyganitidis
+        float terrain_parameter;
+        float slip_factor_left;
+        float slip_factor_right;
         ros::Time stamp;
 
         Commands() : lin(0.0), ang(0.0), stamp(0.0), terrain_parameter(0), slip_factor_left(0), slip_factor_right(0){}
       };
       Commands command_struct_;
+
+      // Physical properties
+      double wheel_radius_;
+      double track_;  // wheel_separation
+      double terrain_parameter_;
+
+      // True when running in simulation
+      bool sim_;
+
+      // Vectors containing the measurements
+      std::vector<double> expectedLinear_;
+      std::vector<double> actualLinear_;
+      std::vector<double> expectedAngular_;
+      std::vector<double> actualAngular_;
+
+      double maxMeasuredLinear_;
+      double maxMeasuredAngular_;
+      double minMeasuredLinear_;
+      double minMeasuredAngular_;
+
+      // Degree and coefficients of polynoms
+      int linearFitDegree_;
+      int angularFitDegree_;
+      std::vector<double> linearFitCoefficients_;
+      std::vector<double> angularFitCoefficients_;
   };
 
   PLUGINLIB_EXPORT_CLASS(
