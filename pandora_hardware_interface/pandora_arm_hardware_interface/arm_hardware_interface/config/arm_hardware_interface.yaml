@@ -1,13 +1,6 @@
 co2_sensors:
   - name: '/sensors/co2'
     frame_id: 'co2_frame'
-thermal_sensors:
-  - name: '/sensors/center_thermal'
-    frame_id: 'middle_thermal_optical_frame'
-    code: 'C'
-    height: 8
-    width: 8
-    step: 8
 range_sensors:
   - name: '/sensors/left_sonar'
     frame_id: 'left_sonar_frame'
@@ -26,11 +19,7 @@ range_sensors:
 batteries:
   - name: '/PSU_battery'
     code: 'S'
-    max_voltage: 24.0
+    max_voltage: 25.2
   - name: '/motors_battery'
     code: 'M'
-    max_voltage: 24.0
-differential_joints:
-  left_joint: left_side_joint
-  right_joint: right_side_joint
-  encoder_offset: -0.8 
+    max_voltage: 25.2
