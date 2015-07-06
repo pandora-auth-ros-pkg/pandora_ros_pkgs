@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/kinect/urdf/*.urdf.xacro" />
+
+  <xacro:macro name="kinect" >
+    <xacro:asus_xtion_pro_live parent="base_link"
+                               pitch_min_limit="${kinect_pitch_joint_min_limit}"
+                               pitch_max_limit="${kinect_pitch_joint_max_limit}"
+                               yaw_min_limit="${kinect_yaw_joint_min_limit}"
+                               yaw_max_limit="${kinect_yaw_joint_max_limit}" >
+      <origin xyz="0.11999 0.0 0.25921"
+              rpy="0.0 0.0 0.0" />
+    </xacro:asus_xtion_pro_live>
+  </xacro:macro>
+
+</robot>

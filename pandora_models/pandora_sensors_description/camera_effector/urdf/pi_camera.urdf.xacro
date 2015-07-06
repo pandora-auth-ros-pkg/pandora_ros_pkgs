@@ -1,0 +1,170 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="pi_camera"
+               params="parent *origin
+                       yaw_min_limit yaw_max_limit
+                       pitch_min_limit pitch_max_limit" >
+
+    <!-- Links -->
+    <link name="camera_effector_pan_link" >
+      <xacro:solid_cuboid_inertial mass="0.020" x="0.012" y="0.032" z="0.029" >
+        <origin xyz="0.0 -0.00518 0.01887" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/camera_effector/meshes/pan_servo_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0 -0.00585 0.01588" />
+        <geometry>
+          <box size="0.012 0.032 0.029" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="camera_effector_base_link" >
+      <xacro:solid_cuboid_inertial mass="0.010" x="0.051" y="0.053" z="0.005" >
+        <origin xyz="-0.0045 -0.00011 0.00069" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/camera_effector/meshes/pan_base_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.00027 -0.00042 0.00104" />
+        <geometry>
+          <box size="0.051 0.053 0.005" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="camera_effector_tilt_link" >
+      <xacro:solid_cuboid_inertial mass="0.020" x="0.012" y="0.029" z="0.032" >
+        <origin xyz="0.0 -0.01887 -0.00518" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/camera_effector/meshes/tilt_servo_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0 -0.01588 -0.00585" />
+        <geometry>
+          <box size="0.012 0.029 0.032" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="pi_camera_platform_link" >
+      <xacro:solid_cuboid_inertial mass="0.005" x="0.011" y="0.050" z="0.030" >
+        <origin xyz="0.0 -0.01085 0.01074" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/camera_effector/meshes/platform.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0 -0.01925 0.00324" />
+        <geometry>
+          <box size="0.011 0.050 0.030" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="pi_camera_link" >
+      <xacro:solid_cuboid_inertial mass="0.021" x="0.009" y="0.025" z="0.024" >
+        <origin xyz="-0.00058 0.0 0.00189" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_sensors_description/camera_effector/meshes/pi_camera.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.00045 0.0 0.0025" />
+        <geometry>
+          <box size="0.009 0.025 0.024" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joints -->
+    <joint name="camera_effector_pan_joint"
+           type="revolute" >
+      <parent link="${parent}" />
+      <child link="camera_effector_pan_link" />
+      <xacro:insert_block name="origin" />
+      <axis xyz="0 0 1" />
+      <dynamics damping="0.0" />
+      <limit lower="${camera_effector_pan_joint_min_limit}"
+             upper="${camera_effector_pan_joint_max_limit}"
+             effort="50.0"
+             velocity="50.0" />
+    </joint>
+
+    <joint name="camera_effector_pan_base_joint"
+           type="fixed" >
+      <parent link="camera_effector_pan_link" />
+      <child link="camera_effector_base_link" />
+      <origin xyz="0.00355 0.0 0.01003" />
+    </joint>
+
+    <joint name="camera_effector_tilt_base_joint"
+           type="fixed" >
+      <parent link="camera_effector_base_link" />
+      <child link="camera_effector_tilt_link" />
+      <origin xyz="0.01036 0.02302 0.01931" />
+    </joint>
+
+    <joint name="camera_effector_tilt_joint"
+           type="revolute" >
+      <parent link="camera_effector_tilt_link" />
+      <child link="pi_camera_platform_link" />
+      <origin xyz="0.0 0.0 0.0"
+              rpy="0.0 0.3490658504 0.0" />
+      <axis xyz="0 1 0" />
+      <dynamics damping="0.0" />
+      <limit lower="${camera_effector_tilt_joint_min_limit}"
+             upper="${camera_effector_tilt_joint_max_limit}"
+             effort="50.0"
+             velocity="50.0" />
+    </joint>
+
+    <joint name="pi_camera_platform_joint"
+           type="fixed" >
+      <parent link="pi_camera_platform_link" />
+      <child link="pi_camera_link" />
+      <origin xyz="0.00034 -0.01925 0.04306"
+              rpy="0.0 -0.3490658504 0.0" />
+    </joint>
+
+    <!-- Frames -->
+    <link name="pi_camera_frame" >
+      <xacro:point_mass_inertial />
+    </link>
+    <link name="pi_camera_optical_frame" >
+      <xacro:point_mass_inertial />
+    </link>
+
+    <joint name="pi_camera_joint"
+           type="fixed" >
+      <parent link="pi_camera_link" />
+      <child link="pi_camera_frame" />
+      <origin xyz="0.0045 0.0 0.0" />
+    </joint>
+    <joint name="pi_camera_optical_joint"
+           type="fixed" >
+      <parent link="pi_camera_frame" />
+      <child link="pi_camera_optical_frame" />
+      <origin xyz="0.0 0.0 0.0"
+              rpy="-1.5708 0.0 -1.5708" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

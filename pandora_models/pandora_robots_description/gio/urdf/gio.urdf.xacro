@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<robot name="gio"
+       xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- Import Files -->
+  <xacro:include filename="$(find pandora_urdf_properties)/xacro/*.xacro" />
+
+  <xacro:include filename="$(find pandora_robots_description)/gio/urdf/urdf_configurations.xacro" />
+
+  <xacro:include filename="$(find pandora_robots_description)/gio/urdf/parts/*.xacro" />
+  <xacro:include filename="$(find pandora_robots_description)/gio/urdf/sensors/*.xacro" />
+
+  <!-- Load Links & Joints -->
+  <xacro:base />
+
+  <xacro:linear />
+
+  <xacro:differential />
+
+  <xacro:side prefix_y="left" reflect_y="1" />
+  <xacro:side prefix_y="right" reflect_y="-1" />
+
+  <xacro:wheel prefix_y="left" prefix_x="front" reflect_y="1" reflect_x="1" />
+  <xacro:wheel prefix_y="left" prefix_x="rear" reflect_y="1" reflect_x="-1" />
+  <xacro:wheel prefix_y="right" prefix_x="front" reflect_y="-1" reflect_x="1" />
+  <xacro:wheel prefix_y="right" prefix_x="rear" reflect_y="-1" reflect_x="-1" />
+
+  <!-- Load Sensors -->
+  <xacro:laser_04 /> <!--<xacro:laser_20 />-->
+  <xacro:kinect />
+
+  <xacro:camera_effector />
+  <xacro:thermal />
+
+  <xacro:left_webcam />
+  <xacro:right_webcam />
+
+  <xacro:left_sonar />
+  <xacro:right_sonar />
+
+  <xacro:co2 />
+  <xacro:microphone />
+
+</robot>

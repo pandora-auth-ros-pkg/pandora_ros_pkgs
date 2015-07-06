@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="linear" >
+
+    <!-- Links -->
+    <link name="linear_link" >
+      <xacro:solid_cuboid_inertial mass="0.055" x="0.02" y="0.018" z="0.207" >
+        <origin xyz="-0.00035 0.0 0.10461" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gio/meshes/linear_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="-0.0015 0.0 0.10075" />
+        <geometry>
+          <box size="0.020 0.018 0.213" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="linear_actuator_link" >
+      <xacro:solid_cuboid_inertial mass="0.029" x="0.009" y="0.009" z="0.100" >
+        <origin xyz="0.0 0.0 0.05034" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gio/meshes/linear_actuator_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0787" />
+        <geometry>
+          <box size="0.009 0.009 0.157" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joints -->
+    <joint name="linear_joint"
+           type="fixed" >
+      <parent link="base_link" />
+      <child link="linear_link" />
+      <origin xyz="0.01306 0.0 0.23771" />
+    </joint>
+
+    <joint name="linear_actuator_joint"
+           type="prismatic" >
+      <parent link="linear_link" />
+      <child link="linear_actuator_link" />
+      <origin xyz="0.0 0.0 0.06211" />
+      <axis xyz="0 0 1" />
+      <dynamics damping="5800.0" />
+      <limit lower="${linear_actuator_joint_min_limit}"
+             upper="${linear_actuator_joint_max_limit}"
+             effort="100.0"
+             velocity="100.0" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

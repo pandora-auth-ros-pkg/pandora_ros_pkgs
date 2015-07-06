@@ -6,7 +6,7 @@
                params="parent *origin
                        pitch_min_limit pitch_max_limit
                        yaw_min_limit yaw_max_limit" >
-    
+
     <!-- Links -->
     <link name="kinect_yaw_servo_link" >
       <xacro:solid_cuboid_inertial mass="0.055" x="0.050" y="0.032" z="0.049" >
@@ -52,10 +52,10 @@
         </geometry>
       </visual>
       <collision>
-        <origin xyz="0.012 -0.00101 -0.019"
+        <origin xyz="0.0095 0.0 0.04851"
                 rpy="0 0 0" />
         <geometry>
-          <box size="0.100 0.120 0.041" />
+          <box size="0.096 0.180 0.043" />
         </geometry>
       </collision>
     </link>
@@ -77,7 +77,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <!-- Joints -->
     <joint name="kinect_servo_parent_joint"
            type="fixed" >
@@ -85,7 +85,7 @@
       <child link="kinect_yaw_servo_link" />
       <xacro:insert_block name="origin" />
     </joint>
-    
+
     <joint name="kinect_yaw_joint"
            type="revolute" >
       <parent link="kinect_yaw_servo_link" />
@@ -114,10 +114,10 @@
            type="fixed" >
       <parent link="kinect_platform_link" />
       <child link="kinect_link" />
-      <origin xyz="0.03261 -0.00101 0.04261"
+      <origin xyz="0.01461 -0.00106 0.05011"
               rpy="0.0 0.0 0.0" />
     </joint>
-    
+
     <!-- Frames -->
     <link name="kinect_frame" >
       <xacro:point_mass_inertial />
@@ -142,49 +142,49 @@
     <link name="kinect_rgb_optical_frame" >
       <xacro:point_mass_inertial />
     </link>
-    
+
     <joint name="kinect_joint"
            type="fixed" >
       <parent link="kinect_link" />
       <child link="kinect_frame" />
-      <origin xyz="0.01784 0.0 0.02167" 
+      <origin xyz="0.01784 0.0 0.02167"
               rpy="0.0 0.0 0.0" />
     </joint>
     <joint name="kinect_optical_joint"
            type="fixed" >
       <parent link="kinect_frame" />
       <child link="kinect_optical_frame" />
-      <origin xyz="0.0 0.0 0.0" 
+      <origin xyz="0.0 0.0 0.0"
               rpy="-1.5708 0.0 -1.5708" />
     </joint>
-    
+
     <joint name="kinect_depth_joint"
            type="fixed" >
       <parent link="kinect_frame" />
       <child link="kinect_depth_frame" />
-      <origin xyz="0.0 0.044 0.0" 
+      <origin xyz="0.0 0.044 0.0"
               rpy="0.0 0.0 0.0" />
     </joint>
     <joint name="kinect_depth_optical_joint"
            type="fixed" >
       <parent link="kinect_depth_frame" />
       <child link="kinect_depth_optical_frame" />
-      <origin xyz="0.0 0.0 0.0" 
+      <origin xyz="0.0 0.0 0.0"
               rpy="-1.5708 0.0 -1.5708" />
     </joint>
-    
+
     <joint name="kinect_rgb_joint"
            type="fixed" >
       <parent link="kinect_frame" />
       <child link="kinect_rgb_frame" />
-      <origin xyz="0.0 0.019 0.0" 
+      <origin xyz="0.0 0.019 0.0"
               rpy="0.0 0.0 0.0" />
     </joint>
     <joint name="kinect_rgb_optical_joint"
            type="fixed" >
       <parent link="kinect_rgb_frame" />
       <child link="kinect_rgb_optical_frame" />
-      <origin xyz="0.0 0.0 0.0" 
+      <origin xyz="0.0 0.0 0.0"
               rpy="-1.5708 0.0 -1.5708" />
     </joint>
 

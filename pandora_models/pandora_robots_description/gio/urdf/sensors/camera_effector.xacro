@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:include filename="$(find pandora_sensors_description)/camera_effector/urdf/*.urdf.xacro" />
+
+  <xacro:macro name="camera_effector" >
+    <xacro:pi_camera parent="linear_actuator_link"
+                               yaw_min_limit="${camera_effector_pan_joint_min_limit}"
+                               yaw_max_limit="${camera_effector_pan_joint_max_limit}"
+                               pitch_min_limit="${camera_effector_tilt_joint_min_limit}"
+                               pitch_max_limit="${camera_effector_tilt_joint_max_limit}" >
+      <origin xyz="0.0 0.0 0.15614" />
+    </xacro:pi_camera>
+  </xacro:macro>
+
+</robot>

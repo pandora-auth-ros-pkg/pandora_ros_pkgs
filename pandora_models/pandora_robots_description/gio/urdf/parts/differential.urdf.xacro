@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <xacro:macro name="differential" >
+
+    <link name="differential_link" >
+      <xacro:solid_cuboid_inertial mass="0.310" x="0.090" y="0.280" z="0.067" >
+        <origin xyz="-0.00821 0.0 0.0" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gio/meshes/differential_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="-0.016 0.0 0.0" />
+        <geometry>
+          <box size="0.050 0.280 0.067" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="differential_joint"
+           type="continuous" >
+      <parent link="base_link" />
+      <child link="differential_link" />
+      <origin xyz="-0.14142 0.0 0.08614" />
+      <axis xyz="1 0 0"/>
+      <limit effort="150.0"
+             velocity="150.0" />
+    </joint>
+
+    <xacro:differential_pin prefix_y="left" reflect_y="1" />
+    <xacro:differential_pin prefix_y="right" reflect_y="-1" />
+
+  </xacro:macro>
+
+  <xacro:macro name="differential_pin"
+             params="prefix_y reflect_y" >
+
+    <link name="differential_${prefix_y}_pin_link" >
+      <xacro:solid_cuboid_inertial mass="0.080" x="0.010" y="0.010" z="0.140" >
+        <origin xyz="0.0 0.0 -0.05756" />
+      </xacro:solid_cuboid_inertial>
+      <visual>
+        <origin xyz="0.0 0.0 -0.05756" />
+        <geometry>
+          <mesh filename="package://pandora_robots_description/gio/meshes/differential_pin_link.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 -0.05756" />
+        <geometry>
+          <box size="0.010 0.010 0.140" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="differential_${prefix_y}_pin_joint"
+           type="revolute" >
+      <parent link="differential_link" />
+      <child link="differential_${prefix_y}_pin_link" />
+      <origin xyz="-0.0062 ${reflect_y * (0.1339)} 0.0"
+              rpy="${reflect_y * (-0.057595865316)} 0.0 0.0" />
+      <axis xyz="1 0 0" />
+      <limit lower="${differential_pin_joint_min_limit}"
+             upper="${differential_pin_joint_max_limit}"
+             effort="150.0"
+             velocity="150.0" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>
