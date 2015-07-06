@@ -1,5 +1,5 @@
 <launch>
-  <arg name="robot" default="woody" />
+  <arg name="robot" default="gio" />
 
   <!-- Launch controller manager with pandora hardware interface-->
   <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface.launch" />

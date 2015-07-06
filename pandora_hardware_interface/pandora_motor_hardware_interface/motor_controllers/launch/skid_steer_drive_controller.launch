@@ -1,5 +1,5 @@
 <launch>
-  <arg name="robot" default="woody" />
+  <arg name="robot" default="gio" />
   <arg name="namespace" default="motor" />
 
   <arg name="sim" default="false" />
