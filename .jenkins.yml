@@ -14,9 +14,12 @@ install:
   
   # Create workspace
   - mkdir -p $BUILD_HOME/catkin_ws/src
-  - cp -r $BUILD_HOME/$REPOSITORY_NAME $BUILD_HOME/catkin_ws/src
   - cd $BUILD_HOME/catkin_ws/src
-  - pandoradep fetch
+  - rm -rf $BUILD_HOME/$REPOSITORY_NAME
+  - wstool init .
+  # Download non-debian stuff
+  - wstool merge https://raw.github.com/pandora-auth-ros-pkg/install/hydro-devel/travis_ci.rosinstall
+  - wstool update
   - cd ..
     
   - sudo rosdep init
