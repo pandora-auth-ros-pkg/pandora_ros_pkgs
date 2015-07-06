@@ -127,7 +127,7 @@ namespace pandora_geotiff
        * @brief Create the geotiff.
        */
 
-      void createGeotiff(const std::string &fileName);
+      bool createGeotiff(const std::string &fileName);
 
       //!< ROS node handler.
       ros::NodeHandle nh_;

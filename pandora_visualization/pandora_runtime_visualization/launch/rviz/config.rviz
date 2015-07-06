@@ -103,7 +103,7 @@ Visualization Manager:
       Draw Behind: true
       Enabled: true
       Name: Map
-      Topic: /map
+      Topic: /slam/map
       Value: true
     - Alpha: 0.5
       Class: rviz/Map

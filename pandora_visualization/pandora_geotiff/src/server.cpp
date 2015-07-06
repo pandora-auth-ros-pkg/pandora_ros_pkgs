@@ -332,8 +332,8 @@ namespace pandora_geotiff
     ROS_INFO("SaveMission service was requested.");
 
     creator_.setMissionName(req.SaveMissionFileName.data);
-    this -> createGeotiff(req.SaveMissionFileName.data);
-    return true;
+    bool result = this -> createGeotiff(req.SaveMissionFileName.data);
+    return result;
   }
 
   void Server::receiveMap(const nav_msgs::OccupancyGrid &map)
@@ -393,7 +393,8 @@ namespace pandora_geotiff
 
     ROS_INFO("Path size: %lu", size);
 
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i)
+    {
       const geometry_msgs::PoseStamped &pose(path_vector[i]);
       pointVector[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
     }
@@ -407,16 +408,23 @@ namespace pandora_geotiff
     ROS_INFO("The robot's path is ready.");
   }
 
-  void Server::createGeotiff(const std::string &fileName)
+  bool Server::createGeotiff(const std::string &fileName)
   {
     ROS_INFO("Starting geotiff creation for mission: %s.", fileName.c_str());
 
-    // TODO(mujx) These errors should be returned when the service is called to notify the client.
     if (!mapReceived_)
+    {
       ROS_ERROR("Map is not available.");
+      ROS_ERROR("Exiting...");
+      return false;
+    }
 
     if (!pathReceived_)
+    {
       ROS_ERROR("Path is not available.");
+      ROS_ERROR("Exiting...");
+      return false;
+    }
 
     if (!coverageMapReceived_)
       ROS_WARN("Coverage map is not available.");
@@ -434,6 +442,8 @@ namespace pandora_geotiff
     // Reset the environment.
     mapReceived_ = false;
     pathReceived_ = false;
+
+    return true;
   }
 
 }  // namespace pandora_geotiff

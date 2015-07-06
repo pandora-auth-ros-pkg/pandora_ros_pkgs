@@ -58,7 +58,7 @@ namespace pandora_geotiff
 
     // These parameters should be moved in a yaml file in a later version.
     missionName_ = std::string("TestMission");
-    missionNamePrefix_ = std::string("/RRL_2015_PANDORA_");
+    missionNamePrefix_ = std::string("RoboCup2015-PANDORA-");
     missionNameExtention_ = std::string(".tiff");
     CHECKER_COLOR_LIGHT = "LIGHT_GREY";
     CHECKER_COLOR_DARK = "DARK_GREY";
@@ -85,7 +85,7 @@ namespace pandora_geotiff
     mapInitialized_ = false;
 
     colorMap["DARK_BLUE_F"]     = QColor(0, 44, 207);
-    colorMap["DARK_BLUE_M"]     = QColor(0, 50, 120);
+    colorMap["DARK_BLUE_M"]     = QColor(0, 50, 140);
     colorMap["DARK_BLUE_W"]     = QColor(0, 40, 120);
     colorMap["LIGHT_GREY"]      = QColor(226, 226, 227);
     colorMap["DARK_GREY"]       = QColor(237, 237, 238);
@@ -136,6 +136,7 @@ namespace pandora_geotiff
     std::string path(pw->pw_dir);
 
     path.append(directory);
+    path.append("/");
     path.append(missionNamePrefix_);
     path.append(missionName_);
     path.append(missionNameExtention_);

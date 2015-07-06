@@ -36,7 +36,7 @@ explored_map:
   wall_bottom_threshold: 52
   wall_top_threshold: 255
   map_color: "WHITE_MAX"
-  wall_color: "SOLID_BLUE"
+  wall_color: "DARK_BLUE_W"
 
 path:
   width: 2
@@ -66,5 +66,5 @@ qr:
 
 obstacle:
     color: "PINK"
-    size: 20
+    size: 30
     shape: "CIRCLE"
