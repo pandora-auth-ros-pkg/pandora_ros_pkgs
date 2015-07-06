@@ -2,14 +2,14 @@
 
   <!--  Sensor Coverage  -->
   <node pkg="pandora_sensor_coverage" type="sensor_coverage_node"              
-    name="sensor_coverage" respawn="false" output="screen" ns="exploration" 
-    launch-prefix="gdb -ex run --args" /> 
+    name="sensor_coverage" respawn="false" output="screen" ns="exploration" /> 
 
   <rosparam file="$(find pandora_sensor_coverage)/config/sensor_coverage/sensor_coverage_params.yaml" 
     command="load" ns="exploration/sensor_coverage" /> 
 
-  <!-- Perfect octomap -->
+  <!-- Perfect octomap 
   <include file="$(find pandora_slam_3d)/launch/perfect_octomap.launch" />
+  -->
 
 </launch>
 

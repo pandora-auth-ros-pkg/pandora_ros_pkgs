@@ -57,6 +57,7 @@ ExplorationController::ExplorationController()
   private_nh_.param<bool>("use_coverage", use_coverage, false);
 
   // if use_coverage is enabled we create a frontier goal selector with the name coverage
+  // WARNING: If the coverage topic is not set correctly the explorer is not initialized
   if (use_coverage)
     coverage_goal_selector_.reset(new FrontierGoalSelector("coverage"));
 
@@ -100,7 +101,7 @@ void ExplorationController::executeCb(
 
   // while we didn't receive a preempt request
   while (ros::ok() && do_exploration_server_.isActive()) {
-    
+
     // if we can't find more frontiers and we have reached our goal we end the exploration
     if (goal_searches_count_ >= max_goal_searches_ && goalReached() )
     {
@@ -124,7 +125,9 @@ void ExplorationController::executeCb(
     }
 
     bool success = false;
-
+    // if the exploration_type is DEEP(coverage_exploration) and coverage_goal_selector_
+    // is not NULL, then we do coverage based exploration. To create the coverage
+    // goal_selector we have to set the param use_coverage to true.
     if (goal->exploration_type == pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP &&
         coverage_goal_selector_) {
       // to current goal gemizetai me to stoxo pou tha vrei o goal selector
@@ -137,7 +140,7 @@ void ExplorationController::executeCb(
     // if succes is false, dld an den exei vrei stoxo, auksanoume ta goal searches
     if (!success) {
       goal_searches_count_++;
-      
+
       // wait a little
       ros::Duration(0.2).sleep();
       continue;
@@ -178,13 +181,13 @@ bool ExplorationController::goalReached()
   if(move_base_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
   {
     ROS_WARN("[pandora_explorer] Goal Reached");
-    return true;  
+    return true;
   }
   else
   {
     return false;
   }
-  
+
 }
 
 void ExplorationController::feedbackMovingCb(

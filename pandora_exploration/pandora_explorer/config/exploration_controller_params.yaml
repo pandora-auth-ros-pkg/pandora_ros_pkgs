@@ -9,4 +9,4 @@ goal_timeout: 20.0
 # to considered visited (in meters)
 goal_reached_dist: 0.5
 
-use_coverage: false
+use_coverage: true

@@ -19,13 +19,12 @@ plugins:
 
 static:
   map_topic: /slam/map
-  #map_topic: move_base/global_costmap/costmap
-  subscribe_to_updates: false #htan fasle
+  subscribe_to_updates: false
   unknown_cost_value: 51
   lethal_cost_threshold: 61
 
 coverage:
-  map_topic: /data_fusion/sensor_coverage/kinect_space
+  map_topic: /exploration/sensor_coverage/kinect_space
   subscribe_to_updates: false
 
 inflation:
