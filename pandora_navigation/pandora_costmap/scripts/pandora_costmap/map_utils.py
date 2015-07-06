@@ -54,16 +54,23 @@ from tf.transformations import euler_from_quaternion
 
 def initMap(mapToSet, incomigMap):
     """
-    @brief Set the mapToSet MapMetaData to be the same as the incoming map and
-    initializes the mapToSet with NO_INFORMATION values.
+    @brief A function that initializes a map with NO_INFORMATION cells
+    @param mapToSet The map to be initialized
+    @param incomingMap The map which MapMetaData we use to initialize the
+    MapToSet
+
+    The mapToSet MapMetaData is set to be the same as the incoming map and
+    it is initialized with NO_INFORMATION values.
     """
 
     mapToSet.header.frame_id = incomigMap.header.frame_id
     mapToSet.info = incomigMap.info
+
     # initialize the map with NO_INFORMATION cells
     temp_array = [params.unknownCost
                   ] * mapToSet.info.width * mapToSet.info.height
     mapToSet.data = temp_array
+    mapToSet.info.origin.orientation.w = 1.0
 
 
 def mapResizer(oldMap, newMap):
@@ -80,6 +87,10 @@ def mapResizer(oldMap, newMap):
 
     if (old_size == 0) or (new_size == 0):
         rospy.logerr("[Map Resizer] One of the two arrays is empty")
+        return False
+
+    if (oldMap.info.resolution == 0.0) or (newMap.info.resolution == 0.0):
+        rospy.logerr("[Map Resizer] One of the two arrays has zero res")
         return False
 
     # Find x,y,yaw differences
@@ -114,18 +125,20 @@ def mapResizer(oldMap, newMap):
             # new x,y in meters
             xn = math.cos(yaw_diff) * x - math.sin(yaw_diff) * y - x_diff
             yn = math.sin(yaw_diff) * x + math.cos(yaw_diff) * y - y_diff
-
+            print "x_diff: [" + str(x_diff) + "]"
+            print "y_diff: [" + str(y_diff) + "]"
             # new x,y in cells
             xn_cell = int(round((xn / res), 0))
             yn_cell = int(round((yn / res), 0))
 
-            coords = xn_cell + yn_cell * newMap.info.width
+            coords = xn_cell + yn_cell * i - 1
             if (coords < 0) or (coords > new_size):
                 rospy.logerr("[Map Resizer] Error in resizing xn_cell: [%d] \
                 yn_cell: [%d] coords: [%d] new_size[%d]", xn_cell, yn_cell,
                              coords, new_size)
             else:
                 temp = temp_old_map[i + j * oldMap.info.width]
+                print "coords: " + str(coords)
                 oldMap.data[coords] = temp
                 # Dilation ??
 
@@ -137,7 +150,8 @@ def mapResizer(oldMap, newMap):
 
 
 def mapMatchingChecker(currentMap, incomingMap):
-    """ A function that checks if two maps have the same MapMetaData.
+    """
+    @brief A function that checks if two maps have the same MapMetaData.
     Returns True if everything is OK.
     """
     # Check frame_id of incoming OGM
@@ -178,14 +192,16 @@ def mapMatchingChecker(currentMap, incomingMap):
         rospy.logerr("An invalid quaternion was passed, containing all zeros")
         return False
 
+    new_origin = incomingMap.info.origin
+    old_origin = currentMap.info.origin
     # Check the origin of the OGM
-    if (incomingMap.info.origin.position.x != currentMap.info.origin.position.x) or
-    (incomingMap.info.origin.position.y != currentMap.info.origin.position.y) or
-    (incomingMap.info.origin.position.z != currentMap.info.origin.position.z) or
-    (incomingMap.info.origin.orientation.x != currentMap.info.origin.orientation.x) or
-    (incomingMap.info.origin.orientation.y != currentMap.info.origin.orientation.y) or
-    (incomingMap.info.origin.orientation.z != currentMap.info.origin.orientation.z) or
-    (incomingMap.info.origin.orientation.w != currentMap.info.origin.orientation.w):
+    if ((new_origin.position.x != old_origin.position.x) or
+        (new_origin.position.y != old_origin.position.y) or
+        (new_origin.position.z != old_origin.position.z) or
+        (new_origin.orientation.x != old_origin.orientation.x) or
+        (new_origin.orientation.y != old_origin.orientation.y) or
+        (new_origin.orientation.z != old_origin.orientation.z) or
+        (new_origin.orientation.w != old_origin.orientation.w)):  # noqa
         rospy.logerr("The origins are different!")
         return False
     # Maybe check something about the time?
@@ -204,8 +220,8 @@ def updateWithOverwrite(mapToUpdate, incomingMap):
     of the incoming OGM. The NO_INFO values of the incomingMap DO NOT OVERWRITE
     the values of the old map.
     """
-    if mapToUpdate.info.width == 0 or mapToUpdate.info.height == 0 or
-    incomingMap.info.width == 0 or incomingMap.info.height == 0:
+    if (mapToUpdate.info.width == 0 or mapToUpdate.info.height == 0 or
+        incomingMap.info.width == 0 or incomingMap.info.height == 0):  # noqa
         rospy.logerr("[MapUtils] One of the maps has not been initialized")
         return False
 
@@ -250,8 +266,8 @@ def updateWithTrueOverwrite(mapToUpdate, incomingMap):
     of the incoming OGM. The NO_INFO values of the incomingMap DO OVERWRITE
     the values of the old map.
     """
-    if mapToUpdate.info.width == 0 or mapToUpdate.info.height == 0 or
-    incomingMap.info.width == 0 or incomingMap.info.height == 0:
+    if (mapToUpdate.info.width == 0 or mapToUpdate.info.height == 0 or
+        incomingMap.info.width == 0 or incomingMap.info.height == 0):  # noqa
         rospy.logerr("[MapUtils] One of the maps has not been initialized")
         return False
 
@@ -306,8 +322,8 @@ def isQuaternionValid(quaternion):
 
     A quaternion with all values zero is considered valid in this function
     """
-    if not isfinite(quaternion.x) or not isfinite(quaternion.y) or
-    not isfinite(quaternion.z) or not isfinite(quaternion.w):
+    if (not isfinite(quaternion.x) or not isfinite(quaternion.y) or
+        not isfinite(quaternion.z) or not isfinite(quaternion.w)):  # noqa
         return False
     return True
 
@@ -318,7 +334,7 @@ def quaternionNotInstantiated(quaternion):
     @param quaternion The quaternion to check
     @return True If the quaternion is (x,y,z,w) = (0,0,0,0), else False
     """
-    if quaternion.x == 0.0 and quaternion.y == 0.0 and quaternion.z == 0.0 and
-    quaternion.w == 0.0:
+    if (quaternion.x == 0.0 and quaternion.y == 0.0 and quaternion.z == 0.0 and
+        quaternion.w == 0.0):  # noqa
         return True
     return False

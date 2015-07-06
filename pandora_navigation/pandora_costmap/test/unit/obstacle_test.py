@@ -38,7 +38,7 @@ __maintainer__ = "Dimitrios Kirtsios"
 __email__ = "dimkirts@gmail.com"
 
 PKG = 'pandora_costmap'
-NAME = 'map_utils_test'
+NAME = 'obstacle_test'
 
 import sys
 import unittest
@@ -46,22 +46,68 @@ import roslib
 
 roslib.load_manifest('pandora_costmap')
 
-from pandora_costmap import obstacle
+from pandora_costmap import Obstacle
 from pandora_data_fusion_msgs.msg import ObstacleInfo
+from tf.transformations import euler_from_quaternion
 
 
 class TestObstacle(unittest.TestCase):
     def setUp(self):
         self.obs = Obstacle()
+        self.obsNorm = Obstacle()
 
     def tearDown(self):
-        self.obs.dispose()
         self.obs = None
 
     def test_createObstacle(self):
-        #obsMsg = ObstacleInfo()
+        # Case where obstacle is not initialized
+        #obs = Obstacle()
+        obsMsg = ObstacleInfo()
         self.obs.createObstacle(obsMsg)
 
-        self.assertEqual(self.obs.width, 0)
-        self.assertEqual(self.obs.height, 0)
-        self.assertEqual(self.obs.id, -1)
+        self.assertEqual(self.obs.length_, 0)
+        self.assertEqual(self.obs.width_, 0)
+        self.assertEqual(self.obs.id_, 0)
+        self.assertEqual(self.obs.map_frame_id_, "")
+
+        # Case where obstacle is initialized
+        #obs_normal = Obstacle()
+
+        obsMsgNorm = ObstacleInfo()
+
+        # Message Creation
+        obsMsgNorm.id = 0
+        obsMsgNorm.obstacleFrameId = "soft_obstacle_0"
+        obsMsgNorm.obstaclePose.header.frame_id = "/map"
+        obsMsgNorm.obstaclePose.pose.position.x = 2.2
+        obsMsgNorm.obstaclePose.pose.position.y = 2.2
+        obsMsgNorm.obstaclePose.pose.position.z = 0.0
+
+        obsMsgNorm.obstaclePose.pose.orientation.x = 0.0
+        obsMsgNorm.obstaclePose.pose.orientation.y = 0.0
+        obsMsgNorm.obstaclePose.pose.orientation.z = -0.06625
+        obsMsgNorm.obstaclePose.pose.orientation.w = 0.9978
+        obsMsgNorm.length = 2.0
+        obsMsgNorm.width = 0.5
+        obsMsgNorm.type = 1
+
+        quat = [
+            obsMsgNorm.obstaclePose.pose.orientation.x,
+            obsMsgNorm.obstaclePose.pose.orientation.y,
+            obsMsgNorm.obstaclePose.pose.orientation.z,
+            obsMsgNorm.obstaclePose.pose.orientation.w
+        ]
+
+        (roll, pitch, yaw) = euler_from_quaternion(quat)
+
+        # Obstacle creation
+        self.obsNorm.createObstacle(obsMsgNorm)
+
+        self.assertEqual(self.obsNorm.id_, 0)
+        self.assertEqual(self.obsNorm.map_frame_id_, "/map")
+        self.assertEqual(self.obsNorm.x_, 2.2)
+        self.assertEqual(self.obsNorm.y_, 2.2)
+        self.assertEqual(self.obsNorm.th_, yaw)
+        self.assertEqual(self.obsNorm.length_, 2.0)
+        self.assertEqual(self.obsNorm.width_, 0.5)
+        self.assertEqual(self.obsNorm.type_, 1)
