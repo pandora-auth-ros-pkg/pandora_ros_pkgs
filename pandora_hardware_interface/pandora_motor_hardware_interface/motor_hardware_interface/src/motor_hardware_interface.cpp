@@ -91,11 +91,9 @@ namespace motor
     // Set motor control mode to velocity control mode
     motors_->setMode(0);
 
-    //Initiallize jointLimits 
+    // Initiallize jointLimits
     for (int ii = 0; ii < jointNames_.size(); ii++)
     {
-
-
       hardware_interface::JointHandle jointLimitsHandle =
         velocityJointInterface_.getHandle(jointNames_[ii]);
 
@@ -105,7 +103,7 @@ namespace motor
         ROS_FATAL("[MOTORS]: Joint Limits not specified in the parameter server");
         exit(-1);
       }
-      //Register handle in joint limits interface
+      // Register handle in joint limits interface
       joint_limits_interface::VelocityJointSoftLimitsHandle handle(
         jointLimitsHandle,  // We read the state and read/write the command
         limits_,  // Limits spec
@@ -199,7 +197,6 @@ namespace motor
       ROS_DEBUG_STREAM("Commands: " << RPMCommand[0] << ", " << RPMCommand[1]);
       motors_->writeRPM(RPMCommand[0], RPMCommand[1]);
     }
-
 
     else if (motors_->getMode() == 1)
     {

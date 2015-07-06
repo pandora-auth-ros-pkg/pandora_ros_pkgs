@@ -48,7 +48,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Float64.h>
-//#include <pandora_motor_hardware_interface/KinodynamicCommand.h>
+// #include <pandora_motor_hardware_interface/KinodynamicCommand.h>
 
 namespace pandora_hardware_interface
 {
@@ -68,17 +68,17 @@ namespace motor
      */
       bool init(hardware_interface::VelocityJointInterface* hw,
                 ros::NodeHandle &ns);
-     // bool init(hardware_interface::JointLimitsINterface* hw,
-                //ros::NodeHandle &ns);
+      // bool init(hardware_interface::JointLimitsINterface* hw,
+                // ros::NodeHandle &ns);
 
       void update(const ros::Time& time, const ros::Duration& period);
       void starting(const ros::Time& time) { }
       void stopping(const ros::Time& time) { }
-      
-      //Callback message changed to new tsirigotis message.
-      void commandCallback(const geometry_msgs::Twist& command); 
-      //if callback Twist enabled it doesnt run.
-      //void commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command);
+
+      // Callback message changed to new tsirigotis message.
+      void commandCallback(const geometry_msgs::Twist& command);
+      // if callback Twist enabled it doesnt run.
+      // void commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command);
 
     private:
       /// Hardware joint handles:
@@ -86,12 +86,12 @@ namespace motor
       hardware_interface::JointHandle right_front_wheel_joint_;
       hardware_interface::JointHandle left_rear_wheel_joint_;
       hardware_interface::JointHandle right_rear_wheel_joint_;
-      
-          //Joint limits
-      //hardware_interface::JointLimits limits;
 
-     // hardware_interface::JointLimits joint_limits_interface_;
-      
+      // Joint limits
+      // hardware_interface::JointLimits limits;
+
+      // hardware_interface::JointLimits joint_limits_interface_;
+
       // cmd_vel ROS subscriber
       ros::Subscriber command_listener_;
 
@@ -100,9 +100,9 @@ namespace motor
       {
         double lin;
         double ang;
-        float terrain_parameter;//Parameter a 1.Equation Zyganitidis
-        float slip_factor_left;//il 2.Equotation Zyganitidis
-        float slip_factor_right;//ir 2.Equation Zyganitidis
+        float terrain_parameter;  // Parameter a 1.Equation Zyganitidis
+        float slip_factor_left;  // il 2.Equotation Zyganitidis
+        float slip_factor_right;  // ir 2.Equation Zyganitidis
         ros::Time stamp;
 
         Commands() : lin(0.0), ang(0.0), stamp(0.0), terrain_parameter(0), slip_factor_left(0), slip_factor_right(0){}

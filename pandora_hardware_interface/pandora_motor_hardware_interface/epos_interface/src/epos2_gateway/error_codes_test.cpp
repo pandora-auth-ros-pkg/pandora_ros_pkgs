@@ -38,17 +38,17 @@
 
 #include "epos2_gateway/error_codes.h"
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <map>
 #include <cstring>
 #include <iostream>  // Input
 #include <fstream>  // Input
 #include <sstream>
-#include <stdlib.h>
 
 bool hasSubstr(std::string base_str, std::string token_str)
 {
-  if(base_str.find(token_str) != std::string::npos)
+  if (base_str.find(token_str) != std::string::npos)
   {
     return true;
   }
@@ -61,7 +61,8 @@ bool hasSubstr(std::string base_str, std::string token_str)
 int main(int argc, char** argv)
 {
   pandora_hardware_interface::motor::ErrorCodes err;
-  std::string error_codes_file = "/home/klpanagi/pandora_ws/src/pandora_hardware_interface/pandora_motor_hardware_interface/epos_interface/src/epos2_gateway/error_codes";
+  std::string error_codes_file = "/home/klpanagi/pandora_ws/src/pandora_hardware_interface"
+    "/pandora_motor_hardware_interface/epos_interface/src/epos2_gateway/error_codes";
   err.fillErrorCodesMap(error_codes_file);
-return 1 ;
+  return 1;
 }

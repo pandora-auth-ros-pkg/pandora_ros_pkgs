@@ -269,7 +269,6 @@ namespace motor
 
   double SerialEpos2Handler::currentToTorque(int _input_current)
   {
-    
     return static_cast<double>(_input_current * 33.5 * 113 / 10 / 10 / 10 );
   }
 
@@ -294,7 +293,7 @@ namespace motor
 
     // Step II: Send commands to motors
     ROS_DEBUG("[Motors]: Setting torques %f, %f, %f, %f",
-      leftRearTorque, leftFrontTorque, 
+      leftRearTorque, leftFrontTorque,
       rightRearTorque, rightFrontTorque);
 
     epos2Gateway_->set_targetCurrent(leftRearMotor_->nodeId_,

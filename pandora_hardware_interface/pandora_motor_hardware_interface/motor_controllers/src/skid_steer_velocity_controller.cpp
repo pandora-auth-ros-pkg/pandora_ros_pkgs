@@ -42,16 +42,12 @@
 
 #include <algorithm>
 
-
-
-//min(max(x, minVal), maxVal).
+// min(max(x, minVal), maxVal).
 template<typename T>
 T clamp(T x, T min, T max)
 {
   return std::min(std::max(min, x), max);
 }
-
-
 
 namespace pandora_hardware_interface
 {
@@ -64,7 +60,7 @@ namespace motor
     // Load Joints from HW Interface , load joint NAMES from YAML
     std::string left_front_wheel_joint_name, right_front_wheel_joint_name;
     std::string left_rear_wheel_joint_name, right_rear_wheel_joint_name;
-   
+
 
     ROS_INFO("STARTING CONTROLLER");
 
@@ -108,50 +104,49 @@ namespace motor
 
   void SkidSteerVelocityController::update(const ros::Time& time, const ros::Duration& period)
   {
-
     // Update with latest cmd_vel commands
     double w = command_struct_.ang;
     double v = command_struct_.lin;
-    double a= 1.5;
-    //double a = command_struct_.terrain_parameter;
+    double a = 1.5;
+    // double a = command_struct_.terrain_parameter;
     double B = 0.35;
-    //double il = command_struct_.slip_factor_left;
-   // double ir = command_struct_.slip_factor_right;
+    // double il = command_struct_.slip_factor_left;
+    // double ir = command_struct_.slip_factor_right;
     double wheel_radius = 0.0975;
 
-  //velocity limits (m/s and m/s^2) linear.
-   double max_vel=0.5;
-   double min_vel=-0.5;
+    // velocity limits (m/s and m/s^2) linear.
+    double max_vel = 0.5;
+    double min_vel = -0.5;
 
-//velocity limits (r/s) angular.
-   double max_ang=0.8;
-   double min_ang=-0.8;
+    // velocity limits (r/s) angular.
+    double max_ang = 0.8;
+    double min_ang = -0.8;
 
-//motor velocity limits (r/s) (5500 motor rpm->5.09 wheel r/s)
-   double min_velocity= -5.09;
-   double max_velocity= 5.09;
+    // motor velocity limits (r/s) (5500 motor rpm->5.09 wheel r/s)
+    double min_velocity = -5.09;
+    double max_velocity = 5.09;
 
-//Limiting cmd_vel.
-//If velocities over the limits,clamp.
+    // Limiting cmd_vel.
+    // If velocities over the limits,clamp.
 
-   //v=clamp(v,min_vel,max_vel);
-   //w=clamp(w,min_ang,max_ang);
+    // v=clamp(v,min_vel,max_vel);
+    // w=clamp(w,min_ang,max_ang);
 
 
-// Compute wheels velocities:  (1.Equations pandora_skid_steering.pdf )
-   double vel_left  = (1/wheel_radius)*v-((a*B)/(2*wheel_radius))*w;
-   double vel_right = (1/wheel_radius)*v+((a*B)/(2*wheel_radius))*w; 
-// BEWARE!! : invert axes !! (paper vs URDF)
+    // Compute wheels velocities:  (1.Equations pandora_skid_steering.pdf )
+    double vel_left  = (1/wheel_radius)*v-((a*B)/(2*wheel_radius))*w;
+    double vel_right = (1/wheel_radius)*v+((a*B)/(2*wheel_radius))*w;
+    // BEWARE!! : invert axes !! (paper vs URDF)
 
-  // Compute wheels velocities:  (2.Equations pandora_skid_steering.pdf )
- 
-   //vel_right = v/(wheel_radius*(1-il)) + w/(2*wheel_radius*(1-il));
-   //vel_left = v/(wheel_radius*(1-ir)) - w/(2*wheel_radius*(1-ir));
+    // Compute wheels velocities:  (2.Equations pandora_skid_steering.pdf )
 
-   //Limiting motor velocities
+    // vel_right = v/(wheel_radius*(1-il)) + w/(2*wheel_radius*(1-il));
+    // vel_left = v/(wheel_radius*(1-ir)) - w/(2*wheel_radius*(1-ir));
 
-    //vel_left=clamp(vel_left, min_velocity, max_velocity);  
-    //vel_right=clamp(vel_right, min_velocity, max_velocity);
+    // Limiting motor velocities
+
+    // vel_left=clamp(vel_left, min_velocity, max_velocity);
+    // vel_right=clamp(vel_right, min_velocity, max_velocity);
 
     // Set Joint Commands
     // ROS_INFO("%f %f",vel_left,vel_right);
@@ -162,36 +157,35 @@ namespace motor
     right_rear_wheel_joint_.setCommand(vel_right);
   }
 
- void SkidSteerVelocityController::commandCallback(const geometry_msgs::Twist& command)
+  void SkidSteerVelocityController::commandCallback(const geometry_msgs::Twist& command)
   {
     // Update command struct
     // Update command struct
-    //add terrain_parameter
+    // add terrain_parameter
     command_struct_.ang   = command.angular.z;
     command_struct_.lin   = command.linear.x;
-    //command_struct_.terrain_parameter = command.terrain_param;
-    //command_struct_.slip_factor_left = command.scale_left;
-    //command_struct_.slip_factor_right = command.scale_right;
+    // command_struct_.terrain_parameter = command.terrain_param;
+    // command_struct_.slip_factor_left = command.scale_left;
+    // command_struct_.slip_factor_right = command.scale_right;
 
     command_struct_.stamp = ros::Time::now();
   }
 
-
-  /*void SkidSteerVelocityController::commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command)
+  /*
+  void SkidSteerVelocityController::commandCallback(const pandora_motor_hardware_interface::KinodynamicCommand& command)
   {
     // Update command struct
     // Update command struct
-    //add terrain_parameter
+    // add terrain_parameter
     command_struct_.ang   = command.cmd_vel.angular.z;
     command_struct_.lin   = command.cmd_vel.linear.x;
     command_struct_.terrain_parameter = command.terrain_param;
-    //command_struct_.slip_factor_left = command.scale_left;
-    //command_struct_.slip_factor_right = command.scale_right;
+    // command_struct_.slip_factor_left = command.scale_left;
+    // command_struct_.slip_factor_right = command.scale_right;
 
     command_struct_.stamp = ros::Time::now();
-  }*/
-
-  
+  }
+  */
 
 }  // namespace motor
 }  // namespace pandora_hardware_interface
