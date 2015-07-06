@@ -20,7 +20,7 @@
   </group>
 
 
-  <!-- <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" /> -->
+  <!-- <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" /> -->
 
   <include file="$(find pandora_vision_victim)/launch/victim_node.launch">
     <arg name="output" value="screen" />
@@ -30,7 +30,7 @@
 <!-- <include file="$(find state_manager)/launch/stateManager.launch" /> -->
 
  <!--
-  
+
  <include file="$(find openni_launch)/launch/openni.launch" >
     <arg name="camera" value="kinect" />
     <arg name="publish_tf" value="false" />

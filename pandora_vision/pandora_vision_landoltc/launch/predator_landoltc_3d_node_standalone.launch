@@ -1,13 +1,13 @@
 <launch>
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  
+
   <include file="$(find pandora_vision_launchers)/launch/usb_cam.launch" >
     <arg name="camID" value="/dev/video1"/>
     <arg name="name" value="kinect"/>
     <arg name="topic_name" value="/kinect/image"/>
     <arg name="frame_id" value="kinect_link"/>
   </include>
-    
+
 <!--
    <include file="$(find openni_launch)/launch/openni.launch" >
     <arg name="camera" value="kinect" />
@@ -16,10 +16,9 @@
   </include>
 -->
   <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
-  
-  <include file="$(find pandora_vision_landoltc)/launch/predator_landoltc_3d_node.launch" />
-  
-  <include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
-  
-</launch>
 
+  <include file="$(find pandora_vision_landoltc)/launch/predator_landoltc_3d_node.launch" />
+
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
+
+</launch>

@@ -6,7 +6,7 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_hazmat)/launch/hazmat_node.launch" />
 
-  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
   <group if="$(arg xtion)">
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
@@ -38,8 +38,8 @@
   <param name="subscriberAlertMessageType" value="HazmatAlertVector"/>
 
   <param name="algorithm" value="Hazmat"/>
-    
+
   <test test-name="HazmatBenchmarkTest" pkg="pandora_vision_hazmat"
     type="hazmat_benchmark_test.py" time-limit="2000.0"/>
-  
+
 </launch>

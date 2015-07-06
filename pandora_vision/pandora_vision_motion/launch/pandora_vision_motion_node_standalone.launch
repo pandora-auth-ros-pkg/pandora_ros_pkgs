@@ -1,7 +1,7 @@
 <launch>
-  
+
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  
+
   <!-- Kinect: choose the openni driver -->
   <arg name="openni" default="false" />
   <group if="$(arg openni)">
@@ -12,7 +12,7 @@
     </include>
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
   </group>
-  
+
   <!-- Xtion: choose the openni2 driver -->
   <arg name="openni2" default="false" />
   <group if="$(arg openni2)">
@@ -23,7 +23,7 @@
     </include>
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
   </group>
-  
+
   <!-- Usb camera: choose the usb_cam launch -->
   <arg name="usbcamera" default="false" />
   <group if="$(arg usbcamera)">
@@ -36,8 +36,8 @@
 
   <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
- 
+
   <include file="$(find pandora_vision_motion)/launch/pandora_vision_motion_node.launch" />
-  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
-  
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
+
 </launch>

@@ -40,6 +40,6 @@
 
   <include file="$(find pandora_vision_obstacle)/launch/soft_obstacle_node.launch" />
 
-  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
 </launch>

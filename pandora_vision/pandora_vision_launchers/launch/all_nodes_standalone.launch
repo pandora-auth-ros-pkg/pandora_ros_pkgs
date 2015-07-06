@@ -1,6 +1,6 @@
 <launch>
-  <arg name="robot" default="woody" />
-  
+  <arg name="robot" default="gio" />
+
   <!-- Robot Description -->
   <include file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch" />
 

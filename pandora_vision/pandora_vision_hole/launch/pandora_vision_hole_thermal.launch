@@ -56,7 +56,7 @@
 
   <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
-  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
   <!-- Output selection -->
   <arg name="output" default="screen" />

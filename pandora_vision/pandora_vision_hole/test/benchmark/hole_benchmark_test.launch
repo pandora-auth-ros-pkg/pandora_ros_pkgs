@@ -4,7 +4,7 @@
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
-  <!-- <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" /> -->
+  <!-- <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" /> -->
 
   <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
   <param name="dataset_camera" value="kinect"/>
@@ -27,9 +27,9 @@
   <param name="subscriberAlertMessageType" value="HoleDirectionAlertVector"/>
 
   <param name="algorithm" value="Hole"/>
-    
+
   <test test-name="HoleBenchmarkTest" pkg="pandora_vision_hole"
     type="hole_benchmark_test.py" time-limit="6000.0"/>
 
-  
+
 </launch>

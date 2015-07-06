@@ -6,7 +6,7 @@
   <include file="$(find state_manager)/launch/stateManager.launch" />
   <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
 
-  <include file="$(find pandora_robots_description)/woody/launch/woody_description.launch" />
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
   <group if="$(arg xtion)">
     <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
@@ -38,8 +38,8 @@
   <param name="subscriberAlertMessageType" value="QRAlertVector"/>
 
   <param name="algorithm" value="QR"/>
-    
+
   <test test-name="QRBenchmarkTest" pkg="pandora_vision_qrcode"
     type="qrcode_benchmark_test.py" time-limit="2000.0"/>
-  
+
 </launch>

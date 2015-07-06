@@ -5,7 +5,7 @@
 <param name="kinect/topic_name" value="/kinect/rgb/image_raw"/>
 <param name="left_camera/topic_name" value="/camera/image_raw"/>
 <param name="right_camera/topic_name" value="/usb1/image_raw"/>
-<include file="$(find pandora_robots_description)/gears/launch/gears_description.launch" />
+<include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
 <test test-name="QrAccuracyTest" pkg="pandora_vision_qrcode"
   type="accuracy_test.py time-limit="200.0"/>
