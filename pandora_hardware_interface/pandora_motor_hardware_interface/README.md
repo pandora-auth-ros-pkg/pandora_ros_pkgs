@@ -6,11 +6,11 @@ This package contains source code written to interfere and control motors/motor_
 
 - gsl-1.16:
   - Debian Package: libgsl0-dev
-  - Depended Package: skid_steer_drive_controller
+  - Depended Package: skid_steer_velocity_controller
   - Installation: 
 
 ```bash 
-sudo apt-get install libgs10-dev
+sudo apt-get install libgsl0-dev
 ```
 
 ## ROS Nodes
