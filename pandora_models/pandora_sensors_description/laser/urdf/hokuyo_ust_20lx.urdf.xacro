@@ -6,7 +6,7 @@
                params="parent *origin
                        roll_min_limit roll_max_limit
                        pitch_min_limit pitch_max_limit" >
-    
+
     <!-- Links -->
     <link name="laser_roll_servo_link" >
       <xacro:solid_cuboid_inertial mass="0.057" x="0.041" y="0.050" z="0.035" >
@@ -61,7 +61,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <!-- Joints -->
     <joint name="laser_servo_parent_joint"
            type="fixed" >
@@ -74,8 +74,8 @@
            type="revolute" >
       <parent link="laser_roll_servo_link" />
       <child link="laser_pitch_servo_link" />
-      <origin xyz="0.03999 0.0 0.0" 
-              rpy="0 0 0" />
+      <origin xyz="0.03999 0.0 0.0"
+              rpy="0.03 0 0" />
       <axis xyz="1 0 0" />
       <limit lower="${roll_min_limit}"
              upper="${roll_max_limit}"
@@ -87,25 +87,25 @@
            type="revolute" >
       <parent link="laser_pitch_servo_link" />
       <child link="laser_main_link" />
-      <origin xyz="0.0 0.0 0.02276" 
-              rpy="0 0 0" />
+      <origin xyz="0.0 0.0 0.02276"
+              rpy="0 -0.03 0" />
       <axis xyz="0 1 0" />
       <limit lower="${pitch_min_limit}"
              upper="${pitch_max_limit}"
              effort="50"
              velocity="50.0" />
     </joint>
-    
+
     <!-- Frames -->
     <link name="laser_link" >
       <xacro:point_mass_inertial />
     </link>
-    
+
     <joint name="laser_joint"
            type="fixed" >
       <parent link="laser_main_link" />
       <child link="laser_link" />
-      <origin xyz="0.0 0.0 0.089" 
+      <origin xyz="0.0 0.0 0.089"
               rpy="0 0 0" />
     </joint>
 
