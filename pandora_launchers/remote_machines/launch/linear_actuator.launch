@@ -1,48 +1,43 @@
 <?xml version="1.0"?>
 
 <launch>
-
+  <!-- Load rpi2 machine -->
   <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
-  <arg name="namespace" default="linear_actuator"/>
 
-    <!-- Linear Motor Hardware Interface Node -->
-
-  <node
-    machine="rpi2"
-    name="linear_motor_hardware_interface"
-    pkg="pandora_linear_motor_hardware_interface"
-    type="linear_motor_hardware_interface_node"
-    ns="$(arg namespace)"
-    launch-prefix=""
-    output="screen" >
-
-    <remap
-        from="/linear_actuator/linear_elevator_controller/command"
-        to="/linear_actuator/command"
-    />
-
-  </node>
+  <!-- set namespace argument -->
+  <arg name="namespace" default="linear_actuator" />
 
   <rosparam
     command="load"
-    file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/config/linear_motor_hardware_interface.yaml"
-    ns="$(arg namespace)"
-  />
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/config/linear_actuator_hardware_interface.yaml"
+    ns="$(arg namespace)" />
 
-
-
-
+  <!-- Linear Actuator Hardware Interface Node -->
   <node
     machine="rpi2"
-    name="linear_motor_controller_spawner"
+    name="linear_actuator_hardware_interface"
+    pkg="pandora_linear_actuator_hardware_interface"
+    type="linear_actuator_hardware_interface_node"
+    ns="$(arg namespace)"
+    launch-prefix=""
+    output="screen">
+
+    <remap
+        from="/linear_actuator/linear_actuator_controller/command"
+        to="/linear_actuator/command" />
+  </node>
+
+  <!-- Linear Actuator Controller Spawner -->
+  <node
+    machine="rpi2"
+    name="linear_actuator_controller_spawner"
     pkg="controller_manager"
     type="controller_manager"
     ns="$(arg namespace)"
     args="
       spawn
       joint_state_controller
-      linear_elevator_controller">
-
+      linear_actuator_controller">
   </node>
 
 </launch>
