@@ -40,7 +40,7 @@ import rospy
 from actionlib import GoalStatus
 from actionlib import SimpleActionServer as Server
 from actionlib import SimpleActionClient as Client
-from client_dict import sensor_client, linear_client, head_client
+from client_dict import sensor_client, linear_actuator_client, head_client
 from command_mapping_dict import translate_command
 
 class SensorClient(object):
@@ -84,14 +84,14 @@ class SensorClient(object):
     if self.client.get_state() == GoalStatus.ACTIVE:
       self.client.cancel_all_goals()
 
-class LinearClient(object):
-  """docstring for LinearClient"""
+class LinearActuatorClient(object):
+  """docstring for LinearActuatorClient"""
 
   def __init__(self):
-    self.goal = linear_client['goal']
-    self.topic = linear_client['topic']
-    self.action = linear_client['action']
-    self.command_dict = translate_command['to_linear']
+    self.goal = linear_actuator_client['goal']
+    self.topic = linear_actuator_client['topic']
+    self.action = linear_actuator_client['action']
+    self.command_dict = translate_command['to_linear_actuator']
 
     self.client = Client(self.topic, self.action)
 

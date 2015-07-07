@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   urdf
   roslint
-  pandora_linear_movement_controller
+  pandora_linear_actuator_controller
   pandora_sensor_orientation_controller
   )
 

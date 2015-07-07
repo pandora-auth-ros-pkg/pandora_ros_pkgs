@@ -41,9 +41,9 @@ from smach import State
 from smach_ros import SimpleActionState
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, linear_movement_topic
+    move_head_topic, linear_actuator_movement_topic
 
 
 class EndEffectorcontrollerState(State):
@@ -101,11 +101,11 @@ class KinectOrientationState(SimpleActionState):
 #         return goal
 
 
-# class LinearMovementState(SimpleActionState):
+# class LinearActuatorState(SimpleActionState):
 
 #     def __init__(self):
-#         SimpleActionState.__init__(self, linear_movement_topic,
-#                                    MoveLinearAction,
+#         SimpleActionState.__init__(self, linear_actuator_topic,
+#                                    MoveLinearActuatorAction,
 #                                    goal_cb=self.goal_cb,
 #                                    outcomes=['succeeded',
 #                                              'aborted',
@@ -114,7 +114,7 @@ class KinectOrientationState(SimpleActionState):
 #                                    output_keys=['move_end_effector_msg'])
 
     # def goal_cb(self, userdata, goal):
-    #     goal = MoveLinearGoal()
+    #     goal = MoveLinearActuatorGoal()
     #     goal.command = userdata.move_end_effector_msg.command
     #     goal.point_of_interest = \
     #         userdata.move_end_effector_msg.point_of_interest

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pandora_linear_movement_controller)
+project(pandora_linear_actuator_controller)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -17,7 +17,7 @@ catkin_python_setup()
 
 add_action_files(
   FILES
-  MoveLinear.action
+  MoveLinearActuator.action
   )
 
 generate_messages(
@@ -47,7 +47,7 @@ include_directories(
   )
 
 add_executable(${PROJECT_NAME}_node
-  src/linear_movement_controller.cpp
+  src/linear_actuator_controller.cpp
   )
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}

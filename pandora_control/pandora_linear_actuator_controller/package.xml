@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>pandora_linear_movement_controller</name>
+  <name>pandora_linear_actuator_controller</name>
   <version>0.0.0</version>
-  <description>The pandora_linear_movement_controller package</description>
+  <description>The pandora_linear_actuator_controller package</description>
 
   <maintainer email="gkourosg@yahoo.gr">George Kouros</maintainer>
 

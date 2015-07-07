@@ -34,20 +34,20 @@
 # Author: Peppas Kostas
 
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, move_linear_topic
+    move_head_topic, move_linear_actuator_topic
 
-sensor_client ={ 
+sensor_client ={
   'goal' : MoveSensorGoal(),
   'topic' : move_kinect_topic,
   'action' : MoveSensorAction
 }
 
-linear_client ={
-  'goal' : MoveLinearGoal(),
-  'topic' : move_linear_topic,
-  'action' : MoveLinearAction
+linear_actuator_client ={
+  'goal' : MoveLinearActuatorGoal(),
+  'topic' : move_linear_actuator_topic,
+  'action' : MoveLinearActuatorAction
 }
 
 head_client ={

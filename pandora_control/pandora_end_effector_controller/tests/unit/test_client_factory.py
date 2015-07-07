@@ -9,7 +9,7 @@ roslib.load_manifest('pandora_end_effector_controller')
 import rospy
 
 
-from pandora_end_effector_controller.effector_clients import SensorClient, LinearClient, HeadClient
+from pandora_end_effector_controller.effector_clients import SensorClient, LinearActuatorClient, HeadClient
 from pandora_end_effector_controller.client_factory import ClientFactory
 
 class TestClientFactory(unittest.TestCase):
@@ -17,9 +17,9 @@ class TestClientFactory(unittest.TestCase):
     def setUp(self):
         self.factory = ClientFactory()
 
-    def test_make_linear_client(self):
-      client = self.factory.make_client('linear_client')
-      self.assertEqual(type(client) ,type(LinearClient()))
+    def test_make_linear_actuator_client(self):
+      client = self.factory.make_client('linear_actuator_client')
+      self.assertEqual(type(client) ,type(LinearActuatorClient()))
 
     def test_make_sensor_client(self):
       client = self.factory.make_client('sensor_client')

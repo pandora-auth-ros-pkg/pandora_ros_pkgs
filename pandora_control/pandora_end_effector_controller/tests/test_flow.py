@@ -39,12 +39,12 @@ import rospy
 
 from mocks.action_servers import MockActionServer
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from pandora_end_effector_controller.topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, move_linear_topic
+    move_head_topic, move_linear_actuator_topic
 
 if __name__ == '__main__':
     rospy.init_node('mock_servers')
     sensorServer = MockActionServer('mock/kinect', move_kinect_topic, MoveSensorAction)
-    linearServer = MockActionServer('mock/linear', move_linear_topic, MoveLinearAction)
+    linearActuatorServer = MockActionServer('mock/linear_actuator', move_linear_actuator_topic, MoveLinearActuatorAction)
     rospy.spin()

@@ -35,8 +35,8 @@
 * Author:  Evangelos Apostolidis
 * Author:  Chris Zalidis
 *********************************************************************/
-#ifndef PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H
-#define PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H
+#ifndef PANDORA_LINEAR_ACTUATOR_CONTROLLER_LINEAR_ACTUATOR_CONTROLLER_H
+#define PANDORA_LINEAR_ACTUATOR_CONTROLLER_LINEAR_ACTUATOR_CONTROLLER_H
 
 #include <string>
 
@@ -47,19 +47,35 @@
 #include <tf/transform_listener.h>
 #include <urdf_parser/urdf_parser.h>
 
-#include <pandora_linear_movement_controller/MoveLinearAction.h>
+#include <pandora_linear_actuator_controller/MoveLinearActuatorAction.h>
 
 namespace pandora_control
 {
-  class LinearMovementActionServer
+  class LinearActuatorActionServer
   {
+    public:
+      LinearActuatorActionServer(
+        std::string name,
+        ros::NodeHandle nodeHandle_);
+
+      ~LinearActuatorActionServer(void);
+
+    private:
+      void callback(const pandora_linear_actuator_controller::MoveLinearActuatorGoalConstPtr& goal);
+
+      bool getcontrollerParams();
+      void testLinearActuator();
+      void lowerLinearActuator();
+      void moveLinearActuator(std::string pointOfInterest, std::string centerPoint,
+        double movementThreshold);
+
     private:
       ros::NodeHandle nodeHandle_;
       std::string actionName_;
       actionlib::SimpleActionServer<
-        pandora_linear_movement_controller::MoveLinearAction> actionServer_;
+        pandora_linear_actuator_controller::MoveLinearActuatorAction> actionServer_;
 
-      ros::Publisher linearCommandPublisher_;
+      ros::Publisher linearActuatorCommandPublisher_;
 
       int command_;
       double minElevation_;
@@ -69,25 +85,10 @@ namespace pandora_control
       double laxMovementThreshold_;
       double commandTimeout_;
       double previousTarget_;
-      std::string linearCommandTopic_;
-      std::string linearMotorFrame_;
+      std::string linearActuatorCommandTopic_;
+      std::string linearActuatorFrame_;
 
       tf::TransformListener tfListener_;
-
-      void callback(const pandora_linear_movement_controller::MoveLinearGoalConstPtr& goal);
-
-      bool getcontrollerParams();
-      void testLinear();
-      void lowerLinear();
-      void moveLinear(std::string pointOfInterest, std::string centerPoint,
-        double movementThreshold);
-
-    public:
-      LinearMovementActionServer(
-        std::string name,
-        ros::NodeHandle nodeHandle_);
-
-      ~LinearMovementActionServer(void);
   };
 }  // namespace pandora_control
-#endif  // PANDORA_LINEAR_MOVEMENT_CONTROLLER_LINEAR_MOVEMENT_CONTROLLER_H
+#endif  // PANDORA_LINEAR_ACTUATOR_CONTROLLER_LINEAR_ACTUATOR_CONTROLLER_H

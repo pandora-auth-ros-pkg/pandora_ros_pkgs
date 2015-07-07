@@ -36,62 +36,60 @@
 * Author:  Chris Zalidis
 *********************************************************************/
 
-#include <string>
-
-#include <pandora_linear_movement_controller/linear_movement_controller.h>
+#include <pandora_linear_actuator_controller/linear_actuator_controller.h>
 
 namespace pandora_control
 {
-  LinearMovementActionServer::LinearMovementActionServer(
+  LinearActuatorActionServer::LinearActuatorActionServer(
     std::string actionName,
     ros::NodeHandle nodeHandle)
   :
     actionServer_(
       nodeHandle,
       actionName,
-      boost::bind(&LinearMovementActionServer::callback, this, _1), false),
+      boost::bind(&LinearActuatorActionServer::callback, this, _1), false),
     actionName_(actionName),
     nodeHandle_(nodeHandle)
   {
     // get params from param server
     if (getcontrollerParams())
     {
-      linearCommandPublisher_ =
+      linearActuatorCommandPublisher_ =
         nodeHandle_.advertise<std_msgs::Float64>(
-          linearCommandTopic_,
+          linearActuatorCommandTopic_,
           5, true);
 
       std_msgs::Float64 targetPosition;
       targetPosition.data = previousTarget_ = 0;
-      linearCommandPublisher_.publish(targetPosition);
+      linearActuatorCommandPublisher_.publish(targetPosition);
       actionServer_.start();
     }
   }
 
-  LinearMovementActionServer::~LinearMovementActionServer(void)
+  LinearActuatorActionServer::~LinearActuatorActionServer(void)
   {
   }
 
-  void LinearMovementActionServer::callback(
-      const pandora_linear_movement_controller::MoveLinearGoalConstPtr& goal)
+  void LinearActuatorActionServer::callback(
+      const pandora_linear_actuator_controller::MoveLinearActuatorGoalConstPtr& goal)
   {
     command_ = goal->command;
-    if (command_ == pandora_linear_movement_controller::MoveLinearGoal::TEST)
+    if (command_ == pandora_linear_actuator_controller::MoveLinearActuatorGoal::TEST)
     {
-      testLinear();
+      testLinearActuator();
     }
-    else if (command_ == pandora_linear_movement_controller::MoveLinearGoal::LOWER)
+    else if (command_ == pandora_linear_actuator_controller::MoveLinearActuatorGoal::LOWER)
     {
-      lowerLinear();
+      lowerLinearActuator();
     }
-    else if (command_ == pandora_linear_movement_controller::MoveLinearGoal::MOVE)
+    else if (command_ == pandora_linear_actuator_controller::MoveLinearActuatorGoal::MOVE)
     {
-      moveLinear(goal->point_of_interest, goal->center_point,
+      moveLinearActuator(goal->point_of_interest, goal->center_point,
         movementThreshold_);
     }
-    else if (command_ == pandora_linear_movement_controller::MoveLinearGoal::LAX_MOVE)
+    else if (command_ == pandora_linear_actuator_controller::MoveLinearActuatorGoal::LAX_MOVE)
     {
-      moveLinear(goal->point_of_interest, goal->center_point,
+      moveLinearActuator(goal->point_of_interest, goal->center_point,
         laxMovementThreshold_);
     }
     else
@@ -102,7 +100,7 @@ namespace pandora_control
     }
   }
 
-  bool LinearMovementActionServer::getcontrollerParams()
+  bool LinearActuatorActionServer::getcontrollerParams()
   {
     nodeHandle_.param("min_command", minCommand_, 0.0);
     nodeHandle_.param("max_command", maxCommand_, 0.18);
@@ -111,23 +109,23 @@ namespace pandora_control
     movementThreshold_ = fabs(movementThreshold_);
     nodeHandle_.param("command_timeout", commandTimeout_, 15.0);
 
-    if (nodeHandle_.getParam("linear_command_topic", linearCommandTopic_))
+    if (nodeHandle_.getParam("linear_actuator_command_topic", linearActuatorCommandTopic_))
     {
-      ROS_INFO_STREAM("Got param linear_command_topic: " << linearCommandTopic_);
+      ROS_INFO_STREAM("Got param linear_actuator_command_topic: " << linearActuatorCommandTopic_);
     }
     else
     {
-      ROS_FATAL("Failed to get param linear_command_topic shuting down");
+      ROS_FATAL("Failed to get param linear_actuator_command_topic shuting down");
       return false;
     }
 
-    if (nodeHandle_.getParam("linear_motor_frame", linearMotorFrame_))
+    if (nodeHandle_.getParam("linear_actuator_frame", linearActuatorFrame_))
     {
-      ROS_INFO_STREAM("Got param linear_motor_frame: " << linearMotorFrame_);
+      ROS_INFO_STREAM("Got param linear_actuator_frame: " << linearActuatorFrame_);
     }
     else
     {
-      ROS_FATAL("Failed to get param linear_motor_frame shuting down");
+      ROS_FATAL("Failed to get param linear_actuator_frame shuting down");
       return false;
     }
 
@@ -145,7 +143,7 @@ namespace pandora_control
 
     // Get current link and its parent
     boost::shared_ptr<const urdf::Link> link =
-      model->getLink(linearMotorFrame_);
+      model->getLink(linearActuatorFrame_);
     minElevation_ =
       link->parent_joint->parent_to_joint_origin_transform.position.z;
     ROS_INFO_STREAM("Got minElevation_ from URDF: " << minElevation_);
@@ -153,20 +151,20 @@ namespace pandora_control
     return true;
   }
 
-  void LinearMovementActionServer::testLinear()
+  void LinearActuatorActionServer::testLinearActuator()
   {
-    tf::StampedTransform linearTransform;
+    tf::StampedTransform linearActuatorTransform;
     try
     {
       tfListener_.lookupTransform(
-        "/base_link", linearMotorFrame_,
-        ros::Time(0), linearTransform);
+        "/base_link", linearActuatorFrame_,
+        ros::Time(0), linearActuatorTransform);
     }
     catch (tf::TransformException ex)
     {
       ROS_ERROR("%s", ex.what());
     }
-    double startX = linearTransform.getOrigin()[2];
+    double startX = linearActuatorTransform.getOrigin()[2];
     double step = -0.006;
     if (startX + step < minElevation_)
     {
@@ -175,7 +173,7 @@ namespace pandora_control
     std_msgs::Float64 targetPosition;
     targetPosition.data = previousTarget_ = startX + step - minElevation_;
     // Step could be a param
-    linearCommandPublisher_.publish(targetPosition);
+    linearActuatorCommandPublisher_.publish(targetPosition);
 
     ros::Time begin = ros::Time::now();
 
@@ -186,14 +184,14 @@ namespace pandora_control
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearMotorFrame_,
-          ros::Time(0), linearTransform);
+          "/base_link", linearActuatorFrame_,
+          ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
       {
         ROS_ERROR("%s", ex.what());
       }
-      linearZ = linearTransform.getOrigin()[2];
+      linearZ = linearActuatorTransform.getOrigin()[2];
       if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
       {
         ROS_DEBUG("%s: Aborted", actionName_.c_str());
@@ -214,15 +212,15 @@ namespace pandora_control
     actionServer_.setSucceeded();
   }
 
-  void LinearMovementActionServer::lowerLinear()
+  void LinearActuatorActionServer::lowerLinearActuator()
   {
     std_msgs::Float64 targetPosition;
     targetPosition.data = previousTarget_ = 0;
-    linearCommandPublisher_.publish(targetPosition);
+    linearActuatorCommandPublisher_.publish(targetPosition);
 
     ros::Time begin = ros::Time::now();
 
-    tf::StampedTransform linearTransform;
+    tf::StampedTransform linearActuatorTransform;
     double linearZ = -1;
     while (ros::ok() &&
       fabs(linearZ - minElevation_) >= movementThreshold_)
@@ -230,14 +228,14 @@ namespace pandora_control
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearMotorFrame_,
-          ros::Time(0), linearTransform);
+          "/base_link", linearActuatorFrame_,
+          ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
       {
         ROS_ERROR("%s", ex.what());
       }
-      linearZ = linearTransform.getOrigin()[2];
+      linearZ = linearActuatorTransform.getOrigin()[2];
       if (actionServer_.isPreemptRequested() || !ros::ok())
       {
         ROS_WARN("%s: Preempted", actionName_.c_str());
@@ -258,7 +256,7 @@ namespace pandora_control
     actionServer_.setSucceeded();
   }
 
-  void LinearMovementActionServer::moveLinear(std::string pointOfInterest,
+  void LinearActuatorActionServer::moveLinearActuator(std::string pointOfInterest,
     std::string centerPoint, double movementThreshold)
   {
     ros::Time lastTf = ros::Time::now();
@@ -275,24 +273,24 @@ namespace pandora_control
         return;
       }
 
-      tf::StampedTransform linearTransform;
+      tf::StampedTransform linearActuatorTransform;
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearMotorFrame_,
-          ros::Time(0), linearTransform);
+          "/base_link", linearActuatorFrame_,
+          ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
       {
         ROS_ERROR("%s", ex.what());
       }
 
-      tf::StampedTransform linearToTargetTransform;
+      tf::StampedTransform linearActuatorToTargetTransform;
       try
       {
         tfListener_.lookupTransform(
-          linearMotorFrame_, pointOfInterest,
-          ros::Time(0), linearToTargetTransform);
+          linearActuatorFrame_, pointOfInterest,
+          ros::Time(0), linearActuatorToTargetTransform);
       }
       catch (tf::TransformException ex)
       {
@@ -317,12 +315,12 @@ namespace pandora_control
         }
       }
 
-      tf::StampedTransform linearToCenterTransform;
+      tf::StampedTransform linearActuatorToCenterTransform;
       try
       {
         tfListener_.lookupTransform(
-          linearMotorFrame_, centerPoint,
-          ros::Time(0), linearToCenterTransform);
+          linearActuatorFrame_, centerPoint,
+          ros::Time(0), linearActuatorToCenterTransform);
       }
       catch (tf::TransformException ex)
       {
@@ -348,10 +346,10 @@ namespace pandora_control
       }
       lastTf = ros::Time::now();
 
-      double deltaZ = linearToTargetTransform.getOrigin()[2]
-        - linearToCenterTransform.getOrigin()[2];
+      double deltaZ = linearActuatorToTargetTransform.getOrigin()[2]
+        - linearActuatorToCenterTransform.getOrigin()[2];
 
-      double targetZ = linearTransform.getOrigin()[2] + deltaZ;
+      double targetZ = linearActuatorTransform.getOrigin()[2] + deltaZ;
       if (targetZ < minElevation_)
       {
         targetPosition.data = minCommand_;
@@ -366,7 +364,7 @@ namespace pandora_control
       }
       if (fabs(previousTarget_ - targetPosition.data) > movementThreshold)
       {
-        linearCommandPublisher_.publish(targetPosition);
+        linearActuatorCommandPublisher_.publish(targetPosition);
         previousTarget_ = targetPosition.data;
       }
       rate.sleep();
@@ -376,12 +374,12 @@ namespace pandora_control
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "linear_movement_action");
+  ros::init(argc, argv, "linear_actuator_action");
   ros::NodeHandle nodeHandle;
-  std::string actionName = "linear_movement_action";
+  std::string actionName = "linear_actuator_action";
 
-  pandora_control::LinearMovementActionServer
-    linearMovementActionServer(
+  pandora_control::LinearActuatorActionServer
+    linearActuatorActionServer(
       actionName,
       nodeHandle);
 

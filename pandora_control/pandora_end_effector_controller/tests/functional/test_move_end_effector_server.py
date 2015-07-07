@@ -10,16 +10,16 @@ import rospy
 
 from rospy import Publisher
 from std_msgs.msg import String
-from pandora_end_effector_controller.effector_clients import SensorClient, LinearClient, HeadClient
+from pandora_end_effector_controller.effector_clients import SensorClient, LinearActuatorClient, HeadClient
 from pandora_end_effector_controller.client_factory import ClientFactory
 from pandora_end_effector_controller.move_end_effector_server import MoveEndEffectorServer
 from pandora_end_effector_controller.mocks.goal_maker import EffectorGoalMaker
 from actionlib import SimpleActionClient as Client
 from actionlib import GoalStatus
 from pandora_end_effector_controller.topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, move_linear_topic
+    move_head_topic, move_linear_actuator_topic
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 
 
@@ -38,7 +38,7 @@ class TestInitialFunctions(unittest.TestCase):
     # The following exact values depend on the factory settings!
     self.assertEqual(len(self.server.current_clients), 3)
     self.assertEqual(type(self.server.current_clients[0]), type(SensorClient()))
-    self.assertEqual(type(self.server.current_clients[1]), type(LinearClient()))
+    self.assertEqual(type(self.server.current_clients[1]), type(LinearActuatorClient()))
     self.assertEqual(type(self.server.current_clients[2]), type(HeadClient()))
 
   def test_fill_goals(self):
@@ -66,7 +66,7 @@ class TestFunctionsInvolvingClients(unittest.TestCase):
     self.goal = MoveEndEffectorGoal()
     self.goal_maker = EffectorGoalMaker()
     self.sensor_pub = Publisher('mock/sensor', String)
-    self.linear_pub = Publisher('mock/linear', String)
+    self.linear_actuator_pub = Publisher('mock/linear_actuator', String)
     self.head_pub = Publisher('mock/head', String)
     rospy.sleep(1)
 
@@ -96,7 +96,7 @@ class TestFunctionsInvolvingClients(unittest.TestCase):
 
 
     self.sensor_pub.publish('success:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('success:1')
     self.server.current_goal = self.goal_maker.create_goal()
     self.server.fill_goals()
@@ -108,7 +108,7 @@ class TestFunctionsInvolvingClients(unittest.TestCase):
     ''' Tests if the server is successfully set to aborted  '''
 
     self.sensor_pub.publish('abort:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('success:1')
     self.server.current_goal = self.goal_maker.create_goal()
     self.server.fill_goals()
@@ -120,13 +120,13 @@ class TestFunctionsInvolvingClients(unittest.TestCase):
     ''' Tests if the server is successfully set to preempted  '''
 
     self.sensor_pub.publish('preempt:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('success:1')
     self.server.current_goal = self.goal_maker.create_goal()
     self.server.fill_goals()
     self.server.send_goals()
     self.server.wait_for_result()
-    self.assertTrue(self.server.check_preempted())    
+    self.assertTrue(self.server.check_preempted())
 
 class TestClientsAndServer(unittest.TestCase):
 
@@ -136,7 +136,7 @@ class TestClientsAndServer(unittest.TestCase):
     self.server = MoveEndEffectorServer()
     self.goal_maker = EffectorGoalMaker()
     self.sensor_pub = Publisher('mock/sensor', String, queue_size=1)
-    self.linear_pub = Publisher('mock/linear', String, queue_size=1)
+    self.linear_actuator_pub = Publisher('mock/linear_actuator', String, queue_size=1)
     self.head_pub = Publisher('mock/head', String, queue_size=1)
     rospy.sleep(1)
 
@@ -144,7 +144,7 @@ class TestClientsAndServer(unittest.TestCase):
     ''' Tests if server is set correctly (triggered by callback!) '''
 
     self.sensor_pub.publish('success:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('success:1')
     self.goal = MoveEndEffectorGoal()
     self.goal = self.goal_maker.create_goal()
@@ -153,7 +153,7 @@ class TestClientsAndServer(unittest.TestCase):
     self.effector_client.wait_for_result()
     self.assertEqual(self.effector_client.get_state(), GoalStatus.SUCCEEDED)
     self.sensor_pub.publish('abort:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('success:1')
     self.goal = MoveEndEffectorGoal()
     self.goal = self.goal_maker.create_goal()
@@ -161,7 +161,7 @@ class TestClientsAndServer(unittest.TestCase):
     self.effector_client.wait_for_result()
     self.assertEqual(self.effector_client.get_state(), GoalStatus.ABORTED)
     self.sensor_pub.publish('preempt:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('preempt:1')
     self.goal = MoveEndEffectorGoal()
     self.goal = self.goal_maker.create_goal()
@@ -169,7 +169,7 @@ class TestClientsAndServer(unittest.TestCase):
     self.effector_client.wait_for_result()
     self.assertEqual(self.effector_client.get_state(), GoalStatus.PREEMPTED)
     self.sensor_pub.publish('abort:1')
-    self.linear_pub.publish('success:1')
+    self.linear_actuator_pub.publish('success:1')
     self.head_pub.publish('preempt:1')
     self.goal = MoveEndEffectorGoal()
     self.goal = self.goal_maker.create_goal()

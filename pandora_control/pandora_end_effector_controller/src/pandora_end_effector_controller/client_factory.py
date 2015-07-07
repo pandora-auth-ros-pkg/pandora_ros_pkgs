@@ -34,7 +34,7 @@
 # Author: Peppas Kostas
 
 import rospy
-from effector_clients import SensorClient, LinearClient, HeadClient
+from effector_clients import SensorClient, LinearActuatorClient, HeadClient
 
 class ClientFactory(object):
 
@@ -44,7 +44,7 @@ class ClientFactory(object):
     rospy.loginfo('Initializing factory...')
     self.return_client ={
       'sensor_client' : self.return_sensor,
-      'linear_client' : self.return_linear,
+      'linear_actuator_client' : self.return_linear_actuator,
       'head_client' : self.return_head
     }
 
@@ -57,9 +57,9 @@ class ClientFactory(object):
     ''' Returning SensorClient instance '''
     return SensorClient()
 
-  def return_linear(self):
-    ''' Returning LinearClient instance '''
-    return LinearClient()
+  def return_linear_actuator(self):
+    ''' Returning LinearActuatorClient instance '''
+    return LinearActuatorClient()
 
   def return_head(self):
     ''' Returning HeadClient instance '''

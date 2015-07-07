@@ -41,9 +41,9 @@ from std_msgs.msg import String, Bool
 
 from actionlib import SimpleActionServer as ActionServer
 from pandora_end_effector_controller.topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, move_linear_topic
+    move_head_topic, move_linear_actuator_topic
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
   # Action Servers
   MockActionServer('linear', move_linear_topic,
-                   MoveLinearAction)
+                   MoveLinearActuatorAction)
   MockActionServer('sensor', move_kinect_topic,
                    MoveSensorAction)
   MockActionServer('head', move_head_topic,

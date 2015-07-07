@@ -43,9 +43,9 @@ from actionlib import SimpleActionClient as Client
 
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from topics import move_end_effector_controller_topic, move_kinect_topic, \
-    move_head_topic, move_linear_topic
+    move_head_topic, move_linear_actuator_topic
 from client_factory import ClientFactory
 from client_list import CLIENTS
 
@@ -57,7 +57,7 @@ class MoveEndEffectorServer(object):
     self.current_goal = MoveEndEffectorGoal()
 
 
-    self.server = Server(move_end_effector_controller_topic, 
+    self.server = Server(move_end_effector_controller_topic,
                         MoveEndEffectorAction, self.execute_cb,
                         False)
     self.server.register_preempt_callback(self.preempt_cb)
@@ -94,7 +94,7 @@ class MoveEndEffectorServer(object):
 
   def fill_goals(self):
     ''' Filling goals into every client respectively '''
-    
+
     for client in self.current_clients:
       client.fill_goal(self.current_goal)
 

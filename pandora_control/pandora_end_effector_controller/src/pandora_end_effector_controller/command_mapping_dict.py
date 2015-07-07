@@ -35,7 +35,7 @@
 
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
-from pandora_linear_movement_controller.msg import MoveLinearAction, MoveLinearGoal
+from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 
 translate_command ={
   'to_sensor' :
@@ -47,13 +47,13 @@ translate_command ={
     MoveEndEffectorGoal.SCAN : MoveSensorGoal.MOVE
   },
 
-  'to_linear' :
+  'to_linear_actuator' :
   {
-    MoveEndEffectorGoal.TEST : MoveLinearGoal.TEST,
-    MoveEndEffectorGoal.PARK : MoveLinearGoal.LOWER,
-    MoveEndEffectorGoal.TRACK : MoveLinearGoal.MOVE,
-    MoveEndEffectorGoal.LAX_TRACK : MoveLinearGoal.LAX_MOVE,
-    MoveEndEffectorGoal.SCAN : MoveLinearGoal.LOWER
+    MoveEndEffectorGoal.TEST : MoveLinearActuatorGoal.TEST,
+    MoveEndEffectorGoal.PARK : MoveLinearActuatorGoal.LOWER,
+    MoveEndEffectorGoal.TRACK : MoveLinearActuatorGoal.MOVE,
+    MoveEndEffectorGoal.LAX_TRACK : MoveLinearActuatorGoal.LAX_MOVE,
+    MoveEndEffectorGoal.SCAN : MoveLinearActuatorGoal.LOWER
   },
 
   'to_head' :

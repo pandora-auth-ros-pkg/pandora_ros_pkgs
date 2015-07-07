@@ -1,0 +1,11 @@
+<launch>
+  <node
+    name="linear_actuator_controller"
+    pkg="pandora_linear_actuator_controller"
+    type="pandora_linear_actuator_controller_node"
+    respawn="false"
+    output="screen"
+    ns="/pandora_control"/>
+  <rosparam command="load" ns="/pandora_control"
+    file="$(find pandora_linear_actuator_controller)/config/linear_actuator_controller.yaml"/>
+</launch>
