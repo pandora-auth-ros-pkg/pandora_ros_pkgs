@@ -109,7 +109,7 @@ namespace arm
     // read voltage of batteries
     for (int ii = 0; ii < batteryName_.size(); ii++)
     {
-        if (arm_->readBatteryValues(batteryCode_[ii], &uValue) > 0)
+        if (arm_->readBatteryValues(batteryCode_[ii], &uValue) > 0 && uValue > 12.0)
           voltage_[ii] = uValue / 4096.0 * 33.0;
     }
     // read encoder degrees
