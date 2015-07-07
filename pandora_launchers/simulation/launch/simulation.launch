@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="robot" default="woody"/>
+  <arg name="robot" default="gio"/>
   <arg name="gazebo" default="false"/>
 
   <arg name="state_manager" default="true"/>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="camera_effector" default="true"/>
+  <arg name="pi_camera" default="true"/>
+  <arg name="flir_lepton" default="true"/>
+  <arg name="ledstrip" default="true"/>
+  <arg name="raspicam" default="false"/>
+
+  <include if="$(arg camera_effector)"
+    file="$(find pandora_launchers)/remote_machines/launch/camera_effector.launch"  
+  />
+
+  <include if="$(arg pi_camera)"
+    file="$(find pandora_launchers)/remote_machines/launch/pi_camera.launch"
+  />
+
+  <include if="$(arg flir_lepton)"
+    file="$(find pandora_launchers)/remote_machines/launch/flir_lepton_thermal.launch"
+  />
+
+  <include if="$(arg ledstrip)"
+    file="$(find pandora_launchers)/remote_machines/launch/ledstrip_controller.launch"
+  />
+
+</launch>

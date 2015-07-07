@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="robot" default="woody"/>
+  <arg name="robot" default="gio"/>
   <arg name="description" default="true"/>
 
   <arg name="state_manager" default="true"/>
@@ -67,7 +67,7 @@
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
   </group>
   <group if="$(arg rpi)">
-    <include file="$(find pandora_launchers)/remote_machines/launch/rpi_flir.launch" />
+    <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch" />
   </group>
 
   <!-- Control -->

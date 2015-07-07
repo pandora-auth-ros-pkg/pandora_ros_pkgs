@@ -1,8 +1,11 @@
+<?xml version="1.0"?>
 <launch>
 
   <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
 
-  <!-- Flir Lepton Node -->
+  <arg name="namespace" default="camera_effector"/>
+
+  <!-- Camera Effector Node -->
   <node
     machine="rpi2"
     name="camera_effector"
@@ -20,7 +23,7 @@
     <param name="pan_joint/joint_name" value="camera_effector_pan_joint" />
     <param name="pan_joint/limits/max" value="1.3962" />
     <param name="pan_joint/limits/min" value="-1.3962" />
-    <param name="pan_joint/offset" value="0" />
+    <param name="pan_joint/offset" value="-0.104" />
     <param name="pan_joint/servo/name" value="pan" />
     <param name="pan_joint/servo/pin" value="17" />
 
@@ -28,7 +31,7 @@
     <param name="tilt_joint/joint_name" value="camera_effector_tilt_joint" />
     <param name="tilt_joint/limits/max" value="0.6" />
     <param name="tilt_joint/limits/min" value="-0.6" />
-    <param name="tilt_joint/offset" value="0.65" />
+    <param name="tilt_joint/offset" value="-0.1920" />
     <param name="tilt_joint/servo/name" value="tilt" />
     <param name="tilt_joint/servo/pin" value="18" />
 

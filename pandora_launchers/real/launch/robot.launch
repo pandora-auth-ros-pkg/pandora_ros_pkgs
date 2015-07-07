@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="robot" default="woody"/>
+  <arg name="robot" default="gio"/>
 
   <arg name="state_manager" default="true"/>
   <arg name="robot_description" default="true"/>
@@ -12,7 +12,7 @@
   <arg name="kinect_filter" default="true"/>
   <arg name="vision" default="true"/>
   <arg name="bag" default="false"/>
-  
+
   <!--Hardware Interface Arguments -->
   <arg name="motor" default="true"/>
   <arg name="dynamixel" default="true"/>
@@ -41,7 +41,7 @@
   <arg name="vision_motion" default="true"/>
   <arg name="vision_landoltc3d" default="false"/>
   <arg name="vision_victim" default="true"/>
-  
+
   <arg name="vision_datamatrix" default="false"/>
   <arg name="vision_predator" default="false"/>
 
@@ -116,7 +116,7 @@
     <arg name="vision_nodes" value="$(arg vision_nodes)"/>
     <arg name="camera_left" value="$(arg camera_left)"/>
     <arg name="camera_right" value="$(arg camera_right)"/>
-    <arg name="xtion" value="false"/> 
+    <arg name="xtion" value="false"/>
     <arg name="vision_qr" value="$(arg vision_qr)"/>
     <arg name="vision_hazmat" value="$(arg vision_hazmat)"/>
     <arg name="vision_landoltc" value="$(arg vision_landoltc)"/>

@@ -1,6 +1,9 @@
+<?xml version="1.0"?>
 <launch>
 
   <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+
+  <arg name="namespace" default="flir_lepton"/>
 
   <!-- Flir Lepton -->
   <node

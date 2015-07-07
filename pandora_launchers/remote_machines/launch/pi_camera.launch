@@ -3,6 +3,9 @@
 <launch>
 
   <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+
+  <arg name="namespace" default="pi_camera"/>
+
   <arg name="hfov" default="53.50" />
   <arg name="vfov" default="41.41" />
   <arg name="optical_frame" default="/pi_camera_optical_frame" />
