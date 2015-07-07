@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pandora_motor_control)
+project(pandora_teleop)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
   geometry_msgs
+  sensor_msgs
   roslint
 )
 
@@ -17,13 +19,19 @@ catkin_package(
     roscpp
     std_msgs
     geometry_msgs
+    sensor_msgs
 #  DEPENDS system_lib
 )
 
-include_directories(${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+)
 
-add_executable(pandora_teleop_key src/pandora_teleop_key.cpp )
-target_link_libraries(pandora_teleop_key ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_library(motors_keyop src/motors_keyop.cpp)
+add_executable(motors_keyop_node src/motors_keyop_node.cpp)
+target_link_libraries(motors_keyop_node motors_keyop ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 # To check lint : catkin_make roslint_pandora_motor_control
 set(ROSLINT_CPP_OPTS
@@ -31,6 +39,7 @@ set(ROSLINT_CPP_OPTS
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
-  src/pandora_teleop_key.cpp
+  include/${PROJECT_NAME}/*.h
+  src/*.cpp
 )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})

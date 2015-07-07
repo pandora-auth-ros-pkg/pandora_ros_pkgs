@@ -19,7 +19,7 @@
 
   <exec_depend>pandora_stabilizer</exec_depend>
   <exec_depend>pandora_end_effector_controller</exec_depend>
-  <exec_depend>pandora_motor_control</exec_depend>
+  <exec_depend>pandora_teleop</exec_depend>
   <exec_depend>pandora_sensor_orientation_controller</exec_depend>
   <exec_depend>pandora_linear_actuator_controller</exec_depend>
 
