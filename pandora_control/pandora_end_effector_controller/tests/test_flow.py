@@ -37,7 +37,7 @@ import roslib
 roslib.load_manifest('pandora_end_effector_controller')
 import rospy
 
-from mocks.action_servers import MockActionServer
+from pandora_end_effector_controller.mocks.action_servers import MockActionServer
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
 from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 from pandora_end_effector_controller.topics import move_end_effector_controller_topic, move_kinect_topic, \
