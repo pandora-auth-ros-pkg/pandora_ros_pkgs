@@ -1,35 +1,34 @@
 <launch>
 
+  <!--  Launchers Checklist  -->
   <arg name="robot" default="gio"/>
   <arg name="description" default="true"/>
-
   <arg name="state_manager" default="true"/>
-
   <arg name="motors" default="true"/>
-  <arg name="linear" default="false"/>
+  <arg name="linear_actuator" default="false"/>
   <arg name="dynamixel" default="true"/>
   <arg name="imu" default="true"/>
-  <arg name="imu_device" default="trax"/>
   <arg name="arm" default="true"/>
   <arg name="hardware_tools" default="true"/>
-
   <arg name="rpi" default="true" />
-
   <arg name="stabilizer" default="true"/>
   <arg name="eef" default="true"/>
-
   <arg name="slam" default="true"/>
-
   <arg name="navigation" default="true"/>
-
   <arg name="data_fusion" default="true"/>
-
   <arg name="xtion" default="false"/>
   <arg name="vision" default="true"/>
-
   <arg name="bag" default="false"/>
 
-  <!-- ##################################################################### -->
+  <!-- RPi Launcher Checklist  -->
+  <arg name="camera_effector" default="true" />
+  <arg name="pi_camera" default="true" />
+  <arg name="flir_lepton" default="true" />
+  <arg name="ledstrip" default="true" />
+  <arg name="raspicam" default="false" />
+  <arg name="rpi_linear_actuator" default="true" />
+
+  <!-- ########################## LAUNCH NODES ############################ -->
 
   <!-- Robot description -->
   <group if="$(arg description)">
@@ -50,8 +49,8 @@
       <arg name="robot" value="$(arg robot)" />
     </include>
   </group>
-  <group if="$(arg linear)">
-    <include file="$(find pandora_linear_motor_hardware_interface)/linear_motor_hardware_interface/launch/linear_motor_hardware_interface_and_controllers.launch" >
+  <group if="$(arg linear_actuator)">
+    <include file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/launch/linear_actuator_hardware_interface_and_controllers.launch" >
       <arg name="robot" value="$(arg robot)" />
     </include>
   </group>
@@ -67,7 +66,14 @@
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
   </group>
   <group if="$(arg rpi)">
-    <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch" />
+    <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch">
+      <arg name="camera_effector" value="$(arg camera_effector)" />
+      <arg name="pi_camera" value="$(arg pi_camera)" />
+      <arg name="flir_lepton" value="$(arg flir_lepton)" />
+      <arg name="ledstrip" value="$(arg ledstrip)" />
+      <arg name="raspicam" value="$(arg raspicam)" />
+      <arg name="rpi_linear_actuator" value="$(arg rpi_linear_actuator)" />
+    </include>
   </group>
 
   <!-- Control -->
