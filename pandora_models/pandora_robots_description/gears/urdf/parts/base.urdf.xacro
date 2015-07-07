@@ -18,7 +18,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gears/meshes/base_link.dae" />
         </geometry>
-        <material name="base" />
       </visual>
       <collision>
         <geometry>

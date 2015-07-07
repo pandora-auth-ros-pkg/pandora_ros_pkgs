@@ -4,7 +4,7 @@
 
   <xacro:macro name="side"
                params="prefix_y reflect_y" >
-               
+
     <link name="${prefix_y}_side_link" >
       <inertial>
         <origin xyz="${ reflect_y * ( -8.21E-06 ) } ${ reflect_y * ( 0.00188403 ) } -0.04035954" />
@@ -22,7 +22,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gears/meshes/side_link.dae" />
         </geometry>
-        <material name="side" />
       </visual>
       <collision>
         <origin xyz="${zero}"
@@ -32,7 +31,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <joint name="${prefix_y}_side_joint"
            type="revolute" >
       <parent link="base_link" />
@@ -46,7 +45,7 @@
              effort="150.0"
              velocity="150.0" />
     </joint>
-    
+
   </xacro:macro>
 
 </robot>

@@ -21,14 +21,5 @@
   <material name="solidworks_default" >
     <color rgba="${192/255} ${192/255} ${192/255} 1.0" />
   </material>
-  <material name="base" >
-    <color rgba="${0/255} ${0/255} ${0/255} 1.0" />
-  </material>
-  <material name="side" >
-    <color rgba="${0/255} ${0/255} ${0/255} 1.0" />
-  </material>
-  <material name="wheel" >
-    <color rgba="${5/255} ${5/255} ${0/255} 1.0" />
-  </material>
 
 </robot>

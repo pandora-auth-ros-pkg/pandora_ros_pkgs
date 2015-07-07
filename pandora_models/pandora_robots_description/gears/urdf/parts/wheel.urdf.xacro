@@ -4,7 +4,7 @@
 
   <xacro:macro name="wheel"
                params="prefix_y prefix_x reflect_y reflect_x" >
-               
+
     <link name="${prefix_y}_${prefix_x}_wheel_link" >
       <inertial>
         <origin xyz="${ reflect_y * ( -2.2235E-05 ) } ${ reflect_y * ( -0.00052624 ) } 2.4287E-05" />
@@ -22,7 +22,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gears/meshes/wheel_link.dae" />
         </geometry>
-        <material name="wheel" />
       </visual>
       <collision>
         <origin xyz="${zero}"
@@ -32,7 +31,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <joint name="${prefix_y}_${prefix_x}_wheel_joint"
            type="continuous" >
       <parent link="${prefix_y}_side_link" />
@@ -44,7 +43,7 @@
       <limit effort="100.0"
              velocity="100.0" />
     </joint>
-    
+
   </xacro:macro>
 
 </robot>

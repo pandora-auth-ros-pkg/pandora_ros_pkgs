@@ -22,7 +22,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gio/meshes/side_link.dae" />
         </geometry>
-        <material name="side" />
       </visual>
       <collision>
         <origin xyz="0.0 0.0 -0.03018"

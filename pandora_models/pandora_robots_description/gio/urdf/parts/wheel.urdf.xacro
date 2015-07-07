@@ -15,7 +15,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gio/meshes/wheel_link.dae" />
         </geometry>
-        <material name="wheel" />
       </visual>
       <collision>
         <origin xyz="${zero}"

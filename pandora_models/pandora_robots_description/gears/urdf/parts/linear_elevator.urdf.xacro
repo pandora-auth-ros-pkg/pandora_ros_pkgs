@@ -3,7 +3,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" >
 
   <xacro:macro name="linear_elevator" >
-  
+
     <link name="linear_elevator_link" >
       <inertial>
         <origin xyz="0.017561 0.0109 0.24001" />
@@ -19,7 +19,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gears/meshes/linear_elevator_link.dae" />
         </geometry>
-        <material name="linear_elevator" />
       </visual>
       <collision>
         <geometry>
@@ -27,7 +26,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <joint name="linear_elevator_joint"
            type="prismatic" >
       <parent link="base_link" />
@@ -41,7 +40,7 @@
              effort="100.0"
              velocity="100.0" />
     </joint>
-    
+
   </xacro:macro>
 
 </robot>

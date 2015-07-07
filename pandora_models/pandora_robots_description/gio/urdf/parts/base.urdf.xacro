@@ -12,7 +12,6 @@
         <geometry>
           <mesh filename="package://pandora_robots_description/gio/meshes/base_link.dae" />
         </geometry>
-        <material name="base" />
       </visual>
       <collision>
         <origin xyz="0.02514 0.0 0.14619" />
