@@ -43,7 +43,6 @@
   <depend>dynamic_reconfigure</depend>
 
   <export>
-    <controller_interface plugin="${prefix}/skid_steer_velocity_controller_plugins.xml"/>
-    <controller_interface plugin="${prefix}/skid_steer_torque_controller_plugins.xml"/>
+    <controller_interface plugin="${prefix}/skid_steer_plugins.xml"/>
   </export>
 </package>
