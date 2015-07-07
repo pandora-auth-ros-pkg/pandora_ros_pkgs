@@ -68,7 +68,7 @@ namespace pandora_exploration
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
 
     class SensorCoverage
-      : public StateClient, private boost::noncopyable
+      : public state_manager::StateClient, private boost::noncopyable
     {
       public:
         /**

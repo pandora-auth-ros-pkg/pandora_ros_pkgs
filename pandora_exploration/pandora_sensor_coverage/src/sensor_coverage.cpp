@@ -201,7 +201,7 @@ namespace pandora_exploration
         if (*globalMap3dPtrPtr_)
           delete *globalMap3dPtrPtr_;
         *globalMap3dPtrPtr_ = dynamic_cast<octomap::OcTree*>(map);
-        
+
         if (*globalMap3dPtrPtr_ == NULL)
         {
           ROS_WARN_NAMED("SENSOR_COVERAGE",
