@@ -13,7 +13,7 @@
     output="screen"
     ns="/linear_actuator">
     <remap
-      from="/linear_actuator/linear_actuator_controller/command"
+      from="/linear_actuator/joint_position_controller/command"
       to="/linear_actuator_controller/command" />
   </node>
 

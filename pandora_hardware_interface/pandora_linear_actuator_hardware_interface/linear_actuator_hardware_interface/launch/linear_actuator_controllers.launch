@@ -14,9 +14,6 @@
     args="
       spawn
       joint_state_controller
-      linear_actuator_controller">
-    <remap
-      from="/linear_actuator/linear_actuator_controller/command"
-      to="/linear_actuator_controller/command"/>
+      joint_position_controller">
   </node>
 </launch>
