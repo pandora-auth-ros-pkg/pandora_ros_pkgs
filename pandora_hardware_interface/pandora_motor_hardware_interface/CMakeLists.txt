@@ -83,7 +83,6 @@ catkin_package(
     dynamic_reconfigure
     message_runtime
   LIBRARIES
-    skid_steer_drive_controller
     skid_steer_velocity_controller
     skid_steer_torque_controller
 )

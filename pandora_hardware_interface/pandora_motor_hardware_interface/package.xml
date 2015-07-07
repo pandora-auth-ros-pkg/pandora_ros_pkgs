@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>pandora_motor_hardware_interface</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>Contains pandora motor hardware interface.</description>
 
   <maintainer email="klpanagi@gmail.com">Konstantinos Panayiotou</maintainer>
@@ -43,7 +43,6 @@
   <depend>dynamic_reconfigure</depend>
 
   <export>
-    <controller_interface plugin="${prefix}/skid_steer_drive_controller_plugins.xml"/>
     <controller_interface plugin="${prefix}/skid_steer_velocity_controller_plugins.xml"/>
     <controller_interface plugin="${prefix}/skid_steer_torque_controller_plugins.xml"/>
   </export>
