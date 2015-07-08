@@ -23,7 +23,7 @@
     output="screen">
 
     <remap
-        from="/linear_actuator/linear_actuator_controller/command"
+      from="/linear_actuator/joint_position_controller/command"
         to="/linear_actuator/command" />
   </node>
 
@@ -37,7 +37,7 @@
     args="
       spawn
       joint_state_controller
-      linear_actuator_controller">
+      joint_position_controller">
   </node>
 
 </launch>
