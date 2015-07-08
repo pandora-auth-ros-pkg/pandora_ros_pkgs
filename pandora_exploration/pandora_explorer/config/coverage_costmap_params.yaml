@@ -15,6 +15,7 @@ track_unknown_space: true
 plugins:
   - {name: static, type: "costmap_2d::MapLayer"}
   - {name: coverage, type: "costmap_2d::CoverageLayer"}
+  - {name: patch, type: "costmap_2d::GlobalPatchLayer"}
   - {name: inflation, type: "costmap_2d::InflationLayer"}
 
 static:
@@ -26,6 +27,12 @@ static:
 coverage:
   map_topic: /exploration/sensor_coverage/kinect_space
   subscribe_to_updates: false
+
+patch:
+  map_topic: /map_patch/obstacles
+  subscribe_to_updates: false
+  unknown_cost_value: 51
+  lethal_cost_threshold: 61
 
 inflation:
   inflation_radius: 0.25
