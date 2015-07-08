@@ -44,6 +44,7 @@
 #include <string>
 #include <map>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
@@ -59,8 +60,13 @@ namespace state_manager
    public:
     static int ROBOT_STATES(const std::string& X) {
       static std::map<std::string, int>* m = NULL;
-      if (m == NULL)
+      static bool initialize = true;
+      static boost::mutex mtx;
+
+      mtx.lock();
+      if (initialize)
       {
+        initialize = false;
         m = new std::map<std::string, int>;
         m->insert(std::make_pair("OFF", 0));
         m->insert(std::make_pair("START_AUTONOMOUS", 1));
@@ -73,13 +79,20 @@ namespace state_manager
         m->insert(std::make_pair("EXPLORATION_MAPPING", 8));
         m->insert(std::make_pair("TERMINATING", 9));
       }
+      mtx.unlock();
+
       return (*m)[X];
     }
 
     static std::string ROBOT_STATES(int X) {
       static std::map<int, std::string>* m = NULL;
-      if (m == NULL)
+      static bool initialize = true;
+      static boost::mutex mtx;
+
+      mtx.lock();
+      if (initialize)
       {
+        initialize = false;
         m = new std::map<int, std::string>;
         m->insert(std::make_pair(0, "OFF"));
         m->insert(std::make_pair(1, "START_AUTONOMOUS"));
@@ -92,6 +105,8 @@ namespace state_manager
         m->insert(std::make_pair(8, "EXPLORATION_MAPPING"));
         m->insert(std::make_pair(9, "TERMINATING"));
       }
+      mtx.unlock();
+
       return (*m)[X];
     }
 
