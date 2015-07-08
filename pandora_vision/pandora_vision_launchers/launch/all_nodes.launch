@@ -26,7 +26,7 @@
   </group>
 
   <!-- Vision Nodes -->
-  <group if="$(arg vision_nodes)" >
+  <group if="$(arg vision_nodes)" ns="/pandora_vision" >
     <!-- OK -->
     <include if="$(arg vision_qr)"
         file="$(find pandora_vision_qrcode)/launch/pandora_vision_qrcode.launch"
@@ -51,7 +51,11 @@
      file="$(find pandora_vision_predator)/launch/predator_node.launch" />
     <include if="$(arg vision_hole_detector)"
         file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch"
-        ns="pandora_vision_hole" />
+        ns="pandora_vision_hole" >
+        <arg name="rgbd" value="true" />
+        <arg name="rgbdt" value="false" />
+        <arg name="thermal" value="false" />
+    </include>
     <include if="$(arg vision_victim)"
         file="$(find pandora_vision_victim)/launch/pandora_vision_victim.launch"
         ns="pandora_vision_victim" />

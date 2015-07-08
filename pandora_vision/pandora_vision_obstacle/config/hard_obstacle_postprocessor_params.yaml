@@ -1,0 +1,4 @@
+map_topic: /slam/map
+unknown_value: 51
+mat_resolution: 0.02
+local_frame: /base_footprint
