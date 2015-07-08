@@ -48,51 +48,67 @@
 
 namespace sensor_processor
 {
+
   /**
    * @class GeneralProcessor TODO
    */
   class GeneralProcessor : public AbstractProcessor
   {
    public:
-    GeneralProcessor(void) {}
+    GeneralProcessor() {}
     virtual
-    ~GeneralProcessor() {}
+    ~GeneralProcessor()
+    {
+      ROS_INFO("[%s] Destroyed", name_.c_str());
+    }
     virtual void
     initialize(const std::string& ns, Handler* handler);
 
    protected:
-    ros::NodeHandlePtr accessPublicNh();
-    ros::NodeHandlePtr accessProcessorNh();
+    ros::NodeHandle& getPublicNodeHandle();
+    ros::NodeHandle& getProcessorNodeHandle();
     std::string getName();
 
    protected:
-    ros::NodeHandlePtr publicNh_;
-    ros::NodeHandlePtr processorNh_;
+    ros::NodeHandle public_nh_;
+    ros::NodeHandle processor_nh_;
     std::string name_;
   };
 
   void
   GeneralProcessor::initialize(const std::string& ns, Handler* handler)
   {
-    this->processorNh_.reset( new ros::NodeHandle(ns) );
-    this->publicNh_ = handler->shareNodeHandle();
-    this->name_ = boost::to_upper_copy<std::string>(this->processorNh_->getNamespace());
+    ros::NodeHandle private_nh = handler->getPrivateNh();
+    std::string private_ns = private_nh.getNamespace();
+    ROS_ASSERT(ns[0] == '~');
+    std::string processor_ns = private_ns + "/" + ns.substr(1);
+    this->processor_nh_ = ros::NodeHandle(processor_ns);
+    this->public_nh_ = handler->getPublicNh();
+    this->name_ = boost::to_upper_copy<std::string>(this->processor_nh_.getNamespace());
+    ROS_INFO("[%s] Initialized", this->name_.c_str());
   }
 
-  ros::NodeHandlePtr GeneralProcessor::accessPublicNh()
+  ros::NodeHandle&
+  GeneralProcessor::
+  getPublicNodeHandle()
   {
-    return this->publicNh_;
+    return this->public_nh_;
   }
 
-  ros::NodeHandlePtr GeneralProcessor::accessProcessorNh()
+  ros::NodeHandle&
+  GeneralProcessor::
+  getProcessorNodeHandle()
   {
-    return this->processorNh_;
+    return this->processor_nh_;
   }
 
-  std::string GeneralProcessor::getName()
+  std::string
+  GeneralProcessor::
+  getName()
   {
     return this->name_;
   }
+
 }  // namespace sensor_processor
 
 #endif  // SENSOR_PROCESSOR_GENERAL_PROCESSOR_H

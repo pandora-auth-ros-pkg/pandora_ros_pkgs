@@ -36,25 +36,15 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#include <string>
+#include <ros/ros.h>
 
-#include "sensor_processor/dummy_postprocessor.h"
+#include "sensor_processor/test/dummy_handler.h"
 
-namespace sensor_processor
+int main(int argc, char** argv)
 {
-  DummyPostProcessor::
-  DummyPostProcessor(const std::string& ns, Handler* handler) :
-  PostProcessor<std_msgs::Int32, std_msgs::Int32>(ns, handler)
-  {
-    data_ = 4;
-  }
-
-  bool
-  DummyPostProcessor::
-  postProcess(const std_msgs::Int32ConstPtr& input, const std_msgs::Int32Ptr& output)
-  {
-    ROS_INFO("post processor: %d", input->data);
-    output->data = data_;
-    return true;
-  }
-}  // namespace sensor_processor
+  ros::init(argc, argv, "test/dummy_processor", ros::init_options::NoSigintHandler);
+  sensor_processor::DummyHandler test/dummyHandler("/sensor_processor/test/dummy_processor_node");
+  ROS_INFO("[SENSOR_PROCESSOR] Beginning Dummy Processor Node");
+  ros::spin();
+  return 0;
+}

@@ -62,10 +62,7 @@ namespace sensor_processor
       initialize(ns, handler);
     }
 
-    Processor(void) {}
-
-    virtual
-    ~Processor() {}
+    Processor() {}
 
     virtual bool
     process(const InputConstPtr& input, const OutputPtr& output) = 0;
@@ -83,7 +80,7 @@ namespace sensor_processor
       }
       catch (boost::bad_any_cast& e)
       {
-        ROS_FATAL("Bad any_cast occured in processor %s: %s",
+        ROS_FATAL("[%s] Bad any_cast occured in processor: %s",
             this->getName().c_str(), e.what());
         ROS_BREAK();
       }

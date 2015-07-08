@@ -10,6 +10,7 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_common.git</url>
 
   <author>Tsirigotis Christos</author>
+  <author>Chatzieleftheriou Eirini</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 

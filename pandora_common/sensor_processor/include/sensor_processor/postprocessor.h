@@ -61,10 +61,8 @@ namespace sensor_processor
     {
       initialize(ns, handler);
     }
-    PostProcessor(void) {}
 
-    virtual
-    ~PostProcessor() {}
+    PostProcessor() {}
 
     virtual bool
     postProcess(const InputConstPtr& input, const OutputPtr& output) = 0;
@@ -74,20 +72,19 @@ namespace sensor_processor
     {
       GeneralProcessor::initialize(ns, handler);
 
-      std::string outputTopic;
-      ros::NodeHandle privateNh("~");
+      ros::NodeHandle private_nh = handler->getPrivateNh();
 
-      if (!privateNh.getParam("published_topics", outputTopic))
+      std::string outputTopic;
+      if (!private_nh.getParam("published_topics", outputTopic))
       {
         ROS_FATAL("[%s] 'published_topics:' param not found", this->getName().c_str());
         ROS_BREAK();
       }
-      nPublisher_ = this->accessPublicNh()->template advertise<Output>(outputTopic, 1);
+      nPublisher_ = this->getPublicNodeHandle().template advertise<Output>(outputTopic, 1);
     }
 
     bool
-    process(boost::shared_ptr<boost::any> input,
-        boost::shared_ptr<boost::any> output)
+    process(boost::shared_ptr<boost::any> input, boost::shared_ptr<boost::any> output)
     {
       InputConstPtr in;
       OutputPtr out( new Output );
@@ -98,7 +95,7 @@ namespace sensor_processor
       }
       catch (boost::bad_any_cast& e)
       {
-        ROS_FATAL("Bad any_cast occured in postprocessor %s: %s",
+        ROS_FATAL("[%s] Bad any_cast occured in postprocessor: %s",
             this->getName().c_str(), e.what());
         ROS_BREAK();
       }
@@ -106,7 +103,7 @@ namespace sensor_processor
       bool success = postProcess(in, out);
       if (success)
       {
-        nPublisher_.publish(*out);
+        nPublisher_.publish(out);
       }
       return success;
     }

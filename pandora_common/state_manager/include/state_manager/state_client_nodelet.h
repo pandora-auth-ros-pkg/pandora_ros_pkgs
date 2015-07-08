@@ -38,14 +38,15 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef STATE_MANAGER_STATE_CLIENT_H
-#define STATE_MANAGER_STATE_CLIENT_H
+#ifndef STATE_MANAGER_STATE_CLIENT_NODELET_H
+#define STATE_MANAGER_STATE_CLIENT_NODELET_H
 
 #include <string>
 #include <map>
 #include <boost/algorithm/string.hpp>
 
 #include <ros/ros.h>
+#include <nodelet/nodelet.h>
 
 #include "state_manager_msgs/RobotModeMsg.h"
 #include "state_manager_msgs/RegisterNodeSrv.h"
@@ -53,7 +54,7 @@
 namespace state_manager
 {
 
-  class StateClient
+  class StateClientNodelet : public nodelet::Nodelet
   {
    public:
     static int ROBOT_STATES(const std::string& X) {
@@ -98,18 +99,24 @@ namespace state_manager
     /**
     * Constructor.
     */
-    explicit StateClient(bool doRegister=true);
+    StateClientNodelet();
     virtual
-    ~StateClient();
+    ~StateClientNodelet();
+
+    virtual void
+    onInit();
 
     ros::NodeHandle&
-    getPublicNodeHandle();
+    getPublicNh();
 
     ros::NodeHandle&
-    getPrivateNodeHandle();
+    getPrivateNh();
 
-    std::string
-    getName();
+    const std::string&
+    getNodeName();
+
+    void
+    clientRegister();
 
     /**
     * Check in node as Initialized
@@ -152,9 +159,6 @@ namespace state_manager
     void
     serverStateInformation(const state_manager_msgs::RobotModeMsgConstPtr&);
 
-    void
-    clientRegister();
-
    private:
     /**
     * The ROS Node Handle
@@ -186,4 +190,4 @@ namespace state_manager
 
 }  // namespace state_manager
 
-#endif  // STATE_MANAGER_STATE_CLIENT_H
+#endif  // STATE_MANAGER_STATE_CLIENT_NODELET_H

@@ -38,7 +38,7 @@
 
 #include <string>
 
-#include "sensor_processor/dummy_preprocessor.h"
+#include "sensor_processor/test/dummy_preprocessor.h"
 
 namespace sensor_processor
 {

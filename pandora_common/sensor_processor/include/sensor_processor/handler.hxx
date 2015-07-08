@@ -49,31 +49,33 @@
 
 namespace sensor_processor
 {
-  Handler::Handler(const std::string& ns) : privateNh_("~")
+
+  Handler::
+  Handler() {}
+
+  void
+  Handler::
+  onInit()
   {
-    nhPtr_.reset( new ros::NodeHandle(ns) );
-    name_ = ros::this_node::getName();
-    currentState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
-    previousState_ = state_manager_msgs::RobotModeMsg::MODE_OFF;
+    state_manager::StateClientNodelet::onInit();
+
+    nh_ = this->getPublicNh();
+    private_nh_ = this->getPrivateNh();
+    name_ = this->getNodeName();
 
     std::string reportTopicName;
 
-    nhPtr_->param<std::string>("op_report_topic", reportTopicName, "processor_log");
-    operationReport_ = nhPtr_->advertise<ProcessorLogInfo>(
-        reportTopicName, 10);
+    private_nh_.param<std::string>("op_report_topic", reportTopicName, "processor_log");
+    operation_report_ = private_nh_.advertise<ProcessorLogInfo>(reportTopicName, 1);
 
     clientInitialize();
-    ROS_INFO("[%s] Handler initialized", name_.c_str());
+    ROS_INFO("[%s] initialized", name_.c_str());
   }
 
-  Handler::~Handler()
+  Handler::
+  ~Handler()
   {
-    ROS_INFO("[%s] Handler terminated", name_.c_str());
-  }
-
-  ros::NodeHandlePtr Handler::shareNodeHandle()
-  {
-    return nhPtr_;
+    ROS_INFO("[%s] terminated", name_.c_str());
   }
 
   template <class SubType>
@@ -95,7 +97,7 @@ namespace sensor_processor
       return;
     }
     if (!success) {
-      completeProcessFinish(success, "PreProcessor");
+      completeProcessFinish(success, "pre_processor");
       return;
     }
 
@@ -107,7 +109,7 @@ namespace sensor_processor
       return;
     }
     if (!success) {
-      completeProcessFinish(success, "Processor");
+      completeProcessFinish(success, "processor");
       return;
     }
 
@@ -118,15 +120,15 @@ namespace sensor_processor
       completeProcessFinish(false, e.what());
       return;
     }
-    completeProcessFinish(success, "Finished");
+    completeProcessFinish(success, "finished");
   }
 
   void Handler::completeProcessFinish(bool success, const std::string& logInfo)
   {
-    ProcessorLogInfo processorLogInfo;
-    processorLogInfo.success = success;
-    processorLogInfo.logInfo = logInfo;
-    operationReport_.publish(processorLogInfo);
+    ProcessorLogInfoPtr processorLogInfo( new ProcessorLogInfo );
+    processorLogInfo->success = success;
+    processorLogInfo->logInfo = logInfo;
+    operation_report_.publish(processorLogInfo);
   }
 }  // namespace sensor_processor
 

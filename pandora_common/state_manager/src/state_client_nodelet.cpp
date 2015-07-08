@@ -41,52 +41,61 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
-#include "state_manager/state_client.h"
+#include "state_manager/state_client_nodelet.h"
 
 namespace state_manager
 {
 
-  StateClient::
-  StateClient(bool doRegister) : nh_(""), private_nh_("~")
+  StateClientNodelet::
+  StateClientNodelet() {}
+
+  void
+  StateClientNodelet::
+  onInit()
   {
-    node_name_ = boost::to_upper_copy<std::string>(private_nh_.getNamespace());
+    nh_ = this->getNodeHandle();
+    private_nh_ = this->getPrivateNodeHandle();
+    node_name_ = boost::to_upper_copy<std::string>(this->getName());
 
     acknowledgePublisher_ = nh_.advertise<state_manager_msgs::RobotModeMsg>
     ("/robot/state/server", 1, true);
 
     stateSubscriber_ = nh_.subscribe("/robot/state/clients", 2,
-      &StateClient::serverStateInformation, this);
+      &StateClientNodelet::serverStateInformation, this);
 
-    if (doRegister)
+    bool register_client;
+    private_nh_.param("register_client", register_client, true);
+
+    if (register_client)
       clientRegister();
   }
 
-  StateClient::
-  ~StateClient() {}
+  StateClientNodelet::
+  ~StateClientNodelet() {}
 
   ros::NodeHandle&
-  StateClient::
-  getPublicNodeHandle()
+  StateClientNodelet::
+  getPublicNh()
   {
-    return nh_;
+    return this->nh_;
   }
 
   ros::NodeHandle&
-  StateClient::
-  getPrivateNodeHandle()
+  StateClientNodelet::
+  getPrivateNh()
   {
-    return private_nh_;
+    return this->private_nh_;
   }
 
-  std::string
-  StateClient::
-  getName()
+  const std::string&
+  StateClientNodelet::
+  getNodeName()
   {
-    return node_name_;
+    return this->node_name_;
   }
 
   void
-  StateClient::
+  StateClientNodelet::
   clientRegister()
   {
     while (!ros::service::waitForService("/robot/state/register",
@@ -107,7 +116,7 @@ namespace state_manager
   }
 
   void
-  StateClient::
+  StateClientNodelet::
   clientInitialize()
   {
     while (!ros::service::waitForService("/robot/state/register",
@@ -128,7 +137,7 @@ namespace state_manager
   }
 
   void
-  StateClient::
+  StateClientNodelet::
   transitionComplete(int newState)
   {
     ROS_INFO("[%s] transitioned to state %s",
@@ -142,7 +151,7 @@ namespace state_manager
   }
 
   void
-  StateClient::
+  StateClientNodelet::
   transitionToState(int newState)
   {
     ROS_INFO("[%s] Requesting transition to state %i", node_name_.c_str(), newState);
@@ -154,7 +163,7 @@ namespace state_manager
   }
 
   void
-  StateClient::
+  StateClientNodelet::
   serverStateInformation(const state_manager_msgs::RobotModeMsgConstPtr& msg)
   {
     // ROS_INFO("[%s] Received new information from state server", node_name_.c_str());
@@ -168,7 +177,7 @@ namespace state_manager
     }
     else
     {
-      ROS_ERROR("[%s] StateClient received a new state command, that is not understandable",
+      ROS_ERROR("[%s] StateClientNodelet received a new state command, that is not understandable",
       node_name_.c_str());
     }
   }

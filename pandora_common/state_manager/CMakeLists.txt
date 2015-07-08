@@ -3,6 +3,7 @@ project(state_manager)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  nodelet
   std_msgs
   actionlib
   diagnostic_updater
@@ -15,12 +16,14 @@ catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
     roscpp
+    nodelet
     std_msgs
     actionlib
     diagnostic_updater
     state_manager_msgs
   LIBRARIES
     state_client
+    state_client_nodelet
   #DEPENDS
 )
 
@@ -41,6 +44,9 @@ add_library(state_client src/state_client.cpp)
 target_link_libraries(state_client ${catkin_LIBRARIES} )
 add_dependencies(state_client ${catkin_EXPORTED_TARGETS})
 
+add_library(state_client_nodelet src/state_client_nodelet.cpp)
+target_link_libraries(state_client_nodelet ${catkin_LIBRARIES} )
+add_dependencies(state_client_nodelet ${catkin_EXPORTED_TARGETS})
 ## Install targets
 
 # Install headers
@@ -48,7 +54,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 # Install libraries
-install(TARGETS state_client
+install(TARGETS state_client state_client_nodelet
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})

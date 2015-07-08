@@ -38,42 +38,23 @@
 
 #include <string>
 
-#include "sensor_processor/dummy_handler.h"
-#include "sensor_processor/dummy_preprocessor.h"
-#include "sensor_processor/dummy_processor.h"
-#include "sensor_processor/dummy_postprocessor.h"
+#include "sensor_processor/test/dummy_postprocessor.h"
 
 namespace sensor_processor
 {
-  DummyHandler::
-  DummyHandler(const std::string& ns) : Handler(ns)
+  DummyPostProcessor::
+  DummyPostProcessor(const std::string& ns, Handler* handler) :
+  PostProcessor<std_msgs::Int32, std_msgs::Int32>(ns, handler)
   {
+    data_ = 4;
   }
 
-  void
-  DummyHandler::
-  startTransition(int newState)
+  bool
+  DummyPostProcessor::
+  postProcess(const std_msgs::Int32ConstPtr& input, const std_msgs::Int32Ptr& output)
   {
-    currentState_ = newState;
-
-    switch (currentState_)  // ................
-    {
-      case 2:
-        preProcPtr_.reset( new DummyPreProcessor("~/preprocessor", this) );
-        processorPtr_.reset( new DummyProcessor("~/processor", this) );
-        postProcPtr_.reset( new DummyPostProcessor("~/postprocessor", this) );
-        break;
-      case state_manager_msgs::RobotModeMsg::MODE_TERMINATING:
-        ros::shutdown();
-        return;
-    }
-    previousState_ = currentState_;
-    transitionComplete(currentState_);
-  }
-
-  void
-  DummyHandler::
-  completeTransition()
-  {
+    ROS_INFO("post processor: %d", input->data);
+    output->data = data_;
+    return true;
   }
 }  // namespace sensor_processor
