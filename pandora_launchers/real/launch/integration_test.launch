@@ -19,6 +19,7 @@
   <arg name="xtion" default="false"/>
   <arg name="vision" default="true"/>
   <arg name="bag" default="false"/>
+  <arg name="gui" default="true"/>
 
   <!-- RPi Launcher Checklist  -->
   <arg name="camera_effector" default="true" />
@@ -119,6 +120,12 @@
   <group if="$(arg bag)">
     <node name="bag" type="record" pkg="rosbag"
       args="-b 0 /kinect/rgb/image_raw/compressed /kinect/depth_registered/points /sensors/imu_rpy /tf /laser/scan /slam/map" />
+  </group>
+
+  <!-- GUI -->
+  <group if="$(arg gui)">
+      <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+      <node name="WebVideoServer" type="web_video_server" pkg="web_video_server" />
   </group>
 
 </launch>
