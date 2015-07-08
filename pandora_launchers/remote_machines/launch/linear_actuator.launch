@@ -9,7 +9,7 @@
 
   <rosparam
     command="load"
-    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/config/linear_actuator_hardware_interface.yaml"
+    file="$(find pandora_linear_actuator_hardware_interface)/linear_actuator_hardware_interface/config/linear_actuator_hardware_interface_and_controllers.yaml"
     ns="$(arg namespace)" />
 
   <!-- Linear Actuator Hardware Interface Node -->

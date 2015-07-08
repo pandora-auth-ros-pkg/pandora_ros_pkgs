@@ -65,16 +65,16 @@
   <group if="$(arg hardware_tools)">
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
   </group>
-  <!--<group if="$(arg rpi)">                                                        -->
-  <!--  <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch">-->
-  <!--    <arg name="camera_effector" value="$(arg camera_effector)" />              -->
-  <!--    <arg name="pi_camera" value="$(arg pi_camera)" />                          -->
-  <!--    <arg name="flir_lepton" value="$(arg flir_lepton)" />                      -->
-  <!--    <arg name="ledstrip" value="$(arg ledstrip)" />                            -->
-  <!--    <arg name="raspicam" value="$(arg raspicam)" />                            -->
-  <!--    <arg name="rpi_linear_actuator" value="$(arg rpi_linear_actuator)" />      -->
-  <!--  </include>                                                                   -->
-  <!--</group>                                                                       -->
+  <group if="$(arg rpi)">
+    <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch">
+      <arg name="camera_effector" value="$(arg camera_effector)" />
+      <arg name="pi_camera" value="$(arg pi_camera)" />
+      <arg name="flir_lepton" value="$(arg flir_lepton)" />
+      <arg name="ledstrip" value="$(arg ledstrip)" />
+      <arg name="raspicam" value="$(arg raspicam)" />
+      <arg name="rpi_linear_actuator" value="$(arg rpi_linear_actuator)" />
+    </include>
+  </group>
 
   <!-- Control -->
   <group if="$(arg stabilizer)">
@@ -113,7 +113,7 @@
 
   <!-- Vision -->
   <group if="$(arg vision)">
-      <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
+    <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
   </group>
 
   <!-- Rosbag -->
