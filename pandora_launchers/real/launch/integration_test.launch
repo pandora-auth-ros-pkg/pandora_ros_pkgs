@@ -59,22 +59,21 @@
   </group>
   <group if="$(arg imu)">
     <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" >
-      <arg name="device" value="$(arg imu_device)" />
     </include>
   </group>
   <group if="$(arg hardware_tools)">
     <include file="$(find pandora_hardware_tools)/launch/hardware_tools.launch" />
   </group>
-  <group if="$(arg rpi)">
-    <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch">
-      <arg name="camera_effector" value="$(arg camera_effector)" />
-      <arg name="pi_camera" value="$(arg pi_camera)" />
-      <arg name="flir_lepton" value="$(arg flir_lepton)" />
-      <arg name="ledstrip" value="$(arg ledstrip)" />
-      <arg name="raspicam" value="$(arg raspicam)" />
-      <arg name="rpi_linear_actuator" value="$(arg rpi_linear_actuator)" />
-    </include>
-  </group>
+  <!--<group if="$(arg rpi)">                                                        -->
+  <!--  <include file="$(find pandora_launchers)/remote_machines/launch/rpi2.launch">-->
+  <!--    <arg name="camera_effector" value="$(arg camera_effector)" />              -->
+  <!--    <arg name="pi_camera" value="$(arg pi_camera)" />                          -->
+  <!--    <arg name="flir_lepton" value="$(arg flir_lepton)" />                      -->
+  <!--    <arg name="ledstrip" value="$(arg ledstrip)" />                            -->
+  <!--    <arg name="raspicam" value="$(arg raspicam)" />                            -->
+  <!--    <arg name="rpi_linear_actuator" value="$(arg rpi_linear_actuator)" />      -->
+  <!--  </include>                                                                   -->
+  <!--</group>                                                                       -->
 
   <!-- Control -->
   <group if="$(arg stabilizer)">
@@ -94,6 +93,7 @@
   <group if="$(arg navigation)">
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
     <include file="$(find pandora_explorer)/launch/explorer.launch" />
+    <include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" />
   </group>
 
   <!-- Data fusion -->
@@ -112,7 +112,7 @@
 
   <!-- Vision -->
   <group if="$(arg vision)">
-    <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
+      <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
   </group>
 
   <!-- Rosbag -->
