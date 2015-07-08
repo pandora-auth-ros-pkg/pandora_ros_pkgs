@@ -2,6 +2,7 @@ cascade_path: /data/rgb_cascade.xml
 
 rgb_classifier: svm
 depth_classifier: svm
+rgbd_classifier: svm
 
 svm:
   rgb:
@@ -14,14 +15,26 @@ svm:
     probability_scaling: 4.7
     probability_translation: 1.0
 
+  rgbd:
+    classifier_path: /data/rgbd_svm_classifier.xml
+    probability_scaling: 4.7
+    probability_translation: 1.0
+
 rf:
   rgb:
     classifier_path: /data/rgb_rf_classifier.xml
   depth:
     classifier_path: /data/depth_rf_classifier.xml
+  rgbd:
+    classifier_path: /data/rgbd_rf_classifier.xml
+    probability_scaling: 4.7
+    probability_translation: 1.0
 
 ann:
   rgb:
     classifier_path: /data/rgb_ann_classifier.xml
   depth:
     classifier_path: /data/depth_ann_classifier.xml
+  rgbd:
+    classifier_path: /data/rgbd_ann_classifier.xml
+

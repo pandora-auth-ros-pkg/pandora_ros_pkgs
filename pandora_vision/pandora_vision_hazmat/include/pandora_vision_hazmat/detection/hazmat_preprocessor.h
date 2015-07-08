@@ -41,16 +41,24 @@
 #define PANDORA_VISION_HAZMAT_DETECTION_HAZMAT_PREPROCESSOR_H
 
 #include <string>
+
+#include "sensor_processor/handler.h"
+
 #include "pandora_vision_common/pandora_vision_interface/vision_preprocessor.h"
 
 namespace pandora_vision
 {
+namespace pandora_vision_hazmat
+{
   class HazmatPreProcessor : public VisionPreProcessor
   {
     public:
-      HazmatPreProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~HazmatPreProcessor();
+      HazmatPreProcessor();
+      virtual void
+      initialize(const std::string& ns,
+                  sensor_processor::Handler* handler);
   };
+}  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_HAZMAT_PREPROCESSOR_H

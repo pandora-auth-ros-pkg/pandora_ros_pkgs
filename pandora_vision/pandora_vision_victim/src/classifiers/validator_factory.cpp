@@ -44,16 +44,19 @@
 
 #include "pandora_vision_victim/classifiers/validator_factory.h"
 #include "pandora_vision_victim/classifiers/svm_validator.h"
+#include "pandora_vision_victim/classifiers/rgbd_svm_validator.h"
 #include "pandora_vision_victim/classifiers/neural_network_validator.h"
 #include "pandora_vision_victim/classifiers/random_forests_validator.h"
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief The constructor for the factory used to produce the validator/classifier objects.
    * @param ns[const std::string&] The namespace for the node handles of the object
   */
-  ValidatorFactory::ValidatorFactory(const std::string& ns): nh_(ns)
+  ValidatorFactory::ValidatorFactory()
   {
     ROS_INFO("[Victim_Validator_Factory]: Creating Validator Factory!");
     ROS_INFO("[Victim_Validator_Factory]: Finished creating Validator Factory!");
@@ -74,22 +77,26 @@ namespace pandora_vision
       const std::string& validatorType,
       const std::string& imageType)
   {
-    std::string ns = nh_.getNamespace();
-
     AbstractValidator* validatorPtr;
 
     std::cout << "In factory : " << validatorType << std::endl;
-    if (boost::iequals(validatorType, "svm"))
+    if (boost::iequals(validatorType, "svm") &&
+        (boost::iequals(imageType, "rgb") || (boost::iequals(imageType, "depth"))))
     {
-      validatorPtr = new SvmValidator(ns, imageType, validatorType);
+      validatorPtr = new SvmValidator(nh, imageType, validatorType);
     }
+    else if (boost::iequals(validatorType, "svm") && boost::iequals(imageType, "rgbd"))
+    {
+      validatorPtr = new RgbdSvmValidator(nh, imageType, validatorType);
+    }
+
     else if (boost::iequals(validatorType, "ann"))
     {
-      validatorPtr =  new NeuralNetworkValidator(ns, imageType, validatorType);
+      validatorPtr =  new NeuralNetworkValidator(nh, imageType, validatorType);
     }
     else if (boost::iequals(validatorType, "rf"))
     {
-      validatorPtr =  new RandomForestsValidator(ns, imageType, validatorType);
+      validatorPtr =  new RandomForestsValidator(nh, imageType, validatorType);
     }
     else
     {
@@ -104,4 +111,5 @@ namespace pandora_vision
     return validatorPtr;
   }
 
-}  //  namespace pandora_vision
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision

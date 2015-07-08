@@ -43,13 +43,11 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
-    HazmatProcessor::HazmatProcessor(const std::string& ns,
-      sensor_processor::Handler* handler) :
-      VisionProcessor(ns, handler), dynamicReconfServer_(*(this->accessProcessorNh()))
+    void
+    HazmatProcessor::initialize(const std::string& ns, sensor_processor::Handler* handler)
     {
+      VisionProcessor::initialize(ns, handler);
       ROS_INFO("[%s] Starting Hazmat Detection!", this->getName().c_str());
-      ROS_INFO("[%s] processor nh namespace: %s", this->getName().c_str(),
-          this->accessProcessorNh()->getNamespace().c_str());
 
       // Get the path of the current package.
       std::string packagePath = ros::package::getPath("pandora_vision_hazmat");
@@ -59,7 +57,11 @@ namespace pandora_vision
       // Initiliaze the object detector
       std::string featureType;
 
-      if (!this->accessProcessorNh()->getParam("feature_type", featureType))
+      ros::NodeHandle processor_nh = this->getProcessorNodeHandle();
+      dynamicReconfServer_.reset( new dynamic_reconfigure::Server< ::pandora_vision_hazmat::DisplayConfig >
+                                (processor_nh) );
+
+      if (!processor_nh.getParam("feature_type", featureType))
       {
         ROS_ERROR("[%s] Could not get the feature type parameter!",
             this->getName().c_str());
@@ -68,11 +70,11 @@ namespace pandora_vision
         featureType = "SIFT";
       }
 
-      this->accessProcessorNh()->param<bool>("visualization",
+      processor_nh.param<bool>("visualization",
           visualizationFlag_, false);
-      this->accessProcessorNh()->param<bool>("execution_timer",
+      processor_nh.param<bool>("execution_timer",
           execTimerFlag_, false);
-      this->accessProcessorNh()->param<bool>("debug_message",
+      processor_nh.param<bool>("debug_message",
           debugMsgFlag_, true);
 
       detector_ = factory_.createDetectorObject(featureType);
@@ -89,7 +91,7 @@ namespace pandora_vision
       ROS_INFO_NAMED(this->getName().c_str(),
           "Created the detector object!");
 
-      dynamicReconfServer_.setCallback(boost::bind(
+      dynamicReconfServer_->setCallback(boost::bind(
             &HazmatProcessor::dynamicReconfigCallback, this, _1, _2));
     }
 
@@ -97,8 +99,8 @@ namespace pandora_vision
 
     HazmatProcessor::~HazmatProcessor()
     {
-      ROS_INFO("[%s] Stopping Hazmat Detection!", this->getName().c_str());
       delete detector_;
+      ROS_INFO("[%s] destroyed", this->getName().c_str());
     }
 
     void HazmatProcessor::dynamicReconfigCallback(

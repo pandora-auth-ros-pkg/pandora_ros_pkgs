@@ -3,6 +3,8 @@ project(pandora_vision_obstacle)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     roslint
     dynamic_reconfigure
     cv_bridge
@@ -16,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 generate_dynamic_reconfigure_options(
+  config/barrel_node.cfg
   config/pandora_vision_obstacle/soft_obstacle_cfg.cfg
 )
 
@@ -23,6 +26,8 @@ catkin_package(
     #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       dynamic_reconfigure
       cv_bridge
       sensor_msgs
@@ -39,11 +44,12 @@ include_directories(include
     ${catkin_INCLUDE_DIRS}
 )
 
-############################# discrete wavelet transform #########################
-add_library(${PROJECT_NAME}_discrete_wavelet_transform
-  src/discrete_wavelet_transform.cpp
+############################# fast symmetry detector #########################
+add_library(${PROJECT_NAME}_fast_symmetry_detector
+  src/barrel_detection/fast_symmetry_detector.cpp
+  src/barrel_detection/parameters.cpp
 )
-target_link_libraries(${PROJECT_NAME}_discrete_wavelet_transform
+target_link_libraries(${PROJECT_NAME}_fast_symmetry_detector
   ${catkin_LIBRARIES}
 )
 
@@ -66,6 +72,8 @@ target_link_libraries(${PROJECT_NAME}_obstacle_postprocessor
 ############################### barrel processor ##############################
 add_library(${PROJECT_NAME}_barrel_processor
   src/barrel_detection/barrel_processor.cpp
+  src/barrel_detection/fast_symmetry_detector.cpp
+  src/barrel_detection/parameters.cpp
 )
 target_link_libraries(${PROJECT_NAME}_barrel_processor
   ${catkin_LIBRARIES}
@@ -88,7 +96,6 @@ add_library(${PROJECT_NAME}_soft_obstacle_detector
 )
 target_link_libraries(${PROJECT_NAME}_soft_obstacle_detector
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_discrete_wavelet_transform
 )
 
 ############################### soft obstacle processor ##############################
@@ -114,13 +121,15 @@ target_link_libraries(${PROJECT_NAME}_soft_obstacle_handler
 ############################ barrel node ###############################
 add_executable(${PROJECT_NAME}_barrel_node
   src/barrel_detection/barrel_node.cpp
+  src/barrel_detection/fast_symmetry_detector.cpp
+  src/barrel_detection/parameters.cpp
 )
 add_dependencies(${PROJECT_NAME}_barrel_node
   ${catkin_EXPORTED_TARGETS}
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
-target_link_libraries(${PROJECT_NAME}_barrel_node 
-  ${catkin_LIBRARIES} 
+target_link_libraries(${PROJECT_NAME}_barrel_node
+  ${catkin_LIBRARIES}
   ${PROJECT_NAME}_barrel_handler
 )
 
@@ -132,8 +141,8 @@ add_dependencies(${PROJECT_NAME}_soft_obstacle_node
   ${catkin_EXPORTED_TARGETS}
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
-target_link_libraries(${PROJECT_NAME}_soft_obstacle_node 
-  ${catkin_LIBRARIES} 
+target_link_libraries(${PROJECT_NAME}_soft_obstacle_node
+  ${catkin_LIBRARIES}
   ${PROJECT_NAME}_soft_obstacle_handler
 )
 
@@ -141,6 +150,8 @@ target_link_libraries(${PROJECT_NAME}_soft_obstacle_node
 
 #set(ROSLINT_CPP_OPTS
     #"--filter=-build/include_what_you_use")
+set(ROSLINT_CPP_OPTS
+    "--filter=-whitespace/end_of_line, -build/include_what_you_use")
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}

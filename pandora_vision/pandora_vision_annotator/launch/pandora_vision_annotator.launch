@@ -6,5 +6,4 @@
 
   <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
-
 </launch>

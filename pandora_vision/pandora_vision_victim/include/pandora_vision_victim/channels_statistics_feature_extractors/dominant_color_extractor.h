@@ -46,6 +46,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class DominantColorExtractor : public ChannelsStatisticsFeatureExtractor
   {
     public:
@@ -66,6 +68,7 @@ namespace pandora_vision
        */
       virtual std::vector<double> extract(void);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CHANNELS_STATISTICS_FEATURE_EXTRACTORS_DOMINANT_COLOR_EXTRACTOR_H
 

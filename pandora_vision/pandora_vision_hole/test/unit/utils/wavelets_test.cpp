@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/wavelets.h"
+#include "rgb_node/utils/wavelets.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class WaveletsTest
@@ -167,5 +171,6 @@ namespace pandora_vision
 
     EXPECT_EQ ( nonZeroRgb / 4 + 50 + 50 + 1, nonZeroOut );
   }
-
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

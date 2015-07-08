@@ -38,14 +38,16 @@
  *********************************************************************/
 
 #include <ros/console.h>
+#include <ros/ros.h>
+
 #include "pandora_vision_qrcode/qrcode_handler.h"
 
-using pandora_vision::QrCodeHandler;
+using pandora_vision::pandora_vision_qrcode::QrCodeHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "qrcode_node");
-  QrCodeHandler qrCodeHandler("pandora_vision_qrcode");
+  QrCodeHandler qrCodeHandler;
   ros::spin();
   return 0;
 }

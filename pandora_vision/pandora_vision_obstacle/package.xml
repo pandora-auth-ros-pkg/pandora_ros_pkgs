@@ -13,6 +13,7 @@
 
   <author>Eirini Chatzieleftheriou</author>
   <author>Miltiadis Kofinas</author>
+  <author>Vasilis Bosdelekidis</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -20,6 +21,8 @@
   <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>cv_bridge</depend>
   <depend>sensor_msgs</depend>
@@ -35,6 +38,7 @@
   <test_depend>pandora_vision_support</test_depend>
 
   <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 
 </package>

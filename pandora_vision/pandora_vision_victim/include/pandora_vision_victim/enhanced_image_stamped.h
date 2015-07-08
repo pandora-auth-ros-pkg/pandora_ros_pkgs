@@ -47,6 +47,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class EnhancedImageStamped : public ImagesStamped
   {
     public:
@@ -106,5 +108,6 @@ namespace pandora_vision
   typedef EnhancedImageStamped::Rect2f Rect2f;
   typedef EnhancedImageStamped::Ptr EnhancedImageStampedPtr;
   typedef EnhancedImageStamped::ConstPtr EnhancedImageStampedConstPtr;
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_ENHANCED_IMAGE_STAMPED_H

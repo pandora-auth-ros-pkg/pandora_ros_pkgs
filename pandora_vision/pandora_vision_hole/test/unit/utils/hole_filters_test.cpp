@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/hole_filters.h"
+#include "rgb_node/utils/hole_filters.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class HoleFiltersTest
@@ -373,7 +377,7 @@ namespace pandora_vision
     // Lower right corner, going counter-clockwise
     EXPECT_NEAR ( WIDTH - 1, conveyor.holes[1].rectangle[3].x, 1);
     EXPECT_NEAR ( HEIGHT - 100, conveyor.holes[1].rectangle[3].y, 1 );
-
   }
-
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

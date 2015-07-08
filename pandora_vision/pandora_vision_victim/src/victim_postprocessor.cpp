@@ -43,17 +43,12 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
 
-  VictimPostProcessor::VictimPostProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) :
-    VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>(
-    ns, handler)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
-  }
-
-  VictimPostProcessor::~VictimPostProcessor() {}
+  VictimPostProcessor::VictimPostProcessor() :
+    VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>()
+  {}
 
   bool VictimPostProcessor::postProcess(const POIsStampedConstPtr& input,
     const GeneralAlertVectorPtr& output)
@@ -65,4 +60,5 @@ namespace pandora_vision
     return true;
   }
 
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

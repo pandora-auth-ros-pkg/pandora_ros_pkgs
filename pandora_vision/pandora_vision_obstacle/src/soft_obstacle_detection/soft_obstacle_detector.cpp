@@ -40,14 +40,14 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <limits>
 #include "pandora_vision_msgs/ObstacleAlert.h"
 #include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_detector.h"
 
 namespace pandora_vision
 {
-  SoftObstacleDetector::SoftObstacleDetector(const std::string& name,
-      const ros::NodeHandle& nh)
+namespace pandora_vision_obstacle
+{
+  SoftObstacleDetector::SoftObstacleDetector(const std::string& name, const ros::NodeHandle& nh)
   {
     nodeName_ = name;
 
@@ -162,18 +162,44 @@ namespace pandora_vision
   {
     for (size_t ii = 0; ii < verticalLines.size(); ii++)
     {
-      cv::Point startPoint(verticalLines[ii][0], verticalLines[ii][1]);
-      cv::Point endPoint(verticalLines[ii][2], verticalLines[ii][3]);
+      cv::Point2f startPoint(verticalLines[ii][0], verticalLines[ii][1]);
+      cv::Point2f endPoint(verticalLines[ii][2], verticalLines[ii][3]);
 
-      cv::Point verticalLineDiff = endPoint - startPoint;
-      cv::Point currentLineDiff(line[2] - line[0], line[3] - line[1]);
+      cv::Point2f verticalLineDiff = endPoint - startPoint;
+      cv::Point2f currentLineDiff(line[2] - line[0], line[3] - line[1]);
 
-      double det0 = verticalLineDiff.x * currentLineDiff.y
-        - verticalLineDiff.y * currentLineDiff.x;
+      double crossProduct = verticalLineDiff.cross(currentLineDiff);
 
-      if (fabs(det0) > 1e-6)
+      if (fabs(crossProduct) > 1e-5)
       {
-        return true;
+        double tt = - currentLineDiff.cross(cv::Point2f(line[0], line[1])
+            - startPoint) / crossProduct;
+        cv::Point2f intersectionPoint = startPoint + tt * verticalLineDiff;
+
+        double verLineCrossProduct = verticalLineDiff.cross(intersectionPoint
+            - startPoint);
+        double curLineCrossProduct = currentLineDiff.cross(intersectionPoint
+            - cv::Point2f(line[0], line[1]));
+
+        if (fabs(verLineCrossProduct) < 1e-5 && fabs(curLineCrossProduct) < 1e-5)
+        {
+          double verLineDotProduct = verticalLineDiff.ddot(intersectionPoint
+              - startPoint);
+          double verLine2DotProduct = verticalLineDiff.ddot(verticalLineDiff);
+          bool verLineIntersection = (verLineDotProduct >= 0
+              && verLineDotProduct <= verLine2DotProduct);
+
+          double curLineDotProduct = currentLineDiff.ddot(intersectionPoint
+              - cv::Point2f(line[0], line[1]));
+          double curLine2DotProduct = currentLineDiff.ddot(currentLineDiff);
+          bool curLineIntersection = (curLineDotProduct >= 0
+              && curLineDotProduct <= curLine2DotProduct);
+
+          if (verLineIntersection && curLineIntersection)
+          {
+            return true;
+          }
+        }
       }
     }
     return false;
@@ -236,7 +262,7 @@ namespace pandora_vision
       if ((grad > 80.0f && grad < 100.0f) && awayFromBorder)
       {
         if (findNonIdenticalLines(lineCoefficients, grad, beta)
-            // && !detectLineIntersection(verticalLines, line)
+            && !detectLineIntersection(verticalLines, line)
             && pickLineColor(hsvImage, line, level))
         {
           lineCoefficients.push_back(cv::Vec2f(grad, beta));
@@ -255,107 +281,163 @@ namespace pandora_vision
     return verticalLines;
   }
 
-float SoftObstacleDetector::detectROI(const std::vector<cv::Vec4i>& verticalLines,
+  float SoftObstacleDetector::detectROI(const std::vector<cv::Vec4i>& verticalLines,
       int frameHeight, const boost::shared_ptr<cv::Rect>& roiPtr)
   {
     float probability = 0.0f;
-
-    int minx = std::numeric_limits<int>::max();
-    int maxx = std::numeric_limits<int>::min();
-    int miny = std::numeric_limits<int>::max();
-    int maxy = std::numeric_limits<int>::min();
+    std::vector<cv::Point> points;
 
     for (size_t ii = 0; ii < verticalLines.size(); ii++)
     {
-      /// Calculate min and max of line coordinates
       int x0 = verticalLines[ii][0];
       int x1 = verticalLines[ii][2];
       int y0 = verticalLines[ii][1];
       int y1 = verticalLines[ii][3];
 
-      minx = x0 < minx ? x0 : minx;
-      minx = x1 < minx ? x1 : minx;
-
-      maxx = x0 > maxx ? x0 : maxx;
-      maxx = x1 > maxx ? x1 : maxx;
-
-      miny = y0 < miny ? y0 : miny;
-      miny = y1 < miny ? y1 : miny;
-
-      maxy = y0 > maxy ? y0 : maxy;
-      maxy = y1 > maxy ? y1 : maxy;
+      // Add each point of the line to list of Points
+      points.push_back(cv::Point(x0, y0));
+      points.push_back(cv::Point(x1, y1));
 
       /// Calculate ROI probability
       probability += static_cast<float>(abs(y1 - y0)) / static_cast<float>(frameHeight);
     }
     probability /= static_cast<float>(verticalLines.size());
 
-    int width = maxx - minx;
-    int height = maxy - miny;
-
     // The point inside this Rect is the roi center, now it is the
     // upper left point in order to visualize
-    cv::Rect roi(minx, miny, width, height);
-    *roiPtr = roi;
+    *roiPtr = cv::boundingRect(points);
 
     return probability;
   }
 
-  std::vector<float> SoftObstacleDetector::findDepthDistance(const cv::Mat& depthImage,
+  boost::array<float, 4> SoftObstacleDetector::findDepthDistance(const cv::Mat& depthImage,
       const std::vector<cv::Vec4i> verticalLines, const cv::Rect& roi, int level)
   {
-    std::vector<float> depth;
+    boost::array<float, 4> depth;
 
     int minLinePosition = 0;
     int maxLinePosition = 0;
+    int middleLinePosition = 0;
 
+    // X coordinate of start and end point
+    int x0 = verticalLines[0][0];
+    int x1 = verticalLines[0][2];
+
+    int minDistanceFromCenter = abs(x0 - static_cast<int>(roi.width / 2));
+
+    /// Find the position of the line in the list with the minimum and
+    /// maximum x coordinate
     for (size_t ii = 1; ii < verticalLines.size(); ii++)
     {
-      int x0 = verticalLines[ii][0];
-      int x1 = verticalLines[ii][2];
+      x0 = verticalLines[ii][0];
+      x1 = verticalLines[ii][2];
 
       minLinePosition = (x0 == roi.x || x1 == roi.x) ? ii : minLinePosition;
-      maxLinePosition = (x0 == roi.x + roi.width || x1 == roi.x + roi.width)
+      maxLinePosition = (x0 == roi.x + roi.width - 1 || x1 == roi.x + roi.width - 1)
         ? ii : maxLinePosition;
+
+      // Find the line closest to the middle of the bounding box
+      int x0DistanceDiff = abs(x0 - static_cast<int>(roi.width / 2));
+      int x1DistanceDiff = abs(x1 - static_cast<int>(roi.width / 2));
+
+      middleLinePosition = (x0DistanceDiff < minDistanceFromCenter
+          || x1DistanceDiff < minDistanceFromCenter) ? ii : middleLinePosition;
     }
 
-    int xx = (roi.x + roi.width / 2) * pow(2, level);
-    int yy = roi.y * pow(2, level);
-    depth.push_back(depthImage.at<float>(yy, xx));
+    // Y coordinate of start and end point
+    int y0 = verticalLines[middleLinePosition][1];
+    int y1 = verticalLines[middleLinePosition][3];
+    x0 = verticalLines[middleLinePosition][0];
+    x1 = verticalLines[middleLinePosition][2];
 
-    int lineCenterX = (verticalLines[maxLinePosition][0]
-        + verticalLines[maxLinePosition][2]) / 2;
-    int lineCenterY = (verticalLines[maxLinePosition][1]
-        + verticalLines[maxLinePosition][3]) / 2;
+    // First and Third point
+    depth[0] = (y0 < y1 ? depthImage.at<float>(y0 * pow(2, level), x0 * pow(2, level))
+        : depthImage.at<float>(y1 * pow(2, level), x1 * pow(2, level)));
+    depth[2] = (y0 < y1 ? depthImage.at<float>(y1 * pow(2, level), x1 * pow(2, level))
+        : depthImage.at<float>(y0 * pow(2, level), x0 * pow(2, level)));
 
-    xx = lineCenterX * pow(2, level);
-    yy = lineCenterY * pow(2, level);
-    depth.push_back(depthImage.at<float>(yy, xx));
+    // Second point
+    int lineCenterX = ((verticalLines[maxLinePosition][0]
+        + verticalLines[maxLinePosition][2]) / 2) * pow(2, level);
+    int lineCenterY = ((verticalLines[maxLinePosition][1]
+        + verticalLines[maxLinePosition][3]) / 2) * pow(2, level);
 
-    xx = (roi.x + roi.width / 2) * pow(2, level);
-    yy = (roi.y + roi.height) * pow(2, level);
-    depth.push_back(depthImage.at<float>(yy, xx));
+    int centerWidth = 5;
+    int centerHeight = 10;
+    cv::Rect lineCenter(lineCenterX - centerWidth / 2, lineCenterY - centerHeight / 2,
+        centerWidth, centerHeight);
 
-    lineCenterX = (verticalLines[minLinePosition][0]
-        + verticalLines[minLinePosition][2]) / 2;
-    lineCenterY = (verticalLines[minLinePosition][1]
-        + verticalLines[minLinePosition][3]) / 2;
+    cv::Mat resizedDepthImage = depthImage(lineCenter);
 
-    xx = lineCenterX * pow(2, level);
-    yy = lineCenterY * pow(2, level);
-    depth.push_back(depthImage.at<float>(yy, xx));
+    // Image should be continuous in order to be reshaped
+    cv::Mat lineCenterDepth(centerWidth, centerHeight, CV_32FC1);
+    resizedDepthImage.copyTo(lineCenterDepth);
+
+    cv::Mat rowLineCenterDepth = lineCenterDepth.reshape(0, 1);
+    cv::sort(rowLineCenterDepth, rowLineCenterDepth, CV_SORT_EVERY_ROW + CV_SORT_ASCENDING);
+
+    int nonZeroValues = cv::countNonZero(rowLineCenterDepth);
+    cv::Mat rowNonZeroDepth = rowLineCenterDepth(cv::Rect(rowLineCenterDepth.cols - nonZeroValues, 0,
+          nonZeroValues, 1));
+
+    // Add the median value
+    depth[1] = (rowNonZeroDepth.empty() ? 0.0f
+        : rowNonZeroDepth.at<float>(0, static_cast<int>(rowNonZeroDepth.cols / 2)));
+
+    // Forth point
+    lineCenterX = ((verticalLines[minLinePosition][0]
+        + verticalLines[minLinePosition][2]) / 2) * pow(2, level);
+    lineCenterY = ((verticalLines[minLinePosition][1]
+        + verticalLines[minLinePosition][3]) / 2) * pow(2, level);
+
+    lineCenter = cv::Rect(lineCenterX - centerWidth / 2, lineCenterY - centerHeight / 2,
+        centerWidth, centerHeight);
+
+    resizedDepthImage = depthImage(lineCenter);
+
+    // Image should be continuous in order to be reshaped
+    resizedDepthImage.copyTo(lineCenterDepth);
+
+    rowLineCenterDepth = lineCenterDepth.reshape(0, 1);
+    cv::sort(rowLineCenterDepth, rowLineCenterDepth, CV_SORT_EVERY_ROW + CV_SORT_ASCENDING);
+
+    nonZeroValues = cv::countNonZero(rowLineCenterDepth);
+    rowNonZeroDepth = rowLineCenterDepth(cv::Rect(rowLineCenterDepth.cols - nonZeroValues, 0,
+          nonZeroValues, 1));
+
+    // Add the median value
+    depth[3] = (rowNonZeroDepth.empty() ? 0.0f
+        : rowNonZeroDepth.at<float>(0, static_cast<int>(rowNonZeroDepth.cols / 2)));
 
     return depth;
   }
 
-  bool SoftObstacleDetector::findDifferentROIDepth(const cv::Mat& depthImage,
-      const cv::Rect& roi, float firstLineDepth, float lastLineDepth)
+  bool SoftObstacleDetector::findSameROIDepth(const cv::Mat& depthImage,
+    const std::vector<cv::Vec4i>& verticalLines, const cv::Rect& roi)
   {
     cv::Mat depthROI = depthImage(roi);
     cv::Scalar meanValue = cv::mean(depthROI);
 
-    if (fabs(meanValue[0] - firstLineDepth) < depthThreshold_
-        || fabs(meanValue[0] - lastLineDepth) < depthThreshold_)
+    int linePixels = 0;
+    float avgLineDepth = 0.0f;
+
+    for (size_t ii = 0; ii < verticalLines.size(); ii++)
+    {
+      cv::Point startPoint(verticalLines[ii][0],
+          verticalLines[ii][1]);
+      cv::Point endPoint(verticalLines[ii][2], verticalLines[ii][3]);
+
+      cv::LineIterator linePoints(depthImage, startPoint, endPoint);
+
+      for (int jj = 0; jj < linePoints.count; jj++, ++linePoints)
+      {
+        avgLineDepth += depthImage.at<float>(linePoints.pos());
+      }
+      linePixels += linePoints.count;
+    }
+    avgLineDepth /= linePixels;
+
+    if (fabs(meanValue[0] - avgLineDepth) > depthThreshold_)
     {
       return false;
     }
@@ -431,48 +513,57 @@ float SoftObstacleDetector::detectROI(const std::vector<cv::Vec4i>& verticalLine
       boost::shared_ptr<cv::Rect> roi(new cv::Rect());
       float probability = detectROI(verticalLines, otsuImage->rows, roi);
 
-      // Find the depth distance of the soft obstacle
-      std::vector<float> depthDistance = findDepthDistance(depthImage, verticalLines,
-          *roi, level);
+      cv::Rect fullFrameRect(roi->x * pow(2, level), roi->y * pow(2, level),
+          roi->width * pow(2, level), roi->height * pow(2, level));
 
       // Examine whether the points of the bounding box have difference in depth
       // distance
-      bool differentDepth = findDifferentROIDepth(depthImage, *roi, depthDistance[1],
-            depthDistance[3]);
+      bool sameDepth = findSameROIDepth(depthImage, verticalLines, fullFrameRect);
 
-      if (probability > 0.0f && differentDepth)
+      if (!sameDepth)
       {
-        ROS_INFO("Soft Obstacle Detected!");
+        boost::array<float, 4> depthDistance;
 
-        if (showROI_)
+        // Find the new depth distance of the soft obstacle
+        depthDistance = findDepthDistance(depthImage, verticalLines,
+            *roi, level);
+        bool nonZeroDepth = (depthDistance[1] && depthDistance[3]);
+
+        if (probability > 0.0f && nonZeroDepth)
         {
-          cv::Mat imageToShow = rgbImage.clone();
+          ROS_INFO("Soft Obstacle Detected!");
 
-          cv::Rect bbox(roi->x * pow(2, level), roi->y * pow(2, level),
-              roi->width * pow(2, level), roi->height * pow(2, level));
-          cv::rectangle(imageToShow, bbox, cv::Scalar(0, 255, 0), 4);
+          if (showROI_)
+          {
+            cv::Mat imageToShow = rgbImage.clone();
 
-          cv::imshow("[" + nodeName_ + "] : Original Image with Soft Obstacle Bounding Box",
-              imageToShow);
-          cv::waitKey(10);
-        }
+            cv::Rect bbox(roi->x * pow(2, level), roi->y * pow(2, level),
+                roi->width * pow(2, level), roi->height * pow(2, level));
+            cv::rectangle(imageToShow, bbox, cv::Scalar(0, 255, 0), 4);
 
-        for (int ii = 0; ii < depthDistance.size(); ii++)
-        {
-          ObstaclePOIPtr poi(new ObstaclePOI);
+            cv::imshow("[" + nodeName_ + "] : Original Image with Soft Obstacle Bounding Box",
+                imageToShow);
+            cv::waitKey(10);
+          }
 
-          poi->setPoint(cv::Point(
-                (roi->x + (1 - (ii == 3)) * roi->width / pow(2, !(ii % 2))) * pow(2, level),
-                (roi->y + (1 - (ii == 0)) * roi->height / pow(2, ii % 2)) * pow(2, level)));
+          for (int ii = 0; ii < depthDistance.size(); ii++)
+          {
+            ObstaclePOIPtr poi(new ObstaclePOI);
 
-          poi->setProbability(probability);
-          poi->setType(pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE);
+            poi->setPoint(cv::Point(
+                  (roi->x + (1 - (ii == 3)) * roi->width / pow(2, !(ii % 2))) * pow(2, level),
+                  (roi->y + (1 - (ii == 0)) * roi->height / pow(2, ii % 2)) * pow(2, level)));
 
-          poi->setDepth(depthDistance[ii]);
-          pois.push_back(poi);
+            poi->setProbability(probability);
+            poi->setType(pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE);
+
+            poi->setDepth(depthDistance[ii]);
+            pois.push_back(poi);
+          }
         }
       }
     }
     return pois;
   }
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision

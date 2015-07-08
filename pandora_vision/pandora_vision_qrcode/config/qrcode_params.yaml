@@ -1,4 +1,4 @@
-debugQrCode: false 
+debugQrCode: false
 qrCodeSharpenBlur: 5
 qrCodeSharpenWeight: 0.8
 timerThreshold: 0.1

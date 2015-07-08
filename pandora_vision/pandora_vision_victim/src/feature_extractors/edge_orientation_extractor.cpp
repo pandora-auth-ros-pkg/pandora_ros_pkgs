@@ -44,6 +44,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
   @brief This is the main function which calls all the others and
   computes the final edge histogram features.
@@ -290,4 +292,5 @@ namespace pandora_vision
     cv::imshow(colorComp, histImg);
     #endif
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor for the Neural Network Classifier Wrapper Class
    * @param ns[const std::string&] The namespace of the node
@@ -55,18 +57,18 @@ namespace pandora_vision
    * @param imageType[const std::string&] The type of input images given to
    * the classifier(RGB or Depth)
    */
-  NeuralNetworkClassifier::NeuralNetworkClassifier(const std::string& ns,
+  NeuralNetworkClassifier::NeuralNetworkClassifier(const ros::NodeHandle& nh,
       const std::string& datasetPath,
       const std::string& classifierType,
       const std::string& imageType)
-    : AbstractClassifier(ns, datasetPath, classifierType,
+    : AbstractClassifier(nh, datasetPath, classifierType,
         imageType)
   {
     ROS_INFO("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Creating Neural "
         "Network training instance");
 
     XmlRpc::XmlRpcValue layers;
-    if (!nh_.getParam(imageType_ + "/layers", layers))
+    if (!nh.getParam(imageType_ + "/layers", layers))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the number of neurons in each layer of the network!");
@@ -94,7 +96,7 @@ namespace pandora_vision
     // Get the parameters of  the sigmoid function.
     double alpha, beta;
 
-    if (!nh_.getParam(imageType_ + "/alpha", alpha))
+    if (!nh.getParam(imageType_ + "/alpha", alpha))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]:Could not retrieve"
           " alpha parameter for sigmoid function!");
@@ -103,7 +105,7 @@ namespace pandora_vision
       alpha = 1;
     }
 
-    if (!nh_.getParam(imageType_ + "/beta", beta))
+    if (!nh.getParam(imageType_ + "/beta", beta))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " beta parameter for the sigmoid function!");
@@ -114,7 +116,7 @@ namespace pandora_vision
 
     std::string trainingAlgorithm;
 
-    if (!nh_.getParam(imageType_ + "/training_algorithm", trainingAlgorithm))
+    if (!nh.getParam(imageType_ + "/training_algorithm", trainingAlgorithm))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the type of the training algorithm for the neural Network!");
@@ -126,7 +128,7 @@ namespace pandora_vision
 
     double learningRate, bpMomentScale;
     // Parse the learning rate parameter
-    if (!nh_.getParam(imageType_ + "/learning_rate", learningRate))
+    if (!nh.getParam(imageType_ + "/learning_rate", learningRate))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the learning rate for the training procedure!");
@@ -135,7 +137,7 @@ namespace pandora_vision
       learningRate = 0.1;
     }
 
-    if (!nh_.getParam(imageType_ + "/momentum_scale", bpMomentScale))
+    if (!nh.getParam(imageType_ + "/momentum_scale", bpMomentScale))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the strength of the momentum term!");
@@ -146,7 +148,7 @@ namespace pandora_vision
 
     // Get the maximum number of iterations for the training of the network.
     int maxIter;
-    if (!nh_.getParam(imageType_ + "/maximum_iter", maxIter))
+    if (!nh.getParam(imageType_ + "/maximum_iter", maxIter))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the maximum number number of training iterations!");
@@ -157,7 +159,7 @@ namespace pandora_vision
 
     // Get the maximum number of iterations for the training of the network.
     double epsilon;
-    if (!nh_.getParam(imageType_ + "/epsilon", epsilon))
+    if (!nh.getParam(imageType_ + "/epsilon", epsilon))
     {
       ROS_DEBUG("[PANDORA_VISION_VICTIM_NEURAL_NETWORK]: Could not retrieve"
           " the epsilon value for the error change between iterations!");
@@ -245,5 +247,6 @@ namespace pandora_vision
       validationResults->at<float>(i) = validationResults->at<float>(i) > 0 ? 1.0f : -1.0f;
     return;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/holes_conveyor.h"
+#include "rgb_node/utils/holes_conveyor.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class HolesConveyorUtilsTest
@@ -571,5 +575,6 @@ namespace pandora_vision
       }
     }
   }
-
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

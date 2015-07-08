@@ -52,7 +52,7 @@ namespace pandora_vision
 
    public:
     /// Coordinates of Point of Interest
-    cv::Point point;
+    cv::Point2f point;
 
     /// The possibility of this actually being a Point of Interest
     float probability;

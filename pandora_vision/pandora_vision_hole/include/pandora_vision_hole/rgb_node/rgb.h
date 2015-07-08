@@ -38,12 +38,15 @@
 #ifndef PANDORA_VISION_HOLE_RGB_NODE_RGB_H
 #define PANDORA_VISION_HOLE_RGB_NODE_RGB_H
 
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
+
 #include "pandora_vision_hole/CandidateHolesVectorMsg.h"
-#include "utils/message_conversions.h"
-#include "utils/histogram.h"
-#include "utils/parameters.h"
-#include "utils/wavelets.h"
-#include "rgb_node/hole_detector.h"
+#include "rgb_node/utils/message_conversions.h"
+#include "rgb_node/utils/histogram.h"
+#include "rgb_node/utils/parameters.h"
+#include "rgb_node/utils/wavelets.h"
+#include "rgb_node/rgb_hole_detector.h"
 
 /**
   @namespace pandora_vision
@@ -53,81 +56,95 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace rgb
+{
   /**
     @class Rgb
     @brief Provides functionalities for locating holes via
     analysis of a RGB image
    **/
-  class Rgb
+  class Rgb : public nodelet::Nodelet
+
   {
-    private:
-      // The NodeHandle
-      ros::NodeHandle nodeHandle_;
+   public:
+    // The constructor
+    Rgb();
 
-      // The ROS subscriber for acquisition of the RGB image through the
-      // depth sensor
-      ros::Subscriber rgbImageSubscriber_;
+    // The destructor
+    virtual
+    ~Rgb();
 
-      // The name of the topic where the rgb image is acquired from
-      std::string rgbImageTopic_;
+    virtual void
+    onInit();
 
-      // The ROS publisher ofcandidate holes
-      ros::Publisher candidateHolesPublisher_;
+    /**
+      @brief Callback for the rgb image received by the synchronizer node.
 
-      // The name of the topic where the candidate holes that the rgb node
-      // locates are published to
-      std::string candidateHolesTopic_;
+      The rgb image message received by the synchronizer node is unpacked
+      in a cv::Mat image. Holes are then located inside this image and
+      information about them, along with the rgb image, is then sent to the
+      hole fusion node
+      @param msg [const sensor_msgs::Image&] The rgb image message
+      @return void
+      **/
+    void inputRgbImageCallback(const sensor_msgs::ImageConstPtr& inImage);
 
-      // A vector of histograms for the texture of walls
-      std::vector<cv::MatND> wallsHistogram_;
+    /**
+      @brief The function called when a parameter is changed
+      @param[in] config [const pandora_vision_hole::rgb_cfgConfig&]
+      @param[in] level [const uint32_t]
+      @return void
+      **/
+    void parametersCallback(
+      const ::pandora_vision_hole::rgb_cfgConfig& config,
+      const uint32_t& level);
 
-      // The dynamic reconfigure (RGB) parameters' server
-      dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig >
-        server;
+   private:
+    /**
+      @brief Acquires topics' names needed to be subscribed to and advertise
+      to by the rgb node
+      @param void
+      @return void
+      **/
+    void getTopicNames();
 
-      // The dynamic reconfigure (RGB) parameters' callback
-      dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig >::
-        CallbackType f;
+   private:
+    // The NodeHandle
+    ros::NodeHandle nodeHandle_;
 
-      /**
-        @brief Callback for the rgb image received by the synchronizer node.
+    // The private ROS node handle
+    ros::NodeHandle privateNodeHandle_;
 
-        The rgb image message received by the synchronizer node is unpacked
-        in a cv::Mat image. Holes are then located inside this image and
-        information about them, along with the rgb image, is then sent to the
-        hole fusion node
-        @param msg [const sensor_msgs::Image&] The rgb image message
-        @return void
-       **/
-      void inputRgbImageCallback(const sensor_msgs::Image& inImage);
+    // The ROS subscriber for acquisition of the RGB image through the
+    // depth sensor
+    ros::Subscriber rgbImageSubscriber_;
 
-      /**
-        @brief Acquires topics' names needed to be subscribed to and advertise
-        to by the rgb node
-        @param void
-        @return void
-       **/
-      void getTopicNames();
+    // Node's distinct name
+    std::string nodeName_;
 
-      /**
-        @brief The function called when a parameter is changed
-        @param[in] config [const pandora_vision_hole::rgb_cfgConfig&]
-        @param[in] level [const uint32_t]
-        @return void
-       **/
-      void parametersCallback(
-        const ::pandora_vision_hole::rgb_cfgConfig& config,
-        const uint32_t& level);
+    // The name of the topic where the rgb image is acquired from
+    std::string rgbImageTopic_;
 
+    // The ROS publisher ofcandidate holes
+    ros::Publisher candidateHolesPublisher_;
 
-    public:
-      // The constructor
-      Rgb();
+    // The name of the topic where the candidate holes that the rgb node
+    // locates are published to
+    std::string candidateHolesTopic_;
 
-      // The destructor
-      ~Rgb();
+    // A vector of histograms for the texture of walls
+    std::vector<cv::MatND> wallsHistogram_;
+
+    // The dynamic reconfigure (RGB) parameters' server
+      boost::shared_ptr< dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig> >
+      serverPtr_;
+
+    // The dynamic reconfigure (RGB) parameters' callback
+    dynamic_reconfigure::Server< ::pandora_vision_hole::rgb_cfgConfig >::
+      CallbackType f;
   };
 
+}  // namespace rgb
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

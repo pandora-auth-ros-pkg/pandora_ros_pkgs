@@ -48,16 +48,15 @@
 
 namespace pandora_vision
 {
-  class HazmatHandler : public VisionHandler<HazmatPreProcessor,
-    pandora_vision_hazmat::HazmatProcessor, HazmatPostProcessor>
+namespace pandora_vision_hazmat
+{
+  class HazmatHandler :
+    public VisionHandler<HazmatPreProcessor, HazmatProcessor, HazmatPostProcessor>
   {
-    public:
-      explicit HazmatHandler(const std::string& ns);
-      virtual ~HazmatHandler() {}
-
-    private:
-      virtual void completeTransition();
+   public:
+    HazmatHandler();
   };
+}  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_HAZMAT_HANDLER_H

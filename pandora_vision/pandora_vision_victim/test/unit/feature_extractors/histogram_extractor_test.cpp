@@ -50,6 +50,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class HistogramExtractorTest: public ::testing::Test
   {
     public:
@@ -671,4 +673,6 @@ namespace pandora_vision
       validChannels.clear();
     }
   }  // End of CIELab color histogram extractor test.
+
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

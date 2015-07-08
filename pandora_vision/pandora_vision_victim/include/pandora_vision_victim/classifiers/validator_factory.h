@@ -47,6 +47,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /*
    * @class ClassifierFactory
    * @brief The class used to produce the different classifier objects
@@ -59,9 +61,9 @@ namespace pandora_vision
        * @brief The constructor for the factory used to produce the validator/classifier objects.
        * @param ns[const std::string&] The namespace for the node handles of the object
        */
-      explicit ValidatorFactory(const std::string& ns);
-      ~ValidatorFactory()
-      { }
+      ValidatorFactory();
+      virtual ~ValidatorFactory()
+      {}
 
       /**
        * @brief Creates a validator object depending on the image type and the validator type
@@ -77,9 +79,7 @@ namespace pandora_vision
       AbstractValidator* createValidator(const ros::NodeHandle& nh,
           const std::string& validatorType,
           const std::string& imageType);
-
-    private:
-      ros::NodeHandle nh_;
   };
-}  //  namespace pandora_vision
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_VALIDATOR_FACTORY_H

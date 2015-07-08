@@ -50,6 +50,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor. Initializes SVM classifier parameters and loads
    * classifier model.
@@ -186,4 +188,5 @@ namespace pandora_vision
     }
     return probability;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

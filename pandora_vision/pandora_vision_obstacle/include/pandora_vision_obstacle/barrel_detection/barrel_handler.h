@@ -47,16 +47,15 @@
 
 namespace pandora_vision
 {
-  class BarrelHandler : public VisionHandler<ObstaclePreProcessor, BarrelProcessor,
-    ObstaclePostProcessor>
+namespace pandora_vision_obstacle
+{
+  class BarrelHandler :
+    public VisionHandler<ObstaclePreProcessor, BarrelProcessor, ObstaclePostProcessor>
   {
-    public:
-      explicit BarrelHandler(const std::string& ns);
-      virtual ~BarrelHandler() {}
-
-    private:
-      virtual void completeTransition();
+   public:
+    BarrelHandler();
   };
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_BARREL_DETECTION_BARREL_HANDLER_H

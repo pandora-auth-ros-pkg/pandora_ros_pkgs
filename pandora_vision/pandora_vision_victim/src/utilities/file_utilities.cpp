@@ -49,6 +49,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
 /**
  * @namespace file_utilities
  * @brief The namespace for a set of file utilities functions.
@@ -376,4 +378,5 @@ namespace file_utilities
     return imageNamesVec.size();
   }
 }  // namespace file_utilities
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

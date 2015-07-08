@@ -18,6 +18,8 @@
   <build_depend>pandora_cmake_tools</build_depend>
 
   <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>zbar</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
@@ -37,6 +39,7 @@
   <test_depend>rosunit</test_depend>
 
   <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 
 </package>

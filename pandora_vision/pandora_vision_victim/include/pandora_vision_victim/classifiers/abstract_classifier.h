@@ -40,6 +40,7 @@
 #define PANDORA_VISION_VICTIM_CLASSIFIERS_ABSTRACT_CLASSIFIER_H
 
 #include <string>
+#include <map>
 
 #include <opencv2/opencv.hpp>
 #include <boost/shared_ptr.hpp>
@@ -54,13 +55,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class AbstractClassifier
   {
     public:
       /**
        * @brief The Constructor
        */
-      AbstractClassifier(const std::string& ns, const std::string& datasetPath,
+      AbstractClassifier(const ros::NodeHandle& nh, const std::string& datasetPath,
           const std::string& classifierType, const std::string& imageType);
 
       /**
@@ -156,9 +159,6 @@ namespace pandora_vision
       /// String used in node messages.
       std::string nodeMessagePrefix_;
 
-      /// The NodeHandle
-      ros::NodeHandle nh_;
-
       /// String containing the type of the images used in the feature
       /// extraction process.
       std::string imageType_;
@@ -246,10 +246,11 @@ namespace pandora_vision
       std::string testAnnotationsFile_;
 
       /// Feature Extractor
-      boost::shared_ptr<FeatureExtraction> featureExtraction_;
+      std::map<std::string, boost::shared_ptr<FeatureExtraction> > featureExtraction_;
       /// Feature Extraction Utilities used to perform feature normalization
       /// and/or feature selection.
       boost::shared_ptr<FeatureExtractionUtilities> featureExtractionUtilities_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_ABSTRACT_CLASSIFIER_H

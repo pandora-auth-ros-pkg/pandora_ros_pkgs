@@ -45,6 +45,8 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace hole_fusion
+{
   /**
     @brief Checks for colour homogeneity in a region where points are
     constrained inside each hole. The colors of the image are reduced
@@ -520,5 +522,6 @@ namespace pandora_vision_hole
     #endif
   }
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

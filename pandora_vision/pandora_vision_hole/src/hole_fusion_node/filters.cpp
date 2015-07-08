@@ -41,6 +41,8 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace hole_fusion
+{
   /**
     @brief Applies a specific active filter, either from an RGB
     or a Depth sources.
@@ -512,5 +514,6 @@ namespace pandora_vision_hole
     #endif
   }
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

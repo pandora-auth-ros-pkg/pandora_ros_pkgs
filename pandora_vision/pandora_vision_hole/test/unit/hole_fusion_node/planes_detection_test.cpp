@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+namespace hole_fusion
+{
   /**
     @class PlanesDetectionTest
     @brief Tests the integrity of methods of class PlanesDetection
@@ -171,4 +175,6 @@ namespace pandora_vision
     EXPECT_EQ ( WIDTH * HEIGHT / 4, inliersVector[1]->indices.size() );
   }
 
-} // namespace pandora_vision
+}  // namespace hole_fusion
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_motion_handler">
+    <class name="pandora_vision/pandora_vision_motion"
+        type="pandora_vision::pandora_vision_motion::MotionHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects motion
+      </description>
+    </class>
+  </library>
+</class_libraries>

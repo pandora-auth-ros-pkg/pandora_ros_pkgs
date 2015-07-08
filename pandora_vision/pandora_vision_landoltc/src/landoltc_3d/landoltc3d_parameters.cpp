@@ -39,19 +39,21 @@
 
 namespace pandora_vision
 {
-  
+namespace pandora_vision_landoltc
+{
   double Landoltc3DParameters::gradientThreshold = 60;
-  
+
   double Landoltc3DParameters::centerThreshold = 90;
-  
+
   double Landoltc3DParameters::huMomentsPrec = 0.3;
-  
+
   int Landoltc3DParameters::adaptiveThresholdSubtractSize = 2;
-  
+
   double Landoltc3DParameters::bradleyPerc = 0.15;
-  
+
   bool Landoltc3DParameters::visualization = false;
-  
+
   double Landoltc3DParameters::timerThreshold = 0.05;
-  
-}// namespace pandora_vision
+
+}  // namespace pandora_vision_landoltc
+}  // namespace pandora_vision

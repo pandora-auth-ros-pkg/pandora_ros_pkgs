@@ -36,10 +36,14 @@
  *********************************************************************/
 
 #include <math.h>
-#include "utils/message_conversions.h"
+#include "rgb_node/utils/message_conversions.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class MessageConversionsTest
@@ -351,7 +355,7 @@ namespace pandora_vision
   TEST_F ( MessageConversionsTest, createCandidateHolesVectorTest )
   {
     // The vector of messages of candidate holes
-    std::vector<::pandora_vision_hole::CandidateHoleMsg> candidateHolesVector;
+    std::vector< ::pandora_vision_hole::CandidateHoleMsg> candidateHolesVector;
 
     // Run MessageConversions::createCandidateHolesVector
     MessageConversions::createCandidateHolesVector( conveyor,
@@ -405,7 +409,8 @@ namespace pandora_vision
     }
 
     // The message of candidate holes
-    ::pandora_vision_hole::CandidateHolesVectorMsg candidateHolesVectorMsg;
+   ::pandora_vision_hole::CandidateHolesVectorMsgPtr
+      canditateHolesVectorMsgPtr( new ::pandora_vision_hole::CandidateHolesVectorMsg );
 
     // A dummy image. Needed only for its header.
     sensor_msgs::Image msg;
@@ -415,14 +420,14 @@ namespace pandora_vision
     MessageConversions::createCandidateHolesVectorMessage(
       conveyor,
       image,
-      &candidateHolesVectorMsg,
+      canditateHolesVectorMsgPtr,
       sensor_msgs::image_encodings::TYPE_8UC1,
       msg);
 
     // Check the integrity of image
     cv::Mat extracted;
     MessageConversions::extractImageFromMessageContainer(
-      candidateHolesVectorMsg,
+      canditateHolesVectorMsgPtr,
       &extracted,
       sensor_msgs::image_encodings::TYPE_8UC1);
 
@@ -450,26 +455,26 @@ namespace pandora_vision
     {
       // The keypoints should be the same
       EXPECT_EQ ( conveyor.holes[i].keypoint.pt.x,
-        candidateHolesVectorMsg.candidateHoles[i].keypointX );
+        canditateHolesVectorMsgPtr.candidateHoles[i].keypointX );
       EXPECT_EQ ( conveyor.holes[i].keypoint.pt.y,
-        candidateHolesVectorMsg.candidateHoles[i].keypointY );
+        canditateHolesVectorMsgPtr.candidateHoles[i].keypointY );
 
       for (int v = 0; v < conveyor.holes[i].rectangle.size(); v++)
       {
         // The rectangle's vertices should be the same
         EXPECT_EQ ( conveyor.holes[i].rectangle[v].x,
-          candidateHolesVectorMsg.candidateHoles[i].verticesX[v]);
+          canditateHolesVectorMsgPtr.candidateHoles[i].verticesX[v]);
         EXPECT_EQ ( conveyor.holes[i].rectangle[v].y,
-          candidateHolesVectorMsg.candidateHoles[i].verticesY[v]);
+          canditateHolesVectorMsgPtr.candidateHoles[i].verticesY[v]);
       }
 
       for (int o = 0; o < conveyor.holes[i].outline.size(); o++)
       {
         // The outline points should be the same
         EXPECT_EQ ( conveyor.holes[i].outline[o].x,
-          candidateHolesVectorMsg.candidateHoles[i].outlineX[o]);
+          canditateHolesVectorMsgPtr.candidateHoles[i].outlineX[o]);
         EXPECT_EQ ( conveyor.holes[i].outline[o].y,
-          candidateHolesVectorMsg.candidateHoles[i].outlineY[o]);
+          canditateHolesVectorMsgPtr.candidateHoles[i].outlineY[o]);
       }
     }
 
@@ -679,7 +684,7 @@ namespace pandora_vision
   TEST_F ( MessageConversionsTest, unpackMessageTest )
   {
     // The overall message
-    ::pandora_vision_hole::CandidateHolesVectorMsg candidateHolesVectorMsg;
+    ::pandora_vision_hole::CandidateHolesVectorMsg canditateHolesVectorMsgPtr;
 
     // The vector of candidate holes
     std::vector<::pandora_vision_hole::CandidateHoleMsg> candidateHolesVector;
@@ -709,7 +714,7 @@ namespace pandora_vision
       candidateHolesVector.push_back(candidateHole);
     }
 
-    candidateHolesVectorMsg.candidateHoles = candidateHolesVector;
+    canditateHolesVectorMsgPtr.candidateHoles = candidateHolesVector;
 
     // A grayscale image
     cv::Mat image_8UC1 = cv::Mat::zeros( HEIGHT, WIDTH, CV_8UC1 );
@@ -732,7 +737,7 @@ namespace pandora_vision
     msgPtr->encoding = sensor_msgs::image_encodings::TYPE_8UC1;
     msgPtr->image = image_8UC1;
 
-    candidateHolesVectorMsg.image = *msgPtr->toImageMsg();
+    canditateHolesVectorMsgPtr.image = *msgPtr->toImageMsg();
 
     // The extracted conveyor
     HolesConveyor extractedConveyor;
@@ -742,7 +747,7 @@ namespace pandora_vision
 
     // Run MessageConversions::unpackMessage for representationMethod 0
     MessageConversions::unpackMessage(
-      candidateHolesVectorMsg,
+      canditateHolesVectorMsgPtr,
       &extractedConveyor,
       &extractedImage,
       0,
@@ -800,7 +805,7 @@ namespace pandora_vision
 
     // Run MessageConversions::unpackMessage for representationMethod 1
     MessageConversions::unpackMessage(
-      candidateHolesVectorMsg,
+      canditateHolesVectorMsgPtr,
       &extractedConveyor,
       &extractedImage,
       1,
@@ -840,5 +845,6 @@ namespace pandora_vision
     // There should be no discrepancies
     ASSERT_EQ ( 0 , diff );
   }
-
-} // namespace pandora_vision
+}  // rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

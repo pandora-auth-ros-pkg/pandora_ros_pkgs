@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_hazmat_handler">
+    <class name="pandora_vision/pandora_vision_hazmat"
+        type="pandora_vision::pandora_vision_hazmat::HazmatHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects hazmats
+      </description>
+    </class>
+  </library>
+</class_libraries>

@@ -1,7 +1,6 @@
 subscribed_topics:
   thermal_roi_topic: thermal/cropper/enhanced/image
-  rgb_image_topic: synchronized/rgb/image
-  depth_image_topic: synchronized/depth/image
+  enhanced_image_topic: synchronized/enhanced/image
 
 published_topics:
   thermal_victim_node_topic: /vision/enhanced_holes

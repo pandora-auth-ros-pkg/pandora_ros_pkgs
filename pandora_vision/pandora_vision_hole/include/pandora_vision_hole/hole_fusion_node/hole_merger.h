@@ -40,10 +40,10 @@
 
 #include "hole_fusion_node/filters_resources.h"
 #include "hole_fusion_node/depth_filters.h"
-#include "utils/defines.h"
-#include "utils/holes_conveyor.h"
-#include "utils/outline_discovery.h"
-#include "utils/parameters.h"
+#include "hole_fusion_node/utils/defines.h"
+#include "hole_fusion_node/utils/holes_conveyor.h"
+#include "hole_fusion_node/utils/outline_discovery.h"
+#include "hole_fusion_node/utils/parameters.h"
 #include <math.h>
 
 // Available merging operations:
@@ -65,6 +65,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class HoleMerger
@@ -277,6 +279,7 @@ namespace pandora_vision_hole
         const PointCloudPtr& pointCloud);
   };
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

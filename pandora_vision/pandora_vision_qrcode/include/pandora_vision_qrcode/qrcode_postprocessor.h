@@ -48,17 +48,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   class QrCodePostProcessor : public VisionPostProcessor<pandora_vision_msgs::QRAlertVector>
   {
-    public:
-      typedef boost::shared_ptr<pandora_vision_msgs::QRAlertVector> QRAlertVectorPtr;
+   public:
+    typedef boost::shared_ptr<pandora_vision_msgs::QRAlertVector> QRAlertVectorPtr;
 
-      QrCodePostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~QrCodePostProcessor();
+    QrCodePostProcessor();
 
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const QRAlertVectorPtr& output);
+    postProcess(const POIsStampedConstPtr& input, const QRAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_QRCODE_QRCODE_POSTPROCESSOR_H

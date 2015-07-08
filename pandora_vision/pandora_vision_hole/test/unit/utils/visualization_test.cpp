@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/visualization.h"
+#include "rgb_node/utils/visualization.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class VisualizationTest
@@ -237,4 +241,6 @@ namespace pandora_vision
     //Visualization::showScaled( "Title", floats, 0 );
   }
 
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

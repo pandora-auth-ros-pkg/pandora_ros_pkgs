@@ -1,0 +1,34 @@
+<launch>
+  <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
+  <arg name="standalone_nodelet" default="false" />
+  <!-- <node name="pandora_landoltc_2d" type="pandora_vision_landoltc_2d_node" pkg="pandora_vision_landoltc"     -->
+  <!--   respawn="False" output="screen" >                                                                       -->
+  <!--   <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_2d_topics.yaml" -->
+  <!--     command="load" />                                                                                     -->
+  <!--   <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_params.yaml"    -->
+  <!--     command="load" ns="detector" />                                                                       -->
+  <!--   <param name="patternPath" type="str" value="$(find pandora_vision_landoltc)/bold.jpg" ns="detector" />  -->
+  <!-- </node>                                                                                                   -->
+
+  <group unless="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_landoltc_2d"
+      args="load pandora_vision/pandora_vision_landoltc_2d $(arg nodelet_manager)" output="screen" >
+      <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_2d_topics.yaml"
+        command="load" />
+      <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_params.yaml"
+        command="load" ns="detector" />
+    </node>
+  </group>
+
+  <group if="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_landoltc_2d"
+      args="standalone pandora_vision/pandora_vision_landoltc_2d" output="screen" >
+      <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_2d_topics.yaml"
+        command="load" />
+      <rosparam file="$(find pandora_vision_landoltc)/config/pandora_vision_landoltc/landoltc_params.yaml"
+        command="load" ns="detector" />
+    </node>
+  </group>
+
+
+</launch>

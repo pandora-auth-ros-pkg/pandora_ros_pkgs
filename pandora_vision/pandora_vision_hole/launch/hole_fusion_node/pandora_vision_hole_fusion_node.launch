@@ -2,7 +2,7 @@
   <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
 
   <node pkg="nodelet" type="nodelet" name="hole_fusion"
-      args="load pandora_vision_hole/hole_fusion $(arg nodelet_manager)" output="screen" >
+      args="load pandora_vision_hole/pandora_hole_fusion $(arg nodelet_manager)" output="screen" >
     <rosparam file="$(find pandora_vision_hole)/cfg/hole_fusion_node_cfg/hole_fusion_node_topics.yaml"
               command="load" />
   </node>

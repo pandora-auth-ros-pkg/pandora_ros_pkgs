@@ -35,11 +35,15 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/edge_detection.h"
+#include "rgb_node/utils/edge_detection.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class EdgeDetectionTest
@@ -1464,4 +1468,6 @@ namespace pandora_vision
     }
   }
 
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

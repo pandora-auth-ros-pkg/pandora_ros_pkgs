@@ -38,15 +38,19 @@
 #ifndef PANDORA_VISION_HOLE_UTILS_TIMER_H
 #define PANDORA_VISION_HOLE_UTILS_TIMER_H
 
+#ifndef DEFINES
+#define DEFINES
+#define PKG_NAME "hole_detector"
+#endif  // DEFINES
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include <map>
 #include <set>
 #include <fstream>
+#include <ros/ros.h>
 #include <sys/time.h>
-
-#include "utils/defines.h"
 
 class Timer
 {

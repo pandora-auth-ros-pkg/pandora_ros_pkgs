@@ -37,14 +37,18 @@
 
 #include "hole_fusion_node/rgb_filters.h"
 #include "hole_fusion_node/filters_resources.h"
-#include "utils/histogram.h"
-#include "utils/parameters.h"
+#include "hole_fusion_node/utils/histogram.h"
+#include "rgb_node/utils/parameters.h"
 #include "gtest/gtest.h"
 #include <stdlib.h>
 #include <sys/time.h>
 
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class RgbFiltersTest
@@ -818,4 +822,7 @@ namespace pandora_vision
     }
   }
 
-} // namespace pandora_vision
+
+}  // namespace hole_fusion
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision

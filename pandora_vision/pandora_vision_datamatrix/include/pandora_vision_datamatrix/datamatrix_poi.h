@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_datamatrix
+{
   class DataMatrixPOI : public POI
   {
     public:
@@ -64,6 +66,7 @@ namespace pandora_vision
       }
   };
   typedef boost::shared_ptr<DataMatrixPOI> DataMatrixPOIPtr;
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_DATAMATRIX_DATAMATRIX_POI_H

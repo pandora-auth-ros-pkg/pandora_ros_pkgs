@@ -1,5 +1,6 @@
 published_topics: /vision/victim_direction_alert
-victim_debug_img_topic : /vision/victim_debug_img
-victim_interpolated_depth_img_topic : /vision/interpolated_depth_img
-
 subscribed_topics: [/vision/enhanced_holes]
+active_states: [IDENTIFICATION, SENSOR_HOLD, SENSOR_TEST]
+detector:
+  victim_debug_img_topic : /vision/victim_debug_img
+  victim_interpolated_depth_img_topic : /vision/interpolated_depth_img

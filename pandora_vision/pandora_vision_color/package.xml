@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_vision_color</name>
+  <version>0.1.0</version>
+  <description>Containts color detection node.</description>
+
+  <maintainer email="protopapas_marios@hotmail.com">Marios Protopapas</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_vision/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
+
+  <author>Marios Protopapas</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslint</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>pandora_common_msgs</depend>
+  <depend>pandora_vision_common</depend>
+  <depend>sensor_processor</depend>
+  <depend>state_manager</depend>
+  <depend>state_manager_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>urdf</depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
+
+</package>

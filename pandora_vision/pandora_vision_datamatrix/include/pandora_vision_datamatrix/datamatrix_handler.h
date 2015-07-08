@@ -44,20 +44,19 @@
 #include "pandora_vision_common/vision_handler.h"
 #include "pandora_vision_datamatrix/datamatrix_preprocessor.h"
 #include "pandora_vision_datamatrix/datamatrix_postprocessor.h"
-#include "pandora_vision_datamatrix/datamatrix_detector.h"
+#include "pandora_vision_datamatrix/datamatrix_processor.h"
 
 namespace pandora_vision
 {
-  class DataMatrixHandler : public VisionHandler<DataMatrixPreProcessor, 
-    DatamatrixDetector, DataMatrixPostProcessor>
+namespace pandora_vision_datamatrix
+{
+  class DataMatrixHandler :
+    public VisionHandler<DataMatrixPreProcessor, DatamatrixProcessor, DataMatrixPostProcessor>
   {
-    public:
-      explicit DataMatrixHandler(const std::string& ns);
-      virtual ~DataMatrixHandler() {}
-
-    private:
-      virtual void completeTransition();
+   public:
+    DataMatrixHandler();
   };
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_DATAMATRIX_DATAMATRIX_HANDLER_H

@@ -40,12 +40,12 @@
 #include <ros/console.h>
 #include "pandora_vision_motion/motion_handler.h"
 
-using pandora_vision::MotionHandler;
+using pandora_vision::pandora_vision_motion::MotionHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "motion_node");
-  MotionHandler motionDetectionHandler("motion");
+  MotionHandler motionDetectionHandler;
   ros::spin();
   return 0;
 }

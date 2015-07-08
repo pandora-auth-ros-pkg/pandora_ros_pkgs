@@ -40,29 +40,27 @@
 #define PANDORA_VISION_OBSTACLE_OBSTACLE_PREPROCESSOR_H
 
 #include <string>
-#include <sensor_msgs/PointCloud2.h>
 #include "sensor_processor/preprocessor.h"
 #include "pandora_vision_common/images_stamped.h"
-#include "pandora_vision_common/pandora_vision_utilities/pointcloud_to_image_converter.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
 
 namespace pandora_vision
 {
-  class ObstaclePreProcessor : public sensor_processor::PreProcessor<sensor_msgs::PointCloud2,
+namespace pandora_vision_obstacle
+{
+  class ObstaclePreProcessor : public sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
     ImagesStamped>
   {
-    public:
-      typedef boost::shared_ptr<sensor_msgs::PointCloud2> PointCloud2Ptr;
-      typedef boost::shared_ptr<sensor_msgs::PointCloud2 const> PointCloud2ConstPtr;
+   public:
+    typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage> EnhancedImagePtr;
+    typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage const> EnhancedImageConstPtr;
 
-    public:
-      ObstaclePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~ObstaclePreProcessor();
+   public:
+    ObstaclePreProcessor();
 
-      virtual bool preProcess(const PointCloud2ConstPtr& input, const ImagesStampedPtr& output);
-
-    private:
-      PointCloudToImageConverterPtr converterPtr_;
+    virtual bool preProcess(const EnhancedImageConstPtr& input, const ImagesStampedPtr& output);
   };
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_OBSTACLE_PREPROCESSOR_H

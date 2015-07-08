@@ -35,10 +35,14 @@
  * Authors: Alexandros Philotheou, Christos Tsirigotis
  *********************************************************************/
 
-#include "utils/morphological_operators.h"
+#include "rgb_node/utils/morphological_operators.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class MorphologyTest
@@ -922,7 +926,7 @@ namespace pandora_vision
 
     // square_ should have shrunk by 4 pixels:
     EXPECT_EQ ( 10000 - 4, nonZerosAfter );
-
   }
-
+}  // namespace rgb
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

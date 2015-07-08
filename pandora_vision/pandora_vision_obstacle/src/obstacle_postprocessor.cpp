@@ -43,15 +43,12 @@
 
 namespace pandora_vision
 {
-  ObstaclePostProcessor::ObstaclePostProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) : VisionPostProcessor<
-    pandora_vision_msgs::ObstacleAlertVector>(ns, handler)
+namespace pandora_vision_obstacle
+{
+  ObstaclePostProcessor::ObstaclePostProcessor() :
+    VisionPostProcessor<pandora_vision_msgs::ObstacleAlertVector>()
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
-        this->accessProcessorNh()->getNamespace());
   }
-
-  ObstaclePostProcessor::~ObstaclePostProcessor() {}
 
   bool ObstaclePostProcessor::postProcess(const POIsStampedConstPtr& input,
     const ObstacleAlertVectorPtr& output)
@@ -80,4 +77,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision

@@ -47,6 +47,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class PlattScaling
    * @brief This class implements Platt's Binary Probabilistic Output, an
@@ -117,6 +119,7 @@ namespace pandora_vision
       /// The Platt Scaling Beta parameter.
       double B_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_PLATT_SCALING_H
 

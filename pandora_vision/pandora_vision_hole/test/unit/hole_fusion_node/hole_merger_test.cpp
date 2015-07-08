@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+namespace hole_fusion
+{
   /**
     @class HoleMergerTest
     @brief Tests the integrity of methods of class HoleMerger
@@ -1063,4 +1067,6 @@ namespace pandora_vision
     EXPECT_EQ ( 3, conveyor.size() );
   }
 
+}  // namespace hole_fusion
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

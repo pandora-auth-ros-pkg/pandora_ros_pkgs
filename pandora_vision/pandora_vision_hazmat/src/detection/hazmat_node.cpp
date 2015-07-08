@@ -37,6 +37,8 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <ros/ros.h>
+
 #include "pandora_vision_hazmat/detection/hazmat_handler.h"
 
 /**
@@ -48,7 +50,7 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "hazmat_node");
-  pandora_vision::HazmatHandler hazmatHandler("pandora_vision_hazmat");
+  pandora_vision::pandora_vision_hazmat::HazmatHandler hazmatHandler;
   ros::spin();
   return 0;
 }

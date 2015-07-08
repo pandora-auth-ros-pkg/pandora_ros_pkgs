@@ -3,6 +3,8 @@ project(pandora_vision_landoltc)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     pandora_common_msgs
     pandora_vision_msgs
     pandora_vision_common
@@ -27,6 +29,8 @@ catkin_package(
     #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       pandora_vision_common
       pandora_vision_msgs
       pandora_common_msgs
@@ -67,9 +71,9 @@ add_library(${PROJECT_NAME}_2d_preprocessor
 target_link_libraries(${PROJECT_NAME}_2d_preprocessor
   ${catkin_LIBRARIES}
   )
-
 add_dependencies(${PROJECT_NAME}_2d_preprocessor
-  ${catkin_EXPORTED_TARGETS})
+  ${catkin_EXPORTED_TARGETS}
+  )
 ########################### landoltc postprocessor ############################
 
 add_library(${PROJECT_NAME}_2d_postprocessor
@@ -78,9 +82,9 @@ add_library(${PROJECT_NAME}_2d_postprocessor
 target_link_libraries(${PROJECT_NAME}_2d_postprocessor
   ${catkin_LIBRARIES}
   )
-
 add_dependencies(${PROJECT_NAME}_2d_postprocessor
-  ${catkin_EXPORTED_TARGETS})
+  ${catkin_EXPORTED_TARGETS}
+  )
 ########################### landoltc handler ############################
 
 add_library(${PROJECT_NAME}_2d_handler
@@ -96,7 +100,7 @@ target_link_libraries(${PROJECT_NAME}_2d_handler
 ########################### landoltcNode ############################
 add_executable(${PROJECT_NAME}_2d_node
   src/landoltc_2d/landoltc_node.cpp
-)
+  )
 target_link_libraries(${PROJECT_NAME}_2d_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_2d_handler
@@ -104,7 +108,7 @@ target_link_libraries(${PROJECT_NAME}_2d_node
 add_dependencies(${PROJECT_NAME}_2d_node
   ${catkin_EXPORTED_TARGETS}
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
-)
+  )
 
 
 add_library(${PROJECT_NAME}_3d_lib
@@ -135,8 +139,8 @@ set(ROSLINT_CPP_OPTS
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
 
-  include/landoltc_2d/*
-  src/landoltc_2d/*
+  include/*.h
+  src/*.cpp
   test/unit/*.cpp
   # include/landoltc_3d/*.h
   # src/landoltc_3d/*.cpp

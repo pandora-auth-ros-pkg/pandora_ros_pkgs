@@ -43,13 +43,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   VictimImagePreProcessor::VictimImagePreProcessor(const std::string& ns,
     sensor_processor::Handler* handler)
     : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
     EnhancedImageStamped>(ns, handler)
   {
     ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+      this->getProcessorNodeHandle().getNamespace());
   }
 
   VictimImagePreProcessor::~VictimImagePreProcessor()
@@ -74,4 +76,5 @@ namespace pandora_vision
 
     return true;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

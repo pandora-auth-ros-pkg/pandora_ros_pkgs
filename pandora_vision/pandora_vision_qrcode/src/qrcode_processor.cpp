@@ -44,13 +44,14 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
 
   /**
    * @brief The default constructor of the QR processor class
    */
   QrCodeProcessor::QrCodeProcessor() : VisionProcessor()
-  {
-  }
+  {}
 
   /**
    * @brief: The Main constructor for the QR code Processor objects.
@@ -58,42 +59,42 @@ namespace pandora_vision
    * @param handler[sensor_processor::Handler*]: A pointer to the handler
    * of the processor used to access the nodehandle of the node
    */
-  QrCodeProcessor::QrCodeProcessor(const std::string& ns,
-      sensor_processor::Handler* handler) :
-    VisionProcessor(ns, handler)
+  void
+  QrCodeProcessor::initialize(const std::string& ns, sensor_processor::Handler* handler)
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
-        this->accessProcessorNh()->getNamespace());
+    VisionProcessor::initialize(ns, handler);
+
+    ros::NodeHandle processor_nh = this->getProcessorNodeHandle();
 
     bool debugQrCode;
     // Get the image debug view flag.
-    if (!this->accessPublicNh()->getParam("debugQrCode", debugQrCode))
+    if (!processor_nh.getParam("debugQrCode", debugQrCode))
       debugQrCode = false;
 
     ROS_DEBUG_STREAM("debugQrCode : " << (debugQrCode ? "True": "False"));
 
     int gaussianSharpenBlur;
     /// Get the buffer size parameter if available
-    if (!this->accessPublicNh()->getParam("qrCodeSharpenBlur",
-          gaussianSharpenBlur))
+    if (!processor_nh.getParam("qrCodeSharpenBlur", gaussianSharpenBlur))
       gaussianSharpenBlur = 5;
 
     ROS_DEBUG_STREAM("qrCodeSharpenBlur : " << gaussianSharpenBlur);
 
     double gaussianSharpenWeight;
     /// Get the difference threshold parameter if available
-    if (!this->accessPublicNh()->getParam("qrCodeSharpenWeight",
-          gaussianSharpenWeight))
+    if (!processor_nh.getParam("qrCodeSharpenWeight", gaussianSharpenWeight))
       gaussianSharpenWeight = 0.8;
 
     ROS_DEBUG_STREAM("qrCodeSharpenWeight : " << gaussianSharpenWeight);
 
     // Initiliaze the QR code detector.
-    detectorPtr_.reset(new QrCodeDetector(gaussianSharpenBlur,
-        gaussianSharpenWeight, debugQrCode));
+    detectorPtr_.reset( new QrCodeDetector(gaussianSharpenBlur,
+        gaussianSharpenWeight, debugQrCode) );
 
     /// The dynamic reconfigure parameter's callback
-    server.setCallback(boost::bind(&QrCodeProcessor::parametersCallback,
+    server_.reset( new dynamic_reconfigure::Server< ::pandora_vision_qrcode::qrcode_cfgConfig >(
+          processor_nh) );
+    server_->setCallback(boost::bind(&QrCodeProcessor::parametersCallback,
           this, _1, _2));
   }
 
@@ -104,7 +105,7 @@ namespace pandora_vision
    * @return void
    */
   void QrCodeProcessor::parametersCallback(
-    const pandora_vision_qrcode::qrcode_cfgConfig& config,
+    const ::pandora_vision_qrcode::qrcode_cfgConfig& config,
     const uint32_t& level)
   {
     detectorPtr_->set_debug(config.debugEnable);
@@ -134,4 +135,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision

@@ -37,8 +37,8 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_POSTPROCESSOR_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_POSTPROCESSOR_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POSTPROCESSOR_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POSTPROCESSOR_H
 
 #include <string>
 #include "pandora_common_msgs/GeneralAlertVector.h"
@@ -48,17 +48,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_landoltc
+{
   class LandoltCPostProcessor : public VisionPostProcessor<pandora_vision_msgs::LandoltcAlertVector>
   {
-    public:
-      typedef boost::shared_ptr<pandora_vision_msgs::LandoltcAlertVector> LandoltcAlertVectorPtr;
+   public:
+    typedef boost::shared_ptr<pandora_vision_msgs::LandoltcAlertVector> LandoltcAlertVectorPtr;
 
-      LandoltCPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~LandoltCPostProcessor();
+    LandoltCPostProcessor();
 
-      virtual bool
-        postProcess(const POIsStampedConstPtr& input, const LandoltcAlertVectorPtr& output);
+    virtual bool
+      postProcess(const POIsStampedConstPtr& input, const LandoltcAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_landoltc
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_POSTPROCESSOR_H
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POSTPROCESSOR_H

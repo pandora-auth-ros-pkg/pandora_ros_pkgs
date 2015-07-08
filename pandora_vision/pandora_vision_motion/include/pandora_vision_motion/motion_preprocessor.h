@@ -45,12 +45,17 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_motion
+{
   class MotionPreProcessor : public VisionPreProcessor
   {
-    public:
-      MotionPreProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~MotionPreProcessor();
+   public:
+    MotionPreProcessor();
+
+    virtual void
+    initialize(const std::string& ns, sensor_processor::Handler* handler);
   };
+}  // namespace pandora_vision_motion
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_MOTION_MOTION_PREPROCESSOR_H

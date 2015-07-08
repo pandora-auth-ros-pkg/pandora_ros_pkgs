@@ -56,6 +56,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class FeatureExtraction
    * @brief This class extracts features from images.
@@ -206,5 +208,6 @@ namespace pandora_vision
       ///
       boost::shared_ptr<BagOfWordsTrainer> bowTrainerPtr_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_FEATURE_EXTRACTION_H

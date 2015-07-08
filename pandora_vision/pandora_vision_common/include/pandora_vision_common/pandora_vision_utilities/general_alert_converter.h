@@ -149,7 +149,7 @@ namespace pandora_vision
     alert.header = result.header;
     alert.header.frame_id = findParentFrameId(nh, result.header.frame_id,
                                               "/robot_description");
-    double x = frameWidth - result.point.x;
+    double x = frameWidth / 2 - result.point.x;
     double y = result.point.y - frameHeight / 2;
 
     alert.info.yaw = atan(2 * x / frameWidth * tan(hfov * CV_PI / 360.0f));
@@ -205,6 +205,16 @@ namespace pandora_vision
 
     poi.point.x = frameWidth / 2 - x;
     poi.point.y = frameHeight / 2 + y;
+
+    if (poi.point.x < 0)
+      poi.point.x = 0;
+    if (poi.point.x > static_cast<int>(frameWidth) - 1)
+      poi.point.x = static_cast<int>(frameWidth) - 1;
+    if (poi.point.y < 0)
+      poi.point.y = 0;
+    if (poi.point.y > static_cast<int>(frameHeight) - 1)
+      poi.point.y = static_cast<int>(frameHeight) - 1;
+
     poi.probability = result.info.probability;
 
     return poi;

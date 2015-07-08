@@ -19,6 +19,8 @@
   <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>pandora_vision_common</depend>
@@ -35,6 +37,7 @@
   <test_depend>rostest</test_depend>
 
   <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 
 </package>

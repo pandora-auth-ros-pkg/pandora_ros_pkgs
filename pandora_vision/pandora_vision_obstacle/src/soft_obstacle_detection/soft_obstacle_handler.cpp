@@ -36,24 +36,21 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include <string>
+#include <pluginlib/class_list_macros.h>
+#include <nodelet/nodelet.h>
+
 #include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_handler.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_obstacle::SoftObstacleHandler,
+    nodelet::Nodelet)
 
 namespace pandora_vision
 {
-  SoftObstacleHandler::SoftObstacleHandler(const std::string& ns) :
-    VisionHandler<ObstaclePreProcessor, SoftObstacleProcessor, ObstaclePostProcessor>(ns)
-  {
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_START_AUTONOMOUS);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SEMI_AUTONOMOUS);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_TELEOPERATED_LOCOMOTION);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING);
-  }
-
-  void SoftObstacleHandler::completeTransition()
+namespace pandora_vision_obstacle
+{
+  SoftObstacleHandler::SoftObstacleHandler() :
+    VisionHandler<ObstaclePreProcessor, SoftObstacleProcessor, ObstaclePostProcessor>()
   {
   }
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision

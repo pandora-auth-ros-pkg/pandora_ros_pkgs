@@ -5,8 +5,8 @@ nmixtures: 3
 diff_threshold: 45
 motion_high_thres: 7500
 motion_low_thres: 200
-visualization: true
-show_image: true
+visualization: false
+show_image: false
 show_background: false
 show_diff_image: false
-show_moving_objects_contours: true
+show_moving_objects_contours: false

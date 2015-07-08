@@ -40,12 +40,12 @@
 #include <ros/console.h>
 #include "pandora_vision_victim/victim_handler.h"
 
-using pandora_vision::VictimHandler;
+using pandora_vision::pandora_vision_victim::VictimHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "victim_node");
-  VictimHandler victimHandler("pandora_vision_victim");
+  VictimHandler victimHandler;
   ros::spin();
   return 0;
 }

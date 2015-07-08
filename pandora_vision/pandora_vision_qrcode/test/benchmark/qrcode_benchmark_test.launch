@@ -1,10 +1,13 @@
 <launch>
- <arg name="xtion" default= "false"/>
- <arg name="usb_cam" default= "false"/>
- <arg name="frame_id" default="/kinect_optical_frame"/>
+  <arg name="xtion" default= "false"/>
+  <arg name="usb_cam" default= "false"/>
+  <arg name="frame_id" default="/kinect_optical_frame"/>
 
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  <include file="$(find pandora_vision_qrcode)/launch/qrcode_node.launch" />
+  <include file="$(find pandora_vision_qrcode)/launch/pandora_vision_qrcode.launch"
+    ns="/pandora_vision/pandora_vision_qrcode" >
+    <arg name="standalone_nodelet" value="true" />
+  </include>
 
   <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
@@ -29,7 +32,7 @@
   <param name="publisherMessagePackage" value="sensor_msgs" />
   <param name="publisherMessageType" value="Image"/>
 
-  <param name="subscriberTopic" value="/pandora_vision/qrcode_node/processor_log" />
+  <param name="subscriberTopic" value="/pandora_vision/pandora_vision_qrcode/pandora_qrcode/processor_log" />
   <param name="subscriberMessagePackage" value="sensor_processor" />
   <param name="subscriberMessageType" value="ProcessorLogInfo"/>
 

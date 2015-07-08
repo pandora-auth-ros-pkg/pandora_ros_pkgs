@@ -44,17 +44,13 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
 
-  QrCodePostProcessor::QrCodePostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionPostProcessor<pandora_vision_msgs::QRAlertVector>(ns, handler)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
-        this->accessProcessorNh()->getNamespace());
-  }
-
-  QrCodePostProcessor::~QrCodePostProcessor()
-  {
-  }
+  QrCodePostProcessor::
+  QrCodePostProcessor() :
+    VisionPostProcessor<pandora_vision_msgs::QRAlertVector>()
+  {}
 
   bool QrCodePostProcessor::postProcess(const POIsStampedConstPtr& input, const QRAlertVectorPtr& output)
   {
@@ -78,4 +74,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision

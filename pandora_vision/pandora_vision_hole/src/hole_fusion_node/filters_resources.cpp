@@ -45,6 +45,8 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace hole_fusion
+{
   /**
     @brief Each Depth and RGB filter requires the construction of a set
     of vectors which uses to determine the validity of each hole.
@@ -889,5 +891,6 @@ namespace pandora_vision_hole
     #endif
   }
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

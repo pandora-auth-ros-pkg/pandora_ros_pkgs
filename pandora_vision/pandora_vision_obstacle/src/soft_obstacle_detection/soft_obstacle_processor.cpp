@@ -37,29 +37,33 @@
  *********************************************************************/
 
 #include <string>
+
 #include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_processor.h"
 
 namespace pandora_vision
 {
-  SoftObstacleProcessor::SoftObstacleProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) : sensor_processor::Processor<ImagesStamped,
-    POIsStamped>(ns, handler)
+namespace pandora_vision_obstacle
+{
+  void
+  SoftObstacleProcessor::initialize(const std::string& ns, sensor_processor::Handler* handler)
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+    sensor_processor::Processor<ImagesStamped, POIsStamped>::initialize(ns, handler);
 
-    detector_.reset(new SoftObstacleDetector(this->getName(),
-          *this->accessPublicNh()));
+    ros::NodeHandle processor_nh = this->getProcessorNodeHandle();
 
-    server.setCallback(boost::bind(&SoftObstacleProcessor::parametersCallback,
+    detector_.reset( new SoftObstacleDetector(this->getName(), processor_nh) );
+
+    server_.reset( new dynamic_reconfigure::
+        Server< ::pandora_vision_obstacle::soft_obstacle_cfgConfig >(processor_nh) );
+    server_->setCallback(boost::bind(&SoftObstacleProcessor::parametersCallback,
         this, _1, _2));
   }
 
-  SoftObstacleProcessor::SoftObstacleProcessor() : sensor_processor::Processor<ImagesStamped,
-    POIsStamped>() {}
+  SoftObstacleProcessor::SoftObstacleProcessor() :
+    sensor_processor::Processor<ImagesStamped, POIsStamped>() {}
 
   void SoftObstacleProcessor::parametersCallback(
-      const pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
+      const ::pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
       const uint32_t& level)
   {
     detector_->setShowOriginalImage(config.showOriginalImage);
@@ -71,7 +75,7 @@ namespace pandora_vision
   }
 
   bool SoftObstacleProcessor::process(const ImagesStampedConstPtr& input,
-    const POIsStampedPtr& output)
+      const POIsStampedPtr& output)
   {
     output->header = input->getHeader();
     output->frameWidth = input->getRgbImage().cols;
@@ -86,4 +90,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision

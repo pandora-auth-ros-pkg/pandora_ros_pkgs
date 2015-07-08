@@ -35,11 +35,15 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/bounding_box_detection.h"
+#include "rgb_node/utils/bounding_box_detection.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class BoundingBoxDetectionTest
@@ -260,5 +264,6 @@ namespace pandora_vision
 
     ASSERT_EQ ( 0, outRectangles.size() );
   }
-
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision

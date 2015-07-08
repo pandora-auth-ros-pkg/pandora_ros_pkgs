@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
      @class MeanStdDevExtractorTest
      @brief Tests the integrity of methods of class MeanStdDevExtractor
@@ -100,4 +102,6 @@ namespace pandora_vision
     EXPECT_EQ(127.5, out[0]);
     EXPECT_EQ(127.5, out[1]);
   }
+
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

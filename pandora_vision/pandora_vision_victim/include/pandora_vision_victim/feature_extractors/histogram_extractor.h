@@ -52,6 +52,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class HistogramExtractor
    * @brief : A feature extractor class that describes an image by its color
@@ -171,5 +173,6 @@ namespace pandora_vision
     /// The color space of the histogram.
     int colorSpace_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_HISTOGRAM_EXTRACTOR_H

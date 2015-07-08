@@ -1,0 +1,19 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_obstacle_soft_obstacle_handler">
+    <class name="pandora_vision/pandora_vision_soft_obstacle"
+        type="pandora_vision::pandora_vision_obstacle::SoftObstacleHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects soft obstacles
+      </description>
+    </class>
+  </library>
+  <library path="lib/libpandora_vision_obstacle_barrel_handler">
+    <class name="pandora_vision/pandora_vision_barrel"
+        type="pandora_vision::pandora_vision_obstacle::BarrelHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects barrels
+      </description>
+    </class>
+  </library>
+
+</class_libraries>

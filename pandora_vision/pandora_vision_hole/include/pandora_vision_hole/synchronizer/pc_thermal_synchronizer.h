@@ -35,8 +35,8 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias, Angelos Triantafyllidis
  *********************************************************************/
 
-#ifndef PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_PC_THERMAL_SYNCHRONIZER_H
-#define PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_PC_THERMAL_SYNCHRONIZER_H
+#ifndef PANDORA_VISION_HOLE_SYNCHRONIZER_PC_THERMAL_SYNCHRONIZER_H
+#define PANDORA_VISION_HOLE_SYNCHRONIZER_PC_THERMAL_SYNCHRONIZER_H
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -48,6 +48,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/conversions.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pluginlib/class_list_macros.h>
 #include <std_msgs/Empty.h>
@@ -56,9 +57,9 @@
 #include "pandora_vision_msgs/EnhancedImage.h"
 #include "pandora_vision_msgs/IndexedThermal.h"
 
-#include "utils/message_conversions.h"
-#include "utils/defines.h"
-#include "utils/parameters.h"
+#include "hole_fusion_node/utils/message_conversions.h"
+#include "hole_fusion_node/utils/noise_elimination.h"
+#include "hole_fusion_node/utils/parameters.h"
 
 /**
   @namespace pandora_vision
@@ -77,6 +78,14 @@ namespace pandora_vision_hole
   typedef boost::shared_ptr<ApprTimePcThermalPolicy> ApprTimePcThermalPolicyPtr;
   typedef message_filters::Synchronizer<ApprTimePcThermalPolicy> ApprTimePcThermalSynchronizer;
   typedef boost::shared_ptr<ApprTimePcThermalSynchronizer> ApprTimePcThermalSynchronizerPtr;
+
+  typedef pcl::PointCloud<pcl::PointXYZ> PointCloudXYZ;
+  typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PointCloudXYZPtr;
+  typedef pcl::PointCloud<pcl::PointXYZ>::ConstPtr PointCloudXYZConstPtr;
+
+  typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
+  typedef pcl::PointCloud<pcl::PointXYZRGB>::Ptr PointCloudPtr;
+  typedef pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr PointCloudConstPtr;
 
   /**
     @class RgbDepthThermalSynchronizer
@@ -109,9 +118,11 @@ namespace pandora_vision_hole
       @return void
       **/
     void
-    inputPointCloudThermalCallback(
+    syncPointCloudThermalCallback(
         const sensor_msgs::PointCloud2ConstPtr& pcMsg,
         const distrib_msgs::FlirLeptonMsgConstPtr& thermalMsg);
+    void
+    inputPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& pcMsg);
 
     /**
       @brief The callback executed when the Hole Fusion node requests
@@ -173,6 +184,13 @@ namespace pandora_vision_hole
     unlockThermalCallback(const std_msgs::EmptyConstPtr& lockMsg);
 
    private:
+    void
+    initCallback(
+        PointCloudPtr& pcPtr,
+        sensor_msgs::ImagePtr& rgbImageMessagePtr,
+        sensor_msgs::ImagePtr& depthImageMessagePtr,
+        const sensor_msgs::PointCloud2ConstPtr& pcMsg);
+
     /**
       @brief Variables regarding the point cloud are needed to be set in
       simulation mode: the point cloud's heigth, width and point step.
@@ -200,17 +218,18 @@ namespace pandora_vision_hole
     //!< The ROS node handle in private namespace
     ros::NodeHandle private_nh_;
 
+    ros::Subscriber inputPointCloudSubscriber_;
     //!< The message_filters subscriber to kinect that aquires the PointCloud2
     //!< message
-    PcSubscriberPtr inputPointCloudSubscriberPtr_;
+    PcSubscriberPtr syncPointCloudSubscriberPtr_;
     //!< The name of the topic from where the PointCloud2 message is acquired
     std::string inputPointCloudTopic_;
 
     //!< The message_filters subscriber to flir-lepton camera that aquires
     //!< the FlirLeptonMsg message
-    ThermalSubscriberPtr inputThermalCameraSubscriberPtr_;
+    ThermalSubscriberPtr syncThermalCameraSubscriberPtr_;
     //!< The name of the topic from where the FlirLeptonMsg message is acquired
-    std::string inputThermalCameraTopic_;
+    std::string syncThermalCameraTopic_;
 
     ApprTimePcThermalSynchronizerPtr synchronizerPtr_;
 
@@ -265,6 +284,12 @@ namespace pandora_vision_hole
     ros::Publisher thermalOutputReceiverPublisher_;
     std::string thermalOutputReceiverTopic_;
 
+    ros::Publisher enhancedImagePublisher_;
+    std::string enhancedImageTopic_;
+
+    ros::Publisher enhancedImageCropperPublisher_;
+    std::string enhancedImageCropperTopic_;
+
     // Booleans that tell the synchronizer where to publish.
     bool holeFusionLocked_;
     bool thermalLocked_;
@@ -272,7 +297,9 @@ namespace pandora_vision_hole
     // The mode in which the package is running
     // If true Thermal process is enabled, else only Rgb-D.
     bool thermalMode_;
-
+    bool rgbdMode_;
+    bool rgbdtMode_;
+    // If we run simulations using pandora_vision_hole
     bool simulating_;
 
 #ifdef DEBUG_TIME
@@ -290,4 +317,4 @@ namespace pandora_vision_hole
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_HOLE_SYNCHRONIZER_NODE_PC_THERMAL_SYNCHRONIZER_H
+#endif  // PANDORA_VISION_HOLE_SYNCHRONIZER_PC_THERMAL_SYNCHRONIZER_H

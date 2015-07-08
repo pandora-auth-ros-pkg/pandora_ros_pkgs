@@ -49,13 +49,14 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor. Initialize member variables.
    */
-  AbstractClassifier::AbstractClassifier(const std::string& ns,
+  AbstractClassifier::AbstractClassifier(const ros::NodeHandle& nh,
       const std::string& datasetPath, const std::string& classifierType,
-      const std::string& imageType) :
-      nh_(ns)
+      const std::string& imageType)
   {
     datasetPath_ = datasetPath;
     imageType_ = imageType;
@@ -78,7 +79,8 @@ namespace pandora_vision
     resultsFile_ = filePrefix + classifierType_ + "_results.xml";
     classifierFile_ = filePrefix + classifierType_ +  "_classifier.xml";
 
-    const std::string trainingDatasetPath = datasetPath_ + "/Training_Images";
+    const std::string trainingDatasetPath = datasetPath_;  // + "/Training_Images";
+    std::cout << trainingDatasetPath << std::endl;
     boost::filesystem::path trainingDirectory(trainingDatasetPath);
     trainingDirectory_ = trainingDirectory;
 
@@ -86,7 +88,8 @@ namespace pandora_vision
     std::cout << trainingAnnotationsFile_ << std::endl;
     int numTrainingFiles = file_utilities::findNumberOfAnnotations(trainingAnnotationsFile_);
 
-    const std::string testDatasetPath = datasetPath_ + "/Test_Images";
+    const std::string testDatasetPath = datasetPath_;  // + "/Test_Images";
+    std::cout << testDatasetPath << std::endl;
     boost::filesystem::path testDirectory(testDatasetPath);
     testDirectory_ = testDirectory;
 
@@ -120,9 +123,22 @@ namespace pandora_vision
     fs.release();
 
     if (imageType_.compare("rgb") == 0)
-      featureExtraction_.reset(new RgbFeatureExtraction(classifierType_));
+    {
+      featureExtraction_[imageType_].reset(new RgbFeatureExtraction(classifierType_));
+
+      numFeatures_ = featureExtraction_[imageType_]->getFeatureNumber();
+    }
     else if (imageType_.compare("depth") == 0)
-      featureExtraction_.reset(new DepthFeatureExtraction(classifierType_));
+    {
+      featureExtraction_[imageType_].reset(new DepthFeatureExtraction(classifierType_));
+
+      numFeatures_ = featureExtraction_[imageType_]->getFeatureNumber();
+    }
+    else if (imageType_.compare("rgbd") == 0)
+    {
+      featureExtraction_["rgb"].reset(new RgbFeatureExtraction(classifierType_));
+      featureExtraction_["depth"].reset(new DepthFeatureExtraction(classifierType_));
+    }
     else
     {
       ROS_ERROR("Invalid image type provided!");
@@ -130,7 +146,6 @@ namespace pandora_vision
       ROS_BREAK();
     }
 
-    numFeatures_ = featureExtraction_->getFeatureNumber();
 
     ROS_INFO("Created Abstract Classifier Instance!");
   }
@@ -283,7 +298,7 @@ namespace pandora_vision
       const boost::filesystem::path& directory,
       const std::string& annotationsFile)
   {
-    return featureExtraction_->constructBagOfWordsVocabulary(directory,
+    return featureExtraction_[imageType_]->constructBagOfWordsVocabulary(directory,
         annotationsFile);
   }
 
@@ -304,7 +319,7 @@ namespace pandora_vision
       const std::string& annotationsFile,
       cv::Mat* featuresMat, cv::Mat* labelsMat)
   {
-    featureExtraction_->constructFeaturesMatrix(directory,
+    featureExtraction_[imageType_]->constructFeaturesMatrix(directory,
         annotationsFile, featuresMat, labelsMat);
   }
 
@@ -410,7 +425,7 @@ namespace pandora_vision
           const std::string bagOfWordsFile = imageType_ + "_" + classifierType_ + "_bag_of_words.xml";
           const std::string bagOfWordsFilePath = filesDirectory_ + bagOfWordsFile;
           file_utilities::saveToFile(bagOfWordsFilePath, "bag_of_words",
-              featureExtraction_->getBagOfWordsVocabulary());
+              featureExtraction_[imageType_]->getBagOfWordsVocabulary());
         }
       }
       else
@@ -462,5 +477,6 @@ namespace pandora_vision
     evaluate(results, testLabelsMat);
   }
 
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

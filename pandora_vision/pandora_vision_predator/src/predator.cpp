@@ -27,57 +27,57 @@ namespace pandora_vision
   @brief Default Constructor
   @return void
   **/
-  Predator::Predator(const std::string& ns): 
-    _nh(ns), predatorNowON(false)
+  Predator::Predator(const std::string& ns):
+    state_manager::StateClient(true), _nh(ns), predatorNowON(false)
   {
     //!< Set initial value of parent frame id to null
     _parent_frame_id = "";
     _frame_id = "";
-      
+
     modelLoaded = false;
-      
+
     getGeneralParams();
-    
+
     //!< The dynamic reconfigure parameter's callback
     server.setCallback(boost::bind(&Predator::parametersCallback, this, _1, _2));
-    
-      
+
+
     //!< Get the path to the pattern used for detection
     std::stringstream model_path_stream;
     model_path_stream << packagePath << "/model";
-    
+
     patternPath = model_path_stream.str();
     if (is_file_exist(patternPath))
       modelLoaded = true;
     else
       ROS_INFO("Model not found!Waiting... <3 ");
-      
+
     //!<Get Model Export Path
     exportPath = model_path_stream.str();
-    
+
     //!< Convert field of view from degrees to rads
     hfov = hfov * CV_PI / 180;
     vfov = vfov * CV_PI / 180;
-    
+
     ROS_INFO("[predator_node] : Created Predator instance");
-    
+
     semaphore_locked = false;
-    
+
     framecounter = 0;
-    
+
     modelExportFile = exportPath.c_str();
-    
+
     tld = new tld::TLD();
-    
+
     tld->trackerEnabled = true;
     tld->alternating = false;
     tld->learningEnabled = learningEnabled;
-      
+
     tld::DetectorCascade* detectorCascade = tld->detectorCascade;
-    
+
     detectorCascade->varianceFilter->enabled = detectorCascadeParams.variance_filter;
     detectorCascade->ensembleClassifier->enabled = detectorCascadeParams.ensemble_classifier;
-    detectorCascade->nnClassifier->enabled = detectorCascadeParams.nn_classifier;  
+    detectorCascade->nnClassifier->enabled = detectorCascadeParams.nn_classifier;
     detectorCascade->useShift = detectorCascadeParams.use_shift;
     detectorCascade->shift = detectorCascadeParams.shift;
     detectorCascade->minScale = detectorCascadeParams.min_scale;
@@ -87,7 +87,7 @@ namespace pandora_vision
     detectorCascade->numFeatures = detectorCascadeParams.num_features;
     detectorCascade->nnClassifier->thetaTP = detectorCascadeParams.theta_TP;
     detectorCascade->nnClassifier->thetaFP = detectorCascadeParams.theta_FP;
-    
+
     if (annotations)
     {
       _inputImageSubscriber = _nh.subscribe(annotator_topic_name, 1, &Predator::annotationCallback, this);
@@ -131,7 +131,7 @@ namespace pandora_vision
     cv::Mat *img = (cv::Mat *)param;
 
     /* user press left button */
-    if (event == CV_EVENT_LBUTTONDOWN && !drag) 
+    if (event == CV_EVENT_LBUTTONDOWN && !drag)
     {
       point = cv::Point(x, y);
       drag = 1;
@@ -145,7 +145,7 @@ namespace pandora_vision
       imgCopy = img->clone();
 
       cv::rectangle(imgCopy, point, cv::Point(x, y), CV_RGB(255, 0, 0), 3, 8, 0);
-      
+
       if (Predator::show_debug_image)
       {
         cv::imshow("tld", imgCopy);
@@ -153,7 +153,7 @@ namespace pandora_vision
       }
     }
     /* user release left button */
-    if (event == CV_EVENT_LBUTTONUP && drag) 
+    if (event == CV_EVENT_LBUTTONUP && drag)
     {
       bbox = cv::Rect(point.x, point.y, x - point.x, y - point.y);
       drag = 0;
@@ -193,10 +193,10 @@ namespace pandora_vision
     }
     else
       _parent_frame_id = _frame_id;
-      
+
     return false;
   }
-  
+
   /**
   @brief Callback for the RGB Image
   @param msg [const sensor_msgs::ImageConstPtr& msg] The RGB Image
@@ -212,10 +212,10 @@ namespace pandora_vision
     double start = static_cast<double>(cv::getTickCount());
     framecounter++;
     double fps;
-    
+
     char LearningString[10]="";
     char mystring[128];
-    
+
     if (!semaphore_locked)
     {
       cv_bridge::CvImagePtr in_msg;
@@ -223,31 +223,31 @@ namespace pandora_vision
       PredatorFrame = in_msg -> image.clone();
       PredatorFrameTimeStamp = msg->header.stamp;
       _frame_id = msg->header.frame_id;
-      
+
       if (_frame_id.c_str()[0] == '/')
         _frame_id = _frame_id.substr(1);
-      
+
       if (PredatorFrame.empty())
       {
         ROS_ERROR("[predator_node] : No more Frames");
         return;
       }
-      
+
       std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
-        
-      if (_frame_ids_map.find(_frame_id) == _frame_ids_map.end()) 
+
+      if (_frame_ids_map.find(_frame_id) == _frame_ids_map.end())
       {
-        bool _indicator = getParentFrameId();      
+        bool _indicator = getParentFrameId();
         _frame_ids_map.insert( it , std::pair<std::string, std::string>(
         _frame_id, _parent_frame_id));
-      } 
-      
+      }
+
       cvtColor(PredatorFrame, grey, CV_BGR2GRAY);
-      
+
       tld->detectorCascade->imgWidth = grey.cols;
       tld->detectorCascade->imgHeight = grey.rows;
-      tld->detectorCascade->imgWidthStep = grey.step; 
-      
+      tld->detectorCascade->imgWidthStep = grey.step;
+
       tld->processImage(PredatorFrame);
 
       double end = (cvGetTickCount() - start) / cvGetTickFrequency();
@@ -255,12 +255,12 @@ namespace pandora_vision
       end = end / 1000000;
 
       fps = 1 / end;
-      
+
       if(tld->learning)
       {
         snprintf(LearningString, sizeof(LearningString), "Learning");
       }
-      
+
       if(tld->currBB != NULL)
       {
         cv::Scalar rectangleColor = tld->currConf > static_cast<double>(0.7) ? CV_RGB(0, 0, 255) : CV_RGB(255, 255, 0);
@@ -273,18 +273,18 @@ namespace pandora_vision
         sendMessage(temp, 0, msg);
       }
     }
-    
+
     snprintf(mystring, sizeof(mystring), "#%d, Posterior %.2f; fps: %.2f, #numwindows:%d, %s",
     framecounter, tld->currConf, fps, tld->detectorCascade->numWindows, LearningString);
     cv::rectangle(PredatorFrame, cv::Point(0, 0), cv::Point(PredatorFrame.cols, 50), CV_RGB(0, 0, 0), CV_FILLED, 8, 0);
     cv::putText(PredatorFrame, mystring, cv::Point(25, 25), CV_FONT_HERSHEY_SIMPLEX, 0.5, CV_RGB(255, 255, 255));
-    
+
     if (Predator::show_debug_image)
     {
       cv::imshow("tld", PredatorFrame);
-    
+
       int keyCode = cv::waitKey(5)&255;
-      
+
       switch (keyCode)
       {
         // draw bounding box
@@ -297,9 +297,9 @@ namespace pandora_vision
         cv::setMouseCallback("tld", mouseHandler, &PredatorFrame);
         break;
         // end drawing bounding box (Enter)
-        
+
         case '\n':
-        
+
         if (semaphore_locked == false) break;
         ROS_INFO("Initiating Hunt.");
         semaphore_locked = false;
@@ -310,37 +310,37 @@ namespace pandora_vision
         }
         tld->selectObject(grey, &bbox);
         break;
-        
+
         case 'l':
-        
+
         tld->learningEnabled = !tld->learningEnabled;
         ROS_INFO("LearningEnabled: %d\n", tld->learningEnabled);
         break;
-        
+
         case 'a':
-        
+
         tld->alternating = !tld->alternating;
         ROS_INFO("alternating: %d\n", tld->alternating);
         break;
-        
+
         case 'e':
-        
+
         ROS_INFO("Saving model...");
         tld->writeToFile(modelExportFile);
         break;
-        
+
         case 'c':
-        
+
         ROS_INFO("Clearing Model");
         tld->release();
         break;
-        
+
         case 'q':
-        
+
         ROS_INFO("Shutdown Request by User. Quitting...");
-        ros::shutdown();  
-        break; 
-        
+        ros::shutdown();
+        break;
+
         case 'i':
         const char* modelPath = patternPath.c_str();
         tld->release();
@@ -349,7 +349,7 @@ namespace pandora_vision
         break;
       }
     }
-    
+
     if (modelLoaded)
     {
       const char* modelPath = patternPath.c_str();
@@ -367,24 +367,24 @@ namespace pandora_vision
   @return void
   **/
   void Predator::annotationCallback(const pandora_vision_msgs::Predator& msg)
-  {  
+  {
     if (!predatorNowON)
     {
       return;
     }
 
-    if (msg.header.frame_id == "close") 
+    if (msg.header.frame_id == "close")
     {
       ROS_INFO_STREAM("Shutting down Predator node");
-      ros::shutdown(); 
+      ros::shutdown();
     }
 
     framecounter++;
     double fps;
-    
+
     char LearningString[10] = "";
     char mystring[128];
-    
+
     if (!semaphore_locked)
     {
       cv_bridge::CvImagePtr in_msg;
@@ -392,10 +392,10 @@ namespace pandora_vision
       PredatorFrame = in_msg -> image.clone();
       PredatorFrameTimeStamp = msg.header.stamp;
       _frame_id = msg.header.frame_id;
-      
+
       if (_frame_id.c_str()[0] == '/')
         _frame_id = _frame_id.substr(1);
-          
+
       if (PredatorFrame.empty())
       {
         ROS_ERROR("[predator_node] : No more Frames");
@@ -403,47 +403,47 @@ namespace pandora_vision
       }
 
       std::map<std::string, std::string>::iterator it = _frame_ids_map.begin();
-        
-      if (_frame_ids_map.find(_frame_id) == _frame_ids_map.end() ) 
+
+      if (_frame_ids_map.find(_frame_id) == _frame_ids_map.end() )
       {
-        bool _indicator = getParentFrameId();      
+        bool _indicator = getParentFrameId();
         _frame_ids_map.insert( it , std::pair<std::string, std::string>(
         _frame_id, _parent_frame_id));
-      } 
-      
+      }
+
       cvtColor(PredatorFrame, grey, CV_BGR2GRAY);
-      
+
       tld->detectorCascade->imgWidth = grey.cols;
       tld->detectorCascade->imgHeight = grey.rows;
-      tld->detectorCascade->imgWidthStep = grey.step; 
+      tld->detectorCascade->imgWidthStep = grey.step;
 
-      if (msg.regionOfInterest.center.x != -1 && msg.regionOfInterest.center.y != -1 
-        && msg.regionOfInterest.width != -1 && msg.regionOfInterest.height !=-1) 
+      if (msg.regionOfInterest.center.x != -1 && msg.regionOfInterest.center.y != -1
+        && msg.regionOfInterest.width != -1 && msg.regionOfInterest.height !=-1)
       {
-        ROS_INFO_STREAM("Starting at: " << msg.regionOfInterest.center.x << " " 
-          << msg.regionOfInterest.center.y << " " << msg.regionOfInterest.width << " " 
+        ROS_INFO_STREAM("Starting at: " << msg.regionOfInterest.center.x << " "
+          << msg.regionOfInterest.center.y << " " << msg.regionOfInterest.width << " "
           << msg.regionOfInterest.height);
         bbox = cv::Rect(msg.regionOfInterest.center.x, msg.regionOfInterest.center.y,
           msg.regionOfInterest.width, msg.regionOfInterest.height);
-        tld->selectObject(grey, &bbox); 
+        tld->selectObject(grey, &bbox);
         tld->learningEnabled = true;
         sendAnnotation(*tld->currBB, tld->currConf);
         cv::imshow("tld", PredatorFrame);
         cv::waitKey(20);
       }
       else
-      { 
+      {
         double start = static_cast<double>(cv::getTickCount());
         tld->processImage(PredatorFrame);
         double end = (cvGetTickCount() - start) / cvGetTickFrequency();
         end = end / 1000000;
         fps = 1 / end;
-      
+
         if (tld->learning)
         {
           snprintf(LearningString, sizeof(LearningString), "Learning");
         }
-      
+
         if (tld->currBB != NULL)
         {
           cv::Scalar rectangleColor = tld->currConf > static_cast<double>(0.7) ? CV_RGB(0, 0, 255) : CV_RGB(255, 255, 0);
@@ -451,11 +451,11 @@ namespace pandora_vision
           sendAnnotation(*tld->currBB, tld->currConf);
         }
         else
-        { 
+        {
           cv::Rect temp = cv::Rect(0, 0, 0, 0);
           sendAnnotation(temp, 0);
         }
-    
+
         snprintf(mystring, sizeof(mystring), "#%d, Posterior %.2f; fps: %.2f, #numwindows:%d, %s",
         framecounter, tld->currConf, fps, tld->detectorCascade->numWindows, LearningString);
         cv::rectangle(PredatorFrame, cv::Point(0, 0), cv::Point(PredatorFrame.cols, 50), CV_RGB(0, 0, 0), CV_FILLED, 8, 0);
@@ -483,7 +483,7 @@ namespace pandora_vision
   void Predator::getGeneralParams()
   {
     packagePath = ros::package::getPath("pandora_vision_predator");
-     
+
     //!< Get value of annotations state
     if (_nh.getParam("annotations", annotations))
       ROS_INFO("annotations state is loaded");
@@ -494,19 +494,19 @@ namespace pandora_vision
     }
 
     //! Publishers
-      
+
     //! Declare publisher and advertise topic
     //! where algorithm results are posted if it works alone or with annotator
     if (_nh.getParam("published_topic_names/predator_alert", param))
     {
       if (annotations)
       {
-        _predatorPublisher = 
+        _predatorPublisher =
           _nh.advertise<pandora_vision_msgs::Predator>(param, 1000);
       }
       else
       {
-        _predatorPublisher = 
+        _predatorPublisher =
           _nh.advertise<pandora_common_msgs::GeneralAlert>(param, 1000);
       }
     }
@@ -515,7 +515,7 @@ namespace pandora_vision
       ROS_FATAL("Predator alert topic name not found");
       ROS_BREAK();
     }
-    
+
     //! Declare publisher and advertise topic
     //! where algorithm results are posted if it works in compination with landoltc3d
     if (_nh.getParam("published_topic_names/predator_employment_output", param))
@@ -528,7 +528,7 @@ namespace pandora_vision
       ROS_FATAL("Predator to landoltc alert topic name not found");
       ROS_BREAK();
     }
-    
+
     //! Declare subscriber
     //! if it works with annotator
     if (_nh.getParam("subscribed_topic_names/annotator_topic_name", annotator_topic_name))
@@ -538,7 +538,7 @@ namespace pandora_vision
       ROS_FATAL("[predator_node] : annotator topic name not found");
       ROS_BREAK();
     }
-    
+
     //!< Get value for enabling or disabling TLD learning mode
     if( _nh.getParam("learning_enabled", learningEnabled))
       ROS_INFO("Learning Enabled Value From Launcher");
@@ -547,7 +547,7 @@ namespace pandora_vision
       learningEnabled = false;
       ROS_INFO("Learning Enabled Value Not Loaded From Launcher");
     }
-    
+
     //!< Get value of current operation state
     if( _nh.getParam("operation_state", operation_state))
       ROS_INFO("Operation state is loaded");
@@ -556,7 +556,7 @@ namespace pandora_vision
       operation_state = true;
       ROS_INFO("Unable to load operation state from launcher");
     }
-    
+
     //!< Get the camera to be used by predator node;
     if (_nh.getParam("camera_name", cameraName))
       ROS_DEBUG_STREAM("camera_name : " << cameraName);
@@ -574,7 +574,7 @@ namespace pandora_vision
       ROS_FATAL("[predtator_node] : Parameter frameHeight not found. ");
       ROS_BREAK();
     }
-      
+
     //! Get the Width parameter if available;
     if (_nh.getParam("image_width", frameWidth))
       ROS_DEBUG_STREAM("width : " << frameWidth);
@@ -583,7 +583,7 @@ namespace pandora_vision
       ROS_FATAL("[predator_node] : Parameter frameWidth not found");
       ROS_BREAK();
     }
-      
+
     //!< Get the HFOV parameter if available;
     if ( _nh.getParam("hfov", hfov))
       ROS_DEBUG_STREAM("HFOV : " << hfov);
@@ -601,7 +601,7 @@ namespace pandora_vision
       ROS_FATAL("[predator_node] : Vertical field of view not found");
       ROS_BREAK();
     }
-    
+
     //!< Get the listener's topic;
     if (_nh.getParam("/" + cameraName + "/topic_name", imageTopic))
       ROS_DEBUG_STREAM("imageTopic : " << imageTopic);
@@ -610,13 +610,13 @@ namespace pandora_vision
       ROS_FATAL("[predator_node] : Imagetopic name not found");
       ROS_BREAK();
     }
-    
+
     //----------------detectorCascadeParams---------------------//
-    
+
     bool param_bool_temp;
     double param_double_temp;
     int param_int_temp;
-    
+
     if (_nh.getParam("variance_filter", param_bool_temp))
     {
       ROS_DEBUG_STREAM("variance_filter : " << param_bool_temp);
@@ -627,7 +627,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : variance_filter param not found");
       detectorCascadeParams.variance_filter = true;
     }
-    
+
     if (_nh.getParam("ensemble_classifier", param_bool_temp))
     {
       ROS_DEBUG_STREAM("ensemble_classifier : " << param_bool_temp);
@@ -638,7 +638,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : ensemble_classifier param not found");
       detectorCascadeParams.ensemble_classifier = true;
     }
-    
+
     if (_nh.getParam("nn_classifier", param_bool_temp))
     {
       ROS_DEBUG_STREAM("nn_classifier : " << param_bool_temp);
@@ -649,7 +649,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : nn_classifier param not found");
       detectorCascadeParams.nn_classifier = true;
     }
-    
+
     if (_nh.getParam("use_shift", param_bool_temp))
     {
       ROS_DEBUG_STREAM("use_shift : " << param_bool_temp);
@@ -660,7 +660,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : use_shift param not found");
       detectorCascadeParams.use_shift = true;
     }
-    
+
     if (_nh.getParam("shift", param_double_temp))
     {
       ROS_DEBUG_STREAM("shift : " << param_double_temp);
@@ -671,7 +671,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : shift param not found");
       detectorCascadeParams.shift = 0.1;
     }
-    
+
     if (_nh.getParam("min_scale", param_int_temp))
     {
       ROS_DEBUG_STREAM("min_scale : " << param_int_temp);
@@ -682,7 +682,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : min_scale param not found");
       detectorCascadeParams.min_scale = -10;
     }
-    
+
     if (_nh.getParam("max_scale", param_int_temp))
     {
       ROS_DEBUG_STREAM("max_scale : " << param_int_temp);
@@ -693,7 +693,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : max_scale param not found");
       detectorCascadeParams.max_scale = 10;
     }
-    
+
     if (_nh.getParam("min_size", param_int_temp))
     {
       ROS_DEBUG_STREAM("min_size : " << param_int_temp);
@@ -704,7 +704,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : min_size param not found");
       detectorCascadeParams.min_size = 25;
     }
-    
+
     if (_nh.getParam("num_trees", param_int_temp))
     {
       ROS_DEBUG_STREAM("num_trees : " << param_int_temp);
@@ -715,7 +715,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : num_trees param not found");
       detectorCascadeParams.num_trees = 15;
     }
-    
+
     if (_nh.getParam("num_features", param_int_temp))
     {
       ROS_DEBUG_STREAM("num_features : " << param_int_temp);
@@ -726,7 +726,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : num_features param not found");
       detectorCascadeParams.num_features = 15;
     }
-    
+
     if (_nh.getParam("theta_TP", param_double_temp))
     {
       ROS_DEBUG_STREAM("theta_TP : " << param_double_temp);
@@ -737,7 +737,7 @@ namespace pandora_vision
       ROS_WARN("[predator_node] : theta_TP param not found");
       detectorCascadeParams.theta_TP = 0.65;
     }
-    
+
     if (_nh.getParam("theta_FP", param_double_temp))
     {
       ROS_DEBUG_STREAM("theta_FP : " << param_double_temp);
@@ -756,7 +756,7 @@ namespace pandora_vision
   @param posterior [const float&] Confidence
   @return void
   **/
-  void Predator::sendAnnotation(const cv::Rect& rec, const float& posterior) 
+  void Predator::sendAnnotation(const cv::Rect& rec, const float& posterior)
   {
     if (operation_state == true)
     {
@@ -769,8 +769,8 @@ namespace pandora_vision
       predatorMsg.regionOfInterest.height = rec.height;
       predatorMsg.posterior = posterior;
 
-     ROS_INFO_STREAM("send predator alert " << predatorMsg.header.frame_id << " " 
-                    << predatorMsg.header.stamp << " "  << predatorMsg.regionOfInterest.center.x << " " 
+     ROS_INFO_STREAM("send predator alert " << predatorMsg.header.frame_id << " "
+                    << predatorMsg.header.stamp << " "  << predatorMsg.regionOfInterest.center.x << " "
                     << predatorMsg.regionOfInterest.center.y << " "<< predatorMsg.regionOfInterest.width << " "
                     << predatorMsg.regionOfInterest.height <<  " " << predatorMsg.posterior);
       _predatorPublisher.publish(predatorMsg);
@@ -783,7 +783,7 @@ namespace pandora_vision
   @param posterior [const float&] Confidence
   @return void
   **/
-  void Predator::sendMessage(const cv::Rect& rec, const float& posterior, 
+  void Predator::sendMessage(const cv::Rect& rec, const float& posterior,
       const sensor_msgs::ImageConstPtr& frame)
   {
     if ( operation_state == true)
@@ -797,8 +797,8 @@ namespace pandora_vision
       predatorLandoltcMsg.regionOfInterest.height = rec.height;
       predatorLandoltcMsg.posterior = posterior;
       predatorLandoltcMsg.image = *frame;
-      
-      _landoltc3dPredatorPublisher.publish(predatorLandoltcMsg);  
+
+      _landoltc3dPredatorPublisher.publish(predatorLandoltcMsg);
     }
     else
     {
@@ -856,7 +856,7 @@ namespace pandora_vision
     }
 
     prevState = curState;
-    
+
     //!< this needs to be called everytime a node finishes transition
     transitionComplete(curState);
   }

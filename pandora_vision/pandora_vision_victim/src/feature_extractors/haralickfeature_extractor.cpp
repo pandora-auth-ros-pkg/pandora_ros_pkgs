@@ -44,6 +44,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Function for updating the values of the GLCM matrix.
    * @param y1 [int] The y coordinate of the first pixel
@@ -567,6 +569,7 @@ namespace pandora_vision
       ROS_INFO_STREAM("vector's size"<< haralickFeatures->size() );
     }
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 

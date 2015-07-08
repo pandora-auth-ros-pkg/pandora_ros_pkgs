@@ -36,11 +36,15 @@
  *********************************************************************/
 
 #include "hole_fusion_node/hole_uniqueness.h"
-#include "utils/visualization.h"
+#include "rgb_node/utils/visualization.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class HoleUniquenessTest
@@ -324,4 +328,6 @@ namespace pandora_vision
 
   }
 
-} // namespace pandora_vision
+}  // namespace hole_fusion
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

@@ -48,6 +48,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor. Initializes Neural Network classifier parameters and loads
    * classifier model.
@@ -96,6 +98,7 @@ namespace pandora_vision
     *probability = outputs.at<float>(0, 0);
     *classLabel = *probability > 0.0f ? 1.0f : -1.0f;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 

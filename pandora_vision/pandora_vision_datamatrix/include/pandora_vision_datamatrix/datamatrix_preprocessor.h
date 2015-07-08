@@ -45,12 +45,16 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_datamatrix
+{
   class DataMatrixPreProcessor : public VisionPreProcessor
   {
-    public:
-      DataMatrixPreProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~DataMatrixPreProcessor();
+   public:
+    DataMatrixPreProcessor();
+    virtual void
+    initialize(const std::string& ns, sensor_processor::Handler* handler);
   };
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_DATAMATRIX_DATAMATRIX_PREPROCESSOR_H

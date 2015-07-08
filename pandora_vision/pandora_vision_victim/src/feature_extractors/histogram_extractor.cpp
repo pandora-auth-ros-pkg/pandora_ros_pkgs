@@ -46,6 +46,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   HistogramExtractor::HistogramExtractor()
   {
     std::vector<int> channels;
@@ -300,5 +302,6 @@ namespace pandora_vision
 
     return;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

@@ -45,14 +45,15 @@
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
 #include <std_msgs/Empty.h>
+#include "state_manager/state_client_nodelet.h"
 
 #include "sensor_msgs/Image.h"
 #include "pandora_vision_msgs/EnhancedImage.h"
 #include "sensor_processor/ProcessorLogInfo.h"
 #include "pandora_vision_msgs/RegionOfInterest.h"
 
-#include "utils/noise_elimination.h"
-#include "utils/message_conversions.h"
+#include "thermal_node/utils/noise_elimination.h"
+#include "thermal_node/utils/message_conversions.h"
 
 /**
   @namespace pandora_vision
@@ -62,6 +63,8 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace thermal
+{
   /**
     @class ThermalCropper
     @brief Is responsible to sent the point of interest detected from thermal
@@ -70,7 +73,7 @@ namespace pandora_vision_hole
     to victim node, an empty message is sent to synchronizer node to restart
     the whole thermal process.
    **/
-  class ThermalCropper : public nodelet::Nodelet
+  class ThermalCropper : public state_manager::StateClientNodelet
   {
    public:
     /**
@@ -110,14 +113,12 @@ namespace pandora_vision_hole
       The message received by the synchronizer node is stored in private variable.
       A counter is set. When this counter reaches 2 it means both rgb Depth and
       thermal poi messages have been subscribed and are ready to be sent to victim.
-      @param msg [const pandora_vision_msgs::EnhancedImage&]
+      @param msg [const pandora_vision_msgs::EnhancedImageConstPtr&]
       The input synchronized rgb and depth images message
       @return void
       **/
     void
-    inputRgbImageCallback(const sensor_msgs::ImageConstPtr& msg);
-    void
-    inputDepthImageCallback(const sensor_msgs::ImageConstPtr& msg);
+    inputEnhancedImageCallback(const pandora_vision_msgs::EnhancedImageConstPtr& msg);
 
    private:
     void
@@ -140,17 +141,20 @@ namespace pandora_vision_hole
       **/
     void
     unlockThermalProcedure();
+    /**
+      @brief The node's state manager.
+      @param[in] newState [const int&] The robot's new state
+      @return void
+    **/
+    void startTransition(int newState);
 
     /**
-      @brief The enhanced messages that is sent to victim node must have the
-      interpolated depth image. So this fuction must extract the image from the
-      message, interpolate it and convert it again to sensor_msgs/Image type.
-      @param[in] depthImage [const sensor_msgs::Image&] The input depthImage
-      @return [sensor_msgs::Image]
-      The interpolated depth image.
-      **/
-    sensor_msgs::Image
-    interpolateDepthImage(const sensor_msgs::Image& depthImage);
+      @brief Completes the transition to a new state
+      @param void
+      @return void
+    **/
+    void completeTransition(void);
+
 
    private:
     //!< Node's distinct name
@@ -170,19 +174,11 @@ namespace pandora_vision_hole
 
     // Subscriber of synchronizer node from where we acquire the synchronized
     // rgb and depth image
-    ros::Subscriber rgbImageSubscriber_;
+    ros::Subscriber enhancedImageSubscriber_;
     // The name of the topic where rgb and depth images are acquired from
-    std::string rgbImageTopic_;
-    sensor_msgs::ImageConstPtr rgbImageConstPtr_;
-    bool isRgbAvailable_;
-
-    // Subscriber of synchronizer node from where we acquire the synchronized
-    // rgb and depth image
-    ros::Subscriber depthImageSubscriber_;
-    // The name of the topic where rgb and depth images are acquired from
-    std::string depthImageTopic_;
-    sensor_msgs::ImageConstPtr depthImageConstPtr_;
-    bool isDepthAvailable_;
+    std::string enhancedImageTopic_;
+    pandora_vision_msgs::EnhancedImageConstPtr enhancedImageConstPtr_;
+    bool isEnhancedImageAvailable_;
 
     // Ros publisher for enchanced message directly to victim node.
     ros::Publisher victimThermalPublisher_;
@@ -203,9 +199,12 @@ namespace pandora_vision_hole
     // The name of the topic where the process end will be advertised
     std::string processEndTopic_;
 
-    bool isDepth_;
+    // The on/off state of the Hole Detector package
+    bool isOn_;
+    bool publishingEnhancedHoles_;
   };
 
+}  // namespace thermal
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

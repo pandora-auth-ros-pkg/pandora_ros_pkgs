@@ -42,13 +42,13 @@
 #include "hole_fusion_node/planes_detection.h"
 #include "hole_fusion_node/depth_filters.h"
 #include "hole_fusion_node/rgb_filters.h"
-#include "utils/edge_detection.h"
-#include "utils/histogram.h"
-#include "utils/holes_conveyor.h"
-#include "utils/morphological_operators.h"
-#include "utils/outline_discovery.h"
-#include "utils/parameters.h"
-#include "utils/visualization.h"
+#include "hole_fusion_node/utils/edge_detection.h"
+#include "hole_fusion_node/utils/histogram.h"
+#include "hole_fusion_node/utils/holes_conveyor.h"
+#include "hole_fusion_node/utils/morphological_operators.h"
+#include "hole_fusion_node/utils/outline_discovery.h"
+#include "hole_fusion_node/utils/parameters.h"
+#include "hole_fusion_node/utils/visualization.h"
 
 /**
   @namespace pandora_vision
@@ -57,6 +57,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class Filters
@@ -195,6 +197,7 @@ namespace pandora_vision_hole
         std::vector<std::vector<float> >* probabilitiesVector);
   };
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

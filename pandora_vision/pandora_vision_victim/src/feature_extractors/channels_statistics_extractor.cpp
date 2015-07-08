@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief This function extracts color related statistic features from a
    * color image.
@@ -190,4 +192,5 @@ namespace pandora_vision
       ROS_INFO_STREAM("vector's size = " << depthStatisticsVector->size());
     }
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

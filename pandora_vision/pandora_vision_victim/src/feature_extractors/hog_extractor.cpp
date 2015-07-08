@@ -48,6 +48,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Default Constructor
    */
@@ -91,5 +93,6 @@ namespace pandora_vision
     hogDescriptor_->compute(grayscaleImage, *descriptors, cv::Size(0, 0),
         cv::Size(0, 0), pointLocations);
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

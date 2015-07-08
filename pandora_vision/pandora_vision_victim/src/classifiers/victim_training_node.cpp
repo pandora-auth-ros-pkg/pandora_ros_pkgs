@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "victim_training_node");
 
-  pandora_vision::ClassifierFactory trainerFactory("victim_training_node");
+  pandora_vision::pandora_vision_victim::ClassifierFactory trainerFactory;
   return 0;
 }
 

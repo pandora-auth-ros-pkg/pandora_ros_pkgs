@@ -34,10 +34,16 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTION_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTION_H
 
-#include "ros/ros.h"
+#include <stdlib.h>
+
+#include <iostream>
+#include <map>
+#include <string>
+
+#include <ros/ros.h>
 #include <ros/package.h>
 
 #include <sensor_msgs/Image.h>
@@ -46,85 +52,84 @@
 
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <urdf_parser/urdf_parser.h>
 
-#include <iostream>
-#include <stdlib.h>
 #include "pandora_vision_msgs/LandoltcAlertVector.h"
 #include "pandora_vision_msgs/Predator.h"
 #include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"
 #include "state_manager/state_client.h"
-#include <urdf_parser/urdf_parser.h>
-#include <map>
 
 
 namespace pandora_vision
 {
-class LandoltC3dDetection : public StateClient {
-
+namespace pandora_vision_landoltc
+{
+class LandoltC3dDetection : public state_manager::StateClient
+{
 private:
-  //!<Subscriber of RGB Image
+  /// Subscriber of RGB Image
   ros::Subscriber _inputImageSubscriber;
 
-  //!<Subscriber for Predator
+  /// Subscriber for Predator
   ros::Subscriber _landoltc3dPredator;
 
-  //!<Node Handler
+  /// Node Handler
   ros::NodeHandle _nh;
 
-  //!< Current frame to be processed
+  /// Current frame to be processed
   cv::Mat landoltCFrame;
 
-  //!< Landoltc3d frame timestamp
+  /// Landoltc3d frame timestamp
   ros::Time landoltc3dFrameTimestamp;
 
-  //!<Landoltc3d Detector object
+  /// Landoltc3d Detector object
   LandoltC3dDetector _landoltc3dDetector;
 
-  //!<Current package path
+  /// Current package path
   std::string packagePath;
 
-  //!<Current pattern path
+  /// Current pattern path
   std::string patternPath;
 
-  //!<Frame Height
+  /// Frame Height
   int frameHeight;
 
-  //!<Frame Width
+  /// Frame Width
   int frameWidth;
 
-  //!< Horizontal Field Of View (rad)
+  /// Horizontal Field Of View (rad)
   double hfov;
 
-  //!< Vertical Field Of View (rad)
+  /// Vertical Field Of View (rad)
   double vfov;
 
-  //!<Camera Name
+  /// Camera Name
   std::string cameraName;
 
   std::string _frame_id;
   std::string _parent_frame_id;
 
-  //!< The topic subscribed to for the front camera
+  /// The topic subscribed to for the front camera
   std::string imageTopic;
 
-  //!< The topic subscribed to if it works with predator
+  /// The topic subscribed to if it works with predator
   std::string predator_topic_name;
 
-  //!< Variable used for State Managing
+  /// Variable used for State Managing
   bool landoltc3dNowON;
 
-  //!< Publishers for LandoltcDetector result messages
+  /// Publishers for LandoltcDetector result messages
   ros::Publisher _landoltc3dPublisher;
 
-  //!< Variable for checking if Predator is On
+  /// Variable for checking if Predator is On
   bool PredatorOn;
 
   ros::Time _lastTimeProcessed;
 
-  //!< The dynamic reconfigure (landoltc3d) parameters' server
-  dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc3d_cfgConfig> server;
+  /// The dynamic reconfigure (landoltc3d) parameters' server
+  dynamic_reconfigure::Server< ::pandora_vision_landoltc::landoltc3d_cfgConfig> server;
 
-  dynamic_reconfigure::Server<pandora_vision_landoltc::landoltc3d_cfgConfig>::CallbackType f;
+  dynamic_reconfigure::Server< ::pandora_vision_landoltc::landoltc3d_cfgConfig>::CallbackType f;
 
   /**
   @brief Callback for the RGB Image
@@ -146,7 +151,7 @@ private:
   @param[in] level [const uint32_t] The level
   @return void
   **/
-  void parametersCallback(const pandora_vision_landoltc::landoltc3d_cfgConfig& config, const uint32_t& level);
+  void parametersCallback(const ::pandora_vision_landoltc::landoltc3d_cfgConfig& config, const uint32_t& level);
 
   /**
   @brief main function called for publishing messages in
@@ -166,7 +171,6 @@ private:
   std::map<std::string, std::string> _frame_ids_map;
 
 public:
-
   /**
   @brief Default Constructor
   @param ref [cv::Mat&] Reference Image
@@ -203,8 +207,8 @@ public:
   int prevState;
 
   std::string param;
-
 };
-} // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTION_H
+}  // namespace pandora_vision_landoltc
+}  // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTION_H
 

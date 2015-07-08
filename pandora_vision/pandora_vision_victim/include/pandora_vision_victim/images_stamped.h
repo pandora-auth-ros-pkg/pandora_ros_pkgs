@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class ImagesStamped
   {
     public:
@@ -100,5 +102,6 @@ namespace pandora_vision
 
   typedef ImagesStamped::Ptr ImagesStampedPtr;
   typedef ImagesStamped::ConstPtr ImagesStampedConstPtr;
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_IMAGES_STAMPED_H

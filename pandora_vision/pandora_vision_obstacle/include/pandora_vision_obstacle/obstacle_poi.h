@@ -44,6 +44,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_obstacle
+{
   class ObstaclePOI : public POI
   {
     public:
@@ -77,6 +79,7 @@ namespace pandora_vision
   };
   typedef ObstaclePOI::Ptr ObstaclePOIPtr;
 
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_OBSTACLE_POI_H

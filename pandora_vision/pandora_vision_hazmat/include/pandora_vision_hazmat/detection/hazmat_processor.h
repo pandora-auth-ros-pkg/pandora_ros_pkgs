@@ -40,6 +40,7 @@
 
 #include <string>
 #include <dynamic_reconfigure/server.h>
+#include <boost/shared_ptr.hpp>
 
 #include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
 #include "pandora_vision_hazmat/DisplayConfig.h"
@@ -49,65 +50,63 @@
 
 namespace pandora_vision
 {
-  namespace pandora_vision_hazmat
+namespace pandora_vision_hazmat
+{
+  class HazmatProcessor : public VisionProcessor
   {
-    class HazmatProcessor : public VisionProcessor
-    {
-      public:
-        /**
-         * @brief : Default Constructor that initiliazes the hazmat detector
-         * and the necessary ROS objects for communication.
-         */
-        HazmatProcessor(const std::string& ns, sensor_processor::Handler* handler);
+   public:
+    /**
+      * @brief : Default Constructor that initiliazes the hazmat detector
+      * and the necessary ROS objects for communication.
+      */
+    virtual void
+    initialize(const std::string& ns, sensor_processor::Handler* handler);
 
-        /**
-         * @brief : Constructor used for testing.
-         */
-        HazmatProcessor();
+    /**
+      * @brief : Constructor used for testing.
+      */
+    HazmatProcessor();
+    virtual
+    ~HazmatProcessor();
 
-        /**
-         * @brief : Class destructor that destroys the current detector.
-         */
-        virtual ~HazmatProcessor();
+    /**
+      * @brief : Class method that is used by the dynamic reconfigure
+      * server to change object parameters.
+      * @param config[const pandora_vision_hazmat::DisplayConfig&] :
+      *  The message containing the new configuration for the node.
+      * @param level[uint32_t]: Flag used by the dynamic reconfigure
+      * server.
+      *
+      */
+    void dynamicReconfigCallback(
+        const ::pandora_vision_hazmat::DisplayConfig& config,
+        uint32_t level);
 
-        /**
-         * @brief : Class method that is used by the dynamic reconfigure
-         * server to change object parameters.
-         * @param config[const pandora_vision_hazmat::DisplayConfig&] :
-         *  The message containing the new configuration for the node.
-         * @param level[uint32_t]: Flag used by the dynamic reconfigure
-         * server.
-         *
-         */
-        void dynamicReconfigCallback(
-            const ::pandora_vision_hazmat::DisplayConfig& config,
-            uint32_t level);
+    /**
+      * @brief
+      */
+    virtual bool process(const CVMatStampedConstPtr& input,
+      const POIsStampedPtr& output);
 
-        /**
-         * @brief
-         */
-        virtual bool process(const CVMatStampedConstPtr& input,
-          const POIsStampedPtr& output);
+   private:
+    boost::shared_ptr< dynamic_reconfigure::Server< ::pandora_vision_hazmat::DisplayConfig > >
+      /// Reconfigure server for changing object params
+      dynamicReconfServer_;
 
-        private:
-          dynamic_reconfigure::Server< ::pandora_vision_hazmat::DisplayConfig>
-          /// Reconfigure server for changing object params
-          dynamicReconfServer_;
+    dynamic_reconfigure::Server< ::pandora_vision_hazmat::DisplayConfig >::
+      CallbackType f_detector_;
 
-          dynamic_reconfigure::Server< ::pandora_vision_hazmat::DisplayConfig>::
-            CallbackType f_detector_;
+    bool visualizationFlag_;
+    /// Flag that toggles the execution time printing.
+    bool execTimerFlag_;
 
-          bool visualizationFlag_;
-          /// Flag that toggles the execution time printing.
-          bool execTimerFlag_;
+    bool debugMsgFlag_;  //!< Flag that toggles debug messages that contain
+    //!< for the detected patterns.
 
-          bool debugMsgFlag_;  //!< Flag that toggles debug messages that contain
-          //!< for the detected patterns.
+    DetectorFactory factory_;  //!< The factory that produces the detectors.
 
-          DetectorFactory factory_;  //!< The factory that produces the detectors.
-
-          PlanarObjectDetector* detector_;  //!< Pointer to the detector used.
-    };
+    PlanarObjectDetector* detector_;  //!< Pointer to the detector used.
+  };
 }  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_HAZMAT_PROCESSOR_H

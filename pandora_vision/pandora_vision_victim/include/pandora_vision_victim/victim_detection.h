@@ -52,6 +52,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimDetection : public StateClient
   {
     private:
@@ -187,6 +189,7 @@ namespace pandora_vision
       **/
       void completeTransition(void);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_DETECTION_H
 

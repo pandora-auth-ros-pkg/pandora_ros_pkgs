@@ -1,8 +1,8 @@
 <launch>
   <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
 
-  <node pkg="nodelet" type="nodelet" name="pandora_thermal_cropper"
-      args="load pandora_vision_hole/pandora_thermal_cropper $(arg nodelet_manager)" output="screen" >
+  <node pkg="nodelet" type="nodelet" name="thermal_cropper"
+      args="load pandora_vision_hole/thermal_cropper $(arg nodelet_manager)" output="screen" >
     <rosparam file="$(find pandora_vision_hole)/cfg/thermal_node_cfg/thermal_cropper_params.yaml"
               command="load" />
   </node>

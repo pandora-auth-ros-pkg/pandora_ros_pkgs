@@ -38,9 +38,9 @@
 #ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H
 #define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_HOLE_VALIDATION_H
 
-#include "utils/defines.h"
-#include "utils/holes_conveyor.h"
-#include "utils/parameters.h"
+#include "hole_fusion_node/utils/defines.h"
+#include "hole_fusion_node/utils/holes_conveyor.h"
+#include "hole_fusion_node/utils/parameters.h"
 
 // The hole's validation process identifiers
 #define VALIDATION_VIA_THRESHOLDING 0
@@ -54,6 +54,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class HoleValidation
@@ -159,6 +161,7 @@ namespace pandora_vision_hole
         const int& filteringMode);
   };
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

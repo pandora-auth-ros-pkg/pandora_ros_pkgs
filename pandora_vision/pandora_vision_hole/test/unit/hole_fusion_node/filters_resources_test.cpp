@@ -40,6 +40,10 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+namespace hole_fusion
+{
   /**
     @class FiltersResourcesTest
     @brief Tests the integrity of methods of class FiltersResources
@@ -1125,4 +1129,6 @@ namespace pandora_vision
      */
   }
 
+} // hole_fusion
+} // namespace pandora_vision_hole
 } // namespace pandora_vision

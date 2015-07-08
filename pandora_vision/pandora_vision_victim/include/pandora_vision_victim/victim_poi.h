@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimPOI : public BBoxPOI
   {
     public:
@@ -80,5 +82,6 @@ namespace pandora_vision
 
   typedef VictimPOI::Ptr VictimPOIPtr;
   typedef VictimPOI::ConstPtr VictimPOIConstPtr;
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_POI_H

@@ -1,0 +1,5 @@
+subscribed_topics:
+  thermal_msg_topic: /flir_lepton/fused_msg
+
+published_topics:
+  thermal_poi_topic: thermal/poi

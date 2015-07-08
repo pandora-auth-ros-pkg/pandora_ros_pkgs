@@ -47,6 +47,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Default Constructor
    */
@@ -230,12 +232,12 @@ namespace pandora_vision
         std::cout << "Find descriptors from bounding boxes." << std::endl;
         for (int ii = 0; ii < annotatedImages.size(); ii++)
         {
-          std::cout << "Processing file " << annotatedImages[ii] << std::endl;
           std::string imageAbsolutePath = directory.string() + "/" + annotatedImages[ii];
+          std::cout << "Processing file " << imageAbsolutePath << std::endl;
           image = cv::imread(imageAbsolutePath);
           if (!image.data)
           {
-            std::cout << "Error reading file " << annotatedImages[ii] << std::endl;
+            std::cout << "Error reading file " << imageAbsolutePath << std::endl;
             continue;
           }
 
@@ -338,4 +340,5 @@ namespace pandora_vision
   {
     return bowTrainerPtr_->getDescriptors();
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

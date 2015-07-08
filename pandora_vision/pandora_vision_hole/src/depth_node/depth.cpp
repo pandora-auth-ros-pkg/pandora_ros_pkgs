@@ -35,7 +35,13 @@
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
 
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+
 #include "depth_node/depth.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::depth::Depth, nodelet::Nodelet)
 
 /**
   @namespace pandora_vision
@@ -45,12 +51,35 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace depth
+{
   /**
     @brief Default constructor. Initiates communications, loads parameters.
     @return void
    **/
-  Depth::Depth(void)
+  Depth::
+  Depth() {}
+
+  /**
+    @brief Default destructor
+    @return void
+   **/
+  Depth::
+  ~Depth()
   {
+    NODELET_INFO("[%s] Terminated", nodeName_.c_str());
+  }
+
+  void
+  Depth::
+  onInit()
+  {
+    nodeHandle_ = this->getNodeHandle();
+    privateNodeHandle_ = this->getPrivateNodeHandle();
+    nodeName_ = boost::to_upper_copy<std::string>(this->getName());
+    serverPtr_.reset(new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::depth_cfgConfig>(privateNodeHandle_));
+
     // Acquire the names of topics which the depth node will be having
     // transactionary affairs with
     getTopicNames();
@@ -66,20 +95,9 @@ namespace pandora_vision_hole
       candidateHolesTopic_, 1);
 
     // The dynamic reconfigure (depth) parameter's callback
-    server.setCallback(boost::bind(&Depth::parametersCallback, this, _1, _2));
+    serverPtr_->setCallback(boost::bind(&Depth::parametersCallback, this, _1, _2));
 
-    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Initiated");
-  }
-
-
-
-  /**
-    @brief Default destructor
-    @return void
-   **/
-  Depth::~Depth(void)
-  {
-    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Terminated");
+    NODELET_INFO("[%s] Initiated", nodeName_.c_str());
   }
 
 
@@ -94,41 +112,28 @@ namespace pandora_vision_hole
     @param msg [const sensor_msgs::Image&] The depth image message
     @return void
    **/
-  void Depth::inputDepthImageCallback(const sensor_msgs::Image& msg)
+  void
+  Depth::
+  inputDepthImageCallback(const sensor_msgs::ImageConstPtr& msg)
   {
-    #ifdef DEBUG_TIME
+#ifdef DEBUG_TIME
     Timer::start("inputDepthImageCallback", "", true);
-    #endif
+#endif
 
-    ROS_INFO_NAMED(PKG_NAME, "Depth node callback");
+    NODELET_INFO("[%s] callback", nodeName_.c_str());
 
     // Obtain the depth image. Since the image is in a format of
     // sensor_msgs::Image, it has to be transformed into a cv format in order
     // to be processed. Its cv format will be CV_32FC1.
     cv::Mat depthImage;
-    MessageConversions::extractImageFromMessage(msg, &depthImage,
+    MessageConversions::extractImageFromMessage(*msg, &depthImage,
       sensor_msgs::image_encodings::TYPE_32FC1);
-
-    #ifdef DEBUG_SHOW
-    if (Parameters::Debug::show_depth_image)
-    {
-      Visualization::showScaled("Depth image", depthImage, 1);
-    }
-    #endif
-
-    // Perform noise elimination on the depth image.
-    // Every pixel of noise will be eliminated and substituted by an
-    // appropriate non-zero value, depending on the amount of noise present
-    // in the input depth image.
-    cv::Mat interpolatedDepthImage;
-    NoiseElimination::performNoiseElimination(depthImage,
-      &interpolatedDepthImage);
 
     // Regardless of the image representation method, the depth node
     // will publish the interpolated depth image of original size
     // to the Hole Fusion node
     cv::Mat interpolatedDepthImageSent;
-    interpolatedDepthImage.copyTo(interpolatedDepthImageSent);
+    depthImage.copyTo(interpolatedDepthImageSent);
 
     // A value of 1 means that the depth image is subtituted by its
     // low-low, wavelet analysis driven, part
@@ -138,41 +143,39 @@ namespace pandora_vision_hole
       // interpolated depth image
       double min;
       double max;
-      cv::minMaxIdx(interpolatedDepthImage, &min, &max);
+      cv::minMaxIdx(depthImage, &min, &max);
 
       // Obtain the low-low part of the interpolated depth image via
       // wavelet analysis
-      Wavelets::getLowLow(interpolatedDepthImage, min, max,
-        &interpolatedDepthImage);
+      Wavelets::getLowLow(depthImage, min, max,
+        &depthImage);
     }
 
     // Locate potential holes in the interpolated depth image
-    HolesConveyor holes = HoleDetector::findHoles(interpolatedDepthImage);
+    HolesConveyor holes = DepthHoleDetector::findHoles(depthImage);
 
     // Create the candidate holes message
-    ::pandora_vision_hole::CandidateHolesVectorMsg depthCandidateHolesMsg;
+    ::pandora_vision_hole::CandidateHolesVectorMsgPtr
+      depthCandidateHolesMsgPtr( new ::pandora_vision_hole::CandidateHolesVectorMsg );
 
     // Pack information about holes found and the interpolated depth image
     // inside a message.
     // This message will be published to and received by the hole fusion node
-    MessageConversions::createCandidateHolesVectorMessage(holes,
+    MessageConversions::createCandidateHolesVectorMessage(
+      holes,
       interpolatedDepthImageSent,
-      &depthCandidateHolesMsg,
+      depthCandidateHolesMsgPtr,
       sensor_msgs::image_encodings::TYPE_32FC1,
-      msg);
+      *msg);
 
     // Publish the candidate holes message
-    candidateHolesPublisher_.publish(depthCandidateHolesMsg);
+    candidateHolesPublisher_.publish(depthCandidateHolesMsgPtr);
 
-    #ifdef DEBUG_TIME
+#ifdef DEBUG_TIME
     Timer::tick("inputDepthImageCallback");
     Timer::printAllMeansTree();
-    #endif
-
-    return;
+#endif
   }
-
-
 
   /**
     @brief Acquires topics' names needed to be subscribed to and advertise
@@ -180,50 +183,29 @@ namespace pandora_vision_hole
     @param void
     @return void
    **/
-  void Depth::getTopicNames()
+  void
+  Depth::
+  getTopicNames()
   {
-    // The namespace dictated in the launch file
-    std::string ns = nodeHandle_.getNamespace();
-
-    // Read the name of the topic from where the depth node acquires the
+     // Read the name of the topic from where the depth node acquires the
     // unadulterated depth image and store it in a private member variable
-    if (nodeHandle_.getParam(
-        ns + "/depth_node/subscribed_topics/depth_image_topic",
+    if (!privateNodeHandle_.getParam("subscribed_topics/depth_image_topic",
         depthImageTopic_))
     {
-      // Make the topic's name absolute
-      depthImageTopic_ = ns + "/" + depthImageTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[Depth Node] Subscribed to the input depth image");
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[Depth Node] Could not find topic depth_image_topic");
+       NODELET_FATAL("[%s] Could not find topic depth_image_topic", nodeName_.c_str());
+      ROS_BREAK();
     }
 
     // Read the name of the topic to which the depth node will be publishing
     // information about the candidate holes found and store it in a private
     // member variable
-    if (nodeHandle_.getParam(
-        ns + "/depth_node/published_topics/candidate_holes_topic",
+    if (!privateNodeHandle_.getParam("published_topics/candidate_holes_topic",
         candidateHolesTopic_))
     {
-      // Make the topic's name absolute
-      candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[Depth Node] Advertising to the candidate holes topic");
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[Depth Node] Could not find topic candidate_holes_topic");
+      NODELET_FATAL("[%s] Could not find topic candidate_holes_topic", nodeName_.c_str());
+      ROS_BREAK();
     }
   }
-
-
 
   /**
     @brief The function called when a parameter is changed
@@ -231,11 +213,13 @@ namespace pandora_vision_hole
     @param[in] level [const uint32_t]
     @return void
    **/
-  void Depth::parametersCallback(
+  void
+  Depth::
+  parametersCallback(
     const ::pandora_vision_hole::depth_cfgConfig& config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Depth node] Parameters callback called");
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     //////////////////// Blob detection - specific parameters //////////////////
 
@@ -361,5 +345,6 @@ namespace pandora_vision_hole
     }
   }
 
+}  // namespace depth
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

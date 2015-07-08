@@ -39,10 +39,10 @@
 #define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_DEPTH_FILTERS_H
 
 #include <math.h>
-#include "utils/holes_conveyor.h"
-#include "utils/outline_discovery.h"
-#include "utils/edge_detection.h"
-#include "utils/visualization.h"
+#include "hole_fusion_node/utils/holes_conveyor.h"
+#include "hole_fusion_node/utils/outline_discovery.h"
+#include "hole_fusion_node/utils/edge_detection.h"
+#include "hole_fusion_node/utils/visualization.h"
 #include "hole_fusion_node/planes_detection.h"
 
 /**
@@ -52,6 +52,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class DepthFilters
@@ -217,6 +219,7 @@ namespace pandora_vision_hole
         std::vector<std::string>* msgs);
   };
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

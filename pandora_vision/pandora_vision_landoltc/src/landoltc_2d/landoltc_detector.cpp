@@ -43,28 +43,23 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_landoltc
+{
   //!< Constructor
-  LandoltCDetector::LandoltCDetector(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionProcessor(ns, handler)
+  void
+  LandoltCDetector::initialize(const std::string& ns, sensor_processor::Handler* handler)
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+    VisionProcessor::initialize(ns, handler);
 
     _minDiff = 60;
     _threshold = 90;
     _edges = 0;
-    params.configLandoltC(*this->accessPublicNh());
+    params.configLandoltC(this->getProcessorNodeHandle());
 
     initializeReferenceImage();
   }
 
   LandoltCDetector::LandoltCDetector() : VisionProcessor() {}
-
-  //!< Destructor
-  LandoltCDetector::~LandoltCDetector()
-  {
-    ROS_INFO("landoltc_detector instance destroyed");
-  }
 
   /**
     @brief Function for the initialization of the reference image
@@ -76,9 +71,9 @@ namespace pandora_vision
     //!< Get the path to the pattern used for detection
     std::string patternPath;
 
-    if (this->accessPublicNh()->hasParam("patternPath"))
+    if (this->getProcessorNodeHandle().hasParam("patternPath"))
     {
-      this->accessPublicNh()->getParam("patternPath", patternPath);
+      this->getProcessorNodeHandle().getParam("patternPath", patternPath);
       ROS_DEBUG_STREAM("patternPath: " << patternPath);
     }
     else
@@ -727,4 +722,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_landoltc
 }  // namespace pandora_vision

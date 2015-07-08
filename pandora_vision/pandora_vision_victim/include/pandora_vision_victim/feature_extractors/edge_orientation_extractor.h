@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   enum ConvolutionType
   {
     /// Return the full convolution, including border
@@ -107,5 +109,6 @@ namespace pandora_vision
       **/
      static void findEdgeFeatures(const cv::Mat& inImage, std::vector<double>* edgeFeatures);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_EDGE_ORIENTATION_EXTRACTOR_H

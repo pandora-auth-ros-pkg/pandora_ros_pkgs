@@ -368,8 +368,9 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                   (2.0 * math.tan(self.imageHFOV / 2.0)))
         imageY = (self.imageHeight * math.tan(pitch) /
                   (2.0 * math.tan(self.imageVFOV / 2.0)))
-        imageX += self.imageWidth / 2.0
-        imageY = -imageY + self.imageHeight / 2.0
+        imageX = -imageX + self.imageWidth / 2.0
+        imageY = imageY + self.imageHeight / 2.0
+
         return imageX, imageY
 
     @classmethod
@@ -429,10 +430,7 @@ class VisionBenchmarkTestBase(test_base.TestBase):
 
         errorThreshold = 900.0
         bridge = CvBridge()
-        if self.algorithm == "Hole":
-            suffix = "sDirections"
-        else:
-            suffix = "alerts"
+        suffix = "alerts"
 
         queueIndex = 0
         count = 0
@@ -488,14 +486,8 @@ class VisionBenchmarkTestBase(test_base.TestBase):
                     truePositivesInImage = 0
                     # Estimate alert center point from message parameters
                     print self.messageList[outputTopic[1]][-1]
-                    if self.algorithm == "Victim":
-                        alerts = getattr(
-                            self.messageList[outputTopic[1]][-1],
-                            suffix)
-                    else:
-                        alerts = getattr(
-                            self.messageList[outputTopic[1]][-1],
-                            self.algorithm.lower()+suffix)
+                    alerts = getattr(self.messageList[outputTopic[1]][-1],
+                                     suffix)
                     queueIndex += 1
                     print alerts
                     for iiAlert in xrange(len(alerts)):

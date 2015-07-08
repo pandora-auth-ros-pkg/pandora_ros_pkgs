@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor for the Random Forests Classifier Wrapper Class.
    * @param ns [const std::string&] The namespace of the node.
@@ -54,17 +56,17 @@ namespace pandora_vision
    * @param imageType[const std::string&] The type of input images given to
    * the classifier (RGB or Depth).
    */
-  RandomForestsClassifier::RandomForestsClassifier(const std::string& ns,
+  RandomForestsClassifier::RandomForestsClassifier(const ros::NodeHandle& nh,
       const std::string& datasetPath,
       const std::string& classifierType,
       const std::string& imageType)
-      : AbstractClassifier(ns, datasetPath, classifierType, imageType)
+      : AbstractClassifier(nh, datasetPath, classifierType, imageType)
   {
     ROS_INFO_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Creating " << imageType_
         << " Random Forests training instance");
 
     int maxDepth;
-    if (!nh_.getParam(imageType_ + "/max_depth", maxDepth))
+    if (!nh.getParam(imageType_ + "/max_depth", maxDepth))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the max depth parameter for Random Forests!");
@@ -74,7 +76,7 @@ namespace pandora_vision
     }
 
     int minSampleCount;
-    if (!nh_.getParam(imageType_ + "/min_sample_count", minSampleCount))
+    if (!nh.getParam(imageType_ + "/min_sample_count", minSampleCount))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the min sample count parameter for Random Forests!");
@@ -84,7 +86,7 @@ namespace pandora_vision
     }
 
     double regressionAccuracy;
-    if (!nh_.getParam(imageType_ + "/regression_accuracy", regressionAccuracy))
+    if (!nh.getParam(imageType_ + "/regression_accuracy", regressionAccuracy))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the regression accuracy parameter for Random Forests!");
@@ -94,7 +96,7 @@ namespace pandora_vision
     }
 
     bool useSurrogates;
-    if (!nh_.getParam(imageType_ + "/use_surrogates", useSurrogates))
+    if (!nh.getParam(imageType_ + "/use_surrogates", useSurrogates))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the surrogates parameter for Random Forests!");
@@ -104,7 +106,7 @@ namespace pandora_vision
     }
 
     int maxCategories;
-    if (!nh_.getParam(imageType_ + "/max_categories", maxCategories))
+    if (!nh.getParam(imageType_ + "/max_categories", maxCategories))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the max categories parameter for Random Forests!");
@@ -114,7 +116,7 @@ namespace pandora_vision
     }
 
     bool calcVarImportance;
-    if (!nh_.getParam(imageType_ + "/calc_var_importance", calcVarImportance))
+    if (!nh.getParam(imageType_ + "/calc_var_importance", calcVarImportance))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << " the calculate variable importance parameter for Random Forests!");
@@ -124,7 +126,7 @@ namespace pandora_vision
     }
 
     int nactiveVars;
-    if (!nh_.getParam(imageType_ + "/nactive_vars", nactiveVars))
+    if (!nh.getParam(imageType_ + "/nactive_vars", nactiveVars))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the number of active variables parameter for Random Forests!");
@@ -134,7 +136,7 @@ namespace pandora_vision
     }
 
     int maxNumOfTreesInTheForest;
-    if (!nh_.getParam(imageType_ + "/max_num_of_trees_in_the_forest", maxNumOfTreesInTheForest))
+    if (!nh.getParam(imageType_ + "/max_num_of_trees_in_the_forest", maxNumOfTreesInTheForest))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the max number of trees parameter for Random Forests!");
@@ -144,7 +146,7 @@ namespace pandora_vision
     }
 
     double forestAccuracy;
-    if (!nh_.getParam(imageType_ + "/forest_accuracy", forestAccuracy))
+    if (!nh.getParam(imageType_ + "/forest_accuracy", forestAccuracy))
     {
       ROS_DEBUG_STREAM("[PANDORA_VISION_VICTIM_RANDOM_FORESTS]: Could not retrieve "
           << "the forest accuracy parameter for Random Forests!");
@@ -218,5 +220,6 @@ namespace pandora_vision
     return;
   }
 
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

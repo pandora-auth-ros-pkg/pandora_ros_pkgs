@@ -49,17 +49,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_hazmat
+{
   class HazmatPostProcessor : public VisionPostProcessor<pandora_vision_msgs::HazmatAlertVector>
   {
     public:
       typedef boost::shared_ptr<pandora_vision_msgs::HazmatAlertVector> HazmatAlertVectorPtr;
 
-      HazmatPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~HazmatPostProcessor();
+      HazmatPostProcessor();
 
     virtual bool
       postProcess(const POIsStampedConstPtr& input, const HazmatAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_HAZMAT_DETECTION_HAZMAT_POSTPROCESSOR_H

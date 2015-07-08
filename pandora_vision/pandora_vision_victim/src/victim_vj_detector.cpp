@@ -42,6 +42,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
   @brief Class Constructor
   Initializes cascade_name and constants
@@ -201,4 +203,5 @@ namespace pandora_vision
     thrfaces.clear();
     return predictions;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

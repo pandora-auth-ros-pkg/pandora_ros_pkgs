@@ -1,0 +1,13 @@
+<launch>
+  <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
+
+  <!-- <node name="pandora_datamatrix" type="pandora_vision_datamatrix_node" pkg="pandora_vision_datamatrix" -->
+  <!--   respawn="False" output="screen" >                                                                   -->
+  <node pkg="nodelet" type="nodelet" name="pandora_datamatrix"
+    args="load pandora_vision/pandora_vision_datamatrix $(arg nodelet_manager)" output="screen" >
+  <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    <rosparam file="$(find pandora_vision_datamatrix)/config/datamatrix_topics.yaml"
+      command="load" />
+  </node>
+
+</launch>

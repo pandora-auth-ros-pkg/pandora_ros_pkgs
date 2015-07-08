@@ -20,6 +20,8 @@
   <build_depend>pandora_cmake_tools</build_depend>
 
   <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
   <depend>pandora_common_msgs</depend>
@@ -33,4 +35,8 @@
 
   <test_depend>rostest</test_depend>
   <test_depend>rosunit</test_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
 </package>

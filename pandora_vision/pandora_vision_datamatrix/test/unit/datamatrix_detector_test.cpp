@@ -40,7 +40,8 @@
 
 namespace pandora_vision
 {
-
+namespace pandora_vision_datamatrix
+{
     /**
      *     @class DatamatrixDetectorTest
      *     @brief Tests the integrity of methods of class DatamatrixDetector
@@ -194,4 +195,6 @@ namespace pandora_vision
     //  // EXPECT_EQ(1, datamatrix_list.size());
     //}
       
-}// namespace pandora_vision
+
+}  // namepsace pandora_vision_datamatrix
+}  // namespace pandora_vision

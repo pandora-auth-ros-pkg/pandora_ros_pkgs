@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   class QrCodePOI : public POI
   {
     public:
@@ -63,6 +65,7 @@ namespace pandora_vision
         return qrContent;
       }
   };
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_QRCODE_QRCODE_POI_H

@@ -1,0 +1,31 @@
+<launch>
+  <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
+  <arg name="standalone_nodelet" default="false" />
+  <!-- <node name="pandora_hazmat" type="pandora_vision_hazmat_node" pkg="pandora_vision_hazmat" -->
+  <!--   respawn="False" output="screen" >                                                       -->
+
+  <group unless="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_hazmat"
+      args="load pandora_vision/pandora_vision_hazmat $(arg nodelet_manager)" output="screen" >
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+      <rosparam file="$(find pandora_vision_hazmat)/config/pandora_vision_hazmat/hazmat_topics.yaml"
+        command="load" />
+      <rosparam file="$(find pandora_vision_hazmat)/config/pandora_vision_hazmat/hazmat_params.yaml"
+        command="load" ns="detector"/>
+    </node>
+  </group>
+
+  <group if="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_hazmat"
+      args="standalone pandora_vision/pandora_vision_hazmat" output="screen" >
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+      <rosparam file="$(find pandora_vision_hazmat)/config/pandora_vision_hazmat/hazmat_topics.yaml"
+        command="load" />
+      <rosparam file="$(find pandora_vision_hazmat)/config/pandora_vision_hazmat/hazmat_params.yaml"
+        command="load" ns="detector"/>
+    </node>
+  </group>
+
+
+
+</launch>

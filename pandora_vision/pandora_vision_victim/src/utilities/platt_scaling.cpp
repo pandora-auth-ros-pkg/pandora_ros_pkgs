@@ -46,6 +46,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   PlattScaling::PlattScaling()
   {
     A_ = 1.0;
@@ -239,4 +241,5 @@ namespace pandora_vision
     fs << "B" << B_;
     fs.release();
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

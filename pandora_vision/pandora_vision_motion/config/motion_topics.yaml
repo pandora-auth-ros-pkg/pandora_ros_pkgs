@@ -1,3 +1,5 @@
 subscribed_topics: [/kinect/rgb/image_raw]
 published_topics: /vision/motion_alert
-
+active_states: [SENSOR_HOLD, SENSOR_TEST]
+detector:
+  debug_motion_topic : debug_image

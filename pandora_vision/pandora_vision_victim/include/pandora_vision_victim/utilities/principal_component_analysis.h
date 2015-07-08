@@ -49,6 +49,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class PrincipalComponentAnalysis
    * @brief This class implements a wrapper of the OPENCV Principal Component
@@ -110,5 +112,6 @@ namespace pandora_vision
     private:
       cv::PCA pca_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_PRINCIPAL_COMPONENT_ANALYSIS_H

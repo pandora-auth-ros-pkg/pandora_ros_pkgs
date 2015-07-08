@@ -52,6 +52,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class HOGExtractor
    * @brief This class extracts HOG features from images.
@@ -79,6 +81,7 @@ namespace pandora_vision
       ///
       cv::Ptr<cv::HOGDescriptor> hogDescriptor_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_HOG_EXTRACTOR_H
 

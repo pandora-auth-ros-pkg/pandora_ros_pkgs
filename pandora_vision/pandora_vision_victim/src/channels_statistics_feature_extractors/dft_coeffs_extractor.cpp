@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor
    */
@@ -110,6 +112,7 @@ namespace pandora_vision
     dftCoefficients[5] = static_cast<double>(magI.at<float>(2, 0));
     return dftCoefficients;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 

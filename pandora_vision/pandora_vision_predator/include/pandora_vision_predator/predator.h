@@ -64,7 +64,7 @@ namespace pandora_vision
     double theta_FP;
   };
 
-  class Predator : public StateClient
+  class Predator : public state_manager::StateClient
   {
     private:
       

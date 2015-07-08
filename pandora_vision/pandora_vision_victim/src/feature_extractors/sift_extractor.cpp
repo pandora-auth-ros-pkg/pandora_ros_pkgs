@@ -46,6 +46,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Default Constructor
    */
@@ -95,4 +97,5 @@ namespace pandora_vision
     // cvWaitKey(0);
     descriptorExtractor_->compute(inImage, keyPoints, *descriptors);
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

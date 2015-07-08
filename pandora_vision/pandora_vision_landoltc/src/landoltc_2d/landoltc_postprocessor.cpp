@@ -43,14 +43,11 @@
 
 namespace pandora_vision
 {
-  LandoltCPostProcessor::LandoltCPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionPostProcessor<pandora_vision_msgs::LandoltcAlertVector>(ns, handler)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
-  }
-
-  LandoltCPostProcessor::~LandoltCPostProcessor() {}
+namespace pandora_vision_landoltc
+{
+  LandoltCPostProcessor::LandoltCPostProcessor() :
+    VisionPostProcessor<pandora_vision_msgs::LandoltcAlertVector>()
+  {}
 
   bool LandoltCPostProcessor::postProcess(const POIsStampedConstPtr& input, const LandoltcAlertVectorPtr& output)
   {
@@ -75,4 +72,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_landoltc
 }  // namespace pandora_vision

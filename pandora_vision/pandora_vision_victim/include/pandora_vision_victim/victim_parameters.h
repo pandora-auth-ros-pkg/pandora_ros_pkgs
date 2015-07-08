@@ -66,12 +66,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   enum VictimSource
   {
     RGB_VJ,
     DEPTH_VJ,
     RGB_SVM,
-    DEPTH_RGB_SVM
+    DEPTH_SVM,
+    RGBD_SVM
   };
 
   enum DetectionMode
@@ -107,14 +110,15 @@ namespace pandora_vision
   {
     public:
       /// Default contructor
-      VictimParameters();
+      VictimParameters() {}
+      explicit VictimParameters(const ros::NodeHandle& nh);
 
       /// The dynamic reconfigure (motion's) parameters' server
       dynamic_reconfigure::Server
-        <pandora_vision_victim::victim_dyn_reconfConfig>server;
+        < ::pandora_vision_victim::victim_dyn_reconfConfig >server;
       /// The dynamic reconfigure (depth) parameters' callback
       dynamic_reconfigure::Server
-        <pandora_vision_victim::victim_dyn_reconfConfig>::CallbackType f;
+        < ::pandora_vision_victim::victim_dyn_reconfConfig >::CallbackType f;
 
       /**
         @brief The function called when a parameter is changed
@@ -123,7 +127,7 @@ namespace pandora_vision
         @return void
       **/
       void parametersCallback(
-        const pandora_vision_victim::victim_dyn_reconfConfig& config,
+        const ::pandora_vision_victim::victim_dyn_reconfConfig& config,
         const uint32_t& level);
 
       void configVictim(const ros::NodeHandle& nh);
@@ -152,6 +156,8 @@ namespace pandora_vision
       double rgb_svm_prob_translation;
       double depth_svm_prob_scaling;
       double depth_svm_prob_translation;
+      bool rgbdEnabled;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_PARAMETERS_H

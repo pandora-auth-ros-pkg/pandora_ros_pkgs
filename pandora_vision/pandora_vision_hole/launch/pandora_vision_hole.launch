@@ -1,47 +1,30 @@
 <launch>
+  <!-- Set this if we play with thermal source -->
+  <arg name="thermal" default="true" />
+  <!-- Set this if we play with rgbd source -->
+  <arg name="rgbd" default="true" />
+  <!-- Set this if we play with rgbdt hole -->
+  <arg name="rgbdt" default="true" />
 
-  <!-- =========================== The namespace =========================== -->
+  <param name="thermal_mode" value="$(arg thermal)" />
+  <param name="rgbd_mode" value="$(arg rgbd)" />
+  <param name="rgbdt_mode" value="$(arg rgbdt)" />
 
-  <arg name="namespace" default="/pandora_vision/pandora_vision_hole" />
+  <group if="$(arg thermal)" >
+    <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch" />
+    <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch" />
+    <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal_cropper.launch" />
+  </group>
 
-  <!-- ========================== Thermal Enable =========================== -->
-  <!-- Set both to true if Thermal must be included -->
-
-  <param name="/hole_detector/thermal" value="true" />
-  <arg name="open_thermal" default="true" />
-
-  <!-- ================== Parameters for yaw pitch extraction ============== -->
-
-  <!-- Output selection -->
-  <arg name="output" default="screen" />
-
-  <!-- ======================= RGBDT Synchronizer node ===================== -->
-
-  <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch"
-      ns="$(arg namespace)" />
-
-  <!-- ============================ Depth node ============================= -->
-
-  <include file="$(find pandora_vision_hole)/launch/depth_node/pandora_vision_hole_depth.launch"
-      ns="$(arg namespace)" />
-
-  <!-- ============================= RGB node ============================== -->
-
-  <include file="$(find pandora_vision_hole)/launch/rgb_node/pandora_vision_hole_rgb.launch"
-    ns="$(arg namespace)" />
-
-  <include file="$(find pandora_vision_hole)/launch/hole_fusion_node/pandora_vision_hole_fusion_node.launch"
-      ns="$(arg namespace)" />
-
-  <!-- <group if="$(arg open_thermal)"> -->
-    <!-- =========================== Thermal node ========================== -->
-
-  <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch"
-    ns="$(arg namespace)" />
-
-    <!-- ====================== Thermal Cropper node ======================= -->
-
-  <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_hole_thermal_cropper.launch"
-    ns="$(arg namespace)" />
-
+  <group if="$(arg rgbd)" >
+    <group unless="$(arg thermal)" >
+      <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch" />
+      <group if="$(arg rgbdt)" >
+        <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch" />
+      </group>
+    </group>
+    <include file="$(find pandora_vision_hole)/launch/depth_node/pandora_vision_hole_depth.launch" />
+    <include file="$(find pandora_vision_hole)/launch/rgb_node/pandora_vision_hole_rgb.launch" />
+    <include file="$(find pandora_vision_hole)/launch/hole_fusion_node/pandora_vision_hole_fusion_node.launch" />
+  </group>
 </launch>

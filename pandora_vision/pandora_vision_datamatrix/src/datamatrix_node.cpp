@@ -40,12 +40,12 @@
 #include <ros/console.h>
 #include "pandora_vision_datamatrix/datamatrix_handler.h"
 
-using pandora_vision::DataMatrixHandler;
+using pandora_vision::pandora_vision_datamatrix::DataMatrixHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "datamatrix_node");
-  DataMatrixHandler dataMatrixHandler("pandora_vision_datamatrix");
+  DataMatrixHandler dataMatrixHandler;
   ros::spin();
   return 0;
 }

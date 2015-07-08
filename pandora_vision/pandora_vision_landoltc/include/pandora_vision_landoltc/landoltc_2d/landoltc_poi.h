@@ -37,27 +37,31 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_POI_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_POI_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POI_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POI_H
 
 #include <string>
+#include <vector>
+
 #include "pandora_vision_common/poi.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_landoltc
 {
   class LandoltCPOI : public POI
   {
     public:
       typedef boost::shared_ptr<LandoltCPOI> Ptr;
-      
+
       virtual ~LandoltCPOI() {}
-    
+
     public:
-      std::vector<float> angles; 
+      std::vector<float> angles;
       std::vector<cv::Scalar> color;
       std::vector<cv::Rect> bbox;
       int count;
-      
+
     public:
       void setAngles(const std::vector<float>& angles)
       {
@@ -75,12 +79,12 @@ namespace pandora_vision
       {
         this->count = count;
       }
-      
+
       std::vector<float> getAngles() const
       {
         return angles;
       }
-      
+
       std::vector<cv::Scalar> getColorVector() const
       {
         return color;
@@ -89,7 +93,7 @@ namespace pandora_vision
       {
         return color[pos];
       }
-      
+
       std::vector<cv::Rect> getBoxVector() const
       {
         return bbox;
@@ -98,14 +102,15 @@ namespace pandora_vision
       {
         return bbox[pos];
       }
-      
+
       int getCount() const
       {
         return count;
       }
   };
-  
+
   typedef LandoltCPOI::Ptr LandoltCPOIPtr;
+}  // namespace pandora_vision_landoltc
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_POI_H
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_POI_H

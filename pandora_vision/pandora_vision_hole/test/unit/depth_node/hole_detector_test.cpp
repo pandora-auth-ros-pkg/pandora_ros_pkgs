@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "depth_node/hole_detector.h"
+#include "depth_node/depth_hole_detector.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace depth
 {
   /**
     @class HoleDetectorTest
@@ -175,7 +179,7 @@ namespace pandora_vision
   TEST_F(HoleDetectorTest, findHolesTest)
   {
     // Run HoleDetector:findHoles
-    HolesConveyor conveyor = HoleDetector::findHoles(squares_);
+    HolesConveyor conveyor = DepthHoleDetector::findHoles(squares_);
 
     // The number of keypoints found
     int size = conveyor.size();
@@ -202,4 +206,6 @@ namespace pandora_vision
     }
   }
 
+}  // namespace depth
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

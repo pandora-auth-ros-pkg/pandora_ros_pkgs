@@ -55,6 +55,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class BagOfWordsTrainer
    * @brief This class applies Bag of words clustering at a set of features.
@@ -148,5 +150,6 @@ namespace pandora_vision
       ///
       cv::Ptr<cv::DescriptorMatcher> descriptorMatcher_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_BAG_OF_WORDS_TRAINER_H

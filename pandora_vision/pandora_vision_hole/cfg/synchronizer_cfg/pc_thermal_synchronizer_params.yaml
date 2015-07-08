@@ -1,6 +1,6 @@
 subscribed_topics:
   pc_topic: /kinect/depth_registered/points
-  thermal_topic: /rpi2/thermal/fused_msg
+  thermal_topic: /rpi2/thermal/fused
 
   hole_fusion_unlock_topic: hole_fusion/unlock/synchronizer
   thermal_unlock_topic: thermal/unlock/synchronizer
@@ -12,5 +12,8 @@ published_topics:
   depth_image_topic: synchronized/depth/image
   rgb_image_topic: synchronized/rgb/image
   thermal_image_topic: synchronized/thermal/image
+  thermal_output_receiver_topic: synchronized/thermal/receiver_info
+  enhanced_image_topic: /vision/synchronized/enhanced/image
+  enhanced_image_cropper_topic: synchronized/enhanced/image
 
 synchronized_queue: 1

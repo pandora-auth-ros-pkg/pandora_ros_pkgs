@@ -1,8 +1,10 @@
 files:
 - md5: 11ec86fc6989922ef65a02a4e2653396
   url: http://downloads.pandora.ee.auth.gr/data/vision/benchmark_dataset/vision_annotations.txt
+  destination: ../
 - md5: 173bcdc68a2fa7c2ac74768f8f3ccca1
   url: http://downloads.pandora.ee.auth.gr/data/vision/benchmark_dataset/vision_benchmarking.txt
+  destination: ../
 - md5: f7dbc713a7844dfa97b839c2720b090c
   url: http://downloads.pandora.ee.auth.gr/data/vision/benchmark_dataset/images_480p/frame0191.png
 - md5: f99c2942f670b7102c47b2899b85c4a2

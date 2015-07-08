@@ -3,6 +3,8 @@ project(pandora_vision_victim)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     pandora_common_msgs
     pandora_vision_msgs
     pandora_vision_common
@@ -10,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
     state_manager
     state_manager_msgs
     pandora_cmake_tools
+    pandora_vision_hole
     cv_bridge
     image_transport
     dynamic_reconfigure
@@ -26,9 +29,12 @@ catkin_package(
     #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       pandora_common_msgs
       pandora_vision_msgs
       pandora_vision_common
+      pandora_vision_hole
       sensor_processor
       state_manager
       state_manager_msgs
@@ -107,6 +113,7 @@ target_link_libraries(${PROJECT_NAME}_feature_extractors
 add_library(${PROJECT_NAME}_classifiers
     src/classifiers/abstract_classifier.cpp
     src/classifiers/svm_classifier.cpp
+    src/classifiers/rgbd_svm_classifier.cpp
     src/classifiers/random_forests_classifier.cpp
     src/classifiers/neural_network_classifier.cpp
 )
@@ -123,6 +130,7 @@ add_library(${PROJECT_NAME}_validator_factory
   src/classifiers/validator_factory.cpp
   src/classifiers/abstract_validator.cpp
   src/classifiers/svm_validator.cpp
+  src/classifiers/rgbd_svm_validator.cpp
   src/classifiers/random_forests_validator.cpp
   src/classifiers/neural_network_validator.cpp
   )

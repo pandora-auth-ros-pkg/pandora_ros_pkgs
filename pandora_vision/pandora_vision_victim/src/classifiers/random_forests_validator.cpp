@@ -49,6 +49,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor. Initializes Random Forests classifier parameters and loads
    * classifier model.
@@ -86,5 +88,6 @@ namespace pandora_vision
     *classLabel = randomForestsValidator_.predict(featuresMat);
     *probability = randomForestsValidator_.predict_prob(featuresMat);
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

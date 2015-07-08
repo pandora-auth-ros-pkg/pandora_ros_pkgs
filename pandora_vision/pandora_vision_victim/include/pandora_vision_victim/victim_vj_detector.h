@@ -45,6 +45,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
 
   class VictimVJDetector
   {
@@ -96,5 +98,6 @@ namespace pandora_vision
       **/
       std::vector<float> predictionToProbability(std::vector<float> predictions);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_VJ_DETECTOR_H

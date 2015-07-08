@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_qrcode_handler">
+    <class name="pandora_vision/pandora_vision_qrcode"
+        type="pandora_vision::pandora_vision_qrcode::QrCodeHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects qrs
+      </description>
+    </class>
+  </library>
+</class_libraries>

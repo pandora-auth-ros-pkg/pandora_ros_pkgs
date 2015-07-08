@@ -38,6 +38,7 @@
 
 #include <cmath>
 #include <string>
+#include <vector>
 
 #include <ros/console.h>
 
@@ -49,6 +50,8 @@
  * @brief The main namespace for PANDORA vision
  */
 namespace pandora_vision
+{
+namespace pandora_vision_victim
 {
   AbstractValidator::AbstractValidator(const ros::NodeHandle& nh,
       const std::string& imageType,
@@ -122,13 +125,54 @@ namespace pandora_vision
           normalizationParamTwoPath, normalizationParamTwoTag);
     }
 
+    std::vector<bool> vocabularyNeeded;
     if (boost::iequals(imageType_ , "rgb"))
     {
-      featureExtraction_ = new RgbFeatureExtraction(classifierType_);
+      featureExtraction_[imageType_].reset(new RgbFeatureExtraction(classifierType_));
+      vocabularyNeeded.push_back(featureExtraction_[imageType_]->bagOfWordsVocabularyNeeded());
+      if (vocabularyNeeded[0])
+      {
+        const std::string bagOfWordsFile = imageType_ + "_" + classifierType_ + "_bag_of_words.xml";
+        const std::string bagOfWordsFilePath = filesDirectory + bagOfWordsFile;
+        cv::Mat vocabulary = file_utilities::loadFiles(bagOfWordsFilePath,
+            "bag_of_words");
+        featureExtraction_[imageType_]->setBagOfWordsVocabulary(vocabulary);
+      }
     }
     else if (boost::iequals(imageType_, "depth"))
     {
-      featureExtraction_ = new DepthFeatureExtraction(classifierType_);
+      featureExtraction_[imageType_].reset(new DepthFeatureExtraction(classifierType_));
+      vocabularyNeeded.push_back(featureExtraction_[imageType_]->bagOfWordsVocabularyNeeded());
+      if (vocabularyNeeded[0])
+      {
+        const std::string bagOfWordsFile = imageType_ + "_" + classifierType_ + "_bag_of_words.xml";
+        const std::string bagOfWordsFilePath = filesDirectory + bagOfWordsFile;
+        cv::Mat vocabulary = file_utilities::loadFiles(bagOfWordsFilePath,
+            "bag_of_words");
+        featureExtraction_[imageType_]->setBagOfWordsVocabulary(vocabulary);
+      }
+    }
+    else if (boost::iequals(imageType_, "rgbd"))
+    {
+      featureExtraction_["rgb"].reset(new RgbFeatureExtraction(classifierType_));
+      featureExtraction_["depth"].reset(new DepthFeatureExtraction(classifierType_));
+      vocabularyNeeded.push_back(featureExtraction_["rgb"]->bagOfWordsVocabularyNeeded());
+      vocabularyNeeded.push_back(featureExtraction_["depth"]->bagOfWordsVocabularyNeeded());
+      std::vector<std::string> imageTypesVec;
+      imageTypesVec.push_back("rgb");
+      imageTypesVec.push_back("depth");
+
+      for (int ii = 0; ii < vocabularyNeeded.size(); ii++)
+      if (vocabularyNeeded[ii])
+      {
+        const std::string bagOfWordsFile = imageType_ + "_"
+                                          + imageTypesVec[ii] + "_"
+                                          + classifierType_ + "_bag_of_words.xml";
+        const std::string bagOfWordsFilePath = filesDirectory + bagOfWordsFile;
+        cv::Mat vocabulary = file_utilities::loadFiles(bagOfWordsFilePath,
+            "bag_of_words");
+        featureExtraction_[imageTypesVec[ii]]->setBagOfWordsVocabulary(vocabulary);
+      }
     }
     else
     {
@@ -137,16 +181,7 @@ namespace pandora_vision
       ROS_BREAK();
     }
 
-    bool vocabularyNeeded = featureExtraction_->bagOfWordsVocabularyNeeded();
-    if (vocabularyNeeded)
-    {
-      const std::string bagOfWordsFile = imageType_ + "_" + classifierType_ + "_bag_of_words.xml";
-      const std::string bagOfWordsFilePath = filesDirectory + bagOfWordsFile;
-      cv::Mat vocabulary = file_utilities::loadFiles(bagOfWordsFilePath,
-          "bag_of_words");
-      featureExtraction_->setBagOfWordsVocabulary(vocabulary);
-    }
-    featureExtractionUtilities_ = new FeatureExtractionUtilities();
+    featureExtractionUtilities_ .reset(new FeatureExtractionUtilities());
     ROS_INFO_STREAM(nodeMessagePrefix_ << ": Initialized Abstract Validator instance");
   }
 
@@ -156,7 +191,12 @@ namespace pandora_vision
 
   void AbstractValidator::extractFeatures(const cv::Mat& inImage)
   {
-    featureExtraction_->extractFeatures(inImage);
+    featureExtraction_[imageType_]->extractFeatures(inImage);
+  }
+
+  void AbstractValidator::extractFeatures(const cv::Mat& inImage, const std::string& imageType)
+  {
+    featureExtraction_[imageType]->extractFeatures(inImage);
   }
 
   void AbstractValidator::calculatePredictionProbability(const cv::Mat& inImage,
@@ -167,7 +207,7 @@ namespace pandora_vision
     ROS_INFO_STREAM(nodeMessagePrefix_ << ": Extracted Features");
     if (!featureVector_.empty())
       featureVector_.clear();
-    featureVector_ = featureExtraction_->getFeatureVector();
+    featureVector_ = featureExtraction_[imageType_]->getFeatureVector();
 
     cv::Mat featuresMat = cv::Mat(featureVector_);
     // Make features matrix a row vector.
@@ -195,4 +235,45 @@ namespace pandora_vision
     ROS_INFO_STREAM(nodeMessagePrefix_ << ": Class Label = " << *classLabel);
     ROS_INFO_STREAM(nodeMessagePrefix_ << ": Probability = " << *probability);
   }
+
+  void AbstractValidator::calculatePredictionProbability(const cv::Mat& rgbImage,
+      const cv::Mat& depthImage, float* classLabel, float* probability)
+  {
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Extracting features");
+    extractFeatures(rgbImage, "rgb");
+    extractFeatures(depthImage, "depth");
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Extracted Features");
+    if (!featureVector_.empty())
+      featureVector_.clear();
+    featureVector_ = featureExtraction_["rgb"]->getFeatureVector();
+    std::vector<double> depthFeatureVector = featureExtraction_["depth"]->getFeatureVector();
+    featureVector_.insert(featureVector_.end(), depthFeatureVector.begin(), depthFeatureVector.end());
+
+    cv::Mat featuresMat = cv::Mat(featureVector_);
+    // Make features matrix a row vector.
+    if (featuresMat.cols == 1)
+      transpose(featuresMat, featuresMat);
+    /// Normalize the data
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Normalize features");
+    if (typeOfNormalization_ == 1)
+    {
+      double newMin = -1.0;
+      double newMax = 1.0;
+      featureExtractionUtilities_->performMinMaxNormalization(newMax, newMin,
+          &featuresMat, normalizationParamOneVec_, normalizationParamTwoVec_);
+    }
+    else if (typeOfNormalization_ == 2)
+    {
+      featureExtractionUtilities_->performZScoreNormalization(
+          &featuresMat, normalizationParamOneVec_, normalizationParamTwoVec_);
+    }
+
+    featuresMat.convertTo(featuresMat, CV_32FC1);
+
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Predict image class and probability");
+    predict(featuresMat, classLabel, probability);
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Class Label = " << *classLabel);
+    ROS_INFO_STREAM(nodeMessagePrefix_ << ": Probability = " << *probability);
+  }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

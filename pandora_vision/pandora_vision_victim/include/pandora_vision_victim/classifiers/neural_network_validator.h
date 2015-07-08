@@ -52,6 +52,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class NeuralNetworkValidator
    * @brief This class classifies images using a Random Forests classifier model.
@@ -85,6 +87,7 @@ namespace pandora_vision
       /// The OpenCV Neural Network classifier.
       CvANN_MLP neuralNetworkValidator_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_NEURAL_NETWORK_VALIDATOR_H
 

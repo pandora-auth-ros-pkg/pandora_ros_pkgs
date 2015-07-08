@@ -39,13 +39,18 @@
 #include <boost/algorithm/string.hpp>
 
 #include <nodelet/nodelet.h>
+#include <ros/ros.h>
 #include <pluginlib/class_list_macros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Image.h>
+#include <pcl_ros/point_cloud.h>
+#include <pcl/conversions.h>
 
 #include "distrib_msgs/FlirLeptonMsg.h"
 
-#include "utils/defines.h"
+#include "hole_fusion_node/utils/defines.h"
+#include "hole_fusion_node/utils/noise_elimination.h"
+#include "hole_fusion_node/utils/message_conversions.h"
 #include "synchronizer/pc_thermal_synchronizer.h"
 
 PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::PcThermalSynchronizer, nodelet::Nodelet)
@@ -80,11 +85,15 @@ namespace pandora_vision_hole
     meanProcessingTime_ = 0.0;
     ticks_ = 0;
 #endif
-
     // Take NodeHandlers from nodelet manager
     nh_ = this->getNodeHandle();
     private_nh_ = this->getPrivateNodeHandle();
     nodeName_ = boost::to_upper_copy<std::string>(this->getName());
+
+    nh_.param("thermal_mode", thermalMode_, true);
+    nh_.param("rgbd_mode", rgbdMode_, true);
+    nh_.param("rgbdt_mode", rgbdtMode_, true);
+    private_nh_.param("simulating", simulating_, false);
 
     // The synchronizer node starts off in life locked, waiting for the
     // hole fusion node to unlock him
@@ -98,10 +107,13 @@ namespace pandora_vision_hole
     // transactionary affairs with
     getTopicNames();
 
-    // Acquire the information about the input point cloud that cannot be
-    // acquired from the point cloud message.
-    // The parameters concerned are needed only if in simulation mode
-    getSimulationInfo();
+    if (simulating_)
+    {
+      // Acquire the information about the input point cloud that cannot be
+      // acquired from the point cloud message.
+      // The parameters concerned are needed only if in simulation mode
+      getSimulationInfo();
+    }
 
 /******************************************************************************
  *                                Synchronizer                                *
@@ -112,32 +124,44 @@ namespace pandora_vision_hole
     // If thermal mode is enabled in launch file message filters is on and
     // the two input messages are synchronized packed and sent.
     // If not only the pointcloud is sent for further usage
-    inputPointCloudSubscriberPtr_.reset( new PcSubscriber(nh_,
-          inputPointCloudTopic_, queue_) );
-    inputThermalCameraSubscriberPtr_.reset( new ThermalSubscriber(nh_,
-          inputThermalCameraTopic_, queue_) );
+    if (rgbdtMode_ || thermalMode_)
+    {
+      syncPointCloudSubscriberPtr_.reset( new PcSubscriber(nh_,
+            inputPointCloudTopic_, queue_) );
+      syncThermalCameraSubscriberPtr_.reset( new ThermalSubscriber(nh_,
+            syncThermalCameraTopic_, queue_) );
 
-    synchronizerPtr_.reset( new ApprTimePcThermalSynchronizer(
-          ApprTimePcThermalPolicy(queue_),
-          *inputPointCloudSubscriberPtr_,
-          *inputThermalCameraSubscriberPtr_) );
-    synchronizerPtr_->registerCallback(
-        boost::bind(&PcThermalSynchronizer::inputPointCloudThermalCallback, this, _1, _2));
+      synchronizerPtr_.reset( new ApprTimePcThermalSynchronizer(
+            ApprTimePcThermalPolicy(queue_),
+            *syncPointCloudSubscriberPtr_,
+            *syncThermalCameraSubscriberPtr_) );
+      synchronizerPtr_->registerCallback(
+          boost::bind(&PcThermalSynchronizer::syncPointCloudThermalCallback, this, _1, _2));
+    }
+    else if (rgbdMode_)
+    {
+      inputPointCloudSubscriber_ = nh_.subscribe(inputPointCloudTopic_, 1,
+          &PcThermalSynchronizer::inputPointCloudCallback, this);
+    }
 
 /******************************************************************************
  *                                Subscribers                                 *
  ******************************************************************************/
 
-    // Subscribe to the hole_fusion lock/unlock topic
-    unlockHoleFusionSubscriber_ = nh_.subscribe(unlockHoleFusionTopic_, 1,
-      &PcThermalSynchronizer::unlockHoleFusionCallback, this);
-
-    // Subscribe to the topic where the thermal node requests synchronizer
-    // to act.
-    unlockThermalSubscriber_ = nh_.subscribe(
-      unlockThermalTopic_, 1,
-      &PcThermalSynchronizer::unlockThermalCallback, this);
-
+    if (rgbdMode_ || rgbdtMode_)
+    {
+      // Subscribe to the hole_fusion lock/unlock topic
+      unlockHoleFusionSubscriber_ = nh_.subscribe(unlockHoleFusionTopic_, 1,
+        &PcThermalSynchronizer::unlockHoleFusionCallback, this);
+    }
+    if (thermalMode_)
+    {
+      // Subscribe to the topic where the thermal node requests synchronizer
+      // to act.
+      unlockThermalSubscriber_ = nh_.subscribe(
+        unlockThermalTopic_, 1,
+        &PcThermalSynchronizer::unlockThermalCallback, this);
+    }
     // Subscribe to the topic where the Hole Fusion node requests from the
     // synchronizer node to subscribe to the input point cloud topic
     subscribeToInputPointCloudSubscriber_ = nh_.subscribe(
@@ -155,28 +179,82 @@ namespace pandora_vision_hole
  *                                 Publishers                                 *
  ******************************************************************************/
 
-    // Advertise the synchronized point cloud
-    synchronizedPointCloudPublisher_ = nh_.advertise
-      <PointCloud>(synchronizedPointCloudTopic_, 1);
+    if (rgbdMode_ || rgbdtMode_)
+    {
+      // Advertise the synchronized point cloud
+      synchronizedPointCloudPublisher_ = nh_.advertise
+        <PointCloud>(synchronizedPointCloudTopic_, 1);
+    }
 
-    // Advertise the synchronized depth image
-    synchronizedDepthImagePublisher_ = nh_.advertise
-      <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1);
+    if (rgbdMode_ || rgbdtMode_)
+    {
+      // Advertise the synchronized depth image
+      synchronizedDepthImagePublisher_ = nh_.advertise
+        <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1);
 
-    // Advertise the synchronized rgb image
-    synchronizedRgbImagePublisher_ = nh_.advertise
-      <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1);
+      // Advertise the synchronized rgb image
+      synchronizedRgbImagePublisher_ = nh_.advertise
+        <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1);
+    }
 
-    // Advertise the synchronized thermal image and its index
-    synchronizedThermalImagePublisher_ = nh_.advertise
-      <distrib_msgs::FlirLeptonMsg>
-      (synchronizedThermalImageTopic_, 1);
+    if (rgbdtMode_ || thermalMode_)
+    {
+      // Advertise the synchronized thermal image and its index
+      synchronizedThermalImagePublisher_ = nh_.advertise
+        <distrib_msgs::FlirLeptonMsg>
+        (synchronizedThermalImageTopic_, 1);
 
-    thermalOutputReceiverPublisher_ = nh_.advertise
-      <std_msgs::String>
-      (thermalOutputReceiverTopic_, 1);
+      thermalOutputReceiverPublisher_ = nh_.advertise
+        <std_msgs::String>
+        (thermalOutputReceiverTopic_, 1);
+    }
 
-    NODELET_INFO("[%s] Initiated", nodeName_.c_str());
+    enhancedImagePublisher_ = nh_.advertise<pandora_vision_msgs::EnhancedImage>(
+        enhancedImageTopic_, 1);
+
+    if (thermalMode_)
+    {
+      enhancedImageCropperPublisher_ = nh_.advertise<pandora_vision_msgs::EnhancedImage>(
+          enhancedImageCropperTopic_, 1);
+    }
+
+    std::string modes;
+    if (rgbdMode_)
+      modes += "rgbd ";
+    if (rgbdtMode_)
+      modes += "rgbdt ";
+    if (thermalMode_)
+      modes += "thermal";
+    NODELET_INFO("[%s] Initiated %s", nodeName_.c_str(), modes.c_str());
+  }
+
+  void
+  PcThermalSynchronizer::
+  inputPointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& pcMsg)
+  {
+    sensor_msgs::ImagePtr rgbImageMessagePtr, depthImageMessagePtr;
+    PointCloudPtr pointCloudPtr;
+    initCallback(pointCloudPtr, rgbImageMessagePtr, depthImageMessagePtr, pcMsg);
+
+    boost::shared_ptr<pandora_vision_msgs::EnhancedImage> enhancedImagePtr(
+        new pandora_vision_msgs::EnhancedImage );
+    enhancedImagePtr->header = pcMsg->header;
+    enhancedImagePtr->rgbImage = *rgbImageMessagePtr;
+    enhancedImagePtr->depthImage = *depthImageMessagePtr;
+    enhancedImagePtr->isDepth = (hole_fusion::Parameters::Depth::interpolation_method == 0);
+
+    enhancedImagePublisher_.publish(enhancedImagePtr);
+
+    if (!holeFusionLocked_)
+    {
+      NODELET_INFO("[%s] RGBD Callback", nodeName_.c_str());
+      holeFusionLocked_ = true;
+      synchronizedPointCloudPublisher_.publish(pointCloudPtr);
+      synchronizedRgbImagePublisher_.publish(rgbImageMessagePtr);
+      synchronizedDepthImagePublisher_.publish(depthImageMessagePtr);
+
+      // inputPointCloudSubscriber_.shutdown();
+    }
   }
 
   /**
@@ -195,149 +273,61 @@ namespace pandora_vision_hole
    **/
   void
   PcThermalSynchronizer::
-  inputPointCloudThermalCallback(
+  syncPointCloudThermalCallback(
       const sensor_msgs::PointCloud2ConstPtr& pcMsg,
       const distrib_msgs::FlirLeptonMsgConstPtr& thermalMsg)
   {
-    // This block is responsible to sent the thermal image to thermal node.
-    // This way thermal node runs autonomously but it also provides its
-    // information to hole fusion node.
+    sensor_msgs::ImagePtr rgbImageMessagePtr, depthImageMessagePtr;
+    PointCloudPtr pointCloudPtr;
+    initCallback(pointCloudPtr, rgbImageMessagePtr, depthImageMessagePtr, pcMsg);
+
+    boost::shared_ptr<pandora_vision_msgs::EnhancedImage> enhancedImagePtr(
+        new pandora_vision_msgs::EnhancedImage );
+    enhancedImagePtr->header = pcMsg->header;
+    enhancedImagePtr->rgbImage = *rgbImageMessagePtr;
+    enhancedImagePtr->depthImage = *depthImageMessagePtr;
+    enhancedImagePtr->isDepth = (hole_fusion::Parameters::Depth::interpolation_method == 0);
+
+    enhancedImagePublisher_.publish(enhancedImagePtr);
+
     if (!thermalLocked_ || !holeFusionLocked_)
     {
-      //  This variable informs thermal node if it must publish to hole fusion
-      //  to thermal cropper node or both.
-      //  If it is set as "thermal" --> post to thermal cropper node.
-      //  If it is set as "hole" --> post to hole fusion node.
-      //  If it is set as "thermalhole" --> post to both.
+      NODELET_INFO("[%s] RGBDT Callback", nodeName_.c_str());
       std_msgs::StringPtr thermalIndex( new std_msgs::String );
 
-      // Exctract the pointcloud from the message and convert it
-      // to PointCloud<T>::Ptr type.
-      pcl::PCLPointCloud2 pcl_pc;
-      pcl_conversions::toPCL(*pcMsg, pcl_pc);
-      PointCloudPtr pointCloud, copiedPc;
-      copiedPc.reset( new PointCloud );
-      pcl::fromPCLPointCloud2(pcl_pc, *copiedPc);
-      pointCloud = copiedPc;
-
-      if (simulating_)
+      if (thermalMode_ && !thermalLocked_)
       {
-        // For simulation purposes, the width and height parameters of the
-        // point cloud must be set. Copy the input point cloud message to another
-        // one so that these can be set manually if and when needed
-        pointCloud.reset( new PointCloud );
-        pcl::copyPointCloud(*copiedPc, *pointCloud);
-
-        // The input point cloud is unorganized, in other words,
-        // simulation is running. Variables are needed to be set in order for
-        // the point cloud to be functionally exploitable.
-        if (pointCloud->height == 1)
-        {
-          // The point cloud's height
-          pointCloud->height = Parameters::Image::HEIGHT;
-
-          // The point cloud's width
-          pointCloud->width = Parameters::Image::WIDTH;
-        }
-      }
-
-      // Extract the RGB image from the point cloud
-      cv::Mat rgbImage = MessageConversions::convertPointCloudMessageToImage(
-        pointCloud, CV_8UC3);
-      // Convert the rgbImage to a ROS message
-      cv_bridge::CvImagePtr rgbImageMessagePtr( new cv_bridge::CvImage() );
-      rgbImageMessagePtr->encoding = sensor_msgs::image_encodings::BGR8;
-      rgbImageMessagePtr->image = rgbImage;
-
-      // Extract the depth image from the point cloud
-      cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
-        pointCloud, CV_32FC1);
-      // Convert the depthImage to a ROS message
-      cv_bridge::CvImagePtr depthImageMessagePtr(new cv_bridge::CvImage());
-      depthImageMessagePtr->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
-      depthImageMessagePtr->image = depthImage;
-
-      // This condition is crucial for the synchronization of thermal, rgb and
-      // depth images to be sent for further processing. This block is
-      // is responsible for the autonomous thermal procedure and sends
-      // an enhanced message to thermal cropper node.
-      if (!thermalLocked_)
-      {
-        // Lock the thermal procedure; aka prevent
-        // the execution of this if-block without the explicit request
-        // of the thermal cropper node.This way we can synchronize the rgb depth
-        // and thermal images sent to thermal cropper.
         thermalLocked_ = true;
-        // Change the thermalIndex_ variable to inform thermal node
         thermalIndex->data = thermalIndex->data + "thermal";
       }
 
-      // This condition is crucial for the synchronization of thermal, rgb and
-      // depth images to be sent for further processing. This block is
-      // is responsible for hole exctraction procedure and sends rgb and depth
-      // images to their respective nodes.
-      if (!holeFusionLocked_)
+      if ((rgbdMode_ || rgbdtMode_) && !holeFusionLocked_)
       {
-        // Lock the rgb_depth_thermal_synchronizer node; aka prevent
-        // the execution of this if-block without the explicit request
-        // of the hole fusion node.
         holeFusionLocked_ = true;
+        if (rgbdtMode_)
+          thermalIndex->data = thermalIndex->data + "hole";
 
-#ifdef DEBUG_TIME
-        ROS_INFO_NAMED(PKG_NAME, "Synchronizer unlocked");
-
-        ROS_INFO_NAMED(PKG_NAME,
-          "=================================================");
-
-        double t = ros::Time::now().toSec() - invocationTime_;
-
-        ROS_INFO_NAMED(PKG_NAME,
-          "Previous synchronizer invocation before %fs", t);
-
-        // Increment the number of this node's invocations
-        ticks_++;
-
-        if (ticks_ > 1)
-        {
-          meanProcessingTime_ += t;
-        }
-
-        ROS_INFO_NAMED(PKG_NAME,
-          "Mean processing time :                  %fs",
-          (meanProcessingTime_ / (ticks_ - 1)));
-
-        ROS_INFO_NAMED(PKG_NAME,
-          "=================================================");
-
-        invocationTime_ = ros::Time::now().toSec();
-
-        Timer::start("synchronizedCallback", "", true);
-#endif
-
-        // Publish the synchronized rgb image
-        synchronizedRgbImagePublisher_.publish(rgbImageMessagePtr->toImageMsg());
-
-        // Publish the synchronized depth image
-        synchronizedDepthImagePublisher_.publish(depthImageMessagePtr->toImageMsg());
-
-        // Publish the synchronized point cloud
-        synchronizedPointCloudPublisher_.publish(pointCloud);
-
-        // Change the thermalIndex_ variable to inform thermal node
-        thermalIndex->data = thermalIndex->data + "hole";
-
-#ifdef DEBUG_TIME
-        Timer::tick("synchronizedCallback");
-        Timer::printAllMeansTree();
-#endif
+        synchronizedPointCloudPublisher_.publish(pointCloudPtr);
+        synchronizedRgbImagePublisher_.publish(rgbImageMessagePtr);
+        synchronizedDepthImagePublisher_.publish(depthImageMessagePtr);
       }
 
-      // Publish the synchronized thermal message to thermal node
-      synchronizedThermalImagePublisher_.publish(thermalMsg);
-      thermalOutputReceiverPublisher_.publish(thermalIndex);
+      if (thermalMode_ || rgbdtMode_)
+      {
+        distrib_msgs::FlirLeptonMsg::Ptr thermalMsgPtr( new distrib_msgs::FlirLeptonMsg );
+        *thermalMsgPtr = *thermalMsg;
 
-      inputPointCloudSubscriberPtr_->unsubscribe();
-      inputThermalCameraSubscriberPtr_->unsubscribe();
+        synchronizedThermalImagePublisher_.publish(thermalMsgPtr);
+        thermalOutputReceiverPublisher_.publish(thermalIndex);
+      }
+
+      if (thermalMode_)
+      {
+        enhancedImageCropperPublisher_.publish(enhancedImagePtr);
+      }
+
+      // syncPointCloudSubscriberPtr_->unsubscribe();
+      // syncThermalCameraSubscriberPtr_->unsubscribe();
     }
   }
 
@@ -355,9 +345,16 @@ namespace pandora_vision_hole
   PcThermalSynchronizer::
   leaveSubscriptionToInputPointCloudCallback(const std_msgs::EmptyConstPtr& msg)
   {
-    // Shutdown the input thermal subscriber
-    inputPointCloudSubscriberPtr_->unsubscribe();
-    inputThermalCameraSubscriberPtr_->unsubscribe();
+    if (rgbdtMode_ || thermalMode_)
+    {
+      // Shutdown the input thermal subscriber
+      syncPointCloudSubscriberPtr_->unsubscribe();
+      syncThermalCameraSubscriberPtr_->unsubscribe();
+    }
+    else if (rgbdMode_)
+    {
+      inputPointCloudSubscriber_.shutdown();
+    }
   }
 
   /**
@@ -376,8 +373,17 @@ namespace pandora_vision_hole
   PcThermalSynchronizer::
   subscribeToInputPointCloudCallback(const std_msgs::EmptyConstPtr& msg)
   {
-    inputPointCloudSubscriberPtr_->subscribe();
-    inputThermalCameraSubscriberPtr_->subscribe();
+    if (rgbdtMode_ || thermalMode_)
+    {
+      syncPointCloudSubscriberPtr_->subscribe();
+      syncThermalCameraSubscriberPtr_->subscribe();
+      synchronizerPtr_->init();
+    }
+    else if (rgbdMode_)
+    {
+      inputPointCloudSubscriber_ = nh_.subscribe(inputPointCloudTopic_, 1,
+          &PcThermalSynchronizer::inputPointCloudCallback, this);
+    }
   }
 
   /**
@@ -403,8 +409,16 @@ namespace pandora_vision_hole
   unlockHoleFusionCallback(const std_msgs::EmptyConstPtr& lockMsg)
   {
     holeFusionLocked_ = false;
-    inputPointCloudSubscriberPtr_->subscribe();
-    inputThermalCameraSubscriberPtr_->subscribe();
+    // if (rgbdtMode_ || thermalMode_)
+    // {
+    //   syncPointCloudSubscriberPtr_->subscribe();
+    //   syncThermalCameraSubscriberPtr_->subscribe();
+    // }
+    // else if (rgbdMode_)
+    // {
+    //   inputPointCloudSubscriber_ = nh_.subscribe(inputPointCloudTopic_, 1,
+    //       &PcThermalSynchronizer::inputPointCloudCallback, this);
+    // }
   }
 
   /**
@@ -419,9 +433,81 @@ namespace pandora_vision_hole
   unlockThermalCallback(const std_msgs::EmptyConstPtr& lockMsg)
   {
     thermalLocked_ = false;
-    inputPointCloudSubscriberPtr_->subscribe();
-    inputThermalCameraSubscriberPtr_->subscribe();
+    // if (rgbdtMode_ || thermalMode_)
+    // {
+    //   syncPointCloudSubscriberPtr_->subscribe();
+    //   syncThermalCameraSubscriberPtr_->subscribe();
+    // }
   }
+
+  void
+  PcThermalSynchronizer::
+  initCallback(
+      PointCloudPtr& pcPtr,
+      sensor_msgs::ImagePtr& rgbImageMessagePtr,
+      sensor_msgs::ImagePtr& depthImageMessagePtr,
+      const sensor_msgs::PointCloud2ConstPtr& pcMsg)
+  {
+    // Exctract the pointcloud from the message and convert it
+    // to PointCloud<T>::Ptr type.
+    // pcl::PCLPointCloud2 pcl_pc;
+    // pcl_conversions::toPCL(*pcMsg, pcl_pc);
+    pcPtr = boost::make_shared<PointCloud>();
+    pcl::fromROSMsg(*pcMsg, *pcPtr);
+
+    if (simulating_)
+    {
+      // The input point cloud is unorganized, in other words,
+      // simulation is running. Variables are needed to be set in order for
+      // the point cloud to be functionally exploitable.
+      if (pcPtr->height == 1)
+      {
+        // The point cloud's height
+        pcPtr->height = hole_fusion::Parameters::Image::HEIGHT;
+
+        // The point cloud's width
+        pcPtr->width = hole_fusion::Parameters::Image::WIDTH;
+      }
+    }
+
+    // Extract the RGB image from the point cloud
+
+    // cv::Mat rgbImage = hole_fusion::MessageConversions::convertPointCloudMessageToImage(
+    //   pcPtr, CV_8UC3);
+    // cv_bridge::CvImagePtr rgbImageConverter( new cv_bridge::CvImage() );
+    // rgbImageConverter->header = pcMsg->header;
+    // rgbImageConverter->encoding = sensor_msgs::image_encodings::BGR8;
+    // rgbImageConverter->image = rgbImage;
+    // rgbImageMessagePtr = rgbImageConverter->toImageMsg();
+
+    rgbImageMessagePtr = boost::make_shared<sensor_msgs::Image>();
+    pcl::toROSMsg(*pcMsg, *rgbImageMessagePtr);
+    rgbImageMessagePtr->header = pcMsg->header;
+
+    // Extract the depth image from the point cloud
+    cv::Mat depthImage = hole_fusion::MessageConversions::convertPointCloudMessageToImage(
+        pcPtr, CV_32FC1);
+    cv::Mat interpolatedDepthImage;
+    hole_fusion::NoiseElimination::performNoiseElimination(depthImage, &interpolatedDepthImage);
+
+#ifdef DEBUG_SHOW
+    if (hole_fusion::Parameters::Debug::show_depth_image)
+    {
+      hole_fusion::Visualization::showScaled("Interpolated Depth image", interpolatedDepthImage, 1);
+    }
+#endif
+
+    cv_bridge::CvImagePtr depthImageConverter(new cv_bridge::CvImage());
+    depthImageConverter->header = pcMsg->header;
+    depthImageConverter->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
+    depthImageConverter->image = interpolatedDepthImage;
+    depthImageMessagePtr = depthImageConverter->toImageMsg();
+
+    // depthImageMessagePtr = boost::make_shared<sensor_msgs::Image>();
+    // MessageConversions::toROSDepthMsg(*pcMsg, *depthImageMessagePtr);
+    // depthImageMessagePtr->header = pcMsg->header;
+  }
+
 
   /**
     @brief Variables regarding the point cloud are needed to be set in
@@ -434,16 +520,8 @@ namespace pandora_vision_hole
   PcThermalSynchronizer::
   getSimulationInfo()
   {
-    // Read "simulating" from the nodehandle
-    if (!private_nh_.getParam("simulating", simulating_))
-    {
-      NODELET_FATAL(
-        "[%s] Simulating mode failed to be read", nodeName_.c_str());
-      ROS_BREAK();
-    }
-
     // Read "height" from the nodehandle
-    if (!private_nh_.getParam("height", Parameters::Image::HEIGHT))
+    if (!private_nh_.getParam("height", hole_fusion::Parameters::Image::HEIGHT))
     {
       NODELET_FATAL(
         "[%s] Input dimension height failed to be read", nodeName_.c_str());
@@ -451,7 +529,7 @@ namespace pandora_vision_hole
     }
 
     // Read "width" from the nodehandle
-    if (!private_nh_.getParam("width", Parameters::Image::WIDTH))
+    if (!private_nh_.getParam("width", hole_fusion::Parameters::Image::WIDTH))
     {
       NODELET_FATAL(
         "[%s] Input dimension width failed to be read", nodeName_.c_str());
@@ -477,41 +555,38 @@ namespace pandora_vision_hole
       ROS_BREAK();
     }
 
-    // Read the name of the topic from where the rgb_depth_thermalsynchronizer
-    // node acquires the input thermal message
-    if (!private_nh_.getParam("subscribed_topics/thermal_topic", inputThermalCameraTopic_))
+    if (rgbdMode_ || rgbdtMode_)
     {
-      NODELET_FATAL("[%s] Could not find thermal camera topic", nodeName_.c_str());
-      ROS_BREAK();
+      // Read the name of the topic that the Hole Fusion node uses to unlock
+      // the synchronizer node
+      if (!private_nh_.getParam("subscribed_topics/hole_fusion_unlock_topic",
+            unlockHoleFusionTopic_))
+      {
+        NODELET_FATAL(
+          "[%s] Could not find topic hole fusion unlock_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
     }
-
-    // This variable indicates the mode in which Hole-Package is running
-    // If is set to true -> Rgb-D-T mode
-    // Else Rgb-D mode
-    if (!nh_.getParam("thermal", thermalMode_))
+    if (rgbdtMode_ || thermalMode_)
     {
-      NODELET_FATAL("[%s] Could not find Packages Mode", nodeName_.c_str());
-      ROS_BREAK();
+      // Read the name of the topic from where the rgb_depth_thermalsynchronizer
+      // node acquires the input thermal message
+      if (!private_nh_.getParam("subscribed_topics/thermal_topic", syncThermalCameraTopic_))
+      {
+        NODELET_FATAL("[%s] Could not find thermal camera topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
     }
-
-    // Read the name of the topic that the Hole Fusion node uses to unlock
-    // the synchronizer node
-    if (!private_nh_.getParam("subscribed_topics/hole_fusion_unlock_topic",
-          unlockHoleFusionTopic_))
+    if (thermalMode_)
     {
-      NODELET_FATAL(
-        "[%s] Could not find topic hole fusion unlock_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
-
-    // Read the name of the topic that the synchronizer node uses to publish or
-    // not to thermal standalone node.
-    if (!private_nh_.getParam("subscribed_topics/thermal_unlock_synchronizer_topic",
-          unlockThermalTopic_))
-    {
-      NODELET_FATAL(
-        "[%s] Could not find topic thermal unlock_topic", nodeName_.c_str());
-      ROS_BREAK();
+      // not to thermal standalone node.
+      if (!private_nh_.getParam("subscribed_topics/thermal_unlock_topic",
+            unlockThermalTopic_))
+      {
+        NODELET_FATAL(
+          "[%s] Could not find topic thermal unlock_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
     }
 
     // Read the name of the topic that the Hole Fusion node uses to request from
@@ -523,7 +598,6 @@ namespace pandora_vision_hole
         "[%s] Could not find subscribe to input command topic", nodeName_.c_str());
       ROS_BREAK();
     }
-
     // Read the name of the topic that the Hole Fusion node uses to request from
     // the synchronizer node to leave its subscription to the input point cloud
     if (!private_nh_.getParam("subscribed_topics/leave_subscription_to_input",
@@ -534,53 +608,77 @@ namespace pandora_vision_hole
       ROS_BREAK();
     }
 
-    // Read the name of the topic that the synchronizer node will be publishing
-    // the input point cloud to
-    if (!private_nh_.getParam("published_topics/point_cloud_internal_topic",
-          synchronizedPointCloudTopic_))
+    if (rgbdMode_ || rgbdtMode_)
     {
-      NODELET_FATAL(
-          "[%s] Could not find topic point_cloud_internal_topic", nodeName_.c_str());
+      // Read the name of the topic that the synchronizer node will be publishing
+      // the input point cloud to
+      if (!private_nh_.getParam("published_topics/point_cloud_internal_topic",
+            synchronizedPointCloudTopic_))
+      {
+        NODELET_FATAL(
+            "[%s] Could not find topic point_cloud_internal_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
+    }
+
+    if (rgbdMode_ || rgbdtMode_)
+    {
+      // Read the name of the topic that the synchronizer node will be publishing
+      // the depth image extracted from the input point cloud to
+      if (!private_nh_.getParam("published_topics/depth_image_topic",
+            synchronizedDepthImageTopic_))
+      {
+        NODELET_FATAL(
+          "[%s] Could not find topic depth_image_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
+      // Read the name of the topic that the synchronizer node will be publishing
+      // the depth image extracted from the input point cloud to
+      if (!private_nh_.getParam("published_topics/rgb_image_topic",
+            synchronizedRgbImageTopic_))
+      {
+        NODELET_FATAL(
+          "[%s] Could not find topic rgb_image_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
+    }
+
+    if (rgbdtMode_ || thermalMode_)
+    {
+      // Read the name of the topic that the synchronizer node will be publishing
+      // the thermal info extracted from flir camera
+      if (!private_nh_.getParam("published_topics/thermal_image_topic",
+            synchronizedThermalImageTopic_))
+      {
+        NODELET_FATAL(
+          "[%s] Could not find topic thermal_image_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
+      // Read the name of the topic that the synchronizer node will be publishing
+      // the rgb and depth image to thermal cropper node
+      if (!private_nh_.getParam("published_topics/thermal_output_receiver_topic",
+            thermalOutputReceiverTopic_))
+      {
+        NODELET_FATAL("[%s] Could not find topic thermal_output_receiver_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
+    }
+
+    if (!private_nh_.getParam("published_topics/enhanced_image_topic",
+          enhancedImageTopic_))
+    {
+      NODELET_FATAL("[%s] Could not find topic enhanced_image_topic", nodeName_.c_str());
       ROS_BREAK();
     }
 
-    // Read the name of the topic that the synchronizer node will be publishing
-    // the depth image extracted from the input point cloud to
-    if (!private_nh_.getParam("published_topics/depth_image_topic",
-          synchronizedDepthImageTopic_))
+    if (thermalMode_)
     {
-      NODELET_FATAL(
-        "[%s] Could not find topic depth_image_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
-
-    // Read the name of the topic that the synchronizer node will be publishing
-    // the depth image extracted from the input point cloud to
-    if (!private_nh_.getParam("published_topics/rgb_image_topic",
-          synchronizedRgbImageTopic_))
-    {
-      NODELET_FATAL(
-        "[%s] Could not find topic rgb_image_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
-
-    // Read the name of the topic that the synchronizer node will be publishing
-    // the thermal info extracted from flir camera
-    if (!private_nh_.getParam("published_topics/thermal_image_topic",
-          synchronizedThermalImageTopic_))
-    {
-      NODELET_FATAL(
-        "[%s] Could not find topic thermal_image_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
-
-    // Read the name of the topic that the synchronizer node will be publishing
-    // the rgb and depth image to thermal cropper node
-    if (!private_nh_.getParam("published_topics/thermal_output_receiver_topic",
-          thermalOutputReceiverTopic_))
-    {
-      NODELET_FATAL("[%s] Could not find topic thermal_output_receiver_topic", nodeName_.c_str());
-      ROS_BREAK();
+      if (!private_nh_.getParam("published_topics/enhanced_image_cropper_topic",
+            enhancedImageCropperTopic_))
+      {
+        NODELET_FATAL("[%s] Could not find topic enhanced_image_cropper_topic", nodeName_.c_str());
+        ROS_BREAK();
+      }
     }
   }
 

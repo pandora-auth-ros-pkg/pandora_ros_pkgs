@@ -47,6 +47,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class RandomForestsClassifier : public AbstractClassifier
   {
     public:
@@ -59,7 +61,7 @@ namespace pandora_vision
        * @param imageType[const std::string&] The type of input images given to
        * the classifier (RGB or Depth).
        */
-      RandomForestsClassifier(const std::string& ns, const std::string& datasetPath,
+      RandomForestsClassifier(const ros::NodeHandle& nh, const std::string& datasetPath,
           const std::string& classifierType,
           const std::string& imageType);
 
@@ -105,5 +107,6 @@ namespace pandora_vision
       /// The Pointer to the classifier object.
       boost::shared_ptr<CvRTrees> classifierPtr_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_RANDOM_FORESTS_CLASSIFIER_H

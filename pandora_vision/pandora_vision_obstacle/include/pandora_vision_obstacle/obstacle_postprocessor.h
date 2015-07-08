@@ -46,17 +46,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_obstacle
+{
   class ObstaclePostProcessor : public VisionPostProcessor<pandora_vision_msgs::ObstacleAlertVector>
   {
-    public:
-      typedef boost::shared_ptr<pandora_vision_msgs::ObstacleAlertVector> ObstacleAlertVectorPtr;
+   public:
+    typedef boost::shared_ptr<pandora_vision_msgs::ObstacleAlertVector> ObstacleAlertVectorPtr;
 
-      ObstaclePostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~ObstaclePostProcessor();
+    ObstaclePostProcessor();
 
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const ObstacleAlertVectorPtr& output);
+    postProcess(const POIsStampedConstPtr& input, const ObstacleAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_OBSTACLE_POSTPROCESSOR_H

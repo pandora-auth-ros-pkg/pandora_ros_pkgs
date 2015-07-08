@@ -80,6 +80,18 @@ namespace pandora_vision
         return detector_->findNonIdenticalLines(lineCoeffs, grad, beta);
       }
 
+      bool detectLineIntersection(const std::vector<cv::Vec4i>& verticalLines,
+          const cv::Vec4i& line)
+      {
+        return detector_->detectLineIntersection(verticalLines, line);
+      }
+
+      bool pickLineColor(const cv::Mat& hsvImage, const cv::Vec4i& line,
+          int level = 1)
+      {
+        return detector_->pickLineColor(hsvImage, line, level);
+      }
+
       std::vector<cv::Vec4i> performProbHoughLines(const cv::Mat& rgbImage,
           const cv::Mat& binaryImage, int level = 1)
       {
@@ -105,6 +117,57 @@ namespace pandora_vision
     ASSERT_FALSE(findNonIdenticalLines(lineCoeffs, 90, 22));
     ASSERT_TRUE(findNonIdenticalLines(lineCoeffs, 85, 35));
     ASSERT_TRUE(findNonIdenticalLines(lineCoeffs, 95, 28));
+  }
+
+  TEST_F(SoftObstacleDetectorTest, doLinesIntersect)
+  {
+    std::vector<cv::Vec4i> lines;
+
+    lines.push_back(cv::Vec4i(1, 1, 1, 10));
+    lines.push_back(cv::Vec4i(5, 1, 5, 15));
+    lines.push_back(cv::Vec4i(12, 20, 10, 5));
+    lines.push_back(cv::Vec4i(15, 18, 16, 2));
+
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(0, 1, 2, 10)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(2, 1, 2, 10)));
+
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(5, 2, 6, 15)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(8, 1, 15, 10)));
+
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(11, 5, 11, 20)));
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(12, 5, 10, 20)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(10, 10, 11, 20)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(12, 15, 15, 5)));
+
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(15, 2, 15, 18)));
+    ASSERT_TRUE(detectLineIntersection(lines, cv::Vec4i(16, 18, 16, 2)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(15, 15, 14, 1)));
+    ASSERT_FALSE(detectLineIntersection(lines, cv::Vec4i(16, 5, 18, 20)));
+  }
+
+  TEST_F(SoftObstacleDetectorTest, isLineWhite)
+  {
+    cv::Mat rgbImage(40, 40, CV_8UC3, cv::Scalar(0, 0, 0));
+
+    cv::line(rgbImage, cv::Point(5, 5), cv::Point(6, 30),
+        cv::Scalar(255, 255, 255), 2, 8);
+    cv::line(rgbImage, cv::Point(10, 5), cv::Point(12, 35),
+        cv::Scalar(0, 255, 255), 2, 8);
+    cv::line(rgbImage, cv::Point(15, 10), cv::Point(16, 35),
+        cv::Scalar(255, 0, 255), 2, 8);
+    cv::line(rgbImage, cv::Point(20, 5), cv::Point(22, 25),
+        cv::Scalar(0, 0, 255), 2, 8);
+    cv::line(rgbImage, cv::Point(30, 5), cv::Point(32, 35),
+        cv::Scalar(255, 255, 255), 2, 8);
+
+    cv::Mat hsvImage;
+    cv::cvtColor(rgbImage, hsvImage, CV_BGR2HSV);
+
+    ASSERT_TRUE(pickLineColor(hsvImage, cv::Vec4i(2, 2, 3, 15)));
+    ASSERT_FALSE(pickLineColor(hsvImage, cv::Vec4i(5, 2, 6, 17)));
+    ASSERT_FALSE(pickLineColor(hsvImage, cv::Vec4i(7, 5, 8, 17)));
+    ASSERT_FALSE(pickLineColor(hsvImage, cv::Vec4i(10, 2, 11, 12)));
+    ASSERT_TRUE(pickLineColor(hsvImage, cv::Vec4i(15, 2, 16, 17)));
   }
 
   TEST_F(SoftObstacleDetectorTest, areVerticalLinesDetectedCorrectly)
@@ -162,7 +225,8 @@ namespace pandora_vision
 
     EXPECT_EQ(1, roi->x);
     EXPECT_EQ(1, roi->y);
-    EXPECT_EQ(3, roi->width);
-    EXPECT_EQ(2, roi->height);
+    // Considering that a pixel has width and height equal to 1
+    EXPECT_EQ(4, roi->width);
+    EXPECT_EQ(3, roi->height);
   }
 }  // namespace pandora_vision

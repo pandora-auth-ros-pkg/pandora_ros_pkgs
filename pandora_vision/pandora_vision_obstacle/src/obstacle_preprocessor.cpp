@@ -43,25 +43,24 @@
 
 namespace pandora_vision
 {
-  ObstaclePreProcessor::ObstaclePreProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) : sensor_processor::PreProcessor<sensor_msgs::PointCloud2,
-    ImagesStamped>(ns, handler), converterPtr_(new PointCloudToImageConverter)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
-  }
+namespace pandora_vision_obstacle
+{
 
-  ObstaclePreProcessor::~ObstaclePreProcessor() {}
+  ObstaclePreProcessor::ObstaclePreProcessor()
+    : sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage, ImagesStamped>()
+  {}
 
-  bool ObstaclePreProcessor::preProcess(const PointCloud2ConstPtr& input,
+  bool ObstaclePreProcessor::preProcess(const EnhancedImageConstPtr& input,
     const ImagesStampedPtr& output)
   {
     output->setHeader(input->header);
 
-    output->setRgbImage(converterPtr_->convertPclToImage(input,
-          CV_8UC3));
-    output->setDepthImage(converterPtr_->convertPclToImage(input,
-          CV_32FC1));
+    cv_bridge::CvImagePtr inMsg;
+    inMsg = cv_bridge::toCvCopy(input->rgbImage, sensor_msgs::image_encodings::BGR8);
+    output->setRgbImage(inMsg->image);
+
+    inMsg = cv_bridge::toCvCopy(input->depthImage, sensor_msgs::image_encodings::TYPE_32FC1);
+    output->setDepthImage(inMsg->image);
 
     if (output->rgbImage.empty() || output->depthImage.empty())
     {
@@ -72,4 +71,5 @@ namespace pandora_vision
     return true;
   }
 
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision

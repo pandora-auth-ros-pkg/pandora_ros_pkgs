@@ -41,6 +41,10 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_hole
+{
+namespace hole_fusion
+{
   /**
     @class HoleValidationTest
     @brief Tests the integrity of methods of class HoleValidation
@@ -1132,4 +1136,6 @@ namespace pandora_vision
     ASSERT_EQ ( 1.0, v_it->second);
   }
 
-} // namespace pandora_vision
+}  // namespace hole_fusion
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

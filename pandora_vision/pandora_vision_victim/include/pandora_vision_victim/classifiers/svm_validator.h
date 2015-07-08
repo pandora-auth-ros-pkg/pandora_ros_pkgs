@@ -55,6 +55,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class SvmValidator
    * @brief This class classifies images using an SVM classifier model.
@@ -114,5 +116,6 @@ namespace pandora_vision
 
       boost::shared_ptr<PrincipalComponentAnalysis> pcaPtr_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_SVM_VALIDATOR_H

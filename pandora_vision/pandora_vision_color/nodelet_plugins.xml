@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_color_handler">
+    <class name="pandora_vision/pandora_vision_color"
+        type="pandora_vision::pandora_vision_color::ColorHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects colors
+      </description>
+    </class>
+  </library>
+</class_libraries>

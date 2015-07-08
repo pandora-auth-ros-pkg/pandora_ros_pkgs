@@ -32,7 +32,7 @@
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * Author: 
+ * Author:
  *********************************************************************/
 
 #include "pandora_vision_landoltc/landoltc_3d/landoltc3d_detector.h"

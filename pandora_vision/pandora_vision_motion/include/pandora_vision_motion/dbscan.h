@@ -40,11 +40,14 @@
 
 #include "opencv2/opencv.hpp"
 #include <map>
+#include <new>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-
+#include <ros/ros.h>
 namespace pandora_vision
+{
+namespace pandora_vision_motion
 {
   typedef std::vector<int32_t> Neighbors;
   typedef std::vector<bool> NoisePoints;
@@ -60,16 +63,12 @@ namespace pandora_vision
       //!< Minimum number of points required to form a dense region
       size_t _minPts;
 
-      int _cluster_id;
 
       //!< Vector of visited points
       VisitedPoints _visitedPoints;
       //!< Vector of clustered data
       ClusteredPoints _clusteredPoints;
       NoisePoints _noise;
-      std::map<int, int> _labels;
-
-      std::vector<cv::Rect>& _data;
 
       /**
        @brief Function that initializes all vectors to begin with the
@@ -95,14 +94,14 @@ namespace pandora_vision
        @param pt2: Second point
        @return their distance
       */
-      double dist2d(cv::Point2d pt1, cv::Point2d pt2);
+      double dist2d(cv::Point pt1, cv::Point pt2);
 
       /**
        @brief Function that returns all points with P's eps-neighborhood
        @param P:current point,we are processeing
        @return vector of all point in the neighborhoud
       */
-      std::vector<int> regionQuery(int p);
+      void regionQuery(int p, std::vector<int>* res);
 
        /**
        @brief If a point is found to be a dense part of a cluster, its
@@ -114,19 +113,24 @@ namespace pandora_vision
        @param  neighbours, found neighbours for current point
        @param void
       */
-      void expandCluster(int p, std::vector<int> neighbours);
+      void expandCluster(int p, std::vector<int>* neighbours);
 
-      double calculateDistanceMatrix(int ai, int bi);
+      double calculateDistanceMatrix(int pt1, int pt2);
 
       double *DP;
 
     public:
-      //!< Class constructor
-      explicit DBSCAN(std::vector<cv::Rect>& _data, double eps, int minPts);
+      int _cluster_id;
+
+      std::map<int, int> _labels;
+      std::vector<cv::Point>& _data;
+
+      /// Class constructor
+      DBSCAN(std::vector<cv::Point>& data, double eps, int minPts);
 
       ~DBSCAN();
 
-      void dbscan_cluster();
+      void cluster();
 
       /**
        @brief Function that returns all clusters calculated from the given
@@ -134,7 +138,10 @@ namespace pandora_vision
        @param void
        @return vector of clusters
       */
-      std::vector<std::vector<cv::Rect> > getGroups();
+      std::vector<std::vector<cv::Point> > getClusters();
+
+      std::vector<double> getCohesion(const std::vector<std::vector<cv::Point> >& clusters);
   };
+}  // namespace pandora_vision_motion
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_MOTION_DBSCAN_H

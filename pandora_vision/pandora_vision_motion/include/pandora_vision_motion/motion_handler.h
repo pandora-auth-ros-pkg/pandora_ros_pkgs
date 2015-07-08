@@ -48,16 +48,15 @@
 
 namespace pandora_vision
 {
-  class MotionHandler : public VisionHandler<MotionPreProcessor, 
+namespace pandora_vision_motion
+{
+  class MotionHandler : public VisionHandler<MotionPreProcessor,
     MotionProcessor, MotionPostProcessor>
   {
-    public:
-      explicit MotionHandler(const std::string& ns);
-      virtual ~MotionHandler() {}
-
-    private:
-      virtual void completeTransition();
+   public:
+    MotionHandler();
   };
+}  // namespace pandora_vision_motion
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_MOTION_MOTION_HANDLER_H

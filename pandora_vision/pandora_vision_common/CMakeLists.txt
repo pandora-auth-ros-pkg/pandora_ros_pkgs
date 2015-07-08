@@ -27,6 +27,7 @@ catkin_package(
     include
   LIBRARIES
     ${PROJECT_NAME}_pcl_to_image
+    ${PROJECT_NAME}_discrete_wavelet_transform
   )
 
 include_directories(
@@ -44,9 +45,24 @@ target_link_libraries(${PROJECT_NAME}_pcl_to_image
   ${catkin_LIBRARIES}
   )
 
+############################# discrete wavelet transform #########################
+add_library(${PROJECT_NAME}_discrete_wavelet_transform
+  src/pandora_vision_utilities/discrete_wavelet_transform.cpp
+)
+target_link_libraries(${PROJECT_NAME}_discrete_wavelet_transform
+  ${catkin_LIBRARIES}
+)
+
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}
     include/**/*.h
     src/**/*.cpp
+    test/**/*.cpp
     )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
+
+##################################### Testing ##################################
+
+if(CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()

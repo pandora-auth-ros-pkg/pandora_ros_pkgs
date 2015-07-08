@@ -70,14 +70,13 @@ namespace pandora_vision
       * @param encoding [int] The image encoding using to transform the image message to
       * an OpenCV matrix
       **/
-    VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler,
-                       const std::string& encoding);
+    VisionPreProcessor();
 
-    /**
-      * @brief Virtual Destructor
-      **/
-    virtual
-    ~VisionPreProcessor() {}
+    void
+    setImageEncoding(const std::string& encoding)
+    {
+      encoding_ = encoding;
+    }
 
     /**
       * @brief Function that gets a message containing an image and converts it to a matrix
@@ -96,12 +95,10 @@ namespace pandora_vision
   };
 
   VisionPreProcessor::
-  VisionPreProcessor(const std::string& ns, sensor_processor::Handler* handler,
-    const std::string& encoding) : sensor_processor::PreProcessor<sensor_msgs::Image,
-    CVMatStamped>(ns, handler)
-  {
-    encoding_ = encoding;
-  }
+  VisionPreProcessor() :
+    sensor_processor::PreProcessor<sensor_msgs::Image, CVMatStamped>(),
+    encoding_("")
+  {}
 
   bool
   VisionPreProcessor::
@@ -109,7 +106,15 @@ namespace pandora_vision
   {
     // ROS_DEBUG_STREAM("["+this->accessPublicNh()->getNamespace()+"] Calling vision preprocessor.");
     cv_bridge::CvImagePtr inMsg;
-    inMsg = cv_bridge::toCvCopy(*input, encoding_);
+    if (encoding_ == "")
+    {
+      inMsg = cv_bridge::toCvCopy(*input, input->encoding);
+    }
+    else
+    {
+      inMsg = cv_bridge::toCvCopy(*input, encoding_);
+    }
+
     output->image = inMsg->image.clone();
 
     output->header = input->header;

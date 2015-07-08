@@ -46,6 +46,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   PrincipalComponentAnalysis::PrincipalComponentAnalysis()
   {
     pca_ = cv::PCA();
@@ -89,6 +91,7 @@ namespace pandora_vision
       fs["eigenvalues"] >> pca_.eigenvalues;
       fs.release();
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 

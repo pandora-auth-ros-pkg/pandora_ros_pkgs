@@ -47,17 +47,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimPostProcessor : public VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>
   {
-    public:
-      typedef boost::shared_ptr<pandora_common_msgs::GeneralAlertVector> GeneralAlertVectorPtr;
+   public:
+    typedef boost::shared_ptr<pandora_common_msgs::GeneralAlertVector> GeneralAlertVectorPtr;
 
-      VictimPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~VictimPostProcessor();
+    VictimPostProcessor();
 
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const GeneralAlertVectorPtr& output);
+    postProcess(const POIsStampedConstPtr& input, const GeneralAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_VICTIM_VICTIM_POSTPROCESSOR_H

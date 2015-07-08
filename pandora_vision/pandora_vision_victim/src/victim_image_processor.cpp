@@ -44,21 +44,23 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   VictimImageProcessor::VictimImageProcessor(const std::string& ns,
     sensor_processor::Handler* handler)
     : sensor_processor::Processor<EnhancedImageStamped,
       POIsStamped>(ns, handler)
   {
-    params_.configVictim(*this->accessPublicNh());
+    params_.configVictim(this->getProcessorNodeHandle());
 
     _debugVictimsPublisher = image_transport::ImageTransport(
-      *this->accessProcessorNh()).advertise(params_.victimDebugImg, 1, true);
+      this->getProcessorNodeHandle()).advertise(params_.victimDebugImg, 1, true);
 
-    rgbSvmValidatorPtr_.reset(new SvmValidator(*this->accessPublicNh(), "rgb", "svm"));
-    depthSvmValidatorPtr_.reset(new SvmValidator(*this->accessPublicNh(), "depth", "svm"));
+    rgbSvmValidatorPtr_.reset(new SvmValidator(this->getProcessorNodeHandle(), "rgb", "svm"));
+    depthSvmValidatorPtr_.reset(new SvmValidator(this->getProcessorNodeHandle(), "depth", "svm"));
 
     ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+      this->getProcessorNodeHandle().getNamespace());
   }
 
   VictimImageProcessor::VictimImageProcessor()
@@ -111,7 +113,7 @@ namespace pandora_vision
               rgb_svm_bounding_boxes.push_back(re);
               rgb_svm_p.push_back(final_victims[i]->getProbability());
               break;
-            case DEPTH_RGB_SVM:
+            case DEPTH_SVM:
               depth_svm_keypoints.push_back(kp);
               depth_svm_bounding_boxes.push_back(re);
               depth_svm_p.push_back(final_victims[i]->getProbability());
@@ -225,7 +227,7 @@ namespace pandora_vision
       depthSvmProbability->setPoint(p);  // center of frame???]
       depthSvmProbability->setWidth(input->getDepthImage().rows);
       depthSvmProbability->setHeight(input->getDepthImage().cols);
-      depthSvmProbability->setSource(DEPTH_RGB_SVM);
+      depthSvmProbability->setSource(DEPTH_SVM);
     }
 
     finalProbability.push_back(rgbSvmProbability);
@@ -265,4 +267,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

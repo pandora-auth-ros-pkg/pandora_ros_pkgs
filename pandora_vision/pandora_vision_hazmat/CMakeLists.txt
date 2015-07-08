@@ -5,6 +5,8 @@ find_package(Boost REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     pandora_vision_common
     pandora_vision_msgs
     state_manager
@@ -27,6 +29,8 @@ catkin_package(
     #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       pandora_vision_common
       pandora_vision_msgs
       state_manager

@@ -43,15 +43,18 @@
 
 namespace pandora_vision
 {
-  QrCodePreProcessor::QrCodePreProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
-    sensor_msgs::image_encodings::BGR8)
+namespace pandora_vision_qrcode
+{
+  void
+  QrCodePreProcessor::
+  initialize(const std::string& ns, sensor_processor::Handler* handler)
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+    VisionPreProcessor::initialize(ns, handler);
+    setImageEncoding(sensor_msgs::image_encodings::BGR8);
   }
 
-  QrCodePreProcessor::~QrCodePreProcessor()
-  {
-  }
+  QrCodePreProcessor::
+  QrCodePreProcessor() : VisionPreProcessor()
+  {}
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision

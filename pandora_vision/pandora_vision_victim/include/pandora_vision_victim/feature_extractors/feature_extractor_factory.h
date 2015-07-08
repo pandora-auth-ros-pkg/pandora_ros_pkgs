@@ -52,6 +52,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class FeatureExtractorFactory
    * @brief This class extracts features from images.
@@ -101,6 +103,7 @@ namespace pandora_vision
       {
       }
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_FEATURE_EXTRACTOR_FACTORY_H
 

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="namespace" default="/pandora_vision/pandora_vision_victim" />
+
+  <arg name="openni" default="false" />
+
+  <group if="$(arg openni)">
+    <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole_standalone.launch" >
+      <arg name="openni" value="true" />
+      <arg name="rgbd" value="true" />
+      <arg name="rgbdt" value="false" />
+      <arg name="thermal" value="false" />
+    </include>
+  </group>
+
+  <arg name="openni2" default="false" />
+
+  <group if="$(arg openni2)">
+    <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole_standalone.launch" >
+      <arg name="openni2" value="true" />
+      <arg name="rgbd" value="true" />
+      <arg name="rgbdt" value="false" />
+      <arg name="thermal" value="false" />
+    </include>
+  </group>
+
+
+  <!-- <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" /> -->
+
+  <include file="$(find pandora_vision_victim)/launch/pandora_vision_victim.launch"
+      ns="$(arg namespace)" >
+    <!-- <arg name="output" value="screen" /> -->
+  </include>
+
+
+<!-- <include file="$(find state_manager)/launch/stateManager.launch" /> -->
+
+ <!--
+
+ <include file="$(find openni_launch)/launch/openni.launch" >
+    <arg name="camera" value="kinect" />
+    <arg name="publish_tf" value="false" />
+    <arg name="depth_registration" value="true" />
+  </include>
+  <param name="kinect/topic_name" value="/kinect/rgb/image_raw" />
+
+
+
+    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
+        command="load" ns="victim"/>
+
+    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
+        command="load" ns="victim"/>
+
+    <param name="model_url" type="str" value="https://pandora.ee.auth.gr/vision/model.xml"/>
+ /-->
+
+
+</launch>

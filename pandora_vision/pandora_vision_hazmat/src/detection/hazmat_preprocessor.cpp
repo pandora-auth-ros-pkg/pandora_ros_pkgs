@@ -39,18 +39,24 @@
 
 #include <string>
 
+#include "sensor_processor/handler.h"
+
 #include "pandora_vision_hazmat/detection/hazmat_preprocessor.h"
 
 namespace pandora_vision
 {
-  HazmatPreProcessor::HazmatPreProcessor(const std::string& ns,
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
-    sensor_msgs::image_encodings::BGR8)
+namespace pandora_vision_hazmat
+{
+  HazmatPreProcessor::HazmatPreProcessor() : VisionPreProcessor()
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
   }
 
-  HazmatPreProcessor::~HazmatPreProcessor() {}
-
+  void
+  HazmatPreProcessor::initialize(const std::string& ns,
+    sensor_processor::Handler* handler)
+  {
+    VisionPreProcessor::initialize(ns, handler);
+    setImageEncoding(sensor_msgs::image_encodings::BGR8);
+  }
+}  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision

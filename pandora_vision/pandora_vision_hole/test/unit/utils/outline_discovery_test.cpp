@@ -35,11 +35,15 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/outline_discovery.h"
+#include "rgb_node/utils/outline_discovery.h"
 #include "gtest/gtest.h"
 
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class OutlineDiscoveryTest
@@ -648,4 +652,6 @@ namespace pandora_vision
 
   }
 
+}  // rgb
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

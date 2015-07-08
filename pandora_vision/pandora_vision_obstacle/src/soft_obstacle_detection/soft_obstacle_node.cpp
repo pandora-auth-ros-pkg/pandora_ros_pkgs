@@ -38,12 +38,12 @@
 
 #include "pandora_vision_obstacle/soft_obstacle_detection/soft_obstacle_handler.h"
 
-using pandora_vision::SoftObstacleHandler;
+using pandora_vision::pandora_vision_obstacle::SoftObstacleHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "soft_obstacle_node");
-  SoftObstacleHandler softObstacleHandler("pandora_vision_obstacle_soft_obstacle");
+  SoftObstacleHandler softObstacleHandler;
   ros::spin();
   return 0;
 }

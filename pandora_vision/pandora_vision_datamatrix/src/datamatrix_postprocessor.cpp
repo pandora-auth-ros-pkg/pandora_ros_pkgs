@@ -41,17 +41,12 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_datamatrix
+{
 
-  DataMatrixPostProcessor::DataMatrixPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    VisionPostProcessor<pandora_vision_msgs::DataMatrixAlertVector>(ns, handler)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] postprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
-  }
-
-  DataMatrixPostProcessor::~DataMatrixPostProcessor()
-  {
-  }
+  DataMatrixPostProcessor::DataMatrixPostProcessor() :
+    VisionPostProcessor<pandora_vision_msgs::DataMatrixAlertVector>()
+  {}
 
   bool DataMatrixPostProcessor::postProcess(const POIsStampedConstPtr& input,
     const DataMatrixAlertVectorPtr& output)
@@ -77,4 +72,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision

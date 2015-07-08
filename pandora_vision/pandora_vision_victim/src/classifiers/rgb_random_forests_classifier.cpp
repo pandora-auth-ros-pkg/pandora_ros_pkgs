@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor
    */
@@ -64,5 +66,6 @@ namespace pandora_vision
   void RgbRandomForestsClassifier::trainSubSystem()
   {
       }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

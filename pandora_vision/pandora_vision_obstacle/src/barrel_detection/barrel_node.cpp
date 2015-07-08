@@ -38,12 +38,12 @@
 
 #include "pandora_vision_obstacle/barrel_detection/barrel_handler.h"
 
-using pandora_vision::BarrelHandler;
+using pandora_vision::pandora_vision_obstacle::BarrelHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "barrel_node");
-  BarrelHandler barrelHandler("pandora_vision_obstacle_barrel");
+  BarrelHandler barrelHandler();
   ros::spin();
   return 0;
 }

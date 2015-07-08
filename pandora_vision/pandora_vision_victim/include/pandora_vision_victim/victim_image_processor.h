@@ -52,6 +52,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimImageProcessor : public sensor_processor::Processor<EnhancedImageStamped, POIsStamped>
   {
     public:
@@ -97,5 +99,6 @@ namespace pandora_vision
       std::vector<float> rgb_svm_p;
       std::vector<float> depth_svm_p;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_IMAGE_PROCESSOR_H

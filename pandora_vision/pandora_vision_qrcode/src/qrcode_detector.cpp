@@ -44,6 +44,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   /**
    * @brief: The main constructor for the QR detector objects.
    * @param gaussianSharpenBlur[int]: The standard deviation in the x axis
@@ -67,9 +69,9 @@ namespace pandora_vision
 
   /**
    * @brief Creates view for debugging purposes.
-   * @param image [zbar::Image&] The QR image. 
+   * @param image [zbar::Image&] The QR image.
    * @param inputFrame[const cv::Mat&]: The input frame of the system.
-   * @param constrastImage[const cv::Mat&]: The image with the enhanced 
+   * @param constrastImage[const cv::Mat&]: The image with the enhanced
    * contrast used to detect the QR codes.
    * @return void
    */
@@ -168,4 +170,5 @@ namespace pandora_vision
 
     return qrCodeList_;
   }
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision

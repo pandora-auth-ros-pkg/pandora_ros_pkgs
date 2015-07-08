@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libpandora_vision_landoltc_2d_handler">
+    <class name="pandora_vision/pandora_vision_landoltc_2d"
+        type="pandora_vision::pandora_vision_landoltc::LandoltCHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects landoltcs
+      </description>
+    </class>
+  </library>
+</class_libraries>

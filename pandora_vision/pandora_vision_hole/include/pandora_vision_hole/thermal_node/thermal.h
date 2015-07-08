@@ -60,10 +60,10 @@
 
 #include "pandora_vision_hole/CandidateHolesVectorMsg.h"
 #include "pandora_vision_hole/CandidateHoleMsg.h"
-#include "utils/parameters.h"
-#include "utils/message_conversions.h"
-#include "utils/image_matching.h"
-#include "thermal_node/hole_detector.h"
+#include "thermal_node/utils/parameters.h"
+#include "thermal_node/utils/message_conversions.h"
+#include "thermal_node/utils/image_matching.h"
+#include "thermal_node/thermal_hole_detector.h"
 
 /**
   @namespace pandora_vision
@@ -72,6 +72,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace thermal
 {
   /**
     @class Thermal
@@ -222,14 +224,18 @@ namespace pandora_vision_hole
     double angle_;
 
     // The dynamic reconfigure (thermal) parameters' server
-    dynamic_reconfigure::Server< ::pandora_vision_hole::thermal_cfgConfig >
-      server;
+    boost::shared_ptr< dynamic_reconfigure::Server< ::pandora_vision_hole::thermal_cfgConfig > >
+      thermalReconfServerPtr_;
 
     // The dynamic reconfigure (thermal) parameters' callback
     dynamic_reconfigure::Server< ::pandora_vision_hole::thermal_cfgConfig >
       ::CallbackType f;
+
+    bool thermalMode_;
+    bool rgbdtMode_;
   };
 
+}  // namespace thermal
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

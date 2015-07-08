@@ -32,6 +32,8 @@
   <exec_depend>pandora_vision_support</exec_depend>
   <exec_depend>pandora_vision_victim</exec_depend>
   <exec_depend>pandora_vision_annotator</exec_depend>
+  <exec_depend>pandora_vision_obstacle</exec_depend>
+  <exec_depend>pandora_vision_common</exec_depend>
 
 
   <export>

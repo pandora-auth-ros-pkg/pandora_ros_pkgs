@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
     @class DominantColorExtractorTest
     @brief Tests the integrity of methods of class DominantColorExtractor
@@ -112,4 +114,6 @@ namespace pandora_vision
     EXPECT_EQ(0 , out[0]);
     EXPECT_EQ(255.0 / cv::sum(descending).val[0], out[1]);
   }
+
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

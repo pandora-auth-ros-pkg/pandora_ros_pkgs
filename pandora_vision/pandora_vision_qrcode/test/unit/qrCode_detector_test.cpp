@@ -46,6 +46,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   /**
    * @class QrCodeDetectorTests
    * @brief Tests the integrity of methods of class QrCodeDetector
@@ -177,4 +179,6 @@ namespace pandora_vision
     // there shouldn't be any qrcodes
     EXPECT_EQ(0, qrcode_list.size());
   }
+
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision

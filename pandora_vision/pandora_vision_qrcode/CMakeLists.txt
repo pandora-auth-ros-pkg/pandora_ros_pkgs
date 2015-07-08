@@ -3,6 +3,8 @@ project(pandora_vision_qrcode)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     pandora_vision_common
     pandora_vision_msgs
     pandora_common_msgs
@@ -28,6 +30,8 @@ catkin_package(
     #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       pandora_vision_common
       pandora_vision_msgs
       pandora_common_msgs

@@ -3,12 +3,13 @@
 
     <arg name="output" default="log" />
 
-    <node name="victim_node" type="pandora_vision_victim_node" pkg="pandora_vision_victim"
-      respawn="False" output="$(arg output)" ns="/pandora_vision"/>
+    <node name="pandora_victim" type="pandora_vision_victim_node" pkg="pandora_vision_victim"
+      respawn="False" output="$(arg output)" >
 
-    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
-        command="load" ns="/pandora_vision/pandora_vision_victim"/>
+      <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
+          command="load" />
 
-    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
-        command="load" ns="/pandora_vision/pandora_vision_victim"/>
+      <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
+          command="load" ns="detector"/>
+    </node>
 </launch>

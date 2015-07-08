@@ -44,16 +44,19 @@
 
 #include "pandora_vision_victim/classifiers/classifier_factory.h"
 #include "pandora_vision_victim/classifiers/svm_classifier.h"
+#include "pandora_vision_victim/classifiers/rgbd_svm_classifier.h"
 #include "pandora_vision_victim/classifiers/neural_network_classifier.h"
 #include "pandora_vision_victim/classifiers/random_forests_classifier.h"
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief The constructor for the factory used to produce the classifier trainer objects.
    * @param ns[const std::string&] The namespace for the node handles of the object
    */
-  ClassifierFactory::ClassifierFactory(const std::string& ns): nh_(ns)
+  ClassifierFactory::ClassifierFactory(): nh_("~")
   {
     ROS_INFO("[Victim_Training]: Starting Victim Training Procedure!");
 
@@ -120,21 +123,25 @@ namespace pandora_vision
       ROS_BREAK();
     }
 
-    std::string ns = nh_.getNamespace();
-
     AbstractClassifier* classifierPtr;
 
-    if (boost::iequals(classifierType, "svm"))
+    if (boost::iequals(classifierType, "svm") &&
+      (boost::iequals(imageType, "rgb") || (boost::iequals(imageType, "rgb"))))
     {
-      classifierPtr = new SvmClassifier(ns, datasetPath, classifierType, imageType);
+      classifierPtr = new SvmClassifier(nh_, datasetPath, classifierType, imageType);
+    }
+
+    else if (boost::iequals(classifierType, "svm") && boost::iequals(imageType, "rgbd"))
+    {
+      classifierPtr = new RgbdSvmClassifier(nh_, datasetPath, classifierType, imageType);
     }
     else if (boost::iequals(classifierType, "ann"))
     {
-      classifierPtr =  new NeuralNetworkClassifier(ns, datasetPath, classifierType, imageType);
+      classifierPtr =  new NeuralNetworkClassifier(nh_, datasetPath, classifierType, imageType);
     }
     else if (boost::iequals(classifierType, "rf"))
     {
-      classifierPtr =  new RandomForestsClassifier(ns, datasetPath, classifierType, imageType);
+      classifierPtr =  new RandomForestsClassifier(nh_, datasetPath, classifierType, imageType);
     }
     else
     {
@@ -149,4 +156,5 @@ namespace pandora_vision
     return classifierPtr;
   }
 
-}  //  namespace pandora_vision
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision

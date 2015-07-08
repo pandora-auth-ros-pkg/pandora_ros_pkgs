@@ -1,10 +1,9 @@
-<?xml version="1.0"?>
 <package format="2">
   <name>pandora_vision_motion</name>
   <version>0.1.0</version>
   <description>Containts motion detection node.</description>
 
-  <maintainer email="paschalidoud@gmail.com">Despoina Paschalidou</maintainer>
+  <maintainer email="mkofinas@gmail.com">Miltos Kofinas</maintainer>
 
   <license>BSD</license>
 
@@ -12,11 +11,15 @@
   <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_vision</url>
 
   <author>Despoina Paschalidou</author>
+  <author>Miltos Kofinas</author>
+  <author>Marios Protopapas</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>pandora_common_msgs</depend>
@@ -29,6 +32,7 @@
   <depend>urdf</depend>
 
   <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
   </export>
 
 </package>

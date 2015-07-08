@@ -1,4 +1,6 @@
-subscribed_topics: 
+subscribed_topics:
   [/kinect/rgb/image_raw, /left_camera/image, /right_camera/image]
 published_topics: /vision/datamatrix_alert
-debug_topic: debugDatamatrix
+active_states: [EXPLORATION_RESCUE, IDENTIFICATION, SENSOR_HOLD, SENSOR_TEST, EXPLORATION_MAPPING]
+detector:
+  debug_topic: debugDatamatrix

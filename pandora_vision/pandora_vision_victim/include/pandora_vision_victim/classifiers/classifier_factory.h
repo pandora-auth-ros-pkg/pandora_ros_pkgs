@@ -46,6 +46,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /*
    * @class ClassifierFactory
    * @brief The class used to produce the different classifier trainer objects
@@ -58,7 +60,7 @@ namespace pandora_vision
        * @brief The constructor for the factory used to produce the classifier trainer objects.
        * @param ns[const std::string&] The namespace for the node handles of the object
        */
-      explicit ClassifierFactory(const std::string& ns);
+      explicit ClassifierFactory();
       ~ClassifierFactory()
       {}
 
@@ -77,7 +79,8 @@ namespace pandora_vision
     private:
       ros::NodeHandle nh_;
   };
-}  //  namespace pandora_vision
+}  // namespace pandora_vision_victim
+}  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_CLASSIFIER_FACTORY_H
 

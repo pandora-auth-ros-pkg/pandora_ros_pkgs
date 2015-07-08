@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
     @class EdgeOrientationExtractorTest
     @brief Tests the integrity of methods of class EdgeOrientationExtractor
@@ -315,4 +317,6 @@ namespace pandora_vision
     EXPECT_EQ ( 0 , out[4] );
   }
   */
+
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

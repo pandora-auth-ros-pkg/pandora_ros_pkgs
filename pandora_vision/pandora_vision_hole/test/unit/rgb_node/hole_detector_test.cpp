@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "rgb_node/hole_detector.h"
+#include "rgb_node/rgb_hole_detector.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class HoleDetectorTest
@@ -182,7 +186,7 @@ namespace pandora_vision
 
     // Run HoleDetector:findHoles
     HolesConveyor conveyor =
-      HoleDetector::findHoles (squares_, wallsHistogram);
+      RgbHoleDetector::findHoles (squares_, wallsHistogram);
 
     // The number of keypoints found
     int size = conveyor.size();
@@ -216,7 +220,7 @@ namespace pandora_vision
     HolesConveyorUtils::clear(&conveyor);
 
     // Run HoleDetector:findHoles
-    conveyor = HoleDetector::findHoles(squares_, wallsHistogram);
+    conveyor = RgbHoleDetector::findHoles(squares_, wallsHistogram);
 
     // The number of keypoints found
     size = conveyor.size();
@@ -243,4 +247,6 @@ namespace pandora_vision
     }
   }
 
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

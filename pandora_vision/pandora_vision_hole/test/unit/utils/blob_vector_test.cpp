@@ -35,11 +35,15 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/message_conversions.h"
-#include "utils/blob_vector.h"
+#include "rgb_node/utils/message_conversions.h"
+#include "rgb_node/utils/blob_vector.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class BlobVectorTest
@@ -504,4 +508,6 @@ namespace pandora_vision
     }
   }
 
+}  // namespace rgb
+}  // namespace pandora_vision_hole
 }  // namespace pandora_vision

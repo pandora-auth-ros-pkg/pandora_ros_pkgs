@@ -47,16 +47,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_obstacle
+{
   class SoftObstacleHandler : public VisionHandler<ObstaclePreProcessor, SoftObstacleProcessor,
     ObstaclePostProcessor>
   {
-    public:
-      explicit SoftObstacleHandler(const std::string& ns);
-      virtual ~SoftObstacleHandler() {}
-
-    private:
-      virtual void completeTransition();
+   public:
+    SoftObstacleHandler();
   };
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_HANDLER_H

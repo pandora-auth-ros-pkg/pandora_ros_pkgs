@@ -35,8 +35,11 @@
 * Author: Victor Daropoulos
 *********************************************************************/
 
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_DETECTOR_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_DETECTOR_H
+
+#include <string>
+#include <vector>
 
 #include "pandora_vision_common/pandora_vision_interface/vision_processor.h"
 #include "pandora_vision_common/cv_mat_stamped.h"
@@ -46,16 +49,16 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_landoltc
+{
   class LandoltCDetector : public VisionProcessor
   {
     public:
-      //!< Constructor
-      LandoltCDetector(const std::string& ns, sensor_processor::Handler* handler);
-      
-      LandoltCDetector();
+      /// Constructor
+      virtual void
+      initialize(const std::string& ns, sensor_processor::Handler* handler);
 
-      //!< Destructor
-      virtual ~LandoltCDetector();
+      LandoltCDetector();
 
       /**
       @brief Function for the initialization of the reference image
@@ -64,10 +67,11 @@ namespace pandora_vision
       **/
       void initializeReferenceImage();
 
-      //int  getNumCenter(void)
-      //{
-        //return _centers.size();
-      //}
+      // int  getNumCenter(void)
+      // {
+        // return _centers.size();
+      // }
+
       /**
       @brief Rasterize line between two points
       @param A [cv::Point] The start point of a line
@@ -123,7 +127,7 @@ namespace pandora_vision
       @return [std::vector<POIPtr>] Vector containing shared pointers of POI class
       **/
       std::vector<POIPtr> begin(cv::Mat input);
-      
+
       /**
       @brief Calculation of rotation based on moments.Precision is good for a
       distance up to 30cm from the camera
@@ -131,8 +135,8 @@ namespace pandora_vision
       @param temp [LandoltCPOIPtr] Shared Pointer of class LandoltCPOI
       @return void
       **/
-      void findRotationA(const cv::Mat& in, LandoltCPOIPtr temp);  
-      
+      void findRotationA(const cv::Mat& in, LandoltCPOIPtr temp);
+
       /**
       @brief Calculation of rotation based on thinning.Precision is good for a
       distance up to 50cm from the camera, gives more accurate results than the first
@@ -140,34 +144,34 @@ namespace pandora_vision
       @param in [const cv::Mat&] Matrix containing the padded frame
       @param temp [LandoltCPOIPtr] Shared Pointer of class LandoltCPOI
       @return void
-      **/  
+      **/
       void findRotationB(const cv::Mat&in, LandoltCPOIPtr temp);
-      
+
       /**
       @brief Function for calculating the neighbours of pixels considering
       8-connectivity
       @param index [unsigned int] Index of pixel in matrix
       @param in [cv::Mat&] Input Image
       @return void
-      **/    
+      **/
       void find8Neights(unsigned int index, const cv::Mat& in);
-      
+
       /**
       @brief Function for calculating perspective transform, in
       order to get better angle calculation precision
       @param rec [cv::rec] Rectangle enclosing a 'C'
       @param in [cv::Mat&] Input Image
-      @return [cv::Mat] Output Image 
-      **/    
+      @return [cv::Mat] Output Image
+      **/
       cv::Mat getWarpPerspectiveTransform(const cv::Mat& in, cv::Rect rec);
-      
+
       /**
       @brief Clearing vector values
       @param void
       @return void
       **/
       void clear();
-      
+
       /**
       @brief Performs fusion taking in consideration number of C's in each Landolt
       @param void
@@ -177,41 +181,42 @@ namespace pandora_vision
 
       /**
        * @brief
-       **/
+       */
       virtual bool
         process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
-    
+
     private:
-      //!<Value for threshholding gradients
+      /// Value for threshholding gradients
       int _minDiff;
-      //!<Value for thresholding values in voting array
+      /// Value for thresholding values in voting array
       int _threshold;
-      //!<Vector containing centers of possible landolts
+      /// Vector containing centers of possible landolts
       std::vector<cv::Point> _centers;
-      //!<Vector containing colors of landolts,used for seperating them later
+      /// Vector containing colors of landolts,used for seperating them later
       std::vector<cv::Scalar> _fillColors;
-      //!<Vector containing bounding rectangles of each landolt
+      /// Vector containing bounding rectangles of each landolt
       std::vector<cv::Rect> _rectangles;
-      //!<Vector containing centers of verified landolts
+      /// Vector containing centers of verified landolts
       std::vector<cv::Point> _newCenters;
-      //!<Vector containing contour points of reference C
+      /// Vector containing contour points of reference C
       std::vector<std::vector<cv::Point> > _refContours;
-      //!<Vector containing edge points of C, found using findRotationB function
+      /// Vector containing edge points of C, found using findRotationB function
       std::vector<cv::Point> _edgePoints;
-      //!<Value representing the number of edges found, again using finRotationB function  
+      /// Value representing the number of edges found, again using finRotationB function
       int _edges;
-      //!<2D Matrix containing "votes" of each pixel, used for finding the centers
+      /// 2D Matrix containing "votes" of each pixel, used for finding the centers
       cv::Mat _voting;
-      //!<2D Matrix containing landoltsC's, each colored with a unique color
+      /// 2D Matrix containing landoltsC's, each colored with a unique color
       cv::Mat _coloredContours;
-      //!<2D Matric used for separating each LandoltC to each parts
+      /// 2D Matric used for separating each LandoltC to each parts
       cv::Mat _mask;
-      //!<Vector containing LandoltCPOIPtrs
+      /// Vector containing LandoltCPOIPtrs
       std::vector<LandoltCPOIPtr> _landoltc;
-      
+
       LandoltcParameters params;
 
       friend class LandoltcDetectorTest;
   };
-} // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_DETECTOR_H
+}  // namespace pandora_vision_landoltc
+}  // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_DETECTOR_H

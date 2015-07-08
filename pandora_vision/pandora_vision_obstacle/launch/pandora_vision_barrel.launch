@@ -1,0 +1,13 @@
+<launch>
+  <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
+
+  <!-- <node name="pandora_soft_obstacle" type="pandora_vision_obstacle_soft_obstacle_node" -->
+  <!--   pkg="pandora_vision_obstacle" respawn="False" output="screen" >                    -->
+  <node pkg="nodelet" type="nodelet" name="pandora_barrel"
+    args="load pandora_vision/pandora_vision_barrel $(arg nodelet_manager)" output="screen" >
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    <rosparam file="$(find pandora_vision_obstacle)/config/obstacle_topics.yaml"
+      command="load" />
+  </node>
+
+</launch>

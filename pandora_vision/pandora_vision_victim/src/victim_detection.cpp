@@ -44,6 +44,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
     @brief Constructor
   **/
@@ -994,4 +996,5 @@ namespace pandora_vision
   {
     ROS_INFO("[victim_node] : Transition Complete");
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

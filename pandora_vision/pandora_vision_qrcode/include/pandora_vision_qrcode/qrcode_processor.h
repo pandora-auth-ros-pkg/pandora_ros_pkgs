@@ -59,6 +59,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   class QrCodeProcessor : public VisionProcessor
   {
     public:
@@ -70,14 +72,13 @@ namespace pandora_vision
        * @param handler[sensor_processor::Handler*]: A pointer to the handler
        * of the processor used to access the nodehandle of the node
        */
-      QrCodeProcessor(const std::string& ns,
-          sensor_processor::Handler* handler);
+      virtual void
+      initialize(const std::string& ns, sensor_processor::Handler* handler);
 
       /**
        * @brief: The default constructor for the QR Code Processor objects
        */
       QrCodeProcessor();
-      virtual ~QrCodeProcessor() {}
 
       virtual bool
         process(const CVMatStampedConstPtr& input,
@@ -99,10 +100,10 @@ namespace pandora_vision
       // boost::shared_ptr<image_transport::Publisher> debugPublisherPtr_;
 
       /// The dynamic reconfigure parameters' server
-      dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
-        server;
+      boost::shared_ptr< dynamic_reconfigure::Server< ::pandora_vision_qrcode::qrcode_cfgConfig > >
+        server_;
       /// The dynamic reconfigure parameters' callback
-      dynamic_reconfigure::Server<pandora_vision_qrcode::qrcode_cfgConfig>
+      dynamic_reconfigure::Server< ::pandora_vision_qrcode::qrcode_cfgConfig >
         ::CallbackType f;
 
       /**
@@ -112,8 +113,9 @@ namespace pandora_vision
        * @return void
        */
       void parametersCallback(
-        const pandora_vision_qrcode::qrcode_cfgConfig& config,
+        const ::pandora_vision_qrcode::qrcode_cfgConfig& config,
         const uint32_t& level);
   };
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_QRCODE_QRCODE_PROCESSOR_H

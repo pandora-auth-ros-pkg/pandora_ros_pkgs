@@ -45,27 +45,22 @@
 
 #include <sensor_msgs/Image.h>
 
-#include "sensor_processor/handler.h"
+#include "sensor_processor/dynamic_handler.h"
 
 #include "pandora_vision_common/cv_mat_stamped.h"
 #include "pandora_vision_common/pois_stamped.h"
 
 namespace pandora_vision
 {
-  template <class PreProc, class Detector, class PostProc>
-  class VisionHandler : public sensor_processor::Handler
+  template <class PreProc, class Proc, class PostProc>
+  class VisionHandler : public sensor_processor::DynamicHandler
   {
    public:
     /**
       * @brief Constructor
       * @param ns [const std::string&] The namespace of this handler's nodeHandle
       **/
-    explicit VisionHandler(const std::string& ns) :
-      sensor_processor::Handler(ns) {}
-
-    /**
-      * @brief Virtual Destructor
-      **/
+    VisionHandler() {}
     virtual ~VisionHandler() {}
 
    protected:
@@ -74,53 +69,46 @@ namespace pandora_vision
       * state is changed
       * @param newState [int] Robot's new state
       **/
-    virtual void startTransition(int newState)
+    virtual void
+    startTransition(int newState)
     {
-      currentState_ = newState;
+      this->previousState_ = this->currentState_;
+      this->currentState_ = newState;
 
       bool previouslyOff = true;
       bool currentlyOn = false;
 
       for (int ii = 0; ii < activeStates_.size(); ii++) {
-        previouslyOff = (previouslyOff && previousState_ != activeStates_[ii]);
-        currentlyOn = (currentlyOn || currentState_ == activeStates_[ii]);
+        previouslyOff = (previouslyOff && this->previousState_ != ROBOT_STATES(activeStates_[ii]));
+        currentlyOn = (currentlyOn || this->currentState_ == ROBOT_STATES(activeStates_[ii]));
       }
 
-      if (previouslyOff && currentlyOn)
+      if (!previouslyOff && !currentlyOn)
       {
-        preProcPtr_.reset(new PreProc("~preprocessor", this));
-        processorPtr_.reset(new Detector("~detector", this));
-        postProcPtr_.reset(new PostProc("~postprocessor", this));
+        unloadPreProcessor();
+        unloadProcessor();
+        unloadPostProcessor();
       }
-      else if (!previouslyOff && !currentlyOn)
+      else if (previouslyOff && currentlyOn)
       {
-        preProcPtr_.reset();
-        processorPtr_.reset();
-        postProcPtr_.reset();
+        loadPreProcessor<PreProc>("~preprocessor");
+        loadProcessor<Proc>("~detector");
+        loadPostProcessor<PostProc>("~postprocessor");
       }
 
-      if (currentState_ == state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
+      if (this->currentState_ == state_manager_msgs::RobotModeMsg::MODE_TERMINATING)
       {
-        preProcPtr_.reset();
-        processorPtr_.reset();
-        postProcPtr_.reset();
+        unloadPreProcessor();
+        unloadProcessor();
+        unloadPostProcessor();
 
+        ROS_INFO("[%s] Terminating", name_.c_str());
         ros::shutdown();
         return;
       }
-      previousState_ = currentState_;
-      transitionComplete(currentState_);
+
+      transitionComplete(this->currentState_);
     }
-
-    /**
-      * @brief Function that is called after the transition from one state to
-      * another is completed
-      **/
-    virtual void completeTransition() {}
-
-   protected:
-    /// States in which node is active
-    std::vector<int> activeStates_;
   };
 }  // namespace pandora_vision
 

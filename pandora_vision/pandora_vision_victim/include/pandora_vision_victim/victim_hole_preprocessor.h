@@ -50,6 +50,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimHolePreProcessor : public sensor_processor::PreProcessor<
     pandora_vision_msgs::EnhancedImage, EnhancedImageStamped>
   {
@@ -58,11 +60,11 @@ namespace pandora_vision
       typedef boost::shared_ptr<pandora_vision_msgs::EnhancedImage const> EnhancedImageConstPtr;
 
     public:
-      VictimHolePreProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~VictimHolePreProcessor();
+      VictimHolePreProcessor();
 
       virtual bool
         preProcess(const EnhancedImageConstPtr& input, const EnhancedImageStampedPtr& output);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_HOLE_PREPROCESSOR_H

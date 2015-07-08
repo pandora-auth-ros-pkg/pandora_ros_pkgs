@@ -50,6 +50,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class VictimImagePreProcessor : public sensor_processor::PreProcessor<pandora_vision_msgs::EnhancedImage,
   EnhancedImageStamped>
   {
@@ -63,5 +65,6 @@ namespace pandora_vision
 
       virtual bool preProcess(const EnhancedImageConstPtr& input, const EnhancedImageStampedPtr& output);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_VICTIM_IMAGE_PREPROCESSOR_H

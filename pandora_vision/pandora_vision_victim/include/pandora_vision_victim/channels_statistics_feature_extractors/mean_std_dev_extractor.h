@@ -46,6 +46,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class MeanStdDevExtractor : public ChannelsStatisticsFeatureExtractor
   {
     public:
@@ -66,6 +68,7 @@ namespace pandora_vision
        */
       virtual std::vector<double> extract(void);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CHANNELS_STATISTICS_FEATURE_EXTRACTORS_MEAN_STD_DEV_EXTRACTOR_H
 

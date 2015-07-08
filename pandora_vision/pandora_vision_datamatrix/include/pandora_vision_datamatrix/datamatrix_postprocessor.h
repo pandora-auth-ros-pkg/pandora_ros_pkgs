@@ -49,17 +49,19 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_datamatrix
+{
   class DataMatrixPostProcessor : public VisionPostProcessor<pandora_vision_msgs::DataMatrixAlertVector>
   {
-    public:
-      typedef boost::shared_ptr<pandora_vision_msgs::DataMatrixAlertVector> DataMatrixAlertVectorPtr;
+   public:
+    typedef boost::shared_ptr<pandora_vision_msgs::DataMatrixAlertVector> DataMatrixAlertVectorPtr;
 
-      DataMatrixPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-      virtual ~DataMatrixPostProcessor();
-      
+    DataMatrixPostProcessor();
+
     virtual bool
-      postProcess(const POIsStampedConstPtr& input, const DataMatrixAlertVectorPtr& output);
+    postProcess(const POIsStampedConstPtr& input, const DataMatrixAlertVectorPtr& output);
   };
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_DATAMATRIX_DATAMATRIX_POSTPROCESSOR_H

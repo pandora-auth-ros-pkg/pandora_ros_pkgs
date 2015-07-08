@@ -40,6 +40,7 @@
 #define PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_PROCESSOR_H
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <dynamic_reconfigure/server.h>
 #include "sensor_processor/processor.h"
@@ -50,15 +51,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_obstacle
+{
   class SoftObstacleProcessor : public sensor_processor::Processor<ImagesStamped, POIsStamped>
   {
     public:
-      SoftObstacleProcessor(const std::string& ns, sensor_processor::Handler* handler);
+      virtual void
+      initialize(const std::string& ns, sensor_processor::Handler* handler);
       SoftObstacleProcessor();
 
-      virtual ~SoftObstacleProcessor() {}
-
-    public:
       virtual bool process(const ImagesStampedConstPtr& input,
         const POIsStampedPtr& output);
 
@@ -68,19 +69,20 @@ namespace pandora_vision
        * @param config [const pandora_vision_obstacle::soft_obstacle_cfgConfig&]
        * @param level [const uint32_t] The level
       **/
-      void parametersCallback(const pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
+      void parametersCallback(const ::pandora_vision_obstacle::soft_obstacle_cfgConfig& config,
         const uint32_t& level);
 
     private:
       /// The dynamic reconfigure parameters' server
-      dynamic_reconfigure::Server<pandora_vision_obstacle::soft_obstacle_cfgConfig>
-        server;
+      boost::shared_ptr< dynamic_reconfigure::
+        Server< ::pandora_vision_obstacle::soft_obstacle_cfgConfig > > server_;
       /// The dynamic reconfigure parameters' callback
-      dynamic_reconfigure::Server<pandora_vision_obstacle::soft_obstacle_cfgConfig>
+      dynamic_reconfigure::Server< ::pandora_vision_obstacle::soft_obstacle_cfgConfig >
         ::CallbackType f;
 
       boost::shared_ptr<SoftObstacleDetector> detector_;
   };
+}  // namespace pandora_vision_obstacle
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_OBSTACLE_SOFT_OBSTACLE_DETECTION_SOFT_OBSTACLE_PROCESSOR_H

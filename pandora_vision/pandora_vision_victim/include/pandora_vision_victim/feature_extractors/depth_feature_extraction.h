@@ -50,6 +50,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class DepthFeatureExtraction
    * @brief This class extracts features from Depth images.
@@ -75,6 +77,7 @@ namespace pandora_vision
        */
       virtual void extractFeatures(const cv::Mat& inImage);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_DEPTH_FEATURE_EXTRACTION_H
 

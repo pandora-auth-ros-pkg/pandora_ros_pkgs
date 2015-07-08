@@ -38,10 +38,10 @@
 #ifndef PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H
 #define PANDORA_VISION_HOLE_HOLE_FUSION_NODE_FILTERS_RESOURCES_H
 
-#include "utils/defines.h"
-#include "utils/outline_discovery.h"
-#include "utils/holes_conveyor.h"
-#include "utils/parameters.h"
+#include "hole_fusion_node/utils/defines.h"
+#include "hole_fusion_node/utils/outline_discovery.h"
+#include "hole_fusion_node/utils/holes_conveyor.h"
+#include "hole_fusion_node/utils/parameters.h"
 
 /**
   @namespace pandora_vision
@@ -50,6 +50,8 @@
 namespace pandora_vision
 {
 namespace pandora_vision_hole
+{
+namespace hole_fusion
 {
   /**
     @class FiltersResources
@@ -289,6 +291,7 @@ namespace pandora_vision_hole
         std::vector<std::set<unsigned int> >* intermediatePointsSetVector);
   };
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision
 

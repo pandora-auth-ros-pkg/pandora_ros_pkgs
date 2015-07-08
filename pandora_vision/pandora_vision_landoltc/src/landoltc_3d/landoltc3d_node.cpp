@@ -45,10 +45,10 @@
 @return int : 0 for success
 **/
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "landoltc3d_node");
-  pandora_vision::LandoltC3dDetection landoltc3d_finder("landoltc3d");  
+  pandora_vision::pandora_vision_landoltc::LandoltC3dDetection landoltc3d_finder("landoltc3d");
   ros::spin();
   return 0;
 }

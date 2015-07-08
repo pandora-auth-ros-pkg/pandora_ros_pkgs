@@ -1,3 +1,4 @@
-subscribed_topics: 
-  [/kinect/depth_registered/points]
+subscribed_topics:
+  [/vision/synchronized/enhanced/image]
 published_topics: /vision/obstacle_alert
+active_states: [EXPLORATION_RESCUE, IDENTIFICATION, SENSOR_HOLD, SEMI_AUTONOMOUS, TELEOPERATED_LOCOMOTION, SENSOR_TEST, EXPLORATION_MAPPING]

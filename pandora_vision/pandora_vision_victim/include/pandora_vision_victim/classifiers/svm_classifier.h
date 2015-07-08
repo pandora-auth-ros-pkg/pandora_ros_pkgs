@@ -50,13 +50,15 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   class SvmClassifier : public AbstractClassifier
   {
     public:
       /**
        * @brief The Constructor
        */
-      SvmClassifier(const std::string& ns, const std::string& datasetPath,
+      SvmClassifier(const ros::NodeHandle& nh, const std::string& datasetPath,
           const std::string& classifierType,
           const std::string& imageType);
 
@@ -114,6 +116,7 @@ namespace pandora_vision
       /// The pointer to the PCA object.
       boost::shared_ptr<PrincipalComponentAnalysis> pcaPtr_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_SVM_CLASSIFIER_H

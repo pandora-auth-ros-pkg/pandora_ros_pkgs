@@ -56,6 +56,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Default Constructor
    */
@@ -242,4 +244,5 @@ namespace pandora_vision
          featureVector_.push_back(colorHistogramFeatures.at<float>(ii));
     }
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

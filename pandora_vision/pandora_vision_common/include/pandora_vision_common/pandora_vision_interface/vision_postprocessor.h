@@ -62,25 +62,7 @@ namespace pandora_vision
      * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
      * handles this postprocessor
      **/
-    VisionPostProcessor(const std::string& ns, sensor_processor::Handler* handler);
-
-    /**
-     * @brief Virtual Destructor
-     **/
-    virtual
-    ~VisionPostProcessor() {}
-
-    /**
-     * @brief Function that gets the Points of Interest with their timestamp and converts them
-     * to a ROS message type in order to be published by a vision node
-     * @param input [const POIsStampedConstPtr&] A constant reference to a constant shared pointer
-     * of a POI with timestamp
-     * @param output [const VisionAlertMsgPtr&] A constant reference to a shared pointer of a
-     * template class that signifies the output ROS message type of each vision node
-     * @return [bool] whether postprocessing finished
-     **/
-    virtual bool
-    postProcess(const POIsStampedConstPtr& input, const VisionAlertMsgPtr& output) = 0;
+    VisionPostProcessor();
 
    protected:
     /**
@@ -100,18 +82,17 @@ namespace pandora_vision
 
   template <class VisionAlertMsg>
   VisionPostProcessor<VisionAlertMsg>::
-  VisionPostProcessor(const std::string& ns, sensor_processor::Handler* handler) :
-    sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(ns, handler),
+  VisionPostProcessor() :
+    sensor_processor::PostProcessor<POIsStamped, VisionAlertMsg>(),
     converter_(new GeneralAlertConverter)
-  {
-  }
+  {}
 
   template <class VisionAlertMsg>
   pandora_common_msgs::GeneralAlertVector
   VisionPostProcessor<VisionAlertMsg>::
   getGeneralAlertInfo(const POIsStampedConstPtr& result)
   {
-    return converter_->getGeneralAlertVector(*this->accessPublicNh(), *result);
+    return converter_->getGeneralAlertVector(this->getPublicNodeHandle(), *result);
   }
 
 }  // namespace pandora_vision

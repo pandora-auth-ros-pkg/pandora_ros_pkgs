@@ -41,6 +41,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include <opencv2/opencv.hpp>
 
@@ -56,6 +57,8 @@
  * @brief The main namespace for PANDORA vision
  */
 namespace pandora_vision
+{
+namespace pandora_vision_victim
 {
   /**
    * @class AbstractValidator
@@ -91,6 +94,18 @@ namespace pandora_vision
       void calculatePredictionProbability(const cv::Mat& inImage, float* classLabel, float* probability);
 
       /**
+       * @brief This function classifies an image and calculates the probability
+       * of it belonging to that class.
+       * @param rgbImage [const cv::Mat&] The rgb frame to be processed.
+       * @param depthImage [const cv::Mat&] The depth frame to be processed.
+       * @param classLabel [float*] The predicted class label.
+       * @param probability [float*] The classification probability.
+       * @return void
+       */
+      void calculatePredictionProbability(const cv::Mat& rgbImage, const cv::Mat& depthImage,
+                                          float* classLabel, float* probability);
+
+      /**
        * @brief This function returns the type of the classifier.
        * @return [const std:;string&] The type of the classifier.
        */
@@ -107,6 +122,15 @@ namespace pandora_vision
        * @return void
        */
       void extractFeatures(const cv::Mat& inImage);
+
+      /**
+       * @brief This function extracts features according to the predefined
+       * feature extraction algorithms.
+       * @param inImage [const cv::Mat&] Frame to extract features from.
+       * @param imageType [const std::string&] the type of image
+       * @return void
+       */
+      void extractFeatures(const cv::Mat& inImage, const std::string& imageType);
 
       /**
        * @brief This function predicts the class label and the classification
@@ -136,12 +160,10 @@ namespace pandora_vision
       /// Variable used to decide the type of feature normalization to perform.
       int typeOfNormalization_;
 
-      /// Extractor of all the neccesary features for the classification.
-      FeatureExtraction* featureExtraction_;
-
+       std::map<std::string, boost::shared_ptr<FeatureExtraction> > featureExtraction_;
       /// Feature Extraction Utilities used to perform feature normalization
       /// and/or feature selection.
-      FeatureExtractionUtilities* featureExtractionUtilities_;
+      boost::shared_ptr<FeatureExtractionUtilities> featureExtractionUtilities_;
 
       /// Vector used for normalization. If z-score normalization is used, this
       /// vector contains mean values. If min-max normalization is used, this
@@ -152,5 +174,6 @@ namespace pandora_vision
       /// this vector contains max values.
       std::vector<double> normalizationParamTwoVec_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_CLASSIFIERS_ABSTRACT_VALIDATOR_H

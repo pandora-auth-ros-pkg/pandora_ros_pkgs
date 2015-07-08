@@ -23,6 +23,7 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>nodelet</depend>
+  <depend>pluginlib</depend>
   <depend>cv_bridge</depend>
   <depend>image_transport</depend>
   <depend>std_msgs</depend>

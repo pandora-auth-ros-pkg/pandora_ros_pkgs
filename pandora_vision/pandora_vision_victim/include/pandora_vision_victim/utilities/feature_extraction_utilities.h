@@ -47,6 +47,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class FeatureExtractionUtilities
    * @brief This class provides utilities for feature extraction, feature
@@ -112,5 +114,6 @@ namespace pandora_vision
           const std::vector<double>& meanVec,
           const std::vector<double>& stdDevVec);
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_FEATURE_EXTRACTION_UTILITIES_H

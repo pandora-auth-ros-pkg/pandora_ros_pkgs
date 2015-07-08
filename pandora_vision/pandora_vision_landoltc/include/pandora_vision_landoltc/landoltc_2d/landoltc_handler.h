@@ -37,8 +37,8 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_HANDLER_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC_HANDLER_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_HANDLER_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_HANDLER_H
 
 #include <string>
 #include "pandora_vision_common/vision_handler.h"
@@ -48,16 +48,15 @@
 
 namespace pandora_vision
 {
-  class LandoltCHandler : public VisionHandler<LandoltCPreProcessor, 
-    LandoltCDetector, LandoltCPostProcessor>
+namespace pandora_vision_landoltc
+{
+  class LandoltCHandler :
+    public VisionHandler<LandoltCPreProcessor, LandoltCDetector, LandoltCPostProcessor>
   {
-    public:
-      explicit LandoltCHandler(const std::string& ns);
-      virtual ~LandoltCHandler() {}
-      
-    private:
-      virtual void completeTransition();
+   public:
+    LandoltCHandler();
   };
+}  // namespace pandora_vision_landoltc
 }  // namespace pandora_vision
 
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_HANDLER_H
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_2D_LANDOLTC_HANDLER_H

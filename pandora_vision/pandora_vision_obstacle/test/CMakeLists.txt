@@ -12,16 +12,6 @@ ${catkin_INCLUDE_DIRS})
 #                               Unit Tests                                     #
 ################################################################################
 
-catkin_add_gtest(discrete_wavelet_transform_test
-  unit/discrete_wavelet_transform_test.cpp
-  )
-target_link_libraries(discrete_wavelet_transform_test
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_discrete_wavelet_transform
-  gtest_main
-  gtest
-  )
-
 catkin_add_gtest(soft_obstacle_detector_test
   unit/soft_obstacle_detector_test.cpp
   )
@@ -31,3 +21,27 @@ target_link_libraries(soft_obstacle_detector_test
   gtest_main
   gtest
   )
+
+catkin_add_gtest(fast_symmetry_detector_test
+  unit/fast_symmetry_detector_test.cpp
+  )
+target_link_libraries(fast_symmetry_detector_test
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_fast_symmetry_detector
+  gtest_main
+  gtest
+  )
+
+catkin_add_gtest(barrel_processor_test
+  unit/barrel_processor_test.cpp
+  )
+target_link_libraries(barrel_processor_test
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_barrel_processor
+  gtest_main
+  gtest
+  )
+
+if (${PROJECT_NAME}_benchmark)
+  add_rostest(benchmark/barrel_benchmark_test.launch)
+endif()

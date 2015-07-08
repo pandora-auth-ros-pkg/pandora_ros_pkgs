@@ -45,6 +45,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor
    */
@@ -148,5 +150,6 @@ namespace pandora_vision
         divide(image->col(ii), stdDevVec.at(ii), image->col(ii));
     }
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

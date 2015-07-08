@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_vision_motion)
 
-
 find_package(catkin REQUIRED COMPONENTS
     roscpp
+    nodelet
+    pluginlib
     pandora_common_msgs
     pandora_vision_common
     state_manager
@@ -22,9 +23,11 @@ generate_dynamic_reconfigure_options(
 )
 
 catkin_package(
-    DEPENDS
+    #DEPENDS
     CATKIN_DEPENDS
       roscpp
+      nodelet
+      pluginlib
       pandora_common_msgs
       pandora_vision_common
       state_manager
@@ -44,6 +47,18 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+################# dbscan #################
+add_library(${PROJECT_NAME}_dbscan
+  src/dbscan.cpp
+)
+
+add_dependencies(${PROJECT_NAME}_dbscan
+    ${catkin_EXPORTED_TARGETS}
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+target_link_libraries(${PROJECT_NAME}_dbscan
+  ${catkin_LIBRARIES}
+)
 ################# motion detector #################
 add_library(${PROJECT_NAME}_detector
   src/motion_detector.cpp
@@ -54,6 +69,7 @@ add_dependencies(${PROJECT_NAME}_detector
 )
 target_link_libraries(${PROJECT_NAME}_detector
   ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_dbscan
 )
 
 
@@ -70,7 +86,6 @@ target_link_libraries(${PROJECT_NAME}_processor
   ${PROJECT_NAME}_detector
 
 )
-
 
 ################# motion preprocessor #################
 add_library(${PROJECT_NAME}_preprocessor

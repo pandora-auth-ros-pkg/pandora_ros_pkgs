@@ -37,20 +37,20 @@
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
+#include <pluginlib/class_list_macros.h>
+#include <nodelet/nodelet.h>
+
 #include "pandora_vision_datamatrix/datamatrix_handler.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_datamatrix::DataMatrixHandler,
+    nodelet::Nodelet)
 
 namespace pandora_vision
 {
-  DataMatrixHandler::DataMatrixHandler(const std::string& ns) : 
-    VisionHandler<DataMatrixPreProcessor, DatamatrixDetector, DataMatrixPostProcessor>(ns)
-  {
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD);
-    activeStates_.push_back(state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
-  }
-  
-  void DataMatrixHandler::completeTransition()
-  {
-  }
+namespace pandora_vision_datamatrix
+{
+  DataMatrixHandler::DataMatrixHandler() :
+    VisionHandler<DataMatrixPreProcessor, DatamatrixProcessor, DataMatrixPostProcessor>()
+  {}
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision

@@ -45,6 +45,8 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace hole_fusion
+{
   /**
     @brief Given a HolesConveyor container, this method detects
     multiple unique holes and deletes the extra copies.
@@ -323,5 +325,6 @@ namespace pandora_vision_hole
     #endif
   }
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

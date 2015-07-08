@@ -61,6 +61,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
 /**
  * @namespace file_utilities
  * @brief The namespace for a set of file utilities functions.
@@ -157,5 +159,6 @@ namespace file_utilities
    */
   int findNumberOfAnnotations(const std::string& filename);
 }  // namespace file_utilities
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_UTILITIES_FILE_UTILITIES_H

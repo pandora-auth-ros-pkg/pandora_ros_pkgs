@@ -34,11 +34,13 @@
  *
  * Authors: Alexandros Philotheou, Manos Tsardoulias
  *********************************************************************/
+
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 
 #include "hole_fusion_node/hole_fusion.h"
-PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::HoleFusion, nodelet::Nodelet)
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::hole_fusion::HoleFusion, nodelet::Nodelet)
 
 /**
   @namespace pandora_vision
@@ -48,39 +50,56 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace hole_fusion
+{
   /**
     @brief The HoleFusion constructor
    **/
-  HoleFusion::HoleFusion(void): generalNodeHandle_("~/general"),
-                                debugNodeHandle_("~/debug"),
-                                filtersPriorityNodeHandle_("~/priority"),
-                                filtersThresholdsNodeHandle_("~/thresholds"),
-                                validityNodeHandle_("~/validation"),
-                                serverDebug(debugNodeHandle_),
-                                serverFiltersPriority(filtersPriorityNodeHandle_),
-                                serverFiltersThresholds(filtersThresholdsNodeHandle_),
-                                serverGeneral(generalNodeHandle_),
-                                serverValidity(validityNodeHandle_),
-                                imageTransport_(nodeHandle_)
-
-  {
-  }
+  HoleFusion::HoleFusion(void) {}
 
   /**
     @brief The HoleFusion deconstructor
    **/
   HoleFusion::~HoleFusion(void)
   {
-    ros::shutdown();
-     NODELET_INFO("[%s] Terminated", nodeName_.c_str());
+    NODELET_INFO("[%s] Terminated", nodeName_.c_str());
   }
 
   void HoleFusion::onInit()
   {
+    state_manager::StateClientNodelet::onInit();
+
     pointCloud_.reset(new PointCloud);
-    nodeHandle_ = this->getNodeHandle();
-    privateNodeHandle_ = this->getPrivateNodeHandle();
-    nodeName_ = boost::to_upper_copy<std::string>(this->getName());
+    nodeHandle_ = this->getPublicNh();
+    privateNodeHandle_ = this->getPrivateNh();
+    nodeName_ = this->getNodeName();
+
+    nodeHandle_.param("rgbd_mode", rgbdMode_, true);
+    nodeHandle_.param("rgbdt_mode", rgbdtMode_, true);
+
+    std::string private_namespace = privateNodeHandle_.getNamespace();
+    generalNodeHandle_ = ros::NodeHandle(private_namespace + "/general");
+    filtersPriorityNodeHandle_ =  ros::NodeHandle(private_namespace + "/priority");
+    filtersThresholdsNodeHandle_ =  ros::NodeHandle(private_namespace + "/thresholds");
+    validityNodeHandle_ = ros::NodeHandle(private_namespace + "/validation");
+    debugNodeHandle_ = ros::NodeHandle(private_namespace + "/debug");
+
+    imageTransportPtr_.reset( new image_transport::ImageTransport(nodeHandle_) );
+
+    serverDebugPtr_.reset(new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::debug_cfgConfig>(debugNodeHandle_));
+
+    serverFiltersPriorityPtr_.reset( new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::filters_priority_cfgConfig>(filtersPriorityNodeHandle_));
+
+    serverFiltersThresholdsPtr_.reset(new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::filters_thresholds_cfgConfig>(filtersThresholdsNodeHandle_));
+
+    serverGeneralPtr_.reset( new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::general_cfgConfig>(generalNodeHandle_) );
+
+    serverValidityPtr_.reset( new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::validity_cfgConfig>(validityNodeHandle_));
 
     // Initialize the parent frame_id to an empty string
     parent_frame_id_ = "";
@@ -90,15 +109,20 @@ namespace pandora_vision_hole
     getTopicNames();
 
     // Check if Thermal is enabled to run with hole-detection Package
-    if (mode_)
+    if (rgbdtMode_)
     {
       // Thermal is enabled
       counter_ = 4;
     }
-    else
+    else if (rgbdMode_)
     {
       // Thermal is disabled
       counter_ = 3;
+    }
+    else
+    {
+      NODELET_FATAL("[%s] Hole Fusion loaded with rgbd and rgbdt mode set to false!",
+          nodeName_.c_str());
     }
 
     // Initialize the numNodesReady variable.
@@ -108,54 +132,53 @@ namespace pandora_vision_hole
 
     // Advertise the topic that the rgb_depth_synchronizer will be
     // subscribed to in order for the hole_fusion_node to unlock it
-    unlockPublisher_ = nodeHandle_.advertise <std_msgs::Empty>(
+    unlockPublisher_ = nodeHandle_.advertise<std_msgs::Empty>(
       unlockTopic_, 1, true);
 
     // Advertise the topic where any external node(e.g. a functional test node)
     // will be subscribed to know that the hole node has finished processing
     // the current candidate holes as well as the result of the procedure.
     processEndPublisher_ = nodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
-        processEndTopic_, 1, true);
+        processEndTopic_, 1);
 
     // Advertise the topic that the yaw and pitch of the keypoints of the final,
     // valid holes will be published to
-    validHolesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_msgs::HoleDirectionAlertVector>(
-        validHolesTopic_, 1, true);
+    validHolesPublisher_ = nodeHandle_.advertise<pandora_vision_msgs::HoleDirectionAlertVector>(
+        validHolesTopic_, 1);
 
     // Advertise the topic that information about the final holes,
     // will be published to
     // Command line usage:
     // image_view /pandora_vision/hole_detector/debug_valid_holes_image
     // _image_transport:=compressed
-    debugValidHolesPublisher_ = imageTransport_.advertise
-      (debugValidHolesTopic_, 1, true);
+    debugValidHolesPublisher_ = imageTransportPtr_->advertise
+      (debugValidHolesTopic_, 1);
 
     // Advertise the topic that information about holes found by the Depth
     // and RGB nodes will be published to
     // Command line usage:
     // image_view /pandora_vision/hole_detector/debug_respective_holes_image
     // _image_transport:=compressed
-    debugRespectiveHolesPublisher_ = imageTransport_.advertise
-      (debugRespectiveHolesTopic_, 1, true);
+    debugRespectiveHolesPublisher_ = imageTransportPtr_->advertise
+      (debugRespectiveHolesTopic_, 1);
 
     // Advertise the topic that the enhanced image
     // will be published to
-    enhancedImagesPublisher_ = nodeHandle_.advertise
-      <pandora_vision_msgs::EnhancedImage>(
-        enhancedImagesTopic_, 1, true);
+    // enhancedImagesPublisher_ = nodeHandle_.advertise
+    //   <pandora_vision_msgs::EnhancedImage>(
+    //     enhancedImagesTopic_, 1, true);
 
     // Advertise the topic that the image of the final holes,
     // will be published to
     enhancedHolesPublisher_ = nodeHandle_.advertise
       <pandora_vision_msgs::EnhancedImage>(
-        enhancedHolesTopic_, 1, true);
+        enhancedHolesTopic_, 1);
 
     // Advertise the topic that the image of the final holes,
     // will be published to
-    InterpolatedDepthImagePublisher_ = nodeHandle_.advertise
-      <sensor_msgs::Image>(
-        InterpolatedDepthImageTopic_, 1, true);
+    // InterpolatedDepthImagePublisher_ = nodeHandle_.advertise
+    //   <sensor_msgs::Image>(
+    //     InterpolatedDepthImageTopic_, 1);
 
     // Advertise the topic where the Hole Fusion node requests from the
     // synchronizer node to subscribe to the input point cloud topic
@@ -195,35 +218,37 @@ namespace pandora_vision_hole
       &HoleFusion::thermalCandidateHolesCallback, this);
 
     // The dynamic reconfigure server for debugging parameters
-    serverDebug.setCallback(
+    serverDebugPtr_->setCallback(
       boost::bind(&HoleFusion::parametersCallbackDebug,
         this, _1, _2));
 
     // The dynamic reconfigure server for parameters pertaining to the
-    // priority of filters' execution
-    serverFiltersPriority.setCallback(
+    // priority of filters' execution:w
+    //
+    serverFiltersPriorityPtr_->setCallback(
       boost::bind(&HoleFusion::parametersCallbackFiltersPriority,
         this, _1, _2));
 
     // The dynamic reconfigure server for parameters pertaining to
     // thresholds of filters
-    serverFiltersThresholds.setCallback(
+    serverFiltersThresholdsPtr_->setCallback(
       boost::bind(&HoleFusion::parametersCallbackFiltersThresholds,
         this, _1, _2));
 
     // The dynamic reconfigure server for general parameters
-    serverGeneral.setCallback(
+    serverGeneralPtr_->setCallback(
       boost::bind(&HoleFusion::parametersCallbackGeneral,
         this, _1, _2));
 
     // The dynamic reconfigure server for parameters pertaining to
     // the validity of holes
-    serverValidity.setCallback(
+    serverValidityPtr_->setCallback(
       boost::bind(&HoleFusion::parametersCallbackValidity,
         this, _1, _2));
 
     // Set the initial on/off state of the Hole Detector package to off
     isOn_ = false;
+    publishingEnhancedHoles_ = false;
 
     // Initialize the filtering mode variable to an invalid value
     filteringMode_ = -1;
@@ -236,7 +261,12 @@ namespace pandora_vision_hole
 
     clientInitialize();
 
-    NODELET_INFO("[%s] Initiated", nodeName_.c_str());
+    std::string modes;
+    if (rgbdMode_)
+      modes += "rgbd ";
+    if (rgbdtMode_)
+      modes += "rgbdt ";
+    NODELET_INFO("[%s] Initiated %s", nodeName_.c_str(), modes.c_str());
   }
 
   /**
@@ -246,7 +276,7 @@ namespace pandora_vision_hole
    **/
   void HoleFusion::completeTransition(void)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Detector] : Transition Complete");
+    NODELET_INFO("[%s]Transition Complete", nodeName_.c_str());
   }
 
 
@@ -267,21 +297,20 @@ namespace pandora_vision_hole
     @return void
    **/
   void HoleFusion::depthCandidateHolesCallback(
-    const ::pandora_vision_hole::CandidateHolesVectorMsg&
-    depthCandidateHolesVector)
+    const ::pandora_vision_hole::CandidateHolesVectorMsgConstPtr& depthCandidateHolesVector)
   {
     #ifdef DEBUG_TIME
     Timer::start("depthCandidateHolesCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Depth callback");
+    NODELET_INFO("[%s] Depth callback", nodeName_.c_str());
 
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
     HolesConveyorUtils::clear(&depthHolesConveyor_);
 
     // Unpack the message
-    MessageConversions::unpackMessage(depthCandidateHolesVector,
+    MessageConversions::unpackMessage(*depthCandidateHolesVector,
       &depthHolesConveyor_,
       &interpolatedDepthImage_,
       Parameters::Image::image_representation_method,
@@ -326,21 +355,21 @@ namespace pandora_vision_hole
     @return void
    **/
   void HoleFusion::thermalCandidateHolesCallback(
-    const ::pandora_vision_hole::CandidateHolesVectorMsg&
+    const ::pandora_vision_hole::CandidateHolesVectorMsgConstPtr&
     thermalCandidateHolesVector)
   {
     #ifdef DEBUG_TIME
     Timer::start("thermalCandidateHolesCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Thermal callback");
+    NODELET_INFO("[%s] Thermal callback", nodeName_.c_str());
 
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
     HolesConveyorUtils::clear(&thermalHolesConveyor_);
 
     // Unpack the message
-    MessageConversions::unpackMessage(thermalCandidateHolesVector,
+    MessageConversions::unpackMessage(*thermalCandidateHolesVector,
       &thermalHolesConveyor_,
       &thermalImage_, 0,
       sensor_msgs::image_encodings::TYPE_8UC1,
@@ -599,24 +628,13 @@ namespace pandora_vision_hole
    **/
   void HoleFusion::getTopicNames()
   {
-    // This variable indicates the mode in which Hole-Package is running
-    // If is set to true -> Rgb-D-T mode
-    // Else Rgb-D mode
-    if (nodeHandle_.getParam("/hole_detector/thermal", mode_))
-    {
-      ROS_INFO("[Hole Fusion Node] Packages Mode has been found");
-    }
-    else
-    {
-      ROS_ERROR("[Hole Fusion Node] Could not find Packages Mode");
-    }
     // Read the name of the topic from where the Hole Fusion node acquires the
     // input point cloud
     if (!privateNodeHandle_.getParam("subscribed_topics/point_cloud_internal_topic",
         pointCloudTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic point_cloud_internal_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic point_cloud_internal_topic",
+          nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic from where the Hole Fusion node acquires the
@@ -624,119 +642,114 @@ namespace pandora_vision_hole
     if (!privateNodeHandle_.getParam("subscribed_topics/depth_candidate_holes_topic",
         depthCandidateHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic depth_candidate_holes_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic depth_candidate_holes_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic from where the Hole Fusion node acquires the
     // candidate holes originated from the Rgb node
-    if (privateNodeHandle_.getParam("subscribed_topics/rgb_candidate_holes_topic",
+    if (!privateNodeHandle_.getParam("subscribed_topics/rgb_candidate_holes_topic",
         rgbCandidateHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic rgb_candidate_holes_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic rgb_candidate_holes_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic from where the Hole Fusion node acquires the
     // candidate holes originated from the Thermal node
-    if (privateNodeHandle_.getParam("subscribed_topics/thermal_candidate_holes_topic",
+    if (!privateNodeHandle_.getParam("subscribed_topics/thermal_candidate_holes_topic",
         thermalCandidateHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic thermal_candidate_holes_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic thermal_candidate_holes_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to unlock
     // the synchronizer node
-    if (privateNodeHandle_.getParam("published_topics/synchronizer_unlock_topic",
+    if (!privateNodeHandle_.getParam("published_topics/synchronizer_unlock_topic",
         unlockTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic synchronizer_unlock_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic synchronizer_unlock_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Get the topic where the result of the hole processing will be
     // published.
-    if (privateNodeHandle_.getParam("published_topics/processor_log_topic",
+    if (!privateNodeHandle_.getParam("published_topics/processor_log_topic",
         processEndTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic processor_log_topic", nodeName_.c_str());
+      NODELET_FATAL("[%s] Could not find topic processor_log_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // information about the valid holes found by the Hole Detector package
-    if (privateNodeHandle_.getParam("published_topics/hole_detector_output_topic",
+    if (!privateNodeHandle_.getParam("published_topics/hole_detector_output_topic",
         validHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic hole_detector_output_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // the EnhancedImage msg
-    if (privateNodeHandle_.getParam("published_topics/enhanced_images_topic",
-        enhancedImagesTopic_))
-    {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic enhanced_images_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
+    // if (!privateNodeHandle_.getParam("published_topics/enhanced_images_topic",
+    //     enhancedImagesTopic_))
+    // {
+    //   NODELET_FATAL(
+    //     "[%s] Could not find topic enhanced_images_topic", nodeName_.c_str());
+    //   ROS_BREAK();
+    // }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // additional information about the valid holes found by the
     // Hole Detector package
-    if (privateNodeHandle_.getParam("published_topics/enhanced_holes_topic",
+    if (!privateNodeHandle_.getParam("published_topics/enhanced_holes_topic",
         enhancedHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic enhanced_images_topic", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // the InterpolatedDepthImage found by the
     // Hole Detector package
-    if (privateNodeHandle_.getParam("published_topics/interpolated_depth_topic",
-        InterpolatedDepthImageTopic_))
-    {
-      ROS_FATAL_NAMED(PKG_NAME,
-        "[%s] Could not find topic interpolated_depth_topic", nodeName_.c_str());
-      ROS_BREAK();
-    }
+    // if (!privateNodeHandle_.getParam("published_topics/interpolated_depth_topic",
+    //     InterpolatedDepthImageTopic_))
+    // {
+    //   NODELET_FATAL(
+    //     "[%s] Could not find topic interpolated_depth_topic", nodeName_.c_str());
+    //   ROS_BREAK();
+    // }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // messages so that the synchronizer node subscribes to the
     // input point cloud
-    if (privateNodeHandle_.getParam("published_topics/make_synchronizer_subscribe_to_input",
+    if (!privateNodeHandle_.getParam("published_topics/make_synchronizer_subscribe_to_input",
         synchronizerSubscribeToInputPointCloudTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic make_synchronizer_subscribe_to_input", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // messages so that the synchronizer node leaves its subscription to the
     // input point cloud
-    if (privateNodeHandle_.getParam("published_topics/make_synchronizer_leave_subscription_to_input",
+    if (!privateNodeHandle_.getParam("published_topics/make_synchronizer_leave_subscription_to_input",
         synchronizerLeaveSubscriptionToInputPointCloudTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic make_synchronizer_leave_subscription_to_input", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // an image of holes found by the Depth and RGB nodes
-    if (privateNodeHandle_.getParam("published_topics/debug_respective_holes_image",
+    if (!privateNodeHandle_.getParam("published_topics/debug_respective_holes_image",
         debugRespectiveHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic debug_respective_holes_image", nodeName_.c_str());
       ROS_BREAK();
     }
     // Read the name of the topic that the Hole Fusion node uses to publish
     // an image of the valid holes found
-    if (privateNodeHandle_.getParam("published_topics/debug_valid_holes_image",
+    if (!privateNodeHandle_.getParam("published_topics/debug_valid_holes_image",
         debugValidHolesTopic_))
     {
-      ROS_FATAL_NAMED(PKG_NAME,
+      NODELET_FATAL(
         "[%s] Could not find topic debug_valid_holes_image", nodeName_.c_str());
       ROS_BREAK();
     }
@@ -775,7 +788,7 @@ namespace pandora_vision_hole
     const ::pandora_vision_hole::debug_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     ////////////////////////////// Debug parameters ////////////////////////////
 
@@ -848,7 +861,7 @@ namespace pandora_vision_hole
     const ::pandora_vision_hole::filters_priority_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     // Depth / Area
     Parameters::Filters::DepthArea::priority =
@@ -912,7 +925,7 @@ namespace pandora_vision_hole
     const ::pandora_vision_hole::filters_thresholds_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     // Depth / Area
     Parameters::Filters::DepthArea::threshold =
@@ -976,7 +989,7 @@ namespace pandora_vision_hole
     const ::pandora_vision_hole::general_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     // Threshold parameters
     Parameters::Edge::denoised_edges_threshold =
@@ -1121,7 +1134,7 @@ namespace pandora_vision_hole
     const ::pandora_vision_hole::validity_cfgConfig &config,
     const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[Hole Fusion node] Parameters callback called");
+     NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
 
     // The validation process
     Parameters::HoleFusion::Validation::validation_process = 1;
@@ -1154,13 +1167,13 @@ namespace pandora_vision_hole
     the point cloud
     @return void
    **/
-  void HoleFusion::pointCloudCallback(const PointCloudPtr& msg)
+  void HoleFusion::pointCloudCallback(const PointCloudConstPtr& msg)
   {
-    #ifdef DEBUG_TIME
+#ifdef DEBUG_TIME
     Timer::start("pointCloudCallback", "", true);
-    #endif
+#endif
 
-    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion Point Cloud callback");
+    NODELET_INFO("[%s] Point Cloud callback", nodeName_.c_str());
 
     // Convert the header of the point cloud message
     std_msgs::Header header;
@@ -1191,7 +1204,7 @@ namespace pandora_vision_hole
 
     // Extract the depth image from the point cloud message
     cv::Mat depthImage = MessageConversions::convertPointCloudMessageToImage(
-      msg, CV_32FC1);
+        msg, CV_32FC1);
 
     // Interpolate the depthImage
     cv::Mat interpolatedDepthImage;
@@ -1260,18 +1273,18 @@ namespace pandora_vision_hole
    **/
   void HoleFusion::processCandidateHoles()
   {
-    ROS_INFO_NAMED(PKG_NAME, "Processing candidate holes");
+    NODELET_INFO("[%s] Processing candidate holes", nodeName_.c_str());
 
     #ifdef DEBUG_TIME
     Timer::start("processCandidateHoles", "", true);
     #endif
 
-    if (Parameters::Debug::publish_enhanced_Images)
-    {
-      publishEnhancedImage();
+    // if (Parameters::Debug::publish_enhanced_Images)
+    // {
+    //   publishEnhancedImage();
 
-      publishInterpolatedDepthImage();
-    }
+    //   publishInterpolatedDepthImage();
+    // }
 
     #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_respective_holes)
@@ -1334,7 +1347,7 @@ namespace pandora_vision_hole
       titles.push_back("Holes originated from RGB analysis, on the Depth image");
 
       // If mode is enabled add the information from thermal procedure
-      if (mode_)
+      if (rgbdtMode_)
       {
         // Holes originated from analysis on the thermal image,
         // on top of the depth image
@@ -1388,7 +1401,7 @@ namespace pandora_vision_hole
     HolesConveyorUtils::merge(depthHolesConveyor_, rgbHolesConveyor_,
       &rgbdHolesConveyor);
 
-    if (mode_)
+    if (rgbdtMode_)
     {
       HolesConveyorUtils::merge(rgbdHolesConveyor, thermalHolesConveyor_,
         &rgbdHolesConveyor);
@@ -1437,14 +1450,15 @@ namespace pandora_vision_hole
     {
       for (int i = 0; i < preValidatedHoles.size(); i++)
       {
-        ROS_INFO_NAMED(PKG_NAME, "--------------------------------");
-        ROS_INFO_NAMED(PKG_NAME, "Keypoint [%f %f]",
+        NODELET_INFO("[%s]--------------------------------", nodeName_.c_str());
+        NODELET_INFO("[%s] Keypoint [%f %f]",
+          nodeName_.c_str(),
           preValidatedHoles.holes[i].keypoint.pt.x,
           preValidatedHoles.holes[i].keypoint.pt.y);
 
         for (int j = 0; j < probabilitiesVector2D.size(); j++)
         {
-          ROS_INFO_STREAM_NAMED(PKG_NAME,
+          NODELET_INFO_STREAM(nodeName_.c_str() <<
             "filter j = " << j << ": " <<probabilitiesVector2D[j][i]);
         }
       }
@@ -1569,7 +1583,8 @@ namespace pandora_vision_hole
 
     // Publish the enhanced holes message
     // regardless of the amount of valid holes
-    publishEnhancedHoles(uniqueValidHoles, &validHolesMap);
+    if (publishingEnhancedHoles_)
+      publishEnhancedHoles(uniqueValidHoles, &validHolesMap);
 
     #ifdef DEBUG_TIME
     Timer::tick("processCandidateHoles");
@@ -1623,50 +1638,50 @@ namespace pandora_vision_hole
     @brief Publishes the interpolatedDepthImage.
     @return void
   **/
-  void HoleFusion::publishInterpolatedDepthImage()
-  {
-    // TO DO changed to ImagePtr
-    sensor_msgs::Image depthMsg;
-    depthMsg = MessageConversions::convertImageToMessage(
-    Visualization::scaleImageForVisualization(interpolatedDepthImage_,
-        Parameters::Image::scale_method),
-        sensor_msgs::image_encodings::TYPE_8UC1,
-        depthMsg);
+  // void HoleFusion::publishInterpolatedDepthImage()
+  // {
+  //   // TO DO changed to ImagePtr
+  //   sensor_msgs::Image depthMsg;
+  //   depthMsg = MessageConversions::convertImageToMessage(
+  //   Visualization::scaleImageForVisualization(interpolatedDepthImage_,
+  //       Parameters::Image::scale_method),
+  //       sensor_msgs::image_encodings::TYPE_8UC1,
+  //       depthMsg);
 
-    InterpolatedDepthImagePublisher_.publish(depthMsg);
-  }
+  //   InterpolatedDepthImagePublisher_.publish(depthMsg);
+  // }
 
   /**
     @brief Publishes the Images' enhanced information.
     @return void
   **/
-  void HoleFusion::publishEnhancedImage()
-  {
-    // The overall message of enhanced holes that will be published
-    pandora_vision_msgs::EnhancedImagePtr enhancedImagesMsgPtr(new pandora_vision_msgs::EnhancedImage);
+  // void HoleFusion::publishEnhancedImage()
+  // {
+  //   // The overall message of enhanced holes that will be published
+  //   pandora_vision_msgs::EnhancedImagePtr enhancedImagesMsgPtr(new pandora_vision_msgs::EnhancedImage);
 
-    // Set the rgbImage in the enhancedImagesMsg message to the rgb image
-    enhancedImagesMsgPtr->rgbImage = MessageConversions::convertImageToMessage(
-    rgbImage_,
-    sensor_msgs::image_encodings::TYPE_8UC3,
-    enhancedImagesMsgPtr->rgbImage);
+  //   // Set the rgbImage in the enhancedImagesMsg message to the rgb image
+  //   enhancedImagesMsgPtr->rgbImage = MessageConversions::convertImageToMessage(
+  //   rgbImage_,
+  //   sensor_msgs::image_encodings::TYPE_8UC3,
+  //   enhancedImagesMsgPtr->rgbImage);
 
-    // Set the depthImage in the enhancedImagesMsg message to the depth image
-    enhancedImagesMsgPtr->depthImage = MessageConversions::convertImageToMessage(
-    Visualization::scaleImageForVisualization(interpolatedDepthImage_,
-        Parameters::Image::scale_method),
-        sensor_msgs::image_encodings::TYPE_8UC1,
-        enhancedImagesMsgPtr->depthImage);
+  //   // Set the depthImage in the enhancedImagesMsg message to the depth image
+  //   enhancedImagesMsgPtr->depthImage = MessageConversions::convertImageToMessage(
+  //   Visualization::scaleImageForVisualization(interpolatedDepthImage_,
+  //       Parameters::Image::scale_method),
+  //       sensor_msgs::image_encodings::TYPE_8UC1,
+  //       enhancedImagesMsgPtr->depthImage);
 
-    // Set whether depth analysis is applicable
-    enhancedImagesMsgPtr->isDepth = (filteringMode_ == RGBD_MODE);
+  //   // Set whether depth analysis is applicable
+  //   enhancedImagesMsgPtr->isDepth = (filteringMode_ == RGBD_MODE);
 
-    // Set the message's header
-    enhancedImagesMsgPtr->header.stamp = timestamp_;
-    enhancedImagesMsgPtr->header.frame_id = frame_id_;
+  //   // Set the message's header
+  //   enhancedImagesMsgPtr->header.stamp = timestamp_;
+  //   enhancedImagesMsgPtr->header.frame_id = frame_id_;
 
-    enhancedImagesPublisher_.publish(enhancedImagesMsgPtr);
-  }
+  //   enhancedImagesPublisher_.publish(enhancedImagesMsgPtr);
+  // }
 
 
 
@@ -1697,13 +1712,20 @@ namespace pandora_vision_hole
         Parameters::Image::scale_method),
       sensor_msgs::image_encodings::TYPE_8UC1,
       enhancedHolesMsgPtr->depthImage);
+    // enhancedHolesMsgPtr->depthImage = MessageConversions::convertImageToMessage(
+    //   interpolatedDepthImage_,
+    //   sensor_msgs::image_encodings::TYPE_8UC1,
+    //   enhancedHolesMsgPtr->depthImage);
 
     // Set the thermalImage in the enhancedHolesMsg message to the thermal image
-    enhancedHolesMsgPtr->thermalImage = MessageConversions::convertImageToMessage(
-      Visualization::scaleImageForVisualization(thermalImage_,
-        Parameters::Image::scale_method),
-      sensor_msgs::image_encodings::TYPE_8UC1,
-      enhancedHolesMsgPtr->thermalImage);
+    if (rgbdtMode_)
+    {
+      enhancedHolesMsgPtr->thermalImage = MessageConversions::convertImageToMessage(
+        Visualization::scaleImageForVisualization(thermalImage_,
+          Parameters::Image::scale_method),
+        sensor_msgs::image_encodings::TYPE_8UC1,
+        enhancedHolesMsgPtr->thermalImage);
+    }
 
     // Set whether depth analysis is applicable
     enhancedHolesMsgPtr->isDepth = (filteringMode_ == RGBD_MODE);
@@ -1724,11 +1746,11 @@ namespace pandora_vision_hole
 
       // Set the hole's bounding box width and height
       int minx = conveyor.holes[it->first].rectangle[0].x;
-      int maxx = conveyor.holes[it->first].rectangle[0].x;
       int miny = conveyor.holes[it->first].rectangle[0].y;
+      int maxx = conveyor.holes[it->first].rectangle[0].x;
       int maxy = conveyor.holes[it->first].rectangle[0].y;
 
-      for (int r = 0; r < conveyor.holes[it->first].rectangle.size(); r++)
+      for (int r = 1; r < conveyor.holes[it->first].rectangle.size(); r++)
       {
         int xx = conveyor.holes[it->first].rectangle[r].x;
         int yy = conveyor.holes[it->first].rectangle[r].y;
@@ -1925,21 +1947,21 @@ namespace pandora_vision_hole
     @return void
    **/
   void HoleFusion::rgbCandidateHolesCallback(
-    const ::pandora_vision_hole::CandidateHolesVectorMsg&
+    const ::pandora_vision_hole::CandidateHolesVectorMsgConstPtr&
     rgbCandidateHolesVector)
   {
     #ifdef DEBUG_TIME
     Timer::start("rgbCandidateHolesCallback", "", true);
     #endif
 
-    ROS_INFO_NAMED(PKG_NAME, "Hole Fusion RGB callback");
+    NODELET_INFO("[%s] RGB callback", nodeName_.c_str());
 
     // Clear the current rgbHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
     HolesConveyorUtils::clear(&rgbHolesConveyor_);
 
     // Unpack the message
-    MessageConversions::unpackMessage(rgbCandidateHolesVector,
+    MessageConversions::unpackMessage(*rgbCandidateHolesVector,
       &rgbHolesConveyor_,
       &rgbImage_,
       Parameters::Image::image_representation_method,
@@ -2075,10 +2097,31 @@ namespace pandora_vision_hole
       isOn_ = toBeOn;
     }
 
+    // Shutdown or open publisher of enhanced images
+    if (newState == state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION
+      || newState == state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD
+      || newState == state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST)
+    {
+      if (!publishingEnhancedHoles_)
+      {
+        NODELET_INFO("[%s] Publishes now enhanced images from holes", nodeName_.c_str());
+        publishingEnhancedHoles_ = true;
+        enhancedHolesPublisher_ = nodeHandle_.advertise<pandora_vision_msgs::EnhancedImage>(
+            enhancedHolesTopic_, 1, true);
+      }
+    }
+    else
+    {
+      if (publishingEnhancedHoles_)
+      {
+        NODELET_INFO("[%s] Stop publishing now enhanced images from holes", nodeName_.c_str());
+        publishingEnhancedHoles_ = false;
+        enhancedHolesPublisher_.shutdown();
+      }
+    }
+
     transitionComplete(newState);
   }
-
-
 
   /**
     @brief Requests from the synchronizer to process a new point cloud
@@ -2091,12 +2134,13 @@ namespace pandora_vision_hole
     // is set to on
     if (isOn_)
     {
-      ROS_INFO_NAMED(PKG_NAME, "Sending unlock message");
+      NODELET_INFO("[%s] Sending unlock message", nodeName_.c_str());
 
       std_msgs::EmptyPtr unlockMsgPtr (new std_msgs::Empty);
       unlockPublisher_.publish(unlockMsgPtr);
     }
   }
 
+}  // namespace hole_fusion
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

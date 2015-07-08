@@ -41,14 +41,18 @@
 
 namespace pandora_vision
 {
-  DataMatrixPreProcessor::DataMatrixPreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler, 
-    sensor_msgs::image_encodings::BGR8)
-  {
-    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
-  }
-  
-  DataMatrixPreProcessor::~DataMatrixPreProcessor() {}
+namespace pandora_vision_datamatrix
+{
+  DataMatrixPreProcessor::
+  DataMatrixPreProcessor() :
+    VisionPreProcessor() {}
 
+  void
+  DataMatrixPreProcessor::
+  initialize(const std::string& ns, sensor_processor::Handler* handler)
+  {
+    VisionPreProcessor::initialize(ns, handler);
+    setImageEncoding(sensor_msgs::image_encodings::BGR8);
+  }
+}  // namespace pandora_vision_datamatrix
 }  // namespace pandora_vision

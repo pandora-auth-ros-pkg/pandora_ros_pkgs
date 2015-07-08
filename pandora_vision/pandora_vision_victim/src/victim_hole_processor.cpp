@@ -44,22 +44,28 @@
 
 namespace pandora_vision
 {
-  VictimHoleProcessor::VictimHoleProcessor(const std::string& ns,
+namespace pandora_vision_victim
+{
+  void
+  VictimHoleProcessor::initialize(const std::string& ns,
     sensor_processor::Handler* handler)
-    : sensor_processor::Processor<EnhancedImageStamped,
-      POIsStamped>(ns, handler)
   {
-    params_.configVictim(*this->accessPublicNh());
+    sensor_processor::Processor<EnhancedImageStamped,
+      POIsStamped>::initialize(ns, handler);
 
-    _debugVictimsPublisher = image_transport::ImageTransport(
-      *this->accessProcessorNh()).advertise(params_.victimDebugImg, 1, true);
+    ros::NodeHandle processor_nh = this->getProcessorNodeHandle();
 
-    interpolatedDepthPublisher_ = image_transport::ImageTransport(
-      *this->accessProcessorNh()).advertise(
-      params_.interpolatedDepthImg, 1, true);
+    paramsPtr_.reset( new VictimParameters(processor_nh) );
+    paramsPtr_->configVictim(processor_nh);
+
+    _debugVictimsPublisher = image_transport::ImageTransport(processor_nh).
+      advertise(paramsPtr_->victimDebugImg, 1, true);
+
+    interpolatedDepthPublisher_ = image_transport::ImageTransport(processor_nh).
+      advertise(paramsPtr_->interpolatedDepthImg, 1, true);
 
     std::string rgbClassifierType;
-    if (!this->accessPublicNh()->getParam("rgb_classifier", rgbClassifierType))
+    if (!processor_nh.getParam("rgb_classifier", rgbClassifierType))
     {
       ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
           "Could not retrieve the RGB classifier Type from the yaml file!");
@@ -69,7 +75,7 @@ namespace pandora_vision
     }
 
     std::string depthClassifierType;
-    if (!this->accessPublicNh()->getParam("depth_classifier", depthClassifierType))
+    if (!processor_nh.getParam("depth_classifier", depthClassifierType))
     {
       ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
           "Could not retrieve the Depth Classifier Type from the yaml file!");
@@ -78,24 +84,30 @@ namespace pandora_vision
       ROS_BREAK();
     }
 
-    validatorFactoryPtr_.reset(new ValidatorFactory(this->accessPublicNh()->getNamespace()));
+    std::string rgbdClassifierType;
+    if (!processor_nh.getParam("rgbd_classifier", rgbdClassifierType))
+    {
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
+          "Could not retrieve the RGBD Classifier Type from the yaml file!");
+      ROS_ERROR_STREAM("[" + this->getName() + "] processor nh processor : " +
+          "Shutting Down now!");
+      ROS_BREAK();
+    }
 
-    rgbValidatorPtr_.reset(validatorFactoryPtr_->createValidator(*this->accessPublicNh(),
+    validatorFactoryPtr_.reset(new ValidatorFactory);
+    rgbValidatorPtr_.reset(validatorFactoryPtr_->createValidator(processor_nh,
           rgbClassifierType, "rgb"));
-    depthValidatorPtr_.reset(validatorFactoryPtr_->createValidator(*this->accessPublicNh(),
+    depthValidatorPtr_.reset(validatorFactoryPtr_->createValidator(processor_nh,
           depthClassifierType, "depth"));
+    rgbdValidatorPtr_.reset(validatorFactoryPtr_->createValidator(processor_nh,
+          rgbdClassifierType, "rgbd"));
 
     ROS_INFO_STREAM("[" + this->getName() + "] processor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+      processor_nh.getNamespace());
   }
 
   VictimHoleProcessor::VictimHoleProcessor() : sensor_processor::Processor<EnhancedImageStamped,
     POIsStamped>() {}
-
-  VictimHoleProcessor::~VictimHoleProcessor()
-  {
-    ROS_DEBUG("[victim_node] : Destroying Victim Hole Processor instance");
-  }
 
   /**
   @brief This method check in which state we are, according to
@@ -105,20 +117,26 @@ namespace pandora_vision
   std::vector<VictimPOIPtr> VictimHoleProcessor::detectVictims(
     const EnhancedImageStampedConstPtr& input)
   {
-    if (params_.debug_img || params_.debug_img_publisher)
+    if (paramsPtr_->debug_img || paramsPtr_->debug_img_publisher)
     {
-      input->getRgbImage().copyTo(debugImage);
+      debugImage.clear();
+      debugImage.push_back(input->getRgbImage());
+      if (input->getDepth())
+        debugImage.push_back(input->getDepthImage());
       rgb_svm_keypoints.clear();
       depth_svm_keypoints.clear();
+      rgbd_svm_keypoints.clear();
       rgb_svm_bounding_boxes.clear();
       depth_svm_bounding_boxes.clear();
+      rgbd_svm_bounding_boxes.clear();
       holes_bounding_boxes.clear();
       rgb_svm_p.clear();
       depth_svm_p.clear();
+      rgbd_svm_p.clear();
     }
 
     DetectionImages imgs;
-    int stateIndicator = 2;  // * input->getDepth() + (input->getRegions().size() > 0) + 1;
+    int stateIndicator = 2;  //  * input->getDepth() + (input->getRegions().size() > 0) + 1;
     DetectionMode detectionMode;
     switch (stateIndicator)
     {
@@ -152,9 +170,6 @@ namespace pandora_vision
 
       EnhancedMat emat;
       emat.img = input->getRgbImage()(rect);
-      // cv::resize(emat.img, emat.img,
-        // cv::Size(params_.frameWidth, params_.frameHeight));
-      emat.bounding_box = rect;
       emat.keypoint = cv::Point2f(input->getRegion(i).x, input->getRegion(i).y);
       imgs.rgbMasks.push_back(emat);
 
@@ -174,7 +189,7 @@ namespace pandora_vision
       // {
         // counter_++;
         /// Debug purposes
-        if (params_.debug_img || params_.debug_img_publisher)
+        if (paramsPtr_->debug_img || paramsPtr_->debug_img_publisher)
         {
           cv::Point victimPOI = final_victims[i]->getPoint();
           victimPOI.x -= final_victims[i]->getWidth() / 2;
@@ -190,115 +205,156 @@ namespace pandora_vision
               rgb_svm_bounding_boxes.push_back(re);
               rgb_svm_p.push_back(final_victims[i]->getProbability());
               break;
-            case DEPTH_RGB_SVM:
+            case DEPTH_SVM:
               depth_svm_keypoints.push_back(kp);
               depth_svm_bounding_boxes.push_back(re);
               depth_svm_p.push_back(final_victims[i]->getProbability());
               break;
+            case RGBD_SVM:
+              rgbd_svm_keypoints.push_back(kp);
+              rgbd_svm_bounding_boxes.push_back(re);
+              rgbd_svm_p.push_back(final_victims[i]->getProbability());
           }
         }
       // }
     }
 
     /// Debug image
-    if (params_.debug_img || params_.debug_img_publisher)
+    if (paramsPtr_->debug_img || paramsPtr_->debug_img_publisher)
     {
-      cv::drawKeypoints(debugImage, rgb_svm_keypoints, debugImage,
-        CV_RGB(0, 100, 255),
-        cv::DrawMatchesFlags::DEFAULT);
-      for (unsigned int i = 0 ; i < rgb_svm_bounding_boxes.size() ; i++)
+      for (int jj = 0; jj < debugImage.size(); jj++)
       {
-        cv::rectangle(debugImage, rgb_svm_bounding_boxes[i],
-          CV_RGB(0, 100, 255));
+        for (unsigned int i = 0 ; i < holes_bounding_boxes.size() ; i++)
         {
-          std::ostringstream convert;
-          convert.str("");
-          convert << rgb_svm_p[i];
-          cv::putText(debugImage, convert.str().c_str(),
-            rgb_svm_keypoints[i].pt,
-            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
+          cv::rectangle(debugImage[jj], holes_bounding_boxes[i],
+          CV_RGB(100, 100, 150));
         }
-      }
 
-      cv::drawKeypoints(debugImage, depth_svm_keypoints, debugImage,
-        CV_RGB(0, 255, 255),
-        cv::DrawMatchesFlags::DEFAULT);
-      for (unsigned int i = 0 ; i < depth_svm_bounding_boxes.size() ; i++)
-      {
-        cv::rectangle(debugImage, depth_svm_bounding_boxes[i],
-          CV_RGB(0, 255, 255));
+        cv::drawKeypoints(debugImage[jj], rgb_svm_keypoints, debugImage[jj],
+          CV_RGB(255, 100, 0),
+          cv::DrawMatchesFlags::DEFAULT);
+        for (unsigned int i = 0 ; i < rgb_svm_bounding_boxes.size() ; i++)
+        {
+          cv::rectangle(debugImage[jj], rgb_svm_bounding_boxes[i],
+            CV_RGB(255, 100, 0));
+          {
+            std::ostringstream convert;
+            convert.str("");
+            convert << rgb_svm_p[i];
+            cv::putText(debugImage[jj], convert.str().c_str(),
+              rgb_svm_keypoints[i].pt,
+              cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 0), 1, CV_AA);
+          }
+        }
+
+        cv::drawKeypoints(debugImage[jj], depth_svm_keypoints, debugImage[jj],
+          CV_RGB(0, 255, 255),
+          cv::DrawMatchesFlags::DEFAULT);
+        for (unsigned int i = 0 ; i < depth_svm_bounding_boxes.size() ; i++)
+        {
+          cv::rectangle(debugImage[jj], depth_svm_bounding_boxes[i],
+            CV_RGB(0, 255, 255));
+          {
+            std::ostringstream convert;
+            convert.str("");
+            convert << depth_svm_p[i];
+            cv::putText(debugImage[jj], convert.str().c_str(),
+              depth_svm_keypoints[i].pt,
+              cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
+          }
+        }
+
+        cv::drawKeypoints(debugImage[jj], rgbd_svm_keypoints, debugImage[jj],
+          CV_RGB(0, 255, 0),
+          cv::DrawMatchesFlags::DEFAULT);
+        for (unsigned int i = 0 ; i < rgbd_svm_bounding_boxes.size() ; i++)
+        {
+          cv::rectangle(debugImage[jj], rgbd_svm_bounding_boxes[i],
+            CV_RGB(0, 255, 0));
+          {
+            std::ostringstream convert;
+            convert.str("");
+            convert << rgbd_svm_p[i];
+            cv::putText(debugImage[jj], convert.str().c_str(),
+              rgbd_svm_keypoints[i].pt,
+              cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 0), 1, CV_AA);
+          }
+        }
+
         {
           std::ostringstream convert;
           convert.str("");
-          convert << depth_svm_p[i];
-          cv::putText(debugImage, convert.str().c_str(),
-            depth_svm_keypoints[i].pt,
+          convert << "RGB_" << boost::to_upper_copy<std::string>(rgbValidatorPtr_->getClassifierType())
+            << " : " << rgb_svm_keypoints.size();
+          cv::putText(debugImage[jj], convert.str().c_str(),
+            cvPoint(10, 60),
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 0), 1, CV_AA);
+        }
+
+        {
+          std::ostringstream convert;
+          convert.str("");
+          convert << "Depth_" << boost::to_upper_copy<std::string>(depthValidatorPtr_->getClassifierType())
+            << " : " << depth_svm_keypoints.size();
+          cv::putText(debugImage[jj], convert.str().c_str(),
+            cvPoint(10, 80),
             cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
         }
-      }
-      for (unsigned int i = 0 ; i < holes_bounding_boxes.size() ; i++)
-      {
-        cv::rectangle(debugImage, holes_bounding_boxes[i],
-          CV_RGB(0, 0, 0));
-      }
 
-      // if (counter_ == params_.positivesCounter)
-      {
-        std::ostringstream convert;
-        convert << "RGB_" << boost::to_upper_copy<std::string>(rgbValidatorPtr_->getClassifierType())
-          << " : " << rgb_svm_keypoints.size();
-        cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10, 60),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(255, 100, 255), 1, CV_AA);
-      }
-      /*
-      else
-      {
-        std::ostringstream convert;
-        convert << "RGB_SVM : "<< rgb_svm_keypoints.size();
-        cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10, 60),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 100, 255), 1, CV_AA);
-      }
-      */
+        {
+          std::ostringstream convert;
+          convert.str("");
+          convert << "RGBD_"
+                  << boost::to_upper_copy<std::string>(rgbdValidatorPtr_->getClassifierType())
+                  << " : " << rgbd_svm_keypoints.size();
+          cv::putText(debugImage[jj], convert.str().c_str(),
+            cvPoint(10, 100),
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 0), 1, CV_AA);
+        }
 
-      {
-        std::ostringstream convert;
-        convert << "Depth_" << boost::to_upper_copy<std::string>(depthValidatorPtr_->getClassifierType())
-          << " : " << depth_svm_keypoints.size();
-        cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10, 80),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 255, 255), 1, CV_AA);
-      }
-
-      {
-        std::ostringstream convert;
-        convert << "Holes got : "<< input->getRegions().size();
-        cv::putText(debugImage, convert.str().c_str(),
-          cvPoint(10, 100),
-          cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(0, 0, 0), 1, CV_AA);
+        {
+          std::ostringstream convert;
+          convert.str("");
+          convert << "Holes got : "<< input->getRegions().size();
+          cv::putText(debugImage[jj], convert.str().c_str(),
+            cvPoint(10, 120),
+            cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, CV_RGB(100, 100, 150), 1, CV_AA);
+        }
       }
     }
 
-    if (params_.debug_img_publisher)
+    if (paramsPtr_->debug_img_publisher)
     {
       // Convert the image into a message
       cv_bridge::CvImagePtr msgPtr(new cv_bridge::CvImage());
 
       msgPtr->header = input->getHeader();
       msgPtr->encoding = sensor_msgs::image_encodings::BGR8;
-      msgPtr->image = debugImage;
+      msgPtr->image = debugImage[0];
       // Publish the image message
       _debugVictimsPublisher.publish(*msgPtr->toImageMsg());
     }
 
-    if (params_.debug_img)
+    if (paramsPtr_->debug_img)
     {
-      cv::imshow("Victim Hole processor", debugImage);
-      cv::waitKey(30);
+      if (debugImage.size() > 1)
+      {
+        cv::Mat displayImage(debugImage[0].rows, debugImage[0].cols * 2, debugImage[0].type());
+        debugImage[0].copyTo(displayImage(cv::Rect(0, 0, debugImage[0].cols, debugImage[0].rows)));
+        debugImage[1].copyTo(displayImage(cv::Rect(debugImage[0].cols, 0, debugImage[0].cols, debugImage[0].rows)));
+        cv::imshow("Victim Hole processor", displayImage);
+        cv::waitKey(30);
+      }
+      else
+      {
+        cv::Mat displayImage;
+        debugImage[0].copyTo(displayImage);
+        cv::imshow("Victim Hole processor", displayImage);
+        cv::waitKey(30);
+      }
     }
 
-    if (counter_ >= params_.positivesCounter)
+    if (counter_ >= paramsPtr_->positivesCounter)
     {
       counter_ = 0;
     }
@@ -325,41 +381,73 @@ namespace pandora_vision
 
     std::vector<VictimPOIPtr> rgb_svm_probabilities;
     std::vector<VictimPOIPtr> depth_svm_probabilities;
+    std::vector<VictimPOIPtr> rgbd_svm_probabilities;
 
     float probability, classLabel;
 
-    if (detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH )  // || detectionMode == GOT_RGB
+    if (detectionMode == GOT_HOLES || detectionMode == GOT_HOLES_AND_DEPTH)  // || detectionMode == GOT_RGB
     {
       for (int i = 0 ; i < imgs.rgbMasks.size(); i++)
       {
         VictimPOIPtr temp(new VictimPOI);
         rgbValidatorPtr_->calculatePredictionProbability(imgs.rgbMasks.at(i).img, &classLabel, &probability);
-        temp->setProbability(probability);
-        temp->setClassLabel(classLabel);
-        temp->setPoint(imgs.rgbMasks[i].keypoint);
-        temp->setSource(RGB_SVM);
-        temp->setWidth(imgs.rgbMasks[i].bounding_box.width);
-        temp->setHeight(imgs.rgbMasks[i].bounding_box.height);
-        rgb_svm_probabilities.push_back(temp);
+        if (classLabel == 1)
+        {
+          temp->setProbability(probability);
+          temp->setClassLabel(classLabel);
+          temp->setPoint(imgs.rgbMasks[i].keypoint);
+          temp->setSource(RGB_SVM);
+          temp->setWidth(imgs.rgbMasks[i].bounding_box.width);
+          temp->setHeight(imgs.rgbMasks[i].bounding_box.height);
+          rgb_svm_probabilities.push_back(temp);
+          final_probabilities.push_back(temp);
+        }
       }
     }
 
     if (detectionMode == GOT_HOLES_AND_DEPTH)
     {
-      for (int i = 0 ; i < imgs.depthMasks.size(); i++)
+      if (!paramsPtr_->rgbdEnabled)
       {
-        VictimPOIPtr temp(new VictimPOI);
-        depthValidatorPtr_->calculatePredictionProbability(imgs.depthMasks.at(i).img, &classLabel, &probability);
-        temp->setProbability(probability);
-        temp->setClassLabel(classLabel);
-        temp->setPoint(imgs.depthMasks[i].keypoint);
-        temp->setSource(DEPTH_RGB_SVM);
-        temp->setWidth(imgs.depthMasks[i].bounding_box.width);
-        temp->setHeight(imgs.depthMasks[i].bounding_box.height);
-        depth_svm_probabilities.push_back(temp);
-        if (depth_svm_probabilities[i]->getClassLabel() == 1)
+        for (int i = 0 ; i < imgs.depthMasks.size(); i++)
         {
-          final_probabilities.push_back(temp);
+          VictimPOIPtr temp(new VictimPOI);
+          depthValidatorPtr_->calculatePredictionProbability(imgs.depthMasks.at(i).img, &classLabel, &probability);
+          if (classLabel == 1)
+          {
+            temp->setProbability(probability);
+            temp->setClassLabel(classLabel);
+            temp->setPoint(imgs.depthMasks[i].keypoint);
+            temp->setSource(DEPTH_SVM);
+            temp->setWidth(imgs.depthMasks[i].bounding_box.width);
+            temp->setHeight(imgs.depthMasks[i].bounding_box.height);
+            depth_svm_probabilities.push_back(temp);
+            final_probabilities.push_back(temp);
+          }
+        }
+      }
+      else
+      {
+        if (imgs.depthMasks.size() == imgs.rgbMasks.size())
+        {
+          for (int i = 0 ; i < imgs.depthMasks.size(); i++)
+          {
+            VictimPOIPtr temp(new VictimPOI);
+            rgbdValidatorPtr_->calculatePredictionProbability(imgs.rgbMasks.at(i).img,
+                                                            imgs.depthMasks.at(i).img,
+                                                            &classLabel, &probability);
+            if (classLabel == 1)
+            {
+              temp->setProbability(probability);
+              temp->setClassLabel(classLabel);
+              temp->setPoint(imgs.depthMasks[i].keypoint);
+              temp->setSource(RGBD_SVM);
+              temp->setWidth(imgs.depthMasks[i].bounding_box.width);
+              temp->setHeight(imgs.depthMasks[i].bounding_box.height);
+              rgbd_svm_probabilities.push_back(temp);
+              final_probabilities.push_back(temp);
+            }
+          }
         }
       }
     }
@@ -373,9 +461,9 @@ namespace pandora_vision
       {
         VictimPOIPtr temp(new VictimPOI);
         float mergedProb;
-        mergedProb = (depth_svm_probabilities[i]->getClassLabel() * params_.depth_svm_weight *
+        mergedProb = (depth_svm_probabilities[i]->getClassLabel() * paramsPtr_->depth_svm_weight *
                      depth_svm_probabilities[i]->getProbability() +
-                     rgb_svm_probabilities[i]->getClassLabel() * params_.rgb_svm_weight *
+                     rgb_svm_probabilities[i]->getClassLabel() * paramsPtr_->rgb_svm_weight *
                      rgb_svm_probabilities[i]->getProbability());
 
         if (mergedProb >= 0.0f)
@@ -397,26 +485,26 @@ namespace pandora_vision
     */
     // Only rgb svm probabilities
 
-    if (detectionMode == GOT_HOLES )  // || detectionMode == GOT_RGB
-    {
-      for (unsigned int i = 0 ; i < rgb_svm_probabilities.size(); i++)
-      {
-        VictimPOIPtr temp(new VictimPOI);
-        if (rgb_svm_probabilities[i]->getClassLabel() == 1)
-        {
-          counter_++;
-          temp->setProbability(rgb_svm_probabilities[i]->getProbability() *
-            params_.rgb_svm_weight);
-          temp->setPoint(rgb_svm_probabilities[i]->getPoint());
-          temp->setSource(RGB_SVM);
-          temp->setWidth(rgb_svm_probabilities[i]->getWidth());
-          temp->setHeight(rgb_svm_probabilities[i]->getHeight());
-          final_probabilities.push_back(temp);
-        }
-        else
-          counter_--;
-     }
-    }
+    // if (detectionMode == GOT_HOLES )  // || detectionMode == GOT_RGB
+    // {
+      // for (unsigned int i = 0 ; i < rgb_svm_probabilities.size(); i++)
+      // {
+        // VictimPOIPtr temp(new VictimPOI);
+        // if (rgb_svm_probabilities[i]->getClassLabel() == 1)
+        // {
+          // counter_++;
+          // temp->setProbability(rgb_svm_probabilities[i]->getProbability() *
+            // paramsPtr_->rgb_svm_weight);
+          // temp->setPoint(rgb_svm_probabilities[i]->getPoint());
+          // temp->setSource(RGB_SVM);
+          // temp->setWidth(rgb_svm_probabilities[i]->getWidth());
+          // temp->setHeight(rgb_svm_probabilities[i]->getHeight());
+          // final_probabilities.push_back(temp);
+        // }
+        // else
+          // counter_--;
+     // }
+    /* } */
     return final_probabilities;
   }
 
@@ -461,4 +549,5 @@ namespace pandora_vision
     }
     return true;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision

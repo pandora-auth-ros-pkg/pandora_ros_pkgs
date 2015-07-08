@@ -41,14 +41,19 @@
 
 namespace pandora_vision
 {
-  MotionPreProcessor::MotionPreProcessor(const std::string& ns, 
-    sensor_processor::Handler* handler) : VisionPreProcessor(ns, handler,
-    sensor_msgs::image_encodings::BGR8)
+namespace pandora_vision_motion
+{
+  void
+  MotionPreProcessor::
+  initialize(const std::string& ns, sensor_processor::Handler* handler)
   {
-    ROS_INFO_STREAM("[" + this->getName() + "] preprocessor nh processor : " +
-      this->accessProcessorNh()->getNamespace());
+    VisionPreProcessor::initialize(ns, handler);
+    setImageEncoding(sensor_msgs::image_encodings::BGR8);
   }
 
-  MotionPreProcessor::~MotionPreProcessor() {}
+  MotionPreProcessor::MotionPreProcessor() : VisionPreProcessor()
+  {
+  }
 
+}  // namespace pandora_vision_motion
 }  // namespace pandora_vision

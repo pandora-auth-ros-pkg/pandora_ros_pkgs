@@ -34,20 +34,25 @@
 *
 * Author: Victor Daropoulos
 *********************************************************************/
-#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H
-#define PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H
+#ifndef PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTOR_H
+#define PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTOR_H
 
-#include "ros/ros.h"
+#include <stdlib.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 
-#include <iostream>
-#include <stdlib.h>
 #include "pandora_vision_landoltc/landoltc_3d/landoltc3d_parameters.h"
 
 namespace pandora_vision
 {
-  
-struct LandoltC3D{
+namespace pandora_vision_landoltc
+{
+
+struct LandoltC3D
+{
   cv::Point center;
   int count;
   std::vector<float> angles;
@@ -60,50 +65,48 @@ struct LandoltC3D{
 class LandoltC3dDetector
 {
   private:
-    
-  //!<Value for threshholding gradients
+  /// Value for threshholding gradients
   int _minDiff;
-  //!<Value for thresholding values in voting array
+  /// Value for thresholding values in voting array
   int _threshold;
-  //!<Vector containing centers of possible landolts
+  /// Vector containing centers of possible landolts
   std::vector <cv::Point> _centers;
-  //!<Vector containing colors of landolts,used for seperating them later
+  /// Vector containing colors of landolts,used for seperating them later
   std::vector<cv::Scalar> _fillColors;
-  //!<Vector containing bounding rectangles of each landolt
+  /// Vector containing bounding rectangles of each landolt
   std::vector<cv::Rect> _rectangles;
-  //!<Vector containing centers of verified landolts
+  /// Vector containing centers of verified landolts
   std::vector<cv::Point> _newCenters;
-  //!<Vector containing contour points of reference C
+  /// Vector containing contour points of reference C
   std::vector<std::vector<cv::Point> > _refContours;
-  //!<2D Matrix containing "votes" of each pixel, used for finding the centers
+  /// 2D Matrix containing "votes" of each pixel, used for finding the centers
   cv::Mat _voting;
-  //!<2D Matrix containing landoltsC's, each colored with a unique color
+  /// 2D Matrix containing landoltsC's, each colored with a unique color
   cv::Mat _coloredContours;
-  //!<Pointer used for Contrast Limited Adaptive Histogram Equalization
+  /// Pointer used for Contrast Limited Adaptive Histogram Equalization
   cv::Ptr<cv::CLAHE> clahe;
-  //!<2D Matric used for separating each LandoltC3D to each parts
+  /// 2D Matric used for separating each LandoltC3D to each parts
   cv::Mat _mask;
-  //!<Vector containing edge points of C, found using findRotationB function
+  /// Vector containing edge points of C, found using findRotationB function
   std::vector<cv::Point> _edgePoints;
-  //!<Value representing the number of edges found, again using finRotationB function  
+  /// Value representing the number of edges found, again using finRotationB function
   int _edges;
-  //!<Vector containing LandoltC3D structs
+  /// Vector containing LandoltC3D structs
   std::vector<LandoltC3D> _landoltc3d;
-  //!<Predator Bounding Box
+  /// Predator Bounding Box
   cv::Rect predator_bbox;
-  //!<Predator Probability
+  /// Predator Probability
   float confidence;
-  //!<Boolean value used for fusion decision
+  /// Boolean value used for fusion decision
   bool PredatorOn;
-  
+
   public:
-  
-  //!< Constructor
+  /// Constructor
   LandoltC3dDetector();
-    
-  //!< Destructor
+
+  /// Destructor
   ~LandoltC3dDetector();
-    
+
   /**
   @brief Function for the initialization of the reference image
   @param path [std::string] The path of the reference image
@@ -118,7 +121,7 @@ class LandoltC3dDetector
   @return void
   **/
   void rasterizeLine(cv::Point A, cv::Point B);
-    
+
   /**
   @brief Finds Centers based on gradient
   @param rows [int] Number of rows of matrix
@@ -138,7 +141,7 @@ class LandoltC3dDetector
   @return void
   **/
   void findLandoltContours(const cv::Mat& inImage, int rows, int cols, std::vector<cv::Point> ref);
-  
+
   /**
   @brief Mask for separating a LandoltC3D Contour to its components
   @return void
@@ -159,23 +162,23 @@ class LandoltC3dDetector
   @return void
   **/
   void thinningIter(cv::Mat* in, int iter);
-    
+
   /**
   @brief Function called for the initiation of LandoltC search in the frame
   @param input [cv::Mat*] Matrix containing the frame received from the camera
   @return void
   **/
   void begin(cv::Mat* input);
-    
+
   /**
   @brief Function for applying BradleyThresholding on Image
   @param in [cv::Mat&] Input Image to be thresholded
   @param out [cv::Mat*] Output, thresholded image
   @return void
   **/
-    
+
   void applyBradleyThresholding(const cv::Mat& in, cv::Mat* out);
-  
+
   /**
   @brief Calculation of rotation based on thinning.Precision is good for a
   distance up to 50cm from the camera, gives more accurate results than the first
@@ -183,42 +186,42 @@ class LandoltC3dDetector
   @param in [const cv::Mat&] Matrix containing the padded frame
   @param temp [LandoltC3D*] Struct of LandoltC3D
   @return void
-  **/  
+  **/
   void findRotation(const cv::Mat&in, LandoltC3D* temp);
-  
+
   /**
   @brief Function for calculating the neighbours of pixels considering
   8-connectivity
   @param index [unsigned int] Index of pixel in matrix
   @param in [cv::Mat&] Input Image
   @return void
-  **/    
+  **/
   void find8Neights(unsigned int index, const cv::Mat& in);
-  
+
   /**
   @brief Function for calculating perspective transform, in
   order to get better angle calculation precision
   @param rec [cv::Rect] Rectangle enclosing a 'C'
   @param in [cv::Mat&] Input Image
-  @return [cv::Mat] Output Image 
-  **/    
+  @return [cv::Mat] Output Image
+  **/
   cv::Mat getWarpPerspectiveTransform(const cv::Mat& in, cv::Rect rec);
-  
+
   /**
   @brief Clearing vector values
   @param void
   @return void
   **/
   void clear();
-    
+
   /**
   @brief Function for fusing results from both LandoltC3D and
   Predator
   @return void
   **/
-    
+
   void fusion();
-  
+
   /**
   @brief Function for storing bounding box and probability sent
   from Predator
@@ -227,21 +230,21 @@ class LandoltC3dDetector
   @return void
   **/
   void setPredatorValues(cv::Rect bbox, float posterior);
-  
+
   /**
   @brief Function used for fusion, in order to decide whether Predator
   is ON or OFF
   @return void
   **/
   void setPredatorOn(bool flag);
-  
+
   /**
   @brief Returns detected landoltc3d, for publishing them later
   @param void
   @return [std::vector<LandoltC3D>] Vector of detected Landolts
   **/
   std::vector<LandoltC3D> getDetectedLandolt();
-    
 };
-} // namespace pandora_vision
-#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC3D_DETECTOR_H
+}  // namespace pandora_vision_landoltc
+}  // namespace pandora_vision
+#endif  // PANDORA_VISION_LANDOLTC_LANDOLTC_3D_LANDOLTC3D_DETECTOR_H

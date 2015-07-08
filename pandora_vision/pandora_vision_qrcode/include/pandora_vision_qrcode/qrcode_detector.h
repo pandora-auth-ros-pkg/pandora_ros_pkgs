@@ -50,85 +50,83 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_qrcode
+{
   class QrCodeDetector
   {
-    public:
-      typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
+   public:
+    typedef boost::shared_ptr<QrCodePOI> QrCodePOIPtr;
 
-      /**
-       * @brief: The main constructor for the QR detector objects.
-       * @param gaussianSharpenBlur[int]: The standard deviation in the x axis
-       * for the Gaussian Filter.
-       * @param gaussianSharpenWeight[float]: The weight for the summation
-       * that is used to sharpen the image.
-       * @param debugCode[bool]: A boolean flag that specifies whether the
-       * input and result images will be displayed.
-       */
-      QrCodeDetector(int gaussianSharpenBlur, float gaussianSharpenWeight,
-          bool debugCode);
+    /**
+      * @brief: The main constructor for the QR detector objects.
+      * @param gaussianSharpenBlur[int]: The standard deviation in the x axis
+      * for the Gaussian Filter.
+      * @param gaussianSharpenWeight[float]: The weight for the summation
+      * that is used to sharpen the image.
+      * @param debugCode[bool]: A boolean flag that specifies whether the
+      * input and result images will be displayed.
+      */
+    QrCodeDetector(int gaussianSharpenBlur, float gaussianSharpenWeight,
+        bool debugCode);
 
-      /**
-       * @brief The default constructor for the QR detector objects.
-       */
-      QrCodeDetector()
-      {
-      }
+    /**
+      * @brief The default constructor for the QR detector objects.
+      */
+    QrCodeDetector()
+    {}
 
-      virtual ~QrCodeDetector()
-      {
-      }
+    void set_debug(bool flag)
+    {
+      debugQrcode_ = flag;
+    };
 
-      void set_debug(bool flag)
-      {
-        debugQrcode_ = flag;
-      };
+    void setSharpenBlur(int gaussianSharpenBlur)
+    {
+      gaussianSharpenBlur_ = gaussianSharpenBlur;
+    }
 
-      void setSharpenBlur(int gaussianSharpenBlur)
-      {
-        gaussianSharpenBlur_ = gaussianSharpenBlur;
-      }
+    void setSharpenWeight(float gaussianSharpenWeight)
+    {
+      gaussianSharpenWeight_ = gaussianSharpenWeight;
+    }
 
-      void setSharpenWeight(float gaussianSharpenWeight)
-      {
-        gaussianSharpenWeight_ = gaussianSharpenWeight;
-      }
+    /**
+      * @brief Detects qrcodes and stores them in a vector.
+      * @param frame [cv::Mat] The image in which the QRs are detected
+      * @return void
+      */
+    std::vector<POIPtr> detectQrCode(const cv::Mat& frame);
 
-      /**
-       * @brief Detects qrcodes and stores them in a vector.
-       * @param frame [cv::Mat] The image in which the QRs are detected
-       * @return void
-       */
-      std::vector<POIPtr> detectQrCode(const cv::Mat& frame);
+   private:
+    /// Filter Parameters
+    int gaussianSharpenBlur_;
+    double gaussianSharpenWeight_;
 
-    private:
-      /// Filter Parameters
-      int gaussianSharpenBlur_;
-      double gaussianSharpenWeight_;
+    /// Debug image topic
+    std::string debugTopic_;
 
-      /// Debug image topic
-      std::string debugTopic_;
+    /// Debug images publisher flag
+    bool debugQrcode_;
 
-      /// Debug images publisher flag
-      bool debugQrcode_;
+    /// QrCode scanner
+    zbar::ImageScanner scanner_;
 
-      /// QrCode scanner
-      zbar::ImageScanner scanner_;
+    /// List of detected qrcodes
+    std::vector<POIPtr> qrCodeList_;
 
-      /// List of detected qrcodes
-      std::vector<POIPtr> qrCodeList_;
+    /**
+      @brief Creates view for debugging purposes.
+      @param image [zbar::Image&] The QR image.
+      @param inputFrame[const cv::Mat&]: The input frame of the system.
+      @param constrastImage[const cv::Mat&]: The image with the enhanced
+      contrast used to detect the QR codes.
+      @return void
+      **/
+    void debugShow(const zbar::Image& image, const cv::Mat& inputFrame,
+        const cv::Mat& contrastImage);
 
-      /**
-        @brief Creates view for debugging purposes.
-        @param image [zbar::Image&] The QR image. 
-        @param inputFrame[const cv::Mat&]: The input frame of the system.
-        @param constrastImage[const cv::Mat&]: The image with the enhanced 
-        contrast used to detect the QR codes.
-        @return void
-       **/
-      void debugShow(const zbar::Image& image, const cv::Mat& inputFrame,
-          const cv::Mat& contrastImage);
-
-      friend class QrCodeDetectorTest;
+    friend class QrCodeDetectorTest;
   };
+}  // namespace pandora_vision_qrcode
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_QRCODE_QRCODE_DETECTOR_H

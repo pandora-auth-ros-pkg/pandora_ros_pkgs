@@ -43,6 +43,8 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor
    */
@@ -75,5 +77,6 @@ namespace pandora_vision
     }
     return meanStdDevVector;
   }
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 

@@ -1,0 +1,83 @@
+%YAML:1.0
+svm:
+  extract_channels_statistics_features: false
+  extract_edge_orientation_features: false
+  extract_haralick_features: false
+  extract_sift_features: true
+  extract_hog_features: false
+  extract_color_histograms: false
+
+  dictionary_size: 5
+  visualization: false
+  save_descriptors: false
+  load_descriptors: false
+
+  training_set_feature_extraction: true
+  test_set_feature_extraction: true
+  load_classifier_model: false
+
+  do_pca_analysis: false
+  use_platt_scaling: false
+  # Normalization Types
+  # 0: No Normalization
+  # 1: Min-Max Normalization
+  # 2: Z-Score Normalization
+  type_of_normalization: 2
+
+  training_annotations_file: rgb_training_annotations.txt
+  test_annotations_file: rgb_test_annotations.txt
+rf:
+  extract_channels_statistics_features: false
+  extract_edge_orientation_features: false
+  extract_haralick_features: false
+  extract_sift_features: true
+  extract_hog_features: false
+  extract_color_histograms: false
+
+  dictionary_size: 100
+  visualization: false
+  save_descriptors: false
+  load_descriptors: false
+
+  training_set_feature_extraction: true
+  test_set_feature_extraction: true
+  load_classifier_model: false
+
+  do_pca_analysis: false
+  # Normalization Types
+  # 0: No Normalization
+  # 1: Min-Max Normalization
+  # 2: Z-Score Normalization
+  type_of_normalization: 2
+
+  training_annotations_file: rgb_training_annotations.txt
+  test_annotations_file: rgb_test_annotations.txt
+
+ann:
+  extract_channels_statistics_features: false
+  extract_edge_orientation_features: false
+  extract_haralick_features: false
+  extract_sift_features: true
+  extract_hog_features: false
+  extract_color_histograms: false
+
+  dictionary_size: 50
+  visualization: false
+  save_descriptors: false
+  load_descriptors: false
+
+  training_set_feature_extraction: true
+  test_set_feature_extraction: true
+  load_classifier_model: false
+
+  do_pca_analysis: false
+  # Normalization Types
+  # 0: No Normalization
+  # 1: Min-Max Normalization
+  # 2: Z-Score Normalization
+  type_of_normalization: 2
+
+  training_annotations_file: rgb_training_annotations.txt
+  test_annotations_file: rgb_test_annotations.txt
+
+

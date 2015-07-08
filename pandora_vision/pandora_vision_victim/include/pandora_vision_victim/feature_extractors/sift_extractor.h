@@ -54,6 +54,8 @@
  */
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @class SiftExtractor
    * @brief This class extracts SIFT features from images.
@@ -94,5 +96,6 @@ namespace pandora_vision
       ///
       const std::string descriptorExtractorType_;
   };
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_VICTIM_FEATURE_EXTRACTORS_SIFT_EXTRACTOR_H

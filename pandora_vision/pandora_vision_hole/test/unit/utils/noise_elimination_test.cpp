@@ -35,10 +35,14 @@
  * Author: Alexandros Philotheou
  *********************************************************************/
 
-#include "utils/noise_elimination.h"
+#include "rgb_node/utils/noise_elimination.h"
 #include "gtest/gtest.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_hole
+{
+namespace rgb
 {
   /**
     @class NoiseEliminationTest
@@ -609,5 +613,6 @@ namespace pandora_vision
     // The number of pixels changed should be equal to the intially noisy ones
     EXPECT_EQ ( numZero, changed );
   }
-
-} // namespace pandora_vision
+}  // namespace rgb
+}  // namespace pandora_vision_hole
+}  // namespace pandora_vision

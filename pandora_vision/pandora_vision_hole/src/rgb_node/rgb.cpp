@@ -35,7 +35,13 @@
 * Authors: Despoina Paschalidou, Alexandros Philotheou
 *********************************************************************/
 
+#include <ros/ros.h>
+#include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+
 #include "rgb_node/rgb.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_vision::pandora_vision_hole::rgb::Rgb, nodelet::Nodelet)
 
 /**
   @namespace pandora_vision
@@ -45,11 +51,33 @@ namespace pandora_vision
 {
 namespace pandora_vision_hole
 {
+namespace rgb
+{
   /**
     @brief Constructor
   **/
-  Rgb::Rgb()
+  Rgb::
+  Rgb() {}
+
+  /**
+    @brief Destructor
+   **/
+  Rgb::
+  ~Rgb()
   {
+    NODELET_INFO("[%s] Terminated", nodeName_.c_str());
+  }
+
+  void
+  Rgb::
+  onInit()
+  {
+    nodeHandle_ = this->getNodeHandle();
+    privateNodeHandle_ = this->getPrivateNodeHandle();
+    nodeName_ = boost::to_upper_copy<std::string>(this->getName());
+    serverPtr_.reset(new dynamic_reconfigure::Server<
+        ::pandora_vision_hole::rgb_cfgConfig>(privateNodeHandle_));
+
     // Acquire the names of topics which the rgb node will be having
     // transactionary affairs with
     getTopicNames();
@@ -71,22 +99,10 @@ namespace pandora_vision_hole
       candidateHolesTopic_, 1);
 
     // The dynamic reconfigure (RGB) parameter's callback
-    server.setCallback(boost::bind(&Rgb::parametersCallback, this, _1, _2));
+    serverPtr_->setCallback(boost::bind(&Rgb::parametersCallback, this, _1, _2));
 
-    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Initiated");
+    NODELET_INFO("[%s] Initiated", nodeName_.c_str());
   }
-
-
-
-  /**
-    @brief Destructor
-   **/
-  Rgb::~Rgb()
-  {
-    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Terminated");
-  }
-
-
 
   /**
     @brief Callback for the rgb image received by the synchronizer node.
@@ -98,19 +114,21 @@ namespace pandora_vision_hole
     @param msg [const sensor_msgs::Image&] The rgb image message
     @return void
   **/
-  void Rgb::inputRgbImageCallback(const sensor_msgs::Image& msg)
+  void
+  Rgb::
+  inputRgbImageCallback(const sensor_msgs::ImageConstPtr& msg)
   {
-    ROS_INFO_NAMED(PKG_NAME, "RGB node callback");
-
     #ifdef DEBUG_TIME
     Timer::start("inputRgbImageCallback", "", true);
     #endif
+
+    NODELET_INFO("[%s] callback", nodeName_.c_str());
 
     // Obtain the rgb image. Since the image is in a format of
     // sensor_msgs::Image, it has to be transformed into a cv format in order
     // to be processed. Its cv format will be CV_8UC3.
     cv::Mat rgbImage;
-    MessageConversions::extractImageFromMessage(msg, &rgbImage,
+    MessageConversions::extractImageFromMessage(*msg, &rgbImage,
       sensor_msgs::image_encodings::BGR8);
 
     #ifdef DEBUG_SHOW
@@ -134,20 +152,22 @@ namespace pandora_vision_hole
     }
 
     // Locate potential holes in the rgb image
-    HolesConveyor conveyor = HoleDetector::findHoles(rgbImage, wallsHistogram_);
+    HolesConveyor conveyor = RgbHoleDetector::findHoles(rgbImage, wallsHistogram_);
 
     // Create the candidate holes message
-    ::pandora_vision_hole::CandidateHolesVectorMsg rgbCandidateHolesMsg;
+    ::pandora_vision_hole::CandidateHolesVectorMsgPtr
+      rgbCandidateHolesMsgPtr( new ::pandora_vision_hole::CandidateHolesVectorMsg );
 
     // Pack information about holes found and the rgb image inside a message.
     // This message will be published to and received by the hole fusion node
-    MessageConversions::createCandidateHolesVectorMessage(conveyor,
-      rgbImageSent,
-      &rgbCandidateHolesMsg,
-      sensor_msgs::image_encodings::TYPE_8UC3, msg);
+    MessageConversions::createCandidateHolesVectorMessage(
+        conveyor,
+        rgbImageSent,
+        rgbCandidateHolesMsgPtr,
+        sensor_msgs::image_encodings::TYPE_8UC3, *msg);
 
     // Publish the candidate holes message
-    candidateHolesPublisher_.publish(rgbCandidateHolesMsg);
+    candidateHolesPublisher_.publish(rgbCandidateHolesMsgPtr);
 
     #ifdef DEBUG_TIME
     Timer::tick("inputRgbImageCallback");
@@ -155,58 +175,34 @@ namespace pandora_vision_hole
     #endif
   }
 
-
-
   /**
     @brief Acquires topics' names needed to be subscribed to and advertise
     to by the rgb node
     @param void
     @return void
    **/
-  void Rgb::getTopicNames()
+  void
+  Rgb::
+  getTopicNames()
   {
-    // The namespace dictated in the launch file
-    std::string ns = nodeHandle_.getNamespace();
-
     // Read the name of the topic from where the rgb node acquires the
     // rgb image and store it in a private member variable
-    if (nodeHandle_.getParam(
-        ns + "/rgb_node/subscribed_topics/rgb_image_topic",
+    if (!privateNodeHandle_.getParam("subscribed_topics/rgb_image_topic",
         rgbImageTopic_))
     {
-      // Make the topic's name absolute
-      rgbImageTopic_ = ns + "/" + rgbImageTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[RGB Node] Subscribed to the input RGB image");
+      NODELET_FATAL("[%s] Could not find topic rgb_image_topic", nodeName_.c_str());
+      ROS_BREAK();
     }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[RGB Node] Could not find topic rgb_image_topic");
-    }
-
     // Read the name of the topic to which the rgb node will be publishing
     // information about the candidate holes found and store it in a private
     // member variable
-    if (nodeHandle_.getParam(
-        ns + "/rgb_node/published_topics/candidate_holes_topic",
+    if (!privateNodeHandle_.getParam("published_topics/candidate_holes_topic",
         candidateHolesTopic_))
     {
-      // Make the topic's name absolute
-      candidateHolesTopic_ = ns + "/" + candidateHolesTopic_;
-
-      ROS_INFO_NAMED(PKG_NAME,
-        "[RGB Node] Advertising to the candidate holes topic");
-    }
-    else
-    {
-      ROS_ERROR_NAMED(PKG_NAME,
-        "[RGB Node] Could not find topic candidate_holes_topic");
+      NODELET_FATAL("[%s] Could not find topic candidate_holes_topic", nodeName_.c_str());
+      ROS_BREAK();
     }
   }
-
-
 
   /**
     @brief The function called when a parameter is changed
@@ -214,12 +210,13 @@ namespace pandora_vision_hole
     @param[in] level [const uint32_t]
     @return void
    **/
-  void Rgb::parametersCallback(
-    const ::pandora_vision_hole::rgb_cfgConfig& config,
-    const uint32_t& level)
+  void
+  Rgb::
+  parametersCallback(
+      const ::pandora_vision_hole::rgb_cfgConfig& config,
+      const uint32_t& level)
   {
-    ROS_INFO_NAMED(PKG_NAME, "[RGB node] Parameters callback called");
-
+    NODELET_INFO("[%s] Parameters callback called", nodeName_.c_str());
     //////////////////// Blob detection - specific parameters //////////////////
 
     Parameters::Blob::min_threshold =
@@ -431,5 +428,6 @@ namespace pandora_vision_hole
       config.watershed_background_erosion_factor;
   }
 
+}  // namespace rgb
 }  // namespace pandora_vision_hole
 }  // namespace pandora_vision

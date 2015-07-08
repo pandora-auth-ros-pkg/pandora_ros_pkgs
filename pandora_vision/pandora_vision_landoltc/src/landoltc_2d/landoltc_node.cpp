@@ -38,14 +38,16 @@
  *********************************************************************/
 
 #include <ros/console.h>
+#include <ros/ros.h>
+
 #include "pandora_vision_landoltc/landoltc_2d/landoltc_handler.h"
 
-using pandora_vision::LandoltCHandler;
+using pandora_vision::pandora_vision_landoltc::LandoltCHandler;
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "landoltc_2d_node");
-  LandoltCHandler landoltCHandler("pandora_vision_landoltc_2d");
+  LandoltCHandler landoltCHandler;
   ros::spin();
   return 0;
 }

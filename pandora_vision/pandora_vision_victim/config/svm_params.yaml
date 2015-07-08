@@ -34,3 +34,15 @@ depth:
   nu: 0.0
   p: 0.0
   auto_train: true
+
+rgbd:
+  svm_type: 100
+  kernel_type: 2
+  degree: 0.0
+  gamma: 0.00225
+  coef0: 0.0
+  C: 62.5
+  nu: 0.0
+  p: 0.0
+  auto_train: true
+

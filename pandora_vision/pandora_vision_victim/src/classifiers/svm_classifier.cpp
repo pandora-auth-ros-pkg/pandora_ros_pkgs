@@ -46,19 +46,21 @@
 
 namespace pandora_vision
 {
+namespace pandora_vision_victim
+{
   /**
    * @brief Constructor
    */
-  SvmClassifier::SvmClassifier(const std::string& ns,
+  SvmClassifier::SvmClassifier(const ros::NodeHandle& nh,
       const std::string& datasetPath,
       const std::string& classifierType,
       const std::string& imageType)
-      : AbstractClassifier(ns, datasetPath, classifierType, imageType)
+      : AbstractClassifier(nh, datasetPath, classifierType, imageType)
   {
     ROS_INFO("[victim_node] : Creating SVM training instance!");
 
     int svmType;
-    if (!nh_.getParam(imageType_ + "/svm_type", svmType))
+    if (!nh.getParam(imageType_ + "/svm_type", svmType))
     {
       ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
           << "the type of the SVM Classifier!");
@@ -67,7 +69,7 @@ namespace pandora_vision
     }
 
     int kernelType;
-    if (!nh_.getParam(imageType_ + "/kernel_type", kernelType))
+    if (!nh.getParam(imageType_ + "/kernel_type", kernelType))
     {
       ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
           << "the kernel type of the SVM Classifier!");
@@ -78,7 +80,7 @@ namespace pandora_vision
     double svmDegree = 0.0;
     if (kernelType == CvSVM::POLY)
     {
-      if (!nh_.getParam(imageType_ + "/degree", svmDegree))
+      if (!nh.getParam(imageType_ + "/degree", svmDegree))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the degree of the SVM Classifier!");
@@ -89,7 +91,7 @@ namespace pandora_vision
     double svmGamma = 1.0;
     if (kernelType == CvSVM::POLY || kernelType == CvSVM::RBF || kernelType == CvSVM::SIGMOID)
     {
-      if (!nh_.getParam(imageType_ + "/gamma", svmGamma))
+      if (!nh.getParam(imageType_ + "/gamma", svmGamma))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the gamma parameter for the SVM Classifier!");
@@ -100,7 +102,7 @@ namespace pandora_vision
     double svmCoef0 = 0.0;
     if (kernelType == CvSVM::POLY || kernelType == CvSVM::SIGMOID)
     {
-      if (!nh_.getParam(imageType_ + "/coef0", svmCoef0))
+      if (!nh.getParam(imageType_ + "/coef0", svmCoef0))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the coef0 parameter for the SVM Classifier!");
@@ -111,7 +113,7 @@ namespace pandora_vision
     double svmC = 1.0;
     if (svmType == CvSVM::C_SVC || svmType == CvSVM::EPS_SVR || svmType == CvSVM::NU_SVR)
     {
-      if (!nh_.getParam(imageType_ + "/C", svmC))
+      if (!nh.getParam(imageType_ + "/C", svmC))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the C parameter for the SVM classifier!");
@@ -122,7 +124,7 @@ namespace pandora_vision
     double svmNu = 0.0;
     if (svmType == CvSVM::NU_SVC || svmType == CvSVM::ONE_CLASS || svmType == CvSVM::NU_SVR)
     {
-      if (!nh_.getParam(imageType_ + "/nu", svmNu))
+      if (!nh.getParam(imageType_ + "/nu", svmNu))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the Nu parameter for the SVM classifier!");
@@ -132,7 +134,7 @@ namespace pandora_vision
     double svmP = 0.0;
     if (svmType == CvSVM::EPS_SVR)
     {
-      if (!nh_.getParam(imageType_ + "/p", svmP))
+      if (!nh.getParam(imageType_ + "/p", svmP))
       {
         ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
             << "the p parameter for the SVM classifier!");
@@ -158,7 +160,7 @@ namespace pandora_vision
       // std::cout << "The grid is NOT VALID." << std::endl;
 
     bool autoTrain;
-    if (!nh_.getParam(imageType_ + "/auto_train", autoTrain))
+    if (!nh.getParam(imageType_ + "/auto_train", autoTrain))
     {
       ROS_ERROR_STREAM(nodeMessagePrefix_ << ": Could not retrieve "
           << "the auto train parameter of the SVM Classifier!");
@@ -317,4 +319,5 @@ namespace pandora_vision
     return;
   }
 
+}  // namespace pandora_vision_victim
 }  // namespace pandora_vision
