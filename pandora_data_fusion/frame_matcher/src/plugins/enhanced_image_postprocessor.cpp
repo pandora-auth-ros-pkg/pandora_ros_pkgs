@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,65 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-
-#include <stdexcept>
 #include <string>
+#include <vector>
+
+#include <pluginlib/class_list_macros.h>
+#include <opencv2/opencv.hpp>
+
+#include "sensor_processor/handler.h"
+#include "sensor_processor/abstract_processor.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
+#include "pandora_vision_msgs/RegionOfInterest.h"
+
+#include "frame_matcher/points_on_frame.h"
+#include "frame_matcher/enhanced_image_postprocessor.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::EnhancedImagePostProcessor, sensor_processor::AbstractProcessor)
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
 
-  class TfException : public std::runtime_error
-  {
-   public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+  /**
+   * @details TODO
+   */
+  EnhancedImagePostProcessor::
+  EnhancedImagePostProcessor() {}
+  EnhancedImagePostProcessor::
+  ~EnhancedImagePostProcessor() {}
 
-  class AlertException : public std::runtime_error
+  /**
+   * @details TODO
+   */
+  bool
+  EnhancedImagePostProcessor::
+  postProcess(const PointsOnFrameConstPtr& input, const pandora_vision_msgs::EnhancedImagePtr& output)
   {
-   public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    ROS_INFO("[%s] post process", this->getName().c_str());
+    output->header = input->header;
 
-  class MapException : public std::runtime_error
-  {
-   public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    output->rgbImage = input->rgbImage;
+    output->isDepth = false;
 
-  class ObstacleTypeException : public std::runtime_error
-  {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    for (int ii = 0; ii < input->pointsVector.size(); ++ii) {
+      pandora_vision_msgs::RegionOfInterest roi;
+      std::vector<cv::Point2f> points = input->pointsVector.at(ii);
 
-}  // namespace pandora_data_fusion_utils
+      roi.width = points[2].x - points[0].x;
+      roi.height = points[2].y - points[0].y;
+      roi.center.x = (points[2].x + points[0].x) / 2;
+      roi.center.y = (points[2].y + points[0].y) / 2;
+
+      output->regionsOfInterest.push_back(roi);
+    }
+
+    return true;
+  }
+
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
-
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H

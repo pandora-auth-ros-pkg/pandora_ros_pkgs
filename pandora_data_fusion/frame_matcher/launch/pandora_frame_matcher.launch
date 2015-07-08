@@ -1,0 +1,10 @@
+<launch>
+
+  <include file="$(find frame_matcher)/launch/frame_matcher.launch">
+    <arg name="name" value="kinect_to_pi_matcher" />
+    <arg name="input_images" value="/vision/enhanced_holes" />
+    <arg name="image_target" value="/rpi2/pi_camera/image" />
+    <arg name="matched_image" value="/vision/victim/enhanced_images" />
+  </include>
+
+</launch>

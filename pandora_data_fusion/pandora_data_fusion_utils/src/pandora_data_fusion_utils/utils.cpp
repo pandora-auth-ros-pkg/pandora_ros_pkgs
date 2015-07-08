@@ -106,6 +106,11 @@ namespace pandora_data_fusion_utils
     return point;
   }
 
+  tf::Vector3 Utils::pointToVector3(const geometry_msgs::Point& point)
+  {
+    return tf::Vector3(point.x, point.y, point.z);
+  }
+
   bool Utils::arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
       bool is3D, float sensor_range)
   {

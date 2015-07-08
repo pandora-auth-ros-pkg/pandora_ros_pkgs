@@ -44,7 +44,7 @@
 #include <string>
 #include <boost/utility.hpp>
 #include <boost/array.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Quaternion.h>
@@ -64,11 +64,17 @@ namespace pandora_data_fusion
 namespace pose_finder
 {
 
-  class PoseFinder : private boost::noncopyable
+  class PoseFinder
   {
    public:
-    PoseFinder(const MapPtr& map, const std::string& mapType);
+    PoseFinder(const std::string& mapType);
+    virtual ~PoseFinder();
 
+    tf::Transform lookupTransformFromWorld(const std::string& globalFrame,
+        const std_msgs::Header& header);
+
+    geometry_msgs::Point findAlertPosition(double alertYaw, double alertPitch,
+        const tf::Transform& tfTransform);
     geometry_msgs::Pose findAlertPose(double alertYaw, double alertPitch,
         const tf::Transform& tfTransform);
     geometry_msgs::Pose findPoseFromPoints(
@@ -78,11 +84,10 @@ namespace pose_finder
         const tf::Transform& tfTransform, double* length);
     geometry_msgs::Point projectAlertPosition(double alertYaw, double alertPitch,
         double depth, const tf::Transform& tfTransform);
-    tf::Transform lookupTransformFromWorld(const std::string& globalFrame,
-        const std_msgs::Header& header);
     geometry_msgs::Quaternion findAppropriateOrientation(
         const geometry_msgs::Point& framePoint, const geometry_msgs::Point& alertPoint);
 
+    void updateMap(const MapConstPtr& mapPtr);
     void updateParams(float occupiedCellThres,
                       float heightHighThres, float heightLowThres,
                       float orientationCircle);
@@ -95,11 +100,12 @@ namespace pose_finder
     std::pair<geometry_msgs::Point, geometry_msgs::Point> findDiameterEndPointsOnWall(
         std::vector<geometry_msgs::Point> points);
 
-   private:
-    MapPtr map_;
+   protected:
+    MapConstPtr mapPtr_;
 
     pandora_data_fusion_utils::TfListenerPtr listener_;
 
+   private:
     /*  Parameters  */
     float ORIENTATION_CIRCLE;
     float HEIGHT_HIGH_THRES;
@@ -110,7 +116,7 @@ namespace pose_finder
     friend class PoseFinderTest;
   };
 
-  typedef boost::scoped_ptr< PoseFinder > PoseFinderPtr;
+  typedef boost::shared_ptr<PoseFinder> PoseFinderPtr;
 
 }  // namespace pose_finder
 }  // namespace pandora_data_fusion

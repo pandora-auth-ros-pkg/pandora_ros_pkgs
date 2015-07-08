@@ -1,0 +1,45 @@
+<package format="2">
+  <name>frame_matcher</name>
+  <version>0.0.0</version>
+  <description>Contains node for transforming points from a camera's frame to another camera's frame</description>
+
+  <maintainer email='tsirif@gmail.com'>Tsirigotis Christos</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_discovery/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_discovery.git</url>
+
+  <author>Tsirigotis Christos</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>pandora_cmake_tools</build_depend>
+
+  <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>rospy</depend>
+  <depend>urdf</depend>
+  <depend>tf</depend>
+  <depend>pose_finder</depend>
+  <depend>sensor_processor</depend>
+  <depend>pandora_vision_common</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>pandora_data_fusion_utils</depend>
+  <depend>pandora_vision_hole</depend>
+
+  <test_depend>rosunit</test_depend>
+  <test_depend>rostest</test_depend>
+  <test_depend>roslib</test_depend>
+  <test_depend>python-numpy</test_depend>
+  <test_depend>pandora_testing_tools</test_depend>
+
+  <export>
+    <frame_matcher plugin="${prefix}/frame_matcher_plugins.xml"/>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
+</package>

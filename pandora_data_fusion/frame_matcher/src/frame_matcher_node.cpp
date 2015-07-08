@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,28 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#include <ros/console.h>
+#include <ros/ros.h>
 
-#include <stdexcept>
-#include <string>
+#include "frame_matcher/frame_matcher.h"
 
-namespace pandora_data_fusion
+using pandora_data_fusion::frame_matcher::FrameMatcher;
+
+int main(int argc, char** argv)
 {
-namespace pandora_data_fusion_utils
-{
-
-  class TfException : public std::runtime_error
+  ros::init(argc, argv, "frame_matcher", ros::init_options::NoSigintHandler);
+  if (argc == 1 && !strcmp(argv[0], "--debug"))
   {
-   public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-  class AlertException : public std::runtime_error
-  {
-   public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-  class MapException : public std::runtime_error
-  {
-   public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-  class ObstacleTypeException : public std::runtime_error
-  {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-}  // namespace pandora_data_fusion_utils
-}  // namespace pandora_data_fusion
-
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+    if (ros::console::set_logger_level(
+          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+    {
+      ros::console::notifyLoggerLevelsChanged();
+    }
+  }
+  FrameMatcher frame_matcher;
+  ros::spin();
+  return 0;
+}

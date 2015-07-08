@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,57 +33,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_UTILS_H
-#define PANDORA_DATA_FUSION_UTILS_UTILS_H
+#ifndef FRAME_MATCHER_VIEW_POSE_FINDER_H
+#define FRAME_MATCHER_VIEW_POSE_FINDER_H
 
-#include <utility>
-#include <cmath>
-#include <boost/utility.hpp>
+#include <string>
+#include <boost/shared_ptr.hpp>
 
-#include <ros/ros.h>
-#include <tf/transform_datatypes.h>
-
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Point.h>
-#include <tf/LinearMath/Vector3.h>
+#include <tf/LinearMath/Transform.h>
 
+#include "pandora_data_fusion_utils/utils.h"
 #include "pandora_data_fusion_utils/exceptions.h"
-#include "pandora_data_fusion_utils/defines.h"
+#include "pose_finder/pose_finder.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
-
-  class Utils : private boost::noncopyable
+  /**
+   * @class ViewPoseFinder TODO
+   */
+  class ViewPoseFinder : public pose_finder::PoseFinder
   {
    public:
-    static geometry_msgs::Point point2DAndHeight2Point3D(geometry_msgs::Point position, float height);
-    static float distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b);
-    static float distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b);
-    static float distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D);
-    static bool arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
-        bool is3D, float sensor_range);
-    static bool isPoseInBox2D(const geometry_msgs::Pose& reference,
-        double length, double width, const geometry_msgs::Pose& pose);
-    static bool isOrientationClose(geometry_msgs::Quaternion orientA,
-        geometry_msgs::Quaternion orientB,
-        float diff_thres);
-    static geometry_msgs::Quaternion calculateQuaternion(geometry_msgs::Point a,
-        geometry_msgs::Point b);
-    static geometry_msgs::Point vector3ToPoint(const tf::Vector3& vector);
-    static tf::Vector3 pointToVector3(const geometry_msgs::Point& point);
-    static float probabilityFromStdDev(float boundingRadius, float deviation);
-    static float stdDevFromProbability(float boundingRadius, float probability);
+    ViewPoseFinder(const std::string& mapType);
+    virtual ~ViewPoseFinder();
+
+    void findViewOrientation(
+        const geometry_msgs::Point& point,
+        const tf::Transform& tfTransform,
+        double* yaw,
+        double* pitch);
   };
 
-}  // namespace pandora_data_fusion_utils
+  typedef boost::shared_ptr<ViewPoseFinder> ViewPoseFinderPtr;
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
 
-#endif  // PANDORA_DATA_FUSION_UTILS_UTILS_H
+#endif  // FRAME_MATCHER_VIEW_POSE_FINDER_H

@@ -1,0 +1,23 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/>
+  <arg name="camera" default="logitec_stick" />
+
+  <node pkg="tf" type="static_transform_publisher"
+    name="worldToMap" args="0 0 0 0 0 0 /world /map 100" />
+
+  <include file="$(find pandora_robots_description)/launch/woody/woody_description.launch" />
+
+  <param name="/$(arg camera)_optical_frame/hfov" value="50" />
+  <param name="/$(arg camera)_optical_frame/vfov" value="40" />
+
+  <!--<env name="ROSCONSOLE_CONFIG_FILE" -->
+    <!--value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
+  <include file="$(find frame_matcher)/launch/frame_matcher_standalone.launch"/>
+
+  <node pkg="pandora_testing_tools" name="frame_matcher_bag_player" type="bag_player_for_tests"
+      args="--bags $(find frame_matcher)/test/functional/frame_matcher_test.bag --clock" output="screen" />
+
+  <test test-name="FrameMatcherTest" pkg="frame_matcher" type="frame_matcher_functional.py" />
+
+</launch>

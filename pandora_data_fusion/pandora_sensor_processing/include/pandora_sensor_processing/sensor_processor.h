@@ -65,7 +65,7 @@ namespace pandora_sensor_processing
    */
   template <class DerivedProcessor>
     class SensorProcessor
-    : public StateClient, private boost::noncopyable
+    : public state_manager::StateClient, private boost::noncopyable
     {
       public:
         /**

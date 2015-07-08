@@ -39,6 +39,7 @@
  *********************************************************************/
 
 #include <ros/console.h>
+#include <ros/ros.h>
 
 #include "pandora_alert_handler/alert_handler.h"
 
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
     }
   }
   AlertHandler alertHandler;
-  ROS_INFO("[DATA_FUSION] Beginning Alert Handler node");
+  ROS_INFO("[PANDORA_DATA_FUSION] Beginning Alert Handler node");
   ros::spin();
   // ros::MultiThreadedSpinner spinner(2); // Use 2 threads
   // spinner.spin(); // spin

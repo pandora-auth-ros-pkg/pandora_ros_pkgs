@@ -1,0 +1,8 @@
+<launch>
+
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <include file="$(find frame_matcher)/launch/frame_matcher.launch" />
+
+</launch>
+

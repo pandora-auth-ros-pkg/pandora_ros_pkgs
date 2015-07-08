@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,57 +33,53 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_UTILS_H
-#define PANDORA_DATA_FUSION_UTILS_UTILS_H
+#ifndef FRAME_MATCHER_FRAME_MATCHER_H
+#define FRAME_MATCHER_FRAME_MATCHER_H
 
-#include <utility>
-#include <cmath>
-#include <boost/utility.hpp>
+#include <string>
+#include <vector>
 
 #include <ros/ros.h>
-#include <tf/transform_datatypes.h>
 
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Quaternion.h>
-#include <geometry_msgs/Point.h>
-#include <tf/LinearMath/Vector3.h>
-
-#include "pandora_data_fusion_utils/exceptions.h"
-#include "pandora_data_fusion_utils/defines.h"
+#include "sensor_processor/dynamic_handler.h"
+#include "sensor_processor/abstract_processor.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
-
-  class Utils : private boost::noncopyable
+  /**
+    * @class FrameMatcher class that implements Handler to organise frame
+    * mather processors
+    */
+  class FrameMatcher : public sensor_processor::DynamicHandler
   {
    public:
-    static geometry_msgs::Point point2DAndHeight2Point3D(geometry_msgs::Point position, float height);
-    static float distanceBetweenPoints2D(geometry_msgs::Point a, geometry_msgs::Point b);
-    static float distanceBetweenPoints3D(geometry_msgs::Point a, geometry_msgs::Point b);
-    static float distanceBetweenPoints(geometry_msgs::Point a, geometry_msgs::Point b, bool is3D);
-    static bool arePointsInRange(geometry_msgs::Point pointA, geometry_msgs::Point pointB,
-        bool is3D, float sensor_range);
-    static bool isPoseInBox2D(const geometry_msgs::Pose& reference,
-        double length, double width, const geometry_msgs::Pose& pose);
-    static bool isOrientationClose(geometry_msgs::Quaternion orientA,
-        geometry_msgs::Quaternion orientB,
-        float diff_thres);
-    static geometry_msgs::Quaternion calculateQuaternion(geometry_msgs::Point a,
-        geometry_msgs::Point b);
-    static geometry_msgs::Point vector3ToPoint(const tf::Vector3& vector);
-    static tf::Vector3 pointToVector3(const geometry_msgs::Point& point);
-    static float probabilityFromStdDev(float boundingRadius, float deviation);
-    static float stdDevFromProbability(float boundingRadius, float probability);
-  };
+    FrameMatcher();
 
-}  // namespace pandora_data_fusion_utils
+    virtual void
+    onInit();
+
+   protected:
+    /**
+      * @brief Function that performs all the needed procedures when the robot's
+      * state is changed
+      * @param newState [int] Robot's new state
+      */
+    virtual void
+    startTransition(int newState);
+
+   private:
+    ros::NodeHandle private_nh_;
+    std::string name_;
+
+    std::string preprocessor_type_;
+    std::string postprocessor_type_;
+  };
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
 
-#endif  // PANDORA_DATA_FUSION_UTILS_UTILS_H
+#endif  // FRAME_MATCHER_FRAME_MATCHER_H

@@ -52,7 +52,7 @@ namespace pandora_sensor_processing
   template <class DerivedProcessor>
     SensorProcessor<DerivedProcessor>::SensorProcessor(const std::string& ns,
         const std::string& sensorType)
-    : nh_(ns), sensorType_(sensorType)
+    : state_manager::StateClient(true), nh_(ns), sensorType_(sensorType)
     {
       working_ = false;
       name_ = boost::to_upper_copy(ros::this_node::getName());

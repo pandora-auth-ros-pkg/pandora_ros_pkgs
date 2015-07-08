@@ -1,0 +1,25 @@
+<launch>
+    <arg name="namespace" default="/pandora_data_fusion/frame_matcher" />
+
+    <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
+    <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" >
+        <arg name="device" value="trax" />
+    </include>
+
+    <include file="$(find pandora_launchers)/remote_machines/launch/camera_effector.launch" />
+    <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller.launch" />
+
+    <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole_standalone.launch" >
+        <arg name="rgbd" value="true" />
+    </include>
+    <include file="$(find pandora_launchers)/remote_machines/launch/pi_camera.launch" />
+
+    <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+    <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+    <node pkg="pandora_end_effector_controller" type="move_eef_script.py"
+        name="mode_eef" args="1" />
+
+    <include file="$(find frame_matcher)/launch/pandora_frame_matcher.launch"
+        ns="$(arg namespace)" />
+</launch>

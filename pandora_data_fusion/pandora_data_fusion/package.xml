@@ -22,6 +22,7 @@
   <exec_depend>pandora_alert_handler</exec_depend>
   <exec_depend>pandora_data_fusion_launchers</exec_depend>
   <exec_depend>pandora_sensor_processing</exec_depend>
+  <exec_depend>frame_matcher</exec_depend>
 
   <export>
     <metapackage/>

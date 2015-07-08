@@ -70,9 +70,10 @@
 #include "pandora_vision_msgs/LandoltcAlertVector.h"
 #include "pandora_vision_msgs/ThermalAlertVector.h"
 #include "pandora_common_msgs/GeneralAlertVector.h"
+#include "pandora_data_fusion_utils/defines.h"
+#include "pose_finder/pose_finder.h"
 
 #include "pandora_alert_handler/AlertHandlerConfig.h"
-#include "pandora_data_fusion_utils/defines.h"
 #include "pandora_alert_handler/object_lists/object_list.h"
 #include "pandora_alert_handler/object_lists/obstacle_list.h"
 #include "pandora_alert_handler/object_lists/victim_list.h"
@@ -223,7 +224,7 @@ namespace pandora_alert_handler
       dynReconfServer_;
 
     std::string globalFrame_;
-    MapPtr map_;
+    MapConstPtr mapPtr_;
 
     //!< The alerts list
     QrListPtr qrs_;
@@ -244,6 +245,7 @@ namespace pandora_alert_handler
     //!< The visited victims list
     VictimListPtr victimsVisited_;
 
+    pose_finder::PoseFinderPtr poseFinderPtr_;
     ObjectFactoryPtr objectFactory_;
     ObjectHandlerPtr objectHandler_;
     VictimHandlerPtr victimHandler_;
@@ -280,7 +282,9 @@ namespace pandora_alert_handler
   template <class ObjectType>
     void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
     {
-      if (map_->data.size() == 0)
+      if (mapPtr_.get() == NULL)
+        return;
+      if (mapPtr_->data.size() == 0)
         return;
 
       ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
@@ -311,7 +315,9 @@ namespace pandora_alert_handler
     void AlertHandler::alertCallback<Hole>(
         const typename Hole::AlertVector& msg)
     {
-      if (map_->data.size() == 0)
+      if (mapPtr_.get() == NULL)
+        return;
+      if (mapPtr_->data.size() == 0)
         return;
 
       ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",

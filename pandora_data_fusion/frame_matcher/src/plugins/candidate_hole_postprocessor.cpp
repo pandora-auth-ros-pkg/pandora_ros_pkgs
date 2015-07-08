@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,46 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-
-#include <stdexcept>
 #include <string>
+
+#include <pluginlib/class_list_macros.h>
+
+#include "sensor_processor/handler.h"
+#include "sensor_processor/abstract_processor.h"
+#include "pandora_vision_hole/CandidateHolesVectorMsg.h"
+
+#include "frame_matcher/points_on_frame.h"
+#include "frame_matcher/candidate_hole_postprocessor.h"
+
+PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::CandidateHolePostProcessor, sensor_processor::AbstractProcessor)
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
 
-  class TfException : public std::runtime_error
-  {
-   public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+  CandidateHolePostProcessor::
+  CandidateHolePostProcessor() {}
+  CandidateHolePostProcessor::
+  ~CandidateHolePostProcessor() {}
 
-  class AlertException : public std::runtime_error
+  /**
+   * @details TODO
+   */
+  bool
+  CandidateHolePostProcessor::
+  postProcess(const PointsOnFrameConstPtr& input,
+      const pandora_vision_hole::CandidateHolesVectorMsgPtr& output)
   {
-   public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    output->header = input->header;
 
-  class MapException : public std::runtime_error
-  {
-   public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    output->image = input->rgbImage;
 
-  class ObstacleTypeException : public std::runtime_error
-  {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    return true;
+  }
 
-}  // namespace pandora_data_fusion_utils
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
-
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H

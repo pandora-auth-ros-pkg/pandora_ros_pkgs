@@ -48,7 +48,6 @@ namespace pandora_alert_handler
   AlertHandler::AlertHandler(const std::string& ns)
   {
     nh_.reset( new ros::NodeHandle(ns) );
-    map_.reset( new Map );
 
     holes_.reset( new HoleList );
     obstacles_.reset( new ObstacleList );
@@ -139,7 +138,8 @@ namespace pandora_alert_handler
       ROS_BREAK();
     }
 
-    objectFactory_.reset( new ObjectFactory(map_, globalFrame_, param) );
+    poseFinderPtr_.reset( new pose_finder::PoseFinder(param) );
+    objectFactory_.reset( new ObjectFactory(poseFinderPtr_, globalFrame_) );
     objectHandler_.reset( new ObjectHandler(nh_, victimsToGo_, victimsVisited_) );
     victimHandler_.reset( new VictimHandler(nh_, globalFrame_, victimsToGo_, victimsVisited_) );
 
@@ -376,7 +376,8 @@ namespace pandora_alert_handler
 
   void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
   {
-    *map_ = *msg;
+    mapPtr_ = msg;
+    poseFinderPtr_->updateMap(msg);
   }
 
   void AlertHandler::dynamicReconfigCallback(

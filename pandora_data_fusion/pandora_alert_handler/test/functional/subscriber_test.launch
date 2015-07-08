@@ -1,19 +1,19 @@
 <launch>
 
   <node pkg="map_server" type="map_server" name="static_map_publisher"
-    args="$(find pandora_alert_handler)/test/test_maps/map1.yaml"/>
-  
-  <node pkg="tf" type="static_transform_publisher" 
+    args="$(find pose_finder)/test/test_maps/map1.yaml"/>
+
+  <node pkg="tf" type="static_transform_publisher"
     name="world2headCamera" args="1 2 1 -1.574 0 0  /map headCamera 100" />
 
-  <node pkg="tf" type="static_transform_publisher" 
+  <node pkg="tf" type="static_transform_publisher"
     name="world2map" args="0 0 0 0 0 0 /world /map 100" />
 
   <!--<env name="ROSCONSOLE_CONFIG_FILE" -->
     <!--value="$(find pandora_alert_handler)/config/alert_handler/logger_debug.cfg"/>-->
-  <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" /> 
+  <include file="$(find pandora_alert_handler)/launch/alert_handler.launch" />
   <rosparam param="subscribed_topic_names/map" ns="data_fusion/alert_handler">/map</rosparam>
- 
+
   <test test-name="SubscriberTest" pkg="pandora_alert_handler"
     type="subscriber_test.py"/>
 

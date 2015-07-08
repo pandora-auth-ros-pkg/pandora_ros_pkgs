@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,69 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#include <vector>
+#include <limits>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <opencv2/opencv.hpp>
 
-#include <stdexcept>
-#include <string>
+#include "frame_matcher/view_pose_finder.h"
+#include "frame_matcher/roi_transformer.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
 
-  class TfException : public std::runtime_error
-  {
-   public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+  RoiTransformer::
+  RoiTransformer(const ros::NodeHandle& nh, const ViewPoseFinderPtr& viewPoseFinderPtr) :
+    keypointTransformer_(nh, viewPoseFinderPtr) {}
 
-  class AlertException : public std::runtime_error
-  {
-   public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+  RoiTransformer::
+  ~RoiTransformer() {}
 
-  class MapException : public std::runtime_error
-  {
-   public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
 
-  class ObstacleTypeException : public std::runtime_error
+  void
+  RoiTransformer::
+  transformRegion(const sensor_msgs::Image& imageFrom,
+                  const std::vector<cv::Point2f>& roiFrom,
+                  const sensor_msgs::Image& imageTo,
+                  std::vector<cv::Point2f>* roiToPtr)
   {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    for (int ii = 0; ii < roiFrom.size(); ++ii) {
+      roiToPtr->push_back(keypointTransformer_.transformKeypoint(
+            imageFrom, roiFrom.at(ii), imageTo));
+    }
+    changeIntoOrthogonalBox(roiToPtr);
+  }
 
-}  // namespace pandora_data_fusion_utils
+  void
+  RoiTransformer::
+  changeIntoOrthogonalBox(std::vector<cv::Point2f>* roiPtr)
+  {
+    int ii;
+    double minx, maxx, miny, maxy;
+    miny = minx = std::numeric_limits<double>::max();
+    maxx = maxy = std::numeric_limits<double>::min();
+    for (ii = 0; ii < roiPtr->size(); ++ii) {
+      double x = roiPtr->at(ii).x;
+      minx = x < minx ? x : minx;
+      maxx = x > maxx ? x : maxx;
+    }
+    for (ii = 0; ii < roiPtr->size(); ++ii) {
+      double y = roiPtr->at(ii).y;
+      miny = y < miny ? y : miny;
+      maxy = y > maxy ? y : maxy;
+    }
+    roiPtr->clear();
+    roiPtr->push_back(cv::Point2f(minx, miny));
+    roiPtr->push_back(cv::Point2f(minx, maxy));
+    roiPtr->push_back(cv::Point2f(maxx, maxy));
+    roiPtr->push_back(cv::Point2f(maxx, miny));
+  }
+
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
-
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H

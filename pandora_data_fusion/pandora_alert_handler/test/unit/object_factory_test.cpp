@@ -64,7 +64,7 @@ namespace pandora_data_fusion
         {
           ros::Time::init();
           *mapPtr = map_loader::loadMap(
-              ros::package::getPath("pandora_alert_handler") +
+              ros::package::getPath("pose_finder") +
               "/test/test_maps/map1.yaml");
           objectFactoryPtr.reset( new ObjectFactory(mapPtr, map_type) );
           objectFactoryPtr->dynamicReconfigForward(0.5, 1.2, 0, 0.5, 0.25);

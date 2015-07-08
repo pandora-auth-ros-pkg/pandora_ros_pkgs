@@ -45,6 +45,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/LinearMath/Vector3.h>
+#include <tf/LinearMath/Quaternion.h>
 #include <tf/LinearMath/Transform.h>
 
 #include "pandora_data_fusion_utils/exceptions.h"
@@ -56,14 +57,20 @@ namespace pandora_data_fusion
 
 using pandora_data_fusion_utils::Utils;
 using pandora_data_fusion_utils::AlertException;
+using pandora_data_fusion_utils::MapException;
 
 namespace pose_finder
 {
 
-  PoseFinder::PoseFinder(const MapPtr& map, const std::string& mapType)
-    : map_(map)
+  PoseFinder::PoseFinder(const std::string& mapType)
   {
     listener_.reset(pandora_data_fusion_utils::TfFinder::newTfListener(mapType));
+  }
+  PoseFinder::~PoseFinder() {}
+
+  void PoseFinder::updateMap(const MapConstPtr& mapPtr)
+  {
+    mapPtr_ = mapPtr;
   }
 
   void PoseFinder::updateParams(float occupiedCellThres,
@@ -75,27 +82,34 @@ namespace pose_finder
     ORIENTATION_CIRCLE = orientationCircle;
   }
 
-  geometry_msgs::Pose PoseFinder::findAlertPose(double alertYaw, double alertPitch,
+  geometry_msgs::Point PoseFinder::findAlertPosition(double alertYaw, double alertPitch,
       const tf::Transform& tfTransform)
   {
-    geometry_msgs::Pose outPose;
+    geometry_msgs::Point outPosition;
 
     tf::Quaternion alertOrientation, sensorOrientation;
     tfTransform.getBasis().getRotation(sensorOrientation);
     tf::Vector3 origin = tfTransform.getOrigin();
+    geometry_msgs::Point framePosition = Utils::vector3ToPoint(origin);
 
     alertOrientation.setRPY(0, alertPitch, alertYaw);
     tf::Transform newTf(sensorOrientation * alertOrientation, origin);
 
     geometry_msgs::Point position = positionOnWall(newTf);
-
-    geometry_msgs::Point framePosition = Utils::vector3ToPoint(origin);
-    float distFromAlert = Utils::distanceBetweenPoints2D(
-        position, framePosition);
-
+    float distFromAlert = Utils::distanceBetweenPoints2D(position, framePosition);
     float height = calcHeight(newTf, distFromAlert);
+    outPosition = Utils::point2DAndHeight2Point3D(position, height);
 
-    outPose.position = Utils::point2DAndHeight2Point3D(position, height);
+    return outPosition;
+  }
+
+  geometry_msgs::Pose PoseFinder::findAlertPose(double alertYaw, double alertPitch,
+      const tf::Transform& tfTransform)
+  {
+    geometry_msgs::Pose outPose;
+    tf::Vector3 origin = tfTransform.getOrigin();
+    geometry_msgs::Point framePosition = Utils::vector3ToPoint(origin);
+    outPose.position = findAlertPosition(alertYaw, alertPitch, tfTransform);
     outPose.orientation = findAppropriateOrientation(framePosition, outPose.position);
 
     return outPose;
@@ -145,8 +159,8 @@ namespace pose_finder
     alertHeight += transform.getOrigin()[2];
 
     ROS_DEBUG_NAMED("pose_finder",
-        "[PANDORA_DATA_FUSION_UTILS]Height of alert = %f ", alertHeight);
-    ROS_DEBUG_NAMED("pose_finder", "[PANDORA_DATA_FUSION_UTILS]Distance from alert = %f ",
+        "[POSE_FINDER] Height of alert = %f ", alertHeight);
+    ROS_DEBUG_NAMED("pose_finder", "[POSE_FINDER] Distance from alert = %f ",
         distFromAlert);
 
     if (alertHeight > HEIGHT_HIGH_THRES || alertHeight < HEIGHT_LOW_THRES)
@@ -157,7 +171,12 @@ namespace pose_finder
 
   geometry_msgs::Point PoseFinder::positionOnWall(const tf::Transform& transform)
   {
-    const float resolution = map_->info.resolution;
+    if (mapPtr_.get() == NULL)
+      throw MapException("Map pointer is uninitialized in PoseFinder");
+    if (mapPtr_->data.size() == 0)
+      throw MapException("Map size equals zero in PoseFinder");
+
+    const float resolution = mapPtr_->info.resolution;
     float x = 0, y = 0, D = 5 * resolution;
     geometry_msgs::Point xDirection = Utils::vector3ToPoint(transform.getBasis().getColumn(0));
 
@@ -167,12 +186,12 @@ namespace pose_finder
     x = D * xDirection.x + currX;
     y = D * xDirection.y + currY;
 
-    while (CELL(x, y, map_) < OCCUPIED_CELL_THRES * 100)
+    while (CELL(x, y, mapPtr_) < OCCUPIED_CELL_THRES * 100)
     {
       x += resolution * xDirection.x;
       y += resolution * xDirection.y;
     }
-    if (CELL(x, y, map_) > OCCUPIED_CELL_THRES * 100)
+    if (CELL(x, y, mapPtr_) > OCCUPIED_CELL_THRES * 100)
     {
       geometry_msgs::Point onWall;
       onWall.x = x;
@@ -186,6 +205,11 @@ namespace pose_finder
   geometry_msgs::Quaternion PoseFinder::findAppropriateOrientation(
       const geometry_msgs::Point& framePoint, const geometry_msgs::Point& alertPoint)
   {
+    if (mapPtr_.get() == NULL)
+      throw MapException("Map pointer is uninitialized in PoseFinder");
+    if (mapPtr_->data.size() == 0)
+      throw MapException("Map size equals zero in PoseFinder");
+
     std::vector< std::vector<geometry_msgs::Point> > freeArcs;
     float x = 0, y = 0;
     unsigned int i, j;
@@ -196,7 +220,7 @@ namespace pose_finder
       x = alertPoint.x + ORIENTATION_CIRCLE * cos(i * DEGREE);
       y = alertPoint.y + ORIENTATION_CIRCLE * sin(i * DEGREE);
 
-      if (CELL(x, y, map_) < OCCUPIED_CELL_THRES * 100)
+      if (CELL(x, y, mapPtr_) < OCCUPIED_CELL_THRES * 100)
       {
         if (!freeSpace)
         {
@@ -217,11 +241,11 @@ namespace pose_finder
     i -= angle_step;
     x = alertPoint.x + ORIENTATION_CIRCLE * cos(i * DEGREE);
     y = alertPoint.y + ORIENTATION_CIRCLE * sin(i * DEGREE);
-    bool last_point = CELL(x, y, map_) < OCCUPIED_CELL_THRES * 100;
+    bool last_point = CELL(x, y, mapPtr_) < OCCUPIED_CELL_THRES * 100;
     i = 0;
     x = alertPoint.x + ORIENTATION_CIRCLE * cos(i * DEGREE);
     y = alertPoint.y + ORIENTATION_CIRCLE * sin(i * DEGREE);
-    bool first_point = CELL(x, y, map_) < OCCUPIED_CELL_THRES * 100;
+    bool first_point = CELL(x, y, mapPtr_) < OCCUPIED_CELL_THRES * 100;
     if (first_point == true && last_point == true)
     {
       std::vector<geometry_msgs::Point> lastFreeArc = freeArcs.back();

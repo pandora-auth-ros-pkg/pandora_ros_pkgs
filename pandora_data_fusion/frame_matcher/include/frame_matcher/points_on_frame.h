@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,49 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#ifndef FRAME_MATCHER_POINTS_ON_FRAME_H
+#define FRAME_MATCHER_POINTS_ON_FRAME_H
 
-#include <stdexcept>
-#include <string>
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
+#include <opencv2/opencv.hpp>
+#include <std_msgs/Header.h>
+#include <sensor_msgs/Image.h>
+
+// #include "pandora_vision_msgs/EnhancedImage.h"
+#include "pandora_vision_msgs/Keypoint.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
-
-  class TfException : public std::runtime_error
+  /**
+   * @class PointsOnFrame TODO
+   */
+  class PointsOnFrame
   {
    public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    typedef boost::shared_ptr<PointsOnFrame> Ptr;
+    typedef boost::shared_ptr<PointsOnFrame const> ConstPtr;
 
-  class AlertException : public std::runtime_error
-  {
    public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    // pandora_vision_msgs::EnhancedImageConstPtr enhancedImagePtr;
+    std_msgs::Header header;
+    sensor_msgs::Image rgbImage;
+    std::vector< std::vector<cv::Point2f> > pointsVector;
 
-  class MapException : public std::runtime_error
-  {
    public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
+    PointsOnFrame() {}
+    virtual ~PointsOnFrame() {}
   };
 
-  class ObstacleTypeException : public std::runtime_error
-  {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-}  // namespace pandora_data_fusion_utils
+  typedef PointsOnFrame::Ptr PointsOnFramePtr;
+  typedef PointsOnFrame::ConstPtr PointsOnFrameConstPtr;
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
 
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#endif  // FRAME_MATCHER_POINTS_ON_FRAME_H

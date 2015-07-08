@@ -45,11 +45,11 @@ namespace pandora_data_fusion
 namespace pandora_alert_handler
 {
 
-  ObjectFactory::ObjectFactory(const MapPtr& map,
-      const std::string& globalFrame, const std::string& mapType)
+  ObjectFactory::ObjectFactory(const pose_finder::PoseFinderPtr& poseFinderPtr,
+                               const std::string& globalFrame) :
+    poseFinderPtr_(poseFinderPtr)
   {
     globalFrame_ = globalFrame;
-    poseFinder_.reset( new pose_finder::PoseFinder(map, mapType) );
     SOFT_OBSTACLE_WIDTH = 1.0;
   }
 
@@ -58,7 +58,7 @@ namespace pandora_alert_handler
       double soft_obstacle_width)
   {
     SOFT_OBSTACLE_WIDTH = soft_obstacle_width;
-    poseFinder_->updateParams(occupiedCellThres,
+    poseFinderPtr_->updateParams(occupiedCellThres,
         highThres, lowThres, orientationCircle);
   }
 

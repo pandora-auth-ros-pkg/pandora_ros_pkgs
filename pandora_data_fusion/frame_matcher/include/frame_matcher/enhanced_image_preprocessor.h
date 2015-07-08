@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -33,51 +33,52 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Christos Zalidis <zalidis@gmail.com>
- *   Triantafyllos Afouras <afourast@gmail.com>
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
-#define PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#ifndef FRAME_MATCHER_ENHANCED_IMAGE_PREPROCESSOR_H
+#define FRAME_MATCHER_ENHANCED_IMAGE_PREPROCESSOR_H
 
-#include <stdexcept>
 #include <string>
+
+#include "sensor_processor/handler.h"
+#include "sensor_processor/preprocessor.h"
+#include "pandora_vision_msgs/EnhancedImage.h"
+
+#include "frame_matcher/points_on_frame.h"
 
 namespace pandora_data_fusion
 {
-namespace pandora_data_fusion_utils
+namespace frame_matcher
 {
-
-  class TfException : public std::runtime_error
+  /**
+   * @class EnhancedImagePreprocessor TODO
+   */
+  class EnhancedImagePreProcessor : public sensor_processor::PreProcessor<
+                                     pandora_vision_msgs::EnhancedImage, PointsOnFrame>
   {
    public:
-    explicit TfException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
+    /**
+     * @brief Constructor
+     * @param ns [const std::string&] The namespace of this postprocessor's nodeHandle
+     * @param handler [sensor_processor::AbstractHandler*] A pointer of the class that
+     * handles this postprocessor
+     **/
+    EnhancedImagePreProcessor();
+    virtual
+    ~EnhancedImagePreProcessor();
 
-  class AlertException : public std::runtime_error
-  {
-   public:
-    explicit AlertException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
+    /**
+     * @brief TODO
+     * @param input [const PointsOnFrameConstPtr&] TODO
+     * @param output [const EnhancedImagesVectorMsgPtr&] TODO
+     * @return bool TODO
+     */
+    virtual bool
+    preProcess(const pandora_vision_msgs::EnhancedImageConstPtr& input,
+        const PointsOnFramePtr& output);
   };
-
-  class MapException : public std::runtime_error
-  {
-   public:
-    explicit MapException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-  class ObstacleTypeException : public std::runtime_error
-  {
-   public:
-    explicit ObstacleTypeException(const std::string& errorDescription) :
-      std::runtime_error(errorDescription) {}
-  };
-
-}  // namespace pandora_data_fusion_utils
+}  // namespace frame_matcher
 }  // namespace pandora_data_fusion
 
-#endif  // PANDORA_DATA_FUSION_UTILS_EXCEPTIONS_H
+#endif  // FRAME_MATCHER_ENHANCED_IMAGE_PREPROCESSOR_H

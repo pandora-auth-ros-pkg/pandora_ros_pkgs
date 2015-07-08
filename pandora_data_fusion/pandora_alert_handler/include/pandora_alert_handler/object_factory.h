@@ -61,8 +61,8 @@ namespace pandora_alert_handler
   class ObjectFactory : private boost::noncopyable
   {
    public:
-    ObjectFactory(const MapPtr& map, const std::string& globalFrame,
-                  const std::string& mapType);
+    ObjectFactory(const pose_finder::PoseFinderPtr& poseFinderPtr,
+                  const std::string& globalFrame);
 
     template <class ObjectType>
     typename ObjectType::PtrVectorPtr makeObjects(
@@ -97,7 +97,7 @@ namespace pandora_alert_handler
     tf::Transform currentTransform_;
 
     std::string globalFrame_;
-    pose_finder::PoseFinderPtr poseFinder_;
+    pose_finder::PoseFinderPtr poseFinderPtr_;
 
     double SOFT_OBSTACLE_WIDTH;
   };
@@ -109,7 +109,7 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    objectPtr->setPose(poseFinder_->findAlertPose(msg.info.yaw,
+    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.info.yaw,
           msg.info.pitch, transform));
     objectPtr->setProbability(msg.info.probability);
     objectPtr->setTimeFound(timeFound);
@@ -124,7 +124,7 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.yaw,
           msg.pitch, transform));
     objectPtr->setProbability(msg.probability);
     objectPtr->setTimeFound(timeFound);
@@ -137,7 +137,7 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.yaw,
           msg.pitch, transform));
     objectPtr->setProbability(msg.probability);
     objectPtr->setTimeFound(timeFound);
@@ -150,7 +150,7 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.yaw,
           msg.pitch, transform));
     objectPtr->setProbability(msg.probability);
     objectPtr->setTimeFound(timeFound);
@@ -163,7 +163,7 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    objectPtr->setPose(poseFinder_->findAlertPose(msg.yaw,
+    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.yaw,
           msg.pitch, transform));
     objectPtr->setProbability(msg.probability);
     objectPtr->setTimeFound(timeFound);
@@ -177,7 +177,7 @@ namespace pandora_alert_handler
       const tf::Transform& transform)
   {
     double length;
-    geometry_msgs::Pose obstaclePose = poseFinder_->findPoseFromPoints(
+    geometry_msgs::Pose obstaclePose = poseFinderPtr_->findPoseFromPoints(
         msg.pointsYaw, msg.pointsPitch, msg.pointsDepth, transform, &length);
     objectPtr->setPose(obstaclePose);
     if (msg.type == pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE) {
@@ -193,7 +193,7 @@ namespace pandora_alert_handler
   typename ObjectType::PtrVectorPtr ObjectFactory::makeObjects(
       const typename ObjectType::AlertVector& msg)
   {
-    currentTransform_ = poseFinder_->lookupTransformFromWorld(
+    currentTransform_ = poseFinderPtr_->lookupTransformFromWorld(
         globalFrame_, msg.header);
 
     typename ObjectType::PtrVectorPtr objectsVectorPtr(
@@ -221,7 +221,7 @@ namespace pandora_alert_handler
   typename Obstacle::PtrVectorPtr ObjectFactory::makeObjects<Obstacle>(
       const typename Obstacle::AlertVector& msg)
   {
-    currentTransform_ = poseFinder_->lookupTransformFromWorld(
+    currentTransform_ = poseFinderPtr_->lookupTransformFromWorld(
         globalFrame_, msg.header);
 
     typename Obstacle::PtrVectorPtr obstacleVectorPtr(new typename Obstacle::PtrVector);

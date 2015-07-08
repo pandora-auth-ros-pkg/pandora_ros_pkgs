@@ -1,0 +1,10 @@
+<class_libraries>
+  <library path="lib/libframe_matcher">
+    <class name="pandora_data_fusion/frame_matcher"
+        type="pandora_data_fusion::frame_matcher::FrameMatcher" base_class_type="nodelet::Nodelet">
+      <description>
+        FrameMatcher
+      </description>
+    </class>
+  </library>
+</class_libraries>

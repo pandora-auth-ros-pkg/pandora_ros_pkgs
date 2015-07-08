@@ -1,0 +1,18 @@
+<class_libraries>
+  <library path="lib/libenhanced_image_postprocessor">
+    <class name="frame_matcher/enhanced_image_postprocessor"
+        type="pandora_data_fusion::frame_matcher::EnhancedImagePostProcessor"
+        base_class_type="sensor_processor::AbstractProcessor">
+      <description>Formats outputs as EnhancedImage messages when given regions
+      regions of interest on an image frame.</description>
+    </class>
+  </library>
+  <library path="lib/libenhanced_image_preprocessor">
+    <class name="frame_matcher/enhanced_image_preprocessor"
+        type="pandora_data_fusion::frame_matcher::EnhancedImagePreProcessor"
+        base_class_type="sensor_processor::AbstractProcessor">
+      <description>Handles EnhancedImage input to match them in a target image frame
+      </description>
+    </class>
+  </library>
+</class_libraries>
