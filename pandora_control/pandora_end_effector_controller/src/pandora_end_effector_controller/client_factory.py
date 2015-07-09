@@ -40,8 +40,9 @@ class ClientFactory(object):
 
   def __init__(self):
     ''' Factory initialized '''
+    self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
 
-    rospy.loginfo('Initializing factory...')
+    rospy.loginfo("[" + self._name + "] Initializing factory...")
     self.return_client ={
       'sensor_client' : self.return_sensor,
       'linear_actuator_client' : self.return_linear_actuator,
@@ -50,7 +51,7 @@ class ClientFactory(object):
 
   def make_client(self, client_name):
     ''' Making appropriate client '''
-    rospy.loginfo('Making client... ' + client_name)
+    rospy.loginfo("[" + self._name + "] Making client... " + client_name)
     return self.return_client[client_name]()
 
   def return_sensor(self):

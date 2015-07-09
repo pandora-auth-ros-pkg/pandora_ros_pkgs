@@ -47,12 +47,16 @@ class SensorClient(object):
   """docstring for SensorClient"""
 
   def __init__(self):
+    self._name = "SensorClient"
     self.goal = sensor_client['goal']
     self.topic = sensor_client['topic']
     self.action = sensor_client['action']
     self.command_dict = translate_command['to_sensor']
 
     self.client = Client(self.topic, self.action)
+
+  def get_name(self):
+    return self._name
 
   def fill_goal(self, effector_goal):
     self.goal.command = self.command_dict[effector_goal.command]
@@ -88,12 +92,16 @@ class LinearActuatorClient(object):
   """docstring for LinearActuatorClient"""
 
   def __init__(self):
+    sefl._name = "LinearActuatorClient"
     self.goal = linear_actuator_client['goal']
     self.topic = linear_actuator_client['topic']
     self.action = linear_actuator_client['action']
     self.command_dict = translate_command['to_linear_actuator']
 
     self.client = Client(self.topic, self.action)
+
+  def get_name(self):
+    return self._name
 
   def fill_goal(self, effector_goal):
     self.goal.command = self.command_dict[effector_goal.command]
@@ -129,12 +137,16 @@ class HeadClient(object):
   """docstring for HeadClient"""
 
   def __init__(self):
+    self._name = "HeadClient"
     self.goal = head_client['goal']
     self.topic = head_client['topic']
     self.action = head_client['action']
     self.command_dict = translate_command['to_head']
 
     self.client = Client(self.topic, self.action)
+
+  def get_name(self):
+    return self._name
 
   def fill_goal(self, effector_goal):
     self.goal.command = self.command_dict[effector_goal.command]

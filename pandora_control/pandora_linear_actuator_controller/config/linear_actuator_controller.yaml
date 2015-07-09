@@ -5,4 +5,3 @@ lax_movement_threshold: 0.03
 command_timeout: 15.0
 linear_actuator_command_topic: /linear_actuator/command
 linear_actuator_frame: linear_actuator_link
-

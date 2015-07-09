@@ -158,18 +158,20 @@ namespace pandora_control
     else if (command_ ==
              pandora_sensor_orientation_controller::MoveSensorGoal::POINT)
     {
+      ROS_INFO("? %s", pointOfInterest_.c_str());
       pointThreshold_ = movementThreshold_;
       pointSensorTimer_.start();
     }
     else if (command_ ==
              pandora_sensor_orientation_controller::MoveSensorGoal::LAX_POINT)
     {
+      ROS_INFO("! %s", pointOfInterest_.c_str());
       pointThreshold_ = laxMovementThreshold_;
       pointSensorTimer_.start();
     }
     else
     {
-      ROS_DEBUG("%s: Aborted, there is no such command", actionName_.c_str());
+      ROS_ERROR("%s: Aborted, there is no such command", actionName_.c_str());
       // set the action state to aborted
       actionServer_.setAborted();
     }
@@ -180,7 +182,7 @@ namespace pandora_control
 
   void SensorOrientationActionServer::preemptCallback()
   {
-    ROS_DEBUG("%s: Preempted", actionName_.c_str());
+    ROS_INFO("%s: Preempted", actionName_.c_str());
     actionServer_.setPreempted();
     stopPreviousTimers();
   }
@@ -347,7 +349,7 @@ namespace pandora_control
     }
     else
     {
-      ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+      ROS_INFO("%s: Succeeded", actionName_.c_str());
       actionServer_.setSucceeded();
     }
   }
@@ -457,7 +459,8 @@ namespace pandora_control
       if (ros::Time::now() - lastTf > ros::Duration(1))
       {
         ROS_DEBUG_STREAM("Is " << pointOfInterest_ << " broadcasted?");
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        ROS_INFO("%s: Aborted", actionName_.c_str());
+
         // set the action state to succeeded
         actionServer_.setAborted();
         stopPreviousTimers();
@@ -516,8 +519,8 @@ namespace pandora_control
     tf::StampedTransform pitchTransform;
     tf::StampedTransform yawTransform;
     double roll, pitch, yaw, tempPitch;
-    pitch = 3.14;
-    yaw = 3.14;
+    pitch = std::numeric_limits<double>::max();
+    yaw = std::numeric_limits<double>::max();
 
     while (ros::ok() && (
       fabs(pitch - pitchTargetPosition_.data) >= pointThreshold_ ||
@@ -564,15 +567,15 @@ namespace pandora_control
     switch (state)
     {
       case 0:
-        ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+        ROS_INFO("%s: Succeeded", actionName_.c_str());
         actionServer_.setSucceeded();
         break;
       case 1:
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        ROS_INFO("%s: Aborted", actionName_.c_str());
         actionServer_.setAborted();
         break;
       case 2:
-        ROS_DEBUG("%s: Preempted", actionName_.c_str());
+        ROS_INFO("%s: Preempted", actionName_.c_str());
         actionServer_.setPreempted();
         break;
     }

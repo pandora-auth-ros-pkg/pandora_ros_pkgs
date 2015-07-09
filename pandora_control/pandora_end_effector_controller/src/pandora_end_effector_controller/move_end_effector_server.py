@@ -52,6 +52,7 @@ from client_list import CLIENTS
 class MoveEndEffectorServer(object):
 
   def __init__(self):
+    self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
     self.factory = ClientFactory()
     self.current_clients = list()
     self.current_goal = MoveEndEffectorGoal()
@@ -91,6 +92,7 @@ class MoveEndEffectorServer(object):
 
     for client in self.current_clients:
       client.preempt_if_active()
+      #self.preempt()
 
   def fill_goals(self):
     ''' Filling goals into every client respectively '''
@@ -119,7 +121,10 @@ class MoveEndEffectorServer(object):
 
   def preempt(self):
 
-    self.server.set_preempted()
+    if self.server.is_active():
+      self.server.set_preempted()
+    else:
+      rospy.logerr("[" + self._name + "] Preempt requested when server goal is not active")
 
   def check_succeeded(self):
     ''' Checks if the final state of the goal must be set succeeded '''
@@ -165,17 +170,25 @@ class MoveEndEffectorServer(object):
     ''' Checking final state of goal '''
 
     if(self.check_succeeded()):
+      rospy.logwarn("check_succeeded")
       self.success()
     elif(self.check_aborted()):
+      rospy.logwarn("check_aborted")
       self.abort()
     elif(self.check_recalled()):
+      rospy.logwarn("check_recalled")
       for client in self.current_clients:
-        rospy.loginfo(str(client.client.get_state()))
+        rospy.logerr("[" + self._name + "] Client " +
+                client.get_name() + " is in state " + str(client.client.get_state()))
+      rospy.logerr("[" + self._name + "] One client at least is recalled, set server to aborted")
       self.abort()
     elif(self.check_preempted()):
+      rospy.logwarn("check_preempted")
       self.preempt()
     else:
+      rospy.logwarn("check_unexpected")
       for client in self.current_clients:
-        rospy.loginfo(str(client.client.get_state()))
-      rospy.loginfo('Unexpected State')
+        rospy.logerr("[" + self._name + "] Client " +
+                client.get_name() + " is in state " + str(client.client.get_state()))
+      rospy.logerr("[" + self._name + "] Unexpected State, set server to aborted")
       self.abort()

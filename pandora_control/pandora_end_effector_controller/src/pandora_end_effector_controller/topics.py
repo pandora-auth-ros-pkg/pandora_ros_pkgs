@@ -34,5 +34,6 @@
 # Author: Voulgarakis George
 
 move_end_effector_controller_topic = '/control/move_end_effector_controller_action'
+move_kinect_topic = '/control/move_kinect_action'
 move_linear_actuator_topic = '/control/linear_actuator_action'
 move_head_topic = '/control/move_camera_effector_action'
