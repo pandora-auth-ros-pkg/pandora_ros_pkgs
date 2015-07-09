@@ -289,6 +289,8 @@ namespace pandora_alert_handler
     for (int ii = 0; ii < newObstacles->size(); ++ii) {
       ObstaclePtr obstacleToSend;
       bool obstacleToSendFound = true;
+      if (newObstacles->at(ii)->getLength() < 0.42)
+        continue;
       if (Obstacle::getList()->add(newObstacles->at(ii)))
       {
         ROS_DEBUG("[ObjectHandler %d] Found new obstacle!", __LINE__);
