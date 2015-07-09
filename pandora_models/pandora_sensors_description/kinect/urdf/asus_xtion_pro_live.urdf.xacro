@@ -103,6 +103,8 @@
            type="revolute" >
       <parent link="kinect_pitch_servo_link" />
       <child link="kinect_platform_link" />
+      <origin xyz="0.0 0.0 0.0"
+              rpy="0.0 -0.0174 0.0" />
       <axis xyz="0 1 0" />
       <limit lower="${pitch_min_limit}"
              upper="${pitch_max_limit}"
@@ -115,7 +117,7 @@
       <parent link="kinect_platform_link" />
       <child link="kinect_link" />
       <origin xyz="0.01461 -0.00106 0.05011"
-              rpy="0.0 0.0 0.0" />
+              rpy="0.0 0.0674 0.0" />
     </joint>
 
     <!-- Frames -->
