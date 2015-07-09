@@ -45,7 +45,8 @@ namespace motor
 {
 
   SerialEpos2Handler::SerialEpos2Handler():
-    epos2_nh_("/motor/epos2")
+    epos2_nh_("/motor/epos2"),
+    MAX_RETRIES_(10)
   {
     std::string _portName, _deviceName, _protocolStackName, _interfaceName;
     int _baudrate, _timeout, _numControllers, _gatewayId;
@@ -53,22 +54,32 @@ namespace motor
     std::string _motorId[4];
 
     /*--<Load epos2 interface configs from parameter server>--*/
-    epos2_nh_.getParam("interface/portName", _portName);
-    epos2_nh_.getParam("interface/baudrate", _baudrate);
-    epos2_nh_.getParam("interface/timeout", _timeout);
-    epos2_nh_.getParam("interface/deviceName", _deviceName);
-    epos2_nh_.getParam("interface/protocolStackName", _protocolStackName);
-    epos2_nh_.getParam("interface/interfaceName", _interfaceName);
-    epos2_nh_.getParam("controllers/epos2Gateway_id", _gatewayId);
-    epos2_nh_.getParam("controllers/num", _numControllers);
-    epos2_nh_.getParam("controllers/node1/id", _nodeId[0]);
-    epos2_nh_.getParam("controllers/node1/index", _motorId[0]);
-    epos2_nh_.getParam("controllers/node2/id", _nodeId[1]);
-    epos2_nh_.getParam("controllers/node2/index", _motorId[1]);
-    epos2_nh_.getParam("controllers/node3/id", _nodeId[2]);
-    epos2_nh_.getParam("controllers/node3/index", _motorId[2]);
-    epos2_nh_.getParam("controllers/node4/id", _nodeId[3]);
-    epos2_nh_.getParam("controllers/node4/index", _motorId[3]);
+    epos2_nh_.param<std::string>("interface/portName", _portName, 
+      "");
+    epos2_nh_.param<int>("interface/baudrate", _baudrate, 0);
+    epos2_nh_.param<int>("interface/timeout", _timeout, 0);
+    epos2_nh_.param<std::string>("interface/deviceName", 
+      _deviceName, "");
+    epos2_nh_.param<std::string>("interface/protocolStackName", 
+      _protocolStackName, "");
+    epos2_nh_.param<std::string>("interface/interfaceName", 
+      _interfaceName, "");
+
+    epos2_nh_.param<int>("controllers/epos2Gateway_id", _gatewayId, 0);
+    epos2_nh_.param<int>("controllers/num", _numControllers, 0);
+
+    epos2_nh_.param<int>("controllers/node1/id", _nodeId[0], 0);
+    epos2_nh_.param<std::string>("controllers/node1/index", 
+      _motorId[0], "");
+    epos2_nh_.param<int>("controllers/node2/id", _nodeId[1], 0);
+    epos2_nh_.param<std::string>("controllers/node2/index", 
+      _motorId[1], "");
+    epos2_nh_.param<int>("controllers/node3/id", _nodeId[2], 0);
+    epos2_nh_.param<std::string>("controllers/node3/index", 
+      _motorId[2], "");
+    epos2_nh_.param<int>("controllers/node4/id", _nodeId[3], 0);
+    epos2_nh_.param<std::string>("controllers/node4/index", 
+      _motorId[3], "");
     /*-------------------------------------------------------*/
 
     epos2Gateway_.reset(new Epos2Gateway(_portName, _baudrate, _timeout,
@@ -96,8 +107,24 @@ namespace motor
 
     gatewayId_ = static_cast<uint16_t>(_gatewayId);
 
-    // Open device communication port
-    epos2Gateway_->openDevice();
+    bool comSucc = false;
+    int retries = 0;
+    /* ---<Initiate Communication with epos2 gateway >--- */
+    while (! comSucc && retries < MAX_RETRIES_)
+    {
+      if ( epos2Gateway_->openDevice() )
+      {
+        ROS_INFO("[Epos2-Handler]: Communication Success");
+        comSucc = true;
+      }
+      else
+      {
+        ROS_WARN("[Epos2-Handler]: Communication Failed!");
+        retries ++;
+        ros::Duration(1).sleep(); // sleep for a second
+      }
+    }
+    /* ------------------------------------------------- */
 
     // Initialize motor controller states {Enabled}
     readStates();   // Read current state of the Motors
@@ -150,13 +177,13 @@ namespace motor
           if (epos2Controllers_.at(_ii)->nodeId_ == gatewayId_)
           {
             // Cannot communicate with epos2-Gateway
-            ROS_FATAL("[Motors]: Cannot communicate with epos2-Gateway.");
+            ROS_WARN("[Epos2-Handler]: Cannot communicate with epos2-Gateway.");
           }
           epos2Gateway_->resetNode(epos2Controllers_.at(_ii)->nodeId_);
           epos2Gateway_->setEnableState(epos2Controllers_.at(_ii)->nodeId_);
           break;
         default:  // UKNOWN STATE
-          ROS_FATAL("[Motors]: UKNOWN STATE --> [%d]",
+          ROS_WARN("[Epos2-Handler]: UKNOWN STATE --> [%d]",
             epos2Controllers_.at(_ii)->state_);
           epos2Gateway_->resetNode(epos2Controllers_.at(_ii)->nodeId_);
           epos2Gateway_->setEnableState(epos2Controllers_.at(_ii)->nodeId_);
@@ -179,6 +206,7 @@ namespace motor
   void SerialEpos2Handler::getRPM(int* leftRearRpm, int* leftFrontRpm,
     int* rightRearRpm, int* rightFrontRpm)
   {
+    /* ----< Read velocity values from Epos2Gateway >---- */
     epos2Gateway_->read_velocityAvg(rightFrontMotor_->nodeId_,
       &rightFrontMotor_->rpm_);
     epos2Gateway_->read_velocityAvg(rightRearMotor_->nodeId_,
@@ -187,15 +215,19 @@ namespace motor
       &leftFrontMotor_->rpm_);
     epos2Gateway_->read_velocityAvg(leftRearMotor_->nodeId_,
       &leftRearMotor_->rpm_);
+    /* ------------------------------------------------- */
+
     *rightFrontRpm = rightFrontMotor_->rpm_;
     *rightRearRpm = rightRearMotor_->rpm_;
     *leftFrontRpm = leftFrontMotor_->rpm_;
     *leftRearRpm = leftRearMotor_->rpm_;
   }
 
+
   void SerialEpos2Handler::getCurrent(int* leftRearCurrent,
     int* leftFrontCurrent, int* rightRearCurrent, int* rightFrontCurrent)
   {
+    /* ----< Read velocity values from Epos2Gateway >---- */
     epos2Gateway_->read_currentAvg(rightFrontMotor_->nodeId_,
       &rightFrontMotor_->current_);
     epos2Gateway_->read_currentAvg(rightRearMotor_->nodeId_,
@@ -204,6 +236,8 @@ namespace motor
       &leftFrontMotor_->current_);
     epos2Gateway_->read_currentAvg(leftRearMotor_->nodeId_,
       &leftRearMotor_->current_);
+    /* ------------------------------------------------- */
+
     *rightFrontCurrent = static_cast<int>(rightFrontMotor_->current_);
     *rightRearCurrent = static_cast<int>(rightRearMotor_->current_);
     *leftFrontCurrent = static_cast<int>(leftFrontMotor_->current_);
@@ -217,7 +251,7 @@ namespace motor
 
   uint16_t SerialEpos2Handler::writeRPM(const int leftRpm, const int rightRpm)
   {
-    ROS_DEBUG("[Motors]: Setting speed %d, %d", leftRpm, rightRpm);
+    ROS_DEBUG("[Epos2-Handler]: Setting speed %d, %d", leftRpm, rightRpm);
     epos2Gateway_->set_targetVelocity(rightFrontMotor_->nodeId_, -rightRpm);
     epos2Gateway_->set_targetVelocity(rightRearMotor_->nodeId_, -rightRpm);
     epos2Gateway_->set_targetVelocity(leftFrontMotor_->nodeId_, leftRpm);
@@ -225,23 +259,24 @@ namespace motor
     return 1;
   }
 
+
   void SerialEpos2Handler::readStates(void)
   {
     epos2Gateway_->readState(rightFrontMotor_->nodeId_,
       &rightFrontMotor_->state_);
-    ROS_INFO("[Motors]: NodeId-%d State==%d", rightFrontMotor_->nodeId_,
+    ROS_INFO("[Epos2-Handler]: NodeId-%d State==%d", rightFrontMotor_->nodeId_,
       rightFrontMotor_->state_);
     epos2Gateway_->readState(rightRearMotor_->nodeId_,
       &rightRearMotor_->state_);
-    ROS_INFO("[Motors]: NodeId-%d State==%d", rightRearMotor_->nodeId_,
+    ROS_INFO("[Epos2-Handler]: NodeId-%d State==%d", rightRearMotor_->nodeId_,
       rightRearMotor_->state_);
     epos2Gateway_->readState(leftFrontMotor_->nodeId_,
       &leftFrontMotor_->state_);
-    ROS_INFO("[Motors]: NodeId-%d State==%d", leftFrontMotor_->nodeId_,
+    ROS_INFO("[Epos2-Handler]: NodeId-%d State==%d", leftFrontMotor_->nodeId_,
       leftFrontMotor_->state_);
     epos2Gateway_->readState(leftRearMotor_->nodeId_,
      &leftRearMotor_->state_);
-    ROS_INFO("[Motors]: NodeId-%d State==%d", leftRearMotor_->nodeId_,
+    ROS_INFO("[Epos2-Handler]: NodeId-%d State==%d", leftRearMotor_->nodeId_,
       leftRearMotor_->state_);
   }
 
@@ -256,14 +291,14 @@ namespace motor
     int _currentFeed[4];
 
     // Fill with current values using getCurrent method
-    this->getCurrent(&_currentFeed[0], &_currentFeed[1],
+    getCurrent(&_currentFeed[0], &_currentFeed[1],
       &_currentFeed[2], &_currentFeed[3]);
 
     // Convert to Torques
-    *leftRearTorque = this->currentToTorque(_currentFeed[0]);
-    *leftFrontTorque = this->currentToTorque(_currentFeed[1]);
-    *rightRearTorque = this->currentToTorque(_currentFeed[2]);
-    *rightFrontTorque = this->currentToTorque(_currentFeed[3]);
+    *leftRearTorque = currentToTorque(_currentFeed[0]);
+    *leftFrontTorque = currentToTorque(_currentFeed[1]);
+    *rightRearTorque = currentToTorque(_currentFeed[2]);
+    *rightFrontTorque = currentToTorque(_currentFeed[3]);
   }
 
 
@@ -277,6 +312,7 @@ namespace motor
   {
     return static_cast<int16_t>(_input_torque / 33.5 / 113 * 1000 );
   }
+
 
   uint16_t SerialEpos2Handler::writeTorques(
         double leftRearTorque,
@@ -292,8 +328,8 @@ namespace motor
 
 
     // Step II: Send commands to motors
-    ROS_DEBUG("[Motors]: Setting torques %f, %f, %f, %f",
-      leftRearTorque, leftFrontTorque,
+    ROS_DEBUG("[Epos2-Handler]: Setting torques %f, %f, %f, %f",
+      leftRearTorque, leftFrontTorque, 
       rightRearTorque, rightFrontTorque);
 
     epos2Gateway_->set_targetCurrent(leftRearMotor_->nodeId_,
@@ -314,26 +350,24 @@ namespace motor
     {
       case 0:
         // Activate Velocity Mode
-        ROS_INFO("Entering Velocity Mode");
+        ROS_INFO("[Epos2-Handler]: Entering Velocity Mode");
         epos2Gateway_->activate_profileVelocityMode(rightFrontMotor_->nodeId_);
         epos2Gateway_->activate_profileVelocityMode(rightRearMotor_->nodeId_);
         epos2Gateway_->activate_profileVelocityMode(leftFrontMotor_->nodeId_);
         epos2Gateway_->activate_profileVelocityMode(leftRearMotor_->nodeId_);
 
         operation_mode_ = 0;
-
         break;
 
       case 1:
         // Activate Current Mode
-        ROS_INFO("Entering Current Mode");
+        ROS_INFO("[Epos2-Handler]: Entering Current Mode");
         epos2Gateway_->activate_currentMode(rightFrontMotor_->nodeId_);
         epos2Gateway_->activate_currentMode(rightRearMotor_->nodeId_);
         epos2Gateway_->activate_currentMode(leftFrontMotor_->nodeId_);
         epos2Gateway_->activate_currentMode(leftRearMotor_->nodeId_);
 
         operation_mode_ = 1;
-
         break;
 
       default:

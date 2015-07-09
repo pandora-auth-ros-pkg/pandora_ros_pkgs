@@ -1,4 +1,3 @@
-#add_library(epos_gateway
   #src/epos_gateway/epos_serial_gateway.cpp
 #)
 #target_link_libraries(epos_gateway ${catkin_LIBRARIES} )
@@ -48,14 +47,21 @@ download_data(
 # Add devel/lib to link directories
 link_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
 
+add_library(Utils
+  src/Utils/Utils.cpp
+)
+
 # Library for epos2 Gateway communication
 add_library(epos2_gateway
   src/epos2_gateway/epos2_gateway.cpp
 )
+
 target_link_libraries(epos2_gateway
   EposCmd
+  Utils
   ${catkin_LIBRARIES}
 )
+
 add_dependencies(epos2_gateway
   ${PROJECT_NAME}_download_libEposCmd
   ${PROJECT_NAME}_download_libftd2xx
@@ -72,9 +78,6 @@ target_link_libraries(serial_epos2_handler
   ${catkin_LIBRARIES}
 )
 
-add_executable(error_codes_test
-  src/epos2_gateway/error_codes_test.cpp
-)
 
 #target_link_libraries(epos2_test
   #serial_epos2_handler

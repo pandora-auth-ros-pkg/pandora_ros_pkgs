@@ -44,8 +44,8 @@
 #include "ros/ros.h"
 #include "epos2_gateway/epos2_definitions.h"
 #include <boost/scoped_ptr.hpp>
-// #include <map>
-// #include <cstring.h>
+//#include <map>
+//#include <cstring.h>
 
 namespace pandora_hardware_interface
 {
@@ -70,6 +70,8 @@ namespace motor
       boost::scoped_ptr<Interface> comInterface_;
       void* comHandler_;
       uint32_t error_;
+      std::map<int, std::string> errorCodes_;
+
     public:
       Epos2Gateway(const std::string port, const uint32_t baudrate,
         const uint32_t timeout, const std::string deviceName,
@@ -81,15 +83,16 @@ namespace motor
       /*!
        * @brief Opens the port to sent and receive commands
        */
-      void openDevice(void);
+      bool openDevice(void);
 
       /*!
        * @brief Closes the communication port
        */
-      void closeDevice(void);
+      bool closeDevice(void);
 
       bool eval_communicationParameters(void);
 
+      void loadErrorCodes(const std::string fileUri);
   //=======================STATE MACHINE Methods===========================
 
       /*!
@@ -246,7 +249,7 @@ namespace motor
   //======================MOTION INFO Methods==============================
 
       /*!
-       * @brief Reads the velocity actual value
+       * @brief Reads the velocity actual value 
        * param nodeId NodeID of the epos2 controller defined on CAN-Bus
        *
        *  If nodeId = 0 then command trasmits to everyone.
@@ -254,7 +257,7 @@ namespace motor
       uint32_t read_velocityActual(uint16_t nodeId, int32_t* velActual);
 
       /*!
-       * @brief Reads the velocity average value
+       * @brief Reads the velocity average value 
        * param nodeId NodeID of the epos2 controller defined on CAN-Bus
        *
        *  If nodeId = 0 then command trasmits to everyone.
@@ -262,7 +265,7 @@ namespace motor
       uint32_t read_velocityAvg(uint16_t nodeId, int32_t* velAvg);
 
       /*!
-       * @brief Reads the current actual value
+       * @brief Reads the current actual value 
        * param nodeId NodeID of the epos2 controller defined on CAN-Bus
        *
        *  If nodeId = 0 then command trasmits to everyone.
@@ -270,7 +273,7 @@ namespace motor
       uint32_t read_currentActual(uint16_t nodeId, int16_t* currentActual);
 
       /*!
-       * @brief Reads the current average value
+       * @brief Reads the current average value 
        * param nodeId NodeID of the epos2 controller defined on CAN-Bus
        *
        *  If nodeId = 0 then command trasmits to everyone.

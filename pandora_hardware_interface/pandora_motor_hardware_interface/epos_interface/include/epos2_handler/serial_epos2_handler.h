@@ -72,6 +72,7 @@ namespace motor
       Epos2Controller* leftRearMotor_;
       uint16_t gatewayId_;
 
+      const int MAX_RETRIES_; 
       /*
        * operation_mode_ = 0 ==> velocity mode
        * operation_mode_ = 1 ==> current mode
