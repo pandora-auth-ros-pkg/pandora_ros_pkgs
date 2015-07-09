@@ -86,6 +86,8 @@ namespace thermal
   ThermalCropper::
   onInit()
   {
+    state_manager::StateClientNodelet::onInit();
+
     // Take NodeHandlers from nodelet manager
     nh_ = this->getPublicNh();
     private_nh_ = this->getPrivateNh();
