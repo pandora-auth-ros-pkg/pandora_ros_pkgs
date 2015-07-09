@@ -105,7 +105,7 @@ if __name__ == '__main__':
   rospy.init_node('mock_node')
 
   # Action Servers
-  MockActionServer('linear', move_linear_topic,
+  MockActionServer('linear_actuator', move_linear_actuator_topic,
                    MoveLinearActuatorAction)
   MockActionServer('sensor', move_kinect_topic,
                    MoveSensorAction)

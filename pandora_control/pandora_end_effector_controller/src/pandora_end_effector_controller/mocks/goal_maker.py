@@ -9,7 +9,7 @@ class EffectorGoalMaker(object):
 
   def __init__(self):
     self.goal = MoveEndEffectorGoal()
-    self.commands = [MoveEndEffectorGoal.TEST, MoveEndEffectorGoal.PARK, 
+    self.commands = [MoveEndEffectorGoal.TEST, MoveEndEffectorGoal.PARK,
                      MoveEndEffectorGoal.TRACK, MoveEndEffectorGoal.LAX_TRACK,
                      MoveEndEffectorGoal.SCAN]
 
@@ -21,4 +21,4 @@ class EffectorGoalMaker(object):
     self.goal.point_of_interest = point_of_interest if point_of_interest else '0,0,1'
     self.goal.center_point = center_point if center_point else '0,1,0'
     return self.goal
-    
+

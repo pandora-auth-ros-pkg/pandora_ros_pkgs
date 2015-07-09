@@ -2,7 +2,7 @@
   <!--Node -->
   <include file="$(find pandora_end_effector_controller)/launch/end_effector_controller_node.launch" />
   <!--Linear Actuator -->
-  <!-- <include file="$(find pandora_linear_actuator_controller)/launch/linear_actuator_controller.launch" /> -->
+  <include file="$(find pandora_linear_actuator_controller)/launch/linear_actuator_controller.launch" />
   <!--Sensors -->
   <include file="$(find pandora_sensor_orientation_controller)/launch/sensor_orientation_controller.launch" />
 
