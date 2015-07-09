@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
     state_manager
     state_manager_msgs
     pandora_cmake_tools
+    pandora_vision_hole
 )
 
 generate_dynamic_reconfigure_options(
@@ -33,6 +34,7 @@ catkin_package(
       sensor_msgs
       pandora_vision_msgs
       pandora_vision_common
+      pandora_vision_hole
       sensor_processor
       state_manager
       state_manager_msgs
@@ -72,10 +74,19 @@ target_link_libraries(${PROJECT_NAME}_obstacle_postprocessor
 ############################### barrel processor ##############################
 add_library(${PROJECT_NAME}_barrel_processor
   src/barrel_detection/barrel_processor.cpp
+)
+target_link_libraries(${PROJECT_NAME}_barrel_processor
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_barrel_detector
+)
+
+############################### barrel detector ##############################
+add_library(${PROJECT_NAME}_barrel_detector
+  src/barrel_detection/barrel_detector.cpp
   src/barrel_detection/fast_symmetry_detector.cpp
   src/barrel_detection/parameters.cpp
 )
-target_link_libraries(${PROJECT_NAME}_barrel_processor
+target_link_libraries(${PROJECT_NAME}_barrel_detector
   ${catkin_LIBRARIES}
 )
 

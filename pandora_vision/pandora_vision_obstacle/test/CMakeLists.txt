@@ -32,12 +32,12 @@ target_link_libraries(fast_symmetry_detector_test
   gtest
   )
 
-catkin_add_gtest(barrel_processor_test
-  unit/barrel_processor_test.cpp
+catkin_add_gtest(barrel_detector_test
+  unit/barrel_detector_test.cpp
   )
-target_link_libraries(barrel_processor_test
+target_link_libraries(barrel_detector_test
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_barrel_processor
+  ${PROJECT_NAME}_barrel_detector
   gtest_main
   gtest
   )

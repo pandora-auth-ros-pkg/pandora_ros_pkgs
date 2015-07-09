@@ -43,13 +43,13 @@
 namespace pandora_vision
 {
   /**
-    @class BarrelProcessorTest
-    @brief Tests the integrity of methods of class BarrelProcessor
+    @class BarrelDetectorTest
+    @brief Tests the integrity of methods of class BarrelDetector
    **/
-  class BarrelProcessorTest : public ::testing::Test
+  class BarrelDetectorTest : public ::testing::Test
   {
     protected:
-      BarrelProcessorTest() {}
+      BarrelDetectorTest() {}
 
       /**
         @brief Constructs a rectangle of width @param x and height of @param y.
@@ -142,7 +142,7 @@ namespace pandora_vision
     imprinted on
     return void
    **/
-  void BarrelProcessorTest::generateRgbRectangle(
+  void BarrelDetectorTest::generateRgbRectangle(
       const cv::Point2f& upperLeft,
       const int& x,
       const int& y,
@@ -173,7 +173,7 @@ namespace pandora_vision
     imprinted on
     return void
    **/
-  void BarrelProcessorTest::generateDepthRectangle(
+  void BarrelDetectorTest::generateDepthRectangle(
       const cv::Point2f& upperLeft,
       const int& x,
       const int& y,
@@ -204,7 +204,7 @@ namespace pandora_vision
     imprinted
     return void
    **/
-  void BarrelProcessorTest::generateStepwiseDifferentiatingDepthRectangle(
+  void BarrelDetectorTest::generateStepwiseDifferentiatingDepthRectangle(
       const cv::Point2f& upperLeft,
       const int& x,
       const int& y,
@@ -239,8 +239,8 @@ namespace pandora_vision
       }
   }
 
-  // ! Tests BarrelProcessor::getSymmertyObject
-  TEST_F(BarrelProcessorTest, getSymmetryObjectTest)
+  // ! Tests BarrelDetector::getSymmertyObject
+  TEST_F(BarrelDetectorTest, getSymmetryObjectTest)
   {
     // The image upon which the squares will be inprinted
     depthImage = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
@@ -270,7 +270,7 @@ namespace pandora_vision
     // Construct a square
     // cv::Mat square = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
-    // BarrelProcessorTest::generateDepthRectangle
+    // BarrelDetectorTest::generateDepthRectangle
     //  (cv::Point2f (WIDTH - 350, HEIGHT - 350),
     //    310,
     //    310,
@@ -283,9 +283,9 @@ namespace pandora_vision
     cv::Point symmetricStartPoint;
     cv::Point symmetricEndPoint;
 
-    pandora_vision_obstacle::BarrelProcessor barrelProcessor;
+    pandora_vision_obstacle::BarrelDetector BarrelDetector;
 
-    barrelProcessor.getSymmetryObject(
+    BarrelDetector.getSymmetryObject(
         depthImage,
         &roi,
         &symmetricStartPoint,
@@ -296,8 +296,8 @@ namespace pandora_vision
     EXPECT_NEAR(310, roi.width, 100);
   }
 
-  // ! Tests BarrelProcessor::validateROI
-  TEST_F(BarrelProcessorTest, validateROITest)
+  // ! Tests BarrelDetector::validateROI
+  TEST_F(BarrelDetectorTest, validateROITest)
   {
     // The image upon which the squares will be inprinted
     depthImage = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
@@ -334,7 +334,7 @@ namespace pandora_vision
     // depth
     cv::Mat square = cv::Mat::zeros(HEIGHT, WIDTH, CV_32FC1);
 
-    BarrelProcessorTest::generateStepwiseDifferentiatingDepthRectangle
+    BarrelDetectorTest::generateStepwiseDifferentiatingDepthRectangle
       (cv::Point2f(WIDTH - 350, HEIGHT - 350),
        310,
        310,
@@ -346,7 +346,7 @@ namespace pandora_vision
     // Construct the homogeneous RGB square
     cv::Mat homogeneousSquare = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC3);
 
-    BarrelProcessorTest::generateRgbRectangle
+    BarrelDetectorTest::generateRgbRectangle
       (cv::Point2f(WIDTH - 350, HEIGHT - 350),
        310,
        310,
@@ -360,11 +360,11 @@ namespace pandora_vision
     cv::Point symmetricStartPoint = cv::Point(445, 130);
     cv::Point symmetricEndPoint(445, 440);
 
-    pandora_vision_obstacle::BarrelProcessor barrelProcessor;
+    pandora_vision_obstacle::BarrelDetector BarrelDetector;
 
     bool valid = true;
 
-    valid = barrelProcessor.validateRoi(
+    valid = BarrelDetector.validateRoi(
         rgbImage,
         depthImage,
         roi,

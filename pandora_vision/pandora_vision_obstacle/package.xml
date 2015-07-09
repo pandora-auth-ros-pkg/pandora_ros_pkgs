@@ -27,6 +27,7 @@
   <depend>cv_bridge</depend>
   <depend>sensor_msgs</depend>
   <depend>pandora_vision_msgs</depend>
+  <depend>pandora_vision_hole</depend>
   <depend>pandora_vision_common</depend>
   <depend>sensor_processor</depend>
   <depend>state_manager</depend>

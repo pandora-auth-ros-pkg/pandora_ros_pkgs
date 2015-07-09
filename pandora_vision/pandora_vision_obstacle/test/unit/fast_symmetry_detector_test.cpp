@@ -197,15 +197,15 @@ namespace pandora_vision
     float rhoDivs = hypotf(depthImage.rows, depthImage.cols) + 1;
     float thetaDivs = 180.0;
 
-    FastSymmetryDetector detector(depthImage.size(), cv::Size(rhoDivs, thetaDivs), 1);
+    pandora_vision_obstacle::FastSymmetryDetector detector(depthImage.size(), cv::Size(rhoDivs, thetaDivs), 1);
 
     cv::Rect region(0, depthImage.rows, thetaDivs * 2.0, rhoDivs * 0.5);
 
-    int canny_thresh_1 = BarrelDetection::fsd_canny_thresh_1;
-    int canny_thresh_2 = BarrelDetection::fsd_canny_thresh_2;
-    int min_pair_dist  = BarrelDetection::fsd_min_pair_dist;
-    int max_pair_dist  = BarrelDetection::fsd_max_pair_dist;
-    int no_of_peaks    = BarrelDetection::fsd_no_of_peaks;
+    int canny_thresh_1 = pandora_vision_obstacle::BarrelDetection::fsd_canny_thresh_1;
+    int canny_thresh_2 = pandora_vision_obstacle::BarrelDetection::fsd_canny_thresh_2;
+    int min_pair_dist  = pandora_vision_obstacle::BarrelDetection::fsd_min_pair_dist;
+    int max_pair_dist  = pandora_vision_obstacle::BarrelDetection::fsd_max_pair_dist;
+    int no_of_peaks    = pandora_vision_obstacle::BarrelDetection::fsd_no_of_peaks;
 
     cv::Mat temp, edge;
 
