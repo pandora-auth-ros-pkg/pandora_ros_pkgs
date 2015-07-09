@@ -37,4 +37,6 @@
 
 CLIENTS =[
   'sensor_client'
+  # 'linear_client',
+  # 'head_client'
 ]
