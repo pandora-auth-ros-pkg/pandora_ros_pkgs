@@ -136,13 +136,13 @@ class Keyop:
     rospy.loginfo("\x1b[1M\x1b[1A")
 
     if self.mode == 'motors':
-      rospy.loginfo("\033[33;1mMotors: linear_speed: %s - angular_speed: %s\033[0m", self.lin_vel, self.ang_vel)
+      rospy.loginfo("\033[33;1mMotors: linear_speed: %0.1f - angular_speed: %0.1f\033[0m", self.lin_vel, self.ang_vel)
     elif self.mode == 'lac':
-      rospy.loginfo("\033[33;1mLinear Actuator: Position: %s\033[0m", self.lac_position)
+      rospy.loginfo("\033[33;1mLinear Actuator: Position: %0.1f\033[0m", self.lac_position)
     elif self.mode == 'xtion':
-      rospy.loginfo("\033[33;1mXtion: pitch: %s - yaw: %s\033[0m", self.xtion_pitch, self.xtion_yaw)
+      rospy.loginfo("\033[33;1mXtion: pitch: %0.2f - yaw: %0.2f\033[0m", self.xtion_pitch, self.xtion_yaw)
     elif self.mode == 'picam':
-      rospy.loginfo("\033[33;1mPicam: pitch: %s - yaw: %s\033[0m", self.picam_pitch, self.picam_yaw)
+      rospy.loginfo("\033[33;1mPicam: pitch: %0.2f - yaw: %0.2f\033[0m", self.picam_pitch, self.picam_yaw)
 
   def get_key(self):
     tty.setraw(sys.stdin.fileno())
@@ -182,7 +182,7 @@ class Keyop:
             self.xtion_yaw = 0
           else:
             self.xtion_pitch = self.xtion_pitch + control_bindings[key][0] / 2
-            self.xtion_yaw = self.xtion_yaw + control_bindings[key][1]
+            self.xtion_yaw = self.xtion_yaw + control_bindings[key][1] / 2
           self.xtion_pitch = clip(self.xtion_pitch, self.xtion_yaw_range[0], self.xtion_yaw_range[1])
           self.xtion_yaw = clip(self.xtion_yaw, self.xtion_pitch_range[0], self.xtion_pitch_range[1])
         elif self.mode == "picam":
@@ -191,7 +191,7 @@ class Keyop:
             self.picam_yaw = 0
           else:
             self.picam_pitch = self.picam_pitch + control_bindings[key][0] / 2
-            self.picam_yaw = self.picam_yaw + control_bindings[key][1]
+            self.picam_yaw = self.picam_yaw + control_bindings[key][1] / 2
           self.picam_yaw = clip(self.picam_yaw, self.picam_yaw_range[0], self.picam_yaw_range[1])
           self.picam_pitch = clip(self.picam_pitch, self.picam_pitch_range[0], self.picam_pitch_range[1])
 

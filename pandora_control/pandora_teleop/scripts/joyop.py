@@ -82,10 +82,10 @@ class Joyop:
 
   def print_state(self):
     rospy.loginfo("\x1b[1M\x1b[5A\x1b[5M")  # erase previous prints
-    rospy.loginfo("\033[33;1m[motors] lin_vel: %s - ang_vel: %s\033[0m", self.motors_lin_vel, self.motors_ang_vel)
-    rospy.loginfo("\033[33;1m[linear_actuator] position: %s\033[0m", self.lac_position)
-    rospy.loginfo("\033[33;1m[xtion] yaw: %s - pitch: %s\033[0m", self.xtion_yaw, self.xtion_pitch)
-    rospy.loginfo("\033[33;1m[picam] yaw: %s - pitch: %s\033[0m", self.picam_yaw, self.picam_pitch)
+    rospy.loginfo("\033[33;1m[motors] lin_vel: %0.1f - ang_vel: %0.1f\033[0m", self.motors_lin_vel, self.motors_ang_vel)
+    rospy.loginfo("\033[33;1m[linear_actuator] position: %0.1f\033[0m", self.lac_position)
+    rospy.loginfo("\033[33;1m[xtion] yaw: %0.2f - pitch: %0.2f\033[0m", self.xtion_yaw, self.xtion_pitch)
+    rospy.loginfo("\033[33;1m[picam] yaw: %0.2f - pitch: %0.2f\033[0m", self.picam_yaw, self.picam_pitch)
 
   def joy_callback(self, joy_msg):
     self.motors_lin_vel = joy_msg.axes[2] * self.motors_lin_vel_scale
