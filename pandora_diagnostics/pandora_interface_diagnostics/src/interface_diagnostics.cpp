@@ -41,7 +41,7 @@
 
 InterfaceDiagnostics::InterfaceDiagnostics() :
     GenericDiagnostic("System Interfaces"), 
-    StateClient(false) {
+    state_manager::StateClient(false) {
     
   docsVector_ = parser_.getDocsVector();
     

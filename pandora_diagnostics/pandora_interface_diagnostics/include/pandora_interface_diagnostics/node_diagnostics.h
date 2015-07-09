@@ -52,7 +52,7 @@
 #include "generic_diagnostic.h"
 #include "interfaces_xml_parser.h"
 
-class NodeDiagnostics: GenericDiagnostic, StateClient {
+class NodeDiagnostics: GenericDiagnostic, state_manager::StateClient {
   
  public:
   
@@ -61,6 +61,7 @@ class NodeDiagnostics: GenericDiagnostic, StateClient {
   ~NodeDiagnostics();
 
   virtual void startTransition (int newState);
+  virtual void completeTransition ();
   
  private:
 

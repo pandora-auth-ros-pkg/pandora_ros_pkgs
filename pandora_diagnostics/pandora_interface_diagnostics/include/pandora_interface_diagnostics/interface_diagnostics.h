@@ -53,7 +53,7 @@
 #include "generic_diagnostic.h"
 #include "interfaces_xml_parser.h"
 
-class InterfaceDiagnostics: GenericDiagnostic, StateClient {
+class InterfaceDiagnostics: GenericDiagnostic, state_manager::StateClient {
   
  public:
   

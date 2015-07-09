@@ -41,7 +41,7 @@
 
 NodeDiagnostics::NodeDiagnostics() :
   GenericDiagnostic("System Nodes"),
-  StateClient(false) {
+  state_manager::StateClient(false) {
   
   docsVector_ = parser_.getDocsVector();
 
@@ -93,3 +93,4 @@ void NodeDiagnostics::nodeExistanceDiagnostic(TiXmlElement* nodeElement,
 }
 
 void NodeDiagnostics::startTransition (int newState) {}
+void NodeDiagnostics::completeTransition () {}
