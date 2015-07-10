@@ -36,6 +36,9 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <vector>
+#include <string>
+
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -82,10 +85,10 @@ namespace pandora_alert_handler
     marker.scale.y = 0.1;
     marker.scale.z = 0.1;
     marker.color.r = 1;
-    marker.color.g = 0.65;
-    marker.color.b = 0;
+    marker.color.g = 0.3;
+    marker.color.b = 1;
     marker.color.a = 0.7;
-    marker.lifetime = ros::Duration(0.2);
+    marker.lifetime = ros::Duration(0.5);
     markers->markers.push_back(marker);
 
     visualization_msgs::Marker description;
@@ -97,12 +100,15 @@ namespace pandora_alert_handler
     description.pose.position.z = pose_.position.z + 0.1;
     description.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
     description.text = getFrameId();
+    for (int ii = 0; ii < words_.size(); ++ii) {
+      description.text += "_" + words_[ii];
+    }
     description.scale.z = 0.1;
     description.color.r = 1;
-    description.color.g = 0.65;
-    description.color.b = 0;
+    description.color.g = 0.3;
+    description.color.b = 1;
     description.color.a = 0.7;
-    description.lifetime = ros::Duration(0.2);
+    description.lifetime = ros::Duration(0.5);
     markers->markers.push_back(description);
   }
 

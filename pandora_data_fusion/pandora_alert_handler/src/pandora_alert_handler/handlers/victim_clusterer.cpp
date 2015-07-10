@@ -38,6 +38,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include "pandora_alert_handler/handlers/victim_clusterer.h"
 
 namespace pandora_data_fusion

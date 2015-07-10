@@ -42,6 +42,7 @@
 #define PANDORA_ALERT_HANDLER_HANDLERS_VICTIM_CLUSTERER_H
 
 #include <vector>
+#include <string>
 #include <boost/utility.hpp>
 #include <boost/scoped_ptr.hpp>
 

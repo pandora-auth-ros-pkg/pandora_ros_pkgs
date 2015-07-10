@@ -40,6 +40,7 @@
 #define PANDORA_ALERT_HANDLER_OBJECTS_SOUND_H
 
 #include <vector>
+#include <string>
 
 #include "pandora_audio_msgs/SoundAlertVector.h"
 #include "pandora_audio_msgs/SoundAlert.h"
