@@ -10,19 +10,9 @@ skid_steer_velocity_controller:
   terrain_parameter: 1.0
   linear_fit_degree: 5
   angular_fit_degree: 7
+
+  # Low friction measurements
   measured_linear_velocities:
-  - expected: 0.10
-    actual: 0.10000
-  - expected: 0.25
-    actual: 0.25000
-  - expected: 0.50
-    actual: 0.50000
-  - expected: -0.10
-    actual: -0.10000
-  - expected: -0.25
-    actual: -0.25000
-  - expected: -0.50
-    actual: -0.50000
   - expected: 0.00
     actual: 0.00000
   measured_angular_velocities:
@@ -72,3 +62,39 @@ skid_steer_velocity_controller:
     actual: -0.00937
   - expected: 0.00
     actual: 0.00000
+
+  # High friction measurements
+  # measured_linear_velocities:
+  # - expected: 0.00
+  #   actual: 0.00000
+  # measured_angular_velocities:
+  # - expected: 2.75
+  #   actual: 1.06494
+  # - expected: 2.50
+  #   actual: 1.04719
+  # - expected: 2.00
+  #   actual: 1.01341
+  # - expected: 1.50
+  #   actual: 0.78539
+  # - expected: 1.25
+  #   actual: 0.66842
+  # - expected: 1.00
+  #   actual: 0.54165
+  # - expected: 0.75
+  #   actual: 0.37850
+  # - expected: 0.50
+  #   actual: 0.25750
+  # - expected: 0.40
+  #   actual: 0.21084
+  # - expected: 0.20
+  #   actual: 0.10334
+  # - expected: 0.10
+  #   actual: 0.04970
+  # - expected: 0.05
+  #   actual: 0.02513
+  # - expected: 0.02
+  #   actual: 0.01003
+  # - expected: 0.01
+  #   actual: 0.00482
+  # - expected: 0.00
+  #   actual: 0.00000
