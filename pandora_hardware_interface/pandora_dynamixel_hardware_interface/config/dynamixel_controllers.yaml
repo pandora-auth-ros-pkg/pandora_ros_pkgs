@@ -36,8 +36,8 @@ kinect_pitch_controller:
     motor:
         id: 6
         init: 511 # 0 deg
-        min: 358 # -45 deg
-        max: 664 # +45 deg
+        min: 425 # -25.8 deg
+        max: 654 # +43.0 deg
 
 kinect_yaw_controller:
     controller:
@@ -49,5 +49,5 @@ kinect_yaw_controller:
     motor:
         id: 5
         init: 511 # 0 deg
-        min: 256 # -75 deg
-        max: 766 # +75 deg
+        min: 349 # -48.7 deg
+        max: 673 # +48.7 deg
