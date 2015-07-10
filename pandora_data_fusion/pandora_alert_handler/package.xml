@@ -33,6 +33,7 @@
   <depend>pandora_common_msgs</depend>
   <depend>pose_finder</depend>
   <depend>pandora_data_fusion_utils</depend>
+  <depend>pandora_audio_msgs</depend>
   <depend>bfl</depend>
 
   <!--  Test Dependencies  -->

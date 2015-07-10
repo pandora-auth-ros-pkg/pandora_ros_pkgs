@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   pandora_data_fusion_msgs
   pandora_common_msgs
   pandora_vision_msgs
+  pandora_audio_msgs
   pose_finder
   pandora_data_fusion_utils
   )
@@ -52,6 +53,7 @@ catkin_package(
     pandora_data_fusion_msgs
     pandora_common_msgs
     pandora_vision_msgs
+    pandora_audio_msgs
     pose_finder
     pandora_data_fusion_utils
   INCLUDE_DIRS

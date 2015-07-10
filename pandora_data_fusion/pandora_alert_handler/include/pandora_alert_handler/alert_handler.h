@@ -280,67 +280,67 @@ namespace pandora_alert_handler
     }
 
   template <class ObjectType>
-    void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
+  void AlertHandler::alertCallback(const typename ObjectType::AlertVector& msg)
+  {
+    if (mapPtr_.get() == NULL)
+      return;
+    if (mapPtr_->data.size() == 0)
+      return;
+
+    ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+        ObjectType::getObjectType() << " ALERT ARRIVED!");
+
+    typename ObjectType::PtrVectorPtr objectsVectorPtr;
+    try
     {
-      if (mapPtr_.get() == NULL)
-        return;
-      if (mapPtr_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          ObjectType::getObjectType() << " ALERT ARRIVED!");
-
-      typename ObjectType::PtrVectorPtr objectsVectorPtr;
-      try
-      {
-        objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
-      }
-      catch (std::runtime_error& ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
-      tf::Transform transform = objectFactory_->getCurrentTransform();
-      objectHandler_->handleObjects<ObjectType>(objectsVectorPtr, transform);
-
-      if (ObjectType::isVictimAlert)
-      {
-        victimHandler_->inspect();
-        publishVictims();
-      }
+      objectsVectorPtr = objectFactory_->makeObjects<ObjectType>(msg);
+    }
+    catch (std::runtime_error& ex)
+    {
+      ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+      return;
     }
 
-  template <>
-    void AlertHandler::alertCallback<Hole>(
-        const typename Hole::AlertVector& msg)
-    {
-      if (mapPtr_.get() == NULL)
-        return;
-      if (mapPtr_->data.size() == 0)
-        return;
-
-      ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
-          Hole::getObjectType() << " ALERT ARRIVED!");
-
-      HolePtrVectorPtr holesVectorPtr;
-      try
-      {
-        holesVectorPtr = objectFactory_->makeObjects<Hole>(msg);
-      }
-      catch (std::runtime_error& ex)
-      {
-        ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
-        return;
-      }
-
     tf::Transform transform = objectFactory_->getCurrentTransform();
-    objectHandler_->handleHoles(holesVectorPtr, transform);
+    objectHandler_->handleObjects<ObjectType>(objectsVectorPtr, transform);
 
-    victimHandler_->notify();
-
-    publishVictims();
+    if (ObjectType::isVictimAlert)
+    {
+      victimHandler_->inspect();
+      publishVictims();
+    }
   }
+
+  template <>
+  void AlertHandler::alertCallback<Hole>(
+      const typename Hole::AlertVector& msg)
+  {
+    if (mapPtr_.get() == NULL)
+      return;
+    if (mapPtr_->data.size() == 0)
+      return;
+
+    ROS_INFO_STREAM_NAMED("ALERT_HANDLER_ALERT_CALLBACK",
+        Hole::getObjectType() << " ALERT ARRIVED!");
+
+    HolePtrVectorPtr holesVectorPtr;
+    try
+    {
+      holesVectorPtr = objectFactory_->makeObjects<Hole>(msg);
+    }
+    catch (std::runtime_error& ex)
+    {
+      ROS_ERROR("[ALERT_HANDLER %d] %s",  __LINE__, ex.what());
+      return;
+    }
+
+  tf::Transform transform = objectFactory_->getCurrentTransform();
+  objectHandler_->handleHoles(holesVectorPtr, transform);
+
+  victimHandler_->notify();
+
+  publishVictims();
+}
 
 }  // namespace pandora_alert_handler
 }  // namespace pandora_data_fusion

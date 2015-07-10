@@ -47,6 +47,27 @@ namespace pandora_alert_handler
 {
 
   Sound::Sound() {}
+  Sound::~Sound() {}
+
+  void
+  Sound::
+  update(const ObjectConstPtr& measurement)
+  {
+    KalmanObject<Sound>::update(measurement);
+
+    SoundConstPtr soundMeas = boost::dynamic_pointer_cast<Sound const>(measurement);
+    if (!soundMeas->isWordsEmpty())
+    {
+      std::vector<std::string> words = soundMeas->getWords();
+      for (int ii = 0; ii < words.size(); ++ii)
+      {
+        if (!this->doesWordExist(words[ii]))
+        {
+          this->appendWord(words[ii]);
+        }
+      }
+    }
+  }
 
   void Sound::getVisualization(visualization_msgs::MarkerArray* markers) const
   {
@@ -83,6 +104,61 @@ namespace pandora_alert_handler
     description.color.a = 0.7;
     description.lifetime = ros::Duration(0.2);
     markers->markers.push_back(description);
+  }
+
+  void
+  Sound::
+  setWords(const std::vector<std::string>& words)
+  {
+    words_ = words;
+  }
+
+  std::vector<std::string>
+  Sound::
+  getWords() const
+  {
+    return words_;
+  }
+
+  void
+  Sound::
+  appendWord(const std::string& word)
+  {
+    words_.push_back(word);
+  }
+
+  void
+  Sound::
+  clearWords()
+  {
+    words_.clear();
+  }
+
+  bool
+  Sound::
+  doesWordExist(const std::string& word) const
+  {
+    for (int ii = 0; ii < words_.size(); ++ii) {
+      if (words_[ii] == word)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  int
+  Sound::
+  getWordsSize() const
+  {
+    return words_.size();
+  }
+
+  bool
+  Sound::
+  isWordsEmpty() const
+  {
+    return getWordsSize() == 0;
   }
 
 }  // namespace pandora_alert_handler

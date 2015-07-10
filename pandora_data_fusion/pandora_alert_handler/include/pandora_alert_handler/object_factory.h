@@ -131,19 +131,6 @@ namespace pandora_alert_handler
     objectPtr->initializeObjectFilter();
   }
   template <>
-  void ObjectFactory::setUpObject<Sound>(
-      const typename Sound::Ptr& objectPtr,
-      const typename Sound::Alert& msg,
-      const ros::Time& timeFound,
-      const tf::Transform& transform)
-  {
-    objectPtr->setPose(poseFinderPtr_->findAlertPose(msg.yaw,
-          msg.pitch, transform));
-    objectPtr->setProbability(msg.probability);
-    objectPtr->setTimeFound(timeFound);
-    objectPtr->initializeObjectFilter();
-  }
-  template <>
   void ObjectFactory::setUpObject<Co2>(
       const typename Co2::Ptr& objectPtr,
       const typename Co2::Alert& msg,

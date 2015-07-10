@@ -199,7 +199,17 @@ namespace pandora_alert_handler
   {
     typename ObjectType::PtrVector::iterator iter = objectsPtr->begin();
 
-    while (iter != objectsPtr->end()) {
+    while (iter != objectsPtr->end())
+    {
+      if (ObjectType::getObjectType() == Sound::getObjectType())
+      {
+        Sound::Ptr soundPtr = boost::dynamic_pointer_cast<Sound>(*iter);
+        if (!soundPtr->isWordsEmpty())
+        {
+          ++iter;
+          continue;
+        }
+      }
       bool valid = false;
       valid = victimsToGoList_->isObjectPoseInList(
           (*iter), VICTIM_CLUSTER_RADIUS);
@@ -228,7 +238,8 @@ namespace pandora_alert_handler
     if (ObjectType::getObjectType() != VisualVictim::getObjectType() &&
         ObjectType::getObjectType() != Hazmat::getObjectType() &&
         ObjectType::getObjectType() != Landoltc::getObjectType() &&
-        ObjectType::getObjectType() != DataMatrix::getObjectType()) {
+        ObjectType::getObjectType() != DataMatrix::getObjectType())
+    {
       keepValidVerificationObjects<ObjectType>(newObjects);
     }
     deleteObjectsOnSoftObstacles<ObjectType>(newObjects);

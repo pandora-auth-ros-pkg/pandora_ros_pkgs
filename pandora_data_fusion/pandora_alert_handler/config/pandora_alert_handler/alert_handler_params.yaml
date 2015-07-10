@@ -25,7 +25,7 @@ subscribed_topic_names:
   visual_victim: /vision/victim_direction_alert
   co2: /sensor_processing/co2_alert
   motion: /vision/motion_alert
-  sound: /sensor_processing/sound_direction_alert
+  sound: /sound/complete_alert
   map: /slam/map
 published_topic_names:
   world_model: /data_fusion/world_model
@@ -43,4 +43,3 @@ service_server_names:
   get_geotiff: /data_fusion/get_geotiff
   get_victim_probabilities: /data_fusion/get_probabilities
   flush_queues: /data_fusion/flush_queues
-

@@ -91,8 +91,17 @@ namespace pandora_alert_handler
         continue;
       // Escape if it has only a hazmat
       std::vector<std::string> sensors = newVictimVector[ii]->getSensors(false);
-      if (sensors.size() == 1 && sensors[0] == Hazmat::getObjectType())
-        continue;
+      if (sensors.size() == 1)
+      {
+        if (sensors[0] == Hazmat::getObjectType())
+          continue;
+        if (sensors[0] == Sound::getObjectType())
+        {
+          if (boost::dynamic_pointer_cast<Sound const>(newVictimVector[ii]->getObjects().at(0))->
+              isWordsEmpty())
+            continue;
+        }
+      }
       bool victimIsNew = victimsToGoList_->add(newVictimVector[ii]);
       if (victimIsNew)
         ROS_INFO("[ALERT_HANDLER] New victim found!!!");
