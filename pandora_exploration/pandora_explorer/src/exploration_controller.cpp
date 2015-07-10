@@ -176,7 +176,7 @@ void ExplorationController::executeCb(
 
 bool ExplorationController::goalReached()
 {
-  if(move_base_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  if (move_base_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
   {
     ROS_WARN("[pandora_explorer] Goal Reached");
     return true;
