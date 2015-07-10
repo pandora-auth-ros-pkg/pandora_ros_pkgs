@@ -2,46 +2,51 @@
  *
  * Software License Agreement (BSD License)
  *
- * Copyright (c) 2014, P.A.N.D.O.R.A. Team.
- * All rights reserved.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
  *
- * * Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following
- * disclaimer in the documentation and/or other materials provided
- * with the distribution.
- * * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
- * contributors may be used to endorse or promote products derived
- * from this software without specific prior written permission.
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
  *   Kofinas Miltiadis <mkofinas@gmail.com>
  *********************************************************************/
 
-#include "gtest/gtest.h"
+#include <algorithm>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 #include "pandora_vision_common/bbox_poi.h"
 #include "pandora_vision_motion/motion_detector.h"
 
 namespace pandora_vision
+{
+namespace pandora_vision_motion
 {
   /**
    * @class MotionDetectorTest
@@ -64,71 +69,88 @@ namespace pandora_vision
       }
 
       /* accessors to private functions */
-      BBoxPOIPtr detectMotionPosition(const cv::Mat& frame);
+      std::vector<BBoxPOIPtr> detectMotionPosition();
 
-      int detectMotion(const cv::Mat& frame);
-      BBoxPOIPtr getMotionPosition();
+      void detectMotion(const cv::Mat& frame);
+      std::vector<BBoxPOIPtr> getMotionPosition() const;
 
-      MotionDetector* motionDetectorPtr_;
+      void setThresholdedDifference(const cv::Mat& thresholdedDifference);
+
     protected:
       int WIDTH;
       int HEIGHT;
+
+      MotionDetector* motionDetectorPtr_;
   };
 
-  BBoxPOIPtr MotionDetectorTest::detectMotionPosition(const cv::Mat& frame)
+  std::vector<BBoxPOIPtr> MotionDetectorTest::detectMotionPosition()
   {
-    motionDetectorPtr_->detectMotionPosition(frame);
-    BBoxPOIPtr topLeft = motionDetectorPtr_->getMotionPosition();
-    cv::Point center(topLeft->getPoint().x + topLeft->getWidth() / 2,
-        topLeft->getPoint().y + topLeft->getHeight() / 2);
-     // motionDetectorPtr_->detectMotion(frame);
-    topLeft->setPoint(center);
+    motionDetectorPtr_->detectMotionPosition();
     return motionDetectorPtr_->getMotionPosition();
   }
 
-  BBoxPOIPtr MotionDetectorTest::getMotionPosition()
+  std::vector<BBoxPOIPtr> MotionDetectorTest::getMotionPosition() const
   {
     return motionDetectorPtr_->getMotionPosition();
   }
 
-  int MotionDetectorTest::detectMotion(const cv::Mat& frame)
+  void MotionDetectorTest::detectMotion(const cv::Mat& frame)
   {
-    return motionDetectorPtr_->detectMotion(frame);
+    motionDetectorPtr_->detectMotion(frame);
+  }
+
+  void MotionDetectorTest::setThresholdedDifference(const cv::Mat& thresholdedDifference)
+  {
+    motionDetectorPtr_->thresholdedDifference_ = thresholdedDifference.clone();
   }
 
   /* Unit Tests */
   TEST_F(MotionDetectorTest, detectMotionPositionImageNoData)
   {
     cv::Mat frame;
-    BBoxPOIPtr bounding_boxes  = detectMotionPosition(frame);
-    EXPECT_EQ(0, bounding_boxes->getWidth());
-    EXPECT_EQ(0, bounding_boxes->getHeight());
-    EXPECT_EQ(0, bounding_boxes->getPoint().x);
-    EXPECT_EQ(0, bounding_boxes->getPoint().y);
-    EXPECT_EQ(0, bounding_boxes->getProbability());
+    setThresholdedDifference(frame);
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(0, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(0, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionPositionBlackImage)
   {
     cv::Mat blackFrame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
-    BBoxPOIPtr bounding_boxes  = detectMotionPosition(blackFrame);
-    EXPECT_EQ(0, bounding_boxes->getWidth());
-    EXPECT_EQ(0, bounding_boxes->getHeight());
-    EXPECT_EQ(0, bounding_boxes->getPoint().x);
-    EXPECT_EQ(0, bounding_boxes->getPoint().y);
-    EXPECT_EQ(0, bounding_boxes->getProbability());
+    setThresholdedDifference(blackFrame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(0, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(0, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionPositionImageWithRectangle)
   {
     cv::Mat frame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
     frame(cv::Rect(17, 63, 8, 8)) = 255;
+    setThresholdedDifference(frame);
 
-    BBoxPOIPtr bounding_boxes  = detectMotionPosition(frame);
-    EXPECT_EQ(21, bounding_boxes->getPoint().x);
-    EXPECT_EQ(67, bounding_boxes->getPoint().y);
-    EXPECT_EQ(8, bounding_boxes->getWidth());
-    EXPECT_EQ(8, bounding_boxes->getHeight());
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(0, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(0, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionPositionImageWithRectangle2)
@@ -136,11 +158,17 @@ namespace pandora_vision
     cv::Mat frame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
     frame(cv::Rect(100, 50, 75, 45)) = 255;
 
-    BBoxPOIPtr bounding_boxes  = MotionDetectorTest::detectMotionPosition(frame);
-    EXPECT_EQ(137, bounding_boxes->getPoint().x);
-    EXPECT_EQ(72, bounding_boxes->getPoint().y);
-    EXPECT_EQ(75, bounding_boxes->getWidth());
-    EXPECT_EQ(45, bounding_boxes->getHeight());
+    setThresholdedDifference(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(75, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(45, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(137, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(72, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(1.0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionPositionImageWithRotatedRectangle)
@@ -156,48 +184,64 @@ namespace pandora_vision
     cv::fillConvexPoly(frame, &rectangleVertices[0],
         rectangleVertices.size(), 255);
 
-    BBoxPOIPtr bounding_boxes  = MotionDetectorTest::detectMotionPosition(frame);
-    EXPECT_EQ(125, bounding_boxes->getPoint().x);
-    EXPECT_EQ(250, bounding_boxes->getPoint().y);
-    EXPECT_EQ(51, bounding_boxes->getWidth());
-    EXPECT_EQ(101, bounding_boxes->getHeight());
+    setThresholdedDifference(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(51, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(101, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(125, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(250, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(1.0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionPositionImageWithHighStdDeviation)
   {
     cv::Mat frame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
     frame(cv::Rect(50, 50, 400, 400)) = 255;
+    setThresholdedDifference(frame);
 
-    int motionEvaluation  = detectMotion(frame);
-    BBoxPOIPtr bounding_boxes  = getMotionPosition();
-    EXPECT_EQ(0, bounding_boxes->getPoint().x);
-    EXPECT_EQ(0, bounding_boxes->getPoint().y);
-    EXPECT_EQ(0, bounding_boxes->getWidth());
-    EXPECT_EQ(0, bounding_boxes->getHeight());
+    std::vector<BBoxPOIPtr> boundingBoxes = detectMotionPosition();
+    for (int ii = 0; ii < boundingBoxes.size(); ii++)
+    {
+      EXPECT_EQ(0, boundingBoxes[ii]->getWidth());
+      EXPECT_EQ(0, boundingBoxes[ii]->getHeight());
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().x);
+      EXPECT_EQ(0, boundingBoxes[ii]->getPoint().y);
+      EXPECT_EQ(0, boundingBoxes[ii]->getProbability());
+    }
   }
 
   TEST_F(MotionDetectorTest, detectMotionNoMotion)
   {
     cv::Mat frame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC3);
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+    EXPECT_EQ(0, boundingBoxes.size());
   }
 
   TEST_F(MotionDetectorTest, detectMotionNoData)
   {
     cv::Mat frame;
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+    EXPECT_EQ(0, boundingBoxes.size());
   }
 
   TEST_F(MotionDetectorTest, detectMotionSingleChannelImage)
   {
     cv::Mat frame = cv::Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+    EXPECT_EQ(0, boundingBoxes.size());
   }
 
   TEST_F(MotionDetectorTest, detectMotionRectangleLinearMovementSlowly)
@@ -219,8 +263,14 @@ namespace pandora_vision
 
     cv::rectangle(frame, startingPoint, endingPoint, rectColor, -1);
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+
+    for (int jj = 0; jj < boundingBoxes.size(); jj++)
+    {
+      EXPECT_EQ(0, boundingBoxes[jj]->getProbability());
+    }
     for (int ii = 0; ii < 10; ii++)
     {
       topLeftXCoordinate += stepXCoordinate;
@@ -232,8 +282,12 @@ namespace pandora_vision
       frame = frameBackground.clone();
       cv::rectangle(frame, startingPoint, endingPoint, rectColor, -1);
 
-      motionEvaluation  = detectMotion(frame);
-      EXPECT_EQ(1, motionEvaluation);
+      detectMotion(frame);
+      boundingBoxes = getMotionPosition();
+      for (int jj = 0; jj < boundingBoxes.size(); jj++)
+      {
+        EXPECT_EQ(1, boundingBoxes[jj]->getProbability());
+      }
     }
   }
 
@@ -256,8 +310,14 @@ namespace pandora_vision
 
     cv::rectangle(frame, startingPoint, endingPoint, rectColor, -1);
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
+
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+
+    for (int jj = 0; jj < boundingBoxes.size(); jj++)
+    {
+      EXPECT_EQ(0, boundingBoxes[jj]->getProbability());
+    }
     for (int ii = 0; ii < 3; ii++)
     {
       topLeftXCoordinate += stepXCoordinate;
@@ -269,14 +329,16 @@ namespace pandora_vision
       frame = frameBackground.clone();
       cv::rectangle(frame, startingPoint, endingPoint, rectColor, -1);
 
-      motionEvaluation  = detectMotion(frame);
-      EXPECT_EQ(2, motionEvaluation);
+      boundingBoxes = getMotionPosition();
 
-      BBoxPOIPtr bounding_boxes  = getMotionPosition();
-      EXPECT_EQ(topLeftXCoordinate + objectWidth / 2, bounding_boxes->getPoint().x);
-      EXPECT_EQ(topLeftYCoordinate + objectHeight / 2, bounding_boxes->getPoint().y);
-      EXPECT_EQ(objectWidth, bounding_boxes->getWidth());
-      EXPECT_EQ(objectHeight, bounding_boxes->getHeight());
+      for (int jj = 0; jj < boundingBoxes.size(); jj++)
+      {
+        EXPECT_EQ(0.51, boundingBoxes[jj]->getProbability());
+        EXPECT_EQ(topLeftXCoordinate + objectWidth / 2, boundingBoxes[jj]->getPoint().x);
+        EXPECT_EQ(topLeftYCoordinate + objectHeight / 2, boundingBoxes[jj]->getPoint().y);
+        EXPECT_EQ(objectWidth, boundingBoxes[jj]->getWidth());
+        EXPECT_EQ(objectHeight, boundingBoxes[jj]->getHeight());
+      }
     }
   }
 
@@ -307,14 +369,18 @@ namespace pandora_vision
     cv::Scalar rectColor = cv::Scalar(255, 255, 255);
     cv::fillConvexPoly(frame, &rectangleVertices[0], rectangleVertices.size(), rectColor);
 
-    int motionEvaluation  = detectMotion(frame);
-    EXPECT_EQ(0, motionEvaluation);
+    detectMotion(frame);
 
-    BBoxPOIPtr bounding_boxes  = getMotionPosition();
-    EXPECT_EQ(0, bounding_boxes->getPoint().x);
-    EXPECT_EQ(0, bounding_boxes->getPoint().y);
-    EXPECT_EQ(0, bounding_boxes->getWidth());
-    EXPECT_EQ(0, bounding_boxes->getHeight());
+    std::vector<BBoxPOIPtr> boundingBoxes = getMotionPosition();
+
+    for (int jj = 0; jj < boundingBoxes.size(); jj++)
+    {
+      EXPECT_EQ(0, boundingBoxes[jj]->getProbability());
+      EXPECT_EQ(0, boundingBoxes[jj]->getPoint().x);
+      EXPECT_EQ(0, boundingBoxes[jj]->getPoint().y);
+      EXPECT_EQ(0, boundingBoxes[jj]->getWidth());
+      EXPECT_EQ(0, boundingBoxes[jj]->getHeight());
+    }
 
     double angle = 45.0;
     double scale = 1.0;
@@ -327,24 +393,29 @@ namespace pandora_vision
       frame = frameBackground.clone();
       cv::fillConvexPoly(frame, &rectangleVertices[0], rectangleVertices.size(), rectColor);
 
-      motionEvaluation = detectMotion(frame);
-      EXPECT_EQ(1, motionEvaluation);
+      detectMotion(frame);
+      boundingBoxes = getMotionPosition();
 
-      bounding_boxes  = getMotionPosition();
-      EXPECT_NEAR(centerXCoordinate, bounding_boxes->getPoint().x, 1);
-      EXPECT_NEAR(centerYCoordinate, bounding_boxes->getPoint().y, 1);
+      for (int jj = 0; jj < boundingBoxes.size(); jj++)
+      {
+        EXPECT_EQ(1.0f, boundingBoxes[jj]->getProbability());
 
-      if (ii % 2)
-      {
-        EXPECT_NEAR(objectWidth, bounding_boxes->getWidth(), 1);
-        EXPECT_NEAR(objectHeight, bounding_boxes->getHeight(), 1);
-      }
-      else
-      {
-        EXPECT_NEAR(sqrt(2) * objectWidth, bounding_boxes->getWidth(), 1);
-        EXPECT_NEAR(sqrt(2) * objectHeight, bounding_boxes->getHeight(), 1);
+        EXPECT_NEAR(centerXCoordinate, boundingBoxes[jj]->getPoint().x, 1);
+        EXPECT_NEAR(centerYCoordinate, boundingBoxes[jj]->getPoint().y, 1);
+
+        if (ii % 2)
+        {
+          EXPECT_NEAR(objectWidth, boundingBoxes[jj]->getWidth(), 1);
+          EXPECT_NEAR(objectHeight, boundingBoxes[jj]->getHeight(), 1);
+        }
+        else
+        {
+          EXPECT_NEAR(sqrt(2) * objectWidth, boundingBoxes[jj]->getWidth(), 1);
+          EXPECT_NEAR(sqrt(2) * objectHeight, boundingBoxes[jj]->getHeight(), 1);
+        }
       }
     }
   }
 
+}  // namespace pandora_vision_motion
 }  // namespace pandora_vision

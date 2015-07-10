@@ -138,7 +138,7 @@ namespace hole_fusion
     // Advertise the topic where any external node(e.g. a functional test node)
     // will be subscribed to know that the hole node has finished processing
     // the current candidate holes as well as the result of the procedure.
-    processEndPublisher_ = nodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
+    processEndPublisher_ = privateNodeHandle_.advertise<sensor_processor::ProcessorLogInfo>(
         processEndTopic_, 1);
 
     // Advertise the topic that the yaw and pitch of the keypoints of the final,

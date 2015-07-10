@@ -37,6 +37,7 @@
  *   Kofinas Miltiadis <mkofinas@gmail.com>
  *********************************************************************/
 
+#include <string>
 #include <vector>
 #include "pandora_vision_motion/motion_processor.h"
 

@@ -38,6 +38,7 @@
 #ifndef PANDORA_VISION_MOTION_MOTION_PROCESSOR_H
 #define PANDORA_VISION_MOTION_MOTION_PROCESSOR_H
 
+#include <string>
 #include <iostream>
 #include <vector>
 

@@ -4,9 +4,10 @@ find_package(pandora_testing_tools REQUIRED)
 find_package(pandora_cmake_tools REQUIRED)
 
 include_directories(
-${pandora_testing_tools_INCLUDE_DIRS}
-${roslib_INCLUDE_DIRS}
-${catkin_INCLUDE_DIRS})
+    ${pandora_testing_tools_INCLUDE_DIRS}
+    ${roslib_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+)
 
 catkin_add_gtest(mean_std_dev_test unit/channels_statistics_feature_extractors/mean_std_dev_test.cpp)
 target_link_libraries(mean_std_dev_test
@@ -56,10 +57,13 @@ target_link_libraries(color_histogram_feature_extractor_test
   ${PROJECT_NAME}_victim_parameters
   gtest_main)
 
-#catkin_add_gtest(color_angles_test unit/channels_statistics_feature_extractors/color_angles_test.cpp)
-#target_link_libraries(color_angles_test ${catkin_LIBRARIES} ${PROJECT_NAME}_channels_statistics_feature_extractors  ${PROJECT_NAME}_victim_parameters gtest_main)
+catkin_add_gtest(color_angles_test
+  unit/channels_statistics_feature_extractors/color_angles_test.cpp)
+target_link_libraries(color_angles_test ${catkin_LIBRARIES} ${PROJECT_NAME}_channels_statistics_feature_extractors  ${PROJECT_NAME}_victim_parameters gtest_main)
 
-############## Functional Tests ###############
+################################################################################
+#                               Functional Tests                               #
+################################################################################
 
 if(${PROJECT_NAME}_download_testing_data)
   catkin_download_test_data(
@@ -81,9 +85,9 @@ if(${PROJECT_NAME}_functional)
   add_rostest(functional/victim_test.launch)
 endif()
 
-#################################################################################
-##                               Benchmark Tests                                #
-#################################################################################
+################################################################################
+#                                Benchmark Tests                                #
+################################################################################
 
 if(${PROJECT_NAME}_benchmark)
   add_rostest(benchmark/victim_benchmark_test.launch)

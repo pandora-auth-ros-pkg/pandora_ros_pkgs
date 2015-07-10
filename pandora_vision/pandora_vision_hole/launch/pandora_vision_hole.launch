@@ -6,6 +6,9 @@
   <!-- Set this if we play with rgbdt hole -->
   <arg name="rgbdt" default="true" />
 
+  <!-- Set this in order to run benchmark tests -->
+  <arg name="hole_standalone_nodelet" default="false" />
+
   <param name="thermal_mode" value="$(arg thermal)" />
   <param name="rgbd_mode" value="$(arg rgbd)" />
   <param name="rgbdt_mode" value="$(arg rgbdt)" />
@@ -18,13 +21,21 @@
 
   <group if="$(arg rgbd)" >
     <group unless="$(arg thermal)" >
-      <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch" />
+      <include file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch" >
+        <arg name="standalone_nodelet" value="$(arg hole_standalone_nodelet)" />
+      </include>
       <group if="$(arg rgbdt)" >
         <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch" />
       </group>
     </group>
-    <include file="$(find pandora_vision_hole)/launch/depth_node/pandora_vision_hole_depth.launch" />
-    <include file="$(find pandora_vision_hole)/launch/rgb_node/pandora_vision_hole_rgb.launch" />
-    <include file="$(find pandora_vision_hole)/launch/hole_fusion_node/pandora_vision_hole_fusion_node.launch" />
+    <include file="$(find pandora_vision_hole)/launch/depth_node/pandora_vision_hole_depth.launch" >
+      <arg name="standalone_nodelet" value="$(arg hole_standalone_nodelet)" />
+    </include>
+    <include file="$(find pandora_vision_hole)/launch/rgb_node/pandora_vision_hole_rgb.launch" >
+      <arg name="standalone_nodelet" value="$(arg hole_standalone_nodelet)" />
+    </include>
+    <include file="$(find pandora_vision_hole)/launch/hole_fusion_node/pandora_vision_hole_fusion_node.launch" >
+      <arg name="standalone_nodelet" value="$(arg hole_standalone_nodelet)" />
+    </include>
   </group>
 </launch>

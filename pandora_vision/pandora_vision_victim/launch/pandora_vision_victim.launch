@@ -1,15 +1,28 @@
-<?xml version="1.0"?>
 <launch>
   <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
   <!-- <arg name="output" default="log" /> -->
 
   <!-- <node name="pandora_victim" type="pandora_vision_victim_node" pkg="pandora_vision_victim" -->
   <!--   respawn="False" output="$(arg output)" >                                                -->
-  <node pkg="nodelet" type="nodelet" name="pandora_victim"
-    args="load pandora_vision/pandora_vision_victim $(arg nodelet_manager)" output="screen" >
-    <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
-        command="load" />
-    <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
-        command="load" ns="detector"/>
-  </node>
+  <arg name="standalone_nodelet" default="false" />
+
+  <group unless="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_victim"
+      args="load pandora_vision/pandora_vision_victim $(arg nodelet_manager)" output="screen" >
+      <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
+          command="load" />
+      <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
+          command="load" ns="detector"/>
+    </node>
+  </group>
+
+  <group if="$(arg standalone_nodelet)">
+    <node pkg="nodelet" type="nodelet" name="pandora_victim"
+      args="standalone pandora_vision/pandora_vision_victim" output="screen" >
+      <rosparam file="$(find pandora_vision_victim)/config/victim_topics.yaml"
+          command="load" />
+      <rosparam file="$(find pandora_vision_victim)/config/victim_params.yaml"
+          command="load" ns="detector"/>
+    </node>
+  </group>
 </launch>

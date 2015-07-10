@@ -38,13 +38,16 @@
 #ifndef PANDORA_VISION_MOTION_DBSCAN_H
 #define PANDORA_VISION_MOTION_DBSCAN_H
 
-#include "opencv2/opencv.hpp"
 #include <map>
+#include <vector>
 #include <new>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+
 #include <ros/ros.h>
+#include <opencv2/opencv.hpp>
+
 namespace pandora_vision
 {
 namespace pandora_vision_motion

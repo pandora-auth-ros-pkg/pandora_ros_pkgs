@@ -2,9 +2,21 @@
 
   <arg name="frame_id" default="/kinect_optical_frame"/>
 
+  <machine name="localhost" address="localhost" env-loader="/opt/ros/hydro/env.sh"/>
+  <node pkg="nodelet" type="nodelet" name="kinect_nodelet_manager" args="manager"
+      output="screen" machine="localhost" />
+
   <include file="$(find state_manager)/launch/stateManager.launch" />
-  <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch" />
-  <!-- <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" /> -->
+
+  <include file="$(find pandora_vision_hole)/launch/pandora_vision_hole.launch"
+      ns="/pandora_vision/pandora_vision_hole" >
+    <arg name="thermal" value="false" />
+    <arg name="rgbd" value="true" />
+    <arg name="rgbdt" value="false" />
+    <arg name="hole_standalone_nodelet" value="true" />
+  </include>
+
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 
   <param name="dataset_path" value="/test/benchmark/data/bags_pcl"/>
   <param name="dataset_camera" value="kinect"/>
@@ -18,7 +30,7 @@
   <param name="publisherMessagePackage" value="sensor_msgs" />
   <param name="publisherMessageType" value="PointCloud2"/>
 
-  <param name="syncSubscriberTopic" value="/hole_detector/processor_log" />
+  <param name="syncSubscriberTopic" value="/pandora_vision/pandora_vision_hole/hole_fusion/processor_log" />
   <param name="subscriberMessagePackage" value="sensor_processor" />
   <param name="subscriberMessageType" value="ProcessorLogInfo"/>
 

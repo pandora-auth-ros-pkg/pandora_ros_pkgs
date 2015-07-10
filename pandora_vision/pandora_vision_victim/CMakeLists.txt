@@ -63,7 +63,7 @@ target_link_libraries(${PROJECT_NAME}_utilities
     ${catkin_LIBRARIES}
 )
 
-######################## Victim_Parameters library #############################
+########################### Victim_Parameters library ##########################
 
 add_library(${PROJECT_NAME}_victim_parameters
     src/victim_parameters.cpp
@@ -109,7 +109,7 @@ target_link_libraries(${PROJECT_NAME}_feature_extractors
     ${PROJECT_NAME}_utilities
 )
 
-########################### Classifiers Library ###############################
+############################## Classifiers Library #############################
 add_library(${PROJECT_NAME}_classifiers
     src/classifiers/abstract_classifier.cpp
     src/classifiers/svm_classifier.cpp
@@ -125,7 +125,7 @@ target_link_libraries(${PROJECT_NAME}_classifiers
     ${PROJECT_NAME}_utilities
 )
 
-########################## Victim Detector Library ##########################
+############################ Victim Detector Library ###########################
 add_library(${PROJECT_NAME}_validator_factory
   src/classifiers/validator_factory.cpp
   src/classifiers/abstract_validator.cpp
@@ -140,7 +140,7 @@ target_link_libraries(${PROJECT_NAME}_validator_factory
   ${PROJECT_NAME}_feature_extractors
   )
 
-########################## Victim Hole Processor ##############################
+############################# Victim Hole Processor ############################
 add_library(${PROJECT_NAME}_hole_processor
   src/victim_hole_processor.cpp
 )
@@ -149,7 +149,7 @@ target_link_libraries(${PROJECT_NAME}_hole_processor
   ${PROJECT_NAME}_validator_factory
 )
 
-######################## Victim Hole Preprocessor #############################
+########################### Victim Hole Preprocessor ###########################
 add_library(${PROJECT_NAME}_hole_preprocessor
   src/victim_hole_preprocessor.cpp
 )
@@ -163,7 +163,7 @@ add_dependencies(${PROJECT_NAME}_hole_preprocessor
 
 
 
-########################## Victim Image Processor #############################
+############################ Victim Image Processor ############################
 add_library(${PROJECT_NAME}_image_processor
   src/victim_image_processor.cpp
   )
@@ -172,7 +172,7 @@ target_link_libraries(${PROJECT_NAME}_image_processor
   ${PROJECT_NAME}_validator_factory
 )
 
-######################## Victim Image Preprocessor ############################
+########################### Victim Image Preprocessor ##########################
 add_library(${PROJECT_NAME}_image_preprocessor
   src/victim_image_preprocessor.cpp
 )
@@ -185,7 +185,7 @@ add_dependencies(${PROJECT_NAME}_image_preprocessor
   ${catkin_EXPORTED_TARGETS}
 )
 
-########################## Victim Postprocessor ###############################
+############################# Victim Postprocessor #############################
 add_library(${PROJECT_NAME}_postprocessor
   src/victim_postprocessor.cpp
 )
@@ -196,7 +196,7 @@ target_link_libraries(${PROJECT_NAME}_postprocessor
 add_dependencies(${PROJECT_NAME}_postprocessor
   ${catkin_EXPORTED_TARGETS})
 
-############################## Victim Handler #################################
+################################ Victim Handler ################################
 add_library(${PROJECT_NAME}_handler
   src/victim_handler.cpp
 )
@@ -209,7 +209,7 @@ target_link_libraries(${PROJECT_NAME}_handler
   ${PROJECT_NAME}_postprocessor
 )
 
-################################ Victim Node ##################################
+################################## Victim Node #################################
 add_executable(${PROJECT_NAME}_node
   src/victim_node.cpp
 )
@@ -222,8 +222,7 @@ target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}_handler
 )
 
-
-############################# Victim Trainer Node #############################
+############################## Victim Trainer Node #############################
 if(VICTIM_ENABLE_TRAIN)
 
   add_library(${PROJECT_NAME}_trainer_factory
@@ -255,7 +254,7 @@ if(DOWNLOAD_DATA OR FUNCTIONAL_TEST OR BENCHMARK)
    )
 endif()
 
-#################################### Lint #####################################
+##################################### Lint #####################################
 #~ To check lint : catkin_make roslint_pandora_vision_victim
 
 file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
@@ -266,7 +265,7 @@ file(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   )
 roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 
-##################################### Testing #################################
+#################################### Testing ###################################
 
 if(CATKIN_ENABLE_TESTING)
   if(DOWNLOAD_TESTING_DATA)

@@ -134,7 +134,7 @@ add_dependencies(${PROJECT_NAME}_node
 
 #~ To check lint : catkin_make roslint_pandora_vision_motion
 set(ROSLINT_CPP_OPTS
-    "--filter=-whitespace/end_of_line,-build/include_what_you_use,-runtime/references")
+    "--filter=-whitespace/comments,-runtime/references")
 
 FILE(GLOB_RECURSE ${PROJECT_NAME}_LINT_SRCS
   RELATIVE ${PROJECT_SOURCE_DIR}

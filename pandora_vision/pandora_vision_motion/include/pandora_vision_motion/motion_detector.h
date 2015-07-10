@@ -41,6 +41,7 @@
 #ifndef PANDORA_VISION_MOTION_MOTION_DETECTOR_H
 #define PANDORA_VISION_MOTION_MOTION_DETECTOR_H
 
+#include <string>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -183,17 +184,17 @@ namespace pandora_vision_motion
       float calculateMotionProbability(const cv::Rect& bbox, const cv::Mat& img);
 
     public:
-      // @{
+      //@{
       /** Visualization parameters */
       bool visualization;
       bool show_image;
       bool show_background;
       bool show_diff_image;
       bool show_moving_objects_contours;
-      // @}
+      //@}
 
     private:
-      // @{
+      //@{
       /** Background segmentation parameters. */
       /// Length of the history.
       int history_;
@@ -204,14 +205,14 @@ namespace pandora_vision_motion
       bool bShadowDetection_;
       /// Number of Gaussian mixtures.
       int numMixtures_;
-      // @}
+      //@}
 
-      // @{
+      //@{
       /** Threshold parameters. */
       int diffThreshold_;
       double highMotionThreshold_;
       double lowMotionThreshold_;
-      // @}
+      //@}
 
       /// Current frame to be processed
       cv::Mat frame_;

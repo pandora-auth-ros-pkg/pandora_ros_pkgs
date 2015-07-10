@@ -17,13 +17,13 @@
   </group>
 
   <group if="$(arg standalone_nodelet)">
-  <node pkg="nodelet" type="nodelet" name="pandora_qrcode"
-    args="standalone pandora_vision/pandora_vision_qrcode" output="screen" >
-    <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_topics.yaml"
-      command="load" />
-    <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_params.yaml"
-      command="load" ns="detector" />
-  </node>
-    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+    <node pkg="nodelet" type="nodelet" name="pandora_qrcode"
+      args="standalone pandora_vision/pandora_vision_qrcode" output="screen" >
+      <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_topics.yaml"
+        command="load" />
+      <rosparam file="$(find pandora_vision_qrcode)/config/qrcode_params.yaml"
+        command="load" ns="detector" />
+    </node>
+      <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
   </group>
 </launch>

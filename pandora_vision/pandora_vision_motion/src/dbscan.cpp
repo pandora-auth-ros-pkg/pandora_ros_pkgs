@@ -35,6 +35,7 @@
 * Author:  Despoina Paschalidou
 *********************************************************************/
 
+#include <vector>
 #include "pandora_vision_motion/dbscan.h"
 
 namespace pandora_vision
