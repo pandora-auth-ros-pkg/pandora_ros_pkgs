@@ -60,6 +60,7 @@ namespace pandora_control
 
     private:
       void callback(const pandora_linear_actuator_controller::MoveLinearActuatorGoalConstPtr& goal);
+      void preemptCallback();
 
       bool getControllerParams();
       void testLinearActuator();
