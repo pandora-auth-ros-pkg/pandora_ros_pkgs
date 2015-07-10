@@ -39,6 +39,7 @@
 #ifndef FRAME_MATCHER_KEYPOINT_TRANSFORMER_H
 #define FRAME_MATCHER_KEYPOINT_TRANSFORMER_H
 
+#include <string>
 #include <boost/scoped_ptr.hpp>
 
 #include <ros/ros.h>

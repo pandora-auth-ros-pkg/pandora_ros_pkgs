@@ -59,7 +59,7 @@ namespace frame_matcher
   class ViewPoseFinder : public pose_finder::PoseFinder
   {
    public:
-    ViewPoseFinder(const std::string& mapType);
+    explicit ViewPoseFinder(const std::string& mapType);
     virtual ~ViewPoseFinder();
 
     void findViewOrientation(

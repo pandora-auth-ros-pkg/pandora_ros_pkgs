@@ -47,7 +47,8 @@
 #include "frame_matcher/points_on_frame.h"
 #include "frame_matcher/candidate_hole_postprocessor.h"
 
-PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::CandidateHolePostProcessor, sensor_processor::AbstractProcessor)
+PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::CandidateHolePostProcessor,
+    sensor_processor::AbstractProcessor)
 
 namespace pandora_data_fusion
 {

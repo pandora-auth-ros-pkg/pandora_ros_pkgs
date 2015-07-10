@@ -36,6 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#include <string>
+
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 

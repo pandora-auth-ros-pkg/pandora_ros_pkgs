@@ -112,7 +112,7 @@ namespace frame_matcher
       // loadPreProcessor<EnhancedImagePreProcessor>("~");
       loadProcessor<MatcherProcessor>("~matcher");
       loadPostProcessor<EnhancedImagePostProcessor>("~postprocessor");
-      //loadPostProcessor("~postprocessor", postprocessor_type_);
+      // loadPostProcessor("~postprocessor", postprocessor_type_);
     }
 
     if (this->currentState_ == state_manager_msgs::RobotModeMsg::MODE_TERMINATING)

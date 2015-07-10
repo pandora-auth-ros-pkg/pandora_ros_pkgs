@@ -50,7 +50,8 @@
 #include "frame_matcher/points_on_frame.h"
 #include "frame_matcher/enhanced_image_postprocessor.h"
 
-PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::EnhancedImagePostProcessor, sensor_processor::AbstractProcessor)
+PLUGINLIB_EXPORT_CLASS(pandora_data_fusion::frame_matcher::EnhancedImagePostProcessor,
+    sensor_processor::AbstractProcessor)
 
 namespace pandora_data_fusion
 {
