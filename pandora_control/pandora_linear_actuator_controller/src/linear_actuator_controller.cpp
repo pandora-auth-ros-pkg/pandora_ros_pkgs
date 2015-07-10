@@ -55,7 +55,7 @@ namespace pandora_control
       linearActuatorCommandPublisher_ =
         nodeHandle_.advertise<std_msgs::Float64>(
           linearActuatorCommandTopic_,
-          5, true);
+          2, true);
 
       std_msgs::Float64 targetPosition;
       targetPosition.data = previousTarget_ = 0;
@@ -94,7 +94,7 @@ namespace pandora_control
     }
     else
     {
-      ROS_DEBUG("%s: Aborted, there is no such command", actionName_.c_str());
+      ROS_ERROR("%s: Aborted, there is no such command", actionName_.c_str());
       // set the action state to aborted
       actionServer_.setAborted();
     }
@@ -165,7 +165,7 @@ namespace pandora_control
     try
     {
       tfListener_.lookupTransform(
-        "/base_link", linearActuatorFrame_,
+        "/linear_link", linearActuatorFrame_,
         ros::Time(0), linearActuatorTransform);
     }
     catch (tf::TransformException ex)
@@ -192,7 +192,7 @@ namespace pandora_control
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearActuatorFrame_,
+          "/linear_link", linearActuatorFrame_,
           ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
@@ -229,7 +229,7 @@ namespace pandora_control
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearActuatorFrame_,
+          "/linear_link", linearActuatorFrame_,
           ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
@@ -263,7 +263,7 @@ namespace pandora_control
       try
       {
         tfListener_.lookupTransform(
-          "/base_link", linearActuatorFrame_,
+          "/linear_link", linearActuatorFrame_,
           ros::Time(0), linearActuatorTransform);
       }
       catch (tf::TransformException ex)
@@ -282,8 +282,8 @@ namespace pandora_control
       {
         if (ros::Time::now() - lastTf > ros::Duration(1))
         {
-          ROS_DEBUG_STREAM("Is " << pointOfInterest << " broadcasted?");
-          ROS_DEBUG("%s: Aborted", actionName_.c_str());
+          ROS_ERROR_STREAM("Is " << pointOfInterest << " broadcasted?");
+          ROS_ERROR("%s: Aborted", actionName_.c_str());
           // set the action state to succeeded
           actionServer_.setAborted();
           return;
@@ -305,8 +305,8 @@ namespace pandora_control
       {
         if (ros::Time::now() - lastTf > ros::Duration(1))
         {
-          ROS_DEBUG_STREAM("Is " << centerPoint << " broadcasted?");
-          ROS_DEBUG("%s: Aborted", actionName_.c_str());
+          ROS_ERROR_STREAM("Is " << centerPoint << " broadcasted?");
+          ROS_ERROR("%s: Aborted", actionName_.c_str());
           // set the action state to succeeded
           actionServer_.setAborted();
           return;
