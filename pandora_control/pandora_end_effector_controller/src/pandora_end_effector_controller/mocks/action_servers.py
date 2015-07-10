@@ -47,69 +47,68 @@ from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, Mov
 from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEffectorGoal
 
 
-
 class MockActionServer(object):
 
-  """ MockActionServer base class """
+    """ MockActionServer base class """
 
-  def __init__(self, name, topic, action_type):
-    """ Creating a custom mock action server."""
+    def __init__(self, name, topic, action_type):
+        """ Creating a custom mock action server."""
 
-    self._topic = topic
-    self._name = name
-    self._action_type = action_type
-    self.timeout = 1
-    self.action_result = None
-    self.prefered_callback = ' '
+        self._topic = topic
+        self._name = name
+        self._action_type = action_type
+        self.timeout = 1
+        self.action_result = None
+        self.prefered_callback = ' '
 
-    Subscriber('mock/' + name, String, self.receive_commands)
-    Subscriber('mock/gui_result', Bool, self.set_gui_result)
-    self._server = ActionServer(self._topic, self._action_type,
-                                self.decide, False)
-    self._server.start()
-    loginfo('>>> Starting ' + self._name)
+        Subscriber('mock/' + name, String, self.receive_commands)
+        Subscriber('mock/gui_result', Bool, self.set_gui_result)
+        self._server = ActionServer(self._topic, self._action_type,
+                                    self.decide, False)
+        self._server.start()
+        loginfo('>>> Starting ' + self._name)
 
-  def receive_commands(self, msg):
-    """ Decides the result of the next call. """
+    def receive_commands(self, msg):
+        """ Decides the result of the next call. """
 
-    callback, timeout = msg.data.split(':')
-    # self.timeout = float(timeout)
-    self.prefered_callback = callback
-    sleep(1)
+        callback, timeout = msg.data.split(':')
+        # self.timeout = float(timeout)
+        self.prefered_callback = callback
+        sleep(1)
 
-  def decide(self, goal):
-    """ Deciding outcome of goal """
+    def decide(self, goal):
+        """ Deciding outcome of goal """
 
-    logwarn('Deciding callback...')
-    sleep(self.timeout)
-    if(self.prefered_callback == 'success'):
-      logwarn('>>> ' + self._name + ': This goal will succeed.')
-      self._server.set_succeeded()
-    elif(self.prefered_callback == 'abort'):
-      logwarn('>>> ' + self._name + ': This goal will be aborted.')
-      self._server.set_aborted()
-    elif(self.prefered_callback == 'preempt'):
-      logwarn('>>> ' + self._name + ': This goal will be preempted.')
-      self._server.set_preempted()
-    else:
-      logwarn('wtf?')
+        logwarn('Deciding callback...')
+        sleep(self.timeout)
+        if(self.prefered_callback == 'success'):
+            logwarn('>>> ' + self._name + ': This goal will succeed.')
+            self._server.set_succeeded()
+        elif(self.prefered_callback == 'abort'):
+            logwarn('>>> ' + self._name + ': This goal will be aborted.')
+            self._server.set_aborted()
+        elif(self.prefered_callback == 'preempt'):
+            logwarn('>>> ' + self._name + ': This goal will be preempted.')
+            self._server.set_preempted()
+        else:
+            logwarn('wtf?')
 
-  def set_gui_result(self, msg):
-    """ Sets the result of the goal. """
+    def set_gui_result(self, msg):
+        """ Sets the result of the goal. """
 
-    self.action_result = ValidateVictimGUIResult()
-    logwarn('>>> The gui response will be: ' + str(msg.data))
-    self.action_result.victimValid = msg.data
+        self.action_result = ValidateVictimGUIResult()
+        logwarn('>>> The gui response will be: ' + str(msg.data))
+        self.action_result.victimValid = msg.data
 
 if __name__ == '__main__':
-  rospy.init_node('mock_node')
+    rospy.init_node('mock_node')
 
-  # Action Servers
-  MockActionServer('linear_actuator', move_linear_actuator_topic,
-                   MoveLinearActuatorAction)
-  MockActionServer('sensor', move_kinect_topic,
-                   MoveSensorAction)
-  MockActionServer('head', move_head_topic,
-                   MoveSensorAction)
+    # Action Servers
+    MockActionServer('linear_actuator', move_linear_actuator_topic,
+                     MoveLinearActuatorAction)
+    MockActionServer('sensor', move_kinect_topic,
+                     MoveSensorAction)
+    MockActionServer('head', move_head_topic,
+                     MoveSensorAction)
 
-  rospy.spin()
+    rospy.spin()

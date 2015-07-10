@@ -49,146 +49,146 @@ from topics import move_end_effector_controller_topic, move_kinect_topic, \
 from client_factory import ClientFactory
 from client_list import CLIENTS
 
+
 class MoveEndEffectorServer(object):
 
-  def __init__(self):
-    self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
-    self.factory = ClientFactory()
-    self.current_clients = list()
-    self.current_goal = MoveEndEffectorGoal()
+    def __init__(self):
+        self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
+        self.factory = ClientFactory()
+        self.current_clients = list()
+        self.current_goal = MoveEndEffectorGoal()
 
+        self.server = Server(move_end_effector_controller_topic,
+                             MoveEndEffectorAction, self.execute_cb,
+                             False)
+        self.server.register_preempt_callback(self.preempt_cb)
+        self.server.start()
+        self.create_clients()
+        self.wait_for_servers()
 
-    self.server = Server(move_end_effector_controller_topic,
-                        MoveEndEffectorAction, self.execute_cb,
-                        False)
-    self.server.register_preempt_callback(self.preempt_cb)
-    self.server.start()
-    self.create_clients()
-    self.wait_for_servers()
+    def create_clients(self):
+        ''' Imports all clients and creates a list of them '''
 
-  def create_clients(self):
-    ''' Imports all clients and creates a list of them '''
+        for client in CLIENTS:
+            self.current_clients.append(self.factory.make_client(client))
 
-    for client in CLIENTS:
-      self.current_clients.append(self.factory.make_client(client))
+    def wait_for_servers(self):
+        ''' Waits for every client to connect with their server '''
 
-  def wait_for_servers(self):
-    ''' Waits for every client to connect with their server '''
+        for client in self.current_clients:
+            client.wait_server()
 
-    for client in self.current_clients:
-      client.wait_server()
+    def execute_cb(self, goal):
+        ''' Callback triggered by the arrival of a goal '''
 
-  def execute_cb(self, goal):
-    ''' Callback triggered by the arrival of a goal '''
+        self.current_goal = goal
+        self.fill_goals()
+        self.send_goals()
+        self.wait_for_result()
+        rospy.logwarn("break from wait for result!")
+        self.checkGoalState()
 
-    self.current_goal = goal
-    self.fill_goals()
-    self.send_goals()
-    self.wait_for_result()
-    rospy.logwarn("break from wait for result!")
-    self.checkGoalState()
+    def preempt_cb(self):
+        ''' Preempting all goals '''
 
-  def preempt_cb(self):
-    ''' Preempting all goals '''
+        for client in self.current_clients:
+            client.preempt_if_active()
 
-    for client in self.current_clients:
-      client.preempt_if_active()
+    def fill_goals(self):
+        ''' Filling goals into every client respectively '''
 
-  def fill_goals(self):
-    ''' Filling goals into every client respectively '''
+        for client in self.current_clients:
+            client.fill_goal(self.current_goal)
 
-    for client in self.current_clients:
-      client.fill_goal(self.current_goal)
+    def send_goals(self):
+        ''' Sending goals to every client respectively '''
 
-  def send_goals(self):
-    ''' Sending goals to every client respectively '''
+        for client in self.current_clients:
+            client.send_goal()
 
-    for client in self.current_clients:
-      client.send_goal()
+    def wait_for_result(self):
 
-  def wait_for_result(self):
+        for client in self.current_clients:
+            client.wait_result()
 
-    for client in self.current_clients:
-      client.wait_result()
+    def success(self):
 
-  def success(self):
+        self.server.set_succeeded()
 
-    self.server.set_succeeded()
+    def abort(self):
 
-  def abort(self):
+        self.server.set_aborted()
 
-    self.server.set_aborted()
+    def preempt(self):
 
-  def preempt(self):
+        if self.server.is_active():
+            self.server.set_preempted()
+        else:
+            rospy.logerr("[" + self._name + "] Preempt requested when server goal is not active")
 
-    if self.server.is_active():
-      self.server.set_preempted()
-    else:
-      rospy.logerr("[" + self._name + "] Preempt requested when server goal is not active")
+    def check_succeeded(self):
+        ''' Checks if the final state of the goal must be set succeeded '''
 
-  def check_succeeded(self):
-    ''' Checks if the final state of the goal must be set succeeded '''
+        must_succeed = True
 
-    must_succeed = True
+        for client in self.current_clients:
+            must_succeed = must_succeed and client.has_succeeded()
 
-    for client in self.current_clients:
-      must_succeed = must_succeed and client.has_succeeded()
+        return must_succeed
 
-    return must_succeed
+    def check_aborted(self):
+        ''' Checks if the final state of the goal must be set aborted '''
 
-  def check_aborted(self):
-    ''' Checks if the final state of the goal must be set aborted '''
+        must_abort = False
 
-    must_abort = False
+        for client in self.current_clients:
+            must_abort = must_abort or client.has_aborted()
 
-    for  client in self.current_clients:
-      must_abort = must_abort or client.has_aborted()
+        return must_abort
 
-    return must_abort
+    def check_preempted(self):
+        ''' Checks if the final state of the goal must be set preempted '''
 
-  def check_preempted(self):
-    ''' Checks if the final state of the goal must be set preempted '''
+        must_preempt = False
 
-    must_preempt = False
+        for client in self.current_clients:
+            must_preempt = must_preempt or client.has_preempted()
 
-    for  client in self.current_clients:
-      must_preempt = must_preempt or client.has_preempted()
+        return must_preempt
 
-    return must_preempt
+    def check_recalled(self):
+        ''' Checks if the final state of the goal must be set preempted '''
 
-  def check_recalled(self):
-    ''' Checks if the final state of the goal must be set preempted '''
+        must_recall = False
 
-    must_recall = False
+        for client in self.current_clients:
+            must_recall = must_recall or client.has_been_recalled()
 
-    for  client in self.current_clients:
-      must_recall = must_recall or client.has_been_recalled()
+        return must_recall
 
-    return must_recall
+    def checkGoalState(self):
+        ''' Checking final state of goal '''
 
-  def checkGoalState(self):
-    ''' Checking final state of goal '''
-
-    if(self.check_succeeded()):
-      rospy.logwarn("check_succeeded")
-      self.success()
-    elif(self.check_aborted()):
-      rospy.logwarn("check_aborted")
-      self.abort()
-    elif(self.check_recalled()):
-      rospy.logwarn("check_recalled")
-      for client in self.current_clients:
-        rospy.logerr("[" + self._name + "] Client " +
-                client.get_name() + " is in state " + str(client.client.get_state()))
-      rospy.logerr("[" + self._name + "] One client at least is recalled, set server to aborted")
-      self.abort()
-    elif(self.check_preempted()):
-      rospy.logwarn("check_preempted")
-      self.preempt()
-    else:
-      rospy.logwarn("check_unexpected")
-      for client in self.current_clients:
-        rospy.logerr("[" + self._name + "] Client " +
-                client.get_name() + " is in state " + str(client.client.get_state()))
-      rospy.logerr("[" + self._name + "] Unexpected State, set server to aborted")
-      self.abort()
+        if(self.check_succeeded()):
+            rospy.logwarn("check_succeeded")
+            self.success()
+        elif(self.check_aborted()):
+            rospy.logwarn("check_aborted")
+            self.abort()
+        elif(self.check_recalled()):
+            rospy.logwarn("check_recalled")
+            for client in self.current_clients:
+                rospy.logerr("[" + self._name + "] Client " +
+                             client.get_name() + " is in state " + str(client.client.get_state()))
+            rospy.logerr("[" + self._name + "] One client at least is recalled, set server to aborted")
+            self.abort()
+        elif(self.check_preempted()):
+            rospy.logwarn("check_preempted")
+            self.preempt()
+        else:
+            rospy.logwarn("check_unexpected")
+            for client in self.current_clients:
+                rospy.logerr("[" + self._name + "] Client " +
+                             client.get_name() + " is in state " + str(client.client.get_state()))
+            rospy.logerr("[" + self._name + "] Unexpected State, set server to aborted")
+            self.abort()

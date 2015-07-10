@@ -36,6 +36,8 @@
 * Author:  Chris Zalidis
 *********************************************************************/
 
+#include <string>
+
 #include <pandora_linear_actuator_controller/linear_actuator_controller.h>
 
 namespace pandora_control

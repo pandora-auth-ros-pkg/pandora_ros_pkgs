@@ -39,6 +39,7 @@
 
 #include <string>
 #include <algorithm>
+#include <limits>
 
 #include <pandora_sensor_orientation_controller/sensor_orientation_controller.h>
 

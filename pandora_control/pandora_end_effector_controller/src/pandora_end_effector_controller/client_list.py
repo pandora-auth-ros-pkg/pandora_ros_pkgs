@@ -35,8 +35,8 @@
 
 # Needs to be in accordance to client_factory
 
-CLIENTS =[
-  'sensor_client',
-  'linear_actuator_client',
-  'head_client'
+CLIENTS = [
+    'sensor_client',
+    'linear_actuator_client',
+    'head_client'
 ]

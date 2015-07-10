@@ -36,32 +36,33 @@
 import rospy
 from effector_clients import SensorClient, LinearActuatorClient, HeadClient
 
+
 class ClientFactory(object):
 
-  def __init__(self):
-    ''' Factory initialized '''
-    self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
+    def __init__(self):
+        ''' Factory initialized '''
+        self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
 
-    rospy.loginfo("[" + self._name + "] Initializing factory...")
-    self.return_client ={
-      'sensor_client' : self.return_sensor,
-      'linear_actuator_client' : self.return_linear_actuator,
-      'head_client' : self.return_head
-    }
+        rospy.loginfo("[" + self._name + "] Initializing factory...")
+        self.return_client = {
+            'sensor_client': self.return_sensor,
+            'linear_actuator_client': self.return_linear_actuator,
+            'head_client': self.return_head
+        }
 
-  def make_client(self, client_name):
-    ''' Making appropriate client '''
-    rospy.loginfo("[" + self._name + "] Making client... " + client_name)
-    return self.return_client[client_name]()
+    def make_client(self, client_name):
+        ''' Making appropriate client '''
+        rospy.loginfo("[" + self._name + "] Making client... " + client_name)
+        return self.return_client[client_name]()
 
-  def return_sensor(self):
-    ''' Returning SensorClient instance '''
-    return SensorClient()
+    def return_sensor(self):
+        ''' Returning SensorClient instance '''
+        return SensorClient()
 
-  def return_linear_actuator(self):
-    ''' Returning LinearActuatorClient instance '''
-    return LinearActuatorClient()
+    def return_linear_actuator(self):
+        ''' Returning LinearActuatorClient instance '''
+        return LinearActuatorClient()
 
-  def return_head(self):
-    ''' Returning HeadClient instance '''
-    return HeadClient()
+    def return_head(self):
+        ''' Returning HeadClient instance '''
+        return HeadClient()

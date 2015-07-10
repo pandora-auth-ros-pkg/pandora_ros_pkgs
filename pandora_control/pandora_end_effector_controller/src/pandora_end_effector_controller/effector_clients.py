@@ -43,136 +43,138 @@ from actionlib import SimpleActionClient as Client
 from client_dict import sensor_client, linear_actuator_client, head_client
 from command_mapping_dict import translate_command
 
+
 class SensorClient(object):
-  """docstring for SensorClient"""
+    """docstring for SensorClient"""
 
-  def __init__(self):
-    self._name = "SensorClient"
-    self.goal = sensor_client['goal']
-    self.topic = sensor_client['topic']
-    self.action = sensor_client['action']
-    self.command_dict = translate_command['to_sensor']
+    def __init__(self):
+        self._name = "SensorClient"
+        self.goal = sensor_client['goal']
+        self.topic = sensor_client['topic']
+        self.action = sensor_client['action']
+        self.command_dict = translate_command['to_sensor']
 
-    self.client = Client(self.topic, self.action)
+        self.client = Client(self.topic, self.action)
 
-  def get_name(self):
-    return self._name
+    def get_name(self):
+        return self._name
 
-  def fill_goal(self, effector_goal):
-    self.goal.command = self.command_dict[effector_goal.command]
-    self.goal.point_of_interest = effector_goal.point_of_interest
+    def fill_goal(self, effector_goal):
+        self.goal.command = self.command_dict[effector_goal.command]
+        self.goal.point_of_interest = effector_goal.point_of_interest
 
-  def send_goal(self):
-    self.client.send_goal(self.goal)
+    def send_goal(self):
+        self.client.send_goal(self.goal)
 
-  def wait_server(self):
-    self.client.wait_for_server()
+    def wait_server(self):
+        self.client.wait_for_server()
 
-  def wait_result(self):
-    self.client.wait_for_result()
+    def wait_result(self):
+        self.client.wait_for_result()
 
-  def has_succeeded(self):
-    return self.client.get_state() == GoalStatus.SUCCEEDED
+    def has_succeeded(self):
+        return self.client.get_state() == GoalStatus.SUCCEEDED
 
-  def has_aborted(self):
-    return self.client.get_state() == GoalStatus.ABORTED
+    def has_aborted(self):
+        return self.client.get_state() == GoalStatus.ABORTED
 
-  def has_preempted(self):
-    return self.client.get_state() == GoalStatus.PREEMPTED
+    def has_preempted(self):
+        return self.client.get_state() == GoalStatus.PREEMPTED
 
+    def has_been_recalled(self):
+        return self.client.get_state() == GoalStatus.RECALLED
 
-  def has_been_recalled(self):
-    return self.client.get_state() == GoalStatus.RECALLED
+    def preempt_if_active(self):
+        if self.client.get_state() == GoalStatus.ACTIVE:
+            self.client.cancel_all_goals()
 
-  def preempt_if_active(self):
-    if self.client.get_state() == GoalStatus.ACTIVE:
-      self.client.cancel_all_goals()
 
 class LinearActuatorClient(object):
-  """docstring for LinearActuatorClient"""
+    """docstring for LinearActuatorClient"""
 
-  def __init__(self):
-    self._name = "LinearActuatorClient"
-    self.goal = linear_actuator_client['goal']
-    self.topic = linear_actuator_client['topic']
-    self.action = linear_actuator_client['action']
-    self.command_dict = translate_command['to_linear_actuator']
+    def __init__(self):
+        self._name = "LinearActuatorClient"
+        self.goal = linear_actuator_client['goal']
+        self.topic = linear_actuator_client['topic']
+        self.action = linear_actuator_client['action']
+        self.command_dict = translate_command['to_linear_actuator']
 
-    self.client = Client(self.topic, self.action)
+        self.client = Client(self.topic, self.action)
 
-  def get_name(self):
-    return self._name
+    def get_name(self):
+        return self._name
 
-  def fill_goal(self, effector_goal):
-    self.goal.command = self.command_dict[effector_goal.command]
-    self.goal.point_of_interest = effector_goal.point_of_interest
-    self.goal.center_point = effector_goal.center_point
+    def fill_goal(self, effector_goal):
+        self.goal.command = self.command_dict[effector_goal.command]
+        self.goal.point_of_interest = effector_goal.point_of_interest
+        self.goal.center_point = effector_goal.center_point
 
-  def send_goal(self):
-    self.client.send_goal(self.goal)
+    def send_goal(self):
+        self.client.send_goal(self.goal)
 
-  def wait_server(self):
-    self.client.wait_for_server()
+    def wait_server(self):
+        self.client.wait_for_server()
 
-  def wait_result(self):
-    self.client.wait_for_result()
+    def wait_result(self):
+        self.client.wait_for_result()
 
-  def has_succeeded(self):
-    return self.client.get_state() == GoalStatus.SUCCEEDED
+    def has_succeeded(self):
+        return self.client.get_state() == GoalStatus.SUCCEEDED
 
-  def has_aborted(self):
-    return self.client.get_state() == GoalStatus.ABORTED
+    def has_aborted(self):
+        return self.client.get_state() == GoalStatus.ABORTED
 
-  def has_preempted(self):
-    return self.client.get_state() == GoalStatus.PREEMPTED
+    def has_preempted(self):
+        return self.client.get_state() == GoalStatus.PREEMPTED
 
-  def has_been_recalled(self):
-    return self.client.get_state() == GoalStatus.RECALLED
+    def has_been_recalled(self):
+        return self.client.get_state() == GoalStatus.RECALLED
 
-  def preempt_if_active(self):
-    if self.client.get_state() == GoalStatus.ACTIVE:
-      self.client.cancel_all_goals()
+    def preempt_if_active(self):
+        if self.client.get_state() == GoalStatus.ACTIVE:
+            self.client.cancel_all_goals()
+
 
 class HeadClient(object):
-  """docstring for HeadClient"""
+    """docstring for HeadClient"""
 
-  def __init__(self):
-    self._name = "HeadClient"
-    self.goal = head_client['goal']
-    self.topic = head_client['topic']
-    self.action = head_client['action']
-    self.command_dict = translate_command['to_head']
+    def __init__(self):
+        self._name = "HeadClient"
+        self.goal = head_client['goal']
+        self.topic = head_client['topic']
+        self.action = head_client['action']
+        self.command_dict = translate_command['to_head']
 
-    self.client = Client(self.topic, self.action)
+        self.client = Client(self.topic, self.action)
 
-  def get_name(self):
-    return self._name
+    def get_name(self):
+        return self._name
 
-  def fill_goal(self, effector_goal):
-    self.goal.command = self.command_dict[effector_goal.command]
-    self.goal.point_of_interest = effector_goal.point_of_interest
+    def fill_goal(self, effector_goal):
+        self.goal.command = self.command_dict[effector_goal.command]
+        self.goal.point_of_interest = effector_goal.point_of_interest
 
-  def send_goal(self):
-    self.client.send_goal(self.goal)
+    def send_goal(self):
+        self.client.send_goal(self.goal)
 
-  def wait_result(self):
-    self.client.wait_for_result()
+    def wait_result(self):
+        self.client.wait_for_result()
 
-  def wait_server(self):
-    self.client.wait_for_server()
+    def wait_server(self):
+        self.client.wait_for_server()
 
-  def has_succeeded(self):
-    return self.client.get_state() == GoalStatus.SUCCEEDED
+    def has_succeeded(self):
+        return self.client.get_state() == GoalStatus.SUCCEEDED
 
-  def has_aborted(self):
-    return self.client.get_state() == GoalStatus.ABORTED
+    def has_aborted(self):
+        return self.client.get_state() == GoalStatus.ABORTED
 
-  def has_preempted(self):
-    return self.client.get_state() == GoalStatus.PREEMPTED
+    def has_preempted(self):
+        return self.client.get_state() == GoalStatus.PREEMPTED
 
-  def has_been_recalled(self):
-    return self.client.get_state() == GoalStatus.RECALLED
+    def has_been_recalled(self):
+        return self.client.get_state() == GoalStatus.RECALLED
 
-  def preempt_if_active(self):
-    if self.client.get_state() == GoalStatus.ACTIVE:
-      self.client.cancel_all_goals()
+    def preempt_if_active(self):
+        if self.client.get_state() == GoalStatus.ACTIVE:
+            self.client.cancel_all_goals()

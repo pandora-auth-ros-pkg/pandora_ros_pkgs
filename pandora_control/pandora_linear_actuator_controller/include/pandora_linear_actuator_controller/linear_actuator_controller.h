@@ -54,7 +54,7 @@ namespace pandora_control
   class LinearActuatorActionServer
   {
     public:
-      LinearActuatorActionServer(const std::string& name);
+      explicit LinearActuatorActionServer(const std::string& name);
 
       ~LinearActuatorActionServer(void);
 

@@ -37,31 +37,31 @@ from pandora_end_effector_controller.msg import MoveEndEffectorAction, MoveEndEf
 from pandora_sensor_orientation_controller.msg import MoveSensorAction, MoveSensorGoal
 from pandora_linear_actuator_controller.msg import MoveLinearActuatorAction, MoveLinearActuatorGoal
 
-translate_command ={
-  'to_sensor' :
-  {
-    MoveEndEffectorGoal.TEST : MoveSensorGoal.TEST,
-    MoveEndEffectorGoal.PARK : MoveSensorGoal.CENTER,
-    MoveEndEffectorGoal.TRACK : MoveSensorGoal.POINT,
-    MoveEndEffectorGoal.LAX_TRACK : MoveSensorGoal.LAX_POINT,
-    MoveEndEffectorGoal.SCAN : MoveSensorGoal.MOVE
-  },
+translate_command = {
+    'to_sensor':
+    {
+        MoveEndEffectorGoal.TEST: MoveSensorGoal.TEST,
+        MoveEndEffectorGoal.PARK: MoveSensorGoal.CENTER,
+        MoveEndEffectorGoal.TRACK: MoveSensorGoal.POINT,
+        MoveEndEffectorGoal.LAX_TRACK: MoveSensorGoal.LAX_POINT,
+        MoveEndEffectorGoal.SCAN: MoveSensorGoal.MOVE
+    },
 
-  'to_linear_actuator' :
-  {
-    MoveEndEffectorGoal.TEST : MoveLinearActuatorGoal.TEST,
-    MoveEndEffectorGoal.PARK : MoveLinearActuatorGoal.LOWER,
-    MoveEndEffectorGoal.TRACK : MoveLinearActuatorGoal.MOVE,
-    MoveEndEffectorGoal.LAX_TRACK : MoveLinearActuatorGoal.LAX_MOVE,
-    MoveEndEffectorGoal.SCAN : MoveLinearActuatorGoal.LOWER
-  },
+    'to_linear_actuator':
+    {
+        MoveEndEffectorGoal.TEST: MoveLinearActuatorGoal.TEST,
+        MoveEndEffectorGoal.PARK: MoveLinearActuatorGoal.LOWER,
+        MoveEndEffectorGoal.TRACK: MoveLinearActuatorGoal.MOVE,
+        MoveEndEffectorGoal.LAX_TRACK: MoveLinearActuatorGoal.LAX_MOVE,
+        MoveEndEffectorGoal.SCAN: MoveLinearActuatorGoal.LOWER
+    },
 
-  'to_head' :
-  {
-    MoveEndEffectorGoal.TEST : MoveSensorGoal.TEST,
-    MoveEndEffectorGoal.PARK : MoveSensorGoal.CENTER,
-    MoveEndEffectorGoal.TRACK : MoveSensorGoal.POINT,
-    MoveEndEffectorGoal.LAX_TRACK : MoveSensorGoal.LAX_POINT,
-    MoveEndEffectorGoal.SCAN : MoveSensorGoal.CENTER
-  }
+    'to_head':
+    {
+        MoveEndEffectorGoal.TEST: MoveSensorGoal.TEST,
+        MoveEndEffectorGoal.PARK: MoveSensorGoal.CENTER,
+        MoveEndEffectorGoal.TRACK: MoveSensorGoal.POINT,
+        MoveEndEffectorGoal.LAX_TRACK: MoveSensorGoal.LAX_POINT,
+        MoveEndEffectorGoal.SCAN: MoveSensorGoal.CENTER
+    }
 }
