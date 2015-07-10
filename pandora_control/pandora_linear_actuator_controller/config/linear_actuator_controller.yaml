@@ -1,7 +1,7 @@
-min_command: 0.0
-max_command: 0.18
+min_command: 0.001
+max_command: 0.135
 movement_threshold: 0.005
-lax_movement_threshold: 0.03
-command_timeout: 15.0
+lax_movement_threshold: 0.05
+command_timeout: 5.0
 linear_actuator_command_topic: /linear_actuator/command
 linear_actuator_frame: linear_actuator_link
