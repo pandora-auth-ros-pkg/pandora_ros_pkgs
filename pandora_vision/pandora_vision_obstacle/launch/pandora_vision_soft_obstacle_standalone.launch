@@ -42,6 +42,7 @@
 
   <include file="$(find pandora_vision_obstacle)/launch/pandora_vision_soft_obstacle.launch"
       ns="$(arg namespace)" />
+
   <group ns="/pandora_vision/pandora_vision_hole" >
     <param name="thermal_mode" value="false" />
     <param name="rgbdt_mode" value="false" />
