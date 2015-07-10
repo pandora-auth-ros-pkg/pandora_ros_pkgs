@@ -1,6 +1,6 @@
 footprint:
-  width: 0.58
-  height: 0.42
+  width: 0.48
+  height: 0.36
 
 map_origin: SLAM
 occupied_cell_thres: 0.5
