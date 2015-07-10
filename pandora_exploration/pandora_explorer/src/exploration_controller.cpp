@@ -49,18 +49,6 @@ ExplorationController::ExplorationController()
                            boost::bind(&ExplorationController::executeCb, this, _1), false),
     move_base_client_("move_base", true)
 {
-  // create explore frontier goal selector
-  explore_goal_selector_.reset(new FrontierGoalSelector("explore"));
-
-  // load use_coverage
-  bool use_coverage;
-  private_nh_.param<bool>("use_coverage", use_coverage, false);
-
-  // if use_coverage is enabled we create a frontier goal selector with the name coverage
-  // WARNING: If the coverage topic is not set correctly the explorer is not initialized
-  if (use_coverage)
-    coverage_goal_selector_.reset(new FrontierGoalSelector("coverage"));
-
   // register preempt callback
   do_exploration_server_.registerPreemptCallback(
       boost::bind(&ExplorationController::preemptCb, this));
@@ -85,6 +73,24 @@ ExplorationController::ExplorationController()
 void ExplorationController::executeCb(
     const pandora_exploration_msgs::DoExplorationGoalConstPtr& goal)
 {
+  // Check if given exploration_type is known to the explorer, if it's not abort
+  if (goal->exploration_type != pandora_exploration_msgs::DoExplorationGoal::TYPE_FAST &&
+    goal->exploration_type != pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP)
+  {
+    ROS_ERROR("[%s] Received invalid exploration type request: %s",
+      ros::this_node::getName().c_str(), goal->exploration_type.c_str());
+    do_exploration_server_.setAborted(pandora_exploration_msgs::DoExplorationResult());
+  }
+
+  // Check if we hold a goal selector of the appropriate exploration_type, if
+  // we do not, then create one and insert it into the goal_selector_map_
+  std::map<std::string, GoalSelectorPtr>::const_iterator iter;
+  if ((iter = goal_selector_map_.find(goal->exploration_type)) == goal_selector_map_.end())
+  {
+    GoalSelectorPtr goalSelectorPtr( new FrontierGoalSelector(goal->exploration_type) );
+    goal_selector_map_.insert(std::make_pair(goal->exploration_type, goalSelectorPtr));
+  }
+
   // wait for move_base to set-up
   if (!move_base_client_.waitForServer(ros::Duration(1.0)))
   {
@@ -101,7 +107,6 @@ void ExplorationController::executeCb(
 
   // while we didn't receive a preempt request
   while (ros::ok() && do_exploration_server_.isActive()) {
-
     // if we can't find more frontiers and we have reached our goal we end the exploration
     if (goal_searches_count_ >= max_goal_searches_ && goalReached() )
     {
@@ -128,14 +133,9 @@ void ExplorationController::executeCb(
     // if the exploration_type is DEEP(coverage_exploration) and coverage_goal_selector_
     // is not NULL, then we do coverage based exploration. To create the coverage
     // goal_selector we have to set the param use_coverage to true.
-    if (goal->exploration_type == pandora_exploration_msgs::DoExplorationGoal::TYPE_DEEP &&
-        coverage_goal_selector_) {
-      // to current goal gemizetai me to stoxo pou tha vrei o goal selector
-      // If success is false that means we cant find more frontiers
-      success = coverage_goal_selector_->findNextGoal(&current_goal_);
-    } else {
-      success = explore_goal_selector_->findNextGoal(&current_goal_);
-    }
+    // to current goal gemizetai me to stoxo pou tha vrei o goal selector
+    // If success is false that means we cant find more frontiers
+    success = goal_selector_map_[goal->exploration_type]->findNextGoal(&current_goal_);
 
     // if succes is false, dld an den exei vrei stoxo, auksanoume ta goal searches
     if (!success) {
@@ -162,9 +162,7 @@ void ExplorationController::executeCb(
           boost::bind(&ExplorationController::feedbackMovingCb, this, _1));
 
       // set selected goal to all goal selectors
-      explore_goal_selector_->setSelectedGoal(current_goal_);
-      if (coverage_goal_selector_)
-        coverage_goal_selector_->setSelectedGoal(current_goal_);
+      goal_selector_map_[goal->exploration_type]->setSelectedGoal(current_goal_);
     }
 
     while (ros::ok() && do_exploration_server_.isActive() && !goalReached() && !isTimeReached() &&

@@ -61,43 +61,43 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 /**
   * @class ExplorationController
   * @brief A class implementing the exploration controller.
-  * 
-  * The exploration controller decides the goals of the exploration, using 
-  * the goal selector and then passes these goals to move base. 
-  * The goal can change while moving. 
+  *
+  * The exploration controller decides the goals of the exploration, using
+  * the goal selector and then passes these goals to move base.
+  * The goal can change while moving.
   */
 class ExplorationController {
  public:
   /**
     * @brief  Constructor for the ExplorationController class
-    * 
+    *
     * Loads parameters and setups exploration server, move base client
-    * and goal selectors. 
+    * and goal selectors.
     */
   ExplorationController();
 
   /**
     * @brief Execute callback of exploration server
-    * @param goal The goal 
+    * @param goal The goal
     */
   void executeCb(const pandora_exploration_msgs::DoExplorationGoalConstPtr& goal);
 
   /**
     * @brief Feedback callback of exploration server
-    * @param feedback  
+    * @param feedback
     */
   void feedbackMovingCb(const move_base_msgs::MoveBaseFeedbackConstPtr& feedback);
 
   /**
-    * @brief 
-    * @param state  
+    * @brief
+    * @param state
     * @param result
     */
   void doneMovingCb(const actionlib::SimpleClientGoalState& state,
                     const move_base_msgs::MoveBaseResultConstPtr& result);
 
   /**
-    * @brief Preempt callback of the 
+    * @brief Preempt callback of the
     *
     * Cancels the move request that was passed to move base, before
     * the goal is reached
@@ -128,8 +128,7 @@ class ExplorationController {
   MoveBaseClient move_base_client_;
 
   // ptrs to explore and coverage goal selectors
-  GoalSelectorPtr explore_goal_selector_;
-  GoalSelectorPtr coverage_goal_selector_;
+  std::map<std::string, GoalSelectorPtr> goal_selector_map_;
 
   // The duration within the goal must be reached
   ros::Duration goal_timeout_;
@@ -152,7 +151,7 @@ class ExplorationController {
   pandora_exploration_msgs::DoExplorationFeedback feedback_;
 
   boost::shared_ptr<boost::thread> computation_thread_;
-  
+
   bool first_time_;
   int goal_expired_count_;  // number of times a goal has expired
 };
