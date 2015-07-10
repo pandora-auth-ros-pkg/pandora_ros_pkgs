@@ -53,5 +53,10 @@ namespace pandora_vision_motion
     VisionHandler<MotionPreProcessor, MotionProcessor, MotionPostProcessor>()
   {
   }
+  void MotionHandler::completeTransition()
+  {
+    ROS_INFO_STREAM("Sleeping for 1s");
+    ros::Duration(1).sleep();
+  }
 }  // namespace pandora_vision_motion
 }  // namespace pandora_vision

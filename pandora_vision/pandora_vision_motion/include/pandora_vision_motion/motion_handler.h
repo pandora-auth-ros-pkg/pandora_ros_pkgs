@@ -55,6 +55,9 @@ namespace pandora_vision_motion
   {
    public:
     MotionHandler();
+
+   private:
+    void completeTransition();
   };
 }  // namespace pandora_vision_motion
 }  // namespace pandora_vision
