@@ -106,12 +106,6 @@ namespace motor
     // Detect if running on simulation
     ns.param("/sim", sim_, false);
 
-    // Degree of polynoms
-    ns.param("linear_fit_degree", linearFitDegree_, 5);
-    linearFitDegree_++;
-    ns.param("angular_fit_degree", angularFitDegree_, 7);
-    angularFitDegree_++;
-
     // Measurements for linear velocity
     XmlRpc::XmlRpcValue linearMeasurementsList;
     if (ns.hasParam("measured_linear_velocities") &&
@@ -162,11 +156,44 @@ namespace motor
     maxMeasuredAngular_ = *std::max_element(actualAngular_.begin(), actualAngular_.end());
     minMeasuredAngular_ = *std::min_element(actualAngular_.begin(), actualAngular_.end());
 
+    // Degree of polynoms
+    ns.param("linear_fit_degree", linearFitDegree_, 5);
+    if (linearFitDegree_ < 2)
+    {
+      linearFitDegree_ = 2;
+    }
+    ns.param("angular_fit_degree", angularFitDegree_, 7);
+    if (angularFitDegree_ < 2)
+    {
+      angularFitDegree_ = 2;
+    }
+
+    // Increase degree because the coefficients also include the constant of the polynom (a0 * x^0)
+    linearFitDegree_++;
+    angularFitDegree_++;
+
     // Calculate coefficients
-    linearFitCoefficients_.resize(linearFitDegree_, 1);
-    angularFitCoefficients_.resize(angularFitDegree_, 1);
-    polynomialFit(linearFitDegree_, actualLinear_, expectedLinear_, linearFitCoefficients_);
-    polynomialFit(angularFitDegree_, actualAngular_, expectedAngular_, angularFitCoefficients_);
+    linearFitCoefficients_.resize(linearFitDegree_, 0);
+    angularFitCoefficients_.resize(angularFitDegree_, 0);
+
+    // We need (degree + 1) measurements to calculate the polynom, otherwise we set (y = 1.0 * x^1)
+    if (actualLinear_.size() >= linearFitDegree_)
+    {
+      polynomialFit(linearFitDegree_, actualLinear_, expectedLinear_, linearFitCoefficients_);
+    }
+    else
+    {
+      linearFitCoefficients_[1] = 1.0;
+    }
+
+    if (actualAngular_.size() >= angularFitDegree_)
+    {
+      polynomialFit(angularFitDegree_, actualAngular_, expectedAngular_, angularFitCoefficients_);
+    }
+    else
+    {
+      angularFitCoefficients_[1] = 1.0;
+    }
 
     // Subscirbe to cmd_vel
     command_listener_ = ns.subscribe(
