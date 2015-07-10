@@ -317,15 +317,38 @@ namespace pandora_vision
 
     // Construct the rgbImage. The entire image is at a colour of
     // value approximate the the colour value of the images of walls
+    int rgbVal[3];
+    if (pandora_vision_obstacle::BarrelDetection::color_selection_R_1_G_2_B_3 == 1)
+    {
+      // Red
+      rgbVal[0] = 0;
+      rgbVal[1] = 0;
+      rgbVal[2] = 200;
+    }
+    else if (pandora_vision_obstacle::BarrelDetection::color_selection_R_1_G_2_B_3 == 2)
+    {
+      // Green
+      rgbVal[0] = 0;
+      rgbVal[1] = 200;
+      rgbVal[2] = 0;
+    }
+    else
+    {
+      // Blue
+      rgbVal[0] = 200;
+      rgbVal[1] = 0;
+      rgbVal[2] = 0;
+    }
+      
     for (int rows = 0; rows < HEIGHT; rows++)
     {
       for (int cols = 0; cols < WIDTH; cols++)
       {
         if (rgbImage.at< cv::Vec3b >(rows, cols).val[0] == 0)
         {
-          rgbImage.at< cv::Vec3b >(rows, cols).val[0] = 116;
-          rgbImage.at< cv::Vec3b >(rows, cols).val[1] = 163;
-          rgbImage.at< cv::Vec3b >(rows, cols).val[2] = 171;
+          rgbImage.at< cv::Vec3b >(rows, cols).val[0] = rgbVal[0];
+          rgbImage.at< cv::Vec3b >(rows, cols).val[1] = rgbVal[1];
+          rgbImage.at< cv::Vec3b >(rows, cols).val[2] = rgbVal[2];
         }
       }
     }

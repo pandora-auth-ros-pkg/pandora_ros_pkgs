@@ -450,6 +450,57 @@ namespace pandora_vision_obstacle
       // (*valid) = false;
       return false;
     }
+
+    // Validation based on specific barrels' color
+    if (BarrelDetection::color_validation)
+    {
+      cv::Mat rgbTemp;
+      rgbImage.copyTo(rgbTemp);
+      cv::Mat hsvImage = rgbTemp(rectRoi);
+      cv::Mat binary, binaryTemp;
+      // convert RGB image into HSV image
+      cv::cvtColor(hsvImage, hsvImage, CV_BGR2HSV);
+      std::vector<cv::Mat> hsvChannels;
+      cv::split(hsvImage, hsvChannels);
+      cv::Mat hImage = hsvChannels[0];
+
+      int iLowH = BarrelDetection::hue_lowest_thresh, iHighH = BarrelDetection::hue_highest_thresh;
+      int iLowS = BarrelDetection::saturation_lowest_thresh, iHighS = BarrelDetection::saturation_highest_thresh;
+      int iLowV = BarrelDetection::value_lowest_thresh, iHighV = BarrelDetection::value_highest_thresh;
+      // cv::inRange(hImage, iLowH, iHighH, binary);
+      cv::inRange(
+          hsvImage, 
+          cv::Scalar(iLowH, iLowS, iLowV), 
+          cv::Scalar(iHighH, iHighS, iHighV), 
+          binary);
+      // For RED define one second threshold
+      if (BarrelDetection::color_selection_R_1_G_2_B_3 == 1)
+      {
+        iLowH = 0;
+        iHighH = 3;
+        // cv::inRange(hImage, iLowH, iHighH, binaryTemp);
+        cv::inRange(
+            hsvImage, 
+            cv::Scalar(iLowH, iLowS, iLowV), 
+            cv::Scalar(iHighH, iHighS, iHighV), 
+            binaryTemp);
+        binary += binaryTemp;
+      }
+    
+
+      int whitesCounter = cv::countNonZero(binary);
+      float whitesOverlap =
+        static_cast<float>(whitesCounter) / static_cast<float>(rectRoi.area());
+
+      if (whitesOverlap < BarrelDetection::specific_color_min_overlap)
+      {
+        // (*valid) = false;
+        return false;
+      }
+
+      // cv::inRange(hsvImage, cv::Scalar(iLowH, iLowS, iLowV), cv::Scalar(iHighH, iHighS, iHighV), binary);  // red*/
+    }
+
     return true;
   }
 

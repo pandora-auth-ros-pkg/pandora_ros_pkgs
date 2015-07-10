@@ -72,6 +72,8 @@ namespace pandora_vision_obstacle
       void parametersCallbackBarrel(
           const ::pandora_vision_obstacle::barrel_nodeConfig& configBarrel,
           const uint32_t& level);
+
+      void resetToRecommendedColors();
   };
   /**
     @struct BarrelDetection
@@ -93,6 +95,18 @@ namespace pandora_vision_obstacle
     static float curve_approximation_max_epsilon;
     static float min_circle_overlapping;
     static float max_corner_thresh;
+
+    static bool color_validation;
+
+    static int color_selection_R_1_G_2_B_3;
+    static bool use_recommended_color_thresholds;
+    static float specific_color_min_overlap;
+    static int hue_lowest_thresh;
+    static int hue_highest_thresh;
+    static int saturation_lowest_thresh;
+    static int saturation_highest_thresh;
+    static int value_lowest_thresh;
+    static int value_highest_thresh;
   };
 
 }  // namespace pandora_vision_obstacle
