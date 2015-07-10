@@ -85,6 +85,7 @@ class MoveEndEffectorServer(object):
     self.fill_goals()
     self.send_goals()
     self.wait_for_result()
+    rospy.logwarn("break from wait for result!")
     self.checkGoalState()
 
   def preempt_cb(self):
@@ -92,7 +93,6 @@ class MoveEndEffectorServer(object):
 
     for client in self.current_clients:
       client.preempt_if_active()
-      #self.preempt()
 
   def fill_goals(self):
     ''' Filling goals into every client respectively '''

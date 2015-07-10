@@ -54,16 +54,14 @@ namespace pandora_control
   class LinearActuatorActionServer
   {
     public:
-      LinearActuatorActionServer(
-        std::string name,
-        ros::NodeHandle nodeHandle_);
+      LinearActuatorActionServer(const std::string& name);
 
       ~LinearActuatorActionServer(void);
 
     private:
       void callback(const pandora_linear_actuator_controller::MoveLinearActuatorGoalConstPtr& goal);
 
-      bool getcontrollerParams();
+      bool getControllerParams();
       void testLinearActuator();
       void lowerLinearActuator();
       void moveLinearActuator(std::string pointOfInterest, std::string centerPoint,
@@ -71,6 +69,7 @@ namespace pandora_control
 
     private:
       ros::NodeHandle nodeHandle_;
+      ros::NodeHandle privateNodeHandle_;
       std::string actionName_;
       actionlib::SimpleActionServer<
         pandora_linear_actuator_controller::MoveLinearActuatorAction> actionServer_;

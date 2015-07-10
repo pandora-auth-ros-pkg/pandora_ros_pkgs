@@ -37,6 +37,6 @@
 
 CLIENTS =[
   'sensor_client',
-  #'linear_actuator_client'
+  'linear_actuator_client',
   'head_client'
 ]

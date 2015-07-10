@@ -40,19 +40,17 @@
 
 namespace pandora_control
 {
-  LinearActuatorActionServer::LinearActuatorActionServer(
-    std::string actionName,
-    ros::NodeHandle nodeHandle)
-  :
+  LinearActuatorActionServer::LinearActuatorActionServer(const std::string& actionName) :
+    nodeHandle_(""),
+    privateNodeHandle_("~"),
     actionServer_(
-      nodeHandle,
+      nodeHandle_,
       actionName,
       boost::bind(&LinearActuatorActionServer::callback, this, _1), false),
-    actionName_(actionName),
-    nodeHandle_(nodeHandle)
+    actionName_(actionName)
   {
     // get params from param server
-    if (getcontrollerParams())
+    if (getControllerParams())
     {
       linearActuatorCommandPublisher_ =
         nodeHandle_.advertise<std_msgs::Float64>(
@@ -100,16 +98,18 @@ namespace pandora_control
     }
   }
 
-  bool LinearActuatorActionServer::getcontrollerParams()
+  bool LinearActuatorActionServer::getControllerParams()
   {
-    nodeHandle_.param("min_command", minCommand_, 0.0);
-    nodeHandle_.param("max_command", maxCommand_, 0.18);
-    nodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
-    nodeHandle_.param("lax_movement_threshold", laxMovementThreshold_, 0.03);
+    privateNodeHandle_.param("min_command", minCommand_, 0.0);
+    privateNodeHandle_.param("max_command", maxCommand_, 0.18);
+    privateNodeHandle_.param("movement_threshold", movementThreshold_, 0.005);
+    privateNodeHandle_.param("lax_movement_threshold", laxMovementThreshold_, 0.03);
     movementThreshold_ = fabs(movementThreshold_);
-    nodeHandle_.param("command_timeout", commandTimeout_, 15.0);
+    privateNodeHandle_.param("command_timeout", commandTimeout_, 15.0);
 
-    if (nodeHandle_.getParam("linear_actuator_command_topic", linearActuatorCommandTopic_))
+    ROS_INFO("private ns: %s", privateNodeHandle_.getNamespace().c_str());
+
+    if (privateNodeHandle_.getParam("linear_actuator_command_topic", linearActuatorCommandTopic_))
     {
       ROS_INFO_STREAM("Got param linear_actuator_command_topic: " << linearActuatorCommandTopic_);
     }
@@ -119,7 +119,7 @@ namespace pandora_control
       return false;
     }
 
-    if (nodeHandle_.getParam("linear_actuator_frame", linearActuatorFrame_))
+    if (privateNodeHandle_.getParam("linear_actuator_frame", linearActuatorFrame_))
     {
       ROS_INFO_STREAM("Got param linear_actuator_frame: " << linearActuatorFrame_);
     }
@@ -132,7 +132,7 @@ namespace pandora_control
     // Parse robot description
     const std::string model_param_name = "/robot_description";
     std::string robot_model_str="";
-    while (!nodeHandle_.getParam(model_param_name, robot_model_str))
+    while (!privateNodeHandle_.getParam(model_param_name, robot_model_str))
     {
       ROS_ERROR_STREAM(
         "Robot descripion couldn't be retrieved from param server.");
@@ -374,14 +374,10 @@ namespace pandora_control
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "linear_actuator_action");
-  ros::NodeHandle nodeHandle;
-  std::string actionName = "linear_actuator_action";
+  ros::init(argc, argv, "linear_actuator_controller");
 
   pandora_control::LinearActuatorActionServer
-    linearActuatorActionServer(
-      actionName,
-      nodeHandle);
+    linearActuatorActionServer(ros::this_node::getName());
 
   ros::spin();
 }

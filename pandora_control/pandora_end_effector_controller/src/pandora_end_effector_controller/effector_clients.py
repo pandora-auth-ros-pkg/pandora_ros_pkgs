@@ -92,7 +92,7 @@ class LinearActuatorClient(object):
   """docstring for LinearActuatorClient"""
 
   def __init__(self):
-    sefl._name = "LinearActuatorClient"
+    self._name = "LinearActuatorClient"
     self.goal = linear_actuator_client['goal']
     self.topic = linear_actuator_client['topic']
     self.action = linear_actuator_client['action']
