@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_PROCESSOR_DUMMY_HANDLER_H
-#define SENSOR_PROCESSOR_DUMMY_HANDLER_H
+#ifndef SENSOR_PROCESSOR_TEST_DUMMY_HANDLER_H
+#define SENSOR_PROCESSOR_TEST_DUMMY_HANDLER_H
 
 #include <string>
 
@@ -61,4 +61,4 @@ namespace sensor_processor
   };
 }  // namespace sensor_processor
 
-#endif  // SENSOR_PROCESSOR_DUMMY_HANDLER_H
+#endif  // SENSOR_PROCESSOR_TEST_DUMMY_HANDLER_H

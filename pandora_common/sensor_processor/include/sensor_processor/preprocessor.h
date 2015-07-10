@@ -100,8 +100,8 @@ namespace sensor_processor
       }
       else
       {
-        ROS_FATAL("[%s] 'subscribed_topics' param can be either a string (single topic) or a list of strings (many topics)!",
-            this->getName().c_str());
+        ROS_FATAL("[%s] 'subscribed_topics' param can be either a string (single topic)"
+          "or a list of strings (many topics)!", this->getName().c_str());
         ROS_ASSERT(false);
       }
     }
