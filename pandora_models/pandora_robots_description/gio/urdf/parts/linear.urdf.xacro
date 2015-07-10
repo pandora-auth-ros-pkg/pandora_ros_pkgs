@@ -23,9 +23,17 @@
     </link>
 
     <link name="linear_actuator_link" >
-      <xacro:solid_cuboid_inertial mass="0.029" x="0.009" y="0.009" z="0.100" >
-        <origin xyz="0.0 0.0 0.05034" />
-      </xacro:solid_cuboid_inertial>
+      <!-- FIXME -->
+      <inertial>
+        <origin xyz="0.017561 0.0109 0.24001" />
+        <mass value="0.92399" />
+        <inertia ixx="0.0097139"
+                 ixy="-0.00039516"
+                 ixz="-0.00086264"
+                 iyy="0.0095873"
+                 iyz="0.0012764"
+                 izz="0.0017829" />
+      </inertial>
       <visual>
         <geometry>
           <mesh filename="package://pandora_robots_description/gio/meshes/linear_actuator_link.dae" />
