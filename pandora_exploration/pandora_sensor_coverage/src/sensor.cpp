@@ -181,5 +181,5 @@ namespace pandora_exploration
         ROS_BREAK();
       }
     }
-}
-}
+}  // namespace pandora_sensor_coverage
+}  // namespace pandora_exploration
