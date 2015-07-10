@@ -6,13 +6,13 @@
   <arg name="state_manager" default="true"/>
 
   <arg name="stabilizer" default="true"/>
-  <arg name="eef" default="true"/>
+  <arg name="eef" default="false"/>
 
   <arg name="navigation" default="true"/>
 
   <arg name="slam" default="true"/>
 
-  <arg name="fusion" default="true"/>
+  <arg name="fusion" default="false"/>
 
   <arg name="bag" default="false"/>
 
@@ -44,6 +44,7 @@
   <group if="$(arg navigation)">
     <include file="$(find pandora_move_base)/launch/move_base.launch" />
     <include file="$(find pandora_explorer)/launch/explorer.launch" />
+    <include file="$(find pandora_sensor_coverage)/launch/sensor_coverage.launch" />
   </group>
 
   <!-- Fusion -->
