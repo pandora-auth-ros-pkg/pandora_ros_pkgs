@@ -18,6 +18,7 @@
   <arg name="data_fusion" default="true"/>
   <arg name="xtion" default="false"/>
   <arg name="vision" default="true"/>
+  <arg name="audio" default="true"/>
   <arg name="bag" default="false"/>
   <arg name="gui" default="true"/>
 
@@ -114,6 +115,11 @@
   <!-- Vision -->
   <group if="$(arg vision)">
     <include file="$(find pandora_vision_launchers)/launch/all_nodes.launch" />
+  </group>
+
+  <!-- Audio -->
+  <group if="$(arg audio)">
+    <include file="$(find pandora_voice_recognition)/launch/pandora_sound_all.launch" />
   </group>
 
   <!-- Rosbag -->

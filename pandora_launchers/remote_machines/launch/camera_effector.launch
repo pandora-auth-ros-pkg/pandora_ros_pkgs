@@ -11,7 +11,7 @@
     name="camera_effector"
     pkg="camera_effector"
     type="camera_effector_node.py" >
-    
+
     <param name="camera_effector_urdf/camera_effector_frame" value="/camera_effector_frame" />
 
     <!-- Subsciber + Publishing Topics parameters -->

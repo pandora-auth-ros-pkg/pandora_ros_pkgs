@@ -9,14 +9,14 @@
   <arg name="hfov" default="53.50" />
   <arg name="vfov" default="41.41" />
   <arg name="optical_frame" default="/pi_camera_optical_frame" />
-  
+
 
   <!-- PI Camera Node -->
   <node
     machine="rpi2"
     name="pi_camera"
     pkg="pi_camera"
-    type="pi_camera_node.py" 
+    type="pi_camera_node.py"
     output="screen" >
 
     <param name="width" value="640" />
