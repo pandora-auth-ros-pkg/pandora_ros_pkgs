@@ -297,13 +297,11 @@ namespace pandora_vision_hole
 
       if (thermalMode_ && !thermalLocked_)
       {
-        thermalLocked_ = true;
         thermalIndex->data = thermalIndex->data + "thermal";
       }
 
       if ((rgbdMode_ || rgbdtMode_) && !holeFusionLocked_)
       {
-        holeFusionLocked_ = true;
         if (rgbdtMode_)
           thermalIndex->data = thermalIndex->data + "hole";
 
@@ -312,7 +310,7 @@ namespace pandora_vision_hole
         synchronizedDepthImagePublisher_.publish(depthImageMessagePtr);
       }
 
-      if (thermalMode_ || rgbdtMode_)
+      if ((thermalMode_ && !thermalLocked_) || (rgbdtMode_ && !holeFusionLocked_))
       {
         distrib_msgs::FlirLeptonMsg::Ptr thermalMsgPtr( new distrib_msgs::FlirLeptonMsg );
         *thermalMsgPtr = *thermalMsg;
@@ -321,10 +319,15 @@ namespace pandora_vision_hole
         thermalOutputReceiverPublisher_.publish(thermalIndex);
       }
 
-      if (thermalMode_)
+      if (thermalMode_ && !thermalLocked_)
       {
         enhancedImageCropperPublisher_.publish(enhancedImagePtr);
       }
+
+      if (!thermalLocked_)
+        thermalLocked_ = true;
+      if (!holeFusionLocked_)
+        holeFusionLocked_ = true;
 
       // syncPointCloudSubscriberPtr_->unsubscribe();
       // syncThermalCameraSubscriberPtr_->unsubscribe();

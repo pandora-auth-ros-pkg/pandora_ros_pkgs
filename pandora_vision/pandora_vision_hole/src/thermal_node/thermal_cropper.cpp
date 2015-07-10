@@ -192,12 +192,12 @@ namespace thermal
     isEnhancedImageAvailable_ = false;
     isThermalAvailable_ = false;
 
-    if (!publishingEnhancedHoles_)
-      return;
-
     NODELET_INFO("[%s] Processing callback", nodeName_.c_str());
 
     unlockThermalProcedure();
+
+    if (!publishingEnhancedHoles_)
+      return;
 
     sensor_processor::ProcessorLogInfoPtr processorLogPtr( new sensor_processor::ProcessorLogInfo );
 
