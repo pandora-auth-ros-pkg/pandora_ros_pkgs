@@ -33,6 +33,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author:  Evangelos Apostolidis
+* Author: George Kouros
 *********************************************************************/
 #include "linear_actuator_hardware_interface/linear_actuator_hardware_interface.h"
 
@@ -60,6 +61,8 @@ namespace linear_actuator
     {
       comInterfacePtr_ = new FirgelliComInterface();
       comInterfacePtr_->init();
+      // initialize position of linear actuator
+      comInterfacePtr_->setTarget(0);
     }
     else
     {
@@ -94,23 +97,20 @@ namespace linear_actuator
 
   void LinearActuatorHardwareInterface::read()
   {
-    int feedback = comInterfacePtr_->readScaledFeedback();
-    position_ = static_cast<float>(feedback);
+    position_ = comInterfacePtr_->readScaledFeedback();
     ROS_DEBUG_STREAM("Feedback: " << position_);
   }
 
   void LinearActuatorHardwareInterface::write()
   {
-    uint16_t target = static_cast<uint16_t>(command_);
-    ROS_INFO("%d", target);
-    if (target >= 0 && target <= 14)
-    {
-      comInterfacePtr_->setTarget(target);
-    }
-    else
-    {
-      ROS_DEBUG_STREAM("Linear command out of bounds");
-    }
+    float target = static_cast<float>(command_);
+    // clip target command
+    if (target < 0)
+      target = 0;
+    else if (target > 14)
+      target = 14;
+
+    comInterfacePtr_->setTarget(target);
   }
 }  // namespace linear_actuator
 }  // namespace pandora_hardware_interface

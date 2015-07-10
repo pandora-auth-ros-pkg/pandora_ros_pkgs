@@ -49,6 +49,7 @@ namespace linear_actuator
     mInterface_ = 0;
     libusb_init(&mCtx_);
     rank_ = 1;
+    feedback_ = 0;
   }
 
   FirgelliComInterface::~FirgelliComInterface()
@@ -67,13 +68,13 @@ namespace linear_actuator
     openDevice();
 
     // set accuracy
-    command = 10;
+    command = 1;
     buf[0] = SET_ACCURACY;
     buf[1] = command % 256;  // Low
     buf[2] = command / 256;  // High
     write(buf, sizeof(buf));
     // set retract limit
-    command = 20;
+    command = 5;
     buf[0] = SET_RETRACT_LIMIT;
     buf[1] = command % 256;  // Low
     buf[2] = command / 256;  // High
@@ -226,16 +227,16 @@ namespace linear_actuator
       exit(1);
     }
 
-    return rval;
+    feedback_ = buf[1] + buf[2] * 256;
+
+    return true;
   }
 
-  int FirgelliComInterface::readScaledFeedback()
+  float FirgelliComInterface::readScaledFeedback()
   {
-    int position;
-    uint8_t buf[3];
-    buf[0] = GET_FEEDBACK;
-    position = write(buf, sizeof(buf));
-    return position;
+    uint8_t data[2];  // useless
+    read(data, sizeof(data));
+    return static_cast<float>(feedback_) / 1023.0 * 14.0;
   }
 
   void FirgelliComInterface::closeDevice()
@@ -245,18 +246,27 @@ namespace linear_actuator
 
   bool FirgelliComInterface::read(uint8_t* data, size_t size)
   {
+    uint8_t buf[3];
+    buf[0] = GET_FEEDBACK;
+    buf[1] = 0;
+    buf[2] = 0;
+
+    bool rval = write(buf, sizeof(buf));
+    return rval;
   }
 
 
-  int FirgelliComInterface::setTarget(uint16_t target)
+  bool FirgelliComInterface::setTarget(float target)
   {
     uint8_t buf[3];
-    uint16_t command = target;
-    command = (target/14.0)*1023;
+    uint16_t command = target * 1023.0 / 14.0;
+
     buf[0] = SET_POSITION;
     buf[1] = command % 256;  // Low
     buf[2] = command / 256;  // High
-    write(buf, sizeof(buf));
+
+    bool rval = write(buf, sizeof(buf));
+    return rval;
   }
 }  // namespace linear_actuator
 }  // namespace pandora_hardware_interface

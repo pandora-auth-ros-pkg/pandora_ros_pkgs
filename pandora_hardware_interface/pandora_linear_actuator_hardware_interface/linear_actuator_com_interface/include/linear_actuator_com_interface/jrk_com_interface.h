@@ -133,7 +133,7 @@ namespace linear_actuator
     @brief Reads position of linear joint in cm
     @return Scaled Feedback value
     **/
-    int readScaledFeedback();
+    float readScaledFeedback();
 
     /**
     @brief Asks linear actuator for duty cycle value. Returns duty cycle value
@@ -150,10 +150,10 @@ namespace linear_actuator
     /**
     @brief Sends position target command [Linear Actuator]
     @param target Target position value
-    @return 0 : success in setting target of linear actuator joint
-    @return -1 : failure in setting target of linear actuator joint
+    @return true : success in setting target of linear actuator joint
+    @return false : failure in setting target of linear actuator joint
     **/
-    int setTarget(uint16_t target);
+    bool setTarget(float target);
 
     /**
     @fn int getErrors();

@@ -100,7 +100,7 @@ namespace linear_actuator
     @brief Reads goal position in cm
     @return int : scaled feedback value
     **/
-    virtual int readScaledFeedback() = 0;
+    virtual float readScaledFeedback() = 0;
 
     /**
     @brief Sends position target command to linear actuator
@@ -108,7 +108,7 @@ namespace linear_actuator
     @return 0 : success in setting target of linear actuator joint
     @return -1 : failure in setting target of linear actuator joint
     **/
-    virtual  int setTarget(uint16_t target)=0;
+    virtual bool setTarget(float target)=0;
   };
 }  // namespace linear_actuator
 }  // namespace pandora_hardware_interface

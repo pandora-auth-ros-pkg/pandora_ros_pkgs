@@ -91,24 +91,23 @@ namespace linear_actuator
     /**
     @brief Gets position feedback from the linear joint
     @details Init must be called first to establish communication
-    @return void
+    @return bool
     **/
     bool read(uint8_t* data, size_t size);
 
     /**
-    @brief Reads goal position in cm
-    @return int : scaled feedback value
+    @brief Reads the linear actuator feedback
+    @return float
     **/
-    int readScaledFeedback();
-
+    float readScaledFeedback();
 
     /**
     @brief Sends position target command to linear actuator
-    @param target Target position value
-    @return 0 : success in setting target of linear actuator joint
-    @return -1 : failure in setting target of linear actuator joint
+    @param target [float] : Target position value
+    @return true : success in setting target of linear actuator joint
+    @return false : failure in setting target of linear actuator joint
     **/
-    int setTarget(uint16_t target);
+    bool setTarget(float target);
 
    private:
     /**
@@ -124,6 +123,7 @@ namespace linear_actuator
     struct libusb_context *mCtx_;
     static int mDebug_;
     int rank_;
+    uint16_t feedback_;
   };
 }  // namespace linear_actuator
 }  // namespace pandora_hardware_interface

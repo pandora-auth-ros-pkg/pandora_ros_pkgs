@@ -130,15 +130,16 @@ namespace linear_actuator
     }
   }
 
-  int JrkComInterface::setTarget(uint16_t target)
+  bool JrkComInterface::setTarget(float target)
   {
-    uint8_t command[] = {0xB3, 0xC0 + (target & 0x1F), (target >> 5) & 0x7F};
+    uint16_t uTarget = target * 1023.0 / 14.0;
+    uint8_t command[] = {0xB3, 0xC0 + (uTarget & 0x1F), (uTarget >> 5) & 0x7F};
     if ( !this->write(command, sizeof(command)) )
     {
       ROS_ERROR_STREAM("[Linear Actuator] Error writing > " << strerror(errno));
-      return -1;
+      return false;
     }
-    return 0;
+    return true;
   }
 
 
@@ -166,9 +167,9 @@ namespace linear_actuator
   }
 
 
-  int JrkComInterface::readScaledFeedback()
+  float JrkComInterface::readScaledFeedback()
   {
-    return readVariable(SCALED_FEEDBACK_VARIABLE);
+    return static_cast<float>(readVariable(SCALED_FEEDBACK_VARIABLE));
   }
 
 
