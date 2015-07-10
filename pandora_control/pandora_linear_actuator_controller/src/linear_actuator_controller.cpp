@@ -349,7 +349,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "linear_actuator_controller");
 
   pandora_control::LinearActuatorActionServer
-    linearActuatorActionServer(ros::this_node::getName());
+    linearActuatorActionServer("linear_actuator_action");
 
   ros::spin();
 }
