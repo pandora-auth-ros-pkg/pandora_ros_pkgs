@@ -40,52 +40,51 @@
 #include <stdint.h>
 #include <map>
 #include <cstring>
-#include <iostream>  // 
+#include <iostream>
 #include <fstream>  // file io streams
 #include <sstream>  // string streams
 #include "Utils/Utils.h"
 
 namespace pandora_hardware_interface
 {
-  namespace motor
+namespace motor
+{
+
+  std::map<int, std::string> Utils::readErrorCodesMap(
+    const std::string error_codes_file)
   {
+    std::map<int, std::string> error_codes_map;
+    std::map<int, std::string>::iterator it = error_codes_map.begin();
+    std::ifstream file;
+    std::string token;
+    std::string line;
+    int error_code;
+    std::string error_str;
+    std::string error_code_str;
 
-    std::map<int, std::string> Utils::readErrorCodesMap(
-      const std::string error_codes_file)
+    file.open(error_codes_file.c_str());
+    if (file.is_open())
     {
-      std::map<int, std::string> error_codes_map;
-      std::map<int, std::string>::iterator it = error_codes_map.begin();
-      std::ifstream file;
-      std::string token;
-      std::string line;
-      int error_code;
-      std::string error_str;
-      std::string error_code_str;
-
-      file.open(error_codes_file.c_str());
-      if(file.is_open())
+      while (std::getline(file, line))
       {
-        while(std::getline(file, line))
+        std::istringstream iss(line);
+        getline(iss, error_code_str, ',');
+
+        std::istringstream hex_str(error_code_str);
+        hex_str >> std::hex >> error_code;
+
+        getline(iss, error_str, ',');
+        if (error_str.at(0) == ' ')
         {
-          std::istringstream iss(line);
-          getline(iss, error_code_str, ',');
-
-          std::istringstream hex_str(error_code_str);
-          hex_str >> std::hex >> error_code;
-
-          getline(iss, error_str, ',');
-          if(error_str.at(0) == ' ')
-          {
-            error_str.erase(0, 1);
-          }
-          error_codes_map.insert(it, std::pair<int, std::string>(
-              error_code, error_str));
-          std::cout << "ErrorCode_int: " << error_code << ", ErrorCode_str: " 
-            << error_code_str << ", Error: " << error_codes_map[error_code] << "\n";
+          error_str.erase(0, 1);
         }
+        error_codes_map.insert(it, std::pair<int, std::string>(
+            error_code, error_str));
+        std::cout << "ErrorCode_int: " << error_code << ", ErrorCode_str: "
+          << error_code_str << ", Error: " << error_codes_map[error_code] << "\n";
       }
-      return error_codes_map;
-
     }
+    return error_codes_map;
   }
-}
+}  // namespace motor
+}  // namespace pandora_hardware_interface

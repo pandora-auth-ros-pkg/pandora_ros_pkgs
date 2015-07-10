@@ -72,7 +72,7 @@ namespace motor
       Epos2Controller* leftRearMotor_;
       uint16_t gatewayId_;
 
-      const int MAX_RETRIES_; 
+      const int MAX_RETRIES_;
       /*
        * operation_mode_ = 0 ==> velocity mode
        * operation_mode_ = 1 ==> current mode
@@ -81,7 +81,7 @@ namespace motor
 
     public:
       /*!
-       * @brief Constructor 
+       * @brief Constructor
        */
       SerialEpos2Handler(void);
 
@@ -165,14 +165,14 @@ namespace motor
 
 
       /*!
-       * @brief Converts single motor current to WHEEL Torque 
+       * @brief Converts single motor current to WHEEL Torque
        */
       double currentToTorque(
         int _input_current);
 
 
       /*!
-       * @brief Writes torque commands to motor controllers 
+       * @brief Writes torque commands to motor controllers
        * (needs to convert torques to currents as well)
        */
       uint16_t writeTorques(
@@ -183,9 +183,9 @@ namespace motor
 
 
       /*!
-       * @brief Switches between current and velocity mode 
-       *        Constuctor defaul = velocity mode 
-       * 
+       * @brief Switches between current and velocity mode
+       *        Constuctor defaul = velocity mode
+       *
        * @param mode  mode = 0 => velocity mode
        *              mode = 1 => current mode
        */

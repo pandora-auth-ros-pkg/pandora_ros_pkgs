@@ -77,8 +77,8 @@ namespace motor
       comInterface_->protocolStackName, comInterface_->interfaceName,
       comInterface_->portName, &error_);
 
-    return ( ( comHandler_ != 0 || error_ == 0) && 
-      eval_communicationParameters() == 0 );
+    return ( ( comHandler_ != 0 || error_ == 0) &&
+      eval_communicationParameters() == 0);
   }
 
   bool Epos2Gateway::closeDevice(void)
@@ -93,12 +93,12 @@ namespace motor
     uint32_t _baudrate;
     uint32_t _timeout;
 
-    int condition = ( ( VCS_GetProtocolStackSettings(comHandler_, 
-      &_baudrate, &_timeout, &error_) != 0 ) &&
-      ( VCS_SetProtocolStackSettings(comHandler_, 
-      comInterface_->baudrate, comInterface_->timeout, &error_) != 0 )
-      && ( VCS_GetProtocolStackSettings(comHandler_, &_baudrate,
-      &_timeout, &error_) != 0 ) );
+    int condition = ((VCS_GetProtocolStackSettings(comHandler_,
+      &_baudrate, &_timeout, &error_) != 0) &&
+      (VCS_SetProtocolStackSettings(comHandler_,
+      comInterface_->baudrate, comInterface_->timeout, &error_) != 0)
+      && (VCS_GetProtocolStackSettings(comHandler_, &_baudrate,
+      &_timeout, &error_) != 0));
 
     return condition;
   }
@@ -154,13 +154,12 @@ namespace motor
     int isEnabled = 0;
     // isEnabled => 1: Device Enabled, 0: Device NOT Enabled
     if (VCS_GetEnableState(comHandler_, nodeId, &isEnabled, &_errorCode) == 0)
-    
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      //ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
-        //"execution -- isEnableState, nodeId=%d",
-        //_errorCode, nodeId);
+      // ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
+        // "execution -- isEnableState, nodeId=%d",
+        // _errorCode, nodeId);
     }
     else  // Command executed succesfully
     {
@@ -202,14 +201,14 @@ namespace motor
   {
     uint32_t _errorCode;
     int isDisabled = 0;
-    if (VCS_GetDisableState(comHandler_, nodeId, &isDisabled, 
+    if (VCS_GetDisableState(comHandler_, nodeId, &isDisabled,
         &_errorCode) == 0)
     {
       // TODO(klpanagi): --- resolve errorCode
       // Will return error to serial_epos2_handler to handle.
-      //ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
-        //"execution -- isDisableState, nodeId=%d",
-        //_errorCode, nodeId);
+      // ROS_FATAL("\033[0m[Epos2-Gateway]: Received error {%d} on command "
+        // "execution -- isDisableState, nodeId=%d",
+        // _errorCode, nodeId);
     }
     else  // Command executed succesfully
     {
@@ -489,7 +488,7 @@ namespace motor
     }
     else
     {
-      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode", 
+      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode",
         nodeId);
     }
     return _errorCode;
@@ -510,7 +509,7 @@ namespace motor
     }
     else
     {
-      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode", 
+      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode",
         nodeId);
     }
     return _errorCode;
@@ -529,7 +528,7 @@ namespace motor
     }
     else
     {
-      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode", 
+      ROS_INFO("[Epos2-Gateway]: NodeId[%d] is set at ProfileVelocity Mode",
         nodeId);
     }
     return _errorCode;
@@ -600,4 +599,3 @@ namespace motor
 
 }  // namespace motor
 }  // namespace pandora_hardware_interface
-

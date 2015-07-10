@@ -54,31 +54,31 @@ namespace motor
     std::string _motorId[4];
 
     /*--<Load epos2 interface configs from parameter server>--*/
-    epos2_nh_.param<std::string>("interface/portName", _portName, 
+    epos2_nh_.param<std::string>("interface/portName", _portName,
       "");
     epos2_nh_.param<int>("interface/baudrate", _baudrate, 0);
     epos2_nh_.param<int>("interface/timeout", _timeout, 0);
-    epos2_nh_.param<std::string>("interface/deviceName", 
+    epos2_nh_.param<std::string>("interface/deviceName",
       _deviceName, "");
-    epos2_nh_.param<std::string>("interface/protocolStackName", 
+    epos2_nh_.param<std::string>("interface/protocolStackName",
       _protocolStackName, "");
-    epos2_nh_.param<std::string>("interface/interfaceName", 
+    epos2_nh_.param<std::string>("interface/interfaceName",
       _interfaceName, "");
 
     epos2_nh_.param<int>("controllers/epos2Gateway_id", _gatewayId, 0);
     epos2_nh_.param<int>("controllers/num", _numControllers, 0);
 
     epos2_nh_.param<int>("controllers/node1/id", _nodeId[0], 0);
-    epos2_nh_.param<std::string>("controllers/node1/index", 
+    epos2_nh_.param<std::string>("controllers/node1/index",
       _motorId[0], "");
     epos2_nh_.param<int>("controllers/node2/id", _nodeId[1], 0);
-    epos2_nh_.param<std::string>("controllers/node2/index", 
+    epos2_nh_.param<std::string>("controllers/node2/index",
       _motorId[1], "");
     epos2_nh_.param<int>("controllers/node3/id", _nodeId[2], 0);
-    epos2_nh_.param<std::string>("controllers/node3/index", 
+    epos2_nh_.param<std::string>("controllers/node3/index",
       _motorId[2], "");
     epos2_nh_.param<int>("controllers/node4/id", _nodeId[3], 0);
-    epos2_nh_.param<std::string>("controllers/node4/index", 
+    epos2_nh_.param<std::string>("controllers/node4/index",
       _motorId[3], "");
     /*-------------------------------------------------------*/
 
@@ -110,7 +110,7 @@ namespace motor
     bool comSucc = false;
     int retries = 0;
     /* ---<Initiate Communication with epos2 gateway >--- */
-    while (! comSucc && retries < MAX_RETRIES_)
+    while (!comSucc && retries < MAX_RETRIES_)
     {
       if ( epos2Gateway_->openDevice() )
       {
@@ -120,8 +120,8 @@ namespace motor
       else
       {
         ROS_WARN("[Epos2-Handler]: Communication Failed!");
-        retries ++;
-        ros::Duration(1).sleep(); // sleep for a second
+        retries++;
+        ros::Duration(1).sleep();  // sleep for a second
       }
     }
     /* ------------------------------------------------- */
@@ -329,7 +329,7 @@ namespace motor
 
     // Step II: Send commands to motors
     ROS_DEBUG("[Epos2-Handler]: Setting torques %f, %f, %f, %f",
-      leftRearTorque, leftFrontTorque, 
+      leftRearTorque, leftFrontTorque,
       rightRearTorque, rightFrontTorque);
 
     epos2Gateway_->set_targetCurrent(leftRearMotor_->nodeId_,
