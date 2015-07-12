@@ -7,16 +7,16 @@
   <xacro:macro name="left_sonar" >
     <xacro:devantech_srf05 name="left"
                            parent="base_link" >
-      <origin xyz="-0.15974 0.11037 0.14973"
-              rpy="0.0 0.0 ${- PI_6 }" />
+      <origin xyz="-0.15974 0.07913 0.14973"
+              rpy="0.0 0.0 0.097651" />
     </xacro:devantech_srf05>
   </xacro:macro>
 
   <xacro:macro name="right_sonar" >
     <xacro:devantech_srf05 name="right"
                            parent="base_link" >
-      <origin xyz="-0.15974 -0.11037 0.14973"
-              rpy="0.0 0.0 ${ PI_6 }" />
+      <origin xyz="-0.15974 -0.07913 0.14973"
+              rpy="0.0 0.0 -0.097651" />
     </xacro:devantech_srf05>
   </xacro:macro>
 
