@@ -200,7 +200,12 @@ namespace motor
         "/cmd_vel",
         1,
         &SkidSteerVelocityController::commandCallbackTwist,
-        // &SkidSteerVelocityController::commandCallbackKinodynamic,
+        this);
+
+    parameter_listener_ = ns.subscribe(
+        "/kinematic_parameters",
+        1,
+        &SkidSteerVelocityController::updateParameters,
         this);
 
     ROS_INFO("Successfully initiallized velocity controller!");
@@ -212,7 +217,7 @@ namespace motor
     // Update cmd_vel commands
     double angular = command_struct_.ang;
     double linear = command_struct_.lin;
-    // double terrain_parameter_ = command_struct_.terrain_parameter;
+    double terrain_parameter_ = command_struct_.terrain_parameter;
 
     if (!sim_)
     {
@@ -237,14 +242,10 @@ namespace motor
     command_struct_.stamp = ros::Time::now();
   }
 
-  void SkidSteerVelocityController::commandCallbackKinodynamic(
-      const pandora_motor_hardware_interface::KinodynamicCommand& command)
+  void SkidSteerVelocityController::updateParameters(
+                                            const pandora_motor_hardware_interface::KinematicParameters& command)
   {
-    command_struct_.ang   = command.cmd_vel.angular.z;
-    command_struct_.lin   = command.cmd_vel.linear.x;
     command_struct_.terrain_parameter = command.terrain_param;
-
-    command_struct_.stamp = ros::Time::now();
   }
 
   void SkidSteerVelocityController::remapVelocities(

@@ -97,13 +97,14 @@ namespace linear_actuator
 
   void LinearActuatorHardwareInterface::read()
   {
-    position_ = comInterfacePtr_->readScaledFeedback();
-    ROS_DEBUG_STREAM("Feedback: " << position_);
+    // get feedback and convert from [cm] to [m]
+    position_ = comInterfacePtr_->readScaledFeedback() / 100;
+    ROS_DEBUG_STREAM("Feedback: " << position_ << " m");
   }
 
   void LinearActuatorHardwareInterface::write()
   {
-    float target = static_cast<float>(command_);
+    float target = static_cast<float>(command_) * 100;
     // clip target command
     if (target < 0)
       target = 0;

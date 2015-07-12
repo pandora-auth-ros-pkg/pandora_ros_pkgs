@@ -51,7 +51,7 @@
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/Float64.h>
 
-#include <pandora_motor_hardware_interface/KinodynamicCommand.h>
+#include <pandora_motor_hardware_interface/KinematicParameters.h>
 
 namespace pandora_hardware_interface
 {
@@ -77,7 +77,7 @@ namespace motor
       void stopping(const ros::Time& time) { }
 
       void commandCallbackTwist(const geometry_msgs::Twist& command);
-      void commandCallbackKinodynamic(const pandora_motor_hardware_interface::KinodynamicCommand& command);
+      void updateParameters(const pandora_motor_hardware_interface::KinematicParameters& command);
 
     private:
       // Remap velocities using the calculated polynom
@@ -101,6 +101,7 @@ namespace motor
 
       // cmd_vel ROS subscriber
       ros::Subscriber command_listener_;
+      ros::Subscriber parameter_listener_;
 
       /// Velocity command related struct
       struct Commands
@@ -112,7 +113,7 @@ namespace motor
         float slip_factor_right;
         ros::Time stamp;
 
-        Commands() : lin(0.0), ang(0.0), stamp(0.0), terrain_parameter(0), slip_factor_left(0), slip_factor_right(0){}
+        Commands() : lin(0.0), ang(0.0), stamp(0.0), terrain_parameter(1.0), slip_factor_left(0), slip_factor_right(0){}
       };
       Commands command_struct_;
 
