@@ -33,7 +33,7 @@
     <param name="tilt_joint/limits/min" value="-0.6" />
     <param name="tilt_joint/offset" value="-0.1920" />
     <param name="tilt_joint/servo/name" value="tilt" />
-    <param name="tilt_joint/servo/pin" value="18" />
+    <param name="tilt_joint/servo/pin" value="27" />
 
   </node>
 
