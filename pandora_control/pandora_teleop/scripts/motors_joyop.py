@@ -104,7 +104,7 @@ class MotorsJoyop:
       msg.linear.x = self.linear*linear_coeff
       msg.angular.z = self.angular*angular_coeff
       self.pub.publish(msg)
-      rospy.sleep(0.2)
+      rospy.sleep(1.0/5.0)
 
 
 if __name__ == '__main__':

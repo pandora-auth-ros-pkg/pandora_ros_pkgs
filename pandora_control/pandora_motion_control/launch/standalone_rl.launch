@@ -1,0 +1,49 @@
+<launch>
+  <arg name="robot" default="gio"/>
+  <arg name="rviz" default="false"/>
+
+  <!-- Actuators -->
+  <!-- Motors -->
+  <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface_and_controllers.launch" >
+    <arg name="robot" value="$(arg robot)" />
+  </include>
+
+  <!-- Dynamixels for stabilizer -->
+  <include file="$(find pandora_dynamixel_hardware_interface)/launch/dynamixel_hardware_interface_and_controllers.launch" />
+
+  <!-- Stabilizer -->
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+
+  <!-- IMU -->
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface_and_controllers.launch" />
+
+  <!-- Software -->
+  <!-- Robot Description -->
+  <include file="$(find pandora_robots_description)/$(arg robot)/launch/$(arg robot)_description.launch"/>
+
+  <!-- State manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!-- SLAM -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
+  <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+
+  <!-- Navigation -->
+  <include file="$(find pandora_move_base)/launch/move_base.launch">
+    <arg name="map_patch" value="true" />
+  </include>
+  <include file="$(find pandora_explorer)/launch/explorer.launch" />
+
+  <!-- State change -->
+  <node name="state_changer" pkg="state_manager" type="state_changer" args="1"/>
+
+  <!-- Pandora Reinforcement Learning -->
+  <node name="kinematic_rl" pkg="pandora_motion_control" type="kinodynamic_control.py" output="screen"
+    respawn="true"/>
+
+  <!-- RVIZ -->
+  <group if="$(arg rviz)">
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find pandora_motion_control)/launch/config.rviz" />
+  </group>
+</launch>

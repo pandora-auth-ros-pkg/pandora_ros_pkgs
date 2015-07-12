@@ -82,7 +82,7 @@ namespace pandora_teleop
   void MotorsKeyop::publishTwist(void)
   {
     geometry_msgs::Twist twist;
-    ros::Rate rate(100);
+    ros::Rate rate(5);
     while (ros::ok)
     {
       twist.linear .x = linear_ * linear_scale_;

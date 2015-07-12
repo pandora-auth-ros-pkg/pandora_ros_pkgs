@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>pandora_motion_control</name>
+  <version>0.0.0</version>
+  <description>The pandora_motion_control package</description>
+
+  <maintainer email="gkourosg@yahoo.gr">George Kouros</maintainer>
+
+  <license>BSD</license>
+
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_control/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_control</url>
+
+  <author>Evangelos Apostolidis</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
+  
+  <depend>message_generation</depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rospy</depend>
+  <depend>pandora_motor_hardware_interface</depend>
+
+</package>

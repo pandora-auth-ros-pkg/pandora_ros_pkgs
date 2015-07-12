@@ -74,7 +74,7 @@ class Keyop:
   def __init__(self, max_lin_vel=0.5, max_ang_vel=0.8):
     self.lin_vel_range = [-float(max_lin_vel), float(max_lin_vel)]
     self.ang_vel_range = [-float(max_ang_vel), float(max_ang_vel)]
-    self.lac_range = [0.0, 14.0]
+    self.lac_range = [0.0, 0.14]
     self.xtion_yaw_range = [-0.7, 0.7]
     self.xtion_pitch_range = [-0.45, 0.75]
     self.picam_yaw_range = [-0.7, 0.7]
@@ -97,7 +97,7 @@ class Keyop:
 
     self.mode = 'motors'  # initialize mode to motors mode
 
-    rospy.Timer(rospy.Duration(0.1), self.pub_callback, oneshot=False)
+    rospy.Timer(rospy.Duration(1.0/5.0), self.pub_callback, oneshot=False)
     self.key_loop()
 
 
@@ -138,7 +138,7 @@ class Keyop:
     if self.mode == 'motors':
       rospy.loginfo("\033[33;1mMotors: linear_speed: %0.1f - angular_speed: %0.1f\033[0m", self.lin_vel, self.ang_vel)
     elif self.mode == 'lac':
-      rospy.loginfo("\033[33;1mLinear Actuator: Position: %0.1f\033[0m", self.lac_position)
+      rospy.loginfo("\033[33;1mLinear Actuator: Position: %0.2f\033[0m", self.lac_position)
     elif self.mode == 'xtion':
       rospy.loginfo("\033[33;1mXtion: pitch: %0.2f - yaw: %0.2f\033[0m", self.xtion_pitch, self.xtion_yaw)
     elif self.mode == 'picam':
@@ -174,7 +174,7 @@ class Keyop:
           if key == control_keys['space']:
             self.lac_position = 0
           else:
-            self.lac_position = self.lac_position + control_bindings[key][0] * 10
+            self.lac_position = self.lac_position + control_bindings[key][0] / 10
           self.lac_position = clip(self.lac_position, self.lac_range[0], self.lac_range[1])
         elif self.mode == 'xtion':
           if key == control_keys['space']:

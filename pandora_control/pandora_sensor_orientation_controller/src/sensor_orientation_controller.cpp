@@ -159,14 +159,12 @@ namespace pandora_control
     else if (command_ ==
              pandora_sensor_orientation_controller::MoveSensorGoal::POINT)
     {
-      ROS_INFO("? %s", pointOfInterest_.c_str());
       pointThreshold_ = movementThreshold_;
       pointSensorTimer_.start();
     }
     else if (command_ ==
              pandora_sensor_orientation_controller::MoveSensorGoal::LAX_POINT)
     {
-      ROS_INFO("! %s", pointOfInterest_.c_str());
       pointThreshold_ = laxMovementThreshold_;
       pointSensorTimer_.start();
     }
@@ -336,7 +334,7 @@ namespace pandora_control
 
   void SensorOrientationActionServer::centerSensor()
   {
-    if (position_ != START  || position_ != CENTER)
+    if (position_ != START)
     {
       pitchTargetPosition_.data = offsetPitch_;
       yawTargetPosition_.data = offsetYaw_;
@@ -362,26 +360,40 @@ namespace pandora_control
     {
       case START:
         yawScan_ = yawStep_;
-        position_ = LEFT;
+        pitchScan_ = 0;
+        position_ = LEFT_UP;
         break;
-      case LEFT:
+      case LEFT_UP:
+        yawScan_ = yawStep_;
+        pitchScan_ = pitchStep_;
+        position_ = LEFT_DOWN;
+        break;
+      case LEFT_DOWN:
         yawScan_ = 0;
-        position_ = CENTER;
+        pitchScan_ = pitchStep_;
+        position_ = CENTER_DOWN;
         break;
-      case CENTER:
+      case CENTER_DOWN:
         yawScan_ = -yawStep_;
-        position_ = RIGHT;
+        pitchScan_ = pitchStep_;
+        position_ = RIGHT_DOWN;
         break;
-      case RIGHT:
+      case RIGHT_DOWN:
+        yawScan_ = -yawStep_;
+        pitchScan_ = 0;
+        position_ = RIGHT_UP;
+        break;
+      case RIGHT_UP:
         yawScan_ = 0;
+        pitchScan_ = 0;
         position_ = START;
         break;
       case UNKNOWN:
         yawScan_ = 0;
+        pitchScan_ = 0;
         position_ = START;
         break;
     }
-    pitchScan_ = pitchStep_;
 
     publishScanPitchCommand();
     publishScanYawCommand();
@@ -459,8 +471,8 @@ namespace pandora_control
     {
       if (ros::Time::now() - lastTf > ros::Duration(1))
       {
-        ROS_DEBUG_STREAM("Is " << pointOfInterest_ << " broadcasted?");
-        ROS_INFO("%s: Aborted", actionName_.c_str());
+        ROS_ERROR_STREAM("Is " << pointOfInterest_ << " broadcasted?");
+        ROS_ERROR("%s: Aborted", actionName_.c_str());
 
         // set the action state to succeeded
         actionServer_.setAborted();

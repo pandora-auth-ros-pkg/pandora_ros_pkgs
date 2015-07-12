@@ -62,8 +62,6 @@ namespace pandora_control
       std_msgs::Float64 targetPosition;
       targetPosition.data = previousTarget_ = 0;
       linearActuatorCommandPublisher_.publish(targetPosition);
-      actionServer_.registerPreemptCallback(
-          boost::bind(&LinearActuatorActionServer::preemptCallback, this));
       actionServer_.start();
     }
   }
@@ -102,12 +100,6 @@ namespace pandora_control
     }
   }
 
-  void LinearActuatorActionServer::preemptCallback()
-  {
-    ROS_INFO("%s: Preempted", actionName_.c_str());
-    actionServer_.setPreempted();
-  }
-
   bool LinearActuatorActionServer::getControllerParams()
   {
     privateNodeHandle_.param("min_command", minCommand_, 0.0);
@@ -116,8 +108,6 @@ namespace pandora_control
     privateNodeHandle_.param("lax_movement_threshold", laxMovementThreshold_, 0.03);
     movementThreshold_ = fabs(movementThreshold_);
     privateNodeHandle_.param("command_timeout", commandTimeout_, 15.0);
-
-    ROS_INFO("private ns: %s", privateNodeHandle_.getNamespace().c_str());
 
     if (privateNodeHandle_.getParam("linear_actuator_command_topic", linearActuatorCommandTopic_))
     {
@@ -204,13 +194,20 @@ namespace pandora_control
       linearZ = linearActuatorTransform.getOrigin()[2];
       if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
       {
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        ROS_ERROR("%s: Aborted", actionName_.c_str());
         // set the action state to succeeded
         actionServer_.setAborted();
         return;
       }
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_WARN("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
     }
-    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+    ROS_INFO("%s: Succeeded", actionName_.c_str());
     // set the action state to succeeded
     actionServer_.setSucceeded();
   }
@@ -239,15 +236,22 @@ namespace pandora_control
         ROS_ERROR("%s", ex.what());
       }
       linearZ = linearActuatorTransform.getOrigin()[2];
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_WARN("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
       if (ros::Time::now().toSec() - begin.toSec() > commandTimeout_)
       {
-        ROS_DEBUG("%s: Aborted", actionName_.c_str());
+        ROS_ERROR("%s: Aborted", actionName_.c_str());
         // set the action state to succeeded
         actionServer_.setAborted();
         return;
       }
     }
-    ROS_DEBUG("%s: Succeeded", actionName_.c_str());
+    ROS_INFO("%s: Succeeded", actionName_.c_str());
     // set the action state to succeeded
     actionServer_.setSucceeded();
   }
@@ -261,6 +265,14 @@ namespace pandora_control
 
     while (ros::ok())
     {
+      if (actionServer_.isPreemptRequested() || !ros::ok())
+      {
+        ROS_WARN("%s: Preempted", actionName_.c_str());
+        // set the action state to preempted
+        actionServer_.setPreempted();
+        return;
+      }
+
       tf::StampedTransform linearActuatorTransform;
       try
       {
@@ -284,6 +296,13 @@ namespace pandora_control
       {
         if (ros::Time::now() - lastTf > ros::Duration(1))
         {
+          if (actionServer_.isPreemptRequested() || !ros::ok())
+          {
+            ROS_WARN("%s: Preempted", actionName_.c_str());
+            // set the action state to preempted
+            actionServer_.setPreempted();
+            return;
+          }
           ROS_ERROR_STREAM("Is " << pointOfInterest << " broadcasted?");
           ROS_ERROR("%s: Aborted", actionName_.c_str());
           // set the action state to succeeded
@@ -307,6 +326,13 @@ namespace pandora_control
       {
         if (ros::Time::now() - lastTf > ros::Duration(1))
         {
+          if (actionServer_.isPreemptRequested() || !ros::ok())
+          {
+            ROS_WARN("%s: Preempted", actionName_.c_str());
+            // set the action state to preempted
+            actionServer_.setPreempted();
+            return;
+          }
           ROS_ERROR_STREAM("Is " << centerPoint << " broadcasted?");
           ROS_ERROR("%s: Aborted", actionName_.c_str());
           // set the action state to succeeded

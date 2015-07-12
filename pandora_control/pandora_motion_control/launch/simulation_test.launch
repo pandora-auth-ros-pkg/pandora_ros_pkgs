@@ -1,0 +1,36 @@
+<launch>
+  <arg name="robot" default="gio"/>
+  <arg name="world" default="start"/>
+
+  <!-- Gazebo -->
+  <include file="$(find pandora_gazebo_worlds)/launch/$(arg world).launch" >
+    <arg name="robot" value="$(arg robot)"/>
+  </include>
+
+  <!-- State manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+  <!-- SLAM -->
+  <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d.launch" />
+  <!-- <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" /> -->
+
+
+  <!-- Navigation [??] (Maybe add explorer (maybe as an arg))-->
+  <include file="$(find pandora_move_base)/launch/move_base.launch">
+    <!-- <arg name="map_patch" value="true" /> -->
+  </include>
+
+  <!-- Laser Stabilizer -->
+  <include file="$(find pandora_stabilizer)/launch/stabilizer_control.launch" />
+
+  <!-- State change -->
+  <node name="state_changer" pkg="state_manager" type="state_changer" args="1"/>
+
+  <!-- Pandora Reinforcement Learning -->
+  <node name="kinematic_rl" pkg="pandora_motion_control" type="kinodynamic_control.py" output="screen"
+    respawn="true"/>
+
+  <!-- RVIZ -->
+  <node name="rviz" type="rviz" pkg="rviz" args="-d $(find pandora_motion_control)/launch/config.rviz" />
+
+</launch>

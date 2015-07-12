@@ -50,7 +50,7 @@ linear_actuator_client = {
     'action': MoveLinearActuatorAction
 }
 
-head_client = as{
+head_client = {
     'goal': MoveSensorGoal(),
     'topic': move_head_topic,
     'action': MoveSensorAction
