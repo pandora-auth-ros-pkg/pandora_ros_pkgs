@@ -215,6 +215,10 @@ namespace pandora_vision_obstacle
       /// The node's name
       std::string nodeName_;
 
+      /// The minimum length that a line should have to be detected by Hough
+      /// transform
+      int minLineLength_;
+
       /// The saturation threshold of HSV color used to pick the color of a line
       int sValueThreshold_;
       /// The value threshold of HSV color used to pick the color of a line
@@ -231,12 +235,24 @@ namespace pandora_vision_obstacle
       float betaThreshold_;
 
       /// The minimum depth difference for a line to be considered valid
-      double depthThreshold_;
+      double minDepthThreshold_;
+      /// The maximum depth difference for a bounding box to be valid
+      double maxDepthThreshold_;
 
       /// The size of the kernel used to erode the image
       cv::Size erodeKernelSize_;
       /// The size of the kernel used to dilate the image
       cv::Size dilateKernelSize_;
+
+      /// The width of the rectangle in which the depth is calculated around the
+      /// line center
+      int centerWidth_;
+      /// The height of the rectangle in which the depth is calculated around the
+      /// line center
+      int centerHeight_;
+
+      /// The minimum number of lines for a soft obstacle to be detected
+      int linesThreshold_;
 
       /// Debug parameters
       bool showOriginalImage_;

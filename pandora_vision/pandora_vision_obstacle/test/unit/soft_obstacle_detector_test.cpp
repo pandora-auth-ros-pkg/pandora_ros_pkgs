@@ -53,14 +53,19 @@ namespace pandora_vision_obstacle
         detector_->sValueThreshold_ = 100;
         detector_->vValueThreshold_ = 130;
 
+        detector_->minLineLength_ = 100;
         detector_->gaussianKernelSize_ = 13;
         detector_->gradientThreshold_ = 2.0;
         detector_->betaThreshold_ = 3.0;
 
-        detector_->depthThreshold_ = 0.3;
+        detector_->minDepthThreshold_ = 0.3;
+        detector_->maxDepthThreshold_ = 0.5;
 
         detector_->erodeKernelSize_ = cv::Size(3, 3);
         detector_->dilateKernelSize_ = cv::Size(3, 3);
+
+        detector_->centerWidth_ = 5;
+        detector_->centerHeight_ = 10;
 
         detector_->showOriginalImage_ = false;
         detector_->showDWTImage_ = false;

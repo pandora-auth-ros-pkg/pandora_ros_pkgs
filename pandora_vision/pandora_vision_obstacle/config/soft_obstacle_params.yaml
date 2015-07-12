@@ -1,3 +1,4 @@
+minLineLength: 100
 gaussianKernelSize: 13
 
 hsvColor:
@@ -11,7 +12,14 @@ dilateKernelSize:
   rows: 3
   cols: 3
 
-depthThreshold: 0.3
+centerRect:
+  width: 5
+  height: 10
+
+minDepthThreshold: 0.3
+maxDepthThreshold: 0.5
 
 gradientThreshold: 2.0
 betaThreshold: 3.0
+
+linesThreshold: 2

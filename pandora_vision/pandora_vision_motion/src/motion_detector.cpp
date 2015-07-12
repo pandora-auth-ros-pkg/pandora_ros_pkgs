@@ -155,7 +155,7 @@ namespace pandora_vision_motion
       /// Calculate the standard deviation
       cv::Scalar mean, stdDev;
       meanStdDev(thresholdedDifference_, mean, stdDev);
-      ROS_INFO_STREAM("Motion stdev=" << stdDev[0] << " max_deviation= " << maxDeviation_);
+      // ROS_INFO_STREAM("Motion stdev=" << stdDev[0] << " max_deviation= " << maxDeviation_);
       /// If not to much changes then the motion is real
       if (stdDev[0] < maxDeviation_)
       {
@@ -167,7 +167,7 @@ namespace pandora_vision_motion
             CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
         cv::Mat mask = cv::Mat::zeros(thresholdedDifference_.size(), CV_8UC1);
         cv::drawContours(mask, contours, -1, cv::Scalar(255, 255, 255), CV_FILLED);
-        ROS_INFO_STREAM("Contours found=" << contours.size());
+        // ROS_INFO_STREAM("Contours found=" << contours.size());
 
         /// find motion Points
         std::vector<cv::Point> motionPoints;
@@ -181,7 +181,7 @@ namespace pandora_vision_motion
             }
           }
         }
-        ROS_INFO_STREAM("motion points=" << motionPoints.size());
+        // ROS_INFO_STREAM("motion points=" << motionPoints.size());
 
         if (contours.size() > 1 && enableDBSCAN_)
         {
@@ -192,7 +192,7 @@ namespace pandora_vision_motion
           std::vector<std::vector<cv::Point> > clusters_ = dbscan.getClusters();
 
           // dbscan.getClusters(clusters_);
-          ROS_INFO_STREAM("CLUSTERS FOUND=" << clusters_.size());
+          // ROS_INFO_STREAM("CLUSTERS FOUND=" << clusters_.size());
           // if (clusters->size() > 0)
           // {
             // cohesion = dbscan.getCohesion(clusters);
@@ -255,7 +255,7 @@ namespace pandora_vision_motion
       probability = 0.51f;
     else if (points >= lowMotionThreshold_)
       probability = 1.0f;
-    ROS_INFO_STREAM("PROB=" << probability << " points=" << points);
+    // ROS_INFO_STREAM("PROB=" << probability << " points=" << points);
     return probability;
   }
 

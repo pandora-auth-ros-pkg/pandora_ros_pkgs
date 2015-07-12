@@ -216,8 +216,6 @@ namespace pandora_vision_motion
     std::vector<double> cohesion;
     std::vector<cv::Point2d> centroid;
 
-    ROS_INFO_STREAM("enter cohesion "<< clusters.size());
-
     /// calculate centroids
     for (int i = 0; i < clusters.size(); i++)
     {
@@ -281,7 +279,7 @@ namespace pandora_vision_motion
         _visitedPoints.at(i) = true;
         std::vector<int> neighbours;
         regionQuery(i, &neighbours);
-        ROS_INFO_STREAM("FIND NEIGHBORS OF POINT " << i << " SIZE="<< neighbours.size());
+        // ROS_INFO_STREAM("FIND NEIGHBORS OF POINT " << i << " SIZE="<< neighbours.size());
           if (neighbours.size() < _minPts)/*  && i != 0) */
           {
             /// Mark P as noise
