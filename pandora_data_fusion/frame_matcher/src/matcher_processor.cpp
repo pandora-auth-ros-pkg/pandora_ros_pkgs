@@ -60,7 +60,14 @@ namespace frame_matcher
   MatcherProcessor::
   MatcherProcessor(const std::string& ns, sensor_processor::Handler* handler)
   {
-    initialize(ns, handler);
+    this->initialize(ns, handler);
+  }
+
+  void
+  MatcherProcessor::
+  initialize(const std::string& ns, sensor_processor::Handler* handler)
+  {
+    sensor_processor::Processor<PointsOnFrame, PointsOnFrame>::initialize(ns, handler);
 
     nh_ = this->getPublicNodeHandle();
     processor_nh_ = this->getProcessorNodeHandle();
@@ -74,14 +81,14 @@ namespace frame_matcher
 
     if (!processor_nh_.getParam("subscribed_topic_names/map_topic", mapTopicName_))
     {
-      ROS_FATAL("[%s] Cound not fing map topic name", processorName_.c_str());
+      ROS_FATAL("[%s] Cound not find map topic name", processorName_.c_str());
       ROS_BREAK();
     }
 
     std::string map_type;
-    if (!nh_.getParam("map_type", map_type))
+    if (!processor_nh_.getParam("map_type", map_type))
     {
-      ROS_FATAL("[%s] Cound not fing map type", processorName_.c_str());
+      ROS_FATAL("[%s] Cound not find map type", processorName_.c_str());
       ROS_BREAK();
     }
 
@@ -96,9 +103,6 @@ namespace frame_matcher
 
   MatcherProcessor::
   MatcherProcessor() {}
-
-  MatcherProcessor::
-  ~MatcherProcessor() {}
 
   /**
    * @details TODO
@@ -135,7 +139,7 @@ namespace frame_matcher
   MatcherProcessor::
   updateMap(const nav_msgs::OccupancyGridConstPtr& msg)
   {
-    ROS_INFO("[%s] Map callback called", this->getName().c_str());
+    // ROS_INFO("[%s] Map callback called", this->getName().c_str());
     mapConstPtr_ = msg;
     viewPoseFinderPtr_->updateMap(msg);
   }
@@ -144,7 +148,7 @@ namespace frame_matcher
   MatcherProcessor::
   updateImageTo(const sensor_msgs::ImageConstPtr& msg)
   {
-    ROS_INFO("[%s] Target image callback called", this->getName().c_str());
+    // ROS_INFO("[%s] Target image callback called", this->getName().c_str());
     imageToConstPtr_ = msg;
   }
 

@@ -121,7 +121,8 @@ class MassPublisher:
                     self.alertDeliveryBoy.deliverSoundOrder(
                         self.config.sound_yaw,
                         self.config.sound_pitch,
-                        self.config.sound_probability)
+                        self.config.sound_probability,
+                        self.config.sound_word)
 
                 if self.config.visualVictim_post:
                     self.alertDeliveryBoy.deliverVisualVictimOrder(

@@ -119,9 +119,9 @@ namespace pandora_alert_handler
           {
             groupedObjects[ii].push_back(currentObj);
             isAdded = true;
-            if (currentObj->getType() != Sound::getObjectType() &&
-                currentObj->getType() != Co2::getObjectType())
-              break;
+            // if (currentObj->getType() != Sound::getObjectType() &&
+            //     currentObj->getType() != Co2::getObjectType())
+            break;
           }
         }
 

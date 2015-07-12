@@ -4,5 +4,6 @@ bool victimVerified
 bool victimValid
 ---
 #result
+pandora_data_fusion_msgs/WorldModel worldModel
 ---
 #feedback

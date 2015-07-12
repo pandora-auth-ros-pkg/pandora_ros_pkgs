@@ -63,8 +63,6 @@ namespace frame_matcher
    */
   EnhancedImagePreProcessor::
   EnhancedImagePreProcessor() {}
-  EnhancedImagePreProcessor::
-  ~EnhancedImagePreProcessor() {}
 
   /**
    * @details TODO

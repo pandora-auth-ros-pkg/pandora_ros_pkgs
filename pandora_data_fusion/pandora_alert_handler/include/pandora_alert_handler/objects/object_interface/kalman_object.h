@@ -196,13 +196,13 @@ namespace pandora_alert_handler
   template <class DerivedObject>
   void KalmanObject<DerivedObject>::update(const ObjectConstPtr& measurement)
   {
-    ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
-        "before measurement std dev = "
-        << std::endl << "x : " << getStdDevX()
-        << std::endl << "y : " << getStdDevY()
-        << std::endl << "z : " << getStdDevZ());
-    ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
-        "before measurement probability = " << this->getProbability());
+    // ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+    //     "before measurement std dev = "
+    //     << std::endl << "x : " << getStdDevX()
+    //     << std::endl << "y : " << getStdDevY()
+    //     << std::endl << "z : " << getStdDevZ());
+    // ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+    //     "before measurement probability = " << this->getProbability());
     geometry_msgs::Point measurementPosition = measurement->getPose().position;
     MatrixWrapper::ColumnVector newPosition(1);
     //!< Filter's input vector
@@ -244,17 +244,17 @@ namespace pandora_alert_handler
     this->pose_ = newObjectPose;
 
     //!< Updating object's probability.
-    ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
-        "after Measurement std dev = "
-        << std::endl << "x : " << getStdDevX()
-        << std::endl << "y : " << getStdDevY()
-        << std::endl << "z : " << getStdDevZ());
+    // ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+    //     "after Measurement std dev = "
+    //     << std::endl << "x : " << getStdDevX()
+    //     << std::endl << "y : " << getStdDevY()
+    //     << std::endl << "z : " << getStdDevZ());
     this->probability_ = (
         pandora_data_fusion_utils::Utils::probabilityFromStdDev(this->distanceThres_, getStdDevX()) +
         pandora_data_fusion_utils::Utils::probabilityFromStdDev(this->distanceThres_, getStdDevY()) +
         pandora_data_fusion_utils::Utils::probabilityFromStdDev(this->distanceThres_, getStdDevZ())) / 3;
-    ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
-        "after Measurement probability = " << this->probability_);
+    // ROS_DEBUG_STREAM_NAMED("KALMAN_OBJECT_UPDATE",
+    //     "after Measurement probability = " << this->probability_);
 
     //!< Check if object has become a legitimate one.
     this->checkLegit();

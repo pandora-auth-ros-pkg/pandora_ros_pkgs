@@ -65,8 +65,6 @@ namespace frame_matcher
      * handles this postprocessor
      **/
     EnhancedImagePreProcessor();
-    virtual
-    ~EnhancedImagePreProcessor();
 
     /**
      * @brief TODO

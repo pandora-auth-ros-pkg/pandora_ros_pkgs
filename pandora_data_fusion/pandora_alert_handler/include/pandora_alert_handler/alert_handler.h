@@ -196,6 +196,12 @@ namespace pandora_alert_handler
       */
     void publishVictims();
 
+    /**
+     * @brief Fetches world model from victim handler
+     * @param worldModelPtr [WorldModel*] pointer to WorldModel variable
+     */
+    void fetchWorldModel(pandora_data_fusion_msgs::WorldModel* worldModelPtr);
+
     void initRosInterfaces();
 
    private:

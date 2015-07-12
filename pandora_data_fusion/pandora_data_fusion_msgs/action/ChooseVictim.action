@@ -2,5 +2,6 @@
 int32 victimId
 ---
 #result
+pandora_data_fusion_msgs/WorldModel worldModel
 ---
 #feedback

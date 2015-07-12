@@ -168,7 +168,6 @@ namespace pandora_alert_handler
   void ObjectHandler::deleteObjectsOnSoftObstacles(
       const typename ObjectType::PtrVectorPtr& objectsPtr)
   {
-    ROS_DEBUG("[OBJECT_HANDLER %d] Deleting %ss on soft obstacles", __LINE__, ObjectType::getObjectType().c_str());
     typename ObjectType::PtrVector::iterator iter = objectsPtr->begin();
 
     while (iter != objectsPtr->end()) {

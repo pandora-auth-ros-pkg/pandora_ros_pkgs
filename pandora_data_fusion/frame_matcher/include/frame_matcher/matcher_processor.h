@@ -70,8 +70,9 @@ namespace frame_matcher
      * handles this postprocessor
      **/
     MatcherProcessor(const std::string& ns, sensor_processor::Handler* handler);
+    virtual void
+    initialize(const std::string& ns, sensor_processor::Handler* handler);
     MatcherProcessor();
-    virtual ~MatcherProcessor();
 
     /**
      * @brief TODO

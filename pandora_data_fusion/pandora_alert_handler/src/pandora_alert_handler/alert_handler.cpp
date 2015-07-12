@@ -152,8 +152,13 @@ namespace pandora_alert_handler
   void AlertHandler::publishVictims()
   {
     pandora_data_fusion_msgs::WorldModel worldModelMsg;
-    victimHandler_->getVictimsInfo(&worldModelMsg);
+    fetchWorldModel(&worldModelMsg);
     worldModelPublisher_.publish(worldModelMsg);
+  }
+
+  void AlertHandler::fetchWorldModel(pandora_data_fusion_msgs::WorldModel* worldModelPtr)
+  {
+    victimHandler_->getVictimsInfo(worldModelPtr);
   }
 
   void AlertHandler::initRosInterfaces()
@@ -348,19 +353,34 @@ namespace pandora_alert_handler
   {
     int victimId = targetVictimServer_->acceptNewGoal()->victimId;
     bool targeted = victimHandler_->targetVictim(victimId);
+    pandora_data_fusion_msgs::ChooseVictimResult result;
+    fetchWorldModel(&result.worldModel);
     if (!targeted)
-      targetVictimServer_->setAborted();
-    targetVictimServer_->setSucceeded();
+    {
+      ROS_ERROR("[/PANDORA_ALERT_HANDLER] Targeting victim with Id %d aborted!",
+          victimId);
+      targetVictimServer_->setAborted(result);
+    }
+    ROS_INFO("[/PANDORA_ALERT_HANDLER] Targeting victim with Id %d succeeded!",
+        victimId);
+    targetVictimServer_->setSucceeded(result);
   }
 
   void AlertHandler::deleteVictimCallback()
   {
     int victimId = deleteVictimServer_->acceptNewGoal()->victimId;
     bool deleted = victimHandler_->deleteVictim(victimId);
-    publishVictims();
+    pandora_data_fusion_msgs::ChooseVictimResult result;
+    fetchWorldModel(&result.worldModel);
     if (!deleted)
-      deleteVictimServer_->setAborted();
-    deleteVictimServer_->setSucceeded();
+    {
+      ROS_ERROR("[/PANDORA_ALERT_HANDLER] Deleting victim with Id %d aborted!",
+          victimId);
+      deleteVictimServer_->setAborted(result);
+    }
+    ROS_WARN("[/PANDORA_ALERT_HANDLER] Deleting victim with Id %d succeeded!",
+        victimId);
+    deleteVictimServer_->setSucceeded(result);
   }
 
   void AlertHandler::validateVictimCallback()
@@ -368,10 +388,17 @@ namespace pandora_alert_handler
     GoalConstPtr goal = validateVictimServer_->acceptNewGoal();
     bool validated = victimHandler_->validateVictim(goal->victimId,
         goal->victimVerified, goal->victimValid);
-    publishVictims();
+    pandora_data_fusion_msgs::ValidateVictimResult result;
+    fetchWorldModel(&result.worldModel);
     if (!validated)
-      validateVictimServer_->setAborted();
-    validateVictimServer_->setSucceeded();
+    {
+      ROS_ERROR("[/PANDORA_ALERT_HANDLER] Validating victim with Id %d aborted!",
+          goal->victimId);
+      validateVictimServer_->setAborted(result);
+    }
+    ROS_INFO("[/PANDORA_ALERT_HANDLER] Validating victim with Id %d succeeded!",
+        goal->victimId);
+    validateVictimServer_->setSucceeded(result);
   }
 
   void AlertHandler::updateMap(const nav_msgs::OccupancyGridConstPtr& msg)

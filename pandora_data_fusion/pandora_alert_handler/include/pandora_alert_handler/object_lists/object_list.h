@@ -153,7 +153,7 @@ namespace pandora_alert_handler
     cool = cool || object->getPose().orientation.y != 0;
     cool = cool || object->getPose().orientation.z != 0;
     cool = cool || object->getPose().orientation.w != 0;
-    ROS_INFO_COND(!cool, "[OBJECT_LIST] Tried to add an object with uninitialized pose.");
+    ROS_ERROR_COND(!cool, "[OBJECT_LIST] Tried to add an object with uninitialized pose.");
     if (!cool)
       return false;
 
