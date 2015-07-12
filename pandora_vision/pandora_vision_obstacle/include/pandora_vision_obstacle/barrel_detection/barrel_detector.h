@@ -124,6 +124,27 @@ namespace pandora_vision_obstacle
           const cv::Point& symmetricStartPoint,
           const cv::Point& symmetricEndPoint);
 
+      /**
+        @brief Finds if a point belongs to a 3D circle's equation. All points
+        given are 2D and the third coordinate is depth.
+        @param[in] depthImage [const cv::Mat&] The depth image
+        @param[in] point [const cv::Point&] The point to check
+        @param[in] center [const cv::Point&] The center of the circle
+        @param[in] normalLineStartPoint [const cv::Point&] The first point of the line perpendicular to the circle's plane
+        @param[in] normalLineEndPoint [const cv::Point&] The second point of the line perpendicular to the circle's plane
+        @param[in] centerDepth [float] The depth of the center
+        @param[in] radius [float] The radius of the circle
+        @return [bool] A flag indicating whether point belongs in the circle
+       **/
+      bool isInCircle(
+          const cv::Mat& depthImage,
+          const cv::Point& point,
+          const cv::Point& center,
+          const cv::Point& normalLineStartPoint,
+          const cv::Point& normalLineEndPoint,
+          float centerDepth,
+          float radius);
+
       float findDepthDistance(const cv::Mat& depthImage,
           const cv::Rect& roi);
 

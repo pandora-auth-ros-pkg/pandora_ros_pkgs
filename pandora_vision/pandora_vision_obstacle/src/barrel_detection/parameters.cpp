@@ -173,8 +173,8 @@ namespace pandora_vision_obstacle
   float BarrelDetection::roi_variance_thresh = 110.0;
   float BarrelDetection::differential_depth_unsymmetry_thresh = 0.2;
   float BarrelDetection::symmetry_line_depth_difference_thresh = 11.0;
-  float BarrelDetection::curve_approximation_max_epsilon = 1200.0;
-  float BarrelDetection::min_circle_overlapping = 0.25;
+  float BarrelDetection::curve_approximation_max_epsilon = 20.0;
+  float BarrelDetection::min_circle_overlapping = 0.35;
   float BarrelDetection::max_corner_thresh = 65.0;
 
   bool BarrelDetection::color_validation = true;

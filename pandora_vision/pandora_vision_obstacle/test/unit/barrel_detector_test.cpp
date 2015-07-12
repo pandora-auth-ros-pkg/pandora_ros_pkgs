@@ -232,8 +232,7 @@ namespace pandora_vision
       {
         image->at<float>(rows, cols) =
           (- std::sqrt(std::abs(std::pow(depthUpper * 255.0 - depthLower * 255.0, 2)
-                - std::pow(
-              std::sqrt(std::pow(cols, 2))
+                - std::pow(std::sqrt(std::pow(cols, 2))
               - std::sqrt(std::pow(s1.x, 2)), 2)))
           + depthUpper * 255.0) / 255.0;
       }

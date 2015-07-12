@@ -402,26 +402,15 @@ namespace pandora_vision_obstacle
       return false;
     int sumNonZero = 0;
     int sumOnCurve = 0;
-    for (int linePoint = leftRightBorder; linePoint >= firstBorder; linePoint --)
+    for (int linePoint = firstBorder; linePoint < secondBorder; linePoint ++)
       if (depthImage.at<float>(points[linePoint].y, points[linePoint].x) != 0.0)
       {
         sumNonZero++;
-        float circleLeftEq =
-          std::pow(
-              std::sqrt(std::pow(points[linePoint].x, 2) + std::pow(points[linePoint].y, 2))
-              - std::sqrt(std::pow(s1.x, 2) + std::pow(s1.y, 2)), 2) +
-          std::pow(depthImage.at<float>(points[linePoint].y, points[linePoint].x) - maxDepth, 2);
-        if (std::abs(circleLeftEq - std::pow(radius, 2)) < BarrelDetection::curve_approximation_max_epsilon)
-          sumOnCurve++;
-      }
-    for (int linePoint = leftRightBorder; linePoint < secondBorder; linePoint ++)
-      if (depthImage.at<float>(points[linePoint].y, points[linePoint].x) != 0.0)
-      {
-        sumNonZero++;
-        float circleLeftEq =
-          std::pow(points[linePoint].x - s1.x, 2) + std::pow(points[linePoint].y - s1.y, 2) +
-          std::pow(depthImage.at<float>(points[linePoint].y, points[linePoint].x) - maxDepth, 2);
-        if (std::abs(circleLeftEq - std::pow(radius, 2)) < BarrelDetection::curve_approximation_max_epsilon)
+        bool validCircle =
+          isInCircle(depthImage, points[linePoint],
+              s1, symmetricStartPoint, symmetricEndPoint,
+              maxDepth, radius);
+        if (validCircle)
           sumOnCurve++;
       }
     float curveProbability = static_cast<float>(sumOnCurve) / static_cast<float>(sumNonZero);
@@ -502,6 +491,80 @@ namespace pandora_vision_obstacle
     }
 
     return true;
+  }
+
+  /**
+    @brief Finds if a point belongs to a 3D circle's equation. All points
+    given are 2D and the third coordinate is depth.
+    @param[in] depthImage [const cv::Mat&] The depth image
+    @param[in] point [const cv::Point&] The point to check
+    @param[in] center [const cv::Point&] The center of the circle
+    @param[in] normalLineStartPoint [const cv::Point&] The first point of the line perpendicular to the circle's plane
+    @param[in] normalLineEndPoint [const cv::Point&] The second point of the line perpendicular to the circle's plane
+    @param[in] centerDepth [float] The depth of the center
+    @param[in] radius [float] The radius of the circle
+    @return [bool] A flag indicating whether point belongs in the circle
+   **/
+  bool BarrelDetector::isInCircle(
+      const cv::Mat& depthImage,
+      const cv::Point& point,
+      const cv::Point& center,
+      const cv::Point& normalLineStartPoint,
+      const cv::Point& normalLineEndPoint,
+      float centerDepth,
+      float radius)
+  {
+    // Calculate unit normal vector for the circle's plane. Consider
+    // third coordinate zero based on the assumption that the depth
+    // between two points on the symmetry line remains constant
+    std::vector<float> vectorN(3);
+    vectorN[0] =
+      std::abs(normalLineEndPoint.x - normalLineStartPoint.x)
+      / std::sqrt(std::pow(normalLineEndPoint.x - normalLineStartPoint.x, 2)
+          + std::pow(normalLineEndPoint.y - normalLineStartPoint.y, 2));
+    vectorN[1] =
+      std::abs(normalLineEndPoint.y - normalLineStartPoint.y)
+      / std::sqrt(std::pow(normalLineEndPoint.x - normalLineStartPoint.x, 2)
+          + std::pow(normalLineEndPoint.y - normalLineStartPoint.y, 2));
+    vectorN[2] = 0.0;
+
+    // Calculate unit vector from center to a point on the circle, consider
+    // this point to be at the center of the symmetry line, thus having same
+    // x, y coordinates as the center point
+    std::vector<float> vectorU(3);
+    vectorU[0] = 0.0;
+    vectorU[1] = 0.0;
+    vectorU[2] = 1.0;
+
+    // Calculate cross product of N and U
+    std::vector<float> vectorV(3);
+    vectorV[0] = vectorN[1] * vectorU[2] - vectorN[2] * vectorU[1];
+    vectorV[1] = vectorN[2] * vectorU[0] - vectorN[0] * vectorU[2];
+    vectorV[2] = vectorN[0] * vectorU[1] - vectorN[1] * vectorU[0];
+
+    // Check if point belongs to the circle equation
+    bool valid = false;
+    for (float tParameter = 0.0; tParameter < 6.28; tParameter += 0.1)
+    {
+      std::vector<float> circleRightEq(3);
+      circleRightEq[0] =
+        center.x + radius * cos(tParameter) * vectorU[0] + radius * sin(tParameter) * vectorV[0];
+      circleRightEq[1] =
+        center.y + radius * cos(tParameter) * vectorU[1] + radius * sin(tParameter) * vectorV[1];
+      circleRightEq[2] =
+        centerDepth + radius * cos(tParameter) * vectorU[2] + radius * sin(tParameter) * vectorV[2];
+
+      // Find the avg error between the point and the equation
+      float epsilon =
+        (std::abs(circleRightEq[0] - point.x) + std::abs(circleRightEq[1] - point.y)
+        + std::abs(circleRightEq[2] - depthImage.at<float>(point.x, point.y))) / 3.0;
+      if (epsilon < BarrelDetection::curve_approximation_max_epsilon)
+      {
+        valid = true;
+        break;
+      }
+    }
+    return valid;
   }
 
   float BarrelDetector::findDepthDistance(const cv::Mat& depthImage,
@@ -588,7 +651,7 @@ namespace pandora_vision_obstacle
 
         poi->setDepth(depthDistance);
         pois.push_back(poi);
-        ROS_INFO("barrel found");
+        // ROS_INFO("barrel found");
       }
       else
       {
