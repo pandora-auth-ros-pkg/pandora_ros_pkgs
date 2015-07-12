@@ -39,7 +39,9 @@
 #include <string>
 #include <vector>
 
-#include "std_msgs/Float32.h"
+#include <std_msgs/Float32.h>
+
+#include "pandora_sensor_coverage/utils.h"
 
 namespace pandora_exploration
 {
@@ -87,13 +89,18 @@ namespace pandora_exploration
     }
 
     template <class TreeType>
+    nav_msgs::OccupancyGridPtr
+    SpaceChecker<TreeType>::
+    getSpaceCoverage() const
+    {
+      return coveredSpace_;
+    }
+
+    template <class TreeType>
     void SpaceChecker<TreeType>::findCoverage(
         const tf::StampedTransform& sensorTransform,
         const tf::StampedTransform& baseTransform)
     {
-      // Aligning coverage OGD with current map. Resizing, rotating and translating.
-      alignCoverageWithMap();
-
       // Declare helper variables
       CoverageChecker::findCoverage(sensorTransform, baseTransform);
       const float resolution = map2dPtr_->info.resolution;
@@ -112,8 +119,9 @@ namespace pandora_exploration
 
         while (CELL(cell.x(), cell.y(), map2dPtr_)
             < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100)
-            && Utils::distanceBetweenPoints2D(octomap::pointOctomapToMsg(sensorPosition_),
-              octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
+            && pandora_data_fusion::pandora_data_fusion_utils::Utils::
+               distanceBetweenPoints2D(octomap::pointOctomapToMsg(sensorPosition_),
+                 octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
         {
           signed covered;
           if (binary_)
@@ -124,8 +132,10 @@ namespace pandora_exploration
           if (covered > CELL(cell.x(), cell.y(), coveredSpace_))
           {
             CELL(cell.x(), cell.y(), coveredSpace_) = covered;
+            CELL(cell.x(), cell.y(), fusedCoveragePtr_) = covered;
           }
-          coverageDilation(1, COORDS(cell.x(), cell.y(), coveredSpace_));
+          Utils::mapDilation(coveredSpace_, 1, COORDS(cell.x(), cell.y(), coveredSpace_));
+          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(cell.x(), cell.y(), fusedCoveragePtr_));
           cell.x() += resolution * cos(sensorYaw_ + angle);
           cell.y() += resolution * sin(sensorYaw_ + angle);
         }
@@ -141,6 +151,7 @@ namespace pandora_exploration
           if (map2dPtr_->data[ii + jj * map2dPtr_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
           {
             coveredSpace_->data[ii + jj * coveredSpace_->info.width] = 0;
+            fusedCoveragePtr_->data[ii + jj * coveredSpace_->info.width] = 0;
           }
           if (coveredSpace_->data[ii + jj * coveredSpace_->info.width] != 0)
           {
@@ -166,7 +177,9 @@ namespace pandora_exploration
           xn = cos(robotYaw_) * x - sin(robotYaw_) * y + robotPosition_.x();
           yn = sin(robotYaw_) * x + cos(robotYaw_) * y + robotPosition_.y();
           CELL(xn, yn, coveredSpace_) = 100;
-          coverageDilation(1, COORDS(xn, yn, coveredSpace_));
+          CELL(xn, yn, fusedCoveragePtr_) = 100;
+          Utils::mapDilation(coveredSpace_, 1, COORDS(xn, yn, coveredSpace_));
+          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(xn, yn, fusedCoveragePtr_));
         }
       }
     }
@@ -257,119 +270,6 @@ namespace pandora_exploration
         }
       }
       return coveredSpace / unoccupiedSpace;
-    }
-
-    template <class TreeType>
-    void SpaceChecker<TreeType>::alignCoverageWithMap()
-    {
-      int oldSize = coveredSpace_->data.size();
-      int newSize = map2dPtr_->data.size();
-      int8_t* oldCoverage = new int8_t[oldSize];
-      nav_msgs::MapMetaData oldMetaData;
-      if (oldSize != 0 && oldSize != newSize)
-      {
-        // Copy old coverage map meta data.
-        oldMetaData = coveredSpace_->info;
-        // Copy old coverage map.
-        for (unsigned int ii = 0; ii < oldSize; ++ii)
-        {
-          oldCoverage[ii] = coveredSpace_->data[ii];
-        }
-      }
-      // Reset coveredSpace_->and copy map2dPtr_'s metadata.
-      coveredSpace_->header = map2dPtr_->header;
-      coveredSpace_->info = map2dPtr_->info;
-      if (oldSize != newSize)
-      {
-        ROS_WARN("[SENSOR_COVERAGE_SPACE_CHECKER %d] Resizing space coverage...", __LINE__);
-        coveredSpace_->data.resize(newSize, 0);
-        ROS_ASSERT(newSize == coveredSpace_->data.size());
-
-        if (oldSize != 0)
-        {
-          double yawDiff = tf::getYaw(coveredSpace_->info.origin.orientation) -
-            tf::getYaw(oldMetaData.origin.orientation);
-          double xDiff = coveredSpace_->info.origin.position.x -
-            oldMetaData.origin.position.x;
-          double yDiff = coveredSpace_->info.origin.position.y -
-            oldMetaData.origin.position.y;
-
-          double x = 0, y = 0, xn = 0, yn = 0;
-          for (unsigned int ii = 0; ii < oldMetaData.width; ++ii)
-          {
-            for (unsigned int jj = 0; jj < oldMetaData.height; ++jj)
-            {
-              x = ii * oldMetaData.resolution;
-              y = jj * oldMetaData.resolution;
-              xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
-              yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-              int coords = static_cast<int>(round(xn / coveredSpace_->info.resolution) +
-                   round(yn * coveredSpace_->info.width / coveredSpace_->info.resolution));
-              if ((coords > newSize) || (coords < 0))
-              {
-                ROS_WARN("Error resizing to: %d\nCoords Xn: %f, Yn: %f\n", newSize, xn, yn);
-              }
-              else
-              {
-                uint8_t temp = oldCoverage[ii + jj * oldMetaData.width];
-                coveredSpace_->data[coords] = temp;
-                coverageDilation(2, coords);
-              }
-            }
-          }
-        }
-      }
-      delete[] oldCoverage;
-    }
-
-    template <class TreeType>
-    void SpaceChecker<TreeType>::coverageDilation(int steps, int coords)
-    {
-      if (steps == 0)
-        return;
-
-      signed char cell = coveredSpace_->data[coords];
-
-      if (cell != 0)  // That's foreground
-      {
-        // Check for all adjacent
-        if (coveredSpace_->data[coords + coveredSpace_->info.width + 1] == 0)
-        {
-          coveredSpace_->data[coords + coveredSpace_->info.width + 1] = cell;
-          coverageDilation(steps - 1, coords + coveredSpace_->info.width + 1);
-        }
-        if (coveredSpace_->data[coords + coveredSpace_->info.width] == 0)
-        {
-          coveredSpace_->data[coords + coveredSpace_->info.width] = cell;
-        }
-        if (coveredSpace_->data[coords + coveredSpace_->info.width - 1] == 0)
-        {
-          coveredSpace_->data[coords + coveredSpace_->info.width - 1] = cell;
-          coverageDilation(steps - 1, coords + coveredSpace_->info.width - 1);
-        }
-        if (coveredSpace_->data[coords + 1] == 0)
-        {
-          coveredSpace_->data[coords + 1] = cell;
-        }
-        if (coveredSpace_->data[coords - 1] == 0)
-        {
-          coveredSpace_->data[coords - 1] = cell;
-        }
-        if (coveredSpace_->data[coords - coveredSpace_->info.width + 1] == 0)
-        {
-          coveredSpace_->data[coords - coveredSpace_->info.width + 1] = cell;
-          coverageDilation(steps - 1, coords - coveredSpace_->info.width + 1);
-        }
-        if (coveredSpace_->data[coords - coveredSpace_->info.width] == 0)
-        {
-          coveredSpace_->data[coords - coveredSpace_->info.width] = cell;
-        }
-        if (coveredSpace_->data[coords - coveredSpace_->info.width - 1] == 0)
-        {
-          coveredSpace_->data[coords - coveredSpace_->info.width - 1] = cell;
-          coverageDilation(steps - 1, coords - coveredSpace_->info.width - 1);
-        }
-      }
     }
 
     template <class TreeType>

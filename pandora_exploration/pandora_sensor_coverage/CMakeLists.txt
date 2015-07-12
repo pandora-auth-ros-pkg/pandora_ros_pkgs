@@ -34,12 +34,22 @@ link_directories(
   ${OCTOMAP_LIBRARY_DIRS}
   )
 
+########################  utils  ####################################
+
+add_library(${PROJECT_NAME}_utils
+  src/utils.cpp
+  )
+target_link_libraries(${PROJECT_NAME}_utils
+  ${catkin_LIBRARIES}
+  )
+
 ########################  coverage checker  #########################
 
 add_library(${PROJECT_NAME}_coverage_checker
   src/coverage_checker.cpp)
 target_link_libraries(${PROJECT_NAME}_coverage_checker
   ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_utils
   )
 
 ########################  space checker  ############################
@@ -77,6 +87,7 @@ add_library(${PROJECT_NAME}_sensor_coverage
 target_link_libraries(${PROJECT_NAME}_sensor_coverage
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_sensor
+  ${PROJECT_NAME}_utils
   )
 
 ########################  sensor_coverage_node  #####################

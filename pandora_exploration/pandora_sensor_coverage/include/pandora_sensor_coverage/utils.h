@@ -2,7 +2,7 @@
  *
  * Software License Agreement (BSD License)
  *
- *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  Copyright (c) 2015, P.A.N.D.O.R.A. Team.
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -36,26 +36,37 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
+#ifndef PANDORA_SENSOR_COVERAGE_UTILS_H
+#define PANDORA_SENSOR_COVERAGE_UTILS_H
+
 #include <ros/console.h>
+#include <tf/transform_datatypes.h>
+#include <nav_msgs/OccupancyGrid.h>
 
-#include "pandora_sensor_coverage/sensor_coverage.h"
-
-using pandora_exploration::pandora_sensor_coverage::SensorCoverage;
-
-int main(int argc, char** argv)
+namespace pandora_exploration
 {
-  ros::init(argc, argv, "sensor_coverage", ros::init_options::NoSigintHandler);
-  if (argc == 1 && !strcmp(argv[0], "--debug"))
+namespace pandora_sensor_coverage
+{
+  class Utils
   {
-    if (ros::console::set_logger_level(
-          ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
-    {
-      ros::console::notifyLoggerLevelsChanged();
-    }
-  }
-  SensorCoverage sensorCoverage("/exploration/sensor_coverage");
-  ROS_INFO("[exploration] Beginning Sensor Coverage node");
-  ros::spin();
-  return 0;
-}
+   public:
+    /**
+      * @brief aligns coverage map with current global world map. Rotates,
+      * translates and scales coverage map appropriately.
+      * @return void
+      */
+    static void
+    alignWithNewMap(const nav_msgs::OccupancyGridConstPtr& in,
+        const nav_msgs::OccupancyGridPtr& out);
 
+    /**
+      * @brief Wrapper for pandora_vision::Morphology::dilation()
+      * @return void
+      */
+    static void
+    mapDilation(const nav_msgs::OccupancyGridPtr& in, int steps, int coords);
+  };
+}  // namespace pandora_sensor_coverage
+}  // namespace pandora_exploration
+
+#endif  // PANDORA_SENSOR_COVERAGE_UTILS_H

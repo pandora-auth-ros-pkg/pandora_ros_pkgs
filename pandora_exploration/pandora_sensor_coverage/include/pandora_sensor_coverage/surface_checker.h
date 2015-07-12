@@ -46,7 +46,7 @@
 
 #include "octomap/ColorOcTree.h"
 
-#include "sensor_coverage/coverage_checker.h"
+#include "pandora_sensor_coverage/coverage_checker.h"
 
 namespace pandora_exploration
 {

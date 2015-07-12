@@ -41,7 +41,7 @@
 
 #include "nav_msgs/OccupancyGrid.h"
 
-#include "sensor_coverage/sensor.h"
+#include "pandora_sensor_coverage/sensor.h"
 
 namespace pandora_exploration
 {
@@ -77,7 +77,6 @@ namespace pandora_exploration
 
     boost::shared_ptr<octomap::OcTree*> Sensor::map3dPtrPtr_ = boost::
       shared_ptr<octomap::OcTree*>();
-    nav_msgs::OccupancyGridPtr Sensor::map2dPtr_ = nav_msgs::OccupancyGridPtr();
     std::string Sensor::GLOBAL_FRAME;
     std::string Sensor::ROBOT_BASE_FRAME;
 
@@ -103,6 +102,13 @@ namespace pandora_exploration
       }
     }
 
+    // nav_msgs::OccupancyGridPtr
+    // Sensor::
+    // getCoverage() const
+    // {
+    //   return spaceChecker_->getSpaceCoverage();
+    // }
+
     void Sensor::flushCoverage()
     {
       spaceChecker_->resetCoverage();
@@ -114,7 +120,7 @@ namespace pandora_exploration
       // If sensor is not open and working, do not update coverage patch.
       if (!sensorWorking_)
         return;
-      if (map2dPtr_->data.size() == 0 || (surfaceCoverage_ && *map3dPtrPtr_ == NULL))
+      if (map2dPtr_.get() == NULL || (surfaceCoverage_ && *map3dPtrPtr_ == NULL))
         return;
       else if (!initialized_)
       {
@@ -151,10 +157,10 @@ namespace pandora_exploration
         if (surfaceCoverage_)
         {
           surfaceChecker_->findCoverage(sensorTransform, baseTransform);
-          surfaceChecker_->publishCoverage(GLOBAL_FRAME);
+          // surfaceChecker_->publishCoverage(GLOBAL_FRAME);
         }
         spaceChecker_->findCoverage(sensorTransform, baseTransform);
-        spaceChecker_->publishCoverage(GLOBAL_FRAME);
+        // spaceChecker_->publishCoverage(GLOBAL_FRAME);
       }
       catch (TfException ex)
       {

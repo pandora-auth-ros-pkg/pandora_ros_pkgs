@@ -38,7 +38,7 @@
 
 #include <string>
 
-#include "sensor_coverage/coverage_checker.h"
+#include "pandora_sensor_coverage/coverage_checker.h"
 
 namespace pandora_exploration
 {
@@ -51,7 +51,6 @@ namespace pandora_exploration
 
     boost::shared_ptr<octomap::OcTree*> CoverageChecker::map3dPtrPtr_ = boost::
       shared_ptr<octomap::OcTree*>();
-    nav_msgs::OccupancyGridPtr CoverageChecker::map2dPtr_ = nav_msgs::OccupancyGridPtr();
     double CoverageChecker::OCCUPIED_CELL_THRES = 0.5;
     double CoverageChecker::MAX_HEIGHT = 0;
     double CoverageChecker::FOOTPRINT_WIDTH = 0;
@@ -63,10 +62,12 @@ namespace pandora_exploration
     {
       sensorTransform.getBasis().getRPY(sensorRoll_, sensorPitch_, sensorYaw_);
       sensorPosition_ = octomap::pointMsgToOctomap(
-          Utils::vector3ToPoint(sensorTransform.getOrigin()));
+          pandora_data_fusion::pandora_data_fusion_utils::Utils::
+          vector3ToPoint(sensorTransform.getOrigin()));
       baseTransform.getBasis().getRPY(robotRoll_, robotPitch_, robotYaw_);
       robotPosition_ = octomap::pointMsgToOctomap(
-          Utils::vector3ToPoint(baseTransform.getOrigin()));
+          pandora_data_fusion::pandora_data_fusion_utils::Utils::
+          vector3ToPoint(baseTransform.getOrigin()));
     }
 
     void CoverageChecker::getParameters()

@@ -48,8 +48,8 @@
 #include "pandora_data_fusion_utils/tf_listener.h"
 #include "pandora_data_fusion_utils/exceptions.h"
 
-#include "sensor_coverage/space_checker.h"
-#include "sensor_coverage/surface_checker.h"
+#include "pandora_sensor_coverage/space_checker.h"
+#include "pandora_sensor_coverage/surface_checker.h"
 
 namespace pandora_exploration
 {
@@ -79,6 +79,9 @@ namespace pandora_exploration
         Sensor(const NodeHandlePtr& nh,
             const std::string& frameName, const std::string& mapOrigin);
 
+        // nav_msgs::OccupancyGridPtr
+        // getCoverage() const;
+
         /**
          * @brief notifies state change
          * @param newState [int] the state to which sensor is transitioning
@@ -97,10 +100,16 @@ namespace pandora_exploration
          * @param map2dPtr [nav_msgs::OccupancyGridPtr const&] map
          * @return void
          */
-        static void setMap2d(const nav_msgs::OccupancyGridPtr& map2dPtr)
+        void setMap2d(const nav_msgs::OccupancyGridConstPtr& map2dPtr)
         {
           map2dPtr_ = map2dPtr;
-          CoverageChecker::setMap2d(map2dPtr);
+          spaceChecker_->setMap2d(map2dPtr);
+          surfaceChecker_->setMap2d(map2dPtr);
+        }
+
+        void shareFusedCoverage(const nav_msgs::OccupancyGridPtr& fusedPtr)
+        {
+          spaceChecker_->shareFusedCoverage(fusedPtr);
         }
 
         /**
@@ -187,7 +196,7 @@ namespace pandora_exploration
 
         //!< Global 3d and 2d maps as they are sent by SLAM
         static boost::shared_ptr<octomap::OcTree*> map3dPtrPtr_;
-        static nav_msgs::OccupancyGridPtr map2dPtr_;
+        nav_msgs::OccupancyGridConstPtr map2dPtr_;
 
         /*  Params  */
         static std::string GLOBAL_FRAME;

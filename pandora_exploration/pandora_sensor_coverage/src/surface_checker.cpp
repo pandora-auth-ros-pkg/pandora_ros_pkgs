@@ -40,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-#include "sensor_coverage/surface_checker.h"
+#include "pandora_sensor_coverage/surface_checker.h"
 
 namespace pandora_exploration
 {

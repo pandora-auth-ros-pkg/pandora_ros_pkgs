@@ -42,7 +42,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "sensor_coverage/coverage_checker.h"
+#include "pandora_sensor_coverage/utils.h"
+#include "pandora_sensor_coverage/coverage_checker.h"
 
 namespace pandora_exploration
 {
@@ -63,6 +64,9 @@ namespace pandora_exploration
            * @param frameName [std::string const&] frame whose view is to be tracked
            */
           SpaceChecker(const NodeHandlePtr& nh, const std::string& frameName);
+
+          nav_msgs::OccupancyGridPtr
+          getSpaceCoverage() const;
 
           /**
            * @override
@@ -101,6 +105,18 @@ namespace pandora_exploration
             coverageMap3d_ = mapPtr;
           }
 
+          /**
+          * @brief Setter for static variable map2dPtr_
+          * @param map2dPtr [nav_msgs::OccupancyGridPtr const&] map
+          * @return void
+          */
+          virtual void
+          setMap2d(const nav_msgs::OccupancyGridConstPtr& map2dPtr)
+          {
+            map2dPtr_ = map2dPtr;
+            Utils::alignWithNewMap(map2dPtr_, coveredSpace_);
+          }
+
         private:
           /**
            * @brief finds cell's space coverage as a percentage of the covered
@@ -110,19 +126,6 @@ namespace pandora_exploration
            * @return float percentage of space covered by sensor.
            */
           float cellCoverage(const octomath::Vector3& cell, float minHeight);
-
-          /**
-           * @brief aligns coverage map with current global world map. Rotates,
-           * translates and scales coverage map appropriately.
-           * @return void
-           */
-          void alignCoverageWithMap();
-
-          /**
-           * @brief Wrapper for pandora_vision::Morphology::dilation()
-           * @return void
-           */
-          void coverageDilation(int steps, int coords);
 
         protected:
           //!< If space coverage is considered as a binary value or as a percentage.
@@ -149,7 +152,7 @@ namespace pandora_exploration
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_exploration
 
-#include "sensor_coverage/space_checker.hxx"
+#include "pandora_sensor_coverage/space_checker.hxx"
 
 #endif  // SENSOR_COVERAGE_SPACE_CHECKER_H
 

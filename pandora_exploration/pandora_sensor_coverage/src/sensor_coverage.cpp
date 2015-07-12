@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-#include "sensor_coverage/sensor_coverage.h"
+#include "pandora_sensor_coverage/sensor_coverage.h"
 
 namespace pandora_exploration
 {
@@ -48,15 +48,13 @@ namespace pandora_exploration
 
     SensorCoverage::SensorCoverage(const std::string& ns)
     {
+      int ii;
       //  initialize NodeHandle and Map.
       nh_.reset( new ros::NodeHandle(ns) );
 
       globalMap3dPtrPtr_.reset( new octomap::OcTree* );
       *globalMap3dPtrPtr_ = NULL;
       Sensor::setMap3d(globalMap3dPtrPtr_);
-
-      globalMap2dPtr_.reset( new nav_msgs::OccupancyGrid );
-      Sensor::setMap2d(globalMap2dPtr_);
 
       std::string param;
       double paramD = 0;
@@ -90,6 +88,20 @@ namespace pandora_exploration
         ROS_FATAL("flush_coverage service name param not found");
         ROS_BREAK();
       }
+
+      if (nh_->getParam("published_topic_names/fused_coverage", param))
+      {
+        fusedCoveragePublisher_ = nh_->advertise<nav_msgs::OccupancyGrid>(param, 1);
+      }
+      else
+      {
+        ROS_FATAL("fused_coverage publish topic name param not found");
+        ROS_BREAK();
+      }
+
+      fusingCoverage_ = false;
+
+      resetFusedCoverage();
 
       //  Set up occupancy grid 2d map occupancy threshold.
       nh_->param<double>("occupied_cell_thres", paramD, static_cast<double>(0.5));
@@ -166,7 +178,7 @@ namespace pandora_exploration
       }
       ROS_ASSERT(framesToTrack.getType() == XmlRpc::XmlRpcValue::TypeArray);
       //  For each frame make a Sensor object.
-      for (int32_t ii = 0; ii < framesToTrack.size(); ++ii)
+      for (ii = 0; ii < framesToTrack.size(); ++ii)
       {
         ROS_ASSERT(framesToTrack[ii].getType() == XmlRpc::XmlRpcValue::TypeString);
         registeredSensors_.push_back(
@@ -176,7 +188,25 @@ namespace pandora_exploration
                 param)));
       }
 
+      for (ii = 0; ii < registeredSensors_.size(); ++ii)
+      {
+        registeredSensors_[ii]->shareFusedCoverage(fusedCoveragePtr_);
+      }
+
+      coverageFuser_ = nh_->createTimer(ros::Duration(0.1),
+          &SensorCoverage::fuseCoverage, this);
+
       clientInitialize();
+    }
+
+    void
+    SensorCoverage::
+    fuseCoverage(const ros::TimerEvent& event)
+    {
+      if (!fusingCoverage_)
+        return;
+      fusedCoveragePtr_->header.stamp = ros::Time::now();
+      fusedCoveragePublisher_.publish(fusedCoveragePtr_);
     }
 
     void SensorCoverage::startTransition(int newState)
@@ -191,6 +221,13 @@ namespace pandora_exploration
       {
         registeredSensors_[ii]->notifyStateChange(currentState_);
       }
+      if (currentState_ == state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE ||
+          currentState_ == state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION ||
+          currentState_ == state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD ||
+          currentState_ == state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_MAPPING)
+        fusingCoverage_ = true;
+      else
+        fusingCoverage_ = false;
     }
 
     void SensorCoverage::map3dUpdate(const octomap_msgs::Octomap& msg)
@@ -219,20 +256,34 @@ namespace pandora_exploration
 
     void SensorCoverage::map2dUpdate(const nav_msgs::OccupancyGridConstPtr& msg)
     {
-      *globalMap2dPtr_ = *msg;
-      globalMap2dPtr_->info.origin.orientation.w = 1;
+      globalMap2dPtr_ = msg;
+
+      Utils::alignWithNewMap(msg, fusedCoveragePtr_);
+      for (int ii = 0; ii < registeredSensors_.size(); ++ii)
+      {
+        registeredSensors_[ii]->setMap2d(msg);
+      }
     }
 
     bool SensorCoverage::flushCoverage(
         std_srvs::Empty::Request& rq,
         std_srvs::Empty::Response& rs)
     {
+      resetFusedCoverage();
+
       for (int ii = 0; ii < registeredSensors_.size(); ++ii)
       {
         registeredSensors_[ii]->flushCoverage();
       }
 
       return true;
+    }
+
+    void
+    SensorCoverage::
+    resetFusedCoverage()
+    {
+      fusedCoveragePtr_.reset( new nav_msgs::OccupancyGrid );
     }
 
 }  // namespace pandora_sensor_coverage

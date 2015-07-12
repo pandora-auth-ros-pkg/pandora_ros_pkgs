@@ -59,7 +59,6 @@ namespace pandora_exploration
   {
 
     //!< Type Definitions
-    using ::pandora_data_fusion::pandora_data_fusion_utils::Utils;
     typedef boost::shared_ptr<ros::NodeHandle> NodeHandlePtr;
 
     /**
@@ -98,13 +97,19 @@ namespace pandora_exploration
         virtual void resetCoverage() {}
 
         /**
-         * @brief Setter for static variable map2dPtr_
-         * @param map2dPtr [nav_msgs::OccupancyGridPtr const&] map
-         * @return void
-         */
-        static void setMap2d(const nav_msgs::OccupancyGridPtr& map2dPtr)
+        * @brief Setter for static variable map2dPtr_
+        * @param map2dPtr [nav_msgs::OccupancyGridPtr const&] map
+        * @return void
+        */
+        virtual void
+        setMap2d(const nav_msgs::OccupancyGridConstPtr& map2dPtr)
         {
           map2dPtr_ = map2dPtr;
+        }
+
+        void shareFusedCoverage(const nav_msgs::OccupancyGridPtr& fusedPtr)
+        {
+          fusedCoveragePtr_ = fusedPtr;
         }
 
         /**
@@ -185,7 +190,8 @@ namespace pandora_exploration
 
         //!< Global 3d and 2d maps as they are sent by SLAM
         static boost::shared_ptr<octomap::OcTree*> map3dPtrPtr_;
-        static nav_msgs::OccupancyGridPtr map2dPtr_;
+        nav_msgs::OccupancyGridConstPtr map2dPtr_;
+        nav_msgs::OccupancyGridPtr fusedCoveragePtr_;
 
         /*  Parameters  */
         //!< sensor's range
