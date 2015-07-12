@@ -4,8 +4,9 @@ import pickle
 import rospy
 import scipy
 import matplotlib.pyplot
-import thread
+from threading import Thread
 
+from pandora_kinodynamic_control.dataset_utils import *
 from pandora_kinodynamic_control.experiment import Experiment
 from pandora_kinodynamic_control.navigation_task import NavigationTask
 from pandora_kinodynamic_control.navigation_environment import NavigationEnvironment
@@ -44,7 +45,7 @@ class KinodynamicController(object):
         # Action Value Table directory
         self.tables_directory = os.path.dirname(__file__) + "/tables/"
         self.table_code = "S"+str(self._number_of_states)+"_"+"A"+str(self._actions)
-        self._filepath = self.tables_directory + FILENAME + self.table_code
+        self._filename = FILENAME + self.table_code
 
         # Action Value Table setup
         self.load_AV_Table()
@@ -72,7 +73,9 @@ class KinodynamicController(object):
         # Start print table thread
         if VISUALIZATION is True:
             try:
-                thread.start_new_thread(self.print_table,())
+                #thread.start_new_thread(self.print_table,())
+                self.visualization_thread = Thread(target = self.print_table, args = () )
+                self.visualization_thread.start()
             except:
                 print "Failed to start visualization thread!"
 
@@ -80,17 +83,15 @@ class KinodynamicController(object):
 
 
     def store_cb(self,req):
-        fileObject = open(self._filepath ,'w')
-        pickle.dump(self._av_table,fileObject)
-        fileObject.close()
+        storeData(self._av_table,self._filename)
         print "Saved AV Table"
         return True
 
     def load_AV_Table(self):
-        if os.path.isfile(self._filepath):
-            fileObject = open(self._filepath, 'r')
-            self._av_table = pickle.load(fileObject)
-            fileObject.close()
+
+        load_D = loadData(self._filename)
+        if load_D[1] == True:
+            self._av_table = load_D[0]
             print "Found Table!"
 
         else:
@@ -114,22 +115,58 @@ class KinodynamicController(object):
             matplotlib.pyplot.draw()
             rospy.sleep(2)
 
+    def __del__(self):
+        # Terminate visualization thread
+        if VISUALIZATION is True:
+            self.visualization_thread.join()
+
+        # Copy learned data to repo
+        if add_to_repo():
+            print "Copied data to pandora_motion_control"
+        else:
+            pass
+
+def main():
+    # Spawn ROS node , create controller and spin!
+    rospy.init_node('kinodynamic_controller')
+    controller = KinodynamicController()
+    rospy.spin()
+    # try:
+    #     # Spawn ROS node , create controller and spin!
+    #     rospy.init_node('kinodynamic_controller')
+    #     controller = KinodynamicController()
+    #     rospy.spin()
+    # except:
+    #     # Case when RL modules fails for some reason , reset velocity controller
+    #     # to nomral control mode (all parameters set to 1)
+    #     pub = rospy.Publisher(COMMAND_TOPIC, KinematicParameters, queue_size=1)
+    #
+    #     # Fill reset msg
+    #     params = KinematicParameters()
+    #     params.scale_left = 1
+    #     params.scale_right = 1
+    #     params.terrain_param = 1
+    #
+    #     pub.publish(params)
+    #     print "RL module failed.Switching to controller-only mode"
+
 if __name__ == '__main__':
-    try:
-        # Spawn ROS node , create controller and spin!
-        rospy.init_node('kinodynamic_controller')
-        controller = KinodynamicController()
-        rospy.spin()
-    except:
-        # Case when RL modules fails for some reason , reset velocity controller
-        # to nomral control mode (all parameters set to 1)
-        pub = rospy.Publisher(COMMAND_TOPIC, KinematicParameters, queue_size=1)
-
-        # Fill reset msg
-        params = KinematicParameters()
-        params.scale_left = 1
-        params.scale_right = 1
-        params.terrain_param = 1
-
-        pub.publish(params)
-        print "RL module failed.Switching to controller-only mode"
+    main()
+    # try:
+    #     # Spawn ROS node , create controller and spin!
+    #     rospy.init_node('kinodynamic_controller')
+    #     controller = KinodynamicController()
+    #     rospy.spin()
+    # except:
+    #     # Case when RL modules fails for some reason , reset velocity controller
+    #     # to nomral control mode (all parameters set to 1)
+    #     pub = rospy.Publisher(COMMAND_TOPIC, KinematicParameters, queue_size=1)
+    #
+    #     # Fill reset msg
+    #     params = KinematicParameters()
+    #     params.scale_left = 1
+    #     params.scale_right = 1
+    #     params.terrain_param = 1
+    #
+    #     pub.publish(params)
+    #     print "RL module failed.Switching to controller-only mode"
