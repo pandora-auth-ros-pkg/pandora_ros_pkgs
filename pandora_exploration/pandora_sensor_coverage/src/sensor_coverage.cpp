@@ -205,6 +205,7 @@ namespace pandora_exploration
     {
       if (!fusingCoverage_)
         return;
+
       fusedCoveragePtr_->header.stamp = ros::Time::now();
       fusedCoveragePublisher_.publish(fusedCoveragePtr_);
     }

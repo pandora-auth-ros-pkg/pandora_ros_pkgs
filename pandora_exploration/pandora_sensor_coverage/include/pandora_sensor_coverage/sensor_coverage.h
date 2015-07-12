@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_COVERAGE_SENSOR_COVERAGE_H
-#define SENSOR_COVERAGE_SENSOR_COVERAGE_H
+#ifndef PANDORA_SENSOR_COVERAGE_SENSOR_COVERAGE_H
+#define PANDORA_SENSOR_COVERAGE_SENSOR_COVERAGE_H
 
 #ifndef BOOST_NO_DEFAULTED_FUNCTIONS
 #define BOOST_NO_DEFAULTED_FUNCTIONS
@@ -158,4 +158,4 @@ namespace pandora_exploration
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_exploration
 
-#endif  // SENSOR_COVERAGE_SENSOR_COVERAGE_H
+#endif  // PANDORA_SENSOR_COVERAGE_SENSOR_COVERAGE_H

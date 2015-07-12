@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_COVERAGE_SPACE_CHECKER_H
-#define SENSOR_COVERAGE_SPACE_CHECKER_H
+#ifndef PANDORA_SENSOR_COVERAGE_SPACE_CHECKER_H
+#define PANDORA_SENSOR_COVERAGE_SPACE_CHECKER_H
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -130,6 +130,8 @@ namespace pandora_exploration
         protected:
           //!< If space coverage is considered as a binary value or as a percentage.
           bool binary_;
+          //!< Is covering unknown?
+          bool coveringUnknown_;
           //!< Do we use for 3d map, the produced map by surface checker?
           bool surfaceCoverage_;
           //!< Sensor's space coverage map.
@@ -154,5 +156,5 @@ namespace pandora_exploration
 
 #include "pandora_sensor_coverage/space_checker.hxx"
 
-#endif  // SENSOR_COVERAGE_SPACE_CHECKER_H
+#endif  // PANDORA_SENSOR_COVERAGE_SPACE_CHECKER_H
 

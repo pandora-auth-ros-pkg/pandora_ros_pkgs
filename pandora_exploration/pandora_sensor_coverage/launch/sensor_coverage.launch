@@ -1,8 +1,9 @@
 <launch>
 
   <!--  Sensor Coverage  -->
-  <node pkg="pandora_sensor_coverage" type="sensor_coverage_node"              
-    name="sensor_coverage" respawn="false" output="screen" ns="exploration" /> 
+  <node pkg="pandora_sensor_coverage" type="pandora_sensor_coverage_node"              
+      name="sensor_coverage" respawn="false" output="screen" ns="exploration"
+      launch-prefix="gdb -ex run --args" /> 
 
   <rosparam file="$(find pandora_sensor_coverage)/config/sensor_coverage/sensor_coverage_params.yaml" 
     command="load" ns="exploration/sensor_coverage" /> 

@@ -101,7 +101,7 @@ namespace pandora_sensor_coverage
             {
               uint8_t temp = oldMap[ii + jj * oldMetaData.width];
               out->data[coords] = temp;
-              Utils::mapDilation(out, 2, coords);
+              Utils::mapDilation(out, 2, coords, in);
             }
           }
         }
@@ -112,10 +112,12 @@ namespace pandora_sensor_coverage
 
   void
   Utils::
-  mapDilation(const nav_msgs::OccupancyGridPtr& in, int steps, int coords)
+  mapDilation(const nav_msgs::OccupancyGridPtr& in, int steps, int coords,
+              nav_msgs::OccupancyGridConstPtr checkMap)
   {
     if (steps == 0)
       return;
+    bool check = checkMap.get() != NULL;
 
     signed char cell = in->data[coords];
 
@@ -124,39 +126,55 @@ namespace pandora_sensor_coverage
       // Check for all adjacent
       if (in->data[coords + in->info.width + 1] == 0)
       {
-        in->data[coords + in->info.width + 1] = cell;
-        Utils::mapDilation(in, steps - 1, coords + in->info.width + 1);
+        if (!check || checkMap->data[coords + in->info.width + 1] < 51)
+        {
+          in->data[coords + in->info.width + 1] = cell;
+          Utils::mapDilation(in, steps - 1, coords + in->info.width + 1);
+        }
       }
       if (in->data[coords + in->info.width] == 0)
       {
-        in->data[coords + in->info.width] = cell;
+        if (!check || checkMap->data[coords + in->info.width] < 51)
+          in->data[coords + in->info.width] = cell;
       }
       if (in->data[coords + in->info.width - 1] == 0)
       {
-        in->data[coords + in->info.width - 1] = cell;
-        Utils::mapDilation(in, steps - 1, coords + in->info.width - 1);
+        if (!check || checkMap->data[coords + in->info.width - 1] < 51)
+        {
+          in->data[coords + in->info.width - 1] = cell;
+          Utils::mapDilation(in, steps - 1, coords + in->info.width - 1);
+        }
       }
       if (in->data[coords + 1] == 0)
       {
-        in->data[coords + 1] = cell;
+        if (!check || checkMap->data[coords + 1] < 51)
+          in->data[coords + 1] = cell;
       }
       if (in->data[coords - 1] == 0)
       {
-        in->data[coords - 1] = cell;
+        if (!check || checkMap->data[coords - 1] < 51)
+          in->data[coords - 1] = cell;
       }
       if (in->data[coords - in->info.width + 1] == 0)
       {
-        in->data[coords - in->info.width + 1] = cell;
-        Utils::mapDilation(in, steps - 1, coords - in->info.width + 1);
+        if (!check || checkMap->data[coords - in->info.width + 1] < 51)
+        {
+          in->data[coords - in->info.width + 1] = cell;
+          Utils::mapDilation(in, steps - 1, coords - in->info.width + 1);
+        }
       }
       if (in->data[coords - in->info.width] == 0)
       {
-        in->data[coords - in->info.width] = cell;
+        if (!check || checkMap->data[coords - in->info.width] < 51)
+          in->data[coords - in->info.width] = cell;
       }
       if (in->data[coords - in->info.width - 1] == 0)
       {
-        in->data[coords - in->info.width - 1] = cell;
-        Utils::mapDilation(in, steps - 1, coords - in->info.width - 1);
+        if (!check || checkMap->data[coords - in->info.width - 1] < 51)
+        {
+          in->data[coords - in->info.width - 1] = cell;
+          Utils::mapDilation(in, steps - 1, coords - in->info.width - 1);
+        }
       }
     }
   }

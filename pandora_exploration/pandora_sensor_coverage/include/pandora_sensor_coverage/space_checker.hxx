@@ -85,6 +85,12 @@ namespace pandora_exploration
         ROS_BREAK();
       }
 
+      if (!nh_->getParam(frameName_+"/covering_unknown", coveringUnknown_))
+      {
+        ROS_FATAL("%s covering unknown coverage param not found", frameName_.c_str());
+        ROS_BREAK();
+      }
+
       getParameters();
     }
 
@@ -109,6 +115,7 @@ namespace pandora_exploration
       float fov = (SENSOR_HFOV / 180.0) * PI;
       octomap::point3d cell;
 
+      bool isFree;
       // Raycast on 2d map rays that orient between -fov_x/2 and fov_x/2 and
       // find how to much covered space (line) corresponds to a 2d cell of
       // the map inside the raycasting area.
@@ -117,9 +124,12 @@ namespace pandora_exploration
         cell.x() = resolution * cos(sensorYaw_ + angle) + currX;
         cell.y() = resolution * sin(sensorYaw_ + angle) + currY;
 
-        while (CELL(cell.x(), cell.y(), map2dPtr_)
-            < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100)
-            && pandora_data_fusion::pandora_data_fusion_utils::Utils::
+        if (coveringUnknown_)
+          isFree = CELL(cell.x(), cell.y(), map2dPtr_) <= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
+        else
+          isFree = CELL(cell.x(), cell.y(), map2dPtr_) < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
+
+        while (isFree && pandora_data_fusion::pandora_data_fusion_utils::Utils::
                distanceBetweenPoints2D(octomap::pointOctomapToMsg(sensorPosition_),
                  octomap::pointOctomapToMsg(cell)) < SENSOR_RANGE)
         {
@@ -134,36 +144,42 @@ namespace pandora_exploration
             CELL(cell.x(), cell.y(), coveredSpace_) = covered;
             CELL(cell.x(), cell.y(), fusedCoveragePtr_) = covered;
           }
-          Utils::mapDilation(coveredSpace_, 1, COORDS(cell.x(), cell.y(), coveredSpace_));
-          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(cell.x(), cell.y(), fusedCoveragePtr_));
+          Utils::mapDilation(coveredSpace_, 1, COORDS(cell.x(), cell.y(), coveredSpace_), map2dPtr_);
+          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(cell.x(), cell.y(), fusedCoveragePtr_), map2dPtr_);
           cell.x() += resolution * cos(sensorYaw_ + angle);
           cell.y() += resolution * sin(sensorYaw_ + angle);
+
+          if (coveringUnknown_)
+            isFree = CELL(cell.x(), cell.y(), map2dPtr_) <= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
+          else
+            isFree = CELL(cell.x(), cell.y(), map2dPtr_) < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
         }
       }
 
       // Exclude all cells that are currently truly unknown or occupied. Count all those
       // that are covered indeed.
       unsigned int cellsCovered = 0;
-      for (int ii = 0; ii < coveredSpace_->info.width; ++ii)
+      for (int xx = 0; xx < coveredSpace_->data.size(); ++xx)
       {
-        for (int jj = 0; jj < coveredSpace_->info.height; ++jj)
-        {
-          if (map2dPtr_->data[ii + jj * map2dPtr_->info.width] >= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100))
-          {
-            coveredSpace_->data[ii + jj * coveredSpace_->info.width] = 0;
-            fusedCoveragePtr_->data[ii + jj * coveredSpace_->info.width] = 0;
-          }
-          if (coveredSpace_->data[ii + jj * coveredSpace_->info.width] != 0)
-          {
-            cellsCovered++;
-          }
-        }
+        // if (coveringUnknown_)
+        //   isFree = map2dPtr_->data[xx] <= static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
+        // else
+        //   isFree = map2dPtr_->data[xx] < static_cast<int8_t>(OCCUPIED_CELL_THRES * 100);
+
+        // if (!isFree)
+        // {
+        //   coveredSpace_->data[xx] = 0;
+        // }
+        // if (coveredSpace_->data[xx] != 0)
+        // {
+        //   cellsCovered++;
+        // }
       }
 
       // Calculate total area explored according to this sensor.
       totalAreaCovered_ = cellsCovered * resolution * resolution;
       ROS_INFO_THROTTLE(20,
-          "[SENSOR_COVERAGE_SPACE_CHECKER %d] Total area covered is %f m^2.",
+          "[PANDORA_SENSOR_COVERAGE_SPACE_CHECKER %d] Total area covered is %f m^2.",
           __LINE__, totalAreaCovered_);
 
       // Robot is standing in fully covered space (assumption).
@@ -178,8 +194,8 @@ namespace pandora_exploration
           yn = sin(robotYaw_) * x + cos(robotYaw_) * y + robotPosition_.y();
           CELL(xn, yn, coveredSpace_) = 100;
           CELL(xn, yn, fusedCoveragePtr_) = 100;
-          Utils::mapDilation(coveredSpace_, 1, COORDS(xn, yn, coveredSpace_));
-          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(xn, yn, fusedCoveragePtr_));
+          Utils::mapDilation(coveredSpace_, 1, COORDS(xn, yn, coveredSpace_), map2dPtr_);
+          Utils::mapDilation(fusedCoveragePtr_, 1, COORDS(xn, yn, fusedCoveragePtr_), map2dPtr_);
         }
       }
     }
@@ -204,7 +220,7 @@ namespace pandora_exploration
       octomap::KeyRay keyRay;
       if (!coverageMap3d_->computeRayKeys(begin, end, keyRay))
       {
-        ROS_ERROR("[SENSOR_COVERAGE_SPACE_CHECKER %d] Compute ray went out of range!",
+        ROS_ERROR("[PANDORA_SENSOR_COVERAGE_SPACE_CHECKER %d] Compute ray went out of range!",
             __LINE__);
       }
       bool coversSpace = false, occupied = false;
@@ -291,4 +307,3 @@ namespace pandora_exploration
 
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_exploration
-

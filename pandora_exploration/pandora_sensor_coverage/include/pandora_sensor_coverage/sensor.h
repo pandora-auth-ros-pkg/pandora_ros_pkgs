@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_COVERAGE_SENSOR_H
-#define SENSOR_COVERAGE_SENSOR_H
+#ifndef PANDORA_SENSOR_COVERAGE_SENSOR_H
+#define PANDORA_SENSOR_COVERAGE_SENSOR_H
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -104,7 +104,8 @@ namespace pandora_exploration
         {
           map2dPtr_ = map2dPtr;
           spaceChecker_->setMap2d(map2dPtr);
-          surfaceChecker_->setMap2d(map2dPtr);
+          if (surfaceCoverage_)
+            surfaceChecker_->setMap2d(map2dPtr);
         }
 
         void shareFusedCoverage(const nav_msgs::OccupancyGridPtr& fusedPtr)
@@ -219,4 +220,4 @@ namespace pandora_exploration
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_exploration
 
-#endif  // SENSOR_COVERAGE_SENSOR_H
+#endif  // PANDORA_SENSOR_COVERAGE_SENSOR_H

@@ -47,7 +47,9 @@ namespace pandora_exploration
 
     CoverageChecker::CoverageChecker(const NodeHandlePtr& nh, const std::string& frameName)
       : nh_(nh), frameName_(frameName)
-    {}
+    {
+      map2dPtr_.reset( new nav_msgs::OccupancyGrid );
+    }
 
     boost::shared_ptr<octomap::OcTree*> CoverageChecker::map3dPtrPtr_ = boost::
       shared_ptr<octomap::OcTree*>();

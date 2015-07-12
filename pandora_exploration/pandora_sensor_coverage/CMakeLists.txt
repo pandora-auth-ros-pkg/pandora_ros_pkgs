@@ -23,6 +23,14 @@ catkin_package(
     state_manager_msgs
     octomap_msgs
     octomap_ros
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}_utils
+    ${PROJECT_NAME}
+    ${PROJECT_NAME}_sensor
+    ${PROJECT_NAME}_surface_checker
+    ${PROJECT_NAME}_coverage_checker
   )
 
 include_directories(
@@ -74,7 +82,9 @@ target_link_libraries(${PROJECT_NAME}_surface_checker
 
 add_library(${PROJECT_NAME}_sensor
   src/sensor.cpp)
-add_dependencies(${PROJECT_NAME}_sensor ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_sensor
+  ${catkin_EXPORTED_TARGETS}
+  )
 target_link_libraries(${PROJECT_NAME}_sensor
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_surface_checker
@@ -82,9 +92,9 @@ target_link_libraries(${PROJECT_NAME}_sensor
 
 ########################  sensor_coverage  ##########################
 
-add_library(${PROJECT_NAME}_sensor_coverage
+add_library(${PROJECT_NAME}
   src/sensor_coverage.cpp)
-target_link_libraries(${PROJECT_NAME}_sensor_coverage
+target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_sensor
   ${PROJECT_NAME}_utils
@@ -92,11 +102,11 @@ target_link_libraries(${PROJECT_NAME}_sensor_coverage
 
 ########################  sensor_coverage_node  #####################
 
-add_executable(sensor_coverage_node
+add_executable(${PROJECT_NAME}_node
   src/main.cpp)
-target_link_libraries(sensor_coverage_node
+target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_sensor_coverage
+  ${PROJECT_NAME}
   )
 
 ########################  roslint  ##################################
@@ -129,7 +139,8 @@ roslint_cpp(${${PROJECT_NAME}_LINT_SRCS})
 ##################### Install targets ###############################
 
 ## Install exported libraries
-install(TARGETS ${PROJECT_NAME}_sensor_coverage
+install(TARGETS ${PROJECT_NAME}_utils
+                ${PROJECT_NAME}
                 ${PROJECT_NAME}_sensor
                 ${PROJECT_NAME}_surface_checker
                 ${PROJECT_NAME}_coverage_checker
@@ -138,5 +149,5 @@ install(TARGETS ${PROJECT_NAME}_sensor_coverage
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 # Install executables
-install(TARGETS sensor_coverage_node
+install(TARGETS ${PROJECT_NAME}_node
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

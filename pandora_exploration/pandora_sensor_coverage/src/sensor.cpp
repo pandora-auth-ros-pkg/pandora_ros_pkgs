@@ -157,10 +157,10 @@ namespace pandora_exploration
         if (surfaceCoverage_)
         {
           surfaceChecker_->findCoverage(sensorTransform, baseTransform);
-          // surfaceChecker_->publishCoverage(GLOBAL_FRAME);
+          surfaceChecker_->publishCoverage(GLOBAL_FRAME);
         }
         spaceChecker_->findCoverage(sensorTransform, baseTransform);
-        // spaceChecker_->publishCoverage(GLOBAL_FRAME);
+        spaceChecker_->publishCoverage(GLOBAL_FRAME);
       }
       catch (TfException ex)
       {

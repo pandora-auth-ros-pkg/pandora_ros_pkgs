@@ -36,8 +36,8 @@
  *   Tsirigotis Christos <tsirif@gmail.com>
  *********************************************************************/
 
-#ifndef SENSOR_COVERAGE_COVERAGE_CHECKER_H
-#define SENSOR_COVERAGE_COVERAGE_CHECKER_H
+#ifndef PANDORA_SENSOR_COVERAGE_COVERAGE_CHECKER_H
+#define PANDORA_SENSOR_COVERAGE_COVERAGE_CHECKER_H
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -109,6 +109,7 @@ namespace pandora_exploration
 
         void shareFusedCoverage(const nav_msgs::OccupancyGridPtr& fusedPtr)
         {
+          ROS_INFO("space checker: sharing pointer");
           fusedCoveragePtr_ = fusedPtr;
         }
 
@@ -213,4 +214,4 @@ namespace pandora_exploration
 }  // namespace pandora_sensor_coverage
 }  // namespace pandora_exploration
 
-#endif  // SENSOR_COVERAGE_COVERAGE_CHECKER_H
+#endif  // PANDORA_SENSOR_COVERAGE_COVERAGE_CHECKER_H
