@@ -14,6 +14,7 @@
   <arg name="stabilizer" default="true"/>
   <arg name="eef" default="true"/>
   <arg name="slam" default="true"/>
+  <arg name="rl" default="true"/>
   <arg name="navigation" default="true"/>
   <arg name="data_fusion" default="true"/>
   <arg name="xtion" default="false"/>
@@ -89,6 +90,11 @@
   <group if="$(arg slam)">
     <include file="$(find pandora_slam_2d)/launch/pandora_slam_2d_real.launch" />
     <include file="$(find pandora_pose_estimation)/launch/pose_estimation_5_dof.launch" />
+
+    <!-- RL -->
+    <group if="$(arg rl)">
+      <node name="pandora_rl" pkg="pandora_motion_control" type="kinodynamic_control.py" />
+    </group>
   </group>
 
   <!-- Navigation -->
