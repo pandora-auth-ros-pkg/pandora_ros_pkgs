@@ -37,6 +37,7 @@ class TestFusionValidationState(unittest.TestCase):
         self.assertFalse(self.agent.gui_result.victimValid)
         self.assertTrue(self.agent.target.is_empty)
         self.assertFalse(self.agent.target.is_verified())
+        self.assertNotIn(self.agent.available_targets, [])
 
     def test_false_positive(self):
 
@@ -51,6 +52,7 @@ class TestFusionValidationState(unittest.TestCase):
         self.assertFalse(self.agent.gui_result.victimValid)
         self.assertTrue(self.agent.target.is_empty)
         self.assertFalse(self.agent.target.is_verified())
+        self.assertNotIn(self.agent.available_targets, [])
 
     def test_true_negative(self):
 
@@ -64,6 +66,7 @@ class TestFusionValidationState(unittest.TestCase):
         self.assertFalse(self.agent.gui_result.victimValid)
         self.assertTrue(self.agent.target.is_empty)
         self.assertFalse(self.agent.target.is_verified())
+        self.assertNotIn(self.agent.available_targets, [])
 
     def test_false_negative(self):
 
@@ -77,6 +80,7 @@ class TestFusionValidationState(unittest.TestCase):
         self.assertFalse(self.agent.gui_result.victimValid)
         self.assertTrue(self.agent.target.is_empty)
         self.assertFalse(self.agent.target.is_verified())
+        self.assertNotIn(self.agent.available_targets, [])
 
     def test_invalid_victim(self):
 
@@ -89,3 +93,4 @@ class TestFusionValidationState(unittest.TestCase):
         self.assertEqual(self.agent.state, 'exploration')
         self.assertFalse(self.agent.gui_result.victimValid)
         self.assertTrue(self.agent.target.is_empty)
+        self.assertNotIn(self.agent.available_targets, [])
