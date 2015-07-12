@@ -111,6 +111,7 @@ if __name__ == "__main__":
         publisher_topics = [
             (publisherTopic, publisherMessagePackage, publisherMessageType)]
         rospy.loginfo("Test is Starting!")
+        rospy.sleep(30)
         BenchmarkTester.connect(subscriber_topics, publisher_topics, 2, False)
         rostest.rosrun(PKG, NAME, BenchmarkTester, sys.argv)
         BenchmarkTester.disconnect()

@@ -135,6 +135,13 @@ namespace depth
     cv::Mat interpolatedDepthImageSent;
     depthImage.copyTo(interpolatedDepthImageSent);
 
+    #ifdef DEBUG_SHOW
+    if (Parameters::Debug::show_depth_image)
+    {
+      Visualization::showScaled("Depth image", depthImage, 1);
+    }
+    #endif
+
     // A value of 1 means that the depth image is subtituted by its
     // low-low, wavelet analysis driven, part
     if (Parameters::Image::image_representation_method == 1)
