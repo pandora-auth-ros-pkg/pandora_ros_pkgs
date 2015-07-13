@@ -126,18 +126,21 @@ class NavigationEnvironment(Environment):
         """ @brief: perform an action on the world that changes vehicle's state
         and influences vehicle's motion
 
-        @param action: The actions chosen by the agent
-        @type action: List of doubles , the transformed agent's action
+        @param action: Details about navigation's velocity commands and quality
+        params for the kinodynamic model
+        @type action: Double , the transformed agent's action
         @return: nothing
 
         """
         # Form a new empty parameter message
         params = KinematicParameters()
 
-        # Coefficients :
-        params.terrain_param = action[0]
-        params.scale_left = action[1]
-        params.scale_right = action[2]
+        # Scale left/right not used in this version
+        params.scale_left = 1
+        params.scale_right = 1
+
+        # Fill terrain parameter
+        params.terrain_param = action
 
         # Terrain parameter (= agent's action)
         self.command_pub.publish(params)

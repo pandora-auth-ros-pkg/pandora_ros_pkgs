@@ -31,7 +31,7 @@ class KinodynamicController(object):
 
         # Number of States : (read from params.py)
         self._states = STATES
-        self._state_limits = STATE_LIMITS
+        self._state_limits = LIMITS
 
         # Total number of states:
         self._number_of_states = 1
@@ -39,17 +39,12 @@ class KinodynamicController(object):
             self._number_of_states *= i
 
         # Number of actions
-        self._actions = ACTIONS
-        self._action_limits = ACTION_LIMITS
-
-        # Total number of actions:
-        self._number_of_actions = 1
-        for i in self._actions:
-            self._number_of_actions *= i
+        self._actions = ACTION_STATES
+        self._action_limits = ACTION_RANGE
 
         # Action Value Table directory
         self.tables_directory = os.path.dirname(__file__) + "/tables/"
-        self.table_code = "S"+str(self._number_of_states)+"_"+"A"+str(self._number_of_actions)
+        self.table_code = "S"+str(self._number_of_states)+"_"+"A"+str(self._actions)
         self._filename = FILENAME + self.table_code
 
         # Action Value Table setup
@@ -58,7 +53,7 @@ class KinodynamicController(object):
         # Declare ROS Service to store Action Value Table
         store_service = rospy.Service('store_table', StoreAVTable, self.store_cb)
 
-        # Set up task parameters: *
+        # Set up task parameters:
         self._task.set_params(COMMAND_DURATION,
                               FUSION_WEIGHTS,
                               TIME_GRANULARITY,
@@ -100,7 +95,7 @@ class KinodynamicController(object):
             print "Found Table!"
 
         else:
-            self._av_table = ActionValueTable(self._number_of_states, self._number_of_actions)
+            self._av_table = ActionValueTable(self._number_of_states, self._actions)
             self._av_table.initialize(0.0)
             print "No training for this format. Creating new AV table"
 
@@ -112,7 +107,7 @@ class KinodynamicController(object):
         """
         matplotlib.pyplot.ion()
         while True:
-            data = self._av_table.params.reshape(self._number_of_states,self._number_of_actions)
+            data = self._av_table.params.reshape(self._number_of_states,self._actions)
             matplotlib.pyplot.pcolor(data,
                                      cmap = matplotlib.pyplot.cm.RdYlGn,
                                      vmin = -MAX_REWARD,
