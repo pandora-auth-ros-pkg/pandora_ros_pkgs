@@ -227,6 +227,10 @@ namespace pandora_vision_obstacle
       /// The size of the kernel of the Gaussian filter used to blur image
       int gaussianKernelSize_;
 
+      /// The maximum gradient difference (from 90 degrees) that a line should
+      /// have to be considered vertical
+      float verticalLineGradDiff_;
+
       /// The maximum gradient difference that two lines should have to be
       /// considered almost identical
       float gradientThreshold_;
@@ -235,9 +239,7 @@ namespace pandora_vision_obstacle
       float betaThreshold_;
 
       /// The minimum depth difference for a line to be considered valid
-      double minDepthThreshold_;
-      /// The maximum depth difference for a bounding box to be valid
-      double maxDepthThreshold_;
+      double depthThreshold_;
 
       /// The size of the kernel used to erode the image
       cv::Size erodeKernelSize_;

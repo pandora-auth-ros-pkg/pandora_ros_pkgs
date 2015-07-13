@@ -55,11 +55,12 @@ namespace pandora_vision_obstacle
 
         detector_->minLineLength_ = 100;
         detector_->gaussianKernelSize_ = 13;
+
+        detector_->verticalLineGradDiff_ = 10.0;
         detector_->gradientThreshold_ = 2.0;
         detector_->betaThreshold_ = 3.0;
 
-        detector_->minDepthThreshold_ = 0.3;
-        detector_->maxDepthThreshold_ = 0.5;
+        detector_->depthThreshold_ = 0.3;
 
         detector_->erodeKernelSize_ = cv::Size(3, 3);
         detector_->dilateKernelSize_ = cv::Size(3, 3);
@@ -284,7 +285,7 @@ namespace pandora_vision_obstacle
     ASSERT_FALSE(findDifferentROIDepth(depthImage, lines, roi));
 
     cv::line(depthImage, cv::Point(8, 6), cv::Point(6, 18), cv::Scalar(0.4), 1, 8);
-    ASSERT_FALSE(findDifferentROIDepth(depthImage, lines, roi));
+    ASSERT_TRUE(findDifferentROIDepth(depthImage, lines, roi));
 
     cv::line(depthImage, cv::Point(16, 8), cv::Point(18, 16), cv::Scalar(0.4), 1, 8);
     ASSERT_TRUE(findDifferentROIDepth(depthImage, lines, roi));
@@ -292,7 +293,7 @@ namespace pandora_vision_obstacle
     cv::line(depthImage, cv::Point(4, 4), cv::Point(6, 16), cv::Scalar(0.6), 1, 8);
     cv::line(depthImage, cv::Point(8, 6), cv::Point(6, 18), cv::Scalar(0.6), 1, 8);
     cv::line(depthImage, cv::Point(16, 8), cv::Point(18, 16), cv::Scalar(0.6), 1, 8);
-    ASSERT_FALSE(findDifferentROIDepth(depthImage, lines, roi));
+    ASSERT_TRUE(findDifferentROIDepth(depthImage, lines, roi));
 
     cv::line(depthImage, cv::Point(4, 4), cv::Point(6, 16), cv::Scalar(0.2), 1, 8);
     cv::line(depthImage, cv::Point(8, 6), cv::Point(6, 18), cv::Scalar(0.2), 1, 8);

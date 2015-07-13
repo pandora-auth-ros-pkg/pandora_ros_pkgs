@@ -68,6 +68,8 @@ namespace pandora_vision_obstacle
     dilateKernelSize_ = cv::Size(rows, cols);
 
     double param;
+    nh.param("verticalLineGradDiff", param, 10.0);
+    verticalLineGradDiff_ = param;
     nh.param("gradientThreshold", param, 2.0);
     gradientThreshold_ = param;
     nh.param("betaThreshold", param, 3.0);
@@ -76,8 +78,7 @@ namespace pandora_vision_obstacle
     nh.param("centerRect/width", centerWidth_, 5);
     nh.param("centerRect/height", centerHeight_, 10);
 
-    nh.param("minDepthThreshold", minDepthThreshold_, 0.3);
-    nh.param("maxDepthThreshold", maxDepthThreshold_, 0.5);
+    nh.param("depthThreshold", depthThreshold_, 0.3);
     nh.param("linesThreshold", linesThreshold_, 2);
 
     showOriginalImage_ = false;
@@ -266,7 +267,7 @@ namespace pandora_vision_obstacle
       }
 
       /// If line is almost vertical and not close to image borders
-      if ((grad > 80.0f && grad < 100.0f) && awayFromBorder)
+      if ((fabs(grad - 90.0f) < verticalLineGradDiff_) && awayFromBorder)
       {
         if (findNonIdenticalLines(lineCoefficients, grad, beta)
             && !detectLineIntersection(verticalLines, line)
@@ -415,14 +416,13 @@ namespace pandora_vision_obstacle
             fullFrameRect.width / 4, fullFrameRect.height));
       meanValue[ii] = cv::mean(depthROI)[0];
     }
-    float minDepth = *std::min_element(meanValue.begin(), meanValue.end());
+    float minDepth = *std::min_element(meanValue.begin(), meanValue.end());  // not used
 
     cv::Mat depthROI = depthImage(fullFrameRect);
     float mean = cv::mean(depthROI)[0];
 
     int linePixels = 0;
     float avgLineDepth = 0.0f;
-    ROS_INFO_STREAM("Mean Depth in bounding box: " << mean);
 
     for (size_t ii = 0; ii < verticalLines.size(); ii++)
     {
@@ -441,8 +441,7 @@ namespace pandora_vision_obstacle
     }
     avgLineDepth /= linePixels;
 
-    ROS_INFO_STREAM("Average Line Depth:" << avgLineDepth);
-    if (fabs(mean - avgLineDepth) < minDepthThreshold_)
+    if (fabs(mean - avgLineDepth) < depthThreshold_)
     {
       return false;
     }
@@ -522,8 +521,6 @@ namespace pandora_vision_obstacle
       // distance
       bool diffDepth = findDifferentROIDepth(depthImage, verticalLines, *roi, level);
 
-      // diffDepth = true;
-
       if (diffDepth)
       {
         boost::array<float, 4> depthDistance;
@@ -532,11 +529,6 @@ namespace pandora_vision_obstacle
         depthDistance = findDepthDistance(depthImage, verticalLines,
             *roi, level);
         bool nonZeroDepth = (depthDistance[1] && depthDistance[3]);
-
-        // Compare the minimum and maximum depth distance of a bounding box
-        double minDepth = *std::min_element(depthDistance.begin(), depthDistance.end());
-        double maxDepth = *std::max_element(depthDistance.begin(), depthDistance.end());
-        bool similarDepthResult = (maxDepth - minDepth < maxDepthThreshold_);
 
         if (probability > 0.0f && nonZeroDepth)
         {
