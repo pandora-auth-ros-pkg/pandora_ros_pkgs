@@ -50,6 +50,7 @@
   <group if="$(arg motors)">
     <include file="$(find pandora_motor_hardware_interface)/motor_hardware_interface/launch/motor_hardware_interface_and_controllers.launch" >
       <arg name="robot" value="$(arg robot)" />
+      <arg name="rl" value="$(arg rl)" />
     </include>
   </group>
   <group if="$(arg linear_actuator)">
