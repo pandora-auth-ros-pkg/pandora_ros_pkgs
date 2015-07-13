@@ -125,7 +125,15 @@ namespace pose_finder
         pointsPitch[3], pointsDepth[3], tfTransform);
     geometry_msgs::Point rightPoint = projectAlertPosition(pointsYaw[1],
         pointsPitch[1], pointsDepth[1], tfTransform);
-    // geometry_msgs::Point leftPoint = findAlertPosition(pointsYaw[3],
+    geometry_msgs::Point lowPoint = projectAlertPosition(pointsYaw[2],
+        pointsPitch[2], pointsDepth[2], tfTransform);
+    geometry_msgs::Point highPoint = projectAlertPosition(pointsYaw[0],
+        pointsPitch[0], pointsDepth[0], tfTransform);
+    if (lowPoint.z > 1.20 || highPoint.z < -0.1)
+      throw AlertException("Obstacle either too low or two high");
+    // Absolute depth and depth difference are evaluated at
+    // pandora_vision_obstacle
+    // geometry_msgs::Point lowPoint = findAlertPosition(pointsYaw[3],
     //     pointsPitch[3], tfTransform);
     // geometry_msgs::Point rightPoint = findAlertPosition(pointsYaw[1],
     //     pointsPitch[1], tfTransform);

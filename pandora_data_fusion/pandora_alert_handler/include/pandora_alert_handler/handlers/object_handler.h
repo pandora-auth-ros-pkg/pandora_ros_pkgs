@@ -299,7 +299,7 @@ namespace pandora_alert_handler
     for (int ii = 0; ii < newObstacles->size(); ++ii) {
       ObstaclePtr obstacleToSend;
       bool obstacleToSendFound = true;
-      if (newObstacles->at(ii)->getLength() < 0.42)
+      if (newObstacles->at(ii)->getLength() < 0.45)
         continue;
       if (Obstacle::getList()->add(newObstacles->at(ii)))
       {
