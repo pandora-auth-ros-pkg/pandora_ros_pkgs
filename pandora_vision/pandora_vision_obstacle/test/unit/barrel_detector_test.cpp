@@ -338,7 +338,7 @@ namespace pandora_vision
       rgbVal[1] = 0;
       rgbVal[2] = 0;
     }
-      
+
     for (int rows = 0; rows < HEIGHT; rows++)
     {
       for (int cols = 0; cols < WIDTH; cols++)

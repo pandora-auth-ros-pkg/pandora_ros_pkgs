@@ -458,9 +458,9 @@ namespace pandora_vision_obstacle
       int iLowV = BarrelDetection::value_lowest_thresh, iHighV = BarrelDetection::value_highest_thresh;
       // cv::inRange(hImage, iLowH, iHighH, binary);
       cv::inRange(
-          hsvImage, 
-          cv::Scalar(iLowH, iLowS, iLowV), 
-          cv::Scalar(iHighH, iHighS, iHighV), 
+          hsvImage,
+          cv::Scalar(iLowH, iLowS, iLowV),
+          cv::Scalar(iHighH, iHighS, iHighV),
           binary);
       // For RED define one second threshold
       if (BarrelDetection::color_selection_R_1_G_2_B_3 == 1)
@@ -469,13 +469,12 @@ namespace pandora_vision_obstacle
         iHighH = 3;
         // cv::inRange(hImage, iLowH, iHighH, binaryTemp);
         cv::inRange(
-            hsvImage, 
-            cv::Scalar(iLowH, iLowS, iLowV), 
-            cv::Scalar(iHighH, iHighS, iHighV), 
+            hsvImage,
+            cv::Scalar(iLowH, iLowS, iLowV),
+            cv::Scalar(iHighH, iHighS, iHighV),
             binaryTemp);
         binary += binaryTemp;
       }
-    
 
       int whitesCounter = cv::countNonZero(binary);
       float whitesOverlap =

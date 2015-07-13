@@ -41,6 +41,7 @@
 #define PANDORA_VISION_OBSTACLE_BARREL_DETECTION_BARREL_DETECTOR_H
 
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include "pandora_vision_obstacle/obstacle_poi.h"

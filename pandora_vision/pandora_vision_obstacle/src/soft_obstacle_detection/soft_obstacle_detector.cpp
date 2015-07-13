@@ -417,8 +417,12 @@ namespace pandora_vision_obstacle
     }
     float minDepth = *std::min_element(meanValue.begin(), meanValue.end());
 
+    cv::Mat depthROI = depthImage(fullFrameRect);
+    float mean = cv::mean(depthROI)[0];
+
     int linePixels = 0;
     float avgLineDepth = 0.0f;
+    ROS_INFO_STREAM("Mean Depth in bounding box: " << mean);
 
     for (size_t ii = 0; ii < verticalLines.size(); ii++)
     {
@@ -437,7 +441,8 @@ namespace pandora_vision_obstacle
     }
     avgLineDepth /= linePixels;
 
-    if (fabs(minDepth - avgLineDepth) < minDepthThreshold_)
+    ROS_INFO_STREAM("Average Line Depth:" << avgLineDepth);
+    if (fabs(mean - avgLineDepth) < minDepthThreshold_)
     {
       return false;
     }
@@ -517,6 +522,8 @@ namespace pandora_vision_obstacle
       // distance
       bool diffDepth = findDifferentROIDepth(depthImage, verticalLines, *roi, level);
 
+      // diffDepth = true;
+
       if (diffDepth)
       {
         boost::array<float, 4> depthDistance;
@@ -531,7 +538,7 @@ namespace pandora_vision_obstacle
         double maxDepth = *std::max_element(depthDistance.begin(), depthDistance.end());
         bool similarDepthResult = (maxDepth - minDepth < maxDepthThreshold_);
 
-        if (probability > 0.0f && nonZeroDepth && similarDepthResult)
+        if (probability > 0.0f && nonZeroDepth)
         {
           ROS_INFO("Soft Obstacle Detected!");
 

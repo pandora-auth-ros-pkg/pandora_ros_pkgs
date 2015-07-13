@@ -10,7 +10,7 @@ erodeKernelSize:
   cols: 3
 dilateKernelSize:
   rows: 3
-  cols: 3
+  cols: 11
 
 centerRect:
   width: 5

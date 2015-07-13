@@ -35,6 +35,7 @@
  * Authors: Vasilis Bosdelekidis
  *********************************************************************/
 
+#include <string>
 #include "pandora_vision_obstacle/barrel_detection/parameters.h"
 
 /**
