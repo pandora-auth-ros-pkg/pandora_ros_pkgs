@@ -232,6 +232,22 @@ def state_mapper(a,states):
 
     return total_state
 
+def decode_actions(k, actions):
+
+    coefficient = [1]
+    for i in range(1, len(actions)):
+        coefficient.append(coefficient[i-1] * actions[i-1])
+
+    final_actions = []
+    i = 0
+    for i in range(0, len(actions) - 1):
+        a = (k % coefficient[i+1]) // coefficient[i]
+        final_actions.append(a)
+    final_actions.append(k // coefficient[-1])
+
+    return final_actions
+
+
 def transform_action(action,action_count,action_limits):
     """
     @brief : Transfroms action selected by the agent (integer) to proper form

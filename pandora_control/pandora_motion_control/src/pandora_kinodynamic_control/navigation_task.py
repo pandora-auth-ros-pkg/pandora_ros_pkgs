@@ -141,10 +141,16 @@ class NavigationTask(Task):
         this function.
 
         """
-        # Make a final action vector of (velocity command, params)
-        transformed_action = utils.transform_action(action,ACTION_STATES,ACTION_RANGE)
+        # Decode Agent's last action
+        decoded_actions = utils.decode_actions(action,ACTIONS)
+
+        # Transform every action
+        transformed_actions = []
+        for i in range(len(decoded_actions)):
+            transformed_actions.append(utils.transform_action(decoded_actions[i],ACTIONS[i],ACTION_LIMITS[i]))
+
         # Delegate interaction with environment to NavigationEnvironment
-        self.env.perform_action(transformed_action)
+        self.env.perform_action(transformed_actions)
 
     def discretize(self, sensors):
         """ @brief: Map continuous values to discrete values
