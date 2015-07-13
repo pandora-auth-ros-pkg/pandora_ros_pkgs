@@ -10,15 +10,16 @@
     machine="rpi2"
     name="ledstrip_controller"
     pkg="ledstrip_controller"
-    type="ledstrip_controller.py" 
+    type="ledstrip_controller.py"
     launch-prefix="nice -n 2"
     output="screen"
   >
-    
-    <param name="published_topics/ledstrip_state" value="/ledstrip/state" />
+
+    <param name="published_topics/ledstrip_state" value="/kinect/ledstrip/state" />
+    <param name="subscribed_topics/brightness" value="/kinect/ledstrip/brigtness" />
     <param name="subscribed_topics/ledstrip_cmd" value="/kinect/ledstrip/state_cmd" />
     <param name="subscribed_topics/state_client" value="/robot/state/clients" />
-    <param name="led_gpio_pin" value="26" />
+    <param name="led_gpio_pin" value="22" />
     <param name="pub_rate" value="1" />
 
   </node>

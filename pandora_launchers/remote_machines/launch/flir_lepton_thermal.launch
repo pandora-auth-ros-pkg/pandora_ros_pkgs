@@ -10,11 +10,11 @@
     machine="rpi2"
     name="flir_lepton"
     pkg="flir_lepton"
-    type="flir_lepton_node" 
+    type="flir_lepton_node"
     launch-prefix="nice -n -10"
   >
 
-    <param name="dataset/spline_interpolated_data" 
+    <param name="dataset/spline_interpolated_data"
       value="/home/pandora/pandora_ws/src/rpi_hardware_interface/data/flir_lepton/dataset_spline_interp.pandora" />
     <param name="interface_rate" value="20" />
     <param name="published_topics/flir_image_topic" value="/rpi2/thermal/image" />
