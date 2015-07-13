@@ -38,9 +38,10 @@
  * Author: Elisabet Papadopoulou     <papaelisabet@gmail.com >
  */
 
-#include "motor_controllers/skid_steer_velocity_controller.h"
-
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
+
+#include "motor_controllers/skid_steer_velocity_controller.h"
 
 // min(max(x, minVal), maxVal)
 template<typename T> T clamp(T x, T min, T max)
@@ -196,17 +197,29 @@ namespace motor
     }
 
     // Subscirbe to cmd_vel
+
+    ros::NodeHandle private_nh("~");
+    nodeName_ = boost::to_upper_copy<std::string>(private_nh.getNamespace());
+
+    if (!ns.getParam("/using_rl", usingRL_))
+    {
+      ROS_FATAL("[%s] Cound not find using rl param!", nodeName_.c_str());
+      ROS_BREAK();
+    }
+    
     command_listener_ = ns.subscribe(
         "/cmd_vel",
         1,
         &SkidSteerVelocityController::commandCallbackTwist,
         this);
+    hasCommandReached_ = false;
 
     parameter_listener_ = ns.subscribe(
         "/kinematic_parameters",
         1,
         &SkidSteerVelocityController::updateParameters,
         this);
+    hasParameterReached_ = false;
 
     ROS_INFO("Successfully initiallized velocity controller!");
     return true;
@@ -218,6 +231,8 @@ namespace motor
     double angular = command_struct_.ang;
     double linear = command_struct_.lin;
     double terrain_parameter_ = command_struct_.terrain_parameter;
+    double scale_left = command_struct_.scale_factor_left;
+    double scale_right = command_struct_.scale_factor_right;
 
     if (!sim_)
     {
@@ -228,24 +243,65 @@ namespace motor
     double vel_left  = (1 / wheel_radius_) * linear - ((terrain_parameter_ * track_) / (2 * wheel_radius_)) * angular;
     double vel_right = (1 / wheel_radius_) * linear + ((terrain_parameter_ * track_) / (2 * wheel_radius_)) * angular;
 
-    left_front_wheel_joint_.setCommand(vel_left);
-    left_rear_wheel_joint_.setCommand(vel_left);
-    right_front_wheel_joint_.setCommand(vel_right);
-    right_rear_wheel_joint_.setCommand(vel_right);
+    left_front_wheel_joint_.setCommand(scale_left * vel_left);
+    left_rear_wheel_joint_.setCommand(scale_left * vel_left);
+    right_front_wheel_joint_.setCommand(scale_right * vel_right);
+    right_rear_wheel_joint_.setCommand(scale_right * vel_right);
   }
 
-  void SkidSteerVelocityController::commandCallbackTwist(const geometry_msgs::Twist& command)
+  void SkidSteerVelocityController::commandCallbackTwist(const geometry_msgs::TwistConstPtr& command)
   {
-    command_struct_.ang   = command.angular.z;
-    command_struct_.lin   = command.linear.x;
+    hasCommandReached_ = true;
+    velocitiesCommand_ = command;
 
-    command_struct_.stamp = ros::Time::now();
+    pandora_motor_hardware_interface::KinematicParametersPtr defaultParameters;
+    if (!usingRL_)
+    {
+      defaultParameters.reset( new pandora_motor_hardware_interface::KinematicParameters );
+      defaultParameters->terrain_param = 1.0;
+      defaultParameters->scale_left = 1.0;
+      defaultParameters->scale_right = 1.0;
+      syncCallback(velocitiesCommand_, defaultParameters);
+    }
+    else
+    {
+      if (hasParameterReached_ && hasCommandReached_)
+        syncCallback(velocitiesCommand_, parameterCommand_);
+    }
   }
 
   void SkidSteerVelocityController::updateParameters(
-                                            const pandora_motor_hardware_interface::KinematicParameters& command)
+      const pandora_motor_hardware_interface::KinematicParametersConstPtr& command)
   {
-    command_struct_.terrain_parameter = command.terrain_param;
+    hasParameterReached_ = true;
+    parameterCommand_ = command;
+
+    if (hasParameterReached_ && hasCommandReached_)
+      syncCallback(velocitiesCommand_, parameterCommand_);
+  }
+
+  void SkidSteerVelocityController::syncCallback(
+      const geometry_msgs::TwistConstPtr& velocitiesCommand,
+      const pandora_motor_hardware_interface::KinematicParametersConstPtr& parameterCommand)
+  {
+    if (usingRL_)
+    {
+      if (!hasParameterReached_ || !hasCommandReached_)
+      {
+        ROS_ERROR("[%s] Incorrect sync callback: has not received enough info",
+            nodeName_.c_str());
+        return;
+      }
+      hasParameterReached_ = false;
+      hasCommandReached_ = false;
+    }
+
+    command_struct_.ang   = velocitiesCommand->angular.z;
+    command_struct_.lin   = velocitiesCommand->linear.x;
+    command_struct_.terrain_parameter = parameterCommand->terrain_param;
+    command_struct_.scale_factor_left = parameterCommand->scale_left;
+    command_struct_.scale_factor_right = parameterCommand->scale_right;
+    command_struct_.stamp = ros::Time::now();
   }
 
   void SkidSteerVelocityController::remapVelocities(
