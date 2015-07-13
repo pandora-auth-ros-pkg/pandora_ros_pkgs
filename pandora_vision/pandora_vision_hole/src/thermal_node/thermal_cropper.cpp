@@ -192,8 +192,6 @@ namespace thermal
     isEnhancedImageAvailable_ = false;
     isThermalAvailable_ = false;
 
-    NODELET_INFO("[%s] Processing callback", nodeName_.c_str());
-
     unlockThermalProcedure();
 
     if (!publishingEnhancedHoles_)

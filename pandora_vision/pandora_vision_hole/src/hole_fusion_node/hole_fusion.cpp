@@ -303,8 +303,6 @@ namespace hole_fusion
     Timer::start("depthCandidateHolesCallback", "", true);
     #endif
 
-    NODELET_INFO("[%s] Depth callback", nodeName_.c_str());
-
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
     HolesConveyorUtils::clear(&depthHolesConveyor_);

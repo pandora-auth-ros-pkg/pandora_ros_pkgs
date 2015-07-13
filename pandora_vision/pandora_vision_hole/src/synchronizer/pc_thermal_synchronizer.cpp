@@ -247,7 +247,6 @@ namespace pandora_vision_hole
 
     if (!holeFusionLocked_)
     {
-      NODELET_INFO("[%s] RGBD Callback", nodeName_.c_str());
       holeFusionLocked_ = true;
       synchronizedPointCloudPublisher_.publish(pointCloudPtr);
       synchronizedRgbImagePublisher_.publish(rgbImageMessagePtr);
@@ -292,7 +291,6 @@ namespace pandora_vision_hole
 
     if (!thermalLocked_ || !holeFusionLocked_)
     {
-      NODELET_INFO("[%s] RGBDT Callback", nodeName_.c_str());
       std_msgs::StringPtr thermalIndex( new std_msgs::String );
 
       if (thermalMode_ && !thermalLocked_)

@@ -120,8 +120,6 @@ namespace depth
     Timer::start("inputDepthImageCallback", "", true);
 #endif
 
-    NODELET_INFO("[%s] callback", nodeName_.c_str());
-
     // Obtain the depth image. Since the image is in a format of
     // sensor_msgs::Image, it has to be transformed into a cv format in order
     // to be processed. Its cv format will be CV_32FC1.
