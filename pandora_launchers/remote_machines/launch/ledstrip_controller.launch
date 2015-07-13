@@ -11,7 +11,7 @@
     name="ledstrip_controller"
     pkg="ledstrip_controller"
     type="ledstrip_controller.py" 
-    launch-prefix=""
+    launch-prefix="nice -n 2"
     output="screen"
   >
     

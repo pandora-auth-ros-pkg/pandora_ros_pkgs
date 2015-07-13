@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <node
+      name="transport_from_rpi2"
+      pkg="pandora_launchers"
+      type="transport_from_rpi2.sh"
+      cwd="node"
+      respawn="true"
+      output="screen"
+    />
+
+</launch>

@@ -19,8 +19,9 @@
     pkg="pandora_linear_actuator_hardware_interface"
     type="linear_actuator_hardware_interface_node"
     ns="$(arg namespace)"
-    launch-prefix=""
-    output="screen">
+    launch-prefix="nice -n -1"
+    output="screen"
+  >
 
     <remap
       from="/linear_actuator/joint_position_controller/command"

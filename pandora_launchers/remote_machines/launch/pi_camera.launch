@@ -17,7 +17,9 @@
     name="pi_camera"
     pkg="pi_camera"
     type="pi_camera_node.py"
-    output="screen" >
+    launch-prefix="nice -n -5"
+    output="screen" 
+  >
 
     <param name="width" value="640" />
     <param name="height" value="480" />
