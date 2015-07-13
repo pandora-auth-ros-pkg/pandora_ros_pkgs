@@ -76,14 +76,10 @@ namespace motor
       void starting(const ros::Time& time) { }
       void stopping(const ros::Time& time) { }
 
-      void commandCallbackTwist(const geometry_msgs::TwistConstPtr& command);
-      void updateParameters(const pandora_motor_hardware_interface::KinematicParametersConstPtr& command);
+      void commandCallbackTwist(const geometry_msgs::Twist& command);
+      void updateParameters(const pandora_motor_hardware_interface::KinematicParameters& command);
 
     private:
-      void syncCallback(
-          const geometry_msgs::TwistConstPtr& velocitiesCommand,
-          const pandora_motor_hardware_interface::KinematicParametersConstPtr& parameterCommand);
-
       // Remap velocities using the calculated polynom
       void remapVelocities(
           double& linear,
@@ -103,17 +99,9 @@ namespace motor
       hardware_interface::JointHandle left_rear_wheel_joint_;
       hardware_interface::JointHandle right_rear_wheel_joint_;
 
-      std::string nodeName_;
-
       // cmd_vel ROS subscriber
-      bool usingRL_;
-
       ros::Subscriber command_listener_;
-      bool hasCommandReached_;
-      geometry_msgs::TwistConstPtr velocitiesCommand_;
       ros::Subscriber parameter_listener_;
-      bool hasParameterReached_;
-      pandora_motor_hardware_interface::KinematicParametersConstPtr parameterCommand_;
 
       /// Velocity command related struct
       struct Commands
@@ -121,13 +109,11 @@ namespace motor
         double lin;
         double ang;
         float terrain_parameter;
-        float scale_factor_left;
-        float scale_factor_right;
+        float slip_factor_left;
+        float slip_factor_right;
         ros::Time stamp;
 
-        Commands() :
-          lin(0.0), ang(0.0), terrain_parameter(1.0),
-          scale_factor_left(1.0), scale_factor_right(1.0), stamp(0.0) {}
+        Commands() : lin(0.0), ang(0.0), stamp(0.0), terrain_parameter(1.0), slip_factor_left(0), slip_factor_right(0){}
       };
       Commands command_struct_;
 

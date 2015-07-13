@@ -4,8 +4,6 @@
 
   <arg name="sim" default="false" />
   <param name="/sim" value="$(arg sim)" />
-  <arg name="rl" default="true" />
-  <param name="/using_rl" value="$(arg rl)" />
 
   <rosparam
     command="load"
