@@ -60,6 +60,8 @@ namespace pandora_vision_obstacle
         detector_->gradientThreshold_ = 2.0;
         detector_->betaThreshold_ = 3.0;
 
+        detector_->depthLimit_ = 1.5;
+        detector_->maxDepthDiff_ = 1.0;
         detector_->depthThreshold_ = 0.3;
 
         detector_->erodeKernelSize_ = cv::Size(3, 3);

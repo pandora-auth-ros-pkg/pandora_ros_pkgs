@@ -40,6 +40,7 @@
 
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
+#include "state_manager/state_client_nodelet.h"
 
 #include "pandora_vision_hole/CandidateHolesVectorMsg.h"
 #include "rgb_node/utils/message_conversions.h"
@@ -63,7 +64,7 @@ namespace rgb
     @brief Provides functionalities for locating holes via
     analysis of a RGB image
    **/
-  class Rgb : public nodelet::Nodelet
+  class Rgb : public state_manager::StateClientNodelet
 
   {
    public:
@@ -98,6 +99,10 @@ namespace rgb
     void parametersCallback(
       const ::pandora_vision_hole::rgb_cfgConfig& config,
       const uint32_t& level);
+
+    void startTransition(int newState);
+
+    void completeTransition(void);
 
    private:
     /**

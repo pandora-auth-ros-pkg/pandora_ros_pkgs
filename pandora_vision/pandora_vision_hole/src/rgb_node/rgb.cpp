@@ -72,6 +72,7 @@ namespace rgb
   Rgb::
   onInit()
   {
+    state_manager::StateClientNodelet::onInit();
     nodeHandle_ = this->getNodeHandle();
     privateNodeHandle_ = this->getPrivateNodeHandle();
     nodeName_ = boost::to_upper_copy<std::string>(this->getName());
@@ -101,8 +102,34 @@ namespace rgb
     // The dynamic reconfigure (RGB) parameter's callback
     serverPtr_->setCallback(boost::bind(&Rgb::parametersCallback, this, _1, _2));
 
+    clientInitialize();
+
     NODELET_INFO("[%s] Initiated", nodeName_.c_str());
   }
+
+  /**
+    @brief Completes the transition to a new state
+    @param void
+    @return void
+   **/
+  void Rgb::completeTransition(void)
+  {
+    NODELET_INFO("[%s] Transition Complete", nodeName_.c_str());
+  }
+
+  void Rgb::startTransition(int newState)
+  {
+    if (newState == state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD)
+    {
+      Parameters::Edge::edge_detection_method = 0;
+    }
+    else
+    {
+      Parameters::Edge::edge_detection_method = 1;
+    }
+    transitionComplete(newState);
+  }
+
 
   /**
     @brief Callback for the rgb image received by the synchronizer node.

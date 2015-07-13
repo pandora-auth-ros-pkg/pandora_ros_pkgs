@@ -238,6 +238,10 @@ namespace pandora_vision_obstacle
       /// considered almost identical
       float betaThreshold_;
 
+      /// The maximum depth value that a bounding box point should have
+      float depthLimit_;
+      /// The maximum depth difference for a soft obstacle alert to be published
+      float maxDepthDiff_;
       /// The minimum depth difference for a line to be considered valid
       double depthThreshold_;
 

@@ -276,7 +276,7 @@ namespace hole_fusion
    **/
   void HoleFusion::completeTransition(void)
   {
-    NODELET_INFO("[%s]Transition Complete", nodeName_.c_str());
+    NODELET_INFO("[%s] Transition Complete", nodeName_.c_str());
   }
 
 
@@ -359,8 +359,6 @@ namespace hole_fusion
     #ifdef DEBUG_TIME
     Timer::start("thermalCandidateHolesCallback", "", true);
     #endif
-
-    NODELET_INFO("[%s] Thermal callback", nodeName_.c_str());
 
     // Clear the current depthHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)
@@ -1171,8 +1169,6 @@ namespace hole_fusion
     Timer::start("pointCloudCallback", "", true);
 #endif
 
-    NODELET_INFO("[%s] Point Cloud callback", nodeName_.c_str());
-
     // Convert the header of the point cloud message
     std_msgs::Header header;
     pcl_conversions::fromPCL(msg->header, header);
@@ -1951,8 +1947,6 @@ namespace hole_fusion
     #ifdef DEBUG_TIME
     Timer::start("rgbCandidateHolesCallback", "", true);
     #endif
-
-    NODELET_INFO("[%s] RGB callback", nodeName_.c_str());
 
     // Clear the current rgbHolesConveyor struct
     // (or else keyPoints, rectangles and outlines accumulate)

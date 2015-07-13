@@ -134,7 +134,6 @@ namespace pandora_vision_victim
       depth_svm_p.clear();
       rgbd_svm_p.clear();
     }
-
     DetectionImages imgs;
     int stateIndicator = 2;  //  * input->getDepth() + (input->getRegions().size() > 0) + 1;
     DetectionMode detectionMode;
@@ -155,18 +154,26 @@ namespace pandora_vision_victim
     }
     for (unsigned int i = 0 ; i < input->getRegions().size(); i++)
     {
+      std::vector<VictimPOIPtr> temp;
+      if (input->getRegion(i).x - input->getRegion(i).width / 2 < 0 &&
+         input->getRegion(i).y - input->getRegion(i).height / 2 < 0 &&
+         input->getRegion(i).width <= 0 &&
+         input->getRegion(i).height <= 0)
+      {
+        ROS_WARN("[victim_node] Bounding box sent from hole out of boundaries");
+        return temp;
+      }
+
+      if (input->getRegion(i).x + input->getRegion(i).width / 2  >= 640 ||
+          input->getRegion(i).y + input->getRegion(i).height / 2 >= 480)
+      {
+        ROS_WARN("[victim_node] bbox bigger than image");
+        return temp;
+      }
       cv::Rect rect(input->getRegion(i).x - input->getRegion(i).width / 2,
         input->getRegion(i).y - input->getRegion(i).height / 2, input->getRegion(i).width,
         input->getRegion(i).height);
       holes_bounding_boxes.push_back(rect);
-
-      if (input->getRegion(i).x - input->getRegion(i).width / 2 <= 0 &&
-         input->getRegion(i).y - input->getRegion(i).height / 2 <= 0 &&
-         input->getRegion(i).width <= 0 &&
-         input->getRegion(i).height <= 0)
-      {
-        ROS_FATAL("[victim_node] Bounding box sent from hole out of boundaries");
-      }
 
       EnhancedMat emat;
       emat.img = input->getRgbImage()(rect);

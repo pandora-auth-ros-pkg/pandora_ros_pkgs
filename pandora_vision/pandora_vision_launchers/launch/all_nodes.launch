@@ -54,7 +54,7 @@
         ns="pandora_vision_hole" >
         <arg name="rgbd" value="true" />
         <arg name="rgbdt" value="false" />
-        <arg name="thermal" value="false" />
+        <arg name="thermal" value="true" />
     </include>
     <include if="$(arg vision_victim)"
         file="$(find pandora_vision_victim)/launch/pandora_vision_victim.launch"

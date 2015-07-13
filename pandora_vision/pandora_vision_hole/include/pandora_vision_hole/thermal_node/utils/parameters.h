@@ -181,6 +181,13 @@ namespace thermal
       //  Low and High acceptable temperatures for thresholding
       static float low_temperature;
       static float high_temperature;
+
+      // transformation parameters for image matching
+      static double xThermal;
+      static double yThermal;
+      static double c_x;
+      static double c_y;
+      static double angle;
     };
 
     //  Thermal image parameters

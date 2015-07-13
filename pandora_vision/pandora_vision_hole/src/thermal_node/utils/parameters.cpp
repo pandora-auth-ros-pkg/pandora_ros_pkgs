@@ -125,7 +125,7 @@ namespace thermal
   // 2 for brushfire far
   int Parameters::Depth::interpolation_method = 0;
 
-  ////////////////// Parameters pecific to the Thermal node ////////////////////
+  ////////////////// Parameters specific to the Thermal node ////////////////////
 
   // The thermal detection method
   // If set to 0 process the binary image acquired from temperatures MultiArray
@@ -149,6 +149,15 @@ namespace thermal
 
   float Parameters::Thermal::left_tolerance = 4;
   float Parameters::Thermal::right_tolerance = 8;
+
+  // transformation variables;
+
+  double  Parameters::Thermal::xThermal = 17;
+  double  Parameters::Thermal::yThermal = -18;
+  double  Parameters::Thermal::c_x = 7.025;
+  double  Parameters::Thermal::c_y = 7.025;
+  double  Parameters::Thermal::angle = 2;
+
 
   ///////////// Parameters of acceptable temperature for threshold /////////////
   float Parameters::Thermal::low_temperature = 28;

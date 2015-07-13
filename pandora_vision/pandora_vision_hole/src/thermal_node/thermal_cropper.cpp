@@ -155,7 +155,6 @@ namespace thermal
   ThermalCropper::
   inputThermalRoiCallback(const pandora_vision_msgs::EnhancedImageConstPtr& msg)
   {
-    NODELET_INFO("[%s] Thermal callback", nodeName_.c_str());
     isThermalAvailable_ = true;
     thermalEnhancedImageConstPtr_ = msg;
 
@@ -169,7 +168,6 @@ namespace thermal
   ThermalCropper::
   inputEnhancedImageCallback(const pandora_vision_msgs::EnhancedImageConstPtr& msg)
   {
-    NODELET_INFO("[%s] RGB callback", nodeName_.c_str());
     isEnhancedImageAvailable_ = true;
     enhancedImageConstPtr_ = msg;
 
@@ -193,6 +191,8 @@ namespace thermal
     isThermalAvailable_ = false;
 
     unlockThermalProcedure();
+
+    NODELET_INFO("[%s] Processing thermal images", nodeName_.c_str());
 
     if (!publishingEnhancedHoles_)
       return;
@@ -268,12 +268,14 @@ namespace thermal
   startTransition(int newState)
   {
     // The new on/off state of the Hole Detector package
-    bool toBeOn = (newState ==
-        state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION)
+    bool toBeOn = ((newState ==
+          state_manager_msgs::RobotModeMsg::MODE_EXPLORATION_RESCUE)
+      || (newState ==
+          state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION)
       || (newState ==
         state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD)
       || (newState ==
-        state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST);
+        state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST));
 
     // off -> on
     if (!isOn_ && toBeOn)
@@ -290,7 +292,9 @@ namespace thermal
     }
 
     // Shutdown or open publisher of enhanced images
-    if (toBeOn)
+    if (newState == state_manager_msgs::RobotModeMsg::MODE_IDENTIFICATION
+      || newState == state_manager_msgs::RobotModeMsg::MODE_SENSOR_HOLD
+      || newState == state_manager_msgs::RobotModeMsg::MODE_SENSOR_TEST)
     {
       if (!publishingEnhancedHoles_)
       {

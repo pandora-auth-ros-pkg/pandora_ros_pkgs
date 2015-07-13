@@ -108,8 +108,8 @@ namespace thermal
     getTopicNames();
 
     // Get the values of the variables used to match the final holeConveyors
-    ImageMatching::variableSetUp(private_nh_, &xThermal_, &yThermal_,
-      &cX_, &cY_, &angle_);
+    /* ImageMatching::variableSetUp(private_nh_, &xThermal_, &yThermal_, */
+      /* &cX_, &cY_, &angle_); */
 
     isImageAvailable_ = false;
     // Subscribe to the thermal image published by raspberry
@@ -232,7 +232,7 @@ namespace thermal
 #ifdef DEBUG_SHOW
     if (Parameters::Debug::show_thermal_image)
     {
-      Visualization::showScaled("Thermal image", thermalSensorImage, 1);
+      Visualization::showScaled("Thermal image", thermalImage, 1);
     }
 #endif
     HolesConveyor holes;
@@ -266,9 +266,13 @@ namespace thermal
     // TODO(@anyone): Delegate to Frame Matcher
     // Convert the conveyors information so it can match with the
     //  Rgb and Depth images. If its outside of limits discart that conveyor.
-    ImageMatching::conveyorMatching(&holes, xThermal_, yThermal_, cX_, cY_, angle_);
+    ImageMatching::conveyorMatching(&holes, Parameters::Thermal::xThermal,
+                                    Parameters::Thermal::yThermal,
+                                    Parameters::Thermal::c_x,
+                                    Parameters::Thermal::c_y,
+                                    Parameters::Thermal::angle * CV_PI / 180);
     // Resize the thermal image to match the rgb-d images, of course the thermal
-    // image will not be further processed.
+    // image will not be further processed
     cv::resize(thermalSensorImage,
         thermalSensorImage, cvSize(Parameters::Image::WIDTH, Parameters::Image::HEIGHT));
 
@@ -774,6 +778,14 @@ namespace thermal
 
     Parameters::Thermal::low_temperature = config.low_temperature;
     Parameters::Thermal::high_temperature = config.high_temperature;
+
+    //-------------- Transformation coords ---------------------
+
+    Parameters::Thermal::xThermal = config.xThermal;
+    Parameters::Thermal::yThermal = config.yThermal;
+    Parameters::Thermal::c_x = config.c_x;
+    Parameters::Thermal::c_y = config.c_y;
+    Parameters::Thermal::angle = config.angle;
   }
 
 }  // namespace thermal
