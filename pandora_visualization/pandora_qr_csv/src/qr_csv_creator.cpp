@@ -176,6 +176,26 @@ namespace pandora_qr_csv
     return dateStamp;
   }
 
+  std::string QrCsvCreator::getObstaclesName(unsigned int code)
+  {
+    if (code == 0)
+    {
+      return std::string("barrel");
+    }
+    else if (code == 1)
+    {
+      return std::string("soft_obstacle");
+    }
+    else if (code == 2)
+    {
+      return std::string("hard_obstacle");
+    }
+    else
+    {
+      return std::string("unknown_obstacle");
+    }
+  }
+
   void QrCsvCreator::generateQrCsv(std::string &missionName, std::string &currentDate, std::string &currentTime)
   {
     ROS_INFO("Creating CSV file.");
@@ -255,7 +275,7 @@ namespace pandora_qr_csv
       sortedIndex = index[i];
       csvFile << qrs_.size() + i + 1 << ","
               << rosTimeToLocal(obstacles_[sortedIndex].timeFound) << ","
-              << obstacles_[sortedIndex].type << ","
+              << getObstaclesName(obstacles_[sortedIndex].type) << ","
               << obstacles_[sortedIndex].obstaclePose.pose.position.x << ","
               << obstacles_[sortedIndex].obstaclePose.pose.position.y << ","
               << obstacles_[sortedIndex].obstaclePose.pose.position.z << ","

@@ -37,7 +37,7 @@ def random_obstacle_info(id):
     obstacle.obstaclePose.pose.position.y = random.randint(2, 10)
     obstacle.obstaclePose.pose.position.z = random.randint(2, 10)
     obstacle.probability = random.random()
-    obstacle.type = random.randint(1, 3)
+    obstacle.type = random.randint(0, 3)
 
     return obstacle
 

@@ -130,6 +130,8 @@ namespace pandora_qr_csv
 
       void getObjects();
 
+      std::string getObstaclesName(unsigned int code);
+
       std::string getCurrentDate();
 
       std::string getCurrentTime();
