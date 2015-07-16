@@ -30,7 +30,7 @@ StateServer::StateServer() :
 
   //Subcriber and Publisher declaration
   _statePublisher = _nh.advertise<state_manager_msgs::RobotModeMsg>
-    ("/robot/state/clients", 100, true);
+    ("/robot/state/clients", 5, true);
 
   _registerService = _nh.advertiseService("/robot/state/register",
                                           &StateServer::registerNode, this);
