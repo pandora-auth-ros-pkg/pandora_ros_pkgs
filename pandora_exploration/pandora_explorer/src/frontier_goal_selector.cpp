@@ -196,9 +196,10 @@ void FrontierGoalSelector::calculateFinalGoalOrientation(Frontier* frontier)
 {
   // path at least of 10 points, otherwise unstable orientations calculated
   if (frontier->path.poses.size() < 10)
+  {
     ROS_WARN("[%s] Could not fix goal orientation", ros::this_node::getName().c_str());
     return;
-
+  }
   // find orientation of last 2 points
   geometry_msgs::Point final_point = frontier->path.poses.back().pose.position;
   geometry_msgs::Point semifinal_point =
@@ -302,6 +303,27 @@ void FrontierGoalSelector::visualizeFrontiers()
       }
       markers.markers.push_back(paths_marker);
     }
+
+    // visualize frontier as a line
+    visualization_msgs::Marker frontier_line_marker;
+    frontier_line_marker.ns = "frontier_line";
+    frontier_line_marker.header.frame_id = explore_costmap_ros_->getGlobalFrameID();
+    frontier_line_marker.header.stamp = ros::Time::now();
+    frontier_line_marker.action = visualization_msgs::Marker::ADD;
+    frontier_line_marker.type = visualization_msgs::Marker::LINE_STRIP;
+    frontier_line_marker.id = id;
+    frontier_line_marker.scale.x = 0.01;
+    //frontier_line_marker.color.r = 0.0;
+    frontier_line_marker.color.g = 1.0;
+    //frontier_line_marker.color.b = 0.0;
+    frontier_line_marker.color.a = 1.0;
+    frontier_line_marker.pose.orientation.w = 1.0;
+
+    BOOST_FOREACH(const geometry_msgs::Point & point, frontier.frontier_points)
+    {
+      frontier_line_marker.points.push_back(point);
+    }
+    markers.markers.push_back(frontier_line_marker);
 
     // update best frontier
     if (frontier.cost > best.cost) {
