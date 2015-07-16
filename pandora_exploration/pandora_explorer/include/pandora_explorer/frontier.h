@@ -1,6 +1,7 @@
 #ifndef PANDORA_EXPLORER_FRONTIER_H
 #define PANDORA_EXPLORER_FRONTIER_H
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <geometry_msgs/Point.h>
 #include <nav_msgs/Path.h>
@@ -18,7 +19,7 @@ namespace pandora_explorer {
   class Frontier
   {
    public:
-    
+
     /**
       * @brief Constructor for the Frontier class
       */
@@ -27,13 +28,13 @@ namespace pandora_explorer {
       min_distance(0.0),
       cost(0.0)
     { }
-    
+
     /**
       * @brief Overload of operator "<"
       * @param other a frontier to compare
       * @return True if the frontier right to the operator has lower min distance
       * than the frontier to the left of the operator
-      * 
+      *
       */
     bool operator< (const Frontier& other)
     {
@@ -50,7 +51,9 @@ namespace pandora_explorer {
 
     geometry_msgs::Point initial;  // initial point of the frontier
     geometry_msgs::Point centroid;  //?? frontier's centroid
-    geometry_msgs::Point middle;  //?? the middle of the frontiers based on coordinates
+    geometry_msgs::Point middle;  //?? the nearest point of the frontier
+    geometry_msgs::Point midpoint;
+    std::vector<geometry_msgs::Point> frontier_points;  // The indexes of each frontier point
 
     nav_msgs::Path path;  // the path to the frontier
   };

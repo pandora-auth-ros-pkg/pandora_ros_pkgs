@@ -123,6 +123,10 @@ Frontier MapFrontierSearch::buildNewFrontier(unsigned int initial_cell, unsigned
 
         // update frontier size
         output.size++;
+        // update frontier points
+        output.midpoint.x = wx;
+        output.midpoint.y = wy;
+        output.frontier_points.push_back(output.midpoint);
 
         // update centroid of frontier
         output.centroid.x += wx;
@@ -143,6 +147,9 @@ Frontier MapFrontierSearch::buildNewFrontier(unsigned int initial_cell, unsigned
       }
     }
   }
+  // find midpoint of frontier
+  int midpoint_idx = static_cast<int>(sizeof(output.frontier_points) / 2);
+  output.midpoint = output.frontier_points.at(midpoint_idx);
 
   // average out frontier centroid
   output.centroid.x /= output.size;

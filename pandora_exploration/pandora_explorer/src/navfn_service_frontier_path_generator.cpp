@@ -79,6 +79,9 @@ bool NavfnServiceFrontierPathGenerator::findPaths(const geometry_msgs::PoseStamp
     else if (frontier_representation_ == "middle") {
       srv.request.goal.pose.position = frontier.middle;
     }
+    else if (frontier_representation_ == "midpoint") {
+      srv.request.goal.pose.position = frontier.midpoint;
+    }
     else {
       srv.request.goal.pose.position = frontier.initial;
     }

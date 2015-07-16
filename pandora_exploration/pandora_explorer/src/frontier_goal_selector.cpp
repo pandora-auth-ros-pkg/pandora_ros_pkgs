@@ -241,6 +241,10 @@ void FrontierGoalSelector::visualizeFrontiers()
       marker.pose.position.x = frontier.middle.x;
       marker.pose.position.y = frontier.middle.y;
     }
+    else if (frontier_representation_ == "midpoint") {
+      marker.pose.position.x = frontier.midpoint.x;
+      marker.pose.position.y = frontier.midpoint.y;
+    }
     else {
       marker.pose.position.x = frontier.initial.x;
       marker.pose.position.y = frontier.initial.y;
@@ -329,6 +333,10 @@ void FrontierGoalSelector::visualizeFrontiers()
   else if (frontier_representation_ == "middle") {
     marker.pose.position.x = best.middle.x;
     marker.pose.position.y = best.middle.y;
+  }
+  else if (frontier_representation_ == "midpoint") {
+    marker.pose.position.x = best.midpoint.x;
+    marker.pose.position.y = best.midpoint.y;
   }
   else {
     marker.pose.position.x = best.initial.x;
