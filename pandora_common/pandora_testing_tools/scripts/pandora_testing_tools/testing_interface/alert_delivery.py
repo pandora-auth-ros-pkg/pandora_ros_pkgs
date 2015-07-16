@@ -56,6 +56,8 @@ from pandora_vision_msgs.msg import LandoltcAlert
 from pandora_vision_msgs.msg import LandoltcAlertVector
 from pandora_vision_msgs.msg import DataMatrixAlert
 from pandora_vision_msgs.msg import DataMatrixAlertVector
+from pandora_audio_msgs.msg import SoundAlert
+from pandora_audio_msgs.msg import SoundAlertVector
 from pandora_common_msgs.msg import GeneralAlertInfo
 from pandora_common_msgs.msg import GeneralAlertVector
 
@@ -94,6 +96,9 @@ class AlertDeliveryBoy():
         self.thermal_msg = ThermalAlertVector()
         self.thermal_msg.header.frame_id = self.frame_id
 
+        self.sound_msg = SoundAlertVector()
+        self.sound_msg.header.frame_id = self.frame_id
+
         self.general_msg = GeneralAlertVector()
         self.general_msg.header.frame_id = self.frame_id
 
@@ -121,9 +126,9 @@ class AlertDeliveryBoy():
         self.visualVictimDeliveryAddress = '/vision/victim_direction_alert'
         self.visualVictim_pub = rospy.Publisher(self.visualVictimDeliveryAddress,
                                        GeneralAlertVector)
-        self.soundDeliveryAddress = '/sensor_processing/sound_direction_alert'
+        self.soundDeliveryAddress = '/sound/complete_alert'
         self.sound_pub = rospy.Publisher(self.soundDeliveryAddress,
-                                       GeneralAlertVector)
+                                         SoundAlertVector)
         self.motionDeliveryAddress = '/vision/motion_alert'
         self.motion_pub = rospy.Publisher(self.motionDeliveryAddress,
                                        GeneralAlertVector)
@@ -256,6 +261,19 @@ class AlertDeliveryBoy():
         else:
             return self.thermal_msg
 
+    def deliverSoundOrder(self, orderYaw, orderPitch, orderProbability, orderWord,
+            publish=True):
+        self.sound_msg.header.stamp = rospy.get_rostime()
+        self.sound_msg.alerts = []
+        msg = SoundAlert(info=self.makeGeneralAlertInfo(orderYaw, orderPitch, orderProbability),
+                         word=orderWord)
+        self.sound_msg.alerts.append(msg)
+        if publish:
+            self.sound_pub.publish(self.sound_msg)
+            rospy.sleep(0.1)
+        else:
+            return msg
+
     def deliverVisualVictimOrder(self, orderYaw, orderPitch, orderProbability,
             publish=True):
         msg = self.makeGeneralAlertVector(orderYaw, orderPitch, orderProbability)
@@ -270,15 +288,6 @@ class AlertDeliveryBoy():
         msg = self.makeGeneralAlertVector(orderYaw, orderPitch, orderProbability)
         if publish:
             self.motion_pub.publish(msg)
-            rospy.sleep(0.1)
-        else:
-            return msg
-
-    def deliverSoundOrder(self, orderYaw, orderPitch, orderProbability,
-            publish=True):
-        msg = self.makeGeneralAlertVector(orderYaw, orderPitch, orderProbability)
-        if publish:
-            self.sound_pub.publish(msg)
             rospy.sleep(0.1)
         else:
             return msg
