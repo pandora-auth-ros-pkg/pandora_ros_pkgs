@@ -58,7 +58,7 @@ namespace state_manager
     node_name_ = boost::to_upper_copy<std::string>(this->getName());
 
     acknowledgePublisher_ = nh_.advertise<state_manager_msgs::RobotModeMsg>
-    ("/robot/state/server", 1, true);
+    ("/robot/state/server", 2, true);
 
     stateSubscriber_ = nh_.subscribe("/robot/state/clients", 2,
       &StateClientNodelet::serverStateInformation, this);
