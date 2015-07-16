@@ -196,6 +196,7 @@ void FrontierGoalSelector::calculateFinalGoalOrientation(Frontier* frontier)
 {
   // path at least of 10 points, otherwise unstable orientations calculated
   if (frontier->path.poses.size() < 10)
+    ROS_WARN("[%s] Could not fix goal orientation", ros::this_node::getName().c_str());
     return;
 
   // find orientation of last 2 points
