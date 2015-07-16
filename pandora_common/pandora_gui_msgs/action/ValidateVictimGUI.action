@@ -1,4 +1,5 @@
 #goal
+int32 victimId
 float32 victimFoundx
 float32 victimFoundy
 float32 probability
