@@ -18,12 +18,12 @@ orientation:
   width: 2
 
 topics:
-  coverage: "/data_fusion/sensor_coverage/kinect_space"
+  coverage: "/exploration/sensor_coverage/kinect_space"
   map: "/slam/map"
   trajectory: "/robot_trajectory"
 
 services:
-  data_fusion_objects: "data_fusion_geotiff"
+  data_fusion_objects: "/data_fusion/get_geotiff"
 
 coverage_map:
   bottom_threshold: 0
