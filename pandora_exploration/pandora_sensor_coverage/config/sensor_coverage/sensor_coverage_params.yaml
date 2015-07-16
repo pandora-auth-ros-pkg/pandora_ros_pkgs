@@ -34,7 +34,8 @@ kinect_rgb_frame:
     surface_coverage: false
   surface_blur_factor: 3
   sensor_range: 1.5
-  sensor_hfov: 58
+  # sensor_hfov: 58
+  sensor_hfov: 45
   sensor_vfov: 45
   exploration_state: true
   identification_state: true

@@ -109,7 +109,6 @@ namespace pandora_exploration
 
         void shareFusedCoverage(const nav_msgs::OccupancyGridPtr& fusedPtr)
         {
-          ROS_INFO("space checker: sharing pointer");
           fusedCoveragePtr_ = fusedPtr;
         }
 

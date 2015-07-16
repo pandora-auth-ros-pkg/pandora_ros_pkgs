@@ -200,6 +200,7 @@ void FrontierGoalSelector::calculateFinalGoalOrientation(Frontier* frontier)
     ROS_WARN("[%s] Could not fix goal orientation", ros::this_node::getName().c_str());
     return;
   }
+
   // find orientation of last 2 points
   geometry_msgs::Point final_point = frontier->path.poses.back().pose.position;
   geometry_msgs::Point semifinal_point =

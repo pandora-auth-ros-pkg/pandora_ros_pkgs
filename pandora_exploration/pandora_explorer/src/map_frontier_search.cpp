@@ -148,8 +148,11 @@ Frontier MapFrontierSearch::buildNewFrontier(unsigned int initial_cell, unsigned
     }
   }
   // find midpoint of frontier
-  int midpoint_idx = static_cast<int>(sizeof(output.frontier_points) / 2);
-  output.midpoint = output.frontier_points.at(midpoint_idx);
+  if (output.size != 0)
+  {
+    int midpoint_idx = static_cast<int>(output.frontier_points.size() / 2);
+    output.midpoint = output.frontier_points.at(midpoint_idx);
+  }
 
   // average out frontier centroid
   output.centroid.x /= output.size;
