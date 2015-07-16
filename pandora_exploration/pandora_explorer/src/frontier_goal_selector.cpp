@@ -314,9 +314,9 @@ void FrontierGoalSelector::visualizeFrontiers()
     frontier_line_marker.type = visualization_msgs::Marker::LINE_STRIP;
     frontier_line_marker.id = id;
     frontier_line_marker.scale.x = 0.01;
-    //frontier_line_marker.color.r = 0.0;
-    frontier_line_marker.color.g = 1.0;
-    //frontier_line_marker.color.b = 0.0;
+    frontier_line_marker.color.r = 0.5;
+    frontier_line_marker.color.g = 0.0;
+    frontier_line_marker.color.b = 0.5;
     frontier_line_marker.color.a = 1.0;
     frontier_line_marker.pose.orientation.w = 1.0;
 
