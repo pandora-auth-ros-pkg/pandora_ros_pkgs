@@ -27,7 +27,7 @@ services:
 
 coverage_map:
   bottom_threshold: 0
-  top_threshold: 100
+  top_threshold: 120
   color: "LIGHT_GREEN_MAX"
 
 explored_map:

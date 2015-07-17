@@ -319,8 +319,7 @@ namespace pandora_geotiff
     for (int i = 0; i < obstacles_.size(); i++)
     {
       sortedIndex = index[i];
-      this -> drawObject(obstacles_[sortedIndex].obstaclePose,
-                         OBSTACLE_COLOR, OBSTACLE_SHAPE, qrs_.size() + i + 1, OBSTACLE_SIZE);
+      this -> drawObject(obstacles_[sortedIndex].obstaclePose, OBSTACLE_COLOR, OBSTACLE_SHAPE, i + 1, OBSTACLE_SIZE);
     }
 
     index.clear();
@@ -371,7 +370,7 @@ namespace pandora_geotiff
 
   void Server::drawCoverageMap()
   {
-    creator_.drawMap(coverageMap_, COVERAGE_COLOR, COV_BOTTOM_THRESHOLD, COV_BOTTOM_THRESHOLD);
+    creator_.drawMap(coverageMap_, COVERAGE_COLOR, COV_BOTTOM_THRESHOLD, COV_TOP_THRESHOLD, 1);
   }
 
   void Server::drawMap()

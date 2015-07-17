@@ -168,7 +168,7 @@ def send_objects_with_order(req):
 def server():
     rospy.init_node("data_fusion_objects")
 
-    rospy.Service('data_fusion_geotiff', GetGeotiff, send_objects_with_order)
+    rospy.Service('/data_fusion/get_geotiff', GetGeotiff, send_objects_with_order)
     #rospy.Service('data_fusion_geotiff', GetGeotiff, send_objects)
 
     print("Service initialized.")

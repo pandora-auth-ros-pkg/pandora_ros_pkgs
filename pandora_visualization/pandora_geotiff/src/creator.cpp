@@ -99,7 +99,7 @@ namespace pandora_geotiff
     colorMap["YELLOW"]          = QColor(255, 200, 0);
     colorMap["SOLID_ORANGE"]    = QColor(255, 100, 30);
     colorMap["SOLID_BLUE"]      = QColor(10, 10, 240);
-    colorMap["MAGENTA"]         = QColor(120, 0, 140, 100);
+    colorMap["MAGENTA"]         = QColor(120, 0, 140);
     colorMap["PINK"]            = QColor(180, 0, 200);
   }
 
