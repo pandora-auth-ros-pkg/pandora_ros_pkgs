@@ -91,8 +91,8 @@ namespace pandora_sensor_coverage
             y = jj * oldMetaData.resolution;
             xn = cos(yawDiff) * x - sin(yawDiff) * y - xDiff;
             yn = sin(yawDiff) * x + cos(yawDiff) * y - yDiff;
-            int coords = static_cast<int>(round(xn / out->info.resolution) +
-                  round(yn * out->info.width / out->info.resolution));
+            int coords = static_cast<int>(round(xn / out->info.resolution)) +
+                  static_cast<int>(round(yn / out->info.resolution)) * out->info.width;
             if ((coords > newSize) || (coords < 0))
             {
               ROS_WARN("Error resizing to: %d\nCoords Xn: %f, Yn: %f\n", newSize, xn, yn);
@@ -102,6 +102,26 @@ namespace pandora_sensor_coverage
               uint8_t temp = oldMap[ii + jj * oldMetaData.width];
               out->data[coords] = temp;
               Utils::mapDilation(out, 2, coords, in);
+            }
+          }
+        }
+
+        int widthDiff = fabs(floor(xDiff / out->info.resolution));
+        int heightDiff = fabs(floor(yDiff / out->info.resolution));
+
+        for (unsigned int ii = 0; ii < out->info.width; ++ii) {
+          for (unsigned int jj = 0; jj < out->info.height; ++jj) {
+            if (ii >= oldMetaData.width + widthDiff ||
+                jj >= oldMetaData.height + heightDiff)
+              out->data[ii + jj * out->info.width] = 0;
+          }
+        }
+        if (widthDiff != 0 || heightDiff != 0)
+        {
+          for (unsigned int ii = 0; ii < out->info.width; ++ii) {
+            for (unsigned int jj = 0; jj < out->info.height; ++jj) {
+              if (ii < widthDiff || jj < heightDiff)
+                out->data[ii + jj * out->info.width] = 0;
             }
           }
         }
