@@ -33,7 +33,7 @@ coverage:
   visualize_paths: true
 
   cost_functions:
-    size_scale: 0.25
-    dist_scale: 0.45
-    alignment_scale: 0.15
-    visited_scale: 0.15
+    size_scale: 0.20
+    dist_scale: 0.50
+    alignment_scale: 0.2
+    visited_scale: 0.1

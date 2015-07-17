@@ -106,8 +106,8 @@ namespace pandora_sensor_coverage
           }
         }
 
-        int widthDiff = fabs(floor(xDiff / out->info.resolution));
-        int heightDiff = fabs(floor(yDiff / out->info.resolution));
+        unsigned int widthDiff = fabs(floor(xDiff / out->info.resolution));
+        unsigned int heightDiff = fabs(floor(yDiff / out->info.resolution));
 
         for (unsigned int ii = 0; ii < out->info.width; ++ii) {
           for (unsigned int jj = 0; jj < out->info.height; ++jj) {
