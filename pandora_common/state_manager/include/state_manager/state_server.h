@@ -20,6 +20,7 @@
 #include "state_manager_msgs/RobotModeMsg.h"
 #include "state_manager_msgs/RegisterNodeSrv.h"
 #include "state_manager_msgs/GetStateInfo.h"
+#include "state_manager_msgs/ChangeMode.h"
 #include "diagnostic_updater/diagnostic_updater.h"
 
 #include <actionlib/server/simple_action_server.h>
@@ -72,6 +73,11 @@ class StateServer {
     ros::ServiceServer _stateInfoService;
 
     /**
+     * Service to change the current mode.
+     */
+    ros::ServiceServer _changeModeService;
+
+    /**
      * Timer watchdog.
      */
     ros::Timer _watchdog;
@@ -118,6 +124,11 @@ class StateServer {
     bool getStateInfo(state_manager_msgs::GetStateInfo::Request& req,
                       state_manager_msgs::GetStateInfo::Response& res);
 
+    /**
+     * Change the robot state
+     */
+    bool changeMode(state_manager_msgs::ChangeMode::Request& req,
+                    state_manager_msgs::ChangeMode::Response& res);
     /**
      * Send a transition request to all nodes.
      */

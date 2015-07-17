@@ -38,6 +38,9 @@ StateServer::StateServer() :
   _stateInfoService = _nh.advertiseService("/robot/state/info",
                                            &StateServer::getStateInfo, this);
 
+  _changeModeService = _nh.advertiseService("/robot/change_mode",
+                                            &StateServer::changeMode, this);
+
   _acknowledgeSubscriber = _nh.subscribe("/robot/state/server", 100,
                                          &StateServer::clientStateInformation,
                                          this);
@@ -336,6 +339,20 @@ void StateServer::stateChangeExecuteCb(const state_manager_msgs::RobotModeGoalCo
   }
 
   _stateChangeActionServer.setSucceeded();
+}
+
+bool StateServer::changeMode(state_manager_msgs::ChangeMode::Request &req,
+                             state_manager_msgs::ChangeMode::Response &res)
+{
+  ROS_INFO("A state transition to %i has been requested.", req.mode);
+
+  sendTransitionRequest(req.mode);
+
+  ros::Duration dur(2);
+
+  res.success = true;
+
+  return true;
 }
 
 
