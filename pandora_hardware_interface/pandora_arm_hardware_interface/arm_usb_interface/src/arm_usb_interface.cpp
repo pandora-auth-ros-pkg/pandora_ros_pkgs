@@ -41,7 +41,6 @@ namespace pandora_hardware_interface
 {
 namespace arm
 {
-
   ArmUsbInterface::ArmUsbInterface()
   {
     openUsbPort();
@@ -51,7 +50,6 @@ namespace arm
   ArmUsbInterface::~ArmUsbInterface()
   {
     close(fd);
-    ROS_INFO("[Arm]: USB port closed because of program termination\n");
   }
 
 
@@ -64,8 +62,8 @@ namespace arm
     // fd = open("/dev/arm", O_RDWR | O_NOCTTY | O_NDELAY);
     while ((fd = open("/dev/arm", O_RDWR | O_NOCTTY | O_NDELAY)) == -1)
     {
-      ROS_ERROR("[Arm]: cannot open USB port\n");
-      ROS_ERROR("[Arm]: open() failed with error [%s]\n", strerror(errno));
+      ROS_DEBUG("[Arm]: cannot open USB port\n");
+      ROS_DEBUG("[Arm]: open() failed with error [%s]\n", strerror(errno));
 
       ros::Duration(0.5).sleep();
 
@@ -75,7 +73,7 @@ namespace arm
         timeout++;
     }
 
-    ROS_INFO("[Arm]: USB port successfully opened\n");
+    ROS_DEBUG("[Arm]: USB port successfully opened\n");
 
     // Needs some time to initialize, even though it opens succesfully.
     // tcflush() didn't work without waiting at least 8 ms
@@ -87,7 +85,7 @@ namespace arm
     struct termios tios;
 
     if (tcgetattr(fd, &tios) < 0)
-      ROS_ERROR("init_serialport: Couldn't get term attributes\n");
+      ROS_DEBUG("init_serialport: Couldn't get term attributes\n");
 
     tios.c_lflag &= ~(ICANON | ISIG | ECHO |  IEXTEN | ECHOE | ECHOK);
 
@@ -98,7 +96,7 @@ namespace arm
     tios.c_cc[VTIME] = 1;  // set timeout to 100ms
 
     if (tcsetattr(fd, TCSANOW, &tios) < 0)
-      ROS_ERROR("init_serialport: Couldn't set term attributes\n");
+      ROS_DEBUG("init_serialport: Couldn't set term attributes\n");
   }
 
   int ArmUsbInterface::readData(
@@ -125,7 +123,7 @@ namespace arm
     nr = write(fd, &bufOut, 1);
     if (nr != 1)
     {
-      ROS_ERROR("[Arm]: Write Error\n");
+      ROS_DEBUG("[Arm]: Write Error\n");
       reconnectUsb();
       return WRITE_ERROR;
     }
@@ -149,11 +147,11 @@ namespace arm
     for (int i = 0; i < NACK_NBYTES; i++){
       rv = select(fd + 1, &set, NULL, NULL, &timeout);
       if (rv == -1){
-        ROS_ERROR("select error at NACK!"); /* an error accured */
+        ROS_DEBUG("select error at NACK!"); /* an error accured */
         return SELECT_ERROR;
       }
       else if (rv == 0){
-        ROS_INFO("timeout at NACK!"); /* a timeout occured */
+        ROS_DEBUG("timeout at NACK!"); /* a timeout occured */
         return READ_TIMEOUT;
       }
       // ROS_INFO("Before NACK read");
@@ -165,7 +163,7 @@ namespace arm
 
       if (nr < 0)
       {
-        ROS_ERROR("[Arm]: Read Error\n");
+        ROS_DEBUG("[Arm]: Read Error\n");
         reconnectUsb();
         return READ_ERROR;
       }
@@ -179,7 +177,7 @@ namespace arm
 
     if (!(nack16 == 0x0001))
     {
-      ROS_ERROR("[Arm]: Received NACK: %x", nack16);
+      ROS_DEBUG("[Arm]: Received NACK: %x", nack16);
       return RECEIVED_NACK;
     }
     // else
@@ -190,12 +188,12 @@ namespace arm
       rv = select(fd + 1, &set, NULL, NULL, &timeout);
       if (rv == -1)
       {
-        ROS_ERROR("select error!"); /* an error accured */
+        ROS_DEBUG("select error!"); /* an error accured */
         return SELECT_ERROR;
       }
       else if (rv == 0)
       {
-        ROS_INFO("timeout!"); /* a timeout occured */
+        ROS_DEBUG("timeout!"); /* a timeout occured */
         return READ_TIMEOUT;
       }
       // ROS_INFO("Before BUFFER READ");
@@ -203,13 +201,13 @@ namespace arm
       // ROS_INFO("After BUFFER READ");
       if (nr < 0)
       {
-        ROS_ERROR("[Arm]: Read Error\n");
+        ROS_DEBUG("[Arm]: Read Error\n");
         reconnectUsb();
         return READ_ERROR;
       }
       else if (nr == 0)
       {
-        ROS_ERROR("GOT TIMEOUT!");
+        ROS_DEBUG("GOT TIMEOUT!");
         return READ_TIMEOUT;
       }
     // else if (nr != read_bytes)
@@ -242,7 +240,7 @@ namespace arm
         bufOut = COMMAND_GEYE_RIGHT;
         break;
       default:
-        ROS_ERROR(
+        ROS_DEBUG(
           "Undefined Grideye Selection! Center Grideye selected by  default.");
         bufOut = COMMAND_GEYE_CENTER;
         break;
@@ -275,7 +273,7 @@ namespace arm
         break;
       default:
         bufOut = COMMAND_SONAR_LEFT;
-        ROS_ERROR("Undefined Sonar Selection! Left Sonar selected by default.");
+        ROS_DEBUG("Undefined Sonar Selection! Left Sonar selected by default.");
         break;
     }
 
@@ -340,7 +338,7 @@ namespace arm
         bufOut = COMMAND_BATTERY_SUPPLY;
         break;
       default:
-        ROS_ERROR(
+        ROS_DEBUG(
           "Undefined Battery selection. Motor battery selected by default");
         bufOut = COMMAND_BATTERY_MOTOR;  // shouldn't get in there
         break;
@@ -356,12 +354,12 @@ namespace arm
   {
     // reconnectUsb() should be called until communication is restored.
     close(fd);
-    ROS_INFO("[Arm]: USB port closed\n");
+    ROS_DEBUG("[Arm]: USB port closed\n");
     ros::Duration(1.5).sleep();
 
     openUsbPort();
 
-    ROS_INFO("[Arm]: USB port reconnected successfully");
+    ROS_DEBUG("[Arm]: USB port reconnected successfully");
   }
 
 }  // namespace arm
