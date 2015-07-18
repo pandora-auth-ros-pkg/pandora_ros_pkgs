@@ -174,8 +174,7 @@ namespace pandora_vision
   **/
   void CController::saveImages(void)
   {
-    ROS_INFO_STREAM("ENTER SAVE IMAGES");
-      for(int i = offset; i < tempFrames.size()+offset; i++)
+    for(int i = offset; i < tempFrames.size()+offset; i++)
     {
       std::stringstream imgName, file;
       file << package_path << "/data/annotations.txt";
@@ -571,19 +570,26 @@ namespace pandora_vision
   void CController::receiveEnhancedImage(const pandora_vision_msgs::EnhancedImageConstPtr& msg)
   {
      cv_bridge::CvImagePtr rgb_msg, depth_msg;
-     cv::Mat rgb, depth, temp; 
+     cv::Mat rgb, depth, temp;
 
-     if(msg->isDepth) 
+     if(msg->isDepth)
      {
-        depth_msg = cv_bridge::toCvCopy(msg->depthImage,
-        sensor_msgs::image_encodings::TYPE_8UC1);
-        cv::cvtColor(depth_msg->image, depth, CV_GRAY2RGB);
-     
+        depth_msg = cv_bridge::toCvCopy(msg->depthImage);
+        if(msg->depthImage.encoding == "8UC1")
+           cv::cvtColor(depth_msg->image, depth, CV_GRAY2RGB);
+        else if (msg->depthImage.encoding == "16UC1" || msg->depthImage.encoding == "32FC1")
+        {
+          double min, max;
+          cv::minMaxLoc(depth_msg->image, &min, &max);
+          cv::Mat img_scaled_8u;
+          cv::Mat(depth_msg->image-min).convertTo(img_scaled_8u, CV_8UC1, 255. / (max - min));
+          cv::cvtColor(img_scaled_8u, depth, CV_GRAY2RGB);
+        }
         rgb_msg = cv_bridge::toCvCopy(msg->rgbImage,
-        sensor_msgs::image_encodings::TYPE_8UC3); 
-        cv::cvtColor(rgb_msg->image, rgb, CV_BGR2RGB); 
-     
-     
+        sensor_msgs::image_encodings::TYPE_8UC3);
+        cv::cvtColor(rgb_msg->image, rgb, CV_BGR2RGB);
+
+
 
       if(!onlinemode)
       {
