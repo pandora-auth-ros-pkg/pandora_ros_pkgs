@@ -16,33 +16,33 @@
 message(STATUS ${CMAKE_SYSTEM_PROCESSOR})
 
 # Download shared libraries
-download_data(
-  ${PROJECT_NAME}_download_libEposCmd5
-  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libEposCmd.so.5.0.1.0
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
-  MD5 0e0e7aee5e056fdc36c1aa3eb272fb96
-  )
+#download_data(
+#  ${PROJECT_NAME}_download_libEposCmd5
+#  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libEposCmd.so.5.0.1.0
+#  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
+#  MD5 0e0e7aee5e056fdc36c1aa3eb272fb96
+#  )
+#
+#download_data(
+#  ${PROJECT_NAME}_download_libftd2xx1
+#  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libftd2xx.so.1.1.12
+#  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
+#  MD5 112a14d164991b79a6c8e7046697f670
+#  )
+#
+#download_data(
+#  ${PROJECT_NAME}_download_libEposCmd
+#  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libEposCmd.so
+#  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
+#  MD5 0e0e7aee5e056fdc36c1aa3eb272fb96
+#  )
 
-download_data(
-  ${PROJECT_NAME}_download_libftd2xx1
-  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libftd2xx.so.1.1.12
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
-  MD5 112a14d164991b79a6c8e7046697f670
-  )
-
-download_data(
-  ${PROJECT_NAME}_download_libEposCmd
-  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libEposCmd.so
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
-  MD5 0e0e7aee5e056fdc36c1aa3eb272fb96
-  )
-
-download_data(
-  ${PROJECT_NAME}_download_libftd2xx
-  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libftd2xx.so
-  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
-  MD5 112a14d164991b79a6c8e7046697f670
-  )
+#download_data(
+#  ${PROJECT_NAME}_download_libftd2xx
+#  http://downloads.pandora.ee.auth.gr/data/shared_libraries/epos2/${CMAKE_SYSTEM_PROCESSOR}/libftd2xx.so
+#  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
+#  MD5 112a14d164991b79a6c8e7046697f670
+#  )
 
 # Add devel/lib to link directories
 link_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
