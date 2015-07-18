@@ -148,12 +148,22 @@ Frontier MapFrontierSearch::buildNewFrontier(unsigned int initial_cell, unsigned
     }
   }
   // find midpoint of frontier
-  if (output.size != 0)
+  try
   {
-    int midpoint_idx = static_cast<int>(output.frontier_points.size() / 2);
-    output.midpoint = output.frontier_points.at(midpoint_idx);
+    if (output.frontier_points.size() != 0)  // output.size -> segfault
+    {
+      int midpoint_idx = static_cast<int>(output.frontier_points.size() / 2);
+      output.midpoint = output.frontier_points.at(midpoint_idx);
+    }
   }
-
+  catch(std::out_of_range& ex)
+  {
+    ROS_ERROR("Frontier points list out of range: %s",ex.what());
+    if(output.frontier_points.size() != 0)
+    {
+      output.midpoint = output.frontier_points.at(0);
+    }
+  }
   // average out frontier centroid
   output.centroid.x /= output.size;
   output.centroid.y /= output.size;
