@@ -117,7 +117,7 @@
       <parent link="kinect_platform_link" />
       <child link="kinect_link" />
       <origin xyz="0.01461 -0.00106 0.05011"
-              rpy="0.0 0.0674 0.0" />
+              rpy="0.0 0.0974 0.0" />
     </joint>
 
     <!-- Frames -->
