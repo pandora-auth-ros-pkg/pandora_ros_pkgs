@@ -45,7 +45,9 @@ message(STATUS ${CMAKE_SYSTEM_PROCESSOR})
 #  )
 
 # Add devel/lib to link directories
-link_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
+link_directories(
+    /usr/lib
+    ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION})
 
 add_library(Utils
   src/Utils/Utils.cpp
