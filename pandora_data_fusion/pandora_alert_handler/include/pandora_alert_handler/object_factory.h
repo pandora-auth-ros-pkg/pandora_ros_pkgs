@@ -172,7 +172,7 @@ namespace pandora_alert_handler
       objectPtr->setLength(length);
       objectPtr->setWidth(SOFT_OBSTACLE_WIDTH);
     }
-    else if (msg.type == pandora_vision_msgs::ObstacleAlert::HARD_OBSTACLE)
+    else if (msg.type == pandora_vision_msgs::ObstacleAlert::BARREL)
     {
       obstaclePose = poseFinderPtr_->findAlertPose(
           msg.pointsYaw[0], msg.pointsPitch[0], transform);
