@@ -57,6 +57,7 @@ class MassPublisher:
 
         self.qr_post = False
         self.obstacle_post = False
+        self.barrel_post = False
         self.hazmat_post = False
         self.landoltc_post = False
         self.dataMatrix_post = False
@@ -157,6 +158,13 @@ class MassPublisher:
                         (0.0, self.config.obstacle_2_depth, 0.0, self.config.obstacle_1_depth),
                         self.config.obstacle_probability,
                         self.config.obstacle_type)
+
+                if self.config.barrel_post:
+                    self.alertDeliveryBoy.deliverBarrelOrder(
+                            self.config.barrel_yaw,
+                            self.config.barrel_pitch,
+                            self.config.barrel_probability)
+
             rospy.sleep(0.5)
 
 if __name__ == '__main__':

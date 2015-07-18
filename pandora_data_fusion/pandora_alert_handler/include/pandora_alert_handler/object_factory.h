@@ -163,14 +163,26 @@ namespace pandora_alert_handler
       const ros::Time& timeFound,
       const tf::Transform& transform)
   {
-    double length;
-    geometry_msgs::Pose obstaclePose = poseFinderPtr_->findPoseFromPoints(
-        msg.pointsYaw, msg.pointsPitch, msg.pointsDepth, transform, &length);
-    objectPtr->setPose(obstaclePose);
-    if (msg.type == pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE) {
+    geometry_msgs::Pose obstaclePose;
+    if (msg.type == pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE)
+    {
+      double length;
+      obstaclePose = poseFinderPtr_->findPoseFromPoints(
+          msg.pointsYaw, msg.pointsPitch, msg.pointsDepth, transform, &length);
       objectPtr->setLength(length);
       objectPtr->setWidth(SOFT_OBSTACLE_WIDTH);
     }
+    else if (msg.type == pandora_vision_msgs::ObstacleAlert::HARD_OBSTACLE)
+    {
+      obstaclePose = poseFinderPtr_->findAlertPose(
+          msg.pointsYaw[0], msg.pointsPitch[0], transform);
+    }
+    else
+    {
+      throw pandora_data_fusion_utils::ObstacleTypeException(
+          "Non-registered obstacle type "+boost::to_string(msg.type));
+    }
+    objectPtr->setPose(obstaclePose);
     objectPtr->setProbability(msg.probability);
     objectPtr->setTimeFound(timeFound);
     objectPtr->initializeObjectFilter();
