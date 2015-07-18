@@ -93,6 +93,9 @@ class AlertDeliveryBoy():
         self.obstacle_msg = ObstacleAlertVector()
         self.obstacle_msg.header.frame_id = self.frame_id
 
+        self.barrel_msg = ObstacleAlertVector()
+        self.barrel_msg.header.frame_id = self.frame_id
+
         self.thermal_msg = ThermalAlertVector()
         self.thermal_msg.header.frame_id = self.frame_id
 
@@ -107,7 +110,7 @@ class AlertDeliveryBoy():
                                           HazmatAlertVector)
         self.landoltcDeliveryAddress = '/vision/landoltc_alert'
         self.landoltc_pub = rospy.Publisher(self.landoltcDeliveryAddress,
-                                          LandoltcAlertVector)
+                                            LandoltcAlertVector)
         self.qrDeliveryAddress = '/vision/qr_alert'
         self.qr_pub = rospy.Publisher(self.qrDeliveryAddress,
                                       QRAlertVector)
@@ -116,6 +119,8 @@ class AlertDeliveryBoy():
                                         HoleDirectionAlertVector)
         self.obstacleDeliveryAddress = '/vision/obstacle_alert'
         self.obstacle_pub = rospy.Publisher(self.obstacleDeliveryAddress,
+                                            ObstacleAlertVector)
+        self.barrel_pub = rospy.Publisher(self.obstacleDeliveryAddress,
                                             ObstacleAlertVector)
         self.dataMatrixDeliveryAddress = '/vision/dataMatrix_alert'
         self.dataMatrix_pub = rospy.Publisher(self.dataMatrixDeliveryAddress,
@@ -169,7 +174,25 @@ class AlertDeliveryBoy():
             self.obstacle_pub.publish(self.obstacle_msg)
             rospy.sleep(0.1)
         else:
-            return self.hole_msg
+            return self.obstacle_msg
+
+    def deliverBarrelOrder(self, yaw, pitch, probability, publish=True):
+
+        self.barrel_msg.header.stamp = rospy.get_rostime()
+        self.barrel_msg.alerts = []
+        msg = ObstacleAlert()
+        msg.type = 0
+        msg.probability = probability
+        msg.pointsYaw[0] = yaw
+        msg.pointsPitch[0] = pitch
+        msg.pointsDepth[0] = 1.0
+        self.barrel_msg.alerts.append(msg)
+        rospy.loginfo(self.barrel_msg)
+        if publish:
+            self.obstacle_pub.publish(self.barrel_msg)
+            rospy.sleep(0.1)
+        else:
+            return self.barrel_msg
 
     def deliverHoleOrder(self, orderYaw,
                         orderPitch, orderProbability=1, orderId=1, publish=True):
