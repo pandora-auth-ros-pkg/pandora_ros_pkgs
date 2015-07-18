@@ -23,15 +23,11 @@
     </include>
   </group>
 
-  <!-- If the source is not a physical device, it is a bag: play "path" bag -->
+  If the source is not a physical device, it is a bag: play "path" bag
   <group unless="$(arg openni2)">
     <group unless="$(arg openni)">
-      <arg name="path" default="$(find pandora_vision_obstacle)/launch/pcl_bag0036.bag" />
-
-      <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg path)" >
-        <remap from="/camera/depth_registered/points" to="/kinect/depth_registered/points" />
-      </node>
-
+      <arg name="path" default="$(find pandora_vision_obstacle)/barrel2.bag" />
+      <node pkg="rosbag" type="play" name="player" output="screen" args= "--clock -l $(arg path)" />
     </group>
   </group>
 

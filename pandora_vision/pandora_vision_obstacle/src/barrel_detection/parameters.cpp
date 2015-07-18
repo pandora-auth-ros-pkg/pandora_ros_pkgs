@@ -138,6 +138,7 @@ namespace pandora_vision_obstacle
       BarrelDetection::value_lowest_thresh = 0;
       BarrelDetection::value_highest_thresh = 255;
     }
+
     else if (BarrelDetection::color_selection_R_1_G_2_B_3 == 2)
     {
       BarrelDetection::hue_lowest_thresh = 40;
@@ -180,7 +181,7 @@ namespace pandora_vision_obstacle
 
   bool BarrelDetection::color_validation = true;
 
-  int BarrelDetection::color_selection_R_1_G_2_B_3 = 1;
+  int BarrelDetection::color_selection_R_1_G_2_B_3 = 3;
   bool BarrelDetection::use_recommended_color_thresholds = true;
   float BarrelDetection::specific_color_min_overlap = 0.2;
   int BarrelDetection::hue_lowest_thresh = 155;

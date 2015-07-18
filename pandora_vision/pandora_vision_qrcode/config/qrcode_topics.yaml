@@ -1,5 +1,5 @@
 subscribed_topics:
-  [/kinect/rgb/image_raw, /left_camera/image, /right_camera/image]
+  [/kinect/rgb/image_raw, /left_camera/image, /right_camera/image, /rpi2/pi_camera/image]
 published_topics: /vision/qr_alert
 active_states: [START_AUTONOMOUS, EXPLORATION_RESCUE, IDENTIFICATION, SENSOR_HOLD, SEMI_AUTONOMOUS, TELEOPERATED_LOCOMOTION, SENSOR_TEST, EXPLORATION_MAPPING]
 detector:

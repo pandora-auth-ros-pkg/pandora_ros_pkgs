@@ -1,4 +1,4 @@
-subscribed_topics: [/kinect/rgb/image_raw]
+subscribed_topics: [/kinect/rgb/image_raw, rpi2/pi_camera/image]
 published_topics: /vision/motion_alert
 active_states: [SENSOR_HOLD, SENSOR_TEST]
 detector:
