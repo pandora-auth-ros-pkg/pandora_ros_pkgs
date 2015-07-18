@@ -25,7 +25,7 @@ subscribed_topic_names:
   visual_victim: /vision/victim_direction_alert
   co2: /sensor_processing/co2_alert
   motion: /vision/motion_alert
-  sound: /sound/complete_alert
+  sound: /sound/complete_alert/poi
   map: /slam/map
 published_topic_names:
   world_model: /data_fusion/world_model

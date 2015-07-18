@@ -71,7 +71,7 @@ namespace pandora_alert_handler
     marker.color.g = 0;
     marker.color.b = 0.8;
     marker.color.a = 0.7;
-    marker.lifetime = ros::Duration(1);
+    marker.lifetime = ros::Duration(0);
     markers->markers.push_back(marker);
 
     visualization_msgs::Marker description;
@@ -88,7 +88,7 @@ namespace pandora_alert_handler
     description.color.g = 0;
     description.color.b = 0.8;
     description.color.a = 0.7;
-    description.lifetime = ros::Duration(1);
+    description.lifetime = ros::Duration(0);
     markers->markers.push_back(description);
   }
 
