@@ -74,6 +74,7 @@ namespace pandora_alert_handler
     virtual ~Barrel();
 
     virtual void getVisualization(visualization_msgs::MarkerArray* markers) const;
+    virtual bool isSameObject(const ObjectConstPtr& object) const;
     virtual std::string setFrameId(int id);
   };
 

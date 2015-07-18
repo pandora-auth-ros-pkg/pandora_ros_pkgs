@@ -297,36 +297,49 @@ namespace pandora_alert_handler
       const tf::Transform& transform)
   {
     for (int ii = 0; ii < newObstacles->size(); ++ii) {
-      ObstaclePtr obstacleToSend;
-      bool obstacleToSendFound = true;
-      if (newObstacles->at(ii)->getLength() < 0.45)
-        continue;
-      if (Obstacle::getList()->add(newObstacles->at(ii)))
+      if (newObstacles->at(ii)->getObstacleType() == pandora_vision_msgs::ObstacleAlert::SOFT_OBSTACLE)
       {
-        ROS_DEBUG("[ObjectHandler %d] Found new obstacle!", __LINE__);
-        obstacleToSend = newObstacles->at(ii);
-      }
-      else
-      {
-        ROS_DEBUG("[ObjectHandler %d] Fetching old obstacle", __LINE__);
-        // Fetch object from list
-        typename Obstacle::List::IteratorList obstacleListIteratorList;
-        obstacleToSendFound = Obstacle::getList()->isAnExistingObject(
-            newObstacles->at(ii), &obstacleListIteratorList);
+        ObstaclePtr obstacleToSend;
+        bool obstacleToSendFound = true;
+        if (newObstacles->at(ii)->getLength() < 0.45)
+          continue;
+        if (Obstacle::getList()->add(newObstacles->at(ii)))
+        {
+          ROS_DEBUG("[ObjectHandler %d] Found new obstacle!", __LINE__);
+          obstacleToSend = newObstacles->at(ii);
+        }
+        else
+        {
+          ROS_DEBUG("[ObjectHandler %d] Fetching old obstacle", __LINE__);
+          // Fetch object from list
+          typename Obstacle::List::IteratorList obstacleListIteratorList;
+          obstacleToSendFound = Obstacle::getList()->isAnExistingObject(
+              newObstacles->at(ii), &obstacleListIteratorList);
+          if (obstacleToSendFound)
+          {
+            ROS_WARN_COND(obstacleListIteratorList.size() != 1,
+                "[ObjectHandler %d] New obstacle matched with more than one old ones", __LINE__);
+            obstacleToSend = *(*obstacleListIteratorList.begin());
+          }
+        }
         if (obstacleToSendFound)
         {
-          ROS_WARN_COND(obstacleListIteratorList.size() != 1,
-              "[ObjectHandler %d] New obstacle matched with more than one old ones", __LINE__);
-          obstacleToSend = *(*obstacleListIteratorList.begin());
+          // Create and send info message to navigation
+          pandora_data_fusion_msgs::ObstacleInfo obstacleInfo;
+          obstacleInfo = obstacleToSend->getObstacleInfo();
+          // Publish order for obstacle costmap
+          obstaclePublisher_.publish(obstacleInfo);
         }
       }
-      if (obstacleToSendFound)
+      else if (newObstacles->at(ii)->getObstacleType() == pandora_vision_msgs::ObstacleAlert::BARREL)
       {
-        // Create and send info message to navigation
-        pandora_data_fusion_msgs::ObstacleInfo obstacleInfo;
-        obstacleInfo = obstacleToSend->getObstacleInfo();
-        // Publish order for obstacle costmap
-        obstaclePublisher_.publish(obstacleInfo);
+        if (Obstacle::getList()->add(newObstacles->at(ii)))
+        {
+          std_msgs::Int32 updateScoreMsg;
+          roboCupScore_ += Obstacle::getObjectScore();
+          updateScoreMsg.data = roboCupScore_;
+          scorePublisher_.publish(updateScoreMsg);
+        }
       }
     }
   }

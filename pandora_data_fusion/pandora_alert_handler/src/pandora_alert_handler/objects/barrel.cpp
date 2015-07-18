@@ -57,6 +57,22 @@ namespace pandora_alert_handler
   }
   Barrel::~Barrel() {}
 
+  bool Barrel::isSameObject(const ObjectConstPtr& object) const
+  {
+    if (this->getType() != object->getType())
+      return false;
+    bool isSame = pandora_data_fusion_utils::Utils::arePointsInRange(
+        this->getPose().position, object->getPose().position,
+        Barrel::is3D, distanceThres_);
+    if (!isSame) return false;
+    isSame = pandora_data_fusion_utils::Utils::isOrientationClose(
+        this->getPose().orientation,
+        object->getPose().orientation, PI / 2);
+    if (!isSame) return false;
+    return (obstacleType_ == boost::dynamic_pointer_cast<Obstacle const>(
+        object)->getObstacleType());
+  }
+
   void Barrel::getVisualization(visualization_msgs::MarkerArray* markers) const
   {
     visualization_msgs::Marker marker;
