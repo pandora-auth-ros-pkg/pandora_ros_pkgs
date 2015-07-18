@@ -16,10 +16,10 @@ ANGULAR = 7
 STATES = [ROLL,PITCH,LINEAR,ANGULAR]
 
 # ii) Limits of each state [format = (low,high)]
-ROLL_LIMITS    = (-0.28,0.28)  # input in rads
-PITCH_LIMITS   = (-0.28,0.28)  # input in rads
+ROLL_LIMITS    = (-0.32,0.32)  # input in rads
+PITCH_LIMITS   = (-0.32,0.32)  # input in rads
 LINEAR_LIMITS  = (-0.31,0.31)    # in m/s
-ANGULAR_LIMITS = (-0.61,0.61)    # in rad/s
+ANGULAR_LIMITS = (-0.51,0.51)    # in rad/s
 
 LIMITS = [ROLL_LIMITS,PITCH_LIMITS,LINEAR_LIMITS,ANGULAR_LIMITS]
 
