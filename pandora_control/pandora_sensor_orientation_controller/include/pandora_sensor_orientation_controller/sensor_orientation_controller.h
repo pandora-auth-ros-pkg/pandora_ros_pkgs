@@ -57,12 +57,15 @@ namespace pandora_control
   enum
   {
     START = 0,
-    LEFT_UP = 1,
-    LEFT_DOWN = 2,
-    CENTER_DOWN = 3,
-    RIGHT_DOWN = 4,
-    RIGHT_UP = 5,
-    UNKNOWN = 6
+    UP_LEFT_ONE = 1,
+    UP_LEFT_TWO = 2,
+    DOWN_LEFT = 3,
+    DOWN_CENTER = 4,
+    DOWN_RIGHT = 5,
+    UP_RIGHT_TWO = 6,
+    UP_RIGHT_ONE = 7,
+    UP_CENTER = 8,
+    UNKNOWN = 9
   };
 
   class SensorOrientationActionServer

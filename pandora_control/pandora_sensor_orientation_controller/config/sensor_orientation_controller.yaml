@@ -6,11 +6,11 @@ move_kinect_action:
   min_pitch: -0.785
   max_pitch: 0.785
   offset_pitch: -0.07
-  yaw_step: 0.7
+  yaw_step: 0.35
   min_yaw: -1.308
   max_yaw: 1.308
   offset_yaw: 0
-  scan_rate: 1.0
+  scan_rate: 0.8
   pitch_rate: 0.1
   command_timeout: 10.0
   movement_threshold: 0.05

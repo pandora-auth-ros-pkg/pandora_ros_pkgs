@@ -361,37 +361,52 @@ namespace pandora_control
       case START:
         yawScan_ = yawStep_;
         pitchScan_ = 0;
-        position_ = LEFT_UP;
+        position_ = UP_LEFT_ONE;
         break;
-      case LEFT_UP:
+      case UP_LEFT_ONE:
+        yawScan_ = 2*yawStep_;
+        pitchScan_ = 0;
+        position_ = UP_LEFT_TWO;
+        break;
+      case UP_LEFT_TWO:
         yawScan_ = yawStep_;
         pitchScan_ = pitchStep_;
-        position_ = LEFT_DOWN;
+        position_ = DOWN_LEFT;
         break;
-      case LEFT_DOWN:
+      case DOWN_LEFT:
         yawScan_ = 0;
         pitchScan_ = pitchStep_;
-        position_ = CENTER_DOWN;
+        position_ = DOWN_CENTER;
         break;
-      case CENTER_DOWN:
+      case DOWN_CENTER:
         yawScan_ = -yawStep_;
         pitchScan_ = pitchStep_;
-        position_ = RIGHT_DOWN;
+        position_ = DOWN_RIGHT;
         break;
-      case RIGHT_DOWN:
+      case DOWN_RIGHT:
+        yawScan_ = -2*yawStep_;
+        pitchScan_ = 0;
+        position_ = UP_RIGHT_TWO;
+        break;
+      case UP_RIGHT_TWO:
         yawScan_ = -yawStep_;
         pitchScan_ = 0;
-        position_ = RIGHT_UP;
+        position_ = UP_RIGHT_ONE;
         break;
-      case RIGHT_UP:
+      case UP_RIGHT_ONE:
         yawScan_ = 0;
         pitchScan_ = 0;
-        position_ = START;
+        position_ = UP_CENTER;
+        break;
+      case UP_CENTER:
+        yawScan_ = yawStep_;
+        pitchScan_ = 0;
+        position_ = UP_LEFT_ONE;
         break;
       case UNKNOWN:
         yawScan_ = 0;
         pitchScan_ = 0;
-        position_ = START;
+        position_ = UP_CENTER;
         break;
     }
 
