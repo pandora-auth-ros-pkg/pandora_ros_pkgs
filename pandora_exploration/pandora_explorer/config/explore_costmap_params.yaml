@@ -14,10 +14,24 @@ track_unknown_space: true
 
 plugins:
   - {name: static, type: "costmap_2d::StaticLayer"}
+  - {name: hard, type: "costmap_2d::GlobalHardLayer"}
+  - {name: soft, type: "costmap_2d::GlobalSoftLayer"}
   - {name: inflation, type: "costmap_2d::InflationLayer"}
 
 static:
   map_topic: /slam/map
+  subscribe_to_updates: false
+  unknown_cost_value: 51
+  lethal_cost_threshold: 61
+
+hard:
+  slam_topic: /slam/map
+  vision_hard_topic: /vision/traversability_map
+  unknown_cost_value: 51
+  mitsos_cost_value: 50
+
+soft:
+  map_topic: /map_patch/obstacles
   subscribe_to_updates: false
   unknown_cost_value: 51
   lethal_cost_threshold: 61

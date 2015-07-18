@@ -16,7 +16,7 @@ plugins:
   - {name: static, type: "costmap_2d::MapLayer"}
   - {name: coverage, type: "costmap_2d::CoverageLayer"}
   - {name: hard, type: "costmap_2d::GlobalHardLayer"}
-  - {name: patch, type: "costmap_2d::GlobalPatchLayer"}
+  - {name: soft, type: "costmap_2d::GlobalSoftLayer"}
   - {name: inflation, type: "costmap_2d::InflationLayer"}
 
 static:
@@ -35,11 +35,11 @@ hard:
   unknown_cost_value: 51
   mitsos_cost_value: 50
 
-patch:
+soft:
   map_topic: /map_patch/obstacles
   subscribe_to_updates: false
   unknown_cost_value: 51
   lethal_cost_threshold: 61
 
 inflation:
-  inflation_radius: 0.20
+  inflation_radius: 0.25
