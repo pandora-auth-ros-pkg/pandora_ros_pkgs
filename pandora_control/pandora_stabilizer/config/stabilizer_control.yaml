@@ -6,5 +6,5 @@ min_roll: -1.57
 min_pitch: -1.57
 max_roll: 1.57
 max_pitch:  1.57
-roll_offset: 0
-pitch_offset: 0
+roll_offset: 0.03
+pitch_offset: -0.03
