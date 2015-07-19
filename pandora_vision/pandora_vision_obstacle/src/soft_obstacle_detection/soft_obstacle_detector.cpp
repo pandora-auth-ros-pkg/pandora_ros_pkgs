@@ -55,6 +55,7 @@ namespace pandora_vision_obstacle
     nh.param("minLineLength", minLineLength_, 100);
     nh.param("gaussianKernelSize", gaussianKernelSize_, 13);
 
+    nh.param("hsvColor/hThreshold", hValueThreshold_, 100);
     nh.param("hsvColor/sThreshold", sValueThreshold_, 95);
     nh.param("hsvColor/vThreshold", vValueThreshold_, 130);
 
@@ -225,7 +226,8 @@ namespace pandora_vision_obstacle
 
     cv::Vec3b hsvValue = hsvImage.at<cv::Vec3b>(center.y, center.x);
 
-    if (hsvValue[1] < sValueThreshold_ && hsvValue[2] > vValueThreshold_)
+    if (hsvValue[1] < sValueThreshold_ && hsvValue[2] > vValueThreshold_ &&
+        hsvValue[0] > hValueThreshold_)
     {
       return true;
     }

@@ -2,8 +2,9 @@ minLineLength: 100
 gaussianKernelSize: 13
 
 hsvColor:
+  hThreshold: 100
   sThreshold: 95
-  vThreshold: 130
+  vThreshold: 200
 
 erodeKernelSize:
   rows: 3

@@ -219,6 +219,8 @@ namespace pandora_vision_obstacle
       /// transform
       int minLineLength_;
 
+      /// The hue threshold of HSV color used to pick the color of a line
+      int hValueThreshold_;
       /// The saturation threshold of HSV color used to pick the color of a line
       int sValueThreshold_;
       /// The value threshold of HSV color used to pick the color of a line
