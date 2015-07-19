@@ -23,7 +23,7 @@ StateServer::StateServer() :
 
 
   //Create watchdog
-  _watchdog = _nh.createTimer(ros::Duration(3),&StateServer::watchdog,this);
+  _watchdog = _nh.createTimer(ros::Duration(8),&StateServer::watchdog,this);
   _timer = _nh.createTimer(ros::Duration(1),&StateServer::publishDiagnostics,this);
   _watchdog.stop();
   _transitioning = false;
