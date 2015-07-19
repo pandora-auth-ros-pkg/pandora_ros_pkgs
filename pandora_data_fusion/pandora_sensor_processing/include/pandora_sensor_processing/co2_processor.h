@@ -76,9 +76,10 @@ namespace pandora_sensor_processing
       //!< Estimated ambient co2 concentration.
       double ambientCo2_;
       //!< Spike found?
-      bool spikeFound_;
+      // bool spikeFound_;
       //!< Time measurement spike was found.
-      double spikeTime_;
+      // double spikeTime_;
+      double times_above_;
 
       /*  Parameters  */
       //!< Time constant of weibull pdf

@@ -48,8 +48,9 @@ namespace pandora_sensor_processing
     : SensorProcessor<Co2Processor>(ns, "co2")
   {
     ambientCo2_ = std::numeric_limits<double>::max();
-    spikeFound_ = false;
-    spikeTime_ = 0;
+    // spikeFound_ = false;
+    // spikeTime_ = 0;
+    times_above_ = 0.0;
   }
 
   /**
@@ -58,37 +59,26 @@ namespace pandora_sensor_processing
   void Co2Processor::sensorCallback(
       const pandora_sensor_msgs::Co2Msg& msg)
   {
-    ROS_DEBUG_NAMED("SENSOR_PROCESSING", "[%s] Incoming co2 raw info.", name_.c_str());
+    ROS_INFO_NAMED("SENSOR_PROCESSING", "[%s] Incoming co2 raw info.", name_.c_str());
     alert_.info.yaw = 0;
     alert_.info.pitch = 0;
     alert_.header = msg.header;
     // Measurement has no information because it has the same value with the ambience.
-    if (msg.co2_percentage < ambientCo2_)
+    if (msg.co2_percentage <= ambientCo2_)
     {
       ambientCo2_ = msg.co2_percentage;
-      spikeFound_ = false;
+      times_above_ = 0.0;
     }
-    else if (msg.co2_percentage > ambientCo2_)
+    else
     {
-      if (!spikeFound_)
-      {
-        spikeFound_ = true;
-        spikeTime_ = ros::Time::now().toSec();
-        return;
-      }
-      double timeFromSpike = ros::Time::now().toSec() - spikeTime_;
-      alert_.info.probability = Utils::weibullPdf(timeFromSpike,
+      times_above_ += 0.2;
+      alert_.info.probability = Utils::weibullPdf(times_above_,
           SHAPE_PARAMETER, TIME_CONSTANT);
       publishAlert();
       if (alert_.info.probability < PROBABILITY_THRES)
       {
         ambientCo2_ = msg.co2_percentage;
-        spikeFound_ = false;
       }
-    }
-    else
-    {
-      spikeFound_ = false;
     }
   }
 
