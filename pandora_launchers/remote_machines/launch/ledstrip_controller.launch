@@ -11,8 +11,6 @@
     name="ledstrip_controller"
     pkg="ledstrip_controller"
     type="ledstrip_controller.py"
-    launch-prefix="nice -n 2"
-    output="screen"
   >
 
     <param name="published_topics/ledstrip_state" value="/kinect/ledstrip/state" />

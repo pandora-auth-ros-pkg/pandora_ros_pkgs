@@ -11,7 +11,6 @@
     name="flir_lepton"
     pkg="flir_lepton"
     type="flir_lepton_node"
-    launch-prefix="nice -n -10"
   >
 
     <param name="dataset/spline_interpolated_data"

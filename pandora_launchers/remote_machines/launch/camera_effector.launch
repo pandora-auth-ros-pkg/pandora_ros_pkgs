@@ -11,8 +11,6 @@
     name="camera_effector"
     pkg="camera_effector"
     type="camera_effector_node.py" 
-    launch-prefix="nice -n -1"
-    output="screen"
   >
 
     <param name="camera_effector_urdf/camera_effector_frame" value="/camera_effector_frame" />

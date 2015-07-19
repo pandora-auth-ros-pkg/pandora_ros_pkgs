@@ -9,7 +9,7 @@
   <arg name="dynamixel" default="true"/>
   <arg name="imu" default="true"/>
   <arg name="arm" default="true"/>
-  <arg name="hardware_tools" default="true"/>
+  <arg name="hardware_tools" default="false"/>
   <arg name="rpi" default="true" />
   <arg name="stabilizer" default="true"/>
   <arg name="eef" default="true"/>

@@ -19,8 +19,6 @@
     pkg="pandora_linear_actuator_hardware_interface"
     type="linear_actuator_hardware_interface_node"
     ns="$(arg namespace)"
-    launch-prefix="nice -n -1"
-    output="screen"
   >
 
     <remap
