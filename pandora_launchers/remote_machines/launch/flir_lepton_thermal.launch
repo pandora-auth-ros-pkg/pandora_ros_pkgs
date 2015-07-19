@@ -11,6 +11,7 @@
     name="flir_lepton"
     pkg="flir_lepton"
     type="flir_lepton_node"
+    respawn="true"
   >
 
     <param name="dataset/spline_interpolated_data"
