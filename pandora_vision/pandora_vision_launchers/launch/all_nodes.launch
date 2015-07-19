@@ -13,7 +13,9 @@
   <arg name="vision_predator" default="false"/>
   <arg name="vision_hole_detector" default="true"/>
   <arg name="vision_victim" default="true"/>
-  <arg name="vision_obstacle" default="true"/>
+  <arg name="vision_obstacle" default="false"/>
+  <arg name="vision_hard_obstacle" default="true"/>
+  <arg name="vision_barrel" default="true"/>
 
 
   <!-- Cameras -->
@@ -61,6 +63,14 @@
         ns="pandora_vision_victim" />
     <include if="$(arg vision_obstacle)"
         file="$(find pandora_vision_obstacle)/launch/pandora_vision_soft_obstacle.launch"
+        ns="pandora_vision_obstacle" />
+
+    <include if="$(arg vision_barrel)"
+        file="$(find pandora_vision_obstacle)/launch/pandora_vision_barrel.launch"
+        ns="pandora_vision_obstacle" />
+
+    <include if="$(arg vision_hard_obstacle)"
+        file="$(find pandora_vision_obstacle)/launch/pandora_vision_dummy_hard_obstacle.launch"
         ns="pandora_vision_obstacle" />
 
   </group>

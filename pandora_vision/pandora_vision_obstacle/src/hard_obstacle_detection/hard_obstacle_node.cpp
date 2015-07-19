@@ -33,17 +33,15 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
+ *   Choutas Vassilis <vasilis4ch@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_obstacle/barrel_detection/barrel_handler.h"
+#include "pandora_vision_obstacle/hard_obstacle_detection/hard_obstacle_handler.h"
 
-using pandora_vision::pandora_vision_obstacle::BarrelHandler;
-
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
-  ros::init(argc, argv, "barrel_node");
-  BarrelHandler barrelHandler;
+  ros::init(argc, argv, "hard_obstacle_node");
+  pandora_vision::pandora_vision_obstacle::HardObstacleHandler hardObstacleHandler;
   ros::spin();
   return 0;
 }

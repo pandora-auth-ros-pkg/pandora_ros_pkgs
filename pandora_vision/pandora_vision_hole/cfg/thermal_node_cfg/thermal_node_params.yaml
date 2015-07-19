@@ -13,12 +13,15 @@ converted_frame: /kinect_rgb_optical_frame
 matching_values:
 
   # The initial position of thermal image after linear transformation
-  x_therm: 17.0
-  y_therm: -18.0
+  #x_therm: 17.0
+  #y_therm: -18.0
+  x_therm: 36
+  y_therm: -8
 
   # Thermal image: c_x = new_width/old_width, c_y = new_height/old_height
-  c_x: 7.025
-  c_y: 7.025
-
+  #c_x: 7.025
+  #c_y: 7.025
+  c_x: 6.1125
+  c_y: 6.1166
   # Angle in degrees. It is positive if its rotated Clockwise
-  angle: 2
+  angle: 0

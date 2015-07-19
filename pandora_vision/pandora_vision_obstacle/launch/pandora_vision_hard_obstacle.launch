@@ -1,0 +1,21 @@
+<launch>
+  <arg name="nodelet_manager" default="/kinect/kinect_nodelet_manager" />
+
+  <!-- <node name="hard_obstacle_node" type="pandora_vision_obstacle_hard_obstacle_node"      -->
+  <!--   pkg="pandora_vision_obstacle" respawn="False" output="screen" ns="/pandora_vision"/> -->
+  <node pkg="nodelet" type="nodelet" name="pandora_hard_obstacle"
+    args="load pandora_vision/pandora_vision_hard_obstacle $(arg nodelet_manager)" output="screen" >
+    <!-- Add in upper line to enable debugging: launch-prefix="kdbg" /-->
+
+    <rosparam file="$(find pandora_vision_obstacle)/config/hard_obstacle_topics.yaml"
+      command="load" />
+    <rosparam file="$(find pandora_vision_obstacle)/config/hard_obstacle_preprocessor_params.yaml"
+      command="load" ns="preprocessor" />
+    <rosparam file="$(find pandora_vision_obstacle)/config/hard_obstacle_detector_params.yaml"
+      command="load" ns="detector" />
+    <rosparam file="$(find pandora_vision_obstacle)/config/hard_obstacle_postprocessor_params.yaml"
+      command="load" ns="postprocessor" />
+
+  </node>
+
+</launch>

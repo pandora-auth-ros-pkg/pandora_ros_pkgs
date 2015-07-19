@@ -17,9 +17,9 @@
  *     with the distribution.
  *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
  *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *     from this hardware without specific prior written permission.
  *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  THIS HARDWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -29,21 +29,32 @@
  *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  ANY WAY OUT OF THE USE OF THIS HARDWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
+ *  Choutas Vassilis <vasilis4ch@gmail.com>
  *********************************************************************/
 
-#include "pandora_vision_obstacle/barrel_detection/barrel_handler.h"
+#ifndef PANDORA_VISION_OBSTACLE_HARD_OBSTACLE_DETECTION_HARD_OBSTACLE_HANDLER_H
+#define PANDORA_VISION_OBSTACLE_HARD_OBSTACLE_DETECTION_HARD_OBSTACLE_HANDLER_H
 
-using pandora_vision::pandora_vision_obstacle::BarrelHandler;
+#include "pandora_vision_common/vision_handler.h"
+#include "pandora_vision_obstacle/hard_obstacle_detection/hard_obstacle_preprocessor.h"
+#include "pandora_vision_obstacle/hard_obstacle_detection/hard_obstacle_postprocessor.h"
+#include "pandora_vision_obstacle/hard_obstacle_detection/hard_obstacle_processor.h"
 
-int main(int argc, char** argv)
+namespace pandora_vision
 {
-  ros::init(argc, argv, "barrel_node");
-  BarrelHandler barrelHandler;
-  ros::spin();
-  return 0;
-}
+namespace pandora_vision_obstacle
+{
+  class HardObstacleHandler : public VisionHandler<HardObstaclePreProcessor, HardObstacleProcessor,
+    HardObstaclePostProcessor>
+  {
+   public:
+    HardObstacleHandler();
+  };
+}  // namespace pandora_vision_obstacle
+}  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_OBSTACLE_HARD_OBSTACLE_DETECTION_HARD_OBSTACLE_HANDLER_H

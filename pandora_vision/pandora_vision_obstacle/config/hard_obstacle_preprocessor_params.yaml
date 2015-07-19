@@ -1,0 +1,8 @@
+ElevationMap:
+  base_foot_print_id: /base_footprint
+  kinect_frame_id: /kinect_rgb_frame
+
+# In meters
+cellResolution: 0.02
+
+published_image_topic: /elevation_map

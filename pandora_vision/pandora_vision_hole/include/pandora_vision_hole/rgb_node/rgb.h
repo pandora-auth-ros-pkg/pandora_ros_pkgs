@@ -65,7 +65,6 @@ namespace rgb
     analysis of a RGB image
    **/
   class Rgb : public state_manager::StateClientNodelet
-
   {
    public:
     // The constructor

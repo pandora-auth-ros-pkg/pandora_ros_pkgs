@@ -39,9 +39,10 @@
 #define PANDORA_VISION_OBSTACLE_BARREL_DETECTION_PARAMETERS_H
 
 #include <string>
-#include <pandora_vision_obstacle/barrel_nodeConfig.h>
-#include <dynamic_reconfigure/server.h>
 #include <boost/shared_ptr.hpp>
+
+#include "pandora_vision_obstacle/barrel_nodeConfig.h"
+#include <dynamic_reconfigure/server.h>
 
 /**
   @namespace pandora_vision

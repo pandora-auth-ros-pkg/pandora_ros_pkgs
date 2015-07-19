@@ -41,6 +41,14 @@ target_link_libraries(barrel_detector_test
   gtest_main
   gtest
   )
+catkin_add_gtest(traversability_mask_test
+  unit/traversability_mask_test.cpp)
+target_link_libraries(traversability_mask_test
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_hard_obstacle_detector
+  gtest_main
+  gtest
+  )
 
 if (${PROJECT_NAME}_benchmark)
   add_rostest(benchmark/barrel_benchmark_test.launch)

@@ -15,5 +15,12 @@
       </description>
     </class>
   </library>
-
+  <library path="lib/libpandora_vision_obstacle_hard_obstacle_handler">
+    <class name="pandora_vision/pandora_vision_hard_obstacle"
+        type="pandora_vision::pandora_vision_obstacle::HardObstacleHandler" base_class_type="nodelet::Nodelet">
+      <description>
+        Nodelet which detects hard obstacles
+      </description>
+    </class>
+  </library>
 </class_libraries>

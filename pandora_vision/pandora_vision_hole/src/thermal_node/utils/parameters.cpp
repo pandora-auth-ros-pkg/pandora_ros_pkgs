@@ -152,11 +152,11 @@ namespace thermal
 
   // transformation variables;
 
-  double  Parameters::Thermal::xThermal = 17;
-  double  Parameters::Thermal::yThermal = -18;
-  double  Parameters::Thermal::c_x = 7.025;
-  double  Parameters::Thermal::c_y = 7.025;
-  double  Parameters::Thermal::angle = 2;
+  double  Parameters::Thermal::xThermal = 36;
+  double  Parameters::Thermal::yThermal = -8;
+  double  Parameters::Thermal::c_x = 6.1125;
+  double  Parameters::Thermal::c_y = 6.1166;
+  double  Parameters::Thermal::angle = 0;
 
 
   ///////////// Parameters of acceptable temperature for threshold /////////////

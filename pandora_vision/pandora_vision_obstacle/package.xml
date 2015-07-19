@@ -25,13 +25,16 @@
   <depend>pluginlib</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>cv_bridge</depend>
+  <depend>pcl_ros</depend>
   <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
   <depend>pandora_vision_msgs</depend>
-  <depend>pandora_vision_hole</depend>
   <depend>pandora_vision_common</depend>
   <depend>sensor_processor</depend>
   <depend>state_manager</depend>
   <depend>state_manager_msgs</depend>
+
+  <exec_depend>pandora_vision_hole</exec_depend>
 
   <test_depend>rostest</test_depend>
   <test_depend>rosunit</test_depend>

@@ -1,0 +1,19 @@
+robot:
+  # In meters
+  robotXDimention: 0.345
+  robotYDimention: 0.345
+robot_description:
+  wheel_height: 0
+  barrel_height: 0.06
+  robot_height: 0.08
+  wheel_width: 0.07
+  barrel_width: 0.07
+  robot_width: 0.09
+  epsilon: 0.01
+  cellResolution: 0.01
+elevation_difference:
+  # In meters
+  elevation_difference_low_free_threshold: 0.1
+  elevation_difference_high_free_threshold: 0.19
+  elevation_difference_low_occupied_threshold: 0.14
+  elevation_difference_high_occupied_threshold: 0.23
