@@ -42,4 +42,4 @@ soft:
   lethal_cost_threshold: 61
 
 inflation:
-  inflation_radius: 0.25
+  inflation_radius: 0.30
