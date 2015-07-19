@@ -100,8 +100,12 @@ namespace thermal
     nodeName_ = boost::to_upper_copy<std::string>(this->getName());
 
     nh_.param("thermal_mode", thermalMode_, true);
-    nh_.param("rgbdt_mode", rgbdtMode_, true);
+    nh_.param("thermal_alone_mode", thermal_alone_, true);
+    nh_.param("rgbdt_mode", rgbdtMode_, false);
     private_nh_.param<std::string>("converted_frame", converted_frame_, "/kinect_rgb_optical_frame");
+
+    if (thermal_alone_)
+      thermalMode_ = true;
 
     // Acquire the names of topics which the thermal node will be having
     // transactionary affairs with
@@ -116,24 +120,27 @@ namespace thermal
     thermalImageSubscriber_ = nh_.subscribe(thermalImageTopic_, 1,
       &Thermal::inputThermalImageCallback, this);
 
-    isReceiverInfoAvailable_ = false;
-    // Subscribe to the thermal image published by raspberry
-    thermalOutputReceiverSubscriber_ = nh_.subscribe(thermalOutputReceiverTopic_, 1,
-      &Thermal::inputThermalOutputReceiverCallback, this);
-
-    if (rgbdtMode_)
+    if (!thermal_alone_)
     {
-      // Advertise the candidate holes found by the thermal node to hole fusion
-      candidateHolesPublisher_ = nh_.advertise
-        < ::pandora_vision_hole::CandidateHolesVectorMsg >(candidateHolesTopic_, 1);
-    }
+      isReceiverInfoAvailable_ = false;
+      // Subscribe to the thermal image published by raspberry
+      thermalOutputReceiverSubscriber_ = nh_.subscribe(thermalOutputReceiverTopic_, 1,
+        &Thermal::inputThermalOutputReceiverCallback, this);
 
-    if (thermalMode_)
-    {
-      // Advertise the candidate holes found by the thermal
-      // node to thermal cropper
-      thermalToCropperPublisher_ = nh_.advertise
-        <pandora_vision_msgs::EnhancedImage>(thermalToCropperTopic_, 1);
+      if (rgbdtMode_)
+      {
+        // Advertise the candidate holes found by the thermal node to hole fusion
+        candidateHolesPublisher_ = nh_.advertise
+          < ::pandora_vision_hole::CandidateHolesVectorMsg >(candidateHolesTopic_, 1);
+      }
+
+      if (thermalMode_)
+      {
+        // Advertise the candidate holes found by the thermal
+        // node to thermal cropper
+        thermalToCropperPublisher_ = nh_.advertise
+          <pandora_vision_msgs::EnhancedImage>(thermalToCropperTopic_, 1);
+      }
     }
 
     // Advertise the candidate holes found by the thermal node to hole fusion
@@ -155,7 +162,9 @@ namespace thermal
     if (rgbdtMode_)
       modes += "rgbdt ";
     if (thermalMode_)
-      modes += "thermal";
+      modes += "thermal ";
+    if (thermal_alone_)
+      modes += "thermal_alone!";
     NODELET_INFO("[%s] Initiated %s", nodeName_.c_str(), modes.c_str());
   }
 
@@ -176,6 +185,14 @@ namespace thermal
   {
     isImageAvailable_ = true;
     imageConstPtr_ = msg;
+
+    if (thermal_alone_)
+    {
+      isReceiverInfoAvailable_ = true;
+      std_msgs::StringPtr infoPtr( new std_msgs::String );
+      infoPtr->data = "thermal";
+      receiverInfoConstPtr_ = infoPtr;
+    }
 
     if (isImageAvailable_ && isReceiverInfoAvailable_)
       process();
@@ -291,46 +308,49 @@ namespace thermal
       sensor_msgs::image_encodings::TYPE_8UC1,
       imageConstPtr_->thermalImage);
 
-    // Check the index and send the message to its proper receiver
-    // The index takes only three values from synchronized node
-    // "thermal", "hole" or "thermalhole".
-    if (receiverInfoConstPtr_->data == "thermal")
+    if (!thermal_alone_)
     {
-      if (thermalMode_)
-        // Publish the candidate holes message to thermal cropper node
-        publishToThermalCropper(thermalCandidateHolesMsg);
+      // Check the index and send the message to its proper receiver
+      // The index takes only three values from synchronized node
+      // "thermal", "hole" or "thermalhole".
+      if (receiverInfoConstPtr_->data == "thermal")
+      {
+        if (thermalMode_)
+          // Publish the candidate holes message to thermal cropper node
+          publishToThermalCropper(thermalCandidateHolesMsg);
+        else
+          NODELET_ERROR("[%s] ReceiverInfo is 'thermal' while 'thermal' mode is not on!",
+              nodeName_.c_str());
+      }
+      else if (receiverInfoConstPtr_->data == "hole")
+      {
+        if (rgbdtMode_)
+          // Publish the candidate holes message to hole fusion node
+          candidateHolesPublisher_.publish(thermalCandidateHolesMsg);
+        else
+          NODELET_ERROR("[%s] ReceiverInfo is 'hole' while 'rgbdt' mode is not on!",
+              nodeName_.c_str());
+      }
+      else if (receiverInfoConstPtr_->data == "thermalhole")
+      {
+        if (thermalMode_)
+          // Publish to both thermal cropper and hole fusion nodes
+          publishToThermalCropper(thermalCandidateHolesMsg);
+        else
+          NODELET_ERROR("[%s] ReceiverInfo is 'thermalhole' while 'thermal' mode is not on!",
+              nodeName_.c_str());
+        if (rgbdtMode_)
+          candidateHolesPublisher_.publish(thermalCandidateHolesMsg);
+        else
+          NODELET_ERROR("[%s] ReceiverInfo is 'thermalhole' while 'rgbdt' mode is not on!",
+              nodeName_.c_str());
+      }
       else
-        NODELET_ERROR("[%s] ReceiverInfo is 'thermal' while 'thermal' mode is not on!",
-            nodeName_.c_str());
-    }
-    else if (receiverInfoConstPtr_->data == "hole")
-    {
-      if (rgbdtMode_)
-        // Publish the candidate holes message to hole fusion node
-        candidateHolesPublisher_.publish(thermalCandidateHolesMsg);
-      else
-        NODELET_ERROR("[%s] ReceiverInfo is 'hole' while 'rgbdt' mode is not on!",
-            nodeName_.c_str());
-    }
-    else if (receiverInfoConstPtr_->data == "thermalhole")
-    {
-      if (thermalMode_)
-        // Publish to both thermal cropper and hole fusion nodes
-        publishToThermalCropper(thermalCandidateHolesMsg);
-      else
-        NODELET_ERROR("[%s] ReceiverInfo is 'thermalhole' while 'thermal' mode is not on!",
-            nodeName_.c_str());
-      if (rgbdtMode_)
-        candidateHolesPublisher_.publish(thermalCandidateHolesMsg);
-      else
-        NODELET_ERROR("[%s] ReceiverInfo is 'thermalhole' while 'rgbdt' mode is not on!",
-            nodeName_.c_str());
-    }
-    else
-    {
-      NODELET_ERROR("[%s] Incorrect callback: receiverInfo is %s", nodeName_.c_str(),
-          receiverInfoConstPtr_->data.c_str());
-      return;
+      {
+        NODELET_ERROR("[%s] Incorrect callback: receiverInfo is %s", nodeName_.c_str(),
+            receiverInfoConstPtr_->data.c_str());
+        return;
+      }
     }
 
     // Used for functional test

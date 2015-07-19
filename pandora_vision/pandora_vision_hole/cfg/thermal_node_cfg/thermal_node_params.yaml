@@ -1,5 +1,5 @@
 subscribed_topics:
-  thermal_image_topic: synchronized/thermal/image
+  thermal_image_topic: /rpi2/thermal/fused
   thermal_output_receiver_topic: synchronized/thermal/receiver_info
 
 published_topics:

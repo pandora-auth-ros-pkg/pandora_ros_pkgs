@@ -187,6 +187,8 @@ namespace thermal
     // Output receiver information
     std_msgs::StringConstPtr receiverInfoConstPtr_;
 
+    bool thermal_alone_;
+
     // Ros publisher for the candidate holes to hole-fusion.
     ros::Publisher candidateHolesPublisher_;
     // The name of the topic where the candidate holes that the thermal node

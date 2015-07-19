@@ -12,6 +12,7 @@
   <arg name="vision_landoltc3d" default="false"/>
   <arg name="vision_predator" default="false"/>
   <arg name="vision_hole_detector" default="true"/>
+  <arg name="vision_thermal" default="true"/>
   <arg name="vision_victim" default="true"/>
   <arg name="vision_obstacle" default="false"/>
   <arg name="vision_hard_obstacle" default="true"/>
@@ -56,8 +57,11 @@
         ns="pandora_vision_hole" >
         <arg name="rgbd" value="true" />
         <arg name="rgbdt" value="false" />
-        <arg name="thermal" value="true" />
+        <arg name="thermal" value="false" />
     </include>
+    <include if="$(arg vision_thermal)"
+        file="$(arg pandora_vision_hole)/launch/pandora_vision_thermal.launch"
+        ns="pandora_vision_thermal" />
     <include if="$(arg vision_victim)"
         file="$(find pandora_vision_victim)/launch/pandora_vision_victim.launch"
         ns="pandora_vision_victim" />

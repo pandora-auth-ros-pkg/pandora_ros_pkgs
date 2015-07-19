@@ -1,0 +1,5 @@
+<launch>
+  <param name="thermal_alone_mode" value="true" />
+
+  <include file="$(find pandora_vision_hole)/launch/thermal_node/pandora_vision_thermal.launch" />
+</launch>

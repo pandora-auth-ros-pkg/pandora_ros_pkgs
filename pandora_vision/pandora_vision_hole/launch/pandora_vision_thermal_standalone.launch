@@ -1,0 +1,16 @@
+<launch>
+  <!-- Set namespace to load pandora_vision_hole on -->
+  <arg name="namespace" default="/pandora_vision/pandora_vision_thermal" />
+  <!-- if not xtion or kinect, set path arg to find a rosbag -->
+  <!-- If the source is not a physical device, it is a bag: play "path" bag -->
+  <!-- <arg name="path" default="/home/pandora/bitch.bag" /> -->
+
+
+  <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
+  <!-- Load state manager -->
+  <include file="$(find state_manager)/launch/stateManager.launch" />
+
+   <!-- Output selection -->
+  <include file="$(find pandora_vision_hole)/launch/pandora_vision_thermal.launch"
+      ns="$(arg namespace)" />
+</launch>
