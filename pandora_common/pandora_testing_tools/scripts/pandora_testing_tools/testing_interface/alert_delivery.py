@@ -181,7 +181,7 @@ class AlertDeliveryBoy():
         self.barrel_msg.header.stamp = rospy.get_rostime()
         self.barrel_msg.alerts = []
         msg = ObstacleAlert()
-        msg.type = 0
+        msg.type = ObstacleAlert.BARREL
         msg.probability = probability
         msg.pointsYaw[0] = yaw
         msg.pointsPitch[0] = pitch
