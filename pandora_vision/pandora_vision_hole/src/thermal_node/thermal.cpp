@@ -283,15 +283,15 @@ namespace thermal
     // TODO(@anyone): Delegate to Frame Matcher
     // Convert the conveyors information so it can match with the
     //  Rgb and Depth images. If its outside of limits discart that conveyor.
-    ImageMatching::conveyorMatching(&holes, Parameters::Thermal::xThermal,
-                                    Parameters::Thermal::yThermal,
-                                    Parameters::Thermal::c_x,
-                                    Parameters::Thermal::c_y,
-                                    Parameters::Thermal::angle * CV_PI / 180);
+    // ImageMatching::conveyorMatching(&holes, Parameters::Thermal::xThermal,
+    //                                 Parameters::Thermal::yThermal,
+    //                                 Parameters::Thermal::c_x,
+    //                                 Parameters::Thermal::c_y,
+    //                                 Parameters::Thermal::angle * CV_PI / 180);
     // Resize the thermal image to match the rgb-d images, of course the thermal
     // image will not be further processed
-    cv::resize(thermalSensorImage,
-        thermalSensorImage, cvSize(Parameters::Image::WIDTH, Parameters::Image::HEIGHT));
+    // cv::resize(thermalSensorImage,
+    //     thermalSensorImage, cvSize(Parameters::Image::WIDTH, Parameters::Image::HEIGHT));
 
     // Create the candidate holes message
     ::pandora_vision_hole::CandidateHolesVectorMsgPtr thermalCandidateHolesMsg(
@@ -370,8 +370,7 @@ namespace thermal
     // Fill the thermal message to be sent
     POIsStamped poisStamped;
 
-    poisStamped.header.stamp = imageConstPtr_->header.stamp;
-    poisStamped.header.frame_id = converted_frame_;
+    poisStamped.header = imageConstPtr_->header;
     poisStamped.frameWidth = thermalSensorImage.cols;
     poisStamped.frameHeight = thermalSensorImage.rows;
 
