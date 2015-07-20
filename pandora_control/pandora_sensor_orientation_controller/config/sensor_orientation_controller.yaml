@@ -2,7 +2,7 @@ action_name:
   - move_kinect_action
   - move_camera_effector_action
 move_kinect_action:
-  pitch_step: 0.3
+  pitch_step: 0.35
   min_pitch: -0.785
   max_pitch: 0.785
   offset_pitch: -0.07
