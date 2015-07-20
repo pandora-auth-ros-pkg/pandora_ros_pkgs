@@ -2,8 +2,10 @@
 <launch>
 
   <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
-
   <arg name="namespace" default="flir_lepton"/>
+  <arg name="optical_frame" default="/flir_optical_frame"/>
+  <arg name="hfov" default="51"/>
+  <arg name="vfov" default="40"/>
 
   <!-- Flir Lepton -->
   <node
@@ -22,5 +24,8 @@
     <param name="flir_urdf/camera_optical_frame" value="/flir_optical_frame" />
 
   </node>
+
+  <param name="$(arg optical_frame)/hfov" value="$(arg hfov)" />
+  <param name="$(arg optical_frame)/vfov" value="$(arg vfov)" />
 
 </launch>

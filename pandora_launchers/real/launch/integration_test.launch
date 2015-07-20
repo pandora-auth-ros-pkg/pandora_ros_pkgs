@@ -14,7 +14,7 @@
   <arg name="stabilizer" default="true"/>
   <arg name="eef" default="true"/>
   <arg name="slam" default="true"/>
-  <arg name="rl" default="true"/>
+  <arg name="rl" default="false"/>
   <arg name="navigation" default="true"/>
   <arg name="data_fusion" default="true"/>
   <arg name="xtion" default="false"/>
