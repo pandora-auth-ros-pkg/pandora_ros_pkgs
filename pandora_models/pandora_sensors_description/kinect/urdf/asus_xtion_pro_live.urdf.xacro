@@ -149,7 +149,7 @@
            type="fixed" >
       <parent link="kinect_link" />
       <child link="kinect_frame" />
-      <origin xyz="0.01784 0.0 0.02167"
+      <origin xyz="0.01784 0.0 0.0"
               rpy="0.0 0.0 0.0" />
     </joint>
     <joint name="kinect_optical_joint"
