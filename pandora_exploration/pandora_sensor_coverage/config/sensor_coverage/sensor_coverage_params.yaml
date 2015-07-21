@@ -19,7 +19,8 @@ published_topic_names:
 service_server_names:
   flush_coverage: /exploration/flush_coverage
 
-frames_to_track: [kinect_rgb_frame, left_sonar_frame, right_sonar_frame]
+frames_to_track: [kinect_rgb_frame, left_camera_frame, right_camera_frame]
+# frames_to_track: [kinect_rgb_frame, left_camera_frame, right_camera_frame, rear_pi_camera_frame]
 
 # kinect_rgb_frame
 kinect_rgb_frame:
@@ -33,7 +34,7 @@ kinect_rgb_frame:
     space_coverage: true
     surface_coverage: false
   surface_blur_factor: 3
-  sensor_range: 1.5
+  sensor_range: 1.0
   # sensor_hfov: 58
   sensor_hfov: 45
   sensor_vfov: 45
@@ -41,38 +42,56 @@ kinect_rgb_frame:
   identification_state: true
   hold_state: true
 
-left_sonar_frame:
+left_camera_frame:
   produces_surface_coverage: false
-  covering_unknown: true
+  covering_unknown: false
   published_topic_names:
-    space_coverage: left_sonar_space
-    area_coverage: left_sonar_area_covered
-    surface_coverage: left_sonar_surface
+    space_coverage: left_camera_space
+    area_coverage: left_camera_area_covered
+    surface_coverage: left_camera_surface
   binary:
     space_coverage: true
     surface_coverage: false
   surface_blur_factor: 3
-  sensor_range: 0.2
-  sensor_hfov: 35
-  sensor_vfov: 30
+  sensor_range: 1.0
+  sensor_hfov: 45
+  sensor_vfov: 48
   exploration_state: true
   identification_state: true
   hold_state: true
 
-right_sonar_frame:
+right_camera_frame:
   produces_surface_coverage: false
-  covering_unknown: true
+  covering_unknown: false
   published_topic_names:
-    space_coverage: right_sonar_space
-    area_coverage: right_sonar_area_covered
-    surface_coverage: right_sonar_surface
+    space_coverage: right_camera_space
+    area_coverage: right_camera_area_covered
+    surface_coverage: right_camera_surface
   binary:
     space_coverage: true
     surface_coverage: false
   surface_blur_factor: 3
-  sensor_range: 0.2
-  sensor_hfov: 35
-  sensor_vfov: 30
+  sensor_range: 1.0
+  sensor_hfov: 45
+  sensor_vfov: 48
   exploration_state: true
   identification_state: true
   hold_state: true
+
+# rear_pi_camera_frame:
+#   produces_surface_coverage: false
+#   covering_unknown: false
+#   published_topic_names:
+#     space_coverage: rear_camera_space
+#     area_coverage: rear_camera_area_covered
+#     surface_coverage: rear_camera_surface
+#   binary:
+#     space_coverage: true
+#     surface_coverage: false
+#   surface_blur_factor: 3
+#   sensor_range: 1.0
+#   sensor_hfov: 45
+#   sensor_vfov: 41.41
+#   exploration_state: true
+#   identification_state: true
+#   hold_state: true

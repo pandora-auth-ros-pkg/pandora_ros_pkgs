@@ -285,6 +285,10 @@ namespace pandora_exploration
     resetFusedCoverage()
     {
       fusedCoveragePtr_.reset( new nav_msgs::OccupancyGrid );
+      for (int ii = 0; ii < registeredSensors_.size(); ++ii)
+      {
+        registeredSensors_[ii]->shareFusedCoverage(fusedCoveragePtr_);
+      }
     }
 
 }  // namespace pandora_sensor_coverage

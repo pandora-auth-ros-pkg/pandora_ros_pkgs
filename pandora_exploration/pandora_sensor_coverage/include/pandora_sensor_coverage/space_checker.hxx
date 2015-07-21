@@ -170,10 +170,10 @@ namespace pandora_exploration
         // {
         //   coveredSpace_->data[xx] = 0;
         // }
-        // if (coveredSpace_->data[xx] != 0)
-        // {
-        //   cellsCovered++;
-        // }
+        if (coveredSpace_->data[xx] != 0)
+        {
+          cellsCovered++;
+        }
       }
 
       // Calculate total area explored according to this sensor.
