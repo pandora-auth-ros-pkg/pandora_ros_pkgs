@@ -1,7 +1,6 @@
 <launch>
-  <!-- Set device parameter -->
-  <arg name="device" />
-  <param name="imu/device" value="$(arg device)" />
+  <!-- Launch device scanner shell script to detect imu devices and set the device param accordingly -->
+  <node name="imu_device_scanner" pkg="pandora_imu_hardware_interface" type="imu_device_scanner.sh" output="screen"/>
 
   <!-- Launch pandora imu hardware interface -->
   <node

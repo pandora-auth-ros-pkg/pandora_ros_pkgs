@@ -1,11 +1,6 @@
 <launch>
- <arg name="device" default="trax" />
  <!-- Launch controller manager with pandora hardware interface -->
-  <include
-    file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface.launch">
-
-    <arg name="device" value="$(arg device)" />
-  </include>
+  <include file="$(find pandora_imu_hardware_interface)/imu_hardware_interface/launch/imu_hardware_interface.launch"/>
 
   <!-- spawn controllers -->
   <include
