@@ -2,30 +2,38 @@
 
 <launch>
 
-  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2.machine" />
+  <include file="$(find pandora_launchers)/remote_machines/machine/rpi2_primary.machine" />
 
   <arg name="namespace" default="pi_camera"/>
 
   <arg name="hfov" default="53.50" />
   <arg name="vfov" default="41.41" />
-  <arg name="optical_frame" default="/pi_camera_optical_frame" />
+  <arg name="width" default="1280" />
+  <arg name="height" default="780" />
+  <arg name="fps" default="30" />
+  <arg name="camera_id" default="rear" />
+  <arg name="optical_frame" default="/$(arg camera_id)_picam_optical_frame" />
+  <arg name="rpi2_id" default="primary" />
 
+
+  <!-- Primary rpi2 holds front picamera -->
+  <!-- Secondary rpi2 holds rear picamera -->
 
   <!-- PI Camera Node -->
   <node
-    machine="rpi2"
-    name="pi_camera"
+    machine="rpi2_$(arg rpi2_id)"
+    name="pi_camera_$(arg camera_id)"
     pkg="pi_camera"
     type="pi_camera_node.py"
   >
 
-    <param name="width" value="640" />
-    <param name="height" value="480" />
-    <param name="framerate" value="30" />
+    <param name="width" value="$(arg width)" />
+    <param name="height" value="$(arg height)" />
+    <param name="framerate" value="$(arg fps)" />
     <param name="image_format" value="rgb" />
     <param name="use_video_port" value="True" />
     <param name="exposure_mode" value="fixedfps" />
-    <param name="published_topics/image" value="/rpi2/pi_camera/image" />
+    <param name="published_topics/image" value="/rpi2/pi_camera_$(arg camera_id)/image" />
     <param name="pi_camera_urdf/optical_frame" value="$(arg optical_frame)" />
   </node>
 

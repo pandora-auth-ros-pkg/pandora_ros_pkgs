@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  
+  <!-- Primary rpi2 handles front_picamera linear actuator camera_effector -->
+
+ <machine
+    name="rpi2_primary"
+    address="rpi2_primary"
+    user="pandora"
+    timeout="20.0"
+    env-loader="~/pandora_ws/src/rpi_hardware_interface/scripts/raspberry_env.sh" 
+  />
+
+</launch>

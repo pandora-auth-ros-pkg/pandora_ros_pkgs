@@ -1,8 +1,12 @@
+<?xml version="1.0"?>
+
 <launch>
 
+  <!-- Secondary rpi2 handles only rear picamera -->
+
  <machine
-    name="rpi2"
-    address="rpi2"
+    name="rpi2_secondary"
+    address="rpi2_secondary"
     user="pandora"
     timeout="20.0"
     env-loader="~/pandora_ws/src/rpi_hardware_interface/scripts/raspberry_env.sh" 
