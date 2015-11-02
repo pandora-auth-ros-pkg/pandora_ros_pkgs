@@ -1,5 +1,7 @@
 # Generic Pandora ROS Packages Travis Continuous Integration Configuration File
 # Author: Chris Zalidis
+sudo: required
+dist: trusty
 language:
   - cpp
   - python
@@ -17,11 +19,11 @@ notifications:
     secure: XIqMZu84WOlTYe/YkcTa6wy7Uus6EqKXIzHu4OeshmzOFsZwNg7TjsgLjpHx+fa0GHTUzCg9yVh1rE28kbjnnuvJhN1rwb3xYVrghzzB0neNGW/+qbLiaJyLtiAewnKT0CDOcLdydw+dGGaZnjbiq6dfYypO7lDu3Mh61zu4TmY=
 before_install: # Use this to prepare the system to install prerequisites or dependencies
   # Define some config vars
-  - export ROS_DISTRO=hydro
+  - export ROS_DISTRO=indigo
   - export CI_SOURCE_PATH=$(pwd)
   - export REPOSITORY_NAME=${PWD##*/}
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
-  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu trusty main" > /etc/apt/sources.list.d/ros-latest.list'
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros 
@@ -35,7 +37,7 @@ install: # Use this to install any prerequisites or dependencies necessary to ru
   - cd ~/ros/ws_pandora/src
   - wstool init .
   # Download non-debian stuff
-  - wstool merge https://raw.github.com/pandora-auth-ros-pkg/install/hydro-devel/travis_ci.rosinstall
+  - wstool merge https://raw.github.com/pandora-auth-ros-pkg/install/$ROS_DISTRO-devel/travis_ci.rosinstall
   - wstool update
   # Delete the .rosinstall version of this repo and use the one of the branch we are testing
   - rm -rf $REPOSITORY_NAME
