@@ -76,11 +76,14 @@ namespace pandora_control
                       ros::Duration(scanRate_),
                       &SensorOrientationActionServer::scan,
                       this);
+      softScanTimer_ = nodeHandle_.createTimer(
+                      ros::Duration(softScanRate_),
+                      &SensorOrientationActionServer::scan,
+                      this);
       scanPitchTimer_ = nodeHandle_.createTimer(
                        ros::Duration(pitchRate_),
                        &SensorOrientationActionServer::stabilizePitch,
                        this);
-
       pointSensorTimer_ = nodeHandle_.createTimer(
                          ros::Duration(pitchRate_),
                          &SensorOrientationActionServer::pointSensor,
@@ -120,6 +123,8 @@ namespace pandora_control
       targetPosition.data = 0;
       lastPitchTarget_ = 0;
       lastYawTarget_ = 0;
+      direction_ = 1.0;
+      firstOfSoftScan_ = true;
       sensorPitchPublisher_.publish(targetPosition);
       sensorYawPublisher_.publish(targetPosition);
       position_ = START;
@@ -154,6 +159,12 @@ namespace pandora_control
              pandora_sensor_orientation_controller::MoveSensorGoal::MOVE)
     {
       scanYawTimer_.start();
+      scanPitchTimer_.start();
+    }
+    else if (command_ ==
+             pandora_sensor_orientation_controller::MoveSensorGoal::SOFT_MOVE)
+    {
+      softScanTimer_.start();
       scanPitchTimer_.start();
     }
     else if (command_ ==
@@ -225,6 +236,7 @@ namespace pandora_control
       }
     }
     nodeHandle_.param(actionName_ + "/scan_rate", scanRate_, 1.0);
+    nodeHandle_.param(actionName_ + "/soft_scan_rate", scanRate_, 1.0);
 
     if (nodeHandle_.getParam(actionName_ + "/imu_topic",
       imuTopic_))
@@ -353,7 +365,6 @@ namespace pandora_control
     }
   }
 
-
   void SensorOrientationActionServer::scan(const ros::TimerEvent& event)
   {
     switch (position_)
@@ -408,6 +419,27 @@ namespace pandora_control
         pitchScan_ = 0;
         position_ = UP_CENTER;
         break;
+    }
+
+    publishScanPitchCommand();
+    publishScanYawCommand();
+  }
+
+  void SensorOrientationActionServer::softScan(const ros::TimerEvent& event)
+  {
+    pitchScan_ = -pitchStep_;
+    if (firstOfSoftScan_)
+    {
+      yawScan_ = 0.0;
+      firstOfSoftScan_ = false;
+    }
+    else
+    {
+      yawScan_ += direction_ * yawStep_;
+      if (yawScan_ + offsetYaw_ > maxYaw_ || yawScan_ + offsetYaw_ < minYaw_)
+      {
+        direction_ *= -1;
+      }
     }
 
     publishScanPitchCommand();
@@ -537,8 +569,10 @@ namespace pandora_control
   void SensorOrientationActionServer::stopPreviousTimers()
   {
     scanYawTimer_.stop();
+    softScanTimer_.stop();
     scanPitchTimer_.stop();
     pointSensorTimer_.stop();
+    firstOfSoftScan_ = true;
   }
 
   int SensorOrientationActionServer::checkGoalCompletion()

@@ -82,6 +82,7 @@ namespace pandora_control
       ros::Subscriber imuSubscriber_;
 
       ros::Timer scanYawTimer_;
+      ros::Timer softScanTimer_;
       ros::Timer scanPitchTimer_;
       ros::Timer pointSensorTimer_;
 
@@ -94,6 +95,7 @@ namespace pandora_control
       double maxPitch_;
       double maxYaw_;
       double scanRate_;
+      double softScanRate_;
       double pitchRate_;
       double commandTimeout_;
       double pointThreshold_;
@@ -114,6 +116,8 @@ namespace pandora_control
       int bufferSize_;
       int bufferCounter_;
 
+      bool firstOfSoftScan_;
+      double direction_;
       double pitchScan_;
       double offsetPitch_;
       double yawScan_;
@@ -135,6 +139,7 @@ namespace pandora_control
       void testSensor();
       void centerSensor();
       void scan(const ros::TimerEvent& event);
+      void softScan(const ros::TimerEvent& event);
       void stabilizePitch(const ros::TimerEvent& event);
       void pointSensor(const ros::TimerEvent& event);
 

@@ -40,7 +40,7 @@ from effector_clients import SensorClient, LinearActuatorClient, HeadClient
 class ClientFactory(object):
 
     def __init__(self):
-        ''' Factory initialized '''
+        """ Factory initialized """
         self._name = "/PANDORA_CONTROL/PANDORA_END_EFFECTOR_CONTROLLER"
 
         rospy.loginfo("[" + self._name + "] Initializing factory...")
@@ -51,18 +51,18 @@ class ClientFactory(object):
         }
 
     def make_client(self, client_name):
-        ''' Making appropriate client '''
+        """ Making appropriate client """
         rospy.loginfo("[" + self._name + "] Making client... " + client_name)
         return self.return_client[client_name]()
 
     def return_sensor(self):
-        ''' Returning SensorClient instance '''
+        """ Returning SensorClient instance """
         return SensorClient()
 
     def return_linear_actuator(self):
-        ''' Returning LinearActuatorClient instance '''
+        """ Returning LinearActuatorClient instance """
         return LinearActuatorClient()
 
     def return_head(self):
-        ''' Returning HeadClient instance '''
+        """ Returning HeadClient instance """
         return HeadClient()

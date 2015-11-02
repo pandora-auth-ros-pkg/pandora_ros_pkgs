@@ -11,6 +11,7 @@ move_kinect_action:
   max_yaw: 1.308
   offset_yaw: 0
   scan_rate: 0.8
+  soft_scan_rate: 0.8
   pitch_rate: 0.1
   command_timeout: 10.0
   movement_threshold: 0.05
@@ -25,15 +26,16 @@ move_kinect_action:
   yaw_joint_child: kinect_pitch_servo_link
   sensor_frame: kinect_frame
 move_camera_effector_action:
-  pitch_step: 0.0
+  pitch_step: -0.2
   min_pitch: -0.6
   max_pitch: 0.6
-  offset_pitch: 0.0
-  yaw_step: 0.7
+  offset_pitch: -0.45
+  yaw_step: 0.35
   min_yaw: -1.3962
   max_yaw: 1.3962
   offset_yaw: 0.0
-  scan_rate: 1.0
+  scan_rate: 0.8
+  soft_scan_rate: 0.8
   pitch_rate: 0.1
   command_timeout: 10.0
   movement_threshold: 0.05
@@ -43,7 +45,7 @@ move_camera_effector_action:
   pitch_command_topic: /camera_effector/tilt_command
   yaw_command_topic: /camera_effector/pan_command
   pitch_joint_parent: camera_effector_tilt_link
-  pitch_joint_child: pi_camera_link
+  pitch_joint_child: front_picam_link
   yaw_joint_parent: linear_actuator_link
   yaw_joint_child: camera_effector_pan_link
-  sensor_frame: pi_camera_frame
+  sensor_frame: front_picam_frame

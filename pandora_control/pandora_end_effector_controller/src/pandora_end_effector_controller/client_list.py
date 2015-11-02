@@ -33,7 +33,10 @@
 #
 # Author: Peppas Kostas
 
-# Needs to be in accordance to client_factory
+"""
+The list of clients that we want to initialise
+IMPORTANT : Needs to be in accordance to client_factory
+"""
 
 CLIENTS = [
     'sensor_client',

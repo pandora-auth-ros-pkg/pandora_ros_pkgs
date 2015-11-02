@@ -67,19 +67,19 @@ class MoveEndEffectorServer(object):
         self.wait_for_servers()
 
     def create_clients(self):
-        ''' Imports all clients and creates a list of them '''
+        """ Imports all clients and creates a list of them """
 
         for client in CLIENTS:
             self.current_clients.append(self.factory.make_client(client))
 
     def wait_for_servers(self):
-        ''' Waits for every client to connect with their server '''
+        """ Waits for every client to connect with their server """
 
         for client in self.current_clients:
             client.wait_server()
 
     def execute_cb(self, goal):
-        ''' Callback triggered by the arrival of a goal '''
+        """ Callback triggered by the arrival of a goal """
 
         self.current_goal = goal
         self.fill_goals()
@@ -89,19 +89,19 @@ class MoveEndEffectorServer(object):
         self.checkGoalState()
 
     def preempt_cb(self):
-        ''' Preempting all goals '''
+        """ Preempting all goals """
 
         for client in self.current_clients:
             client.preempt_if_active()
 
     def fill_goals(self):
-        ''' Filling goals into every client respectively '''
+        """ Filling goals into every client respectively """
 
         for client in self.current_clients:
             client.fill_goal(self.current_goal)
 
     def send_goals(self):
-        ''' Sending goals to every client respectively '''
+        """ Sending goals to every client respectively """
 
         for client in self.current_clients:
             client.send_goal()
@@ -127,7 +127,7 @@ class MoveEndEffectorServer(object):
             rospy.logerr("[" + self._name + "] Preempt requested when server goal is not active")
 
     def check_succeeded(self):
-        ''' Checks if the final state of the goal must be set succeeded '''
+        """ Checks if the final state of the goal must be set succeeded """
 
         must_succeed = True
 
@@ -137,7 +137,7 @@ class MoveEndEffectorServer(object):
         return must_succeed
 
     def check_aborted(self):
-        ''' Checks if the final state of the goal must be set aborted '''
+        """ Checks if the final state of the goal must be set aborted """
 
         must_abort = False
 
@@ -147,7 +147,7 @@ class MoveEndEffectorServer(object):
         return must_abort
 
     def check_preempted(self):
-        ''' Checks if the final state of the goal must be set preempted '''
+        """ Checks if the final state of the goal must be set preempted """
 
         must_preempt = False
 
@@ -157,7 +157,7 @@ class MoveEndEffectorServer(object):
         return must_preempt
 
     def check_recalled(self):
-        ''' Checks if the final state of the goal must be set preempted '''
+        """ Checks if the final state of the goal must be set preempted """
 
         must_recall = False
 
@@ -167,7 +167,7 @@ class MoveEndEffectorServer(object):
         return must_recall
 
     def checkGoalState(self):
-        ''' Checking final state of goal '''
+        """ Checking final state of goal """
 
         if(self.check_succeeded()):
             rospy.logwarn("check_succeeded")
