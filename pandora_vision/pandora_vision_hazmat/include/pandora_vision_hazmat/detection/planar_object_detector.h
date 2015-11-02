@@ -156,6 +156,7 @@ namespace pandora_vision
          */
         PlanarObjectDetector()
         {
+          maskCreatorPtr_.reset(new ImageSignature);
         }
 
         /**
@@ -168,6 +169,7 @@ namespace pandora_vision
         {
           displayResultsFlag_ = false;
           maskDisplayFlag_ = false;
+          maskCreatorPtr_.reset(new ImageSignature);
         }
 
         /**
@@ -184,6 +186,7 @@ namespace pandora_vision
         {
           fileName_ = fileName;
           displayResultsFlag_ = false;
+          maskCreatorPtr_.reset(new ImageSignature);
         }
 
         /**
@@ -259,6 +262,8 @@ namespace pandora_vision
         static int width_;  //!< Width of the input frame.
 
         static int height_;  //!< Height of the input frame.
+
+        boost::shared_ptr<ImageSignature> maskCreatorPtr_;
     };
 }  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision

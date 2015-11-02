@@ -77,6 +77,9 @@ namespace pandora_vision_obstacle
     void
     updateMap(const nav_msgs::OccupancyGridConstPtr& mapConstPtr);
 
+    void obstacleBlur(const nav_msgs::OccupancyGridPtr& inputOutput);
+
+
    private:
     void
     obstacleDilation(const nav_msgs::OccupancyGridPtr& output, int steps, int coords);

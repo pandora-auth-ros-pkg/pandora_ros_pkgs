@@ -43,8 +43,8 @@
 #include <opencv2/opencv.hpp>
 #include <ros/ros.h>
 #include "pandora_vision_common/cv_mat_stamped.h"
-#include "pandora_vision_common/pois_stamped.h"
-#include "pandora_vision_common/bbox_poi.h"
+#include "pandora_vision_color/obstacle_poi.h"
+#include "pandora_vision_msgs/ObstacleAlert.h"
 
 namespace pandora_vision
 {
@@ -64,7 +64,7 @@ namespace pandora_vision_color
       */
       virtual ~ColorDetector();
 
-      BBoxPOIPtr getColorPosition(void);
+      std::vector<POIPtr> getColorPosition(void);
 
       /**
         @brief Function that detects color
@@ -83,6 +83,8 @@ namespace pandora_vision_color
 
       int iLowV;
       int iHighV;
+      
+      double minArea_;
 
     protected:
        /**
@@ -105,7 +107,7 @@ namespace pandora_vision_color
       //!< binary image
       cv::Mat binary_;
       //!< Bounding box of moving objects.
-      BBoxPOIPtr bounding_box_;
+      std::vector<POIPtr> bounding_boxes_;
 
      // friend class ColorDetectorTest;
   };

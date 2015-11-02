@@ -52,46 +52,63 @@ namespace pandora_vision
   namespace pandora_vision_hazmat
   {
     /**
-     * @class ImageSignature
-     * @brief Class that implements the image signature saliency map.
-     */
+      @class ImageSignature
+      @brief Class that implements the image signature saliency map.
+     **/
     class ImageSignature
     {
-      public:
-        /**
+      public :
+
+        /*
          * @brief : Calculates the signature of the image.
          * @param image[const cv::Mat&] : The input image.
          * @param imgSign[cv::Mat *]: The output saliency map.
          */
-        static void calculateSignature(const cv::Mat& image ,
+        void calculateSignature(const cv::Mat& image ,
             cv::Mat* imgSign);
 
-        /**
+        /*
          * @brief : Creates a mask for the frame based on the saliency map
          * produced by the algorithm.
          * @param frame[const cv::Mat&] : The input image.
          * @param mask[cv::Mat*] : The output matsk.
          */
-        static void createSaliencyMapMask(const cv::Mat& frame ,
+        void createSaliencyMapMask(const cv::Mat& frame ,
             cv::Mat* mask);
 
         /**
-         * @brief Calculates the signs of an arbitrary 1-channel matrix.
-         * @param image [const cv::Mat &] : The input image
-         * @param signs[cv::Mat *] : The output matrix with the signs of the
-         * image.
-         */
-        static void signFunction(const cv::Mat& array, cv::Mat* signs);
+          @brief Calculates the signs of an arbitrary 1-channel matrix.
+          @param image [const cv::Mat &] : The input image
+          @param signs[cv::Mat *] : The output matrix with the signs of the
+          image.
+         **/
+        void signFunction(const cv::Mat& array, cv::Mat* signs);
 
-        /**
+        /*
          * @brief : Default Empty Constructor.
          */
         ImageSignature()
         {
+          areaThreshold_ = 5000.0f;
+
+          roiThreshold_ = 0.95;
         };
 
-      private:
+        void setAreaThreshold(double areaThreshold)
+        {
+          areaThreshold_ = areaThreshold;
+        }
+        void setRoiThreshold(double roiThreshold)
+        {
+          roiThreshold_ = roiThreshold;
+        }
+
+      private :
+        double areaThreshold_;
+
+        double roiThreshold_;
     };
+
 }  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision
 #endif  // PANDORA_VISION_HAZMAT_FILTERS_IMAGE_SIGNATURE_H

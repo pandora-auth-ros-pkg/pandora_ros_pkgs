@@ -34,10 +34,18 @@
     </include>
   </group>
 
+  If the source is not a physical device, it is a bag: play "path" bag
+  <group unless="$(arg openni2)">
+    <group unless="$(arg openni)">
+      <arg name="path" default="$(find pandora_vision_color)/barrel4.bag" />
+      <node pkg="rosbag" type="play" name="player" output="screen" args= "--clock -l $(arg path)" />
+    </group>
+  </group>
+
   <param name="/kinect_rgb_optical_frame/hfov" value="58.0" />
   <param name="/kinect_rgb_optical_frame/vfov" value="45.0" />
 
-<  <include file="$(find pandora_vision_color)/launch/pandora_vision_color.launch"
+  <include file="$(find pandora_vision_color)/launch/pandora_vision_color.launch"
       ns="$(arg namespace)" />
   <include file="$(find pandora_robots_description)/gio/launch/gio_description.launch" />
 

@@ -1,7 +1,8 @@
 <launch>
+  <param name="use_sim_time" value="1" />
   <arg name="namespace" default="/pandora_vision/pandora_vision_obstacle" />
   <node pkg="pandora_vision_obstacle" type="pandora_vision_obstacle_dummy" name="pandora_hard_obstacle"
-    output="screen" ns="$(arg namespace)">
+    output="screen" ns="$(arg namespace)" >
    <rosparam file="$(find pandora_vision_obstacle)/config/hard_obstacle_detector_params.yaml"
      command="load" />
   </node>

@@ -58,6 +58,7 @@ namespace pandora_vision_obstacle
     nh.param("hsvColor/hThreshold", hValueThreshold_, 100);
     nh.param("hsvColor/sThreshold", sValueThreshold_, 95);
     nh.param("hsvColor/vThreshold", vValueThreshold_, 130);
+    nh.param("hsvColor/hHighThreshold", hValueHighThreshold_, 5);
 
     int rows, cols;
     nh.param("erodeKernelSize/rows", rows, 3);
@@ -227,7 +228,7 @@ namespace pandora_vision_obstacle
     cv::Vec3b hsvValue = hsvImage.at<cv::Vec3b>(center.y, center.x);
 
     if (hsvValue[1] < sValueThreshold_ && hsvValue[2] > vValueThreshold_ &&
-        hsvValue[0] > hValueThreshold_)
+        (hsvValue[0] > hValueThreshold_ || hsvValue[0] < hValueHighThreshold_))
     {
       return true;
     }
@@ -407,6 +408,7 @@ namespace pandora_vision_obstacle
   }
 
   bool SoftObstacleDetector::findDifferentROIDepth(const cv::Mat& depthImage,
+    const cv::Mat& hsvImage,
     const std::vector<cv::Vec4i>& verticalLines, const cv::Rect& roi, int level)
   {
     boost::array<float, 4> meanValue;
@@ -425,7 +427,24 @@ namespace pandora_vision_obstacle
     float minDepth = *std::min_element(meanValue.begin(), meanValue.end());  // not used
 
     cv::Mat depthROI = depthImage(fullFrameRect);
-    float mean = cv::mean(depthROI)[0];
+
+    cv::Mat hsvROI = hsvImage(fullFrameRect);
+    cv::Mat colorMask = cv::Mat::ones(hsvROI.rows, hsvROI.cols, CV_8UC1);
+
+    for (int ii = 0; ii < hsvROI.rows; ++ii)
+    {
+      for (int jj = 0; jj < hsvROI.cols; ++jj)
+      {
+        cv::Vec3b hsvValue = hsvROI.at<cv::Vec3b>(ii, jj);
+        if (hsvValue[1] < sValueThreshold_ &&
+            hsvValue[2] > vValueThreshold_ &&
+            (hsvValue[0] > hValueThreshold_ || hsvValue[0] < hValueHighThreshold_))
+        {
+          colorMask.at<uchar>(ii, jj) = 0;
+        }
+      }
+    }
+    float mean = cv::mean(depthROI, colorMask)[0];
 
     int linePixels = 0;
     float avgLineDepth = 0.0f;
@@ -468,8 +487,12 @@ namespace pandora_vision_obstacle
     cv::Mat grayScaleImage;
     cv::cvtColor(rgbImage, grayScaleImage, CV_BGR2GRAY);
 
+    // Apply Histogram Equalization
+    cv::Mat grayscaleEqualizedImage;
+    cv::equalizeHist(grayScaleImage, grayscaleEqualizedImage);
+
     cv::Mat imageFloat;
-    grayScaleImage.convertTo(imageFloat, CV_32FC1);
+    grayscaleEqualizedImage.convertTo(imageFloat, CV_32FC1);
 
     // Blur image using Gaussian filter
     cv::Mat blurImage;
@@ -525,10 +548,13 @@ namespace pandora_vision_obstacle
 
       // Examine whether the points of the bounding box have difference in depth
       // distance
-      bool diffDepth = findDifferentROIDepth(depthImage, verticalLines, *roi, level);
+      cv::Mat hsvImage;
+      cv::cvtColor(rgbImage, hsvImage, CV_BGR2HSV);
+      bool diffDepth = findDifferentROIDepth(depthImage, hsvImage, verticalLines, *roi, level);
 
       if (diffDepth)
       {
+        ROS_INFO("Found difference in depth");
         boost::array<float, 4> depthDistance;
 
         // Find the new depth distance of the soft obstacle

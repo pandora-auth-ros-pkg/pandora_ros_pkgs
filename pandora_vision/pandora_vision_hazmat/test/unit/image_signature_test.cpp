@@ -43,8 +43,19 @@ namespace pandora_vision
 {
   namespace pandora_vision_hazmat
   {
+    class ImageSignatureTest : public ::testing::Test
+    {
+      public:
+        ImageSignatureTest(){}
 
-    TEST(ImageSignatureTest, imageSign)
+        virtual void SetUp()
+        {
+          maskCreatorPtr_.reset(new ImageSignature);
+        }
+        boost::shared_ptr<ImageSignature> maskCreatorPtr_;
+    };
+
+    TEST_F(ImageSignatureTest, imageSign)
     {
       // Create a small image with positive elements .
       cv::Mat testImage(20, 20, CV_32SC3);
@@ -52,24 +63,18 @@ namespace pandora_vision
 
       cv::Mat signs;
 
-      ImageSignature::signFunction(testImage, &signs);
-
-      // Since we pass a multi channel matrix the function must return
-      // an empty matrix.
-      ASSERT_TRUE(signs.data == NULL);
-
       // Create a matrix with positive elements.
       testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(100);
 
-      ImageSignature::signFunction(testImage, &signs);
+      maskCreatorPtr_->signFunction(testImage, &signs);
       ASSERT_TRUE(signs.data != NULL);
 
       // Create a matrix with positive elements.
       testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(100);
 
-      ImageSignature::signFunction(testImage, &signs);
+      maskCreatorPtr_->signFunction(testImage, &signs);
 
       // Check that every value is positive.
 
@@ -87,7 +92,7 @@ namespace pandora_vision
       testImage = cv::Mat(20, 20, CV_32FC1);
       testImage.setTo(-100);
 
-      ImageSignature::signFunction(testImage, &signs);
+      maskCreatorPtr_->signFunction(testImage, &signs);
 
       // Check that every value is negative.
 

@@ -23,7 +23,7 @@
     <param name="kinect/topic_name" value="/left_camera/image" />
     <param name="dataset_path" value="/test/benchmark/images/images_720p"/>
     <param name="dataset_camera" value="web_camera"/>
-    <param name="frame_id" value="left_camera_optical_frame" />
+    <param name="frame_id" value="left_webcam_optical_frame" />
     <param name="$(arg frame_id)/hfov" value="60.00" />
     <param name="$(arg frame_id)/vfov" value="33.75" />
   </group>

@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
     nodelet
     pluginlib
     pandora_common_msgs
+    pandora_vision_msgs
     pandora_vision_common
     state_manager
     state_manager_msgs
@@ -28,6 +29,7 @@ catkin_package(
       nodelet
       pluginlib
       pandora_common_msgs
+      pandora_vision_msgs
       pandora_vision_common
       state_manager
       state_manager_msgs

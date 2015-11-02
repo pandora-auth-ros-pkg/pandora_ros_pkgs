@@ -38,21 +38,39 @@
  *********************************************************************/
 
 #include "pandora_vision_color/color_postprocessor.h"
+#include "pandora_vision_color/obstacle_poi.h"
 
 namespace pandora_vision
 {
 namespace pandora_vision_color
 {
   ColorPostProcessor::ColorPostProcessor() :
-    VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>()
+    VisionPostProcessor<pandora_vision_msgs::ObstacleAlertVector>()
   {}
 
     bool ColorPostProcessor::postProcess(const POIsStampedConstPtr& input,
-    const GeneralAlertVectorPtr& output)
+    const ObstacleAlertVectorPtr& output)
   {
     pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
-    *output = alertVector;
-    if (output->alerts.size() == 0) {
+    output->header = alertVector.header;
+
+    pandora_vision_msgs::ObstacleAlert obstacleAlert;
+
+    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
+    {
+      obstacleAlert.pointsYaw[ii] = alertVector.alerts[ii].yaw;
+      obstacleAlert.pointsPitch[ii] = alertVector.alerts[ii].pitch;
+      obstacleAlert.probability = alertVector.alerts[ii].probability;
+
+      boost::shared_ptr<ObstaclePOI> obstaclePOI(boost::dynamic_pointer_cast<ObstaclePOI>(
+        input->pois[ii]));
+      obstacleAlert.type = obstaclePOI->getType();
+      obstacleAlert.pointsDepth[ii] = obstaclePOI->getDepth();
+    }
+    output->alerts.push_back(obstacleAlert);
+
+    if (output->alerts.empty())
+    {
       return false;
     }
     return true;

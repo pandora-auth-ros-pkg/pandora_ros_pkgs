@@ -77,6 +77,7 @@ namespace pandora_vision_color
     colorDetectorPtr_->iHighS = config.iHighS;
     colorDetectorPtr_->iLowV = config.iLowV;
     colorDetectorPtr_->iHighV = config.iHighV;
+    colorDetectorPtr_->minArea_ = config.minArea;
   }
 
    /**
@@ -86,15 +87,19 @@ namespace pandora_vision_color
   {
     output->header = input->getHeader();
     colorDetectorPtr_->detectColor(input->getImage());
-    bounding_box_ = colorDetectorPtr_->getColorPosition();
+    bounding_boxes_ = colorDetectorPtr_->getColorPosition();
     output->frameWidth = input->getImage().cols;
     output->frameHeight = input->getImage().rows;
-    if (bounding_box_->getProbability() > 0.1)
+    for (int i = 0; i < bounding_boxes_.size(); i++)
     {
-      output->pois.push_back(bounding_box_);
-      return true;
+      if (bounding_boxes_[i]->getProbability() > 0.1)
+      {
+        output->pois.push_back(bounding_boxes_[i]);
+        return true;
+      }
+      else
+        return false;
     }
-    return false;
   }
 }  // namespace pandora_vision_color
 }  // namespace pandora_vision

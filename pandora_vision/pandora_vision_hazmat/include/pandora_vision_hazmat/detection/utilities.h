@@ -121,6 +121,9 @@ namespace pandora_vision
       cv::Mat descriptors;  //!< Matrix of image descriptors.
 
       cv::Mat histogram;  //!< Color histogram of the pattern.
+
+      std::string hazmatLabelName;  // keep??
+      int hazmatNum;
     };
 }  // namespace pandora_vision_hazmat
 }  // namespace pandora_vision

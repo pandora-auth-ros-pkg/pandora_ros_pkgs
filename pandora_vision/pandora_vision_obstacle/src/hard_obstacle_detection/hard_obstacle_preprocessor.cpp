@@ -167,6 +167,8 @@ namespace pandora_vision_obstacle
 
     //cv::imshow("Elevation Map Image", colorMapImg);
     cv::waitKey(5);
+
+
     return;
   }
 
@@ -245,7 +247,7 @@ namespace pandora_vision_obstacle
   HardObstaclePreProcessor::
   convertToYCoord(double meters)
   {
-    return static_cast<int>(floor(static_cast<double>(elevationMapHeight_) / 2 - meters / gridResolution_));
+    return static_cast<int>(floor(static_cast<double>(elevationMapHeight_) / 2 + meters / gridResolution_));
   }
 
 }  // namespace pandora_vision_obstacle

@@ -3,6 +3,7 @@ gaussianKernelSize: 13
 
 hsvColor:
   hThreshold: 100
+  hHighThreshold: 5
   sThreshold: 95
   vThreshold: 200
 

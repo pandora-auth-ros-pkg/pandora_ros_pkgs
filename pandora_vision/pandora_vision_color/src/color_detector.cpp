@@ -49,18 +49,14 @@ namespace pandora_vision_color
 
   ColorDetector::ColorDetector(void)
   {
-    bounding_box_.reset( new BBoxPOI() );
-    bounding_box_->setPoint(cv::Point(0, 0));
-    bounding_box_->setWidth(0);
-    bounding_box_->setHeight(0);
-    bounding_box_->setProbability(0.0f);
     visualization_ = false;
-    iLowH = 120;
-    iHighH = 180;
-    iLowS = 82;
-    iHighS = 232;
-    iLowV = 0;
-    iHighV = 194;
+    minArea_ = 2500;
+    iLowH = 110;
+    iHighH = 130;
+    iLowS = 180;
+    iHighS = 255;
+    iLowV = 60;
+    iHighV = 100;
     ROS_INFO_STREAM("Created ColorDetector instance" << visualization_);
   }
 
@@ -74,9 +70,9 @@ namespace pandora_vision_color
     ROS_INFO("Destroying ColorDetector instance");
   }
   
-  BBoxPOIPtr ColorDetector::getColorPosition(void)
+  std::vector<POIPtr> ColorDetector::getColorPosition(void)
   {
-    return bounding_box_;
+    return bounding_boxes_;
   }
 
    /**
@@ -108,7 +104,6 @@ namespace pandora_vision_color
       dilate(binary_, binary_, getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)));
       erode(binary_, binary_, getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)));
 
-
       detectColorPosition();
       if (visualization_)
         debugShow();
@@ -125,7 +120,8 @@ namespace pandora_vision_color
   void ColorDetector::detectColorPosition()
   {
     std::vector< std::vector<cv::Point> > contours;
-    findContours(binary_, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);  // find contours
+    bounding_boxes_.clear();
+    findContours(binary_.clone(), contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);  // find contours
     std::vector<double> areas(contours.size());
     /// find largest contour area
 
@@ -135,24 +131,32 @@ namespace pandora_vision_color
     }
 
     /// get index of largest contour
-    double max;
-    cv::Point maxPosition;
-    minMaxLoc(cv::Mat(areas), 0, &max, 0, &maxPosition);
+   /*  double max; */
+    // cv::Point maxPosition;
+    /* minMaxLoc(cv::Mat(areas), 0, &max, 0, &maxPosition); */
 
     /// draw largest contour.
-    drawContours(binary_, contours, maxPosition.y, cv::Scalar(255), CV_FILLED);
-
-    /// draw bounding rectangle around largest contour
+    drawContours(binary_, contours, -1, cv::Scalar(255), CV_FILLED);
     cv::Point center;
     cv::Rect r;
-    if (contours.size() >= 1)
+    // ROS_INFO_STREAM("AREAS=");
+    /// draw bounding rectangle around largest contour
+    for (int i = 0; i < contours.size(); i++)
     {
-      r = boundingRect(contours[maxPosition.y]);
-      cv::rectangle(frame_, r.tl(), r.br(), CV_RGB(255, 0, 0), 3, 8, 0);  // draw rectangle
-       bounding_box_->setPoint(cv::Point(r.x, r.y));
-      bounding_box_->setWidth(r.width);
-      bounding_box_->setHeight(r.height);
-      bounding_box_->setProbability(1.0f);
+      if (areas[i] > minArea_)
+      {
+        // ROS_INFO_STREAM("CONTOUR NO "<< i << " area="<<areas[i]);
+        ObstaclePOIPtr bounding_box(new ObstaclePOI);
+        r = cv::boundingRect(contours[i]);
+        cv::rectangle(frame_, r.tl(), r.br(), CV_RGB(255, 0, 0), 3);  // draw rectangle
+        bounding_box->setPoint(cv::Point(r.x + r.width / 2, r.y + r.height/2));
+       /*  bounding_box->setWidth(r.width); */
+        /* bounding_box->setHeight(r.height); */
+        bounding_box->setProbability(1.0f);
+        bounding_box->setType(pandora_vision_msgs::ObstacleAlert::BARREL);
+        bounding_box->setDepth(0);
+        bounding_boxes_.push_back(bounding_box);
+      }
     }
   }
 
@@ -160,20 +164,11 @@ namespace pandora_vision_color
     @brief Function used for debug reasons
     @return void
   */
-  void ColorDetector::debugShow()
+  void   ColorDetector::debugShow()
   {
     if (visualization_)
     {
-      /* cv::namedWindow("Control", CV_WINDOW_AUTOSIZE); */
-      // cv::createTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
-      // cv::createTrackbar("HighH", "Control", &iHighH, 179);
-
-      // cv::createTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
-      // cv::createTrackbar("HighS", "Control", &iHighS, 255);
-
-      // cv::createTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
-      /* cv::createTrackbar("HighV", "Control", &iHighV, 255); */
-      cv::Mat temp1[] = {binary_, binary_, binary_};
+     cv::Mat temp1[] = {binary_, binary_, binary_};
       cv::Mat diff;
       cv::merge(temp1, 3, diff);
       cv::Mat displayImage = cv::Mat(frame_.rows, frame_.cols * 2, frame_.type() );

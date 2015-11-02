@@ -6,17 +6,18 @@
   <arg name="xtion" default="true"/>
   <arg name="vision_qr" default="true"/>
   <arg name="vision_hazmat" default="true"/>
-  <arg name="vision_landoltc" default="true"/>
-  <arg name="vision_motion" default="true"/>
+  <arg name="vision_landoltc" default="false"/>
+  <arg name="vision_motion" default="false"/>
   <arg name="vision_datamatrix" default="false"/>
   <arg name="vision_landoltc3d" default="false"/>
   <arg name="vision_predator" default="false"/>
   <arg name="vision_hole_detector" default="true"/>
-  <arg name="vision_thermal" default="true"/>
+  <arg name="vision_thermal" default="false"/>
   <arg name="vision_victim" default="true"/>
   <arg name="vision_obstacle" default="false"/>
-  <arg name="vision_hard_obstacle" default="true"/>
-  <arg name="vision_barrel" default="true"/>
+  <arg name="vision_hard_obstacle" default="false"/>
+  <arg name="vision_barrel" default="false"/>
+  <arg name="vision_color" default="false"/>
 
 
   <!-- Cameras -->
@@ -30,15 +31,12 @@
 
   <!-- Vision Nodes -->
   <group if="$(arg vision_nodes)" ns="/pandora_vision" >
-    <!-- OK -->
     <include if="$(arg vision_qr)"
-        file="$(find pandora_vision_qrcode)/launch/pandora_vision_qrcode.launch"
+        file="$(find pandora_vision_qrcode)/launch/pandora_vision_qrcode_exploration.launch"
         ns="pandora_vision_qrcode" />
-    <!-- OK -->
     <include if="$(arg vision_hazmat)"
         file="$(find pandora_vision_hazmat)/launch/pandora_vision_hazmat.launch"
         ns="pandora_vision_hazmat" />
-    <!-- OK -->
     <include if="$(arg vision_landoltc)"
         file="$(find pandora_vision_landoltc)/launch/pandora_vision_landoltc_2d.launch"
         ns="pandora_vision_landoltc" />
@@ -60,7 +58,7 @@
         <arg name="thermal" value="false" />
     </include>
     <include if="$(arg vision_thermal)"
-        file="$(arg pandora_vision_hole)/launch/pandora_vision_thermal.launch"
+        file="$(find pandora_vision_hole)/launch/pandora_vision_thermal.launch"
         ns="pandora_vision_thermal" />
     <include if="$(arg vision_victim)"
         file="$(find pandora_vision_victim)/launch/pandora_vision_victim.launch"
@@ -72,9 +70,14 @@
     <include if="$(arg vision_barrel)"
         file="$(find pandora_vision_obstacle)/launch/pandora_vision_barrel.launch"
         ns="pandora_vision_obstacle" />
-
+    <include if="$(arg vision_color)"
+        file="$(find pandora_vision_color)/launch/pandora_vision_color.launch"
+        ns="pandora_vision_color" />
+    <include if="$(arg vision_obstacle)"
+        file="$(find pandora_vision_hole)/launch/synchronizer/pandora_pc_thermal_synchronizer.launch"
+        ns="pandora_vision_hole" />
     <include if="$(arg vision_hard_obstacle)"
-        file="$(find pandora_vision_obstacle)/launch/pandora_vision_dummy_hard_obstacle.launch"
+        file="$(find pandora_vision_obstacle)/launch/pandora_vision_hard_obstacle.launch"
         ns="pandora_vision_obstacle" />
 
   </group>

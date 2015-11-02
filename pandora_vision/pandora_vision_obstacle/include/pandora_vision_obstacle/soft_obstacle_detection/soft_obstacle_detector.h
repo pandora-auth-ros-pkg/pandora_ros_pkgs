@@ -205,6 +205,7 @@ namespace pandora_vision_obstacle
        * vertical lines in the bounding box
        **/
       bool findDifferentROIDepth(const cv::Mat& depthImage,
+          const cv::Mat& hsvImage,
           const std::vector<cv::Vec4i>& verticalLines, const cv::Rect& roi,
           int level = 1);
 
@@ -221,6 +222,9 @@ namespace pandora_vision_obstacle
 
       /// The hue threshold of HSV color used to pick the color of a line
       int hValueThreshold_;
+
+      /// The hue threshold of HSV color used to pick the color of a line
+      int hValueHighThreshold_;
       /// The saturation threshold of HSV color used to pick the color of a line
       int sValueThreshold_;
       /// The value threshold of HSV color used to pick the color of a line

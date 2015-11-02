@@ -90,9 +90,9 @@ namespace pandora_vision_hole
     private_nh_ = this->getPrivateNodeHandle();
     nodeName_ = boost::to_upper_copy<std::string>(this->getName());
 
-    nh_.param("thermal_mode", thermalMode_, true);
-    nh_.param("rgbd_mode", rgbdMode_, true);
-    nh_.param("rgbdt_mode", rgbdtMode_, true);
+    nh_.param("thermal_mode", thermalMode_, false);
+    nh_.param("rgbd_mode", rgbdMode_, false);
+    nh_.param("rgbdt_mode", rgbdtMode_, false);
     private_nh_.param("simulating", simulating_, false);
 
     // The synchronizer node starts off in life locked, waiting for the
@@ -124,44 +124,44 @@ namespace pandora_vision_hole
     // If thermal mode is enabled in launch file message filters is on and
     // the two input messages are synchronized packed and sent.
     // If not only the pointcloud is sent for further usage
-    if (rgbdtMode_ || thermalMode_)
-    {
-      syncPointCloudSubscriberPtr_.reset( new PcSubscriber(nh_,
-            inputPointCloudTopic_, queue_) );
-      syncThermalCameraSubscriberPtr_.reset( new ThermalSubscriber(nh_,
-            syncThermalCameraTopic_, queue_) );
+    //if (rgbdtMode_ || thermalMode_)
+    //{
+    //  syncPointCloudSubscriberPtr_.reset( new PcSubscriber(nh_,
+    //        inputPointCloudTopic_, queue_) );
+    //  syncThermalCameraSubscriberPtr_.reset( new ThermalSubscriber(nh_,
+    //        syncThermalCameraTopic_, queue_) );
 
-      synchronizerPtr_.reset( new ApprTimePcThermalSynchronizer(
-            ApprTimePcThermalPolicy(queue_),
-            *syncPointCloudSubscriberPtr_,
-            *syncThermalCameraSubscriberPtr_) );
-      synchronizerPtr_->registerCallback(
-          boost::bind(&PcThermalSynchronizer::syncPointCloudThermalCallback, this, _1, _2));
-    }
-    else if (rgbdMode_)
-    {
+    //  synchronizerPtr_.reset( new ApprTimePcThermalSynchronizer(
+    //        ApprTimePcThermalPolicy(queue_),
+    //        *syncPointCloudSubscriberPtr_,
+    //        *syncThermalCameraSubscriberPtr_) );
+    //  synchronizerPtr_->registerCallback(
+    //      boost::bind(&PcThermalSynchronizer::syncPointCloudThermalCallback, this, _1, _2));
+    //}
+    //else if (rgbdMode_)
+    //{
       inputPointCloudSubscriber_ = nh_.subscribe(inputPointCloudTopic_, 1,
           &PcThermalSynchronizer::inputPointCloudCallback, this);
-    }
+    //}
 
 /******************************************************************************
  *                                Subscribers                                 *
  ******************************************************************************/
 
-    if (rgbdMode_ || rgbdtMode_)
-    {
-      // Subscribe to the hole_fusion lock/unlock topic
+    //if (rgbdMode_ || rgbdtMode_)
+    //{
+    //  // Subscribe to the hole_fusion lock/unlock topic
       unlockHoleFusionSubscriber_ = nh_.subscribe(unlockHoleFusionTopic_, 1,
         &PcThermalSynchronizer::unlockHoleFusionCallback, this);
-    }
-    if (thermalMode_)
-    {
-      // Subscribe to the topic where the thermal node requests synchronizer
-      // to act.
-      unlockThermalSubscriber_ = nh_.subscribe(
-        unlockThermalTopic_, 1,
-        &PcThermalSynchronizer::unlockThermalCallback, this);
-    }
+    //}
+    //if (thermalMode_)
+    //{
+    //  // Subscribe to the topic where the thermal node requests synchronizer
+    //  // to act.
+    //  unlockThermalSubscriber_ = nh_.subscribe(
+    //    unlockThermalTopic_, 1,
+    //    &PcThermalSynchronizer::unlockThermalCallback, this);
+    //}
     // Subscribe to the topic where the Hole Fusion node requests from the
     // synchronizer node to subscribe to the input point cloud topic
     subscribeToInputPointCloudSubscriber_ = nh_.subscribe(
@@ -179,15 +179,15 @@ namespace pandora_vision_hole
  *                                 Publishers                                 *
  ******************************************************************************/
 
-    if (rgbdMode_ || rgbdtMode_)
-    {
-      // Advertise the synchronized point cloud
+    //if (rgbdMode_ || rgbdtMode_j
+    //{
+    //  // Advertise the synchronized point cloud
       synchronizedPointCloudPublisher_ = nh_.advertise
         <PointCloud>(synchronizedPointCloudTopic_, 1);
-    }
+    //}
 
-    if (rgbdMode_ || rgbdtMode_)
-    {
+    //if (rgbdMode_ || rgbdtMode_)
+    //{
       // Advertise the synchronized depth image
       synchronizedDepthImagePublisher_ = nh_.advertise
         <sensor_msgs::Image>(synchronizedDepthImageTopic_, 1);
@@ -195,28 +195,28 @@ namespace pandora_vision_hole
       // Advertise the synchronized rgb image
       synchronizedRgbImagePublisher_ = nh_.advertise
         <sensor_msgs::Image>(synchronizedRgbImageTopic_, 1);
-    }
+    //}
 
-    if (rgbdtMode_ || thermalMode_)
-    {
+    //if (rgbdtMode_ || thermalMode_)
+    //{
       // Advertise the synchronized thermal image and its index
-      synchronizedThermalImagePublisher_ = nh_.advertise
-        <distrib_msgs::FlirLeptonMsg>
-        (synchronizedThermalImageTopic_, 1);
+      //synchronizedThermalImagePublisher_ = nh_.advertise
+      //  <distrib_msgs::FlirLeptonMsg>
+      //  (synchronizedThermalImageTopic_, 1);
 
-      thermalOutputReceiverPublisher_ = nh_.advertise
-        <std_msgs::String>
-        (thermalOutputReceiverTopic_, 1);
-    }
+      //thermalOutputReceiverPublisher_ = nh_.advertise
+      //  <std_msgs::String>
+      //  (thermalOutputReceiverTopic_, 1);
+    //}
 
     enhancedImagePublisher_ = nh_.advertise<pandora_vision_msgs::EnhancedImage>(
         enhancedImageTopic_, 1);
 
-    if (thermalMode_)
-    {
-      enhancedImageCropperPublisher_ = nh_.advertise<pandora_vision_msgs::EnhancedImage>(
-          enhancedImageCropperTopic_, 1);
-    }
+    //if (thermalMode_)
+    //{
+    //  enhancedImageCropperPublisher_ = nh_.advertise<pandora_vision_msgs::EnhancedImage>(
+    //      enhancedImageCropperTopic_, 1);
+    //}
 
     std::string modes;
     if (rgbdMode_)

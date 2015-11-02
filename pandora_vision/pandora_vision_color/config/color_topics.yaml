@@ -1,3 +1,3 @@
-subscribed_topics: [/kinect/rgb/image_raw, /rpi2/pi_camera/image]
-published_topics: /vision/color_alert
-active_states: [SENSOR_HOLD, SENSOR_TEST]
+subscribed_topics: [/kinect/rgb/image_raw, /right_camera/image, /left_camera/image, /rpi2_primary/pi_camera_front/image]
+published_topics: /vision/obstacle_alert
+active_states: [START_AUTONOMOUS, EXPLORATION_RESCUE, IDENTIFICATION, SENSOR_HOLD, SEMI_AUTONOMOUS, TELEOPERATED_LOCOMOTION, SENSOR_TEST, EXPLORATION_MAPPING]

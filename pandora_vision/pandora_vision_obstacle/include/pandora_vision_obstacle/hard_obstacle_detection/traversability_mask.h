@@ -155,6 +155,11 @@ namespace pandora_vision_obstacle
       elevationDifferenceLowOccupiedThreshold_ = elevationDifferenceLowOccupiedThreshold;
     }
 
+    void setDetectRamps(bool detectRamps)
+    {
+      detectRamps_ = detectRamps;
+    }
+
    private:
     /**
      * Finds B matrices, input is respective A matrix, heights and wheel
@@ -242,6 +247,8 @@ namespace pandora_vision_obstacle
     double elevationDifferenceHighOccupiedThreshold_;
     double elevationDifferenceLowFreeThreshold_;
     double elevationDifferenceHighFreeThreshold_;
+
+    bool detectRamps_;
 
     /// Center of matrix A
     cv::Point center_;

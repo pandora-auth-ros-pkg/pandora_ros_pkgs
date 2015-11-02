@@ -1,0 +1,53 @@
+%YAML:1.0
+
+blastingAgent:
+  name: "Blasting Agent"
+  number: 1
+combustible:
+  name: "Spontaneously Combustible"
+  number: 4
+dangerousWhenWet:
+  name: "Dangerous When Wet"
+  number: 4
+explosive:
+  name: "Explosive"
+  number: 1
+explosive14:
+  name: "1.4 Explosives"
+  number: 1
+explosiveClass16:
+  name: "1.6 Explosive"
+  number: 1
+flammableGas:
+  name: "Flammable Gas"
+  number: 2
+flammableLiquidSymbol:
+  name: "Flammable Liquid"
+  number: 3
+flammableSolid:
+  name: "Flammable Solid"
+  number: 4
+infectiousSubstance:
+  name: "Infectious Substance"
+  number: 6
+inhalationHazard:
+  name: "Inhalation Hazard"
+  number: 2
+miscellaneous:
+  name: "Miscellaneous"
+  number: 9
+nonFlammableGas:
+  name: "Non-Flammable Gas"
+  number: 2
+organicPeroxide:
+  name: "Organic Peroxide 5.2"
+  number: 5
+oxidizer:
+  name: "Oxidizer 5.1"
+  number: 5
+poison:
+  name: "Poison Gas"
+  number: 2
+corrosive:
+  name: "Corrosive"
+  number: 8

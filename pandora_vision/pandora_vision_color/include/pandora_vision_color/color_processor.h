@@ -79,7 +79,7 @@ namespace pandora_vision_color
         process(const CVMatStampedConstPtr& input, const POIsStampedPtr& output);
 
     private:
-      BBoxPOIPtr bounding_box_;
+      std::vector<POIPtr> bounding_boxes_;
 
       boost::shared_ptr<ColorDetector> colorDetectorPtr_;
 

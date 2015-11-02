@@ -33,45 +33,53 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
- *   Choutas Vassilis
  *   Chatzieleftheriou Eirini <eirini.ch0@gmail.com>
  *********************************************************************/
 
-#include <string>
+#ifndef PANDORA_VISION_COLOR_OBSTACLE_POI_H
+#define PANDORA_VISION_COLOR_OBSTACLE_POI_H
 
-#include "pandora_vision_hazmat/detection/hazmat_postprocessor.h"
+#include <string>
+#include "pandora_vision_common/bbox_poi.h"
 
 namespace pandora_vision
 {
-namespace pandora_vision_hazmat
+namespace pandora_vision_color
 {
-  HazmatPostProcessor::HazmatPostProcessor() :
-    VisionPostProcessor<pandora_vision_msgs::HazmatAlertVector>()
+  class ObstaclePOI : public POI
   {
-  }
+    public:
+      typedef boost::shared_ptr<ObstaclePOI> Ptr;
 
-  bool HazmatPostProcessor::postProcess(const POIsStampedConstPtr& input, const HazmatAlertVectorPtr& output)
-  {
-    pandora_common_msgs::GeneralAlertVector alertVector = getGeneralAlertInfo(input);
-    output->header = alertVector.header;
-    if (alertVector.alerts.size() == 0)
-      return false;
+    public:
+      virtual ~ObstaclePOI() {}
 
-    for (int ii = 0; ii < alertVector.alerts.size(); ii++)
-    {
-      pandora_vision_msgs::HazmatAlert hazmatAlert;
+    public:
+      int type;
+      float depthDistance;
 
-      hazmatAlert.info.yaw = alertVector.alerts[ii].yaw;
-      hazmatAlert.info.pitch = alertVector.alerts[ii].pitch;
-      hazmatAlert.info.probability = 0.90;
+    public:
+      void setType(int typeArg)
+      {
+        type = typeArg;
+      }
+      int getType() const
+      {
+        return type;
+      }
 
-      boost::shared_ptr<HazmatPOI> hazmatPOI(boost::dynamic_pointer_cast<HazmatPOI>(input->pois[ii]));
-      hazmatAlert.patternType = hazmatPOI->getPattern();
-      hazmatAlert.name = hazmatPOI->getName();
+      void setDepth(float distance)
+      {
+        depthDistance = distance;
+      }
+      float getDepth() const
+      {
+        return depthDistance;
+      }
+  };
+  typedef ObstaclePOI::Ptr ObstaclePOIPtr;
 
-      output->alerts.push_back(hazmatAlert);
-    }
-    return true;
-  }
-}  // namespace pandora_vision_hazmat
+}  // namespace pandora_vision_color
 }  // namespace pandora_vision
+
+#endif  // PANDORA_VISION_COLOR_OBSTACLE_POI_H

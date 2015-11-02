@@ -43,21 +43,24 @@
 #include <string>
 #include "pandora_common_msgs/GeneralAlertInfo.h"
 #include "pandora_common_msgs/GeneralAlertVector.h"
+#include "pandora_vision_msgs/ObstacleAlert.h"
+#include "pandora_vision_msgs/ObstacleAlertVector.h"
 #include "pandora_vision_common/pandora_vision_interface/vision_postprocessor.h"
 
 namespace pandora_vision
 {
 namespace pandora_vision_color
 {
-  class ColorPostProcessor : public VisionPostProcessor<pandora_common_msgs::GeneralAlertVector>
+  class ColorPostProcessor : public VisionPostProcessor<pandora_vision_msgs::ObstacleAlertVector>
   {
     public:
       typedef boost::shared_ptr<pandora_common_msgs::GeneralAlertVector> GeneralAlertVectorPtr;
+      typedef boost::shared_ptr<pandora_vision_msgs::ObstacleAlertVector> ObstacleAlertVectorPtr;
 
       ColorPostProcessor();
 
       virtual bool
-        postProcess(const POIsStampedConstPtr& input, const GeneralAlertVectorPtr& output);
+        postProcess(const POIsStampedConstPtr& input, const ObstacleAlertVectorPtr& output);
   };
 }  // namespace pandora_vision_color
 }  // namespace pandora_vision

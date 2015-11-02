@@ -38,7 +38,10 @@
 #include <string>
 #include <vector>
 
+#include <locale>
+#include <boost/algorithm/string.hpp>
 #include "pandora_vision_hazmat/detection/feature_matching_detector.h"
+
 
 namespace pandora_vision
 {
@@ -76,6 +79,14 @@ namespace pandora_vision
     {
       // Open the file for reading.
       std::string patternNameInputFile = fileName_ + "/data/input.xml";
+
+      cv::FileStorage info(fileName_ + "/data/pattern_info.yaml", cv::FileStorage::READ);
+      if (!info.isOpened())
+      {
+        ROS_ERROR_STREAM("[Hazmat Detection]: XML file for training data"
+                         <<" extra info could not be opened!");
+        return false;
+      }
       cv::FileStorage fs(patternNameInputFile , cv::FileStorage::READ);
       // Check if the file was opened succesfully.
       if (!fs.isOpened())
@@ -240,12 +251,24 @@ namespace pandora_vision
           continue;
         }
         // Add the pattern to the pattern vector.
+        cv::FileNode currentPatternNode = info[input[i]];
+        if (currentPatternNode.empty())
+        {
+          ROS_ERROR_STREAM("Could not read the infor for the pattern that correspondonds to the image named : "
+              << input[i] << std::endl);
+          continue;
+        }
         Pattern p;
         p.name = input[i];
         p.boundingBox = boundingBox;
         p.keyPoints = keyPoints;
         p.descriptors = descriptors;
-        // p.histogram = histogram;
+        int number;
+        currentPatternNode["number"] >> number;
+        p.hazmatNum = number;
+        std::string name = currentPatternNode["name"];
+        p.hazmatLabelName = name;
+
         patterns_->push_back(p);
 
         // Close the xml file.

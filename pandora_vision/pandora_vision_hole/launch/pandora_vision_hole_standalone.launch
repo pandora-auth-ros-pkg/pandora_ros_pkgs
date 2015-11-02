@@ -4,13 +4,13 @@
   <!-- Set this if we play with thermal source -->
   <arg name="thermal" default="false" />
   <!-- Set this if we play with rgbd source -->
-  <arg name="rgbd" default="false" />
+  <arg name="rgbd" default="true" />
   <!-- Set this if we play with rgbdt hole -->
   <arg name="rgbdt" default="false" />
   <!-- Kinect: choose the openni driver -->
   <arg name="openni" default="false" />
   <!-- Xtion: choose the openni2 driver -->
-  <arg name="openni2" default="false" />
+  <arg name="openni2" default="true" />
   <!-- if not xtion or kinect, set path arg to find a rosbag -->
   <!-- If the source is not a physical device, it is a bag: play "path" bag -->
   <arg name="path" default="/home/pandora/bitch.bag" />

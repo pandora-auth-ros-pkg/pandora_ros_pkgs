@@ -19,7 +19,7 @@
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
- *  THIS HARDWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -29,7 +29,7 @@
  *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS HARDWARE, EVEN IF ADVISED OF THE
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Authors:
@@ -107,6 +107,10 @@ namespace pandora_vision_obstacle
       inline void setEdgeMethod(int value){edge_method_ = value;}
       inline void setEdgesThreshold(int value){edges_threshold_ = value;}
 
+      inline void setLocalityRadius(double value){locality_radius_ = value;}
+      inline void setHeightDiff(double value){height_diff_ = value;}
+      inline void setGradDiff(double value){grad_diff_ = value;}
+
       inline void setCannyKernelSize(int value){cannyKernelSize_ = value;}
       inline void setCannyLowThreshold(int value){cannyLowThreshold_ = value;}
       inline void setCannyBlurNoiseKernelSize(int value){cannyBlurKernelSize_ = value;}
@@ -129,27 +133,32 @@ namespace pandora_vision_obstacle
         displayTraversabilityMapEnabled_ = traversabilityMaskDisplay;
       }
 
-      void setElevationDifferenceHighOccupiedThreshold(double elevationDifferenceHighOccupiedThreshold)
+      inline void setElevationDifferenceHighOccupiedThreshold(double elevationDifferenceHighOccupiedThreshold)
       {
         traversabilityMaskPtr_->setElevationDifferenceHighOccupiedThreshold(elevationDifferenceHighOccupiedThreshold);
       }
-      void setElevationDifferenceLowOccupiedThreshold(double elevationDifferenceLowOccupiedThreshold)
+      inline void setElevationDifferenceLowOccupiedThreshold(double elevationDifferenceLowOccupiedThreshold)
       {
         traversabilityMaskPtr_->setElevationDifferenceLowOccupiedThreshold(elevationDifferenceLowOccupiedThreshold);
       }
 
-      void setElevationDifferenceHighFreeThreshold(double elevationDifferenceHighFreeThreshold)
+      inline void setElevationDifferenceHighFreeThreshold(double elevationDifferenceHighFreeThreshold)
       {
         traversabilityMaskPtr_->setElevationDifferenceHighFreeThreshold(elevationDifferenceHighFreeThreshold);
       }
-      void setElevationDifferenceLowFreeThreshold(double elevationDifferenceLowFreeThreshold)
+      inline void setElevationDifferenceLowFreeThreshold(double elevationDifferenceLowFreeThreshold)
       {
         traversabilityMaskPtr_->setElevationDifferenceLowFreeThreshold(elevationDifferenceLowFreeThreshold);
       }
 
-      void setInflationRadius(double radius)
+      inline void setInflationRadius(double radius)
       {
         inflationRadius_ = radius;
+      }
+
+      inline void setDetectRamps(bool detectRamps)
+      {
+        detectRamps_ = detectRamps;
       }
 
     private:
@@ -291,6 +300,10 @@ namespace pandora_vision_obstacle
       // The parameter used to apply threshold  on the edges image
       int edges_threshold_;
 
+      double locality_radius_;
+      double height_diff_;
+      double grad_diff_;
+
       double min_input_image_value_;
 
       // Debug parameters
@@ -309,6 +322,8 @@ namespace pandora_vision_obstacle
       double inflationRadius_;
 
       double resolution_;
+
+      bool detectRamps_;
   };
 
 }  // namespace pandora_vision_obstacle

@@ -97,7 +97,7 @@ namespace pandora_vision
 
       // Create the mask that will be used to extract regions of interest
       // on the image based on the Image Signature Saliency Map.
-      ImageSignature::createSaliencyMapMask(frame, &mask);
+      maskCreatorPtr_->createSaliencyMapMask(frame, &mask);
       // Calculate the keypoints and extract the descriptors from the
       // frame.
 
@@ -216,7 +216,8 @@ namespace pandora_vision
             boost::shared_ptr<HazmatPOI> hazmatPOIPtr(new HazmatPOI);
             hazmatPOIPtr->setName((*patterns_)[i].name);
             hazmatPOIPtr->setPoint(cv::Point2f(x, y));
-            hazmatPOIPtr->setPattern(i + 1);
+            hazmatPOIPtr->setPatternId((*patterns_)[i].hazmatNum);
+            hazmatPOIPtr->setName((*patterns_)[i].hazmatLabelName);
 
             detectedObjects->push_back(hazmatPOIPtr);
           }

@@ -96,6 +96,10 @@ namespace pandora_vision_obstacle
 
     detector_->setEdgesThreshold(config.edges_threshold);
 
+    detector_->setLocalityRadius(config.locality_radius);
+    detector_->setHeightDiff(config.height_diff);
+    detector_->setGradDiff(config.grad_diff);
+
     detector_->setMinInputImageValue(config.min_input_image_value);
     detector_->setEdgeDetectionEnableFlag(config.edge_detection_enabled);
     detector_->setTraversabilityMaskEnableFlag(config.enable_traversability_mask);
@@ -106,6 +110,7 @@ namespace pandora_vision_obstacle
     detector_->setElevationDifferenceLowFreeThreshold(config.elevation_difference_low_free_threshold);
     detector_->setElevationDifferenceHighFreeThreshold(config.elevation_difference_high_free_threshold);
     detector_->setInflationRadius(config.inflation_radius);
+    detector_->setDetectRamps(config.detect_ramps);
   }
 
   bool HardObstacleProcessor::process(const CVMatStampedConstPtr& input,
