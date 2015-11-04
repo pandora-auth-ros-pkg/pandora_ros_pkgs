@@ -2,9 +2,7 @@
 # Author: Chris Zalidis
 sudo: required
 dist: trusty
-language:
-  - cpp
-  - python
+language: generic
 compiler:
   - gcc
 notifications:
